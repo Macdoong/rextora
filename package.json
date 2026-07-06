@@ -1,0 +1,36 @@
+{
+  "name": "rextora",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "verify:rextora": "node scripts/verify-rextora.mjs",
+    "perf:audit": "node scripts/perf-audit.mjs",
+    "test:e2e": "playwright test",
+    "check:prelive": "npm run lint && npm run build && npm run verify:rextora"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.10",
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

@@ -1,0 +1,196 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/rextora/LoadingState";
+import { Badge, Card, Metric } from "@/components/ui/primitives";
+import { displayLabel, displaySettingsFieldHelper, displaySettingsFieldLabel } from "@/src/lib/rextora/displayLabels";
+import type { RextoraSettings, SettingsCategory } from "@/src/lib/rextora/settings/settingsTypes";
+
+const TABS: Array<{ id: SettingsCategory; label: string }> = [
+  { id: "trading", label: "운영 모드" },
+  { id: "market", label: "시장 감시" },
+  { id: "signal", label: "신호" },
+  { id: "cost", label: "비용" },
+  { id: "risk", label: "리스크" },
+  { id: "execution", label: "주문 실행" },
+  { id: "tpSl", label: "TP/SL" },
+  { id: "telegram", label: "텔레그램" },
+  { id: "ui", label: "시스템" }
+];
+
+const ENUM_OPTIONS: Record<string, string[]> = {
+  defaultMode: ["PAPER", "LIVE"],
+  positionMode: ["oneWayMode", "hedgeMode"],
+  marginType: ["ISOLATED", "CROSSED"],
+  orderType: ["MARKET", "LIMIT"],
+  positionSizeMode: ["FIXED_USDT", "BALANCE_PERCENT"]
+};
+
+type ApiEnvelope<T> = { ok: boolean; data: T; error?: string };
+
+export function SettingsTabs() {
+  const [settings, setSettings] = useState<RextoraSettings | null>(null);
+  const [draft, setDraft] = useState<RextoraSettings | null>(null);
+  const [tab, setTab] = useState<SettingsCategory>("trading");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const res = await fetch("/api/rextora/settings", { cache: "no-store" });
+      const body = (await res.json()) as ApiEnvelope<{ settings: RextoraSettings; secretsNotice: string }>;
+      if (!active) return;
+      if (body.ok) {
+        setSettings(body.data.settings);
+        setDraft(body.data.settings);
+      }
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const save = async () => {
+    if (!draft) return;
+    setError(null);
+    setSuccess(null);
+    const res = await fetch("/api/rextora/settings", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ settings: draft })
+    });
+    const body = (await res.json()) as ApiEnvelope<{ settings: RextoraSettings }>;
+    if (!body.ok) {
+      setError(body.error ?? "저장 실패");
+      return;
+    }
+    setSettings(body.data.settings);
+    setDraft(body.data.settings);
+    setSuccess("설정이 저장되었습니다.");
+  };
+
+  const reset = async () => {
+    const res = await fetch("/api/rextora/settings", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "reset" })
+    });
+    const body = (await res.json()) as ApiEnvelope<{ settings: RextoraSettings }>;
+    if (body.ok) {
+      setSettings(body.data.settings);
+      setDraft(body.data.settings);
+      setSuccess("기본값으로 초기화되었습니다.");
+    }
+  };
+
+  const exportJson = async () => {
+    const res = await fetch("/api/rextora/settings", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "export" })
+    });
+    const body = (await res.json()) as ApiEnvelope<{ json: string }>;
+    if (body.ok) navigator.clipboard.writeText(body.data.json);
+  };
+
+  if (loading || !draft) return <LoadingState message="설정을 불러오는 중입니다." hint="잠시만 기다려 주세요." lines={6} />;
+
+  const section = draft[tab] as unknown as Record<string, unknown>;
+
+  return (
+    <div className="space-y-4" data-testid="settings-tabs">
+      <div className="flex flex-wrap gap-2">
+        {TABS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={`rextora-btn-text rounded-lg px-3 py-1.5 ${tab === item.id ? "bg-violet-600 text-white" : "bg-slate-800 text-slate-300"}`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <Card title={`${TABS.find((t) => t.id === tab)?.label} 설정`} action={<Badge tone="purple">편집 가능</Badge>}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Object.entries(section).map(([fieldKey, value]) => {
+            const label = displaySettingsFieldLabel(fieldKey);
+            const helper = displaySettingsFieldHelper(tab, fieldKey);
+            const enumOptions = ENUM_OPTIONS[fieldKey];
+
+            return (
+              <label key={fieldKey} className="block">
+                <span className="rextora-body mb-1 block font-medium text-slate-200">{label}</span>
+                {helper && <p className="rextora-helper mb-2">{helper}</p>}
+                {typeof value === "boolean" ? (
+                  <input
+                    type="checkbox"
+                    checked={value}
+                    onChange={(e) => setDraft({ ...draft, [tab]: { ...section, [fieldKey]: e.target.checked } })}
+                  />
+                ) : typeof value === "number" ? (
+                  <input
+                    type="number"
+                    className="rextora-body w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    value={value}
+                    onChange={(e) => setDraft({ ...draft, [tab]: { ...section, [fieldKey]: Number(e.target.value) } })}
+                  />
+                ) : Array.isArray(value) ? (
+                  <textarea
+                    className="rextora-body w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    value={JSON.stringify(value)}
+                    onChange={(e) => {
+                      try {
+                        setDraft({ ...draft, [tab]: { ...section, [fieldKey]: JSON.parse(e.target.value) } });
+                      } catch {
+                        /* ignore invalid json while typing */
+                      }
+                    }}
+                  />
+                ) : enumOptions ? (
+                  <select
+                    className="rextora-body w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    value={String(value)}
+                    onChange={(e) => setDraft({ ...draft, [tab]: { ...section, [fieldKey]: e.target.value } })}
+                  >
+                    {enumOptions.map((opt) => (
+                      <option key={opt} value={opt}>{displayLabel(opt)}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    className="rextora-body w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    value={String(value)}
+                    onChange={(e) => setDraft({ ...draft, [tab]: { ...section, [fieldKey]: e.target.value } })}
+                  />
+                )}
+              </label>
+            );
+          })}
+        </div>
+      </Card>
+
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void save()} className="rextora-btn-text rounded bg-emerald-600 px-4 py-2 text-white">
+          저장
+        </button>
+        <button type="button" onClick={() => void reset()} className="rextora-btn-text rounded bg-slate-700 px-4 py-2 text-white">
+          기본값 복원
+        </button>
+        <button type="button" onClick={() => void exportJson()} className="rextora-btn-text rounded bg-slate-700 px-4 py-2 text-white">
+          JSON보내기
+        </button>
+      </div>
+
+      {settings?.updatedAt && <Metric label="마지막 저장" value={new Date(settings.updatedAt).toLocaleString("ko-KR")} />}
+      {error && <p className="rextora-helper text-red-300">{error}</p>}
+      {success && <p className="rextora-helper text-emerald-300">{success}</p>}
+      <p className="rextora-helper">비밀값(API 키, Telegram 토큰)은 환경변수로만 관리됩니다. settings.json에는 저장하지 않습니다.</p>
+    </div>
+  );
+}
