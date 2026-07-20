@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       report: result.report,
       trades: result.trades.slice(0, 200),
       equityCurve: result.equityCurve.slice(-200),
+      candles: result.candles?.slice(-400) ?? [],
       saved: "saved" in result ? result.saved : null,
       note: "No live orders are placed by backtest."
     }

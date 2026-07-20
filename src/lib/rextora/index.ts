@@ -45,6 +45,8 @@ export * from "./signalRules";
 export * from "./costEngine";
 export * from "./feeModel";
 export * from "./slippageModel";
+export * from "./metrics";
+export * from "./charts";
 export * from "./aiRanker";
 export * from "./rankingModel";
 export * from "./riskEngine";

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card } from "@/components/ui/primitives";
 import type { StoredStrategy } from "@/src/lib/rextora/strategy/strategyTypes";
 import type { BacktestReport } from "@/src/lib/rextora/backtest/backtestTypes";
+import { BacktestAnalysisView } from "@/components/rextora/charts/BacktestAnalysisView";
+import type { OhlcvCandle } from "@/src/lib/rextora/data/ohlcvTypes";
 
 type TradeRow = {
   side: string;
@@ -19,6 +21,8 @@ type TradeRow = {
   exitReason: string;
   symbol: string;
   holdBars?: number;
+  stopLoss?: number;
+  takeProfit?: number;
 };
 
 const PRESETS: Array<[string, number]> = [
@@ -47,6 +51,8 @@ export function BacktestWorkbench() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<BacktestReport | null>(null);
   const [trades, setTrades] = useState<TradeRow[]>([]);
+  const [equityCurve, setEquityCurve] = useState<number[]>([]);
+  const [candles, setCandles] = useState<OhlcvCandle[]>([]);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -108,6 +114,8 @@ export function BacktestWorkbench() {
       }
       setReport(payload.report);
       setTrades(payload.trades ?? []);
+      setEquityCurve(payload.equityCurve ?? []);
+      setCandles(payload.candles ?? []);
       setMessage(save ? "결과가 저장되었고 전략 성과에 반영되었습니다." : "백테스트 완료 (실주문 없음)");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "error");
@@ -144,7 +152,7 @@ export function BacktestWorkbench() {
           <div className="mt-3 rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300" data-testid="backtest-strategy-summary">
             <div>전략: {strategy.name}</div>
             <div>hash: {strategy.paramsHash}</div>
-            <div>타임프레임: {strategy.timeframe === "unknown" ? "전략 원본 타임프레임 확인 필요" : strategy.timeframe}</div>
+            <div>타임프레임: {strategy.timeframe === "unknown" ? "Unknown" : strategy.timeframe}</div>
             <div>sourceStatus: {strategy.sourceStatus}</div>
             <div>최근 백테스트: {strategy.lastBacktest?.at?.slice(0, 10) ?? "-"}</div>
           </div>
@@ -228,33 +236,18 @@ export function BacktestWorkbench() {
 
       {report && (
         <>
-          <Card title="결과 요약" data-testid="backtest-summary">
-            <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-5">
-              <div>총 수익률: {(report.totalReturn * 100).toFixed(2)}%</div>
-              <div>MDD: {(report.mdd * 100).toFixed(2)}%</div>
-              <div>거래 수: {report.tradeCount}</div>
-              <div>승률: {(report.winRate * 100).toFixed(1)}%</div>
-              <div>평균 손익: {(report.averageTrade * 100).toFixed(2)}%</div>
-              <div>손익비: {report.profitFactor.toFixed(2)}</div>
-              <div>최대 연속 손실: {report.maxConsecutiveLosses}</div>
-              <div>수수료 총합: {(report.feeTotal * 100).toFixed(3)}%</div>
-              <div>슬리피지 총합: {(report.slippageTotal * 100).toFixed(3)}%</div>
-              <div>음수 월: {report.negativeMonths}</div>
-            </div>
-          </Card>
-
-          <Card title="검증 상태" data-testid="backtest-validation">
-            <div className="grid grid-cols-2 gap-2 text-sm text-slate-300 md:grid-cols-3">
-              <div>params_hash 검증: {report.validation.paramsHashVerified ? "통과" : "확인"}</div>
-              <div>데이터 범위: {report.fromDate ?? "-"} ~ {report.toDate ?? "-"}</div>
-              <div>캔들 수: {report.candleCount}</div>
-              <div>수수료 적용: {report.validation.feesApplied ? "예" : "아니오"}</div>
-              <div>슬리피지 적용: {report.validation.slippageApplied ? "예" : "아니오"}</div>
-              <div>펀딩 적용: {report.validation.fundingApplied ? "예" : "아니오"}</div>
-              <div>실주문: 없음</div>
-              <div>hash: {report.strategyHash}</div>
-            </div>
-          </Card>
+          <BacktestAnalysisView
+            report={report}
+            trades={trades.map((t) => ({
+              ...t,
+              side: t.side === "SHORT" ? "SHORT" : "LONG",
+              stopLoss: t.stopLoss ?? 0,
+              takeProfit: t.takeProfit ?? 0,
+              exitReason: (t.exitReason as "take_profit" | "stop_loss" | "trailing_stop" | "max_hold" | "end") ?? "end"
+            }))}
+            equityCurve={equityCurve.length ? equityCurve : [report.startingBalance, report.endingBalance]}
+            candles={candles}
+          />
 
           {report.costStress && (
             <Card title="비용 스트레스 비교" data-testid="backtest-cost-stress">
@@ -282,31 +275,6 @@ export function BacktestWorkbench() {
               </table>
             </Card>
           )}
-
-          <Card title="월간/구간 수익">
-            <table className="w-full text-left text-sm">
-              <thead className="text-slate-400">
-                <tr>
-                  <th>월</th>
-                  <th>수익률</th>
-                  <th>거래 수</th>
-                  <th>낙폭</th>
-                  <th>수수료</th>
-                </tr>
-              </thead>
-              <tbody>
-                {report.monthlyReturns.map((row) => (
-                  <tr key={row.month} className="border-t border-slate-900">
-                    <td className="py-2">{row.month}</td>
-                    <td className={row.returnPct >= 0 ? "text-green-300" : "text-red-300"}>{(row.returnPct * 100).toFixed(2)}%</td>
-                    <td>{row.trades}</td>
-                    <td>{(row.mdd * 100).toFixed(2)}%</td>
-                    <td>{(row.fees * 100).toFixed(3)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
 
           <Card title="거래 리스트">
             <div className="overflow-x-auto">

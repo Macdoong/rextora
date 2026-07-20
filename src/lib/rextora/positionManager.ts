@@ -24,7 +24,8 @@ export function closePositionBySymbol(symbol: string): Position | null {
   if (!target) return null;
   const closed = { ...target, side: "Flat" as const, quantity: 0, unrealizedPnl: 0 };
   upsertPosition(closed);
-  return closed;
+  // Return the open snapshot so callers can compute PnL with original quantity.
+  return target;
 }
 
 export function closeAllPositions(): Position[] {

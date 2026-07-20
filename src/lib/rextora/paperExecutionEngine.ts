@@ -6,6 +6,7 @@ import { appendPaperOrder, cancelPendingOrders, closeAllPositions, getOpenPositi
 import { recordPaperEntry, recordPaperExit } from "./tradeLifecycle";
 import { getTopCandidates } from "./aiRanker";
 import { getStoredMarketCoins } from "./marketDataStore";
+import { computeUnrealizedMetrics } from "./metrics/tradeResult";
 import type { BotStatus, EngineResult, OrderRecord, Position, Strategy, AiCandidate } from "./types";
 
 function resolveMarketPrice(symbol: string, fallback = 100): number {
@@ -86,7 +87,8 @@ export async function managePaperPositions(): Promise<{ checked: number; closed:
     if (!Number.isFinite(price) || price <= 0) continue;
 
     const isLong = position.side === "Long";
-    const unrealizedPnl = Number(((isLong ? price - position.entryPrice : position.entryPrice - price) * position.quantity).toFixed(4));
+    const side = isLong ? "LONG" : "SHORT";
+    const unrealizedPnl = computeUnrealizedMetrics(side, position.entryPrice, price, position.quantity).unrealizedPnl;
     const barsHeld = (position.barsHeld ?? 0) + 1;
 
     let stopLoss = position.stopLoss;

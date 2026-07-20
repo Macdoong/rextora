@@ -11,10 +11,7 @@ export default function CostAnalysisPage() {
   const primary = top
     ? calculateCostBreakdown({
         symbol: top.symbol,
-        expectedProfitPct: top.expectedProfitPct,
-        estimatedSlippagePct: top.expectedCostPct * 0.3,
-        spreadPct: 0.05,
-        fundingFeePct: 0.03
+        expectedProfitPct: top.expectedProfitPct
       })
     : costBreakdownSeed;
 
@@ -28,8 +25,12 @@ export default function CostAnalysisPage() {
             const b = calculateCostBreakdown({ symbol: c.symbol, expectedProfitPct: c.expectedProfitPct });
             return (
               <div key={c.symbol} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 px-3 py-2">
-                <span>{c.symbol} · {c.direction}</span>
-                <span className={b.passed ? "text-green-300" : "text-red-300"}>{b.decision} (기대값 {formatPercent(b.finalExpectedValuePct)})</span>
+                <span>
+                  {c.symbol} · {c.direction}
+                </span>
+                <span className={b.passed ? "text-green-300" : "text-red-300"}>
+                  {b.decision} (기대값 {formatPercent(b.finalExpectedValuePct)})
+                </span>
               </div>
             );
           })}

@@ -1,8 +1,9 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import {
   copyStrategy,
+  deleteStrategy,
   ensureStrategyStore,
   getStrategyById,
   listStrategies,
@@ -12,12 +13,36 @@ import {
 import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
 import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import { runConfiguredBacktest } from "../src/lib/rextora/backtest/backtestRunner";
+import { isTestStrategyRecord } from "../src/lib/rextora/strategy/strategyTestFilter";
 
 const DIR = path.join(process.cwd(), "data", "rextora", "strategies");
+const createdIds: string[] = [];
 
 describe("strategyStore", () => {
   beforeEach(() => {
     ensureStrategyStore();
+    createdIds.length = 0;
+  });
+
+  afterEach(() => {
+    for (const id of createdIds) {
+      try {
+        deleteStrategy(id);
+      } catch {
+        /* already gone */
+      }
+    }
+    // Sweep leftover pollution clones from interrupted runs
+    for (const s of listStrategies()) {
+      if (s.id === SAFE_STRATEGY_ID) continue;
+      if (isTestStrategyRecord(s as never)) {
+        try {
+          deleteStrategy(s.id);
+        } catch {
+          /* ignore */
+        }
+      }
+    }
   });
 
   it("lists protected SAFE_v44_i4060 with verified hash", () => {
@@ -26,11 +51,13 @@ describe("strategyStore", () => {
     expect(safe).toBeDefined();
     expect(safe!.locked).toBe(true);
     expect(safe!.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(safe!.timeframe).toBe("15m");
     expect(fs.existsSync(path.join(DIR, "index.json"))).toBe(true);
   });
 
   it("copy creates editable strategy with new hash", () => {
     const copy = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
+    createdIds.push(copy.id);
     expect(copy.locked).toBe(false);
     expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
     const edited = saveStrategy(copy.id, {
@@ -47,9 +74,12 @@ describe("strategyStore", () => {
 
   it("can set paper active strategy", () => {
     const copy = copyStrategy(SAFE_STRATEGY_ID);
+    createdIds.push(copy.id);
     const active = setPaperActiveStrategy(copy.id);
     expect(active.paperActive).toBe(true);
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.paperActive).toBe(false);
+    const list = listStrategies();
+    expect(list.find((s) => s.id === copy.id)?.paperActive).toBe(true);
+    expect(list.filter((s) => s.paperActive).length).toBe(1);
     setPaperActiveStrategy(SAFE_STRATEGY_ID);
   });
 });

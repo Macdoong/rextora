@@ -53,7 +53,44 @@ const LABEL_MAP: Record<string, string> = {
   trend_reversal: "추세 전환",
   trend: "추세 신호",
   mean_reversion: "평균 회귀 신호",
-  unknown: "미확인",
+  unknown: "확인되지 않음",
+  Unknown: "확인되지 않음",
+  context_fallback: "기본 설정 사용 중",
+  locked_file: "원본 전략 파일",
+  data_file: "원본 전략 파일",
+  user_copy: "복사본 전략",
+  user_created: "사용자 전략",
+  hash_mismatch: "원본 정보 확인 필요",
+  params_hash: "전략 고유값",
+  cost_guard_k: "비용 안전 계수",
+  base_bal_pct: "기본 진입 비율",
+  Bot: "봇",
+  Today: "오늘",
+  Equity: "자산",
+  Risk: "위험",
+  Positions: "포지션",
+  Signals: "신호",
+  Status: "상태",
+  Profit: "손익",
+  Balance: "잔고",
+  Usage: "사용률",
+  Open: "열림",
+  Count: "개수",
+  Trend: "추세",
+  Momentum: "모멘텀",
+  Volume: "거래량",
+  Volatility: "변동성",
+  Signal: "신호",
+  Score: "종합 점수",
+  "Mini Equity": "자산 변화",
+  "Mini Drawdown": "낙폭 변화",
+  "Mini Daily Profit": "일별 손익",
+  "Mini Win Rate": "승률 변화",
+  "Latest Trades": "최근 거래",
+  "Latest Signals": "최근 신호",
+  LONG: "롱",
+  SHORT: "숏",
+  FLAT: "없음",
   pending: "대기",
   failed: "실패",
   success: "성공",
@@ -289,6 +326,26 @@ export function displayLabel(value: string | number | boolean | null | undefined
   if (typeof value === "boolean") return value ? "켜짐" : "꺼짐";
   const key = String(value);
   return LABEL_MAP[key] ?? key;
+}
+
+/** Alias for chart/UI string localization. */
+export function uiLabel(value: string): string {
+  return LABEL_MAP[value] ?? displayLabel(value);
+}
+
+export function displaySourceStatus(status: string | null | undefined): string {
+  if (!status) return "원본 정보 확인 필요";
+  return displayLabel(status);
+}
+
+export function displayTimeframeLabel(tf: string | null | undefined): string {
+  if (!tf || tf === "unknown" || tf === "Unknown") return "확인되지 않음";
+  if (tf.endsWith("m") || tf.endsWith("h")) return `${tf.replace("m", "분").replace("h", "시간")}봉`;
+  return tf;
+}
+
+export function displayParamsHashLabel(): string {
+  return "전략 고유값";
 }
 
 export function displayEngineLabel(nameOrLabel: string): string {

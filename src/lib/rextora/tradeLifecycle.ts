@@ -3,6 +3,9 @@ import { recordTradeOutcome, loadRiskState } from "./riskStateStore";
 import { appendPaperOrder, closePositionBySymbol, upsertPosition } from "./positionManager";
 import { notifyTradeEntry, notifyTradeClosed } from "./telegramOperation";
 import { generateAiTradeReport } from "./report/aiTradeReport";
+import { buildUnifiedTradeResult } from "./metrics/tradeResult";
+import { appendUnifiedTradeResult } from "./metrics/tradeResultStore";
+import { SAFE_STRATEGY_ID } from "./strategy/strategyTypes";
 import type { AiCandidate, OrderRecord, Position, SignalType, TradeDirection } from "./types";
 
 export interface SafePaperEntryPayload {
@@ -129,10 +132,23 @@ export function recordPaperExit(symbol: string, exitPrice: number, exitReason: s
   const closed = closePositionBySymbol(symbol);
   if (!closed) return null;
   const direction: TradeDirection = closed.side === "Short" ? "숏" : "롱";
-  const pnlPct =
-    closed.side === "Long"
-      ? Number((((exitPrice - closed.entryPrice) / closed.entryPrice) * 100).toFixed(2))
-      : Number((((closed.entryPrice - exitPrice) / closed.entryPrice) * 100).toFixed(2));
+  const tradeSide = closed.side === "Short" ? "SHORT" : "LONG";
+
+  const unified = buildUnifiedTradeResult({
+    symbol,
+    side: tradeSide,
+    strategyId: closed.strategyName ?? SAFE_STRATEGY_ID,
+    entryPrice: closed.entryPrice,
+    exitPrice,
+    quantity: closed.quantity,
+    leverage: closed.leverage || 1,
+    exitReason,
+    mode: "PAPER",
+    openedAt: closed.openedAt
+  });
+  appendUnifiedTradeResult(unified);
+
+  const pnlPct = unified.netPct;
 
   appendPaperOrder({
     id: `paper-exit-${Date.now()}`,
@@ -156,10 +172,11 @@ export function recordPaperExit(symbol: string, exitPrice: number, exitReason: s
     leverage: closed.leverage,
     entryPrice: closed.entryPrice,
     exitPrice,
+    realizedPnl: unified.realizedUsdt,
     realizedPnlPct: pnlPct,
-    result: pnlPct > 0 ? "win" : pnlPct < 0 ? "loss" : "flat",
+    result: unified.netPnl > 0 ? "win" : unified.netPnl < 0 ? "loss" : "flat",
     exitReason: exitReason.includes("손절") ? "stop_loss" : exitReason.includes("익절") ? "take_profit" : "manual",
-    timestamp: new Date().toISOString()
+    timestamp: unified.timestamp
   });
   recordTradeOutcome(loadRiskState(), pnlPct);
 

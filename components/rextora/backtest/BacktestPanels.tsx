@@ -1,20 +1,21 @@
+"use client";
+
 import { Badge, Card, Metric, ProgressBar } from "@/components/ui/primitives";
+import { EquityCurveChart } from "@/components/rextora/charts/EquityCurveChart";
+import { equityCurveToSeries } from "@/src/lib/rextora/charts/adapters";
 import { BACKTEST_SNAPSHOT_WARNING } from "@/src/lib/rextora/seedData";
 import type { Strategy } from "@/lib/types";
 
+/** Legacy alias — routes through Unified Chart Engine. */
 export function EquityCurvePanel({ points }: { points: Array<{ label: string; value: number }> }) {
-  const max = Math.max(...points.map((point) => point.value));
-
+  const series = equityCurveToSeries(
+    points.map((p) => p.value),
+    "Equity"
+  );
+  series.data = series.data.map((d, i) => ({ ...d, label: points[i]?.label }));
   return (
     <Card title="에쿼티 커브">
-      <div className="flex h-40 items-end gap-2">
-        {points.map((point) => (
-          <div key={point.label} className="flex flex-1 flex-col items-center gap-1">
-            <div className="w-full rounded-t bg-violet-500/80" style={{ height: `${(point.value / max) * 130}px` }} />
-            <span className="text-[10px] text-slate-500">{point.label}</span>
-          </div>
-        ))}
-      </div>
+      <EquityCurveChart series={series} height={160} />
     </Card>
   );
 }
@@ -56,7 +57,11 @@ export function CostStressPanel({ strategy }: { strategy: Strategy }) {
   return (
     <Card title="비용 스트레스">
       <div className="grid grid-cols-3 gap-2">
-        {items.map(([label, status]) => <Badge key={label} tone={status === "pass" ? "success" : "danger"}>{label}: {status}</Badge>)}
+        {items.map(([label, status]) => (
+          <Badge key={label} tone={status === "pass" ? "success" : "danger"}>
+            {label}: {status}
+          </Badge>
+        ))}
       </div>
     </Card>
   );
@@ -65,7 +70,10 @@ export function CostStressPanel({ strategy }: { strategy: Strategy }) {
 export function JitterTestPanel({ strategy }: { strategy: Strategy }) {
   return (
     <Card title="Jitter 테스트">
-      <div className="mb-2 flex justify-between text-xs"><span>통과율</span><span>{strategy.validation.jitterPassRate}%</span></div>
+      <div className="mb-2 flex justify-between text-xs">
+        <span>통과율</span>
+        <span>{strategy.validation.jitterPassRate}%</span>
+      </div>
       <ProgressBar value={strategy.validation.jitterPassRate} tone={strategy.validation.jitterPassRate > 80 ? "success" : "warning"} />
       <div className="mt-3 text-xs text-slate-400">과최적화 위험: {strategy.validation.overfittingRisk}</div>
     </Card>

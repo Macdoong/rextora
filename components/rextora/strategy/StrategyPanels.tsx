@@ -13,13 +13,13 @@ export function StrategyRankingTable({ strategies }: { strategies: Strategy[] })
             <tr>
               <th className="py-2">전략명</th>
               <th>유형</th>
-              <th>Sharpe</th>
-              <th>CAGR</th>
-              <th>MDD</th>
-              <th>Win Rate</th>
-              <th>Trades</th>
-              <th>Score</th>
-              <th>LIVE</th>
+              <th>샤프</th>
+              <th>연환산 수익</th>
+              <th>최대 낙폭</th>
+              <th>승률</th>
+              <th>거래 수</th>
+              <th>점수</th>
+              <th>실전</th>
             </tr>
           </thead>
           <tbody>
@@ -33,7 +33,7 @@ export function StrategyRankingTable({ strategies }: { strategies: Strategy[] })
                 <td>{strategy.validation.full10m.winRate}%</td>
                 <td>{strategy.validation.full10m.trades}</td>
                 <td>{strategy.validation.full10m.score}</td>
-                <td><Badge tone={strategy.liveEligible ? "success" : "danger"}>{strategy.liveEligible ? "검증 완료" : "LIVE 차단"}</Badge></td>
+                <td><Badge tone={strategy.liveEligible ? "success" : "danger"}>{strategy.liveEligible ? "검증 완료" : "실전 차단"}</Badge></td>
               </tr>
             ))}
           </tbody>
@@ -54,7 +54,7 @@ export function StrategyDetailPanel({ strategy }: { strategy: Strategy }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div className="space-y-3">
           <Metric label="전략명" value={strategy.name} />
-          <Metric label="params_hash" value={strategy.paramsHash} />
+          <Metric label="전략 고유값" value={strategy.paramsHash} />
           <Metric label="해시 검증" value={hash.ok ? "일치" : hash.message} tone={hash.ok ? "success" : "danger"} />
           <Metric label="서비스 상태" value={strategy.serviceState} />
           <Metric label="해석" value={strategy.interpretation} />

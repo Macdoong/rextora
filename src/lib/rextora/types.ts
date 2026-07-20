@@ -37,6 +37,8 @@ export interface MarketCoin {
   volatility: number;
   spread: number;
   fundingFee: number;
+  /** Binance 24h quote volume (USDT). */
+  quoteVolume: number;
   state: CoinState;
   aiScore: number;
   directionHint?: TradeDirection;
@@ -138,6 +140,14 @@ export interface TodayPnlSummary {
   openPositionCount: number;
   todayTradeCount: number;
   riskState: RiskState;
+  /** Extended fields from unified metrics (optional for backward compat). */
+  todayRealizedPnlUsdt?: number;
+  todayUnrealizedPnlUsdt?: number;
+  todayFeeUsdt?: number;
+  todayFundingUsdt?: number;
+  todaySlippageUsdt?: number;
+  accountEquity?: number;
+  accountReturnPct?: number;
 }
 
 export interface MarketWatcherSummary {

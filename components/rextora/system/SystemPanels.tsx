@@ -1,6 +1,8 @@
 import { Badge, Card, Metric } from "@/components/ui/primitives";
 import type { ApiStatus } from "@/lib/types";
 
+export { MarketChartPanel } from "@/components/rextora/charts/MarketChartPanel";
+
 export function ApiStatusPanel({ api }: { api: ApiStatus }) {
   return (
     <Card title="API 상태 상세" action={<Badge tone={api.binanceFuturesConnected ? "success" : "danger"}>{api.binanceFuturesConnected ? "연결 정상" : "연결 오류"}</Badge>}>
@@ -48,48 +50,6 @@ export function IntegrationReadinessPanel({
         <Metric label="실주문 엔진" value="미연결" tone="danger" />
         <Metric label="LIVE 실행" value="차단" tone="danger" />
         <Metric label="서버 TP/SL" value="서버 TP/SL 실주문 구현 전" tone="danger" />
-      </div>
-    </Card>
-  );
-}
-
-export function MarketChartPanel({
-  candles,
-  sourceLabel = "mock market data"
-}: {
-  candles: Array<{ label: string; open: number; high: number; low: number; close: number }>;
-  sourceLabel?: string;
-}) {
-  const min = Math.min(...candles.map((candle) => candle.low));
-  const max = Math.max(...candles.map((candle) => candle.high));
-  const range = max - min;
-
-  return (
-    <Card title="시장 요약">
-      <div className="mb-3 flex items-end justify-between">
-        <div>
-          <div className="text-3xl font-black text-red-400">{candles.at(-1)?.close.toLocaleString()}</div>
-          <div className="text-xs text-red-300">-1.25%</div>
-        </div>
-        <Badge tone="purple">BTCUSDT · 1H · {sourceLabel}</Badge>
-      </div>
-      <div className="flex h-44 items-end gap-3">
-        {candles.map((candle) => {
-          const high = ((candle.high - min) / range) * 150;
-          const low = ((candle.low - min) / range) * 150;
-          const close = ((candle.close - min) / range) * 150;
-          const up = candle.close >= candle.open;
-
-          return (
-            <div key={candle.label} className="flex flex-1 flex-col items-center justify-end gap-1">
-              <div className="relative h-36 w-full">
-                <div className="absolute left-1/2 w-px -translate-x-1/2 bg-slate-500" style={{ bottom: `${low}px`, height: `${Math.max(8, high - low)}px` }} />
-                <div className={`absolute left-1/2 h-8 w-4 -translate-x-1/2 rounded-sm ${up ? "bg-green-500" : "bg-red-500"}`} style={{ bottom: `${close}px` }} />
-              </div>
-              <span className="text-[10px] text-slate-500">{candle.label}</span>
-            </div>
-          );
-        })}
       </div>
     </Card>
   );

@@ -7,6 +7,7 @@ export interface CoinMetrics {
   volatility: number;
   spreadPct: number;
   fundingRate: number;
+  quoteVolume: number;
   aiScore: number;
 }
 
@@ -16,13 +17,24 @@ export function computeCoinMetrics(ticker: BinanceTicker24hr, funding?: BinanceP
   const high = Number(ticker.highPrice);
   const low = Number(ticker.lowPrice);
   const open = Number(ticker.openPrice);
+  const quoteVolume = Number(ticker.quoteVolume) || 0;
   const volatility = open > 0 ? Number((((high - low) / open) * 100).toFixed(2)) : 0;
-  const volumeChangePct = Number(ticker.volume) > 0 ? Math.min(300, 80 + (Number(ticker.volume) % 200)) : 80;
+  // Binance 24hr ticker has no prior-period volume; leave change at 0 (no fabricated %).
+  const volumeChangePct = 0;
   const spreadPct = price > 0 ? Number(((Math.abs(high - low) / price) * 0.01).toFixed(3)) : 0.05;
   const fundingRate = funding ? Number(funding.lastFundingRate) : 0.0001;
   const aiScore = Math.max(40, Math.min(98, 55 + change24hPct * 2 + volatility * 3));
 
-  return { price, change24hPct, volumeChangePct, volatility, spreadPct, fundingRate, aiScore: Number(aiScore.toFixed(1)) };
+  return {
+    price,
+    change24hPct,
+    volumeChangePct,
+    volatility,
+    spreadPct,
+    fundingRate,
+    quoteVolume,
+    aiScore: Number(aiScore.toFixed(1))
+  };
 }
 
 export function detectCoinStateFromMetrics(metrics: CoinMetrics): import("./types").CoinState {

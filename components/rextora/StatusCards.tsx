@@ -1,5 +1,6 @@
 import { Badge, Card, Metric, ProgressBar } from "@/components/ui/primitives";
 import { displayLabel } from "@/src/lib/rextora/displayLabels";
+import { formatUsdt } from "@/src/lib/rextora/displayFormat";
 import type { ApiStatus, BotStatus, TodayPnlSummary } from "@/lib/types";
 
 export function PageHeader({ title, description, compact = false }: { title: string; description: string; compact?: boolean }) {
@@ -35,23 +36,54 @@ export function BotStatusCard({ bot, api, className = "" }: { bot: BotStatus; ap
   );
 }
 
+function fmtPct(v: number | undefined, digits = 2): string {
+  if (v == null || !Number.isFinite(v)) return "-";
+  return `${v >= 0 ? "+" : ""}${v.toFixed(digits)}%`;
+}
+
+function fmtUsdt(v: number | undefined): string {
+  if (v == null || !Number.isFinite(v)) return "-";
+  return formatUsdt(v);
+}
+
 export function TodayPnlRiskCard({ summary, className = "" }: { summary: TodayPnlSummary; className?: string }) {
   const riskTone = summary.riskState === "정상" ? "success" : summary.riskState === "주의" ? "warning" : "danger";
 
   return (
     <Card title="오늘 손익 / 리스크 요약" action={<Badge tone={riskTone}>{summary.riskState}</Badge>} className={className}>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Metric label="오늘 손익" value={`${summary.todayPnlPct >= 0 ? "+" : ""}${summary.todayPnlPct}%`} tone={summary.todayPnlPct >= 0 ? "success" : "danger"} />
-        <Metric label="일 손실 한도 사용" value={`${summary.dailyLossLimitUsagePct}%`} />
-        <Metric label="현재 포지션" value={summary.openPositionCount} />
+        <Metric
+          label="오늘 실현 손익"
+          value={summary.todayRealizedPnlUsdt != null ? fmtUsdt(summary.todayRealizedPnlUsdt) : fmtPct(summary.todayPnlPct)}
+          tone={(summary.todayRealizedPnlUsdt ?? summary.todayPnlPct) >= 0 ? "success" : "danger"}
+        />
+        <Metric
+          label="오늘 미실현"
+          value={summary.todayUnrealizedPnlUsdt != null ? fmtUsdt(summary.todayUnrealizedPnlUsdt) : "-"}
+        />
+        <Metric label="계정 수익률" value={fmtPct(summary.accountReturnPct ?? summary.todayPnlPct)} />
         <Metric label="오늘 거래" value={summary.todayTradeCount} />
-        <Metric label="리스크 상태" value={summary.riskState} tone={riskTone === "success" ? "success" : riskTone === "warning" ? "default" : "danger"} />
+        <Metric label="리스크 사용률" value={`${summary.dailyLossLimitUsagePct}%`} />
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Metric label="현재 자산" value={summary.accountEquity != null ? fmtUsdt(summary.accountEquity) : "-"} />
+        <Metric label="오늘 수수료" value={summary.todayFeeUsdt != null ? fmtUsdt(summary.todayFeeUsdt) : "-"} />
+        <Metric label="오늘 펀딩" value={summary.todayFundingUsdt != null ? fmtUsdt(summary.todayFundingUsdt) : "-"} />
+        <Metric label="오늘 슬리피지" value={summary.todaySlippageUsdt != null ? fmtUsdt(summary.todaySlippageUsdt) : "-"} />
       </div>
       <div className="mt-3">
-        <div className="rextora-helper mb-1 flex justify-between"><span>일 손실 한도 사용률</span><span>{summary.dailyLossLimitUsagePct}%</span></div>
-        <ProgressBar value={summary.dailyLossLimitUsagePct} tone={summary.dailyLossLimitUsagePct > 70 ? "danger" : summary.dailyLossLimitUsagePct > 40 ? "warning" : "success"} />
+        <div className="rextora-helper mb-1 flex justify-between">
+          <span>일 손실 한도 사용률</span>
+          <span>{summary.dailyLossLimitUsagePct}%</span>
+        </div>
+        <ProgressBar
+          value={summary.dailyLossLimitUsagePct}
+          tone={summary.dailyLossLimitUsagePct > 70 ? "danger" : summary.dailyLossLimitUsagePct > 40 ? "warning" : "success"}
+        />
       </div>
+      <p className="rextora-helper mt-2">
+        포지션 {summary.openPositionCount} · 리스크 {summary.riskState}
+      </p>
     </Card>
   );
 }
-

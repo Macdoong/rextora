@@ -2,15 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
+import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
+import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 
 export default function LiveTradingPage() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
+  const [riskView, setRiskView] = useState<UnifiedRiskView | null>(null);
 
   async function refresh() {
-    const res = await fetch("/api/rextora/trading/dashboard");
-    const json = await res.json();
-    setStatus(json.data?.status ?? json.status ?? null);
+    const [dash, bot] = await Promise.all([
+      fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
+      fetch("/api/rextora/bot/status").then((r) => r.json())
+    ]);
+    setStatus(dash.data?.status ?? dash.status ?? null);
+    setRiskView(bot.data?.riskView ?? null);
   }
 
   useEffect(() => {
@@ -45,9 +52,29 @@ export default function LiveTradingPage() {
     activeStrategy?: { name: string; paramsHash: string };
     positions?: Array<Record<string, unknown>>;
     recentTrades?: Array<Record<string, unknown>>;
+    metrics?: {
+      todayRealizedPnlUsdt: number;
+      todayUnrealizedPnlUsdt: number;
+      accountEquity: number;
+      accountReturnPct: number;
+      todayFeeUsdt: number;
+      todayFundingUsdt: number;
+      todaySlippageUsdt: number;
+    };
+    todayStats?: {
+      realizedPnlUsdt?: number;
+      unrealizedPnlUsdt?: number;
+      accountEquity?: number;
+      accountReturnPct?: number;
+      feeUsdt?: number;
+      fundingUsdt?: number;
+      slippageUsdt?: number;
+    };
   } | null;
 
   const liveEnabled = Boolean(s?.canStartLive);
+  const m = s?.metrics;
+  const ts = s?.todayStats;
 
   return (
     <div className="space-y-4" data-testid="live-trading-page">
@@ -71,6 +98,25 @@ export default function LiveTradingPage() {
           </p>
         )}
       </Card>
+
+      <Card title="통일 지표">
+        <div className="grid gap-3 md:grid-cols-4">
+          <Metric label="오늘 실현" value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`} />
+          <Metric label="오늘 미실현" value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`} />
+          <Metric label="현재 자본" value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`} />
+          <Metric label="계정 수익률" value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`} />
+          <Metric label="수수료" value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`} />
+          <Metric label="펀딩" value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`} />
+          <Metric label="슬리피지" value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`} />
+        </div>
+      </Card>
+
+      <TradingChartsPanel
+        mode="LIVE"
+        metrics={(s?.metrics as UnifiedMetricsSnapshot) ?? null}
+        riskView={riskView}
+        symbol={typeof s?.positions?.[0]?.symbol === "string" ? String(s.positions[0].symbol) : undefined}
+      />
 
       <Card title="실전 제어">
         <div className="flex flex-wrap gap-2">

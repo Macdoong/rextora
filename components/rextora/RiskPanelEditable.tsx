@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { Badge, Button, Card, Metric, ProgressBar } from "@/components/ui/primitives";
 import type { RiskSettings, RiskStatus } from "@/lib/types";
+import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
+import {
+  computeRemainingLossAllowancePct,
+  computeRiskUsagePct,
+  normalizeDailyLossPct
+} from "@/src/lib/rextora/metrics/riskFormulas";
 
 const DEFAULT_SETTINGS: RiskSettings = {
   dailyLossLimitPct: -5,
@@ -26,14 +32,40 @@ const RISK_FIELD_HELPERS: Record<keyof RiskSettings, string> = {
   overtradingCooldownMinutes: "거래 후 다음 거래까지 대기 시간입니다."
 };
 
-type EditableRisk = RiskStatus;
+type EditableRisk = RiskStatus & { riskView?: UnifiedRiskView };
+
+function buildViewFromRisk(risk: RiskStatus): UnifiedRiskView {
+  const limit = risk.settings.dailyLossLimitPct;
+  const current = normalizeDailyLossPct(risk.dailyLossPct);
+  const usagePct = computeRiskUsagePct(current, limit);
+  return {
+    riskState: risk.riskState,
+    dailyLossLimitPct: limit,
+    currentDailyLossPct: current,
+    remainingDailyLossPct: computeRemainingLossAllowancePct(current, limit),
+    usagePct,
+    accountDrawdownPct: risk.totalLossPct,
+    accountLossLimitPct: risk.settings.totalLossLimitPct,
+    consecutiveLosses: risk.consecutiveLosses,
+    consecutiveLossLimit: risk.settings.consecutiveLossLimit,
+    dailyTrades: risk.dailyTrades,
+    maxDailyTrades: risk.settings.maxDailyTrades,
+    remainingTrades: Math.max(0, risk.settings.maxDailyTrades - risk.dailyTrades),
+    openPositions: risk.openPositions,
+    maxPositions: risk.settings.maxSimultaneousPositions,
+    remainingPositionSlots: Math.max(0, risk.settings.maxSimultaneousPositions - risk.openPositions),
+    currentLeverage: risk.currentLeverage,
+    maxLeverage: risk.settings.maxLeverage,
+    limitBreached: usagePct >= 100
+  };
+}
 
 export function RiskPanelEditable({ initialRisk }: { initialRisk: EditableRisk }) {
   const [settings, setSettings] = useState<RiskSettings>({ ...initialRisk.settings });
   const [statusMessage, setStatusMessage] = useState("");
   const risk = { ...initialRisk, settings };
-  const dailyRemaining = Math.max(0, 100 - (Math.abs(risk.dailyLossPct / risk.settings.dailyLossLimitPct) * 100));
-  const riskTone = risk.riskState === "정상" ? "success" : risk.riskState === "주의" ? "warning" : "danger";
+  const view = initialRisk.riskView ?? buildViewFromRisk(risk);
+  const riskTone = view.riskState === "정상" ? "success" : view.riskState === "주의" ? "warning" : "danger";
 
   function updateField<K extends keyof RiskSettings>(key: K, value: RiskSettings[K]) {
     setSettings((current) => ({ ...current, [key]: value }));
@@ -62,7 +94,7 @@ export function RiskPanelEditable({ initialRisk }: { initialRisk: EditableRisk }
 
   return (
     <div className="space-y-3">
-      <Card title="리스크 상태" action={<Badge tone={riskTone}>{risk.riskState}</Badge>}>
+      <Card title="리스크 상태" action={<Badge tone={riskTone}>{view.riskState}</Badge>}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {fields.map(({ key, label, step = 1 }) => (
             <label key={key} className="block">
@@ -79,22 +111,44 @@ export function RiskPanelEditable({ initialRisk }: { initialRisk: EditableRisk }
           ))}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button tone="success" onClick={saveSettings}>설정 저장</Button>
-          <Button tone="muted" onClick={resetDefaults}>기본값 복원</Button>
+          <Button tone="success" onClick={saveSettings}>
+            설정 저장
+          </Button>
+          <Button tone="muted" onClick={resetDefaults}>
+            기본값 복원
+          </Button>
         </div>
         {statusMessage && <p className="rextora-helper mt-3 text-green-300">{statusMessage}</p>}
       </Card>
       <Card title="한도 사용 현황">
-        <div className="space-y-3">
-          <div>
-            <div className="rextora-helper mb-1 flex justify-between"><span>일 손실</span><span>{risk.dailyLossPct}% / {risk.settings.dailyLossLimitPct}%</span></div>
-            <ProgressBar value={100 - dailyRemaining} tone="danger" />
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <Metric label="오늘 손실 한도" value={`${Math.abs(view.dailyLossLimitPct).toFixed(2)}%`} />
+          <Metric label="현재 일 손실" value={`${Math.abs(view.currentDailyLossPct).toFixed(2)}%`} />
+          <Metric label="남은 손실 여유" value={`${view.remainingDailyLossPct.toFixed(2)}%`} />
+          <Metric
+            label="손실 한도 사용률"
+            value={`${view.usagePct}%`}
+            tone={view.usagePct >= 100 ? "danger" : view.usagePct >= 70 ? "warning" : "default"}
+          />
+          <Metric label="계정 낙폭" value={`${view.accountDrawdownPct}%`} />
+          <Metric label="계정 손실 한도" value={`${Math.abs(view.accountLossLimitPct).toFixed(2)}%`} />
+        </div>
+        <div className="mt-3">
+          <div className="rextora-helper mb-1 flex justify-between">
+            <span>일 손실 한도 사용률</span>
+            <span>{view.usagePct}%</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <Metric label="연속 손실" value={`${risk.consecutiveLosses}/${risk.settings.consecutiveLossLimit}`} />
-            <Metric label="일 거래" value={`${risk.dailyTrades}/${risk.settings.maxDailyTrades}`} />
-            <Metric label="포지션" value={`${risk.openPositions}/${risk.settings.maxSimultaneousPositions}`} />
-          </div>
+          <ProgressBar
+            value={Math.min(100, view.usagePct)}
+            tone={view.usagePct >= 100 ? "danger" : view.usagePct > 70 ? "warning" : "success"}
+          />
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+          <Metric label="일 거래" value={`${view.dailyTrades} / ${view.maxDailyTrades}`} />
+          <Metric label="남은 거래" value={view.remainingTrades} />
+          <Metric label="사용 중인 포지션 슬롯" value={`${view.openPositions} / ${view.maxPositions}`} />
+          <Metric label="남은 포지션 슬롯" value={view.remainingPositionSlots} />
+          <Metric label="연속 손실" value={`${view.consecutiveLosses} / ${view.consecutiveLossLimit}`} />
         </div>
       </Card>
     </div>

@@ -2,18 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
+import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
+import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
+
+type Metrics = UnifiedMetricsSnapshot;
 
 export default function PaperTradingPage() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
   const [strategy, setStrategy] = useState<{ name: string; paramsHash: string } | null>(null);
+  const [riskView, setRiskView] = useState<UnifiedRiskView | null>(null);
 
   async function refresh() {
-    const [dash, strategies] = await Promise.all([
+    const [dash, strategies, bot] = await Promise.all([
       fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
-      fetch("/api/rextora/strategies").then((r) => r.json())
+      fetch("/api/rextora/strategies").then((r) => r.json()),
+      fetch("/api/rextora/bot/status").then((r) => r.json())
     ]);
     setStatus(dash.data?.status ?? dash.status ?? null);
+    setRiskView(bot.data?.riskView ?? null);
     const active = (strategies.data ?? []).find((s: { paperActive?: boolean }) => s.paperActive);
     if (active) setStrategy({ name: active.name, paramsHash: active.paramsHash });
   }
@@ -43,12 +51,26 @@ export default function PaperTradingPage() {
   const s = status as {
     modeLabel?: string;
     botStatusLabel?: string;
-    todayStats?: { realizedPnlPct: number; trades: number };
+    todayStats?: {
+      realizedPnlPct: number;
+      trades: number;
+      realizedPnlUsdt?: number;
+      unrealizedPnlUsdt?: number;
+      feeUsdt?: number;
+      fundingUsdt?: number;
+      slippageUsdt?: number;
+      accountEquity?: number;
+      accountReturnPct?: number;
+    };
+    metrics?: Metrics;
     operations?: { watchedSymbolCount: number; openPositionCount: number };
     positions?: Array<Record<string, unknown>>;
     recentTrades?: Array<Record<string, unknown>>;
     activeStrategy?: { name: string; paramsHash: string };
   } | null;
+
+  const m = s?.metrics;
+  const ts = s?.todayStats;
 
   return (
     <div className="space-y-4" data-testid="paper-trading-page">
@@ -62,7 +84,21 @@ export default function PaperTradingPage() {
           <Metric label="전략" value={strategy?.name ?? s?.activeStrategy?.name ?? "SAFE_v44_i4060"} />
           <Metric label="params_hash" value={strategy?.paramsHash ?? s?.activeStrategy?.paramsHash ?? "-"} />
           <Metric label="감시 코인" value={String(s?.operations?.watchedSymbolCount ?? 0)} />
-          <Metric label="오늘 모의 손익" value={`${s?.todayStats?.realizedPnlPct ?? 0}%`} />
+          <Metric
+            label="오늘 실현 손익"
+            value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT (${ts?.realizedPnlPct ?? 0}%)`}
+          />
+        </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-4">
+          <Metric label="오늘 미실현" value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`} />
+          <Metric label="순수익(계정)" value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`} />
+          <Metric label="현재 자본" value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`} />
+          <Metric label="오늘 거래" value={String(ts?.trades ?? m?.todayTradeCount ?? 0)} />
+        </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          <Metric label="수수료" value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`} />
+          <Metric label="펀딩" value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`} />
+          <Metric label="슬리피지" value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`} />
         </div>
       </Card>
 
@@ -76,8 +112,17 @@ export default function PaperTradingPage() {
           </Button>
         </div>
         {message && <p className="mt-3 text-sm text-slate-300">{message}</p>}
-        <p className="mt-2 text-xs text-slate-500">상태: {s?.botStatusLabel ?? "-"} · 모드: {s?.modeLabel ?? "모의 거래"}</p>
+        <p className="mt-2 text-xs text-slate-500">
+          상태: {s?.botStatusLabel ?? "-"} · 모드: {s?.modeLabel ?? "모의 거래"}
+        </p>
       </Card>
+
+      <TradingChartsPanel
+        mode="PAPER"
+        metrics={(s?.metrics as Metrics) ?? null}
+        riskView={riskView}
+        symbol={typeof s?.positions?.[0]?.symbol === "string" ? String(s.positions[0].symbol) : undefined}
+      />
 
       <Card title="현재 모의 포지션">
         {(s?.positions?.length ?? 0) > 0 ? (
@@ -123,7 +168,7 @@ export default function PaperTradingPage() {
                 <th>코인</th>
                 <th>방향</th>
                 <th>결과</th>
-                <th>손익</th>
+                <th>순손익</th>
                 <th>청산 이유</th>
               </tr>
             </thead>
@@ -136,7 +181,9 @@ export default function PaperTradingPage() {
                   <td>
                     <Badge>{String(t.resultLabel)}</Badge>
                   </td>
-                  <td>{String(t.pnlPct)}%</td>
+                  <td>
+                    {t.netPnl != null ? `${t.netPnl} USDT` : ""} {t.pnlPct != null ? `(${t.pnlPct}%)` : ""}
+                  </td>
                   <td>{String(t.exitReasonLabel)}</td>
                 </tr>
               ))}

@@ -123,11 +123,20 @@ export function TradingDashboard() {
           <Metric label="보유 포지션 수" value={String(status?.operations.openPositionCount ?? 0)} />
           <Metric
             label="오늘 실현 손익"
-            value={formatPnlPct(status?.todayStats.realizedPnlPct)}
+            value={
+              status?.todayStats?.realizedPnlUsdt != null
+                ? `${status.todayStats.realizedPnlUsdt} USDT (${formatPnlPct(status.todayStats.realizedPnlPct)})`
+                : formatPnlPct(status?.todayStats.realizedPnlPct)
+            }
             tone={(status?.todayStats.realizedPnlPct ?? 0) >= 0 ? "success" : "danger"}
           />
+          <Metric label="오늘 미실현" value={`${status?.todayStats?.unrealizedPnlUsdt ?? status?.metrics?.todayUnrealizedPnlUsdt ?? 0} USDT`} />
           <Metric label="오늘 거래 수" value={String(status?.todayStats.trades ?? 0)} />
           <Metric label="오늘 승률" value={`${status?.todayStats.winRate ?? 0}%`} />
+          <Metric label="수수료" value={`${status?.todayStats?.feeUsdt ?? status?.metrics?.todayFeeUsdt ?? 0} USDT`} />
+          <Metric label="펀딩" value={`${status?.todayStats?.fundingUsdt ?? status?.metrics?.todayFundingUsdt ?? 0} USDT`} />
+          <Metric label="슬리피지" value={`${status?.todayStats?.slippageUsdt ?? status?.metrics?.todaySlippageUsdt ?? 0} USDT`} />
+          <Metric label="현재 자본" value={`${status?.todayStats?.accountEquity ?? status?.metrics?.accountEquity ?? "-"} USDT`} />
           <Metric label="안전 상태" value={status?.safetyLabel ?? "정상"} tone={safetyTone(status?.safetyLabel ?? "정상")} />
           <Metric label="활성 전략" value={status?.activeStrategy?.name ?? "SAFE_v44_i4060"} />
           <Metric label="params_hash" value={status?.activeStrategy?.paramsHash ?? "-"} />

@@ -2,10 +2,12 @@ import { RiskPanelEditable } from "@/components/rextora/RiskPanelEditable";
 import { PageHeader } from "@/components/rextora/StatusCards";
 import { getRiskStatus } from "@/src/lib/rextora/riskManager";
 import { resolveRiskState } from "@/src/lib/rextora/riskEngine";
+import { getUnifiedRiskView } from "@/src/lib/rextora/metrics/riskService";
 
 export default function RiskPage() {
   const base = getRiskStatus();
-  const risk = { ...base, riskState: resolveRiskState(base) };
+  const riskView = getUnifiedRiskView();
+  const risk = { ...base, riskState: resolveRiskState(base), riskView };
 
   return (
     <>

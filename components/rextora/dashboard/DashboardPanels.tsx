@@ -10,6 +10,8 @@ import { PanelErrorBoundary, PanelSkeleton } from "@/components/rextora/PanelShe
 import { Card, Metric } from "@/components/ui/primitives";
 import { formatDataSourceMeta } from "@/src/lib/rextora/displayLabels";
 import type { AiCandidate, ApiStatus, BotStatus, MarketWatcherSummary, Position, TodayPnlSummary } from "@/lib/types";
+import { DashboardCharts } from "@/components/rextora/charts/DashboardCharts";
+import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 
 const POLL_MS = 10_000;
 
@@ -17,6 +19,7 @@ type BotStatusPayload = {
   bot: BotStatus;
   runtime: { lastHeartbeat: string; scanInProgress?: boolean; marketSnapshotAgeMs?: number };
   todayPnl: TodayPnlSummary;
+  metrics?: UnifiedMetricsSnapshot;
   topCandidates: AiCandidate[];
   positions: Position[];
   marketSummary: MarketWatcherSummary;
@@ -85,7 +88,7 @@ export function DashboardPanels() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 gap-2 xl:grid-cols-[1fr_300px]" data-testid="dashboard-sections">
+    <div className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_300px]" data-testid="dashboard-sections">
       <div className="space-y-2">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           <div data-section="bot-status">
@@ -100,11 +103,27 @@ export function DashboardPanels() {
           </div>
         </div>
 
+        <div data-section="dashboard-charts">
+          <PanelErrorBoundary title="차트">
+            {loading || !data ? (
+              <PanelSkeleton lines={6} />
+            ) : (
+              <DashboardCharts
+                metrics={data.metrics ?? null}
+                bot={data.bot}
+                todayPnl={data.todayPnl}
+                signalCount={data.topCandidates?.length ?? 0}
+                candidates={data.topCandidates}
+              />
+            )}
+          </PanelErrorBoundary>
+        </div>
+
         <div data-section="active-strategy">
           <Card title="활성 전략" className="!p-3" data-testid="dashboard-active-strategy">
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
               <Metric label="전략" value={strategy?.name ?? "SAFE_v44_i4060"} />
-              <Metric label="params_hash" value={strategy?.paramsHash ?? "7893ca3f0e30"} />
+              <Metric label="전략 고유값" value={strategy?.paramsHash ?? "7893ca3f0e30"} />
               <Metric label="최근 백테스트" value={strategy?.lastReturn != null ? `${(strategy.lastReturn * 100).toFixed(1)}%` : "-"} />
               <Metric label="실전 후보" value="보호 전략" />
             </div>
@@ -146,7 +165,7 @@ export function DashboardPanels() {
           </p>
         )}
       </div>
-      <div data-section="quick-emergency-controls">
+      <div data-section="quick-emergency-controls" className="order-first self-start lg:order-none lg:sticky lg:top-4">
         <PanelErrorBoundary title="긴급 제어">
           <QuickControls className="!p-3" />
         </PanelErrorBoundary>

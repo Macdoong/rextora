@@ -3,6 +3,7 @@ import { getConfig } from "./config";
 import { riskStatusSeed } from "./seedData";
 import type { RiskState, RiskStatus } from "./types";
 import { isRiskLimitBreached } from "./riskRules";
+import { computeRiskUsagePct, normalizeDailyLossPct } from "./metrics/riskFormulas";
 
 const RISK_STATE_FILE = "risk-state.json";
 
@@ -31,16 +32,21 @@ export function saveRiskState(status: RiskStatus): RiskStatus {
 }
 
 export function resolveRiskStateFromStatus(status: RiskStatus): RiskState {
-  if (isRiskLimitBreached(status)) return "자동 중단";
-  const warnings = countRiskWarnings(status);
-  if (warnings >= 2) return "위험";
-  if (warnings === 1 || status.dailyLossPct <= status.settings.dailyLossLimitPct * 0.7) return "주의";
+  const lossPct = normalizeDailyLossPct(status.dailyLossPct);
+  const usage = computeRiskUsagePct(lossPct, status.settings.dailyLossLimitPct);
+  const normalized = { ...status, dailyLossPct: lossPct };
+
+  if (isRiskLimitBreached(normalized) || usage >= 100) return "자동 중단";
+  const warnings = countRiskWarnings(normalized);
+  if (warnings >= 2 || usage >= 85) return "위험";
+  if (warnings === 1 || usage >= 70 || lossPct <= status.settings.dailyLossLimitPct * 0.7) return "주의";
   return "정상";
 }
 
 function countRiskWarnings(status: RiskStatus): number {
   let count = 0;
-  if (status.dailyLossPct <= status.settings.dailyLossLimitPct) count += 1;
+  const lossPct = normalizeDailyLossPct(status.dailyLossPct);
+  if (lossPct <= status.settings.dailyLossLimitPct) count += 1;
   if (status.totalLossPct <= status.settings.totalLossLimitPct) count += 1;
   if (status.consecutiveLosses >= status.settings.consecutiveLossLimit) count += 1;
   if (status.dailyTrades >= status.settings.maxDailyTrades) count += 1;
@@ -49,15 +55,26 @@ function countRiskWarnings(status: RiskStatus): number {
   return count;
 }
 
+/**
+ * Accumulate daily/total loss %. Only losses (negative pnlPct) increase loss counters.
+ * Profits reset consecutive losses but never inflate "daily loss".
+ */
 export function recordTradeOutcome(status: RiskStatus, pnlPct: number): RiskStatus {
+  const lossDelta = Math.min(0, pnlPct);
   const next: RiskStatus = {
     ...status,
-    dailyLossPct: Number((status.dailyLossPct + pnlPct).toFixed(2)),
-    totalLossPct: Number((status.totalLossPct + pnlPct).toFixed(2)),
+    dailyLossPct: Number((normalizeDailyLossPct(status.dailyLossPct) + lossDelta).toFixed(2)),
+    totalLossPct: Number((Math.min(0, status.totalLossPct) + lossDelta).toFixed(2)),
     dailyTrades: status.dailyTrades + 1,
     consecutiveLosses: pnlPct < 0 ? status.consecutiveLosses + 1 : 0,
     riskState: "정상"
   };
   next.riskState = resolveRiskStateFromStatus(next);
   return saveRiskState(next);
+}
+
+export function syncOpenPositionCount(count: number): void {
+  const status = loadRiskState();
+  if (status.openPositions === count) return;
+  saveRiskState({ ...status, openPositions: count, riskState: resolveRiskStateFromStatus({ ...status, openPositions: count }) });
 }

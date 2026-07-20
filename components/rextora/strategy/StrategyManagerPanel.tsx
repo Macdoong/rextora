@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Card } from "@/components/ui/primitives";
 import type { SafeV44Params, StoredStrategy } from "@/src/lib/rextora/strategy/strategyTypes";
+import { displayParamsHashLabel, displaySourceStatus, displayTimeframeLabel, uiLabel } from "@/src/lib/rextora/displayLabels";
 
 export function StrategyManagerPanel() {
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
@@ -10,6 +11,7 @@ export function StrategyManagerPanel() {
   const [message, setMessage] = useState("");
   const [editParams, setEditParams] = useState<SafeV44Params | null>(null);
   const [editName, setEditName] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/rextora/strategies");
@@ -57,32 +59,50 @@ export function StrategyManagerPanel() {
   return (
     <div className="space-y-4" data-testid="strategy-manager">
       <div className="flex flex-wrap gap-2">
-        <Button tone="success" data-testid="strategy-create" onClick={() => void act("create", { name: `사용자전략_${Date.now().toString(36)}` })}>
-          새 전략 만들기
-        </Button>
-        <Button data-testid="strategy-copy" onClick={() => void act("copy")}>
-          전략 복사
-        </Button>
-        <Button
-          tone="success"
-          data-testid="strategy-save"
-          disabled={selected?.locked}
-          onClick={() => void act("save", { patch: { name: editName, params: editParams } })}
-        >
-          전략 저장
-        </Button>
-        <Button tone="danger" data-testid="strategy-delete" disabled={selected?.locked} onClick={() => void act("delete")}>
-          전략 삭제
-        </Button>
-        <Button data-testid="strategy-apply-paper" onClick={() => void act("apply_paper")}>
-          모의 매매에 적용
-        </Button>
-        <Button tone="warning" data-testid="strategy-apply-live" onClick={() => void act("apply_live")}>
-          실전 전략으로 지정
-        </Button>
+        {selected?.locked ? (
+          <Button tone="success" data-testid="strategy-copy" onClick={() => void act("copy")}>
+            복사해서 수정하기
+          </Button>
+        ) : (
+          <>
+            <Button tone="success" data-testid="strategy-create" onClick={() => void act("create", { name: `사용자전략_${Date.now().toString(36)}` })}>
+              새 전략 만들기
+            </Button>
+            <Button data-testid="strategy-copy" onClick={() => void act("copy")}>
+              전략 복사
+            </Button>
+            <Button
+              tone="success"
+              data-testid="strategy-save"
+              onClick={() => void act("save", { patch: { name: editName, params: editParams } })}
+            >
+              전략 저장
+            </Button>
+            <Button data-testid="strategy-apply-paper" onClick={() => void act("apply_paper")}>
+              모의 매매에 적용
+            </Button>
+            <Button tone="warning" data-testid="strategy-apply-live" onClick={() => void act("mark_live_candidate")}>
+              실전 후보로 지정
+            </Button>
+          </>
+        )}
         <a href="/backtest" className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200">
           백테스트 실행
         </a>
+        {!selected?.locked && (
+          <div className="relative">
+            <Button tone="muted" onClick={() => setMenuOpen((v) => !v)}>
+              추가 작업
+            </Button>
+            {menuOpen && (
+              <div className="absolute left-0 z-10 mt-1 min-w-[160px] rounded-lg border border-slate-700 bg-slate-950 p-2 shadow-lg">
+                <Button tone="danger" data-testid="strategy-delete" className="w-full" onClick={() => void act("delete")}>
+                  전략 삭제
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       {message && <p className="text-sm text-slate-300">{message}</p>}
       {selected?.locked && (
@@ -98,10 +118,10 @@ export function StrategyManagerPanel() {
               <tr>
                 <th className="py-2">전략명</th>
                 <th>유형</th>
-                <th>타임프레임</th>
-                <th>params_hash</th>
+                <th>시간봉</th>
+                <th>{displayParamsHashLabel()}</th>
                 <th>최근 수익률</th>
-                <th>MDD</th>
+                <th>최대 낙폭</th>
                 <th>거래 수</th>
                 <th>승률</th>
                 <th>실전</th>
@@ -120,7 +140,7 @@ export function StrategyManagerPanel() {
                     {s.name} {s.locked && <Badge tone="warning">잠금</Badge>}
                   </td>
                   <td>{s.type}</td>
-                  <td>{s.timeframe === "unknown" ? "원본 확인 필요" : s.timeframe}</td>
+                  <td>{displayTimeframeLabel(s.timeframe)}</td>
                   <td className="font-mono text-xs">{s.paramsHash}</td>
                   <td>{s.lastBacktest ? `${(s.lastBacktest.totalReturn * 100).toFixed(1)}%` : "-"}</td>
                   <td>{s.lastBacktest ? `${(s.lastBacktest.mdd * 100).toFixed(1)}%` : "-"}</td>
@@ -142,17 +162,19 @@ export function StrategyManagerPanel() {
               <div>전략명: {selected.locked ? selected.name : <input className="rounded border border-slate-700 bg-slate-950 px-2 py-1" value={editName} onChange={(e) => setEditName(e.target.value)} />}</div>
               <div>설명: {selected.description}</div>
               <div>유형: {selected.type}</div>
-              <div>타임프레임: {selected.timeframe === "unknown" ? "전략 원본 타임프레임 확인 필요" : selected.timeframe}</div>
+              <div>시간봉: {displayTimeframeLabel(selected.timeframe)}</div>
               <div>롱 조건: {selected.longConditionSummary}</div>
               <div>숏 조건: {selected.shortConditionSummary}</div>
               <div>손절: {selected.stopLossSummary}</div>
               <div>익절: {selected.takeProfitSummary}</div>
               <div>트레일링: {selected.params.use_trailing ? "사용" : "미사용"}</div>
               <div>동적 레버리지: {selected.params.use_dynamic_leverage ? "사용" : "미사용"}</div>
-              <div>비용 방어: {selected.params.cost_guard ? `사용 (k=${selected.params.cost_guard_k})` : "미사용"}</div>
-              <div>params_hash: <span className="font-mono">{selected.paramsHash}</span></div>
-              <div>source: {selected.sourceFile ?? "-"}</div>
-              <div>sourceStatus: {selected.sourceStatus}</div>
+              <div>비용 방어: {selected.params.cost_guard ? `사용 (${uiLabel("cost_guard_k")}=${selected.params.cost_guard_k})` : "미사용"}</div>
+              <div>
+                {displayParamsHashLabel()}: <span className="font-mono">{selected.paramsHash}</span>
+              </div>
+              <div>원본 파일: {selected.sourceFile ?? "-"}</div>
+              <div>출처: {displaySourceStatus(selected.sourceStatus)}</div>
             </div>
           </Card>
 
@@ -160,34 +182,33 @@ export function StrategyManagerPanel() {
             <div className="grid gap-3 md:grid-cols-3">
               {(
                 [
-                  ["ema_fast", "Trend EMA Fast"],
-                  ["ema_mid", "Trend EMA Mid"],
-                  ["ema_slow", "Trend EMA Slow"],
-                  ["rsi_period", "RSI Period"],
-                  ["rsi_max_long", "RSI Max Long"],
-                  ["atr_period", "ATR Period"],
-                  ["sl_atr_mult", "SL ATR"],
-                  ["tp_atr_mult", "TP ATR"],
-                  ["trail_atr_mult", "Trail ATR"],
-                  ["vol_ratio_min", "Volume Min"],
-                  ["max_hold_bars", "Max Hold"],
-                  ["cooldown_bars", "Cooldown"],
-                  ["lev_min", "Lev Min"],
-                  ["lev_base", "Lev Base"],
-                  ["lev_max", "Lev Max"],
-                  ["cost_guard_k", "Cost Guard K"],
-                  ["base_bal_pct", "Base Bal %"]
+                  ["ema_fast", "빠른 이동평균"],
+                  ["ema_mid", "중간 이동평균"],
+                  ["ema_slow", "느린 이동평균"],
+                  ["rsi_period", "RSI 기간"],
+                  ["rsi_max_long", "롱 최대 RSI"],
+                  ["atr_period", "ATR 기간"],
+                  ["sl_atr_mult", "손절 ATR 배수"],
+                  ["tp_atr_mult", "익절 ATR 배수"],
+                  ["trail_atr_mult", "트레일링 ATR"],
+                  ["vol_ratio_min", "최소 거래량 배수"],
+                  ["max_hold_bars", "최대 보유 봉"],
+                  ["cooldown_bars", "쿨다운 봉"],
+                  ["lev_min", "최소 레버리지"],
+                  ["lev_base", "기본 레버리지"],
+                  ["lev_max", "최대 레버리지"],
+                  ["cost_guard_k", "비용 안전 계수"],
+                  ["base_bal_pct", "기본 진입 비율"]
                 ] as Array<[keyof SafeV44Params, string]>
               ).map(([key, label]) => (
-                <label key={key} className="text-xs text-slate-400">
+                <label key={key} className="block text-sm text-slate-300">
                   {label}
                   <input
                     type="number"
-                    step="any"
+                    className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1"
                     disabled={selected.locked}
-                    className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-slate-100"
                     value={Number(editParams[key])}
-                    onChange={(e) => updateParam(key, Number(e.target.value) as never)}
+                    onChange={(e) => updateParam(key, Number(e.target.value) as SafeV44Params[typeof key])}
                   />
                 </label>
               ))}

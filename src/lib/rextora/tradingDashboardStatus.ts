@@ -10,15 +10,18 @@ import { getRuntimeState } from "./runtimeState";
 import { summarizeExecutionQueue, getLastExecutionQueueResult, computeCandidateQueueDisplays, buildExecutionQueue } from "./executionQueue";
 import { convertAiCandidatesToExecutionCandidates } from "./aiExecutionBridge";
 import { buildLearningSummary } from "./learningEngine";
-import { getUserFacingLearningLogs, getSignalWinRates, isLearningTradeLog } from "./learningLogger";
+import { getSignalWinRates } from "./learningLogger";
 import { getAuditLogs } from "./storage/auditStore";
 import { displayAuditActionLabel, displayAuditResultLabel, displayPositionProtectionStatus, displaySignalReason, type PositionProtectionLabel } from "./displayLabels";
 import { filterUserFacingRecords } from "./dataFilters";
 import { getLastSafeSignals } from "./execution/safePaperLoop";
 import { loadSafeV44Strategy } from "./strategy/safeV44Strategy";
-import { getLatestAiTradeReportSummary, listAiTradeReports } from "./report/aiTradeReport";
+import { getLatestAiTradeReportSummary, listAiTradeReports, type AiTradeReport } from "./report/aiTradeReport";
+import { getUnifiedMetrics } from "./metrics/metricsEngine";
+import { computePriceReturnFraction } from "./metrics/tradeResult";
 import type { BinanceDiagnosticsReport } from "./binanceDiagnosticsTypes";
 import type { LearningSummary } from "./learningTypes";
+import type { UnifiedTradeResult } from "./metrics/types";
 import type { Position } from "./types";
 
 export interface DashboardCandidateRow {
@@ -75,12 +78,28 @@ export interface DashboardRecentTradeRow {
   pnlPct: number | null;
   exitReasonLabel: string;
   modeLabel: "모의 거래" | "실전 거래";
+  grossPct?: number;
+  netPct?: number;
+  grossPnl?: number;
+  netPnl?: number;
+  fee?: number;
+  funding?: number;
+  slippage?: number;
+  holdingTimeLabel?: string;
+  realizedUsdt?: number;
 }
 
 export interface DashboardTodayStats {
   realizedPnlPct: number;
   trades: number;
   winRate: number;
+  realizedPnlUsdt?: number;
+  unrealizedPnlUsdt?: number;
+  feeUsdt?: number;
+  fundingUsdt?: number;
+  slippageUsdt?: number;
+  accountEquity?: number;
+  accountReturnPct?: number;
 }
 
 export interface DashboardLearningView {
@@ -119,7 +138,18 @@ export interface TradingDashboardStatus {
     sourceStatus: string;
   };
   aiReportSummary: string | null;
-  aiReports: Array<{ id: string; symbol: string; summary: string; createdAt: string }>;
+  aiReports: Array<{
+    id: string;
+    symbol: string;
+    summary: string;
+    createdAt: string;
+    analysisMethod?: string;
+    whyEntered?: string;
+    whyExited?: string;
+    parameterSuggestion?: string;
+    costImpact?: string;
+    sections?: AiTradeReport["sections"];
+  }>;
 
   learningView: DashboardLearningView;
   lastUpdatedAt: string;
@@ -152,6 +182,8 @@ export interface TradingDashboardStatus {
   };
   learningSummary: LearningSummary;
   recentExecutionLogs: DashboardExecutionLogRow[];
+  /** Unified metrics snapshot — sole source for PnL/cost/equity fields. */
+  metrics: ReturnType<typeof getUnifiedMetrics>;
 }
 
 function mapCandidateStatus(status: string, costPass: boolean): "진입 가능" | "보류" | "대기" | "제외" {
@@ -202,11 +234,8 @@ function toCandidateRow(
 }
 
 function computePositionPnlPct(side: string, entryPrice: number, currentPrice: number): number {
-  if (entryPrice <= 0) return 0;
-  const raw = side === "Short" || side === "SHORT" || side === "숏"
-    ? ((entryPrice - currentPrice) / entryPrice) * 100
-    : ((currentPrice - entryPrice) / entryPrice) * 100;
-  return Number(raw.toFixed(2));
+  const mapped = side === "Short" || side === "SHORT" || side === "숏" ? "SHORT" : "LONG";
+  return Number((computePriceReturnFraction(mapped, entryPrice, currentPrice) * 100).toFixed(2));
 }
 
 function formatHoldTime(openedAt?: string): string {
@@ -265,44 +294,61 @@ function mapLivePosition(
   };
 }
 
-function mapRecentTradeResult(log: { exitReason: string; result: string }): DashboardRecentTradeRow["resultLabel"] {
-  if (log.exitReason.includes("익절")) return "익절";
-  if (log.exitReason.includes("손절")) return "손절";
-  if (log.exitReason.includes("수동")) return "수동청산";
-  if (log.exitReason.includes("오류") || log.result === "실패") return log.result === "보합" ? "보합" : "실패";
-  if (log.result === "보합") return "보합";
-  if (log.result === "성공") return "익절";
-  return "보합";
+function mapUnifiedTrade(trade: UnifiedTradeResult): DashboardRecentTradeRow {
+  const resultLabel: DashboardRecentTradeRow["resultLabel"] =
+    trade.exitReason.includes("익절") || trade.netPnl > 0
+      ? "익절"
+      : trade.exitReason.includes("손절")
+        ? "손절"
+        : trade.exitReason.includes("수동")
+          ? "수동청산"
+          : trade.netPnl === 0
+            ? "보합"
+            : "실패";
+  return {
+    time: new Date(trade.timestamp).toLocaleString("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+    symbol: trade.symbol,
+    direction: trade.side === "LONG" ? "롱" : "숏",
+    entryPrice: trade.entryPrice,
+    exitPrice: trade.exitPrice,
+    resultLabel,
+    pnlPct: trade.netPct,
+    exitReasonLabel: trade.exitReason,
+    modeLabel: trade.mode === "LIVE" ? "실전 거래" : "모의 거래",
+    grossPct: trade.grossPct,
+    netPct: trade.netPct,
+    grossPnl: trade.grossPnl,
+    netPnl: trade.netPnl,
+    fee: trade.fee,
+    funding: trade.funding,
+    slippage: trade.slippage,
+    holdingTimeLabel: trade.holdingTimeLabel,
+    realizedUsdt: trade.realizedUsdt
+  };
 }
 
 function buildRecentTrades(limit = 10): DashboardRecentTradeRow[] {
-  return getUserFacingLearningLogs()
-    .filter(isLearningTradeLog)
-    .slice(0, limit)
-    .map((log) => ({
-      time: log.time,
-      symbol: log.symbol,
-      direction: log.direction,
-      entryPrice: log.entryPrice ?? null,
-      exitPrice: log.exitPrice ?? null,
-      resultLabel: mapRecentTradeResult(log),
-      pnlPct: log.pnlPct,
-      exitReasonLabel: log.exitReason || "-",
-      modeLabel: log.serviceState === "live-ready" ? "실전 거래" : "모의 거래"
-    }));
+  return getUnifiedMetrics().recentTrades.slice(0, limit).map(mapUnifiedTrade);
 }
 
 function buildTodayStats(): DashboardTodayStats {
-  const todayPrefix = new Date().toLocaleString("ko-KR", { month: "2-digit", day: "2-digit" });
-  const todayTrades = getUserFacingLearningLogs()
-    .filter(isLearningTradeLog)
-    .filter((log) => log.time.startsWith(todayPrefix));
-  const wins = todayTrades.filter((log) => log.result === "성공").length;
-  const realized = todayTrades.reduce((sum, log) => sum + (log.pnlPct ?? 0), 0);
+  const m = getUnifiedMetrics();
   return {
-    realizedPnlPct: Number(realized.toFixed(2)),
-    trades: todayTrades.length,
-    winRate: todayTrades.length > 0 ? Number(((wins / todayTrades.length) * 100).toFixed(1)) : 0
+    realizedPnlPct: m.todayRealizedPnlPct,
+    trades: m.todayTradeCount,
+    winRate: m.winRate,
+    realizedPnlUsdt: m.todayRealizedPnlUsdt,
+    unrealizedPnlUsdt: m.todayUnrealizedPnlUsdt,
+    feeUsdt: m.todayFeeUsdt,
+    fundingUsdt: m.todayFundingUsdt,
+    slippageUsdt: m.todaySlippageUsdt,
+    accountEquity: m.accountEquity,
+    accountReturnPct: m.accountReturnPct
   };
 }
 
@@ -431,7 +477,13 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     id: r.id,
     symbol: r.symbol,
     summary: r.summary,
-    createdAt: r.createdAt
+    createdAt: r.createdAt,
+    analysisMethod: r.analysisMethod ?? "규칙 기반 분석",
+    whyEntered: r.whyEntered,
+    whyExited: r.whyExited,
+    parameterSuggestion: r.parameterSuggestion,
+    costImpact: r.costImpact,
+    sections: r.sections
   }));
 
   const safetyLabel: TradingDashboardStatus["safetyLabel"] = runtime.emergencyStopped
@@ -441,6 +493,7 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
       : "정상";
 
   const state = getAccountState();
+  const metrics = getUnifiedMetrics();
 
   return {
     modeLabel,
@@ -468,7 +521,7 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     operations: {
       watchedSymbolCount: marketSnapshot.coins.length || settings.market.watchedSymbolCount,
       eligibleCandidateCount: eligibleCount,
-      openPositionCount: positions.length,
+      openPositionCount: metrics.openPositionCount,
       queueStatusLabel
     },
     topCandidates,
@@ -482,7 +535,8 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
       recentItems: filterUserFacingRecords(queueBase.recentItems ?? [], (item) => item.symbol)
     },
     learningSummary,
-    recentExecutionLogs: buildRecentExecutionLogs(10)
+    recentExecutionLogs: buildRecentExecutionLogs(10),
+    metrics
   };
 }
 

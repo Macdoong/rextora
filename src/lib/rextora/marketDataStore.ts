@@ -66,6 +66,7 @@ async function doRefresh(): Promise<MarketDataSnapshot> {
       volatility: metrics.volatility,
       spread: metrics.spreadPct,
       fundingFee: metrics.fundingRate,
+      quoteVolume: metrics.quoteVolume,
       state: detectCoinStateFromMetrics(metrics),
       aiScore: metrics.aiScore,
       directionHint: metrics.change24hPct >= 0 ? "롱" : "숏",
