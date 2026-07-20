@@ -11,7 +11,7 @@ describe("liveExecutionEngine", () => {
   it("preflight blocks when LIVE setting is off", () => {
     const result = preflightLiveExecution();
     expect(result.ok).toBe(false);
-    expect(result.blockedReasons.some((r) => r.includes("LIVE 실전 거래 설정"))).toBe(true);
+    expect(result.blockedReasons.some((r) => r.includes("실전 거래 허용"))).toBe(true);
   });
 
   it("preflight does not mention env approval blockers", () => {

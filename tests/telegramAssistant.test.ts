@@ -7,4 +7,9 @@ describe("telegramOperation", () => {
     expect(typeof result.ok).toBe("boolean");
     expect(result.message.length).toBeGreaterThan(0);
   }, 10_000);
+
+  it("uses Korean telegram test copy", async () => {
+    const { buildTelegramTestMessage } = await import("../src/lib/rextora/telegram/telegramMessages");
+    expect(buildTelegramTestMessage()).toContain("[렉스토라 테스트]");
+  });
 });

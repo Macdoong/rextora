@@ -34,6 +34,7 @@ export interface AccountState {
   source: "mock" | "binance" | "user_stream" | "polling";
   userStreamConnected: boolean;
   userStreamLastEventAt: string | null;
+  initialSeedUsdt: number | null;
 }
 
 let accountState: AccountState = {
@@ -45,11 +46,16 @@ let accountState: AccountState = {
   lastSyncAt: null,
   source: "mock",
   userStreamConnected: false,
-  userStreamLastEventAt: null
+  userStreamLastEventAt: null,
+  initialSeedUsdt: null
 };
 
 export function getAccountState(): AccountState {
   return accountState;
+}
+
+export function initializeSeed(seed: number): void {
+  accountState = { ...accountState, initialSeedUsdt: seed };
 }
 
 export function setAccountMode(mode: "PAPER" | "LIVE"): void {

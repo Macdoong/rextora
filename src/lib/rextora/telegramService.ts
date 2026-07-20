@@ -1,5 +1,5 @@
 import { getEnv, hasTelegramCredentials } from "./env";
-import { TELEGRAM_TEST_MESSAGE } from "./telegramTemplates";
+import { TELEGRAM_TEST_MESSAGE, buildRiskBlockMessage } from "./telegram/telegramMessages";
 
 const RATE_LIMIT_MS = 3000;
 let lastSendAt = 0;
@@ -76,5 +76,5 @@ export async function sendTestMessage(message = TELEGRAM_TEST_MESSAGE) {
 export const sendBotStartMessage = async () => ({ ok: false, serviceState: "live-blocked" as const, message: "LIVE 실행 메시지는 전송하지 않습니다." });
 export const sendEntryMessage = async () => ({ ok: false, serviceState: "live-blocked" as const, message: "LIVE 진입 메시지는 전송하지 않습니다." });
 export const sendExitMessage = async () => ({ ok: false, serviceState: "live-blocked" as const, message: "LIVE 청산 메시지는 전송하지 않습니다." });
-export const sendRiskWarningMessage = async (warning: string) => sendTelegramMessage(`[Rextora] 위험: ${warning}`);
+export const sendRiskWarningMessage = async (warning: string) => sendTelegramMessage(buildRiskBlockMessage(warning));
 export const sendErrorMessage = async (error: string) => ({ ok: true, serviceState: "mock" as const, message: `오류 mock 기록: ${error}` });

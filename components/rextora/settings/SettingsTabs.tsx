@@ -7,16 +7,24 @@ import { displayLabel, displaySettingsFieldHelper, displaySettingsFieldLabel } f
 import type { RextoraSettings, SettingsCategory } from "@/src/lib/rextora/settings/settingsTypes";
 
 const TABS: Array<{ id: SettingsCategory; label: string }> = [
-  { id: "trading", label: "운영 모드" },
-  { id: "market", label: "시장 감시" },
-  { id: "signal", label: "신호" },
+  { id: "trading", label: "거래 모드" },
+  { id: "market", label: "감시 코인" },
+  { id: "signal", label: "진입 조건" },
   { id: "cost", label: "비용" },
-  { id: "risk", label: "리스크" },
-  { id: "execution", label: "주문 실행" },
-  { id: "tpSl", label: "TP/SL" },
-  { id: "telegram", label: "텔레그램" },
+  { id: "execution", label: "주문" },
+  { id: "tpSl", label: "손절/익절" },
+  { id: "telegram", label: "알림" },
   { id: "ui", label: "시스템" }
 ];
+
+const HIDDEN_FIELDS = new Set([
+  "manualLiveConfirmationRequired",
+  "liveConfirmationText",
+  "operatorLiveStartRequired",
+  "riskSettingsConfirmed",
+  "requireTelegramForLive",
+  "manualLiveConfirmationRequired"
+]);
 
 const ENUM_OPTIONS: Record<string, string[]> = {
   defaultMode: ["PAPER", "LIVE"],
@@ -99,6 +107,7 @@ export function SettingsTabs() {
   if (loading || !draft) return <LoadingState message="설정을 불러오는 중입니다." hint="잠시만 기다려 주세요." lines={6} />;
 
   const section = draft[tab] as unknown as Record<string, unknown>;
+  const visibleFields = Object.entries(section).filter(([fieldKey]) => !HIDDEN_FIELDS.has(fieldKey));
 
   return (
     <div className="space-y-4" data-testid="settings-tabs">
@@ -107,6 +116,7 @@ export function SettingsTabs() {
           <button
             key={item.id}
             type="button"
+            data-testid={`settings-tab-${item.id}`}
             onClick={() => setTab(item.id)}
             className={`rextora-btn-text rounded-lg px-3 py-1.5 ${tab === item.id ? "bg-violet-600 text-white" : "bg-slate-800 text-slate-300"}`}
           >
@@ -117,7 +127,7 @@ export function SettingsTabs() {
 
       <Card title={`${TABS.find((t) => t.id === tab)?.label} 설정`} action={<Badge tone="purple">편집 가능</Badge>}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {Object.entries(section).map(([fieldKey, value]) => {
+          {visibleFields.map(([fieldKey, value]) => {
             const label = displaySettingsFieldLabel(fieldKey);
             const helper = displaySettingsFieldHelper(tab, fieldKey);
             const enumOptions = ENUM_OPTIONS[fieldKey];

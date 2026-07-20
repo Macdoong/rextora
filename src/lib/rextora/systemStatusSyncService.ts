@@ -241,21 +241,19 @@ export function buildTradingPageLiveContext(): {
   const report = getCachedDiagnosticsReport();
   const api = applyDiagnosticsToApiStatus(report);
   const liveGate = evaluateLiveSafetyGate({
-    readinessOnly: true,
+    fatalOnly: true,
+    mode: "LIVE",
+    operatorLiveStartRequested: true,
     diagnostics: report ?? undefined,
     api
   });
-  const blockedReasons =
-    report && diagnosticIsNormal(report, "connection")
-      ? getExpectedRemainingLiveBlocks(liveGate)
-      : liveGate.blockedReasons;
 
   return {
     diagnostics: report,
     api,
     liveReadiness: {
       ...liveGate,
-      blockedReasons
+      blockedReasons: liveGate.blockedReasons
     }
   };
 }
@@ -285,14 +283,13 @@ export async function buildSyncedSystemPayload(options?: {
   const api = applyDiagnosticsToApiStatus(report);
   const marketDataStatus = resolveMarketDataStatus();
   const liveGate = evaluateLiveSafetyGate({
-    readinessOnly: true,
+    fatalOnly: true,
+    mode: "LIVE",
+    operatorLiveStartRequested: true,
     diagnostics: report ?? undefined,
     api
   });
-  const blockedReasons =
-    report && diagnosticIsNormal(report, "connection")
-      ? getExpectedRemainingLiveBlocks(liveGate)
-      : liveGate.blockedReasons;
+  const blockedReasons = liveGate.blockedReasons;
   const stream = getUserStreamStatus();
 
   return {

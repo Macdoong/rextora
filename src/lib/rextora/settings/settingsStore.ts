@@ -21,6 +21,7 @@ export function loadSettings(): RextoraSettings {
     cost: { ...defaults.cost, ...stored.cost },
     risk: { ...defaults.risk, ...stored.risk },
     execution: { ...defaults.execution, ...stored.execution },
+    learning: { ...defaults.learning, ...stored.learning },
     tpSl: { ...defaults.tpSl, ...stored.tpSl },
     telegram: { ...defaults.telegram, ...stored.telegram },
     ui: { ...defaults.ui, ...stored.ui }

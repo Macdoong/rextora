@@ -127,6 +127,7 @@ export function buildFinalLiveReadinessChecklist(options: {
 }
 
 const REMAINING_BLOCK_ALLOWLIST = [
+  "설정에서 실전 거래 허용을 켜야 합니다.",
   "LIVE 실전 거래 설정이 꺼져 있습니다.",
   "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
   "Binance 연결이 정상이 아닙니다.",
@@ -139,7 +140,8 @@ const REMAINING_BLOCK_ALLOWLIST = [
 ];
 
 function normalizeRemainingBlock(reason: string): string {
-  if (reason.includes("서버 TP/SL")) return "서버 TP/SL 보호가 아직 준비되지 않았습니다.";
+  if (reason.includes("서버 TP/SL") || reason.includes("서버 손절")) return "서버 TP/SL 보호가 아직 준비되지 않았습니다.";
+  if (reason.includes("실전 거래 허용")) return "설정에서 실전 거래 허용을 켜야 합니다.";
   return reason;
 }
 

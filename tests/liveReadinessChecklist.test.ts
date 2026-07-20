@@ -41,7 +41,7 @@ describe("liveReadinessChecklist", () => {
   it("includes expected LIVE block reasons when setting is off", () => {
     const gate = evaluateLiveSafetyGate({ readinessOnly: true, diagnostics: healthyReport });
     const remaining = getExpectedRemainingLiveBlocks(gate);
-    expect(remaining.some((r) => r.includes("LIVE 실전 거래 설정"))).toBe(true);
+    expect(remaining.some((r) => r.includes("실전 거래 허용"))).toBe(true);
     expect(remaining.some((r) => r.includes("실전 거래 승인 환경변수"))).toBe(false);
   });
 });

@@ -1,19 +1,21 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/primitives";
+import { ModeBadge } from "@/components/rextora/ModeBadge";
 
 const navItems: Array<[string, string]> = [
   ["대시보드", "/dashboard"],
+  ["전략 관리", "/strategies"],
+  ["백테스트", "/backtest"],
+  ["전략 성과", "/strategy-performance"],
   ["멀티코인 감시", "/market-watch"],
-  ["AI 후보 랭킹", "/ai-candidates"],
-  ["비용 분석", "/cost-analysis"],
-  ["자동매매", "/trading"],
+  ["모의 매매", "/paper-trading"],
+  ["실전 매매", "/live-trading"],
+  ["거래 기록", "/trades"],
+  ["AI 분석 보고", "/ai-reports"],
   ["리스크 관리", "/risk"],
-  ["알림 / 텔레그램", "/alerts"],
-  ["학습 기록", "/learning-log"],
-  ["시스템 상태", "/system-status"],
-  ["설정", "/settings"]
+  ["설정", "/settings"],
+  ["시스템 상태", "/system-status"]
 ];
 
 export function Sidebar() {
@@ -25,26 +27,26 @@ export function Sidebar() {
         <div className="grid h-10 w-10 place-items-center rounded-xl bg-violet-600 text-xl font-black shadow-glow">R</div>
         <div>
           <div className="text-xl font-black tracking-tight">Rextora</div>
-          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-400">AI Scalping Bot</div>
+          <div className="text-[11px] tracking-wide text-slate-400">수학적 Quant Futures</div>
         </div>
       </div>
 
       <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 p-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">거래 모드</span>
-          <Badge tone="success">PAPER</Badge>
+          <span className="text-xs text-slate-300">현재 거래 모드</span>
+          <ModeBadge />
         </div>
-        <p className="mt-2 text-[11px] text-slate-400">LIVE는 안전 체크리스트 통과 전 차단됩니다.</p>
+        <p className="mt-2 text-[11px] text-slate-400">실전 매매는 명시적 시작 후에만 실제 주문이 실행됩니다.</p>
       </div>
 
-      <nav className="space-y-1" data-testid="main-nav">
+      <nav className="space-y-1 overflow-y-auto pb-16" data-testid="main-nav">
         {navItems.map(([label, href]) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
             <a
               key={href}
               href={href}
-              data-testid={`nav-${href.slice(1)}`}
+              data-testid={`nav-${href.slice(1).replace(/\//g, "-")}`}
               className={`block rounded-lg px-3 py-2 text-sm transition ${
                 active ? "bg-violet-600 text-white shadow-glow" : "text-slate-300 hover:bg-violet-500/15 hover:text-white"
               }`}
@@ -55,7 +57,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="absolute bottom-4 left-4 right-4 text-[11px] text-slate-500">Rextora v2.0 · Futures Scalping</div>
+      <div className="absolute bottom-4 left-4 right-4 text-[11px] text-slate-500">Rextora Quant · SAFE_v44</div>
     </aside>
   );
 }

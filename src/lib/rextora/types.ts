@@ -74,7 +74,13 @@ export interface AiCandidate {
   riskPassed?: boolean;
   blockReason?: string;
   serviceState: ServiceState;
+  /** 큐/실행 경로에서 결정된 레버리지 */
+  leverage?: number;
+  /** 학습 보정 후 최종 점수 */
+  finalScore?: number;
 }
+
+export type LearningEventCategory = "후보 기록" | "거래 기록" | "학습 반영" | "시스템 이벤트";
 
 export interface LearningLogItem {
   id: string;
@@ -83,9 +89,22 @@ export interface LearningLogItem {
   direction: TradeDirection;
   entryReason: string;
   exitReason: string;
-  result: "성공" | "실패";
-  pnlPct: number;
+  result: "성공" | "실패" | "대기" | "보합";
+  pnlPct: number | null;
   signalType: SignalType;
+  eventCategory?: LearningEventCategory;
+  eventType?: string;
+  candidateStatus?: "대기" | "보류" | "제외";
+  holdReason?: string;
+  aiScore?: number;
+  finalScore?: number;
+  leverage?: number;
+  entryPrice?: number;
+  exitPrice?: number;
+  scoreDelta?: number;
+  leverageAdjustment?: number;
+  learningSummary?: string;
+  learningReason?: string;
   successPattern?: string;
   failurePattern?: string;
   blockedReason?: string;
@@ -283,6 +302,16 @@ export interface Position {
   takeProfit: number;
   mode: TradingMode;
   serviceState: ServiceState;
+  aiScore?: number;
+  finalScore?: number;
+  entrySignalType?: SignalType;
+  openedAt?: string;
+  entryReason?: string;
+  paramsHash?: string;
+  strategyName?: string;
+  trailingDistance?: number;
+  maxHoldBars?: number;
+  barsHeld?: number;
 }
 
 export interface OrderRecord {

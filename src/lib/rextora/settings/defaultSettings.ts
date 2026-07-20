@@ -90,6 +90,12 @@ export function createDefaultSettings(): RextoraSettings {
       positionSizePct: 2,
       maxConcurrentPositions: 3,
       defaultLeverage: 2,
+      autoLeverageEnabled: true,
+      minLeverage: 1,
+      maxLeverage: 3,
+      maxEntriesPerScan: 3,
+      maxEntriesPerMinute: 3,
+      queueDelayMs: 1000,
       reduceOnlyForExit: true,
       closePositionOnTpSlFailure: true,
       cancelOpenOrdersBeforeEntry: true,
@@ -97,6 +103,15 @@ export function createDefaultSettings(): RextoraSettings {
       allowPartialTakeProfit: false,
       partialTakeProfitPct: 0.5,
       partialTakeProfitSizePct: 50
+    },
+    learning: {
+      enabled: true,
+      scoreAdjustmentEnabled: true,
+      leverageAdjustmentEnabled: true,
+      badPatternAutoRejectEnabled: true,
+      minSamplesForAdjustment: 10,
+      maxScoreDelta: 8,
+      dailySummaryEnabled: true
     },
     tpSl: {
       takeProfitPct: 0.8,

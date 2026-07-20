@@ -1,30 +1,97 @@
-export function formatCandidateAlert(symbol: string, direction: string, score: number): string {
-  return `[Rextora] 진입 후보\n코인: ${symbol}\n방향: ${direction}\nAI 점수: ${score}\n※ PAPER 모드 기준 알림입니다.`;
+import {
+  buildCandidateDetectedMessage,
+  buildDailySummaryMessage,
+  buildEmergencyStopMessage,
+  buildExitFilledMessage,
+  buildLiveEntrySuccessMessage,
+  buildRiskBlockMessage,
+  buildTopCandidateBriefingMessage,
+  TELEGRAM_TEST_MESSAGE
+} from "./telegram/telegramMessages";
+
+export {
+  TELEGRAM_BANNED_LABELS,
+  TELEGRAM_TEST_MESSAGE,
+  buildApiAuthFailureMessage,
+  buildBinanceConnectionFailureMessage,
+  buildCancelAllOrdersMessage,
+  buildCandidateDetectedMessage,
+  buildCandidateRejectedMessage,
+  buildCandidateSelectedMessage,
+  buildCloseAllPositionsMessage,
+  buildCostRejectedMessage,
+  buildDailySummaryMessage,
+  buildDuplicatePositionBlockedMessage,
+  buildEmergencyStopMessage,
+  buildEntryConditionFailedMessage,
+  buildEntryConditionPassedMessage,
+  buildExitFilledMessage,
+  buildFundingRejectedMessage,
+  buildLiveBotStartedMessage,
+  buildLiveBotStoppedMessage,
+  buildLiveEntryAttemptMessage,
+  buildLiveEntryFailureMessage,
+  buildLiveEntrySuccessMessage,
+  buildMaxConcurrentPositionsBlockedMessage,
+  buildOrderErrorMessage,
+  buildPaperBotStartedMessage,
+  buildPaperBotStoppedMessage,
+  buildPositionClosedAfterTpSlFailureMessage,
+  buildRiskBlockMessage,
+  buildServerTpSlFailureMessage,
+  buildServerTpSlSuccessMessage,
+  buildSpreadRejectedMessage,
+  buildSystemErrorMessage,
+  buildTelegramTestMessage,
+  buildTopCandidateBriefingMessage,
+  containsBannedTelegramLabel,
+  containsTelegramSecret,
+  formatTelegramDirection,
+  formatTelegramMode,
+  formatTelegramTimestamp,
+  maskTelegramOrderId,
+  translateTelegramErrorReason
+} from "./telegram/telegramMessages";
+
+/** @deprecated use buildCandidateDetectedMessage */
+export function formatCandidateAlert(symbol: string, direction: string, score: number, mode: "PAPER" | "LIVE" = "PAPER"): string {
+  return buildCandidateDetectedMessage({ symbol, direction, score, mode });
 }
 
-export function formatEntryAlert(symbol: string, mode: string, price?: number): string {
-  return `[Rextora] ${mode} 진입\n코인: ${symbol}${price ? `\n가격: ${price}` : ""}\n실제 LIVE 주문은 전송되지 않습니다.`;
+/** @deprecated use buildLiveEntrySuccessMessage */
+export function formatEntryAlert(symbol: string, direction: string, price?: number): string {
+  return buildLiveEntrySuccessMessage({
+    symbol,
+    direction,
+    quantity: 0,
+    entryPrice: price ?? 0,
+    stopLoss: 0,
+    takeProfit: 0
+  });
 }
 
+/** @deprecated use buildExitFilledMessage */
 export function formatExitAlert(symbol: string, pnl: number, reason?: string): string {
-  return `[Rextora] 청산 알림\n코인: ${symbol}\n손익: ${pnl}%\n사유: ${reason ?? "청산"}\n투자 조언이 아닙니다.`;
+  return buildExitFilledMessage({ symbol, pnlPct: pnl, reason });
 }
 
-export function formatRiskAlert(message: string, state?: string): string {
-  return `[Rextora] ⚠️ 위험 알림\n상태: ${state ?? "주의"}\n${message}`;
+/** @deprecated use buildRiskBlockMessage */
+export function formatRiskAlert(message: string, _state?: string): string {
+  void _state;
+  return buildRiskBlockMessage(message);
 }
 
-export function formatDailyReport(trades: number, pnl: number): string {
-  return `[Rextora] 일일 리포트\n거래: ${trades}건\n손익: ${pnl}%\n투자 조언이 아닙니다.`;
+/** @deprecated use buildDailySummaryMessage */
+export function formatDailyReport(trades: number, pnl: number, summary?: string): string {
+  return buildDailySummaryMessage({ trades, pnlPct: pnl, summary });
 }
 
+/** @deprecated use buildTopCandidateBriefingMessage */
 export function formatTopCandidateBriefing(symbols: string[]): string {
-  return `[Rextora] TOP 후보\n${symbols.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
+  return buildTopCandidateBriefingMessage(symbols);
 }
 
-export function formatEmergencyAlert(action: string): string {
-  return `[Rextora] 🚨 긴급 알림\n${action}\n즉시 확인이 필요합니다.`;
+/** @deprecated use buildEmergencyStopMessage */
+export function formatEmergencyAlert(_action: string, mode: "PAPER" | "LIVE" = "PAPER"): string {
+  return buildEmergencyStopMessage(mode);
 }
-
-export const TELEGRAM_TEST_MESSAGE =
-  "Rextora Telegram test message. This is only a connectivity test. No trading action was executed.";

@@ -2,10 +2,16 @@ import { botStatusSeed, riskStatusSeed } from "./seedData";
 import { canUsePaperMode } from "./safety";
 import { getPreservedSafeStrategy } from "./strategyRepository";
 import { saveBotMode } from "./localStore";
-import { appendPaperOrder, cancelPendingOrders, closeAllPositions, getOpenPositions, getPaperOrderHistory } from "./positionManager";
+import { appendPaperOrder, cancelPendingOrders, closeAllPositions, getOpenPositions, getPaperOrderHistory, upsertPosition } from "./positionManager";
 import { recordPaperEntry, recordPaperExit } from "./tradeLifecycle";
 import { getTopCandidates } from "./aiRanker";
-import type { BotStatus, EngineResult, OrderRecord, Position, Strategy } from "./types";
+import { getStoredMarketCoins } from "./marketDataStore";
+import type { BotStatus, EngineResult, OrderRecord, Position, Strategy, AiCandidate } from "./types";
+
+function resolveMarketPrice(symbol: string, fallback = 100): number {
+  const coin = getStoredMarketCoins().find((c) => c.symbol === symbol);
+  return coin?.price && coin.price > 0 ? coin.price : fallback;
+}
 
 let botStatus: BotStatus = { ...botStatusSeed };
 let orders: OrderRecord[] = getPaperOrderHistory();
@@ -44,12 +50,15 @@ export async function restartPaperBot(): Promise<EngineResult> {
   return startPaperBot();
 }
 
-export async function executePaperEntry(symbol?: string): Promise<EngineResult> {
-  const candidate = getTopCandidates(5).find((c) => c.symbol === symbol) ?? getTopCandidates(1)[0];
+export async function executePaperEntry(symbolOrCandidate?: string | AiCandidate): Promise<EngineResult> {
+  const candidate =
+    typeof symbolOrCandidate === "object" && symbolOrCandidate
+      ? symbolOrCandidate
+      : getTopCandidates(5).find((c) => c.symbol === symbolOrCandidate) ?? getTopCandidates(1)[0];
   if (!candidate || candidate.status !== "진입 가능") {
     return { ok: false, mode: "PAPER", serviceState: "paper", message: "진입 가능한 PAPER 후보가 없습니다." };
   }
-  const price = 100;
+  const price = resolveMarketPrice(candidate.symbol);
   const { order } = recordPaperEntry(candidate, price);
   orders = [order, ...orders];
   return { ok: true, mode: "PAPER", serviceState: "paper", message: `PAPER 모의 진입이 기록되었습니다: ${candidate.symbol}. 실제 주문은 전송되지 않습니다.` };
@@ -57,9 +66,54 @@ export async function executePaperEntry(symbol?: string): Promise<EngineResult> 
 
 export async function executePaperExit(symbol?: string): Promise<EngineResult> {
   const target = symbol ?? getPaperPosition().symbol;
-  const event = recordPaperExit(target, 101, "PAPER 모의 청산");
+  const exitPrice = resolveMarketPrice(target, 101);
+  const event = recordPaperExit(target, exitPrice, "수동 청산");
   if (!event) return { ok: false, mode: "PAPER", serviceState: "paper", message: "청산할 PAPER 포지션이 없습니다." };
   return { ok: true, mode: "PAPER", serviceState: "paper", message: `PAPER 모의 청산이 기록되었습니다: ${target}. 실제 주문은 전송되지 않습니다.` };
+}
+
+/**
+ * Paper risk engine step: updates prices for open paper positions and closes
+ * them when the simulated stop-loss, take-profit, trailing stop, or max-hold is reached.
+ * No real orders are placed.
+ */
+export async function managePaperPositions(): Promise<{ checked: number; closed: number }> {
+  const open = getOpenPositions();
+  let closed = 0;
+
+  for (const position of open) {
+    const price = resolveMarketPrice(position.symbol, position.currentPrice);
+    if (!Number.isFinite(price) || price <= 0) continue;
+
+    const isLong = position.side === "Long";
+    const unrealizedPnl = Number(((isLong ? price - position.entryPrice : position.entryPrice - price) * position.quantity).toFixed(4));
+    const barsHeld = (position.barsHeld ?? 0) + 1;
+
+    let stopLoss = position.stopLoss;
+    if (position.trailingDistance && position.trailingDistance > 0) {
+      if (isLong) stopLoss = Math.max(stopLoss, price - position.trailingDistance);
+      else stopLoss = Math.min(stopLoss, price + position.trailingDistance);
+    }
+
+    upsertPosition({ ...position, currentPrice: price, unrealizedPnl, stopLoss, barsHeld });
+
+    const hitTakeProfit = position.takeProfit > 0 && (isLong ? price >= position.takeProfit : price <= position.takeProfit);
+    const hitStopLoss = stopLoss > 0 && (isLong ? price <= stopLoss : price >= stopLoss);
+    const hitMaxHold = position.maxHoldBars != null && barsHeld >= position.maxHoldBars;
+
+    if (hitTakeProfit) {
+      recordPaperExit(position.symbol, price, "익절");
+      closed += 1;
+    } else if (hitStopLoss) {
+      recordPaperExit(position.symbol, price, position.trailingDistance ? "트레일링 손절" : "손절");
+      closed += 1;
+    } else if (hitMaxHold) {
+      recordPaperExit(position.symbol, price, "최대 보유 청산");
+      closed += 1;
+    }
+  }
+
+  return { checked: open.length, closed };
 }
 
 export async function closePaperPosition(): Promise<EngineResult> {

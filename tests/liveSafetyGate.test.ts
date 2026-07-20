@@ -27,9 +27,9 @@ describe("liveSafetyGate", () => {
   });
 
   it("blocks LIVE when allowLiveTrading is false", () => {
-    const gate = evaluateLiveSafetyGate({ readinessOnly: true, diagnostics: healthyReport });
+    const gate = evaluateLiveSafetyGate({ fatalOnly: true, mode: "LIVE", operatorLiveStartRequested: true, diagnostics: healthyReport });
     expect(gate.passed).toBe(false);
-    expect(gate.blockedReasons.some((r) => r.includes("LIVE 실전 거래 설정"))).toBe(true);
+    expect(gate.blockedReasons.some((r) => r.includes("실전 거래 허용"))).toBe(true);
   });
 
   it("does not block on REXTORA_LIVE_APPROVED anymore", () => {
@@ -44,13 +44,33 @@ describe("liveSafetyGate", () => {
     expect(gate.blockedReasons.some((r) => r.includes("리스크 설정 확인"))).toBe(false);
   });
 
+  it("does not block on order permission warning when fatalOnly", () => {
+    const warningReport: BinanceDiagnosticsReport = {
+      ...healthyReport,
+      items: healthyReport.items.map((item) =>
+        item.id === "order_permission" ? { ...item, status: "warning" as const } : item
+      )
+    };
+    const settings = getRextoraSettings();
+    updateRextoraSettings({
+      trading: { ...settings.trading, allowLiveTrading: true, liveTradingEnabled: true }
+    });
+    const gate = evaluateLiveSafetyGate({
+      fatalOnly: true,
+      mode: "LIVE",
+      operatorLiveStartRequested: true,
+      diagnostics: warningReport
+    });
+    expect(gate.blockedReasons.some((r) => r.includes("주문 권한"))).toBe(false);
+  });
+
   it("passes readiness when LIVE allowed and TP/SL manager ready", async () => {
     const settings = getRextoraSettings();
     updateRextoraSettings({
       trading: { ...settings.trading, allowLiveTrading: true, liveTradingEnabled: true }
     });
     await initializeServerTpSlManagerReadiness({ exchangeInfoValidated: true });
-    const gate = evaluateLiveSafetyGate({ readinessOnly: true, diagnostics: healthyReport });
+    const gate = evaluateLiveSafetyGate({ fatalOnly: true, mode: "LIVE", operatorLiveStartRequested: true, diagnostics: healthyReport });
     expect(gate.blockedReasons.some((r) => r.includes("서버 TP/SL"))).toBe(false);
     expect(gate.blockedReasons.some((r) => r.includes("실전 거래 승인 환경변수"))).toBe(false);
   });

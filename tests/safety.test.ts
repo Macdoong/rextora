@@ -109,7 +109,13 @@ describe("Rextora scalping pipeline", () => {
   it("learning logger records entry and exit reasons", () => {
     const logs = getLearningLogs();
     expect(logs.length).toBeGreaterThan(0);
-    expect(logs.every((log) => log.entryReason && log.exitReason)).toBe(true);
+    for (const log of logs) {
+      expect(log.entryReason).toBeTruthy();
+      if (log.eventCategory === "후보 기록" || log.eventCategory === "학습 반영" || log.eventCategory === "시스템 이벤트") {
+        continue;
+      }
+      expect(log.exitReason).toBeTruthy();
+    }
   });
 
   it("requires server TP/SL for LIVE", () => {

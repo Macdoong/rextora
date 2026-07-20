@@ -1,4 +1,4 @@
-import { readJsonStore, writeJsonStore } from "./jsonStore";
+import { readJsonStore, writeJsonStore, invalidateJsonStoreCache } from "./jsonStore";
 import type { LearningLogItem, OrderRecord, Position } from "../types";
 
 const TRADES_FILE = "trades.json";
@@ -11,6 +11,11 @@ export function loadTradeLogs(fallback: LearningLogItem[] = []): LearningLogItem
 
 export function saveTradeLogs(logs: LearningLogItem[]): LearningLogItem[] {
   return writeJsonStore(TRADES_FILE, logs);
+}
+
+export function resetTradeLogsForTests(seed: LearningLogItem[] = []): void {
+  invalidateJsonStoreCache(TRADES_FILE);
+  writeJsonStore(TRADES_FILE, seed);
 }
 
 export function loadPaperOrders(fallback: OrderRecord[] = []): OrderRecord[] {

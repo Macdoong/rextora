@@ -2,7 +2,9 @@ import type { SettingsCategory } from "./settings/settingsTypes";
 
 const LABEL_MAP: Record<string, string> = {
   defaultMode: "기본 거래 모드",
-  liveTradingEnabled: "실전 거래 활성화",
+  allowLiveTrading: "실전 거래 허용",
+  liveTradingEnabled: "실전 거래 허용",
+  operatorLiveStartRequired: "수동 시작 필수",
   manualLiveConfirmationRequired: "실전 시작 전 수동 확인",
   liveConfirmationText: "실전 확인 문구",
   testnetMode: "테스트넷 사용",
@@ -15,8 +17,10 @@ const LABEL_MAP: Record<string, string> = {
   defaultLeverage: "기본 레버리지",
   maxLeverage: "최대 레버리지",
 
-  PAPER: "PAPER 모의 거래",
-  LIVE: "LIVE 실전 거래",
+  PAPER: "모의 거래",
+  LIVE: "실전 거래",
+  paper: "모의 거래",
+  live: "실전 거래",
   BACKTEST: "백테스트",
   LIVE_BLOCKED: "실전 거래 차단됨",
   LIVE_READY: "실전 거래 준비 완료",
@@ -43,22 +47,32 @@ const LABEL_MAP: Record<string, string> = {
   Short: "숏",
   long: "롱",
   short: "숏",
-  breakout: "돌파",
-  pullback: "눌림",
+  breakout: "돌파 신호",
+  pullback: "되돌림 신호",
   volume_spike: "거래량 급증",
   trend_reversal: "추세 전환",
+  trend: "추세 신호",
+  mean_reversion: "평균 회귀 신호",
+  unknown: "미확인",
+  pending: "대기",
+  failed: "실패",
+  success: "성공",
+  보합: "보합",
+  대기: "대기",
   overheated_zone: "과열 구간",
   weak_signal: "신호 약함",
   long_candidate: "롱 후보",
   short_candidate: "숏 후보",
+  take_profit: "익절",
+  stop_loss: "손절",
+  manual: "수동 청산",
 
-  "SERVER REQUIRED": "서버 TP/SL 필요",
-  "server tp/sl required": "서버 TP/SL 필요",
+  "SERVER REQUIRED": "서버 손절/익절 필요",
+  "server tp/sl required": "서버 손절/익절 필요",
   "order permission blocked": "주문 권한 차단",
   "futures permission blocked": "Futures 권한 차단",
 
   open: "진행 중",
-  success: "성공",
   failure: "실패",
   inactive: "비활성화됨",
   active: "활성",
@@ -66,8 +80,6 @@ const LABEL_MAP: Record<string, string> = {
   OFF: "꺼짐",
 
   "in-progress": "진행 중",
-  idle: "대기",
-  paper: "PAPER 모의 거래",
   normal: "정상",
   waiting: "대기",
   blocked: "차단",
@@ -104,8 +116,9 @@ const ENGINE_LABEL_MAP: Record<string, string> = {
 
 export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, string>> = {
   trading: {
-    defaultMode: "처음 실행할 때 사용할 거래 모드입니다. PAPER는 실제 주문 없이 모의로 실행됩니다.",
-    liveTradingEnabled: "실전 주문을 허용할지 선택합니다. 모든 안전 조건을 통과해야만 실제 주문이 가능합니다.",
+    defaultMode: "처음 실행할 때 사용할 거래 모드입니다. 모의 거래는 실제 주문 없이 모의로 실행됩니다.",
+    liveTradingEnabled: "실전 주문을 허용할지 선택합니다. 실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다.",
+    allowLiveTrading: "실전 거래를 허용합니다. 켜도 시작 버튼을 누르기 전까지는 주문하지 않습니다.",
     manualLiveConfirmationRequired: "실전 시작 전에 확인 문구를 직접 입력해야 하는지 설정합니다.",
     liveConfirmationText: "실전 거래 시작 시 입력해야 하는 확인 문구입니다.",
     testnetMode: "Binance 테스트 환경을 사용할지 선택합니다. 실제 돈이 움직이지 않습니다.",
@@ -185,7 +198,22 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     preventDuplicateSymbolPosition: "같은 코인 중복 포지션을 막을지 설정합니다.",
     allowPartialTakeProfit: "부분 익절을 허용할지 설정합니다.",
     partialTakeProfitPct: "부분 익절 목표 수익(%)입니다.",
-    partialTakeProfitSizePct: "부분 익절 시 청산 비율(%)입니다."
+    partialTakeProfitSizePct: "부분 익절 시 청산 비율(%)입니다.",
+    maxEntriesPerScan: "한 번 스캔에서 실행 큐에 넣을 최대 후보 수입니다.",
+    maxEntriesPerMinute: "1분 동안 실행할 최대 진입 수입니다.",
+    queueDelayMs: "큐 항목 실행 사이 대기 시간(밀리초)입니다.",
+    autoLeverageEnabled: "시장 상황과 학습 결과에 따라 레버리지를 자동 조정합니다.",
+    minLeverage: "자동 레버리지 최소 배율입니다.",
+    maxConcurrentPositions: "동시에 유지할 수 있는 최대 포지션 수입니다."
+  },
+  learning: {
+    enabled: "학습 엔진을 사용해 후보 점수와 레버리지를 보수적으로 조정합니다.",
+    scoreAdjustmentEnabled: "과거 거래 결과로 후보 점수를 조정합니다.",
+    leverageAdjustmentEnabled: "과거 손실 패턴에 따라 레버리지를 낮춥니다.",
+    badPatternAutoRejectEnabled: "반복 손실 패턴 후보를 자동 제외합니다.",
+    minSamplesForAdjustment: "학습 보정을 적용하기 위한 최소 거래 샘플 수입니다.",
+    maxScoreDelta: "한 번에 적용할 최대 점수 보정 폭입니다.",
+    dailySummaryEnabled: "일일 학습 요약 텔레그램 알림을 보냅니다."
   },
   tpSl: {
     takeProfitPct: "익절 목표 수익(%)입니다.",
@@ -193,10 +221,11 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     useAtrBasedTpSl: "ATR 기반 TP/SL을 사용할지 설정합니다.",
     atrTpMultiplier: "ATR 익절 배수입니다.",
     atrSlMultiplier: "ATR 손절 배수입니다.",
-    serverTpSlRequired: "서버 TP/SL 보호 사용",
-    verifyTpSlAfterEntry: "진입 후 TP/SL 주문 확인 필수",
-    cancelTpSlOnPositionClose: "포지션 청산 시 TP/SL 주문을 취소할지 설정합니다.",
-    fallbackCloseIfTpSlFails: "TP/SL 실패 시 포지션 즉시 청산"
+    serverTpSlRequired: "서버 손절/익절 보호 사용",
+    verifyTpSlAfterEntry: "진입 후 손절/익절 주문 확인 필수",
+    fallbackCloseIfTpSlFails: "손절/익절 실패 시 포지션 즉시 청산",
+    closePositionIfTpSlFails: "손절/익절 실패 시 포지션 즉시 청산",
+    cancelTpSlOnPositionClose: "포지션 청산 시 손절/익절 주문을 취소할지 설정합니다."
   },
   telegram: {
     telegramEnabled: "텔레그램 알림을 사용할지 설정합니다.",
@@ -225,15 +254,15 @@ export const LIVE_READINESS_NEXT_ACTIONS = [
   ".env.local에 Binance API 키와 Secret을 입력하세요.",
   "Telegram Token과 Chat ID를 입력하세요.",
   "서버를 재시작한 뒤 시스템 상태에서 연결을 확인하세요.",
-  "Binance 읽기·잔고 조회·Telegram 테스트를 점검하세요.",
-  "모든 LIVE 체크리스트가 통과해야 실전 거래가 가능합니다."
+  "고급 진단에서 Binance 권한과 User Data Stream을 점검하세요.",
+  "실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다."
 ];
 
 const BLOCK_REASON_MAP: Record<string, string> = {
   "REXTORA_LIVE_APPROVED=false — LIVE 승인이 필요합니다.": "실전 거래 승인 환경변수가 꺼져 있습니다.",
   "거래소 연결이 read-only/mock 상태입니다.": "읽기 전용 / 모의 데이터 상태입니다.",
   "Binance API 키/시크릿이 설정되지 않았습니다.": "Binance API 키가 설정되지 않았습니다.",
-  "설정에서 LIVE 거래가 비활성화되어 있습니다.": "LIVE 거래 설정이 꺼져 있습니다.",
+  "설정에서 LIVE 거래가 비활성화되어 있습니다.": "설정에서 실전 거래 허용을 켜야 합니다.",
   "서버 TP/SL 보호가 활성화되지 않았습니다.": "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
   "서버 TP/SL 보호 주문이 필요합니다.": "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
   "실전 사용 승인된 전략이 아닙니다.": "전략 실전 승인이 필요합니다.",
@@ -311,6 +340,57 @@ export function formatDurationMs(ms?: number): string {
   return `${(ms / 1000).toFixed(1)}초`;
 }
 
+export const UI_BANNED_LABELS = [
+  "PAPER",
+  "LIVE",
+  "Start LIVE",
+  "Stop bot",
+  "Emergency stop",
+  "Close all positions",
+  "Cancel all orders",
+  "Server TP/SL",
+  "Candidate",
+  "Position",
+  "Execution Engine",
+  "Risk Engine",
+  "Cost Engine"
+] as const;
+
+const AUDIT_ACTION_MAP: Record<string, string> = {
+  settings_change: "설정 변경",
+  settings_reset: "설정 초기화",
+  live_execution_attempt: "실전 주문 시도",
+  live_entry: "실전 진입",
+  live_exit: "실전 청산",
+  paper_trade: "모의 거래",
+  tpsl_placement: "서버 손절/익절 등록",
+  tpsl_failure: "서버 손절/익절 실패",
+  emergency_action: "긴급 조치",
+  telegram_failure: "텔레그램 전송 실패",
+  binance_error: "Binance 오류",
+  candidate_block: "후보 제외",
+  candidate_selected: "후보 선택",
+  preflight: "사전 점검"
+};
+
+export function displayAuditActionLabel(type: string): string {
+  return AUDIT_ACTION_MAP[type] ?? "시스템 기록";
+}
+
+export function displayAuditResultLabel(type: string, message: string): string {
+  if (type.includes("failure") || message.includes("실패") || message.includes("차단")) return "실패";
+  if (message.includes("중지") || message.includes("제외")) return "제외";
+  if (message.includes("대기")) return "대기";
+  return "성공";
+}
+
+export function containsBannedUiLabel(text: string): string | null {
+  for (const label of UI_BANNED_LABELS) {
+    if (text.includes(label)) return label;
+  }
+  return null;
+}
+
 export function displayDiagnosticStatus(status: string): string {
   switch (status) {
     case "normal":
@@ -325,3 +405,68 @@ export function displayDiagnosticStatus(status: string): string {
       return displayLabel(status);
   }
 }
+
+export function displaySignalReason(value: string | null | undefined): string {
+  if (!value) return "미확인";
+  return LABEL_MAP[value] ?? displayLabel(value);
+}
+
+export function displayModeBannerText(): string {
+  return "모의 거래 기본 · 실전 거래 차단";
+}
+
+export function displayLearningLogResult(result: string): string {
+  return displayLabel(result);
+}
+
+export function displayLearningLogPnl(pnlPct: number | null | undefined): string {
+  if (pnlPct === null || pnlPct === undefined) return "-";
+  if (!Number.isFinite(pnlPct)) return "-";
+  return `${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%`;
+}
+
+export function learningLogResultTone(result: string): "success" | "danger" | "warning" | "default" {
+  if (result === "성공") return "success";
+  if (result === "실패") return "danger";
+  if (result === "대기" || result === "보합") return "warning";
+  return "default";
+}
+
+export type PositionProtectionLabel =
+  | "서버 손절/익절 연결됨"
+  | "미연결"
+  | "오류"
+  | "모의 손절/익절 적용"
+  | "모의 보호값 없음";
+
+export function displayPositionProtectionStatus(input: {
+  mode: "PAPER" | "LIVE";
+  stopLoss?: number;
+  takeProfit?: number;
+  serverProtected?: boolean;
+  serverError?: boolean;
+}): PositionProtectionLabel {
+  if (input.mode === "PAPER") {
+    const hasStop = (input.stopLoss ?? 0) > 0;
+    const hasTake = (input.takeProfit ?? 0) > 0;
+    if (hasStop && hasTake) return "모의 손절/익절 적용";
+    return "모의 보호값 없음";
+  }
+  if (input.serverError) return "오류";
+  if (input.serverProtected) return "서버 손절/익절 연결됨";
+  return "미연결";
+}
+
+export function positionProtectionTone(label: PositionProtectionLabel): "success" | "danger" | "warning" | "default" {
+  if (label === "서버 손절/익절 연결됨" || label === "모의 손절/익절 적용") return "success";
+  if (label === "오류") return "danger";
+  if (label === "미연결" || label === "모의 보호값 없음") return "warning";
+  return "default";
+}
+
+export const CANDIDATE_STATUS_GUIDE: Array<{ status: string; description: string }> = [
+  { status: "진입 가능", description: "지금 실행 큐에 들어갈 수 있는 후보입니다." },
+  { status: "대기", description: "조건은 일부 맞지만 아직 관찰이 필요한 후보입니다." },
+  { status: "보류", description: "조건은 맞지만 현재 포지션 수나 중복 포지션 때문에 잠시 보류된 후보입니다." },
+  { status: "제외", description: "비용, 변동성, 신호 강도 기준에서 제외된 후보입니다." }
+];

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { SystemStatusPanel } from "@/components/rextora/SystemStatusPanel";
-import { LiveReadinessPanel } from "@/components/rextora/LiveReadinessPanel";
 import { PageHeader } from "@/components/rextora/StatusCards";
 import { ErrorState } from "@/components/rextora/ErrorState";
 import { LoadingState } from "@/components/rextora/LoadingState";
@@ -136,7 +135,6 @@ export default function SystemStatusPage() {
             diagnosticsLoading={diagnosticsLoading}
             onRefreshDiagnostics={() => void refreshDiagnostics()}
           />
-          <LiveReadinessPanel />
           </>
         )}
       </PanelErrorBoundary>

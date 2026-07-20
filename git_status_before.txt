@@ -1,0 +1,79 @@
+ M app/api/rextora/learning/route.ts
+ M app/learning-log/page.tsx
+ M app/settings/page.tsx
+ M app/system-status/page.tsx
+ M app/trading/page.tsx
+ M components/rextora/Sidebar.tsx
+ M components/rextora/StatusCards.tsx
+ M components/rextora/SystemStatusPanel.tsx
+ M components/rextora/settings/SettingsTabs.tsx
+ M scripts/verify-rextora.mjs
+ M src/lib/rextora/accountStateStore.ts
+ M src/lib/rextora/displayLabels.ts
+ M src/lib/rextora/emergencyControls.ts
+ M src/lib/rextora/learningLogger.ts
+ M src/lib/rextora/liveExecutionEngine.ts
+ M src/lib/rextora/liveReadinessChecklist.ts
+ M src/lib/rextora/liveSafetyGate.ts
+ M src/lib/rextora/paperExecutionEngine.ts
+ M src/lib/rextora/seedData.ts
+ M src/lib/rextora/settings/defaultSettings.ts
+ M src/lib/rextora/settings/settingsStore.ts
+ M src/lib/rextora/settings/settingsTypes.ts
+ M src/lib/rextora/settings/settingsValidation.ts
+ M src/lib/rextora/storage/tradeStore.ts
+ M src/lib/rextora/systemStatusSyncService.ts
+ M src/lib/rextora/telegramAssistant.ts
+ M src/lib/rextora/telegramOperation.ts
+ M src/lib/rextora/telegramService.ts
+ M src/lib/rextora/telegramTemplates.ts
+ M src/lib/rextora/tradeLifecycle.ts
+ M src/lib/rextora/types.ts
+ M test-results/.last-run.json
+ M tests/e2e/rextora-smoke.spec.ts
+ M tests/learningLogger.test.ts
+ M tests/liveExecutionEngine.test.ts
+ M tests/liveReadinessChecklist.test.ts
+ M tests/liveSafetyGate.test.ts
+ M tests/safety.test.ts
+ M tests/telegramAssistant.test.ts
+?? app/api/rextora/trading/dashboard/
+?? binance_direct_test.js
+?? components/rextora/ModeBadge.tsx
+?? components/rextora/learning/
+?? components/rextora/trading/TradingDashboard.tsx
+?? cursor_analysis.log
+?? cursor_install.sh
+?? git_diff_before.txt
+?? git_status_after.txt
+?? git_status_before.txt
+?? src/lib/rextora/aiExecutionBridge.ts
+?? src/lib/rextora/dataFilters.ts
+?? src/lib/rextora/executionCandidateTypes.ts
+?? src/lib/rextora/executionQueue.ts
+?? src/lib/rextora/learningEngine.ts
+?? src/lib/rextora/learningLogCategories.ts
+?? src/lib/rextora/learningStore.ts
+?? src/lib/rextora/learningTypes.ts
+?? src/lib/rextora/leverageEngine.ts
+?? src/lib/rextora/leverageTypes.ts
+?? src/lib/rextora/paperEndToEndVerifier.ts
+?? src/lib/rextora/telegram/
+?? src/lib/rextora/telegramNotifier.ts
+?? src/lib/rextora/tradingDashboardStatus.ts
+?? src/lib/rextora/tradingFlowVerifier.ts
+?? test-results/rextora-smoke-Rextora-scal-fb596-didates-TOP-5-table-visible-chromium/
+?? tests/aiExecutionBridge.test.ts
+?? tests/assetIntegrity.test.ts
+?? tests/dataFilters.test.ts
+?? tests/executionQueue.test.ts
+?? tests/learningEngine.test.ts
+?? tests/learningStore.test.ts
+?? tests/leverageEngine.test.ts
+?? tests/paperEndToEndVerifier.test.ts
+?? tests/settingsMerge.test.ts
+?? tests/telegramMessages.test.ts
+?? tests/telegramNotifier.test.ts
+?? tests/telegramRateLimiter.test.ts
+?? tests/tradingDashboardStatus.test.ts
+?? tests/tradingFlowVerifier.test.ts

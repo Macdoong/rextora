@@ -11,3 +11,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 data/rextora/
+
+# Local diagnostic files
+binance_direct_test.js
+cursor_analysis.log
+cursor_install.sh
+git_diff_*.txt
+git_status_*.txt

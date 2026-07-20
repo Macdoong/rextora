@@ -92,6 +92,12 @@ export interface ExecutionSettings {
   positionSizePct: number;
   maxConcurrentPositions: number;
   defaultLeverage: number;
+  autoLeverageEnabled: boolean;
+  minLeverage: number;
+  maxLeverage: number;
+  maxEntriesPerScan: number;
+  maxEntriesPerMinute: number;
+  queueDelayMs: number;
   reduceOnlyForExit: boolean;
   closePositionOnTpSlFailure: boolean;
   cancelOpenOrdersBeforeEntry: boolean;
@@ -99,6 +105,16 @@ export interface ExecutionSettings {
   allowPartialTakeProfit: boolean;
   partialTakeProfitPct: number;
   partialTakeProfitSizePct: number;
+}
+
+export interface LearningSettings {
+  enabled: boolean;
+  scoreAdjustmentEnabled: boolean;
+  leverageAdjustmentEnabled: boolean;
+  badPatternAutoRejectEnabled: boolean;
+  minSamplesForAdjustment: number;
+  maxScoreDelta: number;
+  dailySummaryEnabled: boolean;
 }
 
 export interface TpSlSettings {
@@ -146,6 +162,7 @@ export interface RextoraSettings {
   cost: CostSettings;
   risk: RiskSettingsConfig;
   execution: ExecutionSettings;
+  learning: LearningSettings;
   tpSl: TpSlSettings;
   telegram: TelegramSettingsConfig;
   ui: UiSettings;

@@ -19,10 +19,10 @@ export interface LiveGateOptions {
   diagnostics?: BinanceDiagnosticsReport;
   candidate?: AiCandidate;
   api?: ApiStatus;
-  /** Readiness UI — skip mode / operator-start / candidate checks */
   readinessOnly?: boolean;
-  /** Active order placement — skip candidate / operator-start checks */
   executionInProgress?: boolean;
+  /** Personal UX: only fatal blockers (ignore permission warnings, balance rows, etc.) */
+  fatalOnly?: boolean;
 }
 
 export interface LiveGateResult {
@@ -38,6 +38,10 @@ function findDiagnosticItem(report: BinanceDiagnosticsReport | undefined, id: st
 
 function diagnosticIsNormal(report: BinanceDiagnosticsReport | undefined, id: string): boolean {
   return findDiagnosticItem(report, id)?.status === "normal";
+}
+
+function diagnosticIsBlocked(report: BinanceDiagnosticsReport | undefined, id: string): boolean {
+  return findDiagnosticItem(report, id)?.status === "blocked";
 }
 
 function isLiveTradingAllowed(): boolean {
@@ -63,11 +67,11 @@ function buildChecklist(
       ? diagnosticIsNormal(diagnostics, "account") && diagnosticIsNormal(diagnostics, "position")
       : api.readPermission === "정상",
     orderPermissionNormal: diagnostics
-      ? diagnosticIsNormal(diagnostics, "order_permission")
-      : api.orderPermission === "정상",
+      ? !diagnosticIsBlocked(diagnostics, "order_permission")
+      : api.orderPermission !== "차단",
     futuresPermissionNormal: diagnostics
-      ? diagnosticIsNormal(diagnostics, "futures_permission")
-      : api.futuresPermission === "정상",
+      ? !diagnosticIsBlocked(diagnostics, "futures_permission")
+      : api.futuresPermission !== "차단",
     serverTpSlEnabled: !settings.tpSl.serverTpSlRequired || isServerTpSlManagerReady(),
     liveSettingEnabled: isLiveTradingAllowed(),
     emergencyStopActive: emergency,
@@ -87,13 +91,20 @@ function countOpenPositions(): number {
   return account.positions.filter((p) => p.side !== "FLAT" && p.quantity > 0).length;
 }
 
+function connectionFatallyBlocked(diagnostics?: BinanceDiagnosticsReport): boolean {
+  if (!hasBinanceCredentials()) return true;
+  if (!diagnostics) return false;
+  return diagnosticIsBlocked(diagnostics, "connection");
+}
+
 export async function evaluateLiveSafetyGateAsync(options: LiveGateOptions = {}): Promise<LiveGateResult> {
   const syncResult = evaluateLiveSafetyGate(options);
   const reasons = [...syncResult.blockedReasons];
   const settings = getRextoraSettings();
   const diagnostics = options.diagnostics;
+  const fatalOnly = options.fatalOnly === true;
 
-  if (!options.readinessOnly && !options.executionInProgress) {
+  if (!fatalOnly && !options.readinessOnly && !options.executionInProgress) {
     const readiness = await verifyBinanceReadiness();
     if (!diagnostics || !diagnosticIsNormal(diagnostics, "connection")) {
       if (!readiness.serverTimeOk) reasons.push("Binance 서버 시간 조회 실패");
@@ -103,7 +114,7 @@ export async function evaluateLiveSafetyGateAsync(options: LiveGateOptions = {})
     }
   }
 
-  if (settings.risk.blockWhenMarketDataStale && !options.readinessOnly && !options.executionInProgress) {
+  if (!fatalOnly && settings.risk.blockWhenMarketDataStale && !options.readinessOnly && !options.executionInProgress) {
     if (!diagnostics || !diagnosticIsNormal(diagnostics, "connection")) {
       const staleReason = getMarketStaleBlockReason();
       if (staleReason) reasons.push(staleReason);
@@ -132,66 +143,81 @@ export function evaluateLiveSafetyGate(options: LiveGateOptions = {}): LiveGateR
   const reasons: string[] = [];
   const readinessOnly = options.readinessOnly === true;
   const executionInProgress = options.executionInProgress === true;
+  const fatalOnly = options.fatalOnly === true;
 
-  if (!readinessOnly && !executionInProgress && options.mode !== "LIVE") {
-    reasons.push("LIVE 모드가 선택되지 않았습니다.");
+  if (!readinessOnly && !executionInProgress && !fatalOnly && options.mode !== "LIVE") {
+    reasons.push("실전 거래 모드가 선택되지 않았습니다.");
   }
 
   if (!isLiveTradingAllowed()) {
-    reasons.push("LIVE 실전 거래 설정이 꺼져 있습니다.");
+    reasons.push("설정에서 실전 거래 허용을 켜야 합니다.");
   }
 
   if (
     !readinessOnly &&
     !executionInProgress &&
+    !fatalOnly &&
     settings.trading.operatorLiveStartRequired &&
     !options.operatorLiveStartRequested
   ) {
-    reasons.push("실전 거래 시작 버튼을 눌러야 LIVE가 시작됩니다.");
+    reasons.push("실전 자동매매 시작 버튼을 눌러야 합니다.");
   }
 
-  if (!hasBinanceCredentials()) {
-    reasons.push("Binance API 키가 설정되지 않았습니다.");
+  if (checklist.emergencyStopActive) {
+    reasons.push("긴급 중단 상태입니다.");
   }
 
-  if (!checklist.exchangeConnectionNormal && (!diagnostics || !diagnosticIsNormal(diagnostics, "connection"))) {
-    reasons.push("Binance 연결이 정상이 아닙니다.");
+  if (connectionFatallyBlocked(diagnostics)) {
+    reasons.push("Binance 연결에 실패했습니다.");
   }
 
-  if (!checklist.balanceFetchNormal && (!diagnostics || !diagnosticIsNormal(diagnostics, "balance"))) {
-    reasons.push("잔고 조회가 정상 확인되지 않았습니다.");
-  }
-
-  if (!checklist.accountReadNormal && diagnostics) {
-    if (!diagnosticIsNormal(diagnostics, "account") || !diagnosticIsNormal(diagnostics, "position")) {
-      reasons.push("계정/포지션 조회가 정상 확인되지 않았습니다.");
+  if (fatalOnly) {
+    if (diagnostics && diagnosticIsBlocked(diagnostics, "order_permission")) {
+      reasons.push("주문 권한이 차단되어 있습니다.");
     }
-  }
-
-  if (!checklist.orderPermissionNormal) {
-    reasons.push("주문 권한이 정상이 아닙니다.");
-  }
-
-  if (!checklist.futuresPermissionNormal) {
-    reasons.push("Futures 권한이 정상이 아닙니다.");
+    if (diagnostics && diagnosticIsBlocked(diagnostics, "futures_permission")) {
+      reasons.push("Futures 권한이 차단되어 있습니다.");
+    }
+  } else {
+    if (!hasBinanceCredentials()) reasons.push("Binance API 키가 설정되지 않았습니다.");
+    if (!checklist.exchangeConnectionNormal && (!diagnostics || diagnosticIsBlocked(diagnostics, "connection"))) {
+      reasons.push("Binance 연결이 정상이 아닙니다.");
+    }
+    if (!checklist.balanceFetchNormal && (!diagnostics || diagnosticIsBlocked(diagnostics, "balance"))) {
+      reasons.push("잔고 조회가 정상 확인되지 않았습니다.");
+    }
+    if (!checklist.accountReadNormal && diagnostics) {
+      if (diagnosticIsBlocked(diagnostics, "account") || diagnosticIsBlocked(diagnostics, "position")) {
+        reasons.push("계정/포지션 조회가 정상 확인되지 않았습니다.");
+      }
+    }
+    if (diagnostics && diagnosticIsBlocked(diagnostics, "order_permission")) {
+      reasons.push("주문 권한이 차단되어 있습니다.");
+    }
+    if (diagnostics && diagnosticIsBlocked(diagnostics, "futures_permission")) {
+      reasons.push("Futures 권한이 차단되어 있습니다.");
+    }
   }
 
   if ((config.serverTpSlRequired || settings.tpSl.serverTpSlRequired) && !checklist.serverTpSlEnabled) {
     reasons.push("서버 TP/SL 보호가 아직 준비되지 않았습니다.");
   }
 
-  if (checklist.emergencyStopActive) {
-    reasons.push("긴급 중지 상태입니다.");
-  }
-
-  if (!readinessOnly && !executionInProgress) {
+  if (!readinessOnly && !executionInProgress && fatalOnly) {
     const maxPositions = settings.execution.maxConcurrentPositions ?? settings.risk.maxPositions;
     if (countOpenPositions() >= maxPositions) {
       reasons.push("최대 동시 포지션 수에 도달했습니다.");
     }
   }
 
-  if (!readinessOnly && candidate) {
+  if (!readinessOnly && !fatalOnly && !executionInProgress) {
+    const maxPositions = settings.execution.maxConcurrentPositions ?? settings.risk.maxPositions;
+    if (countOpenPositions() >= maxPositions) {
+      reasons.push("최대 동시 포지션 수에 도달했습니다.");
+    }
+  }
+
+  if (!readinessOnly && candidate && !fatalOnly) {
     if (candidate.status !== "진입 가능") reasons.push("후보 상태가 진입 가능이 아닙니다.");
     if (!candidate.costPassed) reasons.push("비용 규칙 미통과");
     const coin = getMarketDataSnapshot().coins.find((c) => c.symbol === candidate.symbol);
@@ -202,8 +228,16 @@ export function evaluateLiveSafetyGate(options: LiveGateOptions = {}): LiveGateR
     if (checkDuplicatePosition(candidate.symbol)) {
       reasons.push("동일 심볼 포지션이 이미 존재합니다.");
     }
-  } else if (!readinessOnly && !executionInProgress && !candidate) {
-    reasons.push("진입 가능한 후보가 선택되지 않았습니다.");
+  } else if (!readinessOnly && executionInProgress && candidate) {
+    if (candidate.status !== "진입 가능") reasons.push("후보 상태가 진입 가능이 아닙니다.");
+    if (!candidate.costPassed) reasons.push("비용 규칙 미통과");
+    if (checkDuplicatePosition(candidate.symbol)) {
+      reasons.push("동일 심볼 포지션이 이미 존재합니다.");
+    }
+    const maxPositions = settings.execution.maxConcurrentPositions ?? settings.risk.maxPositions;
+    if (countOpenPositions() >= maxPositions) {
+      reasons.push("최대 동시 포지션 수에 도달했습니다.");
+    }
   }
 
   const passed = reasons.length === 0;
@@ -221,6 +255,7 @@ export function evaluateLiveSafetyGate(options: LiveGateOptions = {}): LiveGateR
 export function canPassLiveSafetyGate(options: LiveGateOptions = {}): boolean {
   return evaluateLiveSafetyGate({
     ...options,
+    fatalOnly: true,
     mode: "LIVE",
     operatorLiveStartRequested: true
   }).passed;

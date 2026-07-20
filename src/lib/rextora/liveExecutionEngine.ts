@@ -18,8 +18,9 @@ import {
 import { calculateTpSlPrices, normalizeLiveQuantity, placeServerTpSlAfterEntry } from "./tpSlPlacement";
 import { appendAuditLog } from "./storage/auditStore";
 import { appendLearningEntry } from "./learningLogger";
+import { recordTradeOutcome } from "./learningEngine";
 import {
-  notifyEntryFilled,
+  notifyLiveEntrySuccess,
   notifyLiveEntryAttempt,
   notifyLiveOrderError,
   notifyLiveTpSlFailure,
@@ -36,7 +37,7 @@ export function preflightLiveExecution(): EngineResult & { blockedReasons: strin
   const gate = evaluateLiveSafetyGate({
     mode: "LIVE",
     operatorLiveStartRequested: true,
-    readinessOnly: true
+    fatalOnly: true
   });
   const tpSl = validateServerTpSlRequired("LIVE");
   const blockedReasons = [...gate.blockedReasons];
@@ -90,6 +91,19 @@ export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineRe
       signalType: candidate.signalType,
       mode: "LIVE"
     });
+    recordTradeOutcome({
+      mode: "LIVE",
+      symbol: candidate.symbol,
+      side: candidate.direction,
+      signalType: candidate.signalType,
+      aiScore: candidate.aiScore,
+      finalScore: candidate.finalScore ?? candidate.aiScore,
+      leverage: candidate.leverage ?? 1,
+      entryPrice: 0,
+      result: "loss",
+      exitReason: "error",
+      timestamp: new Date().toISOString()
+    });
     return {
       ok: false,
       mode: "LIVE",
@@ -125,7 +139,7 @@ export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineRe
     const exchange = await getExchangeInfo();
     const coin = getMarketDataSnapshot().coins.find((c) => c.symbol === candidate.symbol);
     const entryPrice = coin?.price ?? 100;
-    const leverage = settings.execution.defaultLeverage || settings.trading.defaultLeverage;
+    const leverage = candidate.leverage ?? (settings.execution.defaultLeverage || settings.trading.defaultLeverage);
     const orderUsdt =
       settings.execution.positionSizeMode === "BALANCE_PERCENT"
         ? (settings.execution.positionSizePct / 100) * 10_000
@@ -190,6 +204,19 @@ export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineRe
           signalType: candidate.signalType,
           mode: "LIVE"
         });
+        recordTradeOutcome({
+          mode: "LIVE",
+          symbol: candidate.symbol,
+          side: candidate.direction,
+          signalType: candidate.signalType,
+          aiScore: candidate.aiScore,
+          finalScore: candidate.finalScore ?? candidate.aiScore,
+          leverage: candidate.leverage ?? leverage,
+          entryPrice: fillPrice,
+          result: "loss",
+          exitReason: "error",
+          timestamp: new Date().toISOString()
+        });
         return {
           ok: false,
           mode: "LIVE",
@@ -219,7 +246,15 @@ export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineRe
 
     const prices = calculateTpSlPrices(fillPrice, positionSide);
     await syncPositionsFromBinance();
-    await notifyEntryFilled(candidate.symbol, candidate.direction);
+    await notifyLiveEntrySuccess({
+      symbol: candidate.symbol,
+      direction: candidate.direction,
+      leverage: candidate.leverage ?? leverage,
+      quantity,
+      entryPrice: fillPrice,
+      stopLoss: prices.stopLossPrice,
+      takeProfit: prices.takeProfitPrice
+    });
     await notifyLiveTpSlPlaced({
       symbol: candidate.symbol,
       side: candidate.direction,
@@ -256,6 +291,19 @@ export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineRe
       pnlPct: 0,
       signalType: candidate.signalType,
       mode: "LIVE"
+    });
+    recordTradeOutcome({
+      mode: "LIVE",
+      symbol: candidate.symbol,
+      side: candidate.direction,
+      signalType: candidate.signalType,
+      aiScore: candidate.aiScore,
+      finalScore: candidate.finalScore ?? candidate.aiScore,
+      leverage,
+      entryPrice: fillPrice,
+      result: "unknown",
+      exitReason: "unknown",
+      timestamp: new Date().toISOString()
     });
 
     setLiveExecutionStatus("LIVE_READY");

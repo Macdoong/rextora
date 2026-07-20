@@ -4,7 +4,7 @@ import { createEmergencyLiveContext, setLiveExecutionStatus } from "./serverTpSl
 import { cancelAllFuturesOrders } from "./binance/binanceTradeService";
 import { getAccountState } from "./accountStateStore";
 import { clearServerTpSlOrders } from "./tpSlPlacement";
-import { notifyEmergency } from "./telegramOperation";
+import { notifyEmergency, notifyCloseAllPositions, notifyCancelAllOrders } from "./telegramOperation";
 import { appendAuditLog } from "./storage/auditStore";
 import { stopBotRuntime } from "./botRuntime";
 import type { EngineResult, TradingMode } from "./types";
@@ -44,7 +44,7 @@ export async function emergencyStopLive(mode: TradingMode = "PAPER"): Promise<En
   if (mode === "PAPER") {
     const result = await emergencyStopPaper();
     logEmergency("긴급 전체 중단", mode, result.message, "simulated");
-    await notifyEmergency("PAPER emergency stop");
+    await notifyEmergency("PAPER");
     return result;
   }
 
@@ -55,7 +55,7 @@ export async function emergencyStopLive(mode: TradingMode = "PAPER"): Promise<En
   }
   clearServerTpSlOrders();
   logEmergency("LIVE 긴급 전체 중단", mode, "LIVE emergency stop executed", "logged");
-  await notifyEmergency("LIVE emergency stop");
+  await notifyEmergency("LIVE");
   return { ok: true, mode: "LIVE", serviceState: "live-ready", message: "LIVE emergency stop executed" };
 }
 
@@ -63,6 +63,7 @@ export async function closeAllLivePositions(mode: TradingMode = "PAPER"): Promis
   if (mode === "PAPER") {
     const message = "PAPER close-all simulated";
     logEmergency("전체 포지션 청산", mode, message, "simulated");
+    await notifyCloseAllPositions(mode);
     return { ok: true, mode, serviceState: "paper", message };
   }
   const context = createEmergencyLiveContext();
@@ -72,6 +73,7 @@ export async function closeAllLivePositions(mode: TradingMode = "PAPER"): Promis
   }
   const message = "LIVE close-all executed";
   logEmergency("LIVE 전체 포지션 청산", mode, message, "logged");
+  await notifyCloseAllPositions("LIVE");
   return { ok: true, mode: "LIVE", serviceState: "live-ready", message };
 }
 
@@ -79,6 +81,7 @@ export async function cancelAllLiveOrders(mode: TradingMode = "PAPER"): Promise<
   if (mode === "PAPER") {
     const message = "PAPER cancel-all simulated";
     logEmergency("전체 주문 취소", mode, message, "simulated");
+    await notifyCancelAllOrders(mode);
     return { ok: true, mode, serviceState: "paper", message };
   }
   const context = createEmergencyLiveContext();
@@ -89,5 +92,6 @@ export async function cancelAllLiveOrders(mode: TradingMode = "PAPER"): Promise<
   clearServerTpSlOrders();
   const message = "LIVE cancel-all executed";
   logEmergency("LIVE 전체 주문 취소", mode, message, "logged");
+  await notifyCancelAllOrders("LIVE");
   return { ok: true, mode: "LIVE", serviceState: "live-ready", message };
 }
