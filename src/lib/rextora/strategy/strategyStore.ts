@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { CONTEXT_FALLBACK_PARAMS, mergeSafeParams } from "./safeV44Params";
 import { computeParamsHash } from "./strategyHash";
 import { loadSafeV44Strategy } from "./safeV44Strategy";
@@ -193,7 +194,7 @@ export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
   const now = new Date().toISOString();
   const params = { ...source.params };
   let paramsHash = computeParamsHash(params);
-  const copyId = `copy_${Date.now().toString(36)}`;
+  const copyId = `copy_${Date.now().toString(36)}_${crypto.randomBytes(3).toString("hex")}`;
   assertSafeStrategyId(copyId);
   const summary = summariesFromParams(params);
   const sourceStrategyId = source.id === SAFE_STRATEGY_ID ? SAFE_STRATEGY_ID : source.sourceStrategyId ?? source.id;
