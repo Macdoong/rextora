@@ -3,20 +3,38 @@ import { getAccountState } from "./accountStateStore";
 import { getMarketDataSnapshot } from "./marketDataStore";
 import { getOpenPositions } from "./positionManager";
 import { evaluateLiveSafetyGate } from "./liveSafetyGate";
-import { getServerTpSlReadiness, isServerTpSlManagerReady } from "./serverTpSlReadiness";
+import {
+  getServerTpSlReadiness,
+  isServerTpSlManagerReady,
+} from "./serverTpSlReadiness";
 import { getServerTpSlState } from "./serverTpSlManager";
 import { getRextoraSettings } from "./settings/settingsService";
 import { getRuntimeState } from "./runtimeState";
-import { summarizeExecutionQueue, getLastExecutionQueueResult, computeCandidateQueueDisplays, buildExecutionQueue } from "./executionQueue";
+import {
+  summarizeExecutionQueue,
+  getLastExecutionQueueResult,
+  computeCandidateQueueDisplays,
+  buildExecutionQueue,
+} from "./executionQueue";
 import { convertAiCandidatesToExecutionCandidates } from "./aiExecutionBridge";
 import { buildLearningSummary } from "./learningEngine";
 import { getSignalWinRates } from "./learningLogger";
 import { getAuditLogs } from "./storage/auditStore";
-import { displayAuditActionLabel, displayAuditResultLabel, displayPositionProtectionStatus, displaySignalReason, type PositionProtectionLabel } from "./displayLabels";
+import {
+  displayAuditActionLabel,
+  displayAuditResultLabel,
+  displayPositionProtectionStatus,
+  displaySignalReason,
+  type PositionProtectionLabel,
+} from "./displayLabels";
 import { filterUserFacingRecords } from "./dataFilters";
 import { getLastSafeSignals } from "./execution/safePaperLoop";
 import { loadSafeV44Strategy } from "./strategy/safeV44Strategy";
-import { getLatestAiTradeReportSummary, listAiTradeReports, type AiTradeReport } from "./report/aiTradeReport";
+import {
+  getLatestAiTradeReportSummary,
+  listAiTradeReports,
+  type AiTradeReport,
+} from "./report/aiTradeReport";
 import { getUnifiedMetrics } from "./metrics/metricsEngine";
 import { computePriceReturnFraction } from "./metrics/tradeResult";
 import type { BinanceDiagnosticsReport } from "./binanceDiagnosticsTypes";
@@ -52,6 +70,12 @@ export interface DashboardPositionRow {
   takeProfit: number;
   unrealizedPnl: number;
   pnlPct: number;
+  leverage: number;
+  margin: number;
+  liquidationPrice: number | null;
+  riskPct: number | null;
+  currentSignal: string;
+  entryReason: string;
   holdTimeLabel: string;
   modeLabel: "모의 거래" | "실전 거래";
   protectionLabel: PositionProtectionLabel;
@@ -148,6 +172,17 @@ export interface TradingDashboardStatus {
     whyExited?: string;
     parameterSuggestion?: string;
     costImpact?: string;
+    slippageImpact?: string;
+    followedRules?: boolean;
+    recurringLossPattern?: string;
+    needsMoreBacktesting?: boolean;
+    mode?: "PAPER" | "LIVE";
+    tradeId?: string | null;
+    side?: string;
+    entryPrice?: number;
+    exitPrice?: number;
+    realizedPnlPct?: number;
+    holdingTimeLabel?: string;
     sections?: AiTradeReport["sections"];
   }>;
 
@@ -186,15 +221,21 @@ export interface TradingDashboardStatus {
   metrics: ReturnType<typeof getUnifiedMetrics>;
 }
 
-function mapCandidateStatus(status: string, costPass: boolean): "진입 가능" | "보류" | "대기" | "제외" {
+function mapCandidateStatus(
+  status: string,
+  costPass: boolean,
+): "진입 가능" | "보류" | "대기" | "제외" {
   if (status === "보류") return "보류";
   if (status === "진입 가능" && costPass) return "진입 가능";
   if (status === "대기") return "대기";
   return "제외";
 }
 
-function mapBotStatus(runtime: ReturnType<typeof getRuntimeState>): TradingDashboardStatus["botStatusLabel"] {
-  if (runtime.emergencyStopped || runtime.state === "오류") return runtime.state === "오류" ? "오류" : "중지됨";
+function mapBotStatus(
+  runtime: ReturnType<typeof getRuntimeState>,
+): TradingDashboardStatus["botStatusLabel"] {
+  if (runtime.emergencyStopped || runtime.state === "오류")
+    return runtime.state === "오류" ? "오류" : "중지됨";
   if (runtime.running) return "실행 중";
   if (runtime.state === "대기") return "대기 중";
   return "중지됨";
@@ -210,9 +251,16 @@ function mapTpSlLabel(): TradingDashboardStatus["serverTpSlLabel"] {
 }
 
 function toCandidateRow(
-  candidate: ReturnType<typeof convertAiCandidatesToExecutionCandidates>[number],
+  candidate: ReturnType<
+    typeof convertAiCandidatesToExecutionCandidates
+  >[number],
   rank: number,
-  queueDisplay: ReturnType<typeof computeCandidateQueueDisplays> extends Map<string, infer V> ? V : never
+  queueDisplay: ReturnType<typeof computeCandidateQueueDisplays> extends Map<
+    string,
+    infer V
+  >
+    ? V
+    : never,
 ): DashboardCandidateRow {
   return {
     rank,
@@ -229,13 +277,22 @@ function toCandidateRow(
     costPass: candidate.costPass,
     queueStatus: queueDisplay.queueStatus,
     queueReason: queueDisplay.queueReason,
-    runtimeStatusLabel: queueDisplay.runtimeStatusLabel
+    runtimeStatusLabel: queueDisplay.runtimeStatusLabel,
   };
 }
 
-function computePositionPnlPct(side: string, entryPrice: number, currentPrice: number): number {
-  const mapped = side === "Short" || side === "SHORT" || side === "숏" ? "SHORT" : "LONG";
-  return Number((computePriceReturnFraction(mapped, entryPrice, currentPrice) * 100).toFixed(2));
+function computePositionPnlPct(
+  side: string,
+  entryPrice: number,
+  currentPrice: number,
+): number {
+  const mapped =
+    side === "Short" || side === "SHORT" || side === "숏" ? "SHORT" : "LONG";
+  return Number(
+    (
+      computePriceReturnFraction(mapped, entryPrice, currentPrice) * 100
+    ).toFixed(2),
+  );
 }
 
 function formatHoldTime(openedAt?: string): string {
@@ -252,45 +309,82 @@ function formatHoldTime(openedAt?: string): string {
 function mapPaperPosition(position: Position): DashboardPositionRow {
   return {
     symbol: position.symbol,
-    side: position.side === "Long" ? "롱" : position.side === "Short" ? "숏" : position.side,
+    side:
+      position.side === "Long"
+        ? "롱"
+        : position.side === "Short"
+          ? "숏"
+          : position.side,
     quantity: position.quantity,
     entryPrice: position.entryPrice,
     currentPrice: position.currentPrice,
     stopLoss: position.stopLoss,
     takeProfit: position.takeProfit,
     unrealizedPnl: position.unrealizedPnl,
-    pnlPct: computePositionPnlPct(position.side, position.entryPrice, position.currentPrice),
+    pnlPct: computePositionPnlPct(
+      position.side,
+      position.entryPrice,
+      position.currentPrice,
+    ),
+    leverage: position.leverage,
+    margin: position.margin,
+    liquidationPrice: null,
+    riskPct: null,
+    currentSignal: displaySignalReason(position.entrySignalType ?? "unknown"),
+    entryReason: position.entryReason ?? "진입 사유 기록 없음",
     holdTimeLabel: formatHoldTime(position.openedAt),
     modeLabel: "모의 거래",
     protectionLabel: displayPositionProtectionStatus({
       mode: "PAPER",
       stopLoss: position.stopLoss,
-      takeProfit: position.takeProfit
-    })
+      takeProfit: position.takeProfit,
+    }),
   };
 }
 
 function mapLivePosition(
   position: ReturnType<typeof getAccountState>["positions"][number],
-  tpSlState: ReturnType<typeof getServerTpSlState>
+  tpSlState: ReturnType<typeof getServerTpSlState>,
 ): DashboardPositionRow {
   return {
     symbol: position.symbol,
-    side: position.side === "LONG" ? "롱" : position.side === "SHORT" ? "숏" : position.side,
+    side:
+      position.side === "LONG"
+        ? "롱"
+        : position.side === "SHORT"
+          ? "숏"
+          : position.side,
     quantity: position.quantity,
     entryPrice: position.entryPrice,
     currentPrice: position.markPrice,
     stopLoss: 0,
     takeProfit: 0,
     unrealizedPnl: position.unrealizedPnl,
-    pnlPct: computePositionPnlPct(position.side, position.entryPrice, position.markPrice),
+    pnlPct: computePositionPnlPct(
+      position.side,
+      position.entryPrice,
+      position.markPrice,
+    ),
+    leverage: position.leverage,
+    margin:
+      position.leverage > 0
+        ? (position.markPrice * position.quantity) / position.leverage
+        : 0,
+    liquidationPrice: null,
+    riskPct: null,
+    currentSignal: "실시간 계정 포지션",
+    entryReason: "거래소 포지션",
     holdTimeLabel: "-",
     modeLabel: "실전 거래",
     protectionLabel: displayPositionProtectionStatus({
       mode: "LIVE",
-      serverProtected: tpSlState.active && tpSlState.verified && tpSlState.symbol === position.symbol,
-      serverError: tpSlState.failedCount > 0 && tpSlState.symbol === position.symbol
-    })
+      serverProtected:
+        tpSlState.active &&
+        tpSlState.verified &&
+        tpSlState.symbol === position.symbol,
+      serverError:
+        tpSlState.failedCount > 0 && tpSlState.symbol === position.symbol,
+    }),
   };
 }
 
@@ -310,7 +404,7 @@ function mapUnifiedTrade(trade: UnifiedTradeResult): DashboardRecentTradeRow {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     }),
     symbol: trade.symbol,
     direction: trade.side === "LONG" ? "롱" : "숏",
@@ -328,7 +422,7 @@ function mapUnifiedTrade(trade: UnifiedTradeResult): DashboardRecentTradeRow {
     funding: trade.funding,
     slippage: trade.slippage,
     holdingTimeLabel: trade.holdingTimeLabel,
-    realizedUsdt: trade.realizedUsdt
+    realizedUsdt: trade.realizedUsdt,
   };
 }
 
@@ -348,21 +442,29 @@ function buildTodayStats(): DashboardTodayStats {
     fundingUsdt: m.todayFundingUsdt,
     slippageUsdt: m.todaySlippageUsdt,
     accountEquity: m.accountEquity,
-    accountReturnPct: m.accountReturnPct
+    accountReturnPct: m.accountReturnPct,
   };
 }
 
-function buildLearningView(learningSummary: LearningSummary): DashboardLearningView {
+function buildLearningView(
+  learningSummary: LearningSummary,
+): DashboardLearningView {
   const signalRates = getSignalWinRates().filter((row) => row.trades > 0);
-  const best = signalRates.length > 0 ? signalRates.reduce((a, b) => (b.winRate > a.winRate ? b : a)) : null;
-  const worst = signalRates.length > 0 ? signalRates.reduce((a, b) => (b.winRate < a.winRate ? b : a)) : null;
+  const best =
+    signalRates.length > 0
+      ? signalRates.reduce((a, b) => (b.winRate > a.winRate ? b : a))
+      : null;
+  const worst =
+    signalRates.length > 0
+      ? signalRates.reduce((a, b) => (b.winRate < a.winRate ? b : a))
+      : null;
   return {
     totalTrades: learningSummary.totalTrades,
     winRate: learningSummary.winRate,
     avgPnlPct: learningSummary.avgPnlPct,
     bestStrategy: best ? displaySignalReason(best.signalType) : "-",
     worstStrategy: worst ? displaySignalReason(worst.signalType) : "-",
-    recentAdjustment: learningSummary.recentAdjustment
+    recentAdjustment: learningSummary.recentAdjustment,
   };
 }
 
@@ -373,11 +475,11 @@ function buildRecentExecutionLogs(limit = 10): DashboardExecutionLogRow[] {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit"
+      second: "2-digit",
     }),
     action: displayAuditActionLabel(entry.type),
     result: displayAuditResultLabel(entry.type, entry.message),
-    message: entry.message
+    message: entry.message,
   }));
 }
 
@@ -387,25 +489,35 @@ function countExecutingFromQueue(): number {
   return raw.items.filter((item) => item.status === "실행 중").length;
 }
 
-export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsReport | null): TradingDashboardStatus {
+export function buildTradingDashboardStatus(
+  diagnostics?: BinanceDiagnosticsReport | null,
+): TradingDashboardStatus {
   const settings = getRextoraSettings();
   const runtime = getRuntimeState();
-  const liveAllowed = settings.trading.allowLiveTrading || settings.trading.liveTradingEnabled;
+  const liveAllowed =
+    settings.trading.allowLiveTrading || settings.trading.liveTradingEnabled;
   const modeLabel = runtime.mode === "LIVE" ? "실전 거래" : "모의 거래";
   const ranked = rankCandidates(10);
   const executionCandidates = convertAiCandidatesToExecutionCandidates(ranked);
   const queueMode = runtime.mode === "LIVE" ? "LIVE" : "PAPER";
   buildExecutionQueue(executionCandidates, queueMode);
-  const queueDisplays = computeCandidateQueueDisplays(executionCandidates, queueMode);
+  const queueDisplays = computeCandidateQueueDisplays(
+    executionCandidates,
+    queueMode,
+  );
   const topCandidates = filterUserFacingRecords(
     executionCandidates.map((candidate, index) =>
-      toCandidateRow(candidate, index + 1, queueDisplays.get(`${candidate.symbol}:${candidate.side}`) ?? {
-        queueStatus: "제외",
-        runtimeStatusLabel: "제외",
-        queueReason: candidate.rejectReason ?? "진입 조건 미통과"
-      })
+      toCandidateRow(
+        candidate,
+        index + 1,
+        queueDisplays.get(`${candidate.symbol}:${candidate.side}`) ?? {
+          queueStatus: "제외",
+          runtimeStatusLabel: "제외",
+          queueReason: candidate.rejectReason ?? "진입 조건 미통과",
+        },
+      ),
     ),
-    (row) => row.symbol
+    (row) => row.symbol,
   );
   const executionTop = topCandidates[0] ?? null;
   const top = ranked[0];
@@ -415,7 +527,7 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     mode: "LIVE",
     operatorLiveStartRequested: true,
     diagnostics: diagnostics ?? undefined,
-    candidate: top
+    candidate: top,
   });
 
   const marketSnapshot = getMarketDataSnapshot();
@@ -430,9 +542,16 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
   const paperPositions = getOpenPositions()
     .filter((p) => p.quantity > 0 && p.side !== "Flat")
     .map(mapPaperPosition);
-  const positions = runtime.mode === "LIVE" ? livePositions : paperPositions.length > 0 ? paperPositions : livePositions;
+  const positions =
+    runtime.mode === "LIVE"
+      ? livePositions
+      : paperPositions.length > 0
+        ? paperPositions
+        : livePositions;
 
-  const eligibleCount = topCandidates.filter((c) => c.queueStatus === "큐 가능").length;
+  const eligibleCount = topCandidates.filter(
+    (c) => c.queueStatus === "큐 가능",
+  ).length;
   const queueStatusLabel =
     queueBase.received > 0
       ? `수신 ${queueBase.received} · 대기 ${queueBase.queued} · 실행 ${executing} · 완료 ${queueBase.executed}`
@@ -443,7 +562,12 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     if (safeSignals.length > 0) {
       return safeSignals.map((row) => ({
         symbol: row.symbol,
-        direction: row.signal.side === "LONG" ? "롱" : row.signal.side === "SHORT" ? "숏" : "-",
+        direction:
+          row.signal.side === "LONG"
+            ? "롱"
+            : row.signal.side === "SHORT"
+              ? "숏"
+              : "-",
         strategyLabel: "SAFE_v44_i4060",
         score: row.signal.score,
         judgment:
@@ -452,14 +576,15 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
             : row.status === "차단"
               ? "제외"
               : "관찰",
-        reason: row.reason
+        reason: row.reason,
       }));
     }
     return topCandidates.map((row) => ({
       symbol: row.symbol,
       direction: row.direction,
       strategyLabel: displaySignalReason(
-        executionCandidates.find((candidate) => candidate.symbol === row.symbol)?.source.signal ?? "unknown"
+        executionCandidates.find((candidate) => candidate.symbol === row.symbol)
+          ?.source.signal ?? "unknown",
       ),
       score: row.finalScore,
       judgment:
@@ -468,11 +593,12 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
           : row.runtimeStatusLabel === "제외"
             ? "제외"
             : "관찰",
-      reason: row.queueReason ?? row.rejectReason ?? "-"
+      reason: row.queueReason ?? row.rejectReason ?? "-",
     }));
   })();
 
   const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
+  const metrics = getUnifiedMetrics();
   const aiReports = listAiTradeReports(5).map((r) => ({
     id: r.id,
     symbol: r.symbol,
@@ -483,24 +609,40 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     whyExited: r.whyExited,
     parameterSuggestion: r.parameterSuggestion,
     costImpact: r.costImpact,
-    sections: r.sections
+    slippageImpact: r.slippageImpact,
+    followedRules: r.followedRules,
+    recurringLossPattern: r.recurringLossPattern,
+    needsMoreBacktesting: r.needsMoreBacktesting,
+    mode: r.mode,
+    tradeId: r.tradeId,
+    side: r.raw?.side,
+    entryPrice: r.raw?.entryPrice,
+    exitPrice: r.raw?.exitPrice,
+    realizedPnlPct: r.raw?.realizedPnlPct,
+    holdingTimeLabel: r.tradeId
+      ? metrics.recentTrades.find((trade) => trade.id === r.tradeId)
+          ?.holdingTimeLabel
+      : undefined,
+    sections: r.sections,
   }));
 
-  const safetyLabel: TradingDashboardStatus["safetyLabel"] = runtime.emergencyStopped
-    ? "차단"
-    : runtime.state === "오류"
-      ? "오류"
-      : "정상";
+  const safetyLabel: TradingDashboardStatus["safetyLabel"] =
+    runtime.emergencyStopped
+      ? "차단"
+      : runtime.state === "오류"
+        ? "오류"
+        : "정상";
 
   const state = getAccountState();
-  const metrics = getUnifiedMetrics();
 
   return {
     modeLabel,
     botStatusLabel: mapBotStatus(runtime),
     canStartPaper: !runtime.running || runtime.mode !== "PAPER",
     canStartLive: liveAllowed && liveGate.passed,
-    liveBlockReason: liveGate.passed ? null : liveGate.blockedReasons[0] ?? null,
+    liveBlockReason: liveGate.passed
+      ? null
+      : (liveGate.blockedReasons[0] ?? null),
     liveAllowed,
     serverTpSlLabel: mapTpSlLabel(),
     candidateLabel: executionTop ? executionTop.runtimeStatusLabel : "제외",
@@ -512,17 +654,18 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     activeStrategy: {
       name: strategyMeta.name,
       paramsHash: strategyMeta.paramsHash,
-      sourceStatus: strategyMeta.sourceStatus
+      sourceStatus: strategyMeta.sourceStatus,
     },
     aiReportSummary: getLatestAiTradeReportSummary(),
     aiReports,
     learningView: buildLearningView(learningSummary),
     lastUpdatedAt: new Date().toISOString(),
     operations: {
-      watchedSymbolCount: marketSnapshot.coins.length || settings.market.watchedSymbolCount,
+      watchedSymbolCount:
+        marketSnapshot.coins.length || settings.market.watchedSymbolCount,
       eligibleCandidateCount: eligibleCount,
       openPositionCount: metrics.openPositionCount,
-      queueStatusLabel
+      queueStatusLabel,
     },
     topCandidates,
     selectedCandidate: executionTop,
@@ -532,11 +675,14 @@ export function buildTradingDashboardStatus(diagnostics?: BinanceDiagnosticsRepo
     queueSummary: {
       ...queueBase,
       executing,
-      recentItems: filterUserFacingRecords(queueBase.recentItems ?? [], (item) => item.symbol)
+      recentItems: filterUserFacingRecords(
+        queueBase.recentItems ?? [],
+        (item) => item.symbol,
+      ),
     },
     learningSummary,
     recentExecutionLogs: buildRecentExecutionLogs(10),
-    metrics
+    metrics,
   };
 }
 

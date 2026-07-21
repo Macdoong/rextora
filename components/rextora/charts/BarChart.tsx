@@ -2,14 +2,25 @@
 
 import { ChartShell, type ChartRenderContext } from "./ChartShell";
 import { CHART_THEME } from "@/src/lib/rextora/charts/theme";
-import { createLinearScale, formatAxisNumber, niceDomain, ticks } from "@/src/lib/rextora/charts/scales";
-import type { ChartSeries, DistributionBin, HeatmapCell, ScatterPoint, TimelineEvent } from "@/src/lib/rextora/charts/types";
+import {
+  createLinearScale,
+  formatAxisNumber,
+  niceDomain,
+  ticks,
+} from "@/src/lib/rextora/charts/scales";
+import type {
+  ChartSeries,
+  DistributionBin,
+  HeatmapCell,
+  ScatterPoint,
+  TimelineEvent,
+} from "@/src/lib/rextora/charts/types";
 
 export function BarChart({
   title,
   series,
   height = 200,
-  diverging = false
+  diverging = false,
 }: {
   title: string;
   series: ChartSeries;
@@ -17,19 +28,39 @@ export function BarChart({
   diverging?: boolean;
 }) {
   return (
-    <ChartShell title={title} height={height} empty={series.data.length === 0} legend={[{ label: series.name, color: series.color ?? CHART_THEME.accent }]}>
+    <ChartShell
+      title={title}
+      height={height}
+      empty={series.data.length === 0}
+      legend={[
+        { label: series.name, color: series.color ?? CHART_THEME.accent },
+      ]}
+    >
       {(ctx) => <Bars ctx={ctx} series={series} diverging={diverging} />}
     </ChartShell>
   );
 }
 
-function Bars({ ctx, series, diverging }: { ctx: ChartRenderContext; series: ChartSeries; diverging: boolean }) {
+function Bars({
+  ctx,
+  series,
+  diverging,
+}: {
+  ctx: ChartRenderContext;
+  series: ChartSeries;
+  diverging: boolean;
+}) {
   const { pad, plotW, plotH, setTooltip } = ctx;
   const data = series.data;
   if (!data.length) return null;
   const ys = data.map((d) => d.y);
-  const yDom = diverging ? niceDomain(Math.min(0, ...ys), Math.max(0, ...ys)) : niceDomain(0, Math.max(...ys, 0));
-  const xScale = createLinearScale([0, data.length], [pad.left, pad.left + plotW]);
+  const yDom = diverging
+    ? niceDomain(Math.min(0, ...ys), Math.max(0, ...ys))
+    : niceDomain(0, Math.max(...ys, 0));
+  const xScale = createLinearScale(
+    [0, data.length],
+    [pad.left, pad.left + plotW],
+  );
   const yScale = createLinearScale(yDom, [pad.top + plotH, pad.top]);
   const zero = yScale(0);
   const barW = Math.max(2, (plotW / data.length) * 0.7);
@@ -39,8 +70,20 @@ function Bars({ ctx, series, diverging }: { ctx: ChartRenderContext; series: Cha
     <g>
       {ticks(yDom, 4).map((t) => (
         <g key={t}>
-          <line x1={pad.left} x2={pad.left + plotW} y1={yScale(t)} y2={yScale(t)} stroke={CHART_THEME.grid} />
-          <text x={pad.left - 6} y={yScale(t) + 3} textAnchor="end" fill={CHART_THEME.axisLabel} fontSize={10}>
+          <line
+            x1={pad.left}
+            x2={pad.left + plotW}
+            y1={yScale(t)}
+            y2={yScale(t)}
+            stroke={CHART_THEME.grid}
+          />
+          <text
+            x={pad.left - 6}
+            y={yScale(t) + 3}
+            textAnchor="end"
+            fill={CHART_THEME.axisLabel}
+            fontSize={10}
+          >
             {formatAxisNumber(t)}
           </text>
         </g>
@@ -50,7 +93,9 @@ function Bars({ ctx, series, diverging }: { ctx: ChartRenderContext; series: Cha
         const y = yScale(d.y);
         const top = Math.min(y, zero);
         const h = Math.max(1, Math.abs(y - zero));
-        const fill = diverging ? (d.y >= 0 ? CHART_THEME.up : CHART_THEME.down) : color;
+        const fill =
+          d.color ??
+          (diverging ? (d.y >= 0 ? CHART_THEME.up : CHART_THEME.down) : color);
         return (
           <rect
             key={i}
@@ -60,7 +105,16 @@ function Bars({ ctx, series, diverging }: { ctx: ChartRenderContext; series: Cha
             height={h}
             fill={fill}
             rx={1}
-            onMouseEnter={() => setTooltip({ x, y: top, lines: [d.label ?? String(i), formatAxisNumber(d.y)] })}
+            onMouseEnter={() =>
+              setTooltip({
+                x,
+                y: top,
+                lines: d.tooltipLines ?? [
+                  d.label ?? String(i),
+                  formatAxisNumber(d.y),
+                ],
+              })
+            }
             onMouseLeave={() => setTooltip(null)}
           />
         );
@@ -72,7 +126,7 @@ function Bars({ ctx, series, diverging }: { ctx: ChartRenderContext; series: Cha
 export function DistributionChart({
   title,
   bins,
-  height = 180
+  height = 180,
 }: {
   title: string;
   bins: DistributionBin[];
@@ -81,7 +135,7 @@ export function DistributionChart({
   const series: ChartSeries = {
     id: "dist",
     name: title,
-    data: bins.map((b, i) => ({ x: i, y: b.value, label: b.label }))
+    data: bins.map((b, i) => ({ x: i, y: b.value, label: b.label })),
   };
   return <BarChart title={title} series={series} height={height} />;
 }
@@ -90,7 +144,7 @@ export function TimelineChart({
   title = "타임라인",
   events,
   height = 160,
-  showLabels = false
+  showLabels = false,
 }: {
   title?: string;
   events: TimelineEvent[];
@@ -98,7 +152,12 @@ export function TimelineChart({
   showLabels?: boolean;
 }) {
   return (
-    <ChartShell title={title} height={height} empty={events.length === 0} emptyLabel="표시할 신호가 없습니다">
+    <ChartShell
+      title={title}
+      height={height}
+      empty={events.length === 0}
+      emptyLabel="표시할 신호가 없습니다"
+    >
       {(ctx) => {
         const { pad, plotW, plotH, setTooltip } = ctx;
         if (!events.length) return null;
@@ -108,12 +167,25 @@ export function TimelineChart({
         const mid = pad.top + plotH / 2;
         return (
           <g>
-            <line x1={pad.left} x2={pad.left + plotW} y1={mid} y2={mid} stroke={CHART_THEME.grid} />
+            <line
+              x1={pad.left}
+              x2={pad.left + plotW}
+              y1={mid}
+              y2={mid}
+              stroke={CHART_THEME.grid}
+            />
             {events.map((e, i) => {
               const x = xScale(e.time);
               const color =
-                e.tone === "up" ? CHART_THEME.up : e.tone === "down" ? CHART_THEME.down : e.tone === "warn" ? CHART_THEME.warning : CHART_THEME.accent;
-              const shortLabel = e.label.length > 18 ? `${e.label.slice(0, 16)}…` : e.label;
+                e.tone === "up"
+                  ? CHART_THEME.up
+                  : e.tone === "down"
+                    ? CHART_THEME.down
+                    : e.tone === "warn"
+                      ? CHART_THEME.warning
+                      : CHART_THEME.accent;
+              const shortLabel =
+                e.label.length > 18 ? `${e.label.slice(0, 16)}…` : e.label;
               return (
                 <g
                   key={i}
@@ -121,13 +193,23 @@ export function TimelineChart({
                     setTooltip({
                       x,
                       y: mid - 20,
-                      lines: [e.label, e.value != null ? formatAxisNumber(e.value) : ""]
+                      lines: [
+                        e.label,
+                        e.value != null ? formatAxisNumber(e.value) : "",
+                      ],
                     })
                   }
                   onMouseLeave={() => setTooltip(null)}
                 >
                   <circle cx={x} cy={mid} r={5} fill={color} />
-                  <line x1={x} x2={x} y1={mid - 14} y2={mid + 14} stroke={color} opacity={0.4} />
+                  <line
+                    x1={x}
+                    x2={x}
+                    y1={mid - 14}
+                    y2={mid + 14}
+                    stroke={color}
+                    opacity={0.4}
+                  />
                   {showLabels && (
                     <text
                       x={x}
@@ -151,16 +233,21 @@ export function TimelineChart({
 }
 
 export function HeatmapChart({
-  title = "Monthly Heatmap",
+  title = "월별 수익률",
   cells,
-  height = 160
+  height = 160,
 }: {
   title?: string;
   cells: HeatmapCell[];
   height?: number;
 }) {
   return (
-    <ChartShell title={title} height={height} empty={cells.length === 0} interactive={false}>
+    <ChartShell
+      title={title}
+      height={height}
+      empty={cells.length === 0}
+      interactive={false}
+    >
       {(ctx) => {
         const cols = [...new Set(cells.map((c) => c.col))];
         const rows = [...new Set(cells.map((c) => c.row))];
@@ -176,7 +263,10 @@ export function HeatmapChart({
               const x = pad.left + ci * cellW;
               const y = pad.top + ri * cellH;
               const intensity = Math.abs(c.value) / maxAbs;
-              const fill = c.value >= 0 ? `rgba(52,211,153,${0.15 + intensity * 0.75})` : `rgba(248,113,113,${0.15 + intensity * 0.75})`;
+              const fill =
+                c.value >= 0
+                  ? `rgba(52,211,153,${0.15 + intensity * 0.75})`
+                  : `rgba(248,113,113,${0.15 + intensity * 0.75})`;
               return (
                 <rect
                   key={`${c.row}-${c.col}`}
@@ -186,13 +276,26 @@ export function HeatmapChart({
                   height={Math.max(1, cellH - 2)}
                   fill={fill}
                   rx={2}
-                  onMouseEnter={() => setTooltip({ x: x + cellW / 2, y, lines: [c.col, `${c.value.toFixed(2)}%`] })}
+                  onMouseEnter={() =>
+                    setTooltip({
+                      x: x + cellW / 2,
+                      y,
+                      lines: [c.col, `${c.value.toFixed(2)}%`],
+                    })
+                  }
                   onMouseLeave={() => setTooltip(null)}
                 />
               );
             })}
             {cols.map((col, i) => (
-              <text key={col} x={pad.left + i * cellW + cellW / 2} y={ctx.height - 8} textAnchor="middle" fill={CHART_THEME.axisLabel} fontSize={9}>
+              <text
+                key={col}
+                x={pad.left + i * cellW + cellW / 2}
+                y={ctx.height - 8}
+                textAnchor="middle"
+                fill={CHART_THEME.axisLabel}
+                fontSize={9}
+              >
                 {col}
               </text>
             ))}
@@ -204,11 +307,11 @@ export function HeatmapChart({
 }
 
 export function ScatterChart({
-  title = "Risk vs Return",
+  title = "위험 대비 수익",
   points,
   height = 240,
-  xLabel = "Risk (MDD %)",
-  yLabel = "Return %"
+  xLabel = "위험 (최대 낙폭 %)",
+  yLabel = "수익률 %",
 }: {
   title?: string;
   points: ScatterPoint[];
@@ -221,14 +324,27 @@ export function ScatterChart({
       {(ctx) => {
         const { pad, plotW, plotH, setTooltip } = ctx;
         if (!points.length) return null;
-        const xDom = niceDomain(Math.min(...points.map((p) => p.x)), Math.max(...points.map((p) => p.x)));
-        const yDom = niceDomain(Math.min(...points.map((p) => p.y)), Math.max(...points.map((p) => p.y)));
+        const xDom = niceDomain(
+          Math.min(...points.map((p) => p.x)),
+          Math.max(...points.map((p) => p.x)),
+        );
+        const yDom = niceDomain(
+          Math.min(...points.map((p) => p.y)),
+          Math.max(...points.map((p) => p.y)),
+        );
         const xScale = createLinearScale(xDom, [pad.left, pad.left + plotW]);
         const yScale = createLinearScale(yDom, [pad.top + plotH, pad.top]);
         return (
           <g>
             {ticks(yDom, 4).map((t) => (
-              <line key={t} x1={pad.left} x2={pad.left + plotW} y1={yScale(t)} y2={yScale(t)} stroke={CHART_THEME.grid} />
+              <line
+                key={t}
+                x1={pad.left}
+                x2={pad.left + plotW}
+                y1={yScale(t)}
+                y2={yScale(t)}
+                stroke={CHART_THEME.grid}
+              />
             ))}
             {points.map((p) => (
               <circle
@@ -242,13 +358,23 @@ export function ScatterChart({
                   setTooltip({
                     x: xScale(p.x),
                     y: yScale(p.y),
-                    lines: [p.label, `${xLabel}: ${p.x.toFixed(2)}`, `${yLabel}: ${p.y.toFixed(2)}`]
+                    lines: [
+                      p.label,
+                      `${xLabel}: ${p.x.toFixed(2)}`,
+                      `${yLabel}: ${p.y.toFixed(2)}`,
+                    ],
                   })
                 }
                 onMouseLeave={() => setTooltip(null)}
               />
             ))}
-            <text x={pad.left + plotW / 2} y={ctx.height - 4} textAnchor="middle" fill={CHART_THEME.axisLabel} fontSize={10}>
+            <text
+              x={pad.left + plotW / 2}
+              y={ctx.height - 4}
+              textAnchor="middle"
+              fill={CHART_THEME.axisLabel}
+              fontSize={10}
+            >
               {xLabel}
             </text>
           </g>

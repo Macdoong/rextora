@@ -34,7 +34,7 @@ describe("unified chart engine", () => {
 
   it("builds distributions and meters from real fields", () => {
     const dist = winLossDistribution([{ pnlPct: 1 }, { pnlPct: -0.5 }, { pnlPct: 0 }]);
-    expect(dist.find((d) => d.label === "Win")?.value).toBe(1);
+    expect(dist.find((d) => d.label === "이익")?.value).toBe(1);
     const meters = coinMeters({ change24hPct: 2, volumeChangePct: 0, volatility: 3, aiScore: 80, quoteVolume: 5_000_000 });
     expect(meters).toHaveLength(6);
     expect(rollingWinRate([{ pnlPct: 1 }, { pnlPct: -1 }, { pnlPct: 1 }]).data).toHaveLength(3);

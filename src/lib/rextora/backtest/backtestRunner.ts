@@ -1,14 +1,25 @@
 import { generateSyntheticCandles } from "../data/ohlcvTypes";
-import { getStrategyById, updateStrategyLastBacktest } from "../strategy/strategyStore";
+import {
+  getStrategyById,
+  updateStrategyLastBacktest,
+} from "../strategy/strategyStore";
 import { runSafeV44Backtest } from "./backtestEngine";
 import { saveBacktestResult } from "./backtestStore";
 import type { BacktestConfig, BacktestReport } from "./backtestTypes";
 import type { BacktestTrade } from "./backtestEngine";
-import { storedToDefinition, type StoredStrategyV1 } from "../strategy/definition/bridge";
+import {
+  storedToDefinition,
+  type StoredStrategyV1,
+} from "../strategy/definition/bridge";
 import { runConditionBuilderBacktest } from "../strategy/conditionBacktest";
 import { validateCanonicalDefinition } from "../strategy/definition/validator";
+import { buildBacktestReport } from "./backtestReport";
 
-function barsForRange(timeframe: string, fromMs?: number, toMs?: number): number {
+function barsForRange(
+  timeframe: string,
+  fromMs?: number,
+  toMs?: number,
+): number {
   const span = (toMs ?? Date.now()) - (fromMs ?? Date.now() - 90 * 86400000);
   const tfMs =
     timeframe === "1m"
@@ -29,14 +40,16 @@ export function runConfiguredBacktest(config: BacktestConfig): {
   equityCurve: number[];
   candles: ReturnType<typeof generateSyntheticCandles>;
 } {
-  const strategy = getStrategyById(config.strategyId) as StoredStrategyV1 | undefined;
+  const strategy = getStrategyById(config.strategyId) as
+    StoredStrategyV1 | undefined;
   if (!strategy) throw new Error("전략을 찾을 수 없습니다.");
 
   if (strategy.strategyType === "condition_builder") {
     const def = storedToDefinition(strategy);
     const v = validateCanonicalDefinition(def);
     if (!v.ok) throw new Error(v.errors.join(" · "));
-    if (def.timeframe === "unknown") throw new Error("적용 시간봉이 확인되지 않았습니다.");
+    if (def.timeframe === "unknown")
+      throw new Error("적용 시간봉이 확인되지 않았습니다.");
   }
 
   const symbols = config.symbols.length ? config.symbols : ["BTCUSDT"];
@@ -48,7 +61,9 @@ export function runConfiguredBacktest(config: BacktestConfig): {
 
   const stress: NonNullable<BacktestReport["costStress"]> = [];
 
-  for (const mult of config.costStressMultipliers.length ? config.costStressMultipliers : [1]) {
+  for (const mult of config.costStressMultipliers.length
+    ? config.costStressMultipliers
+    : [1]) {
     const feeRate = config.feeRate * mult;
     const slippageRate = config.slippageRate * mult;
     let stressReturn = 0;
@@ -58,8 +73,16 @@ export function runConfiguredBacktest(config: BacktestConfig): {
     let stressEquity = config.balance;
 
     for (const symbol of symbols) {
-      const count = barsForRange(config.timeframe, config.fromOpenTime, config.toOpenTime);
-      const candles = generateSyntheticCandles(count, 80 + symbol.length * 3, 0.00012 + symbol.length * 0.00001);
+      const count = barsForRange(
+        config.timeframe,
+        config.fromOpenTime,
+        config.toOpenTime,
+      );
+      const candles = generateSyntheticCandles(
+        count,
+        80 + symbol.length * 3,
+        0.00012 + symbol.length * 0.00001,
+      );
 
       let resultTrades: BacktestTrade[] = [];
       let resultEquity: number[] = [];
@@ -81,10 +104,11 @@ export function runConfiguredBacktest(config: BacktestConfig): {
           candles,
           balance: config.balance / Math.max(1, symbols.length),
           feeRate,
-          slippageRate
+          slippageRate,
         });
         const starting = config.balance / Math.max(1, symbols.length);
-        const totalReturn = starting > 0 ? (cb.endingBalance - starting) / starting : 0;
+        const totalReturn =
+          starting > 0 ? (cb.endingBalance - starting) / starting : 0;
         let peak = starting;
         let mdd = 0;
         for (const eq of cb.equityCurve) {
@@ -100,7 +124,7 @@ export function runConfiguredBacktest(config: BacktestConfig): {
           totalReturn,
           mdd,
           tradeCount: cb.trades.length,
-          negativeMonths: 0
+          negativeMonths: 0,
         };
       } else {
         const safe = runSafeV44Backtest({
@@ -109,7 +133,7 @@ export function runConfiguredBacktest(config: BacktestConfig): {
           params: {
             ...strategy.params,
             cost_guard_k: config.costGuardK,
-            base_bal_pct: config.baseBalPct ?? strategy.params.base_bal_pct
+            base_bal_pct: config.baseBalPct ?? strategy.params.base_bal_pct,
           },
           paramsHash: strategy.paramsHash,
           strategyName: strategy.name,
@@ -123,7 +147,7 @@ export function runConfiguredBacktest(config: BacktestConfig): {
           applyFunding: config.applyFunding,
           costGuardK: config.costGuardK,
           fromOpenTime: config.fromOpenTime,
-          toOpenTime: config.toOpenTime
+          toOpenTime: config.toOpenTime,
         });
         resultTrades = safe.trades;
         resultEquity = safe.equityCurve;
@@ -133,7 +157,8 @@ export function runConfiguredBacktest(config: BacktestConfig): {
       if (mult === (config.costStressMultipliers[0] ?? 1)) {
         allTrades.push(...resultTrades);
         candleCount += resultReport.candleCount;
-        combinedEquity += resultReport.endingBalance - resultReport.startingBalance;
+        combinedEquity +=
+          resultReport.endingBalance - resultReport.startingBalance;
         equityCurve.push(...resultEquity.slice(1));
         if (!primaryCandles.length) primaryCandles = candles;
       }
@@ -150,77 +175,53 @@ export function runConfiguredBacktest(config: BacktestConfig): {
       totalReturn: Number((stressReturn / symbols.length).toFixed(6)),
       mdd: Number(stressMdd.toFixed(6)),
       tradeCount: stressTrades,
-      negativeMonths: stressNegMonths
+      negativeMonths: stressNegMonths,
     });
     void stressEquity;
   }
 
-  const primary = stress[0];
-  const wins = allTrades.filter((t) => t.pnlPct > 0).length;
-  const report: BacktestReport = {
+  const report = buildBacktestReport({
     strategyName: strategy.name,
-    strategyHash: strategy.paramsHash,
+    paramsHash: strategy.paramsHash,
     strategyId: strategy.id,
     sourceStatus: strategy.sourceStatus,
     symbol: symbols[0],
     symbols,
     timeframe: config.timeframe,
-    fromDate: config.fromOpenTime ? new Date(config.fromOpenTime).toISOString().slice(0, 10) : null,
-    toDate: config.toOpenTime ? new Date(config.toOpenTime).toISOString().slice(0, 10) : null,
+    fromDate: config.fromOpenTime
+      ? new Date(config.fromOpenTime).toISOString().slice(0, 10)
+      : null,
+    toDate: config.toOpenTime
+      ? new Date(config.toOpenTime).toISOString().slice(0, 10)
+      : null,
     candleCount,
-    totalReturn: primary?.totalReturn ?? 0,
-    mdd: primary?.mdd ?? 0,
-    tradeCount: allTrades.length,
-    winRate: allTrades.length ? wins / allTrades.length : 0,
-    averageTrade: allTrades.length ? allTrades.reduce((s, t) => s + t.pnlPct, 0) / allTrades.length : 0,
-    profitFactor: 1,
-    maxConsecutiveLosses: 0,
-    feeImpact: allTrades.length ? allTrades.reduce((s, t) => s + t.feePct, 0) / allTrades.length : 0,
-    feeTotal: allTrades.reduce((s, t) => s + t.feePct, 0),
-    slippageTotal: allTrades.reduce((s, t) => s + (t.slippagePct ?? 0), 0),
-    monthlyReturns: [],
-    negativeMonths: primary?.negativeMonths ?? 0,
     startingBalance: config.balance,
     endingBalance: combinedEquity,
+    equityCurve,
+    trades: allTrades,
     costStress: stress,
-    validation: {
-      paramsHashVerified: strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
-      feesApplied: true,
-      slippageApplied: true,
-      fundingApplied: config.applyFunding,
-      noRealOrders: true
-    }
-  };
-
-  const byMonth = new Map<string, { returnPct: number; trades: number; fees: number; mdd: number }>();
-  for (const t of allTrades) {
-    const month = `T${String(Math.floor(t.exitBar / 20) + 1).padStart(2, "0")}`;
-    const cur = byMonth.get(month) ?? { returnPct: 0, trades: 0, fees: 0, mdd: 0 };
-    cur.returnPct += t.pnlPct;
-    cur.trades += 1;
-    cur.fees += t.feePct;
-    cur.mdd = Math.min(cur.mdd, t.pnlPct);
-    byMonth.set(month, cur);
-  }
-  report.monthlyReturns = [...byMonth.entries()].map(([month, row]) => ({ month, ...row }));
-  report.negativeMonths = report.monthlyReturns.filter((m) => m.returnPct < 0).length;
-
-  updateStrategyLastBacktest(strategy.id, {
-    totalReturn: report.totalReturn,
-    mdd: report.mdd,
-    trades: report.tradeCount,
-    winRate: report.winRate
+    paramsHashVerified:
+      strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
+    feesApplied: true,
+    slippageApplied: true,
+    fundingApplied: config.applyFunding,
   });
-
-  const grossWin = allTrades.filter((t) => t.pnlPct > 0).reduce((s, t) => s + t.pnlPct, 0);
-  const grossLoss = Math.abs(allTrades.filter((t) => t.pnlPct < 0).reduce((s, t) => s + t.pnlPct, 0));
-  report.profitFactor = grossLoss > 0 ? Number((grossWin / grossLoss).toFixed(4)) : grossWin > 0 ? 99 : 0;
 
   return { report, trades: allTrades, equityCurve, candles: primaryCandles };
 }
 
 export function runAndSaveBacktest(config: BacktestConfig) {
   const result = runConfiguredBacktest(config);
-  const saved = saveBacktestResult({ config, report: result.report, trades: result.trades });
+  updateStrategyLastBacktest(config.strategyId, {
+    totalReturn: result.report.totalReturn,
+    mdd: result.report.mdd,
+    trades: result.report.tradeCount,
+    winRate: result.report.winRate,
+  });
+  const saved = saveBacktestResult({
+    config,
+    report: result.report,
+    trades: result.trades,
+  });
   return { ...result, saved };
 }

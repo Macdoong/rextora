@@ -8,15 +8,36 @@ const toneClass: Record<Tone, string> = {
   danger: "border-red-500/40 bg-red-500/10 text-red-300",
   warning: "border-orange-500/40 bg-orange-500/10 text-orange-300",
   purple: "border-violet-500/40 bg-violet-500/10 text-violet-200",
-  muted: "border-slate-600 bg-slate-800/70 text-slate-300"
+  muted: "border-slate-600 bg-slate-800/70 text-slate-300",
 };
 
-export function Card({ title, action, children, className = "", "data-testid": dataTestId }: { title?: string; action?: ReactNode; children: ReactNode; className?: string; "data-testid"?: string }) {
+export function Card({
+  title,
+  action,
+  children,
+  className = "",
+  "data-testid": dataTestId,
+}: {
+  title?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  "data-testid"?: string;
+}) {
   return (
-    <section className={`rextora-card rounded-xl p-4 ${className}`} data-testid={dataTestId}>
+    <section
+      className={`rextora-card rounded-xl p-4 ${className}`}
+      data-testid={dataTestId}
+    >
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-3">
-          {title ? <h2 className="rextora-card-title font-semibold text-slate-100">{title}</h2> : <span />}
+          {title ? (
+            <h2 className="rextora-card-title font-semibold text-slate-100">
+              {title}
+            </h2>
+          ) : (
+            <span />
+          )}
           {action}
         </div>
       )}
@@ -25,8 +46,23 @@ export function Card({ title, action, children, className = "", "data-testid": d
   );
 }
 
-export function Badge({ children, tone = "default", "data-testid": dataTestId }: { children: ReactNode; tone?: Tone; "data-testid"?: string }) {
-  return <span data-testid={dataTestId} className={`rextora-badge inline-flex rounded-full border px-2.5 py-0.5 font-semibold ${toneClass[tone]}`}>{children}</span>;
+export function Badge({
+  children,
+  tone = "default",
+  "data-testid": dataTestId,
+}: {
+  children: ReactNode;
+  tone?: Tone;
+  "data-testid"?: string;
+}) {
+  return (
+    <span
+      data-testid={dataTestId}
+      className={`rextora-badge inline-flex rounded-full border px-2.5 py-0.5 font-semibold ${toneClass[tone]}`}
+    >
+      {children}
+    </span>
+  );
 }
 
 export function Button({
@@ -53,21 +89,60 @@ export function Button({
   );
 }
 
-export function ProgressBar({ value, tone = "success" }: { value: number; tone?: Tone }) {
-  const color = tone === "danger" ? "bg-red-500" : tone === "warning" ? "bg-orange-500" : tone === "purple" ? "bg-violet-500" : "bg-green-500";
+export function ProgressBar({
+  value,
+  tone = "success",
+}: {
+  value: number;
+  tone?: Tone;
+}) {
+  const color =
+    tone === "danger"
+      ? "bg-red-500"
+      : tone === "warning"
+        ? "bg-orange-500"
+        : tone === "purple"
+          ? "bg-violet-500"
+          : "bg-green-500";
 
   return (
     <div className="h-2 overflow-hidden rounded-full bg-slate-800">
-      <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <div
+        className={`h-full rounded-full ${color}`}
+        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+      />
     </div>
   );
 }
 
-export function Metric({ label, value, tone = "default" }: { label: string; value: ReactNode; tone?: Tone }) {
+export function Metric({
+  label,
+  value,
+  tone = "default",
+  help,
+}: {
+  label: string;
+  value: ReactNode;
+  tone?: Tone;
+  help?: string;
+}) {
   return (
     <div>
-      <div className="rextora-helper">{label}</div>
-      <div className={`rextora-body mt-1 font-semibold ${tone === "success" ? "text-green-300" : tone === "danger" ? "text-red-300" : "text-slate-100"}`}>
+      <div className="rextora-helper flex items-center gap-1">
+        <span>{label}</span>
+        {help && (
+          <span
+            className="inline-grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-600 text-[10px] text-slate-300"
+            title={help}
+            aria-label={`${label} 설명: ${help}`}
+          >
+            i
+          </span>
+        )}
+      </div>
+      <div
+        className={`rextora-body mt-1 font-semibold ${tone === "success" ? "text-green-300" : tone === "danger" ? "text-red-300" : "text-slate-100"}`}
+      >
         {value}
       </div>
     </div>
