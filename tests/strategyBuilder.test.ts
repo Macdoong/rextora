@@ -269,7 +269,7 @@ describe("Priority #3 strategy builder", () => {
     const confirmed = catalog.filter((c) => c.confirmedInDataFile);
     expect(confirmed.length).toBeGreaterThanOrEqual(13);
     const unconfirmed = catalog.filter((c) => !c.confirmedInDataFile);
-    expect(unconfirmed.every((c) => c.sourceLabel.includes("원본에서 확인되지 않음"))).toBe(true);
+    expect(unconfirmed.every((c) => c.sourceLabel === "unconfirmed")).toBe(true);
   });
 
   it("24. validateStrategyById works", () => {

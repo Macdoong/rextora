@@ -2,6 +2,8 @@ export interface ChartPoint {
   x: number;
   y: number;
   label?: string;
+  color?: string;
+  tooltipLines?: string[];
 }
 
 export interface ChartSeries {

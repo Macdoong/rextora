@@ -42,6 +42,14 @@ const LABEL_MAP: Record<string, string> = {
   "live-blocked": "실전 차단",
   "bot-runtime": "봇 실행 상태",
   "system-status": "시스템 상태",
+  "execution-engine": "거래 실행 상태",
+  "trading-dashboard": "거래 현황",
+  market: "시장 데이터",
+  strategies: "전략 데이터",
+  learning: "학습 기록",
+  backtest: "과거 데이터",
+  historical: "과거 데이터",
+  simulation: "시뮬레이션",
 
   Long: "롱",
   Short: "숏",
@@ -102,6 +110,9 @@ const LABEL_MAP: Record<string, string> = {
   short_candidate: "숏 후보",
   take_profit: "익절",
   stop_loss: "손절",
+  trailing_stop: "트레일링 청산",
+  max_hold: "최대 보유 시간 청산",
+  end: "백테스트 종료 청산",
   manual: "수동 청산",
 
   "SERVER REQUIRED": "서버 손절/익절 필요",
@@ -129,7 +140,7 @@ const LABEL_MAP: Record<string, string> = {
   BALANCE_PERCENT: "잔고 비율",
 
   "Settings Store": "설정 저장소",
-  "User Data Stream": "Binance 실시간 계정 동기화"
+  "User Data Stream": "Binance 실시간 계정 동기화",
 };
 
 const ENGINE_LABEL_MAP: Record<string, string> = {
@@ -148,21 +159,32 @@ const ENGINE_LABEL_MAP: Record<string, string> = {
   "Risk Engine": "리스크 관리 엔진",
   "Execution Engine": "주문 실행 엔진",
   "Telegram Assistant": "텔레그램 알림",
-  "Learning Logger": "학습 기록 저장"
+  "Learning Logger": "학습 기록 저장",
 };
 
-export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, string>> = {
+export const SETTINGS_FIELD_HELPERS: Record<
+  SettingsCategory,
+  Record<string, string>
+> = {
   trading: {
-    defaultMode: "처음 실행할 때 사용할 거래 모드입니다. 모의 거래는 실제 주문 없이 모의로 실행됩니다.",
-    liveTradingEnabled: "실전 주문을 허용할지 선택합니다. 실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다.",
-    allowLiveTrading: "실전 거래를 허용합니다. 켜도 시작 버튼을 누르기 전까지는 주문하지 않습니다.",
-    manualLiveConfirmationRequired: "실전 시작 전에 확인 문구를 직접 입력해야 하는지 설정합니다.",
+    defaultMode:
+      "처음 실행할 때 사용할 거래 모드입니다. 모의 거래는 실제 주문 없이 모의로 실행됩니다.",
+    liveTradingEnabled:
+      "실전 주문을 허용할지 선택합니다. 실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다.",
+    allowLiveTrading:
+      "실전 거래를 허용합니다. 켜도 시작 버튼을 누르기 전까지는 주문하지 않습니다.",
+    manualLiveConfirmationRequired:
+      "실전 시작 전에 확인 문구를 직접 입력해야 하는지 설정합니다.",
     liveConfirmationText: "실전 거래 시작 시 입력해야 하는 확인 문구입니다.",
-    testnetMode: "Binance 테스트 환경을 사용할지 선택합니다. 실제 돈이 움직이지 않습니다.",
-    positionMode: "단방향은 한 코인에 롱 또는 숏 하나만 유지합니다. 초보 운영에는 단방향을 권장합니다.",
-    marginType: "격리는 코인별로 손실 범위를 제한하고, 교차는 계정 잔고를 함께 사용합니다.",
+    testnetMode:
+      "Binance 테스트 환경을 사용할지 선택합니다. 실제 돈이 움직이지 않습니다.",
+    positionMode:
+      "단방향은 한 코인에 롱 또는 숏 하나만 유지합니다. 초보 운영에는 단방향을 권장합니다.",
+    marginType:
+      "격리는 코인별로 손실 범위를 제한하고, 교차는 계정 잔고를 함께 사용합니다.",
     defaultLeverage: "기본으로 사용할 레버리지 배율입니다.",
-    maxLeverage: "시스템이 사용할 수 있는 최대 레버리지입니다. 낮을수록 안전합니다."
+    maxLeverage:
+      "시스템이 사용할 수 있는 최대 레버리지입니다. 낮을수록 안전합니다.",
   },
   market: {
     watchedSymbolCount: "동시에 감시할 코인 개수입니다.",
@@ -174,7 +196,7 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     staleDataThresholdMs: "이 시간보다 오래되면 데이터를 지연으로 표시합니다.",
     maxKlineSymbolsPerScan: "한 번에 조회할 캔들 차트 코인 수입니다.",
     klineInterval: "캔들 차트 시간 간격입니다.",
-    candidateRefreshIntervalMs: "AI 후보 목록을 다시 계산하는 간격입니다."
+    candidateRefreshIntervalMs: "AI 후보 목록을 다시 계산하는 간격입니다.",
   },
   signal: {
     enableLong: "롱(상승) 신호 탐지를 사용할지 설정합니다.",
@@ -192,19 +214,20 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     volumeSpikeMultiplier: "평소 대비 거래량 급증 기준 배수입니다.",
     maxSpreadPct: "허용할 최대 스프레드(%)입니다.",
     minVolatilityPct: "최소 변동성 기준(%)입니다.",
-    maxVolatilityPct: "최대 변동성 기준(%)입니다."
+    maxVolatilityPct: "최대 변동성 기준(%)입니다.",
   },
   cost: {
     makerFeePct: "지정가 주문 수수료율(%)입니다.",
     takerFeePct: "시장가 주문 수수료율(%)입니다.",
-    useTakerFeeForMarketOrders: "시장가 주문 시 테이커 수수료를 적용할지 설정합니다.",
+    useTakerFeeForMarketOrders:
+      "시장가 주문 시 테이커 수수료를 적용할지 설정합니다.",
     slippageBasePct: "기본 슬리피지(%) 추정치입니다.",
     slippageVolatilityMultiplier: "변동성에 따른 슬리피지 보정 배수입니다.",
     safetyMarginPct: "예상 수익에서 빼는 안전 마진(%)입니다.",
     minExpectedEdgePct: "진입에 필요한 최소 기대 수익(%)입니다.",
     includeFundingFee: "펀딩비를 비용 계산에 포함할지 설정합니다.",
     maxFundingFeePct: "허용할 최대 펀딩비(%)입니다.",
-    maxSpreadPct: "비용 계산에 사용할 최대 스프레드(%)입니다."
+    maxSpreadPct: "비용 계산에 사용할 최대 스프레드(%)입니다.",
   },
   risk: {
     maxDailyLossPct: "하루에 허용할 최대 손실(%)입니다.",
@@ -216,12 +239,15 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     maxTradesPerDay: "과매매를 막기 위한 하루 최대 거래 횟수입니다.",
     maxTradesPerSymbolPerDay: "코인별 하루 최대 거래 횟수입니다.",
     cooldownMs: "거래 후 다음 거래까지 대기 시간(밀리초)입니다.",
-    emergencyStopOnDailyLoss: "일일 손실 한도 도달 시 긴급 중단할지 설정합니다.",
-    emergencyStopOnConsecutiveLosses: "연속 손실 한도 도달 시 긴급 중단할지 설정합니다.",
+    emergencyStopOnDailyLoss:
+      "일일 손실 한도 도달 시 긴급 중단할지 설정합니다.",
+    emergencyStopOnConsecutiveLosses:
+      "연속 손실 한도 도달 시 긴급 중단할지 설정합니다.",
     requireServerTpSl: "실전 거래 시 서버 TP/SL이 필수인지 설정합니다.",
     requireTelegramForLive: "실전 거래 시 텔레그램 알림이 필수인지 설정합니다.",
-    blockWhenMarketDataStale: "시장 데이터가 지연되면 진입을 차단할지 설정합니다.",
-    riskSettingsConfirmed: "리스크 설정을 확인했는지 표시합니다."
+    blockWhenMarketDataStale:
+      "시장 데이터가 지연되면 진입을 차단할지 설정합니다.",
+    riskSettingsConfirmed: "리스크 설정을 확인했는지 표시합니다.",
   },
   execution: {
     orderType: "진입 주문 유형(시장가/지정가)입니다.",
@@ -232,25 +258,28 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     reduceOnlyForExit: "청산 시 reduce-only 주문을 사용할지 설정합니다.",
     closePositionOnTpSlFailure: "TP/SL 실패 시 포지션을 닫을지 설정합니다.",
     cancelOpenOrdersBeforeEntry: "진입 전 미체결 주문을 취소할지 설정합니다.",
-    preventDuplicateSymbolPosition: "같은 코인 중복 포지션을 막을지 설정합니다.",
+    preventDuplicateSymbolPosition:
+      "같은 코인 중복 포지션을 막을지 설정합니다.",
     allowPartialTakeProfit: "부분 익절을 허용할지 설정합니다.",
     partialTakeProfitPct: "부분 익절 목표 수익(%)입니다.",
     partialTakeProfitSizePct: "부분 익절 시 청산 비율(%)입니다.",
     maxEntriesPerScan: "한 번 스캔에서 실행 큐에 넣을 최대 후보 수입니다.",
     maxEntriesPerMinute: "1분 동안 실행할 최대 진입 수입니다.",
     queueDelayMs: "큐 항목 실행 사이 대기 시간(밀리초)입니다.",
-    autoLeverageEnabled: "시장 상황과 학습 결과에 따라 레버리지를 자동 조정합니다.",
+    autoLeverageEnabled:
+      "시장 상황과 학습 결과에 따라 레버리지를 자동 조정합니다.",
     minLeverage: "자동 레버리지 최소 배율입니다.",
-    maxConcurrentPositions: "동시에 유지할 수 있는 최대 포지션 수입니다."
+    maxConcurrentPositions: "동시에 유지할 수 있는 최대 포지션 수입니다.",
   },
   learning: {
     enabled: "학습 엔진을 사용해 후보 점수와 레버리지를 보수적으로 조정합니다.",
     scoreAdjustmentEnabled: "과거 거래 결과로 후보 점수를 조정합니다.",
     leverageAdjustmentEnabled: "과거 손실 패턴에 따라 레버리지를 낮춥니다.",
     badPatternAutoRejectEnabled: "반복 손실 패턴 후보를 자동 제외합니다.",
-    minSamplesForAdjustment: "학습 보정을 적용하기 위한 최소 거래 샘플 수입니다.",
+    minSamplesForAdjustment:
+      "학습 보정을 적용하기 위한 최소 거래 샘플 수입니다.",
     maxScoreDelta: "한 번에 적용할 최대 점수 보정 폭입니다.",
-    dailySummaryEnabled: "일일 학습 요약 텔레그램 알림을 보냅니다."
+    dailySummaryEnabled: "일일 학습 요약 텔레그램 알림을 보냅니다.",
   },
   tpSl: {
     takeProfitPct: "익절 목표 수익(%)입니다.",
@@ -262,7 +291,8 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     verifyTpSlAfterEntry: "진입 후 손절/익절 주문 확인 필수",
     fallbackCloseIfTpSlFails: "손절/익절 실패 시 포지션 즉시 청산",
     closePositionIfTpSlFails: "손절/익절 실패 시 포지션 즉시 청산",
-    cancelTpSlOnPositionClose: "포지션 청산 시 손절/익절 주문을 취소할지 설정합니다."
+    cancelTpSlOnPositionClose:
+      "포지션 청산 시 손절/익절 주문을 취소할지 설정합니다.",
   },
   telegram: {
     telegramEnabled: "텔레그램 알림을 사용할지 설정합니다.",
@@ -276,15 +306,15 @@ export const SETTINGS_FIELD_HELPERS: Record<SettingsCategory, Record<string, str
     alertOnEmergency: "긴급 상황 시 알림을 보낼지 설정합니다.",
     alertOnDailyReport: "일일 리포트 알림을 보낼지 설정합니다.",
     minCandidateScoreForAlert: "알림을 보낼 최소 AI 점수입니다.",
-    alertRateLimitMs: "알림 전송 간격 제한(밀리초)입니다."
+    alertRateLimitMs: "알림 전송 간격 제한(밀리초)입니다.",
   },
   ui: {
     dashboardRefreshMs: "대시보드 자동 새로고침 간격(밀리초)입니다.",
     marketWatchRefreshMs: "시장 감시 화면 새로고침 간격(밀리초)입니다.",
     systemStatusRefreshMs: "시스템 상태 새로고침 간격(밀리초)입니다.",
     showAdvancedSettings: "고급 설정 항목을 표시할지 설정합니다.",
-    compactMode: "화면을 더 촘촘하게 표시할지 설정합니다."
-  }
+    compactMode: "화면을 더 촘촘하게 표시할지 설정합니다.",
+  },
 };
 
 export const LIVE_READINESS_NEXT_ACTIONS = [
@@ -292,16 +322,22 @@ export const LIVE_READINESS_NEXT_ACTIONS = [
   "Telegram Token과 Chat ID를 입력하세요.",
   "서버를 재시작한 뒤 시스템 상태에서 연결을 확인하세요.",
   "고급 진단에서 Binance 권한과 User Data Stream을 점검하세요.",
-  "실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다."
+  "실전 자동매매 시작 버튼을 눌러야 실제 주문이 실행됩니다.",
 ];
 
 const BLOCK_REASON_MAP: Record<string, string> = {
-  "REXTORA_LIVE_APPROVED=false — LIVE 승인이 필요합니다.": "실전 거래 승인 환경변수가 꺼져 있습니다.",
-  "거래소 연결이 read-only/mock 상태입니다.": "읽기 전용 / 모의 데이터 상태입니다.",
-  "Binance API 키/시크릿이 설정되지 않았습니다.": "Binance API 키가 설정되지 않았습니다.",
-  "설정에서 LIVE 거래가 비활성화되어 있습니다.": "설정에서 실전 거래 허용을 켜야 합니다.",
-  "서버 TP/SL 보호가 활성화되지 않았습니다.": "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
-  "서버 TP/SL 보호 주문이 필요합니다.": "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
+  "REXTORA_LIVE_APPROVED=false — LIVE 승인이 필요합니다.":
+    "실전 거래 승인 환경변수가 꺼져 있습니다.",
+  "거래소 연결이 read-only/mock 상태입니다.":
+    "읽기 전용 / 모의 데이터 상태입니다.",
+  "Binance API 키/시크릿이 설정되지 않았습니다.":
+    "Binance API 키가 설정되지 않았습니다.",
+  "설정에서 LIVE 거래가 비활성화되어 있습니다.":
+    "설정에서 실전 거래 허용을 켜야 합니다.",
+  "서버 TP/SL 보호가 활성화되지 않았습니다.":
+    "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
+  "서버 TP/SL 보호 주문이 필요합니다.":
+    "서버 TP/SL 보호가 아직 준비되지 않았습니다.",
   "실전 사용 승인된 전략이 아닙니다.": "전략 실전 승인이 필요합니다.",
   "API order permission blocked": "API 주문 권한이 차단되어 있습니다.",
   "Futures permission blocked": "Futures 거래 권한이 차단되어 있습니다.",
@@ -310,18 +346,22 @@ const BLOCK_REASON_MAP: Record<string, string> = {
   "Manual confirmation mismatch": "실전 확인 문구가 일치하지 않습니다.",
   "Risk settings not confirmed": "리스크 설정 확인이 필요합니다.",
   "Telegram not configured": "Telegram 알림 설정이 필요합니다.",
-  "Strategy verifiedForLive=false": "전략 실전 승인이 필요합니다."
+  "Strategy verifiedForLive=false": "전략 실전 승인이 필요합니다.",
 };
 
 export function displayBlockReason(reason: string): string {
   if (BLOCK_REASON_MAP[reason]) return BLOCK_REASON_MAP[reason];
-  if (reason.includes("REXTORA_LIVE_APPROVED")) return "실전 거래 승인 환경변수가 꺼져 있습니다.";
-  if (reason.includes("read-only/mock")) return "읽기 전용 / 모의 데이터 상태입니다.";
+  if (reason.includes("REXTORA_LIVE_APPROVED"))
+    return "실전 거래 승인 환경변수가 꺼져 있습니다.";
+  if (reason.includes("read-only/mock"))
+    return "읽기 전용 / 모의 데이터 상태입니다.";
   if (reason.includes("verifiedForLive")) return "전략 실전 승인이 필요합니다.";
   return reason;
 }
 
-export function displayLabel(value: string | number | boolean | null | undefined): string {
+export function displayLabel(
+  value: string | number | boolean | null | undefined,
+): string {
   if (value === null || value === undefined) return "-";
   if (typeof value === "boolean") return value ? "켜짐" : "꺼짐";
   const key = String(value);
@@ -338,9 +378,27 @@ export function displaySourceStatus(status: string | null | undefined): string {
   return displayLabel(status);
 }
 
+export function displayParamSourceLabel(
+  source: string | null | undefined,
+): string {
+  if (
+    !source ||
+    source === "unconfirmed" ||
+    source === "원본에서 확인되지 않음"
+  )
+    return "설정되지 않음";
+  return displayLabel(source);
+}
+
+export function displayDirection(value: string | null | undefined): string {
+  if (!value) return "-";
+  return displayLabel(value);
+}
+
 export function displayTimeframeLabel(tf: string | null | undefined): string {
   if (!tf || tf === "unknown" || tf === "Unknown") return "확인되지 않음";
-  if (tf.endsWith("m") || tf.endsWith("h")) return `${tf.replace("m", "분").replace("h", "시간")}봉`;
+  if (tf.endsWith("m") || tf.endsWith("h"))
+    return `${tf.replace("m", "분").replace("h", "시간")}봉`;
   return tf;
 }
 
@@ -353,14 +411,24 @@ export function displayEngineLabel(nameOrLabel: string): string {
 }
 
 export function displaySettingsFieldLabel(fieldKey: string): string {
-  return LABEL_MAP[fieldKey] ?? fieldKey.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+  return (
+    LABEL_MAP[fieldKey] ??
+    fieldKey.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())
+  );
 }
 
-export function displaySettingsFieldHelper(category: SettingsCategory, fieldKey: string): string {
+export function displaySettingsFieldHelper(
+  category: SettingsCategory,
+  fieldKey: string,
+): string {
   return SETTINGS_FIELD_HELPERS[category]?.[fieldKey] ?? "";
 }
 
-export function formatDataSourceMeta(source: string, cached: boolean, durationMs: number): string {
+export function formatDataSourceMeta(
+  source: string,
+  cached: boolean,
+  durationMs: number,
+): string {
   const sourceLabel = displayLabel(source);
   const cacheLabel = cached ? displayLabel("cached") : displayLabel("real");
   return `데이터 출처: ${sourceLabel} · ${cacheLabel} · 응답 ${durationMs}ms`;
@@ -379,7 +447,7 @@ export function formatRuntimeMeta(meta: {
   const parts = [
     formatScanStatus(Boolean(meta.scanInProgress)),
     `마지막 감시 ${formatDurationMs(meta.lastScanDurationMs)}`,
-    `시장 데이터 경과 ${formatDurationMs(meta.marketSnapshotAgeMs)}`
+    `시장 데이터 경과 ${formatDurationMs(meta.marketSnapshotAgeMs)}`,
   ];
   return parts.join(" · ");
 }
@@ -410,7 +478,7 @@ export const UI_BANNED_LABELS = [
   "Position",
   "Execution Engine",
   "Risk Engine",
-  "Cost Engine"
+  "Cost Engine",
 ] as const;
 
 const AUDIT_ACTION_MAP: Record<string, string> = {
@@ -427,7 +495,7 @@ const AUDIT_ACTION_MAP: Record<string, string> = {
   binance_error: "Binance 오류",
   candidate_block: "후보 제외",
   candidate_selected: "후보 선택",
-  preflight: "사전 점검"
+  preflight: "사전 점검",
 };
 
 export function displayAuditActionLabel(type: string): string {
@@ -435,7 +503,12 @@ export function displayAuditActionLabel(type: string): string {
 }
 
 export function displayAuditResultLabel(type: string, message: string): string {
-  if (type.includes("failure") || message.includes("실패") || message.includes("차단")) return "실패";
+  if (
+    type.includes("failure") ||
+    message.includes("실패") ||
+    message.includes("차단")
+  )
+    return "실패";
   if (message.includes("중지") || message.includes("제외")) return "제외";
   if (message.includes("대기")) return "대기";
   return "성공";
@@ -476,13 +549,17 @@ export function displayLearningLogResult(result: string): string {
   return displayLabel(result);
 }
 
-export function displayLearningLogPnl(pnlPct: number | null | undefined): string {
+export function displayLearningLogPnl(
+  pnlPct: number | null | undefined,
+): string {
   if (pnlPct === null || pnlPct === undefined) return "-";
   if (!Number.isFinite(pnlPct)) return "-";
   return `${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%`;
 }
 
-export function learningLogResultTone(result: string): "success" | "danger" | "warning" | "default" {
+export function learningLogResultTone(
+  result: string,
+): "success" | "danger" | "warning" | "default" {
   if (result === "성공") return "success";
   if (result === "실패") return "danger";
   if (result === "대기" || result === "보합") return "warning";
@@ -514,16 +591,35 @@ export function displayPositionProtectionStatus(input: {
   return "미연결";
 }
 
-export function positionProtectionTone(label: PositionProtectionLabel): "success" | "danger" | "warning" | "default" {
-  if (label === "서버 손절/익절 연결됨" || label === "모의 손절/익절 적용") return "success";
+export function positionProtectionTone(
+  label: PositionProtectionLabel,
+): "success" | "danger" | "warning" | "default" {
+  if (label === "서버 손절/익절 연결됨" || label === "모의 손절/익절 적용")
+    return "success";
   if (label === "오류") return "danger";
   if (label === "미연결" || label === "모의 보호값 없음") return "warning";
   return "default";
 }
 
-export const CANDIDATE_STATUS_GUIDE: Array<{ status: string; description: string }> = [
-  { status: "진입 가능", description: "지금 실행 큐에 들어갈 수 있는 후보입니다." },
-  { status: "대기", description: "조건은 일부 맞지만 아직 관찰이 필요한 후보입니다." },
-  { status: "보류", description: "조건은 맞지만 현재 포지션 수나 중복 포지션 때문에 잠시 보류된 후보입니다." },
-  { status: "제외", description: "비용, 변동성, 신호 강도 기준에서 제외된 후보입니다." }
+export const CANDIDATE_STATUS_GUIDE: Array<{
+  status: string;
+  description: string;
+}> = [
+  {
+    status: "진입 가능",
+    description: "지금 실행 큐에 들어갈 수 있는 후보입니다.",
+  },
+  {
+    status: "대기",
+    description: "조건은 일부 맞지만 아직 관찰이 필요한 후보입니다.",
+  },
+  {
+    status: "보류",
+    description:
+      "조건은 맞지만 현재 포지션 수나 중복 포지션 때문에 잠시 보류된 후보입니다.",
+  },
+  {
+    status: "제외",
+    description: "비용, 변동성, 신호 강도 기준에서 제외된 후보입니다.",
+  },
 ];

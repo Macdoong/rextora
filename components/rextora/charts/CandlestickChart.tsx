@@ -2,8 +2,18 @@
 
 import { ChartShell, type ChartRenderContext } from "./ChartShell";
 import { CHART_THEME } from "@/src/lib/rextora/charts/theme";
-import { createLinearScale, formatAxisNumber, formatTimeLabel, niceDomain, ticks } from "@/src/lib/rextora/charts/scales";
-import type { CandlePoint, LevelLine, TradeMarker } from "@/src/lib/rextora/charts/types";
+import {
+  createLinearScale,
+  formatAxisNumber,
+  formatTimeLabel,
+  niceDomain,
+  ticks,
+} from "@/src/lib/rextora/charts/scales";
+import type {
+  CandlePoint,
+  LevelLine,
+  TradeMarker,
+} from "@/src/lib/rextora/charts/types";
 
 function markerColor(kind: TradeMarker["kind"]): string {
   switch (kind) {
@@ -29,12 +39,12 @@ function markerColor(kind: TradeMarker["kind"]): string {
 }
 
 export function CandlestickChart({
-  title = "Candlestick",
+  title = "가격 차트",
   candles,
   markers = [],
   levels = [],
   height = 320,
-  showVolume = true
+  showVolume = true,
 }: {
   title?: string;
   candles: CandlePoint[];
@@ -51,11 +61,19 @@ export function CandlestickChart({
       height={height}
       empty={empty}
       legend={[
-        { label: "Up", color: CHART_THEME.up },
-        { label: "Down", color: CHART_THEME.down }
+        { label: "상승", color: CHART_THEME.up },
+        { label: "하락", color: CHART_THEME.down },
       ]}
     >
-      {(ctx) => <CandlePlot ctx={ctx} candles={candles} markers={markers} levels={levels} showVolume={showVolume} />}
+      {(ctx) => (
+        <CandlePlot
+          ctx={ctx}
+          candles={candles}
+          markers={markers}
+          levels={levels}
+          showVolume={showVolume}
+        />
+      )}
     </ChartShell>
   );
 }
@@ -65,7 +83,7 @@ function CandlePlot({
   candles,
   markers,
   levels,
-  showVolume
+  showVolume,
 }: {
   ctx: ChartRenderContext;
   candles: CandlePoint[];
@@ -84,7 +102,10 @@ function CandlePlot({
   const yDom = niceDomain(Math.min(...lows), Math.max(...highs));
   const volH = showVolume ? plotH * 0.18 : 0;
   const candleH = plotH - volH - 4;
-  const xScale = createLinearScale([0, view.length - 1 || 1], [pad.left, pad.left + plotW]);
+  const xScale = createLinearScale(
+    [0, view.length - 1 || 1],
+    [pad.left, pad.left + plotW],
+  );
   const yScale = createLinearScale(yDom, [pad.top + candleH, pad.top]);
   const maxVol = Math.max(...view.map((c) => c.volume ?? 0), 1);
   const candleW = Math.max(2, (plotW / view.length) * 0.7);
@@ -95,8 +116,21 @@ function CandlePlot({
     <g>
       {yTicks.map((t) => (
         <g key={t}>
-          <line x1={pad.left} x2={pad.left + plotW} y1={yScale(t)} y2={yScale(t)} stroke={CHART_THEME.grid} strokeWidth={1} />
-          <text x={pad.left - 6} y={yScale(t) + 3} textAnchor="end" fill={CHART_THEME.axisLabel} fontSize={10}>
+          <line
+            x1={pad.left}
+            x2={pad.left + plotW}
+            y1={yScale(t)}
+            y2={yScale(t)}
+            stroke={CHART_THEME.grid}
+            strokeWidth={1}
+          />
+          <text
+            x={pad.left - 6}
+            y={yScale(t) + 3}
+            textAnchor="end"
+            fill={CHART_THEME.axisLabel}
+            fontSize={10}
+          >
             {formatAxisNumber(t)}
           </text>
         </g>
@@ -114,7 +148,13 @@ function CandlePlot({
             strokeDasharray={lv.dashed ? "4 3" : undefined}
             opacity={0.85}
           />
-          <text x={pad.left + plotW - 4} y={yScale(lv.endPrice ?? lv.price) - 3} textAnchor="end" fill={lv.color} fontSize={9}>
+          <text
+            x={pad.left + plotW - 4}
+            y={yScale(lv.endPrice ?? lv.price) - 3}
+            textAnchor="end"
+            fill={lv.color}
+            fontSize={9}
+          >
             {lv.label}
           </text>
         </g>
@@ -142,18 +182,34 @@ function CandlePlot({
                   `O ${c.open.toFixed(4)}`,
                   `H ${c.high.toFixed(4)}`,
                   `L ${c.low.toFixed(4)}`,
-                  `C ${c.close.toFixed(4)}`
-                ]
+                  `C ${c.close.toFixed(4)}`,
+                ],
               })
             }
             onMouseLeave={() => setTooltip(null)}
           >
-            <line x1={x} x2={x} y1={yHigh} y2={yLow} stroke={color} strokeWidth={1} />
-            <rect x={x - candleW / 2} y={bodyTop} width={candleW} height={bodyH} fill={color} rx={1} />
+            <line
+              x1={x}
+              x2={x}
+              y1={yHigh}
+              y2={yLow}
+              stroke={color}
+              strokeWidth={1}
+            />
+            <rect
+              x={x - candleW / 2}
+              y={bodyTop}
+              width={candleW}
+              height={bodyH}
+              fill={color}
+              rx={1}
+            />
             {showVolume && (
               <rect
                 x={x - candleW / 2}
-                y={pad.top + candleH + 4 + volH * (1 - (c.volume ?? 0) / maxVol)}
+                y={
+                  pad.top + candleH + 4 + volH * (1 - (c.volume ?? 0) / maxVol)
+                }
                 width={candleW}
                 height={Math.max(1, (volH * (c.volume ?? 0)) / maxVol)}
                 fill={CHART_THEME.volume}
@@ -172,12 +228,35 @@ function CandlePlot({
           if (m.time < start || m.time >= end) return null;
         }
         const useBarIndex = m.time < 1e10;
-        const x = useBarIndex ? xScale(Math.max(0, Math.min(view.length - 1, m.time - start))) : xScale(Math.max(0, xi));
+        const x = useBarIndex
+          ? xScale(Math.max(0, Math.min(view.length - 1, m.time - start)))
+          : xScale(Math.max(0, xi));
         const y = yScale(m.price);
         const color = markerColor(m.kind);
         return (
-          <g key={`${m.kind}-${idx}-${m.time}`}>
-            <circle cx={x} cy={y} r={4} fill={color} stroke="#0f172a" strokeWidth={1} />
+          <g
+            key={`${m.kind}-${idx}-${m.time}`}
+            className="cursor-help"
+            onMouseEnter={() =>
+              setTooltip({
+                x,
+                y,
+                lines: [
+                  m.label ?? "거래 표시",
+                  `가격 ${formatAxisNumber(m.price)}`,
+                ],
+              })
+            }
+            onMouseLeave={() => setTooltip(null)}
+          >
+            <circle
+              cx={x}
+              cy={y}
+              r={4}
+              fill={color}
+              stroke="#0f172a"
+              strokeWidth={1}
+            />
             {m.label && (
               <text x={x + 6} y={y - 4} fill={color} fontSize={9}>
                 {m.label}
@@ -187,10 +266,21 @@ function CandlePlot({
         );
       })}
 
-      <text x={pad.left} y={ctx.height - 8} fill={CHART_THEME.axisLabel} fontSize={10}>
+      <text
+        x={pad.left}
+        y={ctx.height - 8}
+        fill={CHART_THEME.axisLabel}
+        fontSize={10}
+      >
         {formatTimeLabel(view[0].time)}
       </text>
-      <text x={pad.left + plotW} y={ctx.height - 8} textAnchor="end" fill={CHART_THEME.axisLabel} fontSize={10}>
+      <text
+        x={pad.left + plotW}
+        y={ctx.height - 8}
+        textAnchor="end"
+        fill={CHART_THEME.axisLabel}
+        fontSize={10}
+      >
         {formatTimeLabel(view[view.length - 1].time)}
       </text>
     </g>

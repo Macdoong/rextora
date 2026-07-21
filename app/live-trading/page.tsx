@@ -5,6 +5,7 @@ import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
+import { displayParamsHashLabel } from "@/src/lib/rextora/displayLabels";
 
 export default function LiveTradingPage() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
@@ -14,7 +15,7 @@ export default function LiveTradingPage() {
   async function refresh() {
     const [dash, bot] = await Promise.all([
       fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
-      fetch("/api/rextora/bot/status").then((r) => r.json())
+      fetch("/api/rextora/bot/status").then((r) => r.json()),
     ]);
     setStatus(dash.data?.status ?? dash.status ?? null);
     setRiskView(bot.data?.riskView ?? null);
@@ -35,10 +36,14 @@ export default function LiveTradingPage() {
     const res = await fetch(path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode })
+      body: JSON.stringify({ mode }),
     });
     const json = await res.json();
-    setMessage(json.message ?? json.data?.message ?? (json.ok ? "완료" : json.error ?? "실패"));
+    setMessage(
+      json.message ??
+        json.data?.message ??
+        (json.ok ? "완료" : (json.error ?? "실패")),
+    );
     await refresh();
   }
 
@@ -80,7 +85,9 @@ export default function LiveTradingPage() {
     <div className="space-y-4" data-testid="live-trading-page">
       <div>
         <h1 className="text-2xl font-bold text-white">실전 매매</h1>
-        <p className="mt-1 text-sm text-slate-400">Binance Futures 실주문. 명시적 시작 전에는 주문이 발생하지 않습니다.</p>
+        <p className="mt-1 text-sm text-slate-400">
+          Binance Futures 실주문. 명시적 시작 전에는 주문이 발생하지 않습니다.
+        </p>
       </div>
 
       <Card title="실전 준비 상태" data-testid="live-readiness">
@@ -89,25 +96,56 @@ export default function LiveTradingPage() {
           <Metric label="시작 가능" value={liveEnabled ? "가능" : "불가"} />
           <Metric label="서버 손절/익절" value={s?.serverTpSlLabel ?? "-"} />
           <Metric label="안전 상태" value={s?.safetyLabel ?? "-"} />
-          <Metric label="활성 전략" value={s?.activeStrategy?.name ?? "SAFE_v44_i4060"} />
-          <Metric label="params_hash" value={s?.activeStrategy?.paramsHash ?? "-"} />
+          <Metric
+            label="활성 전략"
+            value={s?.activeStrategy?.name ?? "SAFE_v44_i4060"}
+          />
+          <Metric
+            label={displayParamsHashLabel()}
+            value={s?.activeStrategy?.paramsHash ?? "-"}
+          />
         </div>
         {!liveEnabled && (
-          <p className="mt-3 rounded-lg border border-orange-500/30 bg-orange-500/10 p-3 text-sm text-orange-100" data-testid="live-start-helper">
-            {s?.liveBlockReason ?? "설정에서 실전 거래 허용을 켜고 안전 조건을 통과해야 합니다."}
+          <p
+            className="mt-3 rounded-lg border border-orange-500/30 bg-orange-500/10 p-3 text-sm text-orange-100"
+            data-testid="live-start-helper"
+          >
+            {s?.liveBlockReason ??
+              "설정에서 실전 거래 허용을 켜고 안전 조건을 통과해야 합니다."}
           </p>
         )}
       </Card>
 
       <Card title="통일 지표">
         <div className="grid gap-3 md:grid-cols-4">
-          <Metric label="오늘 실현" value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`} />
-          <Metric label="오늘 미실현" value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`} />
-          <Metric label="현재 자본" value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`} />
-          <Metric label="계정 수익률" value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`} />
-          <Metric label="수수료" value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`} />
-          <Metric label="펀딩" value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`} />
-          <Metric label="슬리피지" value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`} />
+          <Metric
+            label="오늘 실현"
+            value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}
+          />
+          <Metric
+            label="오늘 미실현"
+            value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
+          />
+          <Metric
+            label="현재 자본"
+            value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`}
+          />
+          <Metric
+            label="계정 수익률"
+            value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`}
+          />
+          <Metric
+            label="수수료"
+            value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`}
+          />
+          <Metric
+            label="펀딩"
+            value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`}
+          />
+          <Metric
+            label="슬리피지"
+            value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`}
+          />
         </div>
       </Card>
 
@@ -115,24 +153,48 @@ export default function LiveTradingPage() {
         mode="LIVE"
         metrics={(s?.metrics as UnifiedMetricsSnapshot) ?? null}
         riskView={riskView}
-        symbol={typeof s?.positions?.[0]?.symbol === "string" ? String(s.positions[0].symbol) : undefined}
+        symbol={
+          typeof s?.positions?.[0]?.symbol === "string"
+            ? String(s.positions[0].symbol)
+            : undefined
+        }
       />
 
       <Card title="실전 제어">
         <div className="flex flex-wrap gap-2">
-          <Button tone={liveEnabled ? "success" : "default"} data-testid="live-start" disabled={!liveEnabled} onClick={() => liveEnabled && void run("/api/bot/start", "LIVE")}>
+          <Button
+            tone={liveEnabled ? "success" : "default"}
+            data-testid="live-start"
+            disabled={!liveEnabled}
+            onClick={() => liveEnabled && void run("/api/bot/start", "LIVE")}
+          >
             실전 매매 시작
           </Button>
-          <Button tone="warning" data-testid="live-stop" onClick={() => void run("/api/bot/stop", "LIVE")}>
+          <Button
+            tone="warning"
+            data-testid="live-stop"
+            onClick={() => void run("/api/bot/stop", "LIVE")}
+          >
             실전 매매 중지
           </Button>
-          <Button tone="danger" data-testid="emergency-stop" onClick={() => void run("/api/emergency/stop-all", "LIVE")}>
+          <Button
+            tone="danger"
+            data-testid="emergency-stop"
+            onClick={() => void run("/api/emergency/stop-all", "LIVE")}
+          >
             긴급 중지
           </Button>
-          <Button tone="danger" onClick={() => void run("/api/rextora/trading/close-all", "LIVE")}>
+          <Button
+            tone="danger"
+            onClick={() => void run("/api/rextora/trading/close-all", "LIVE")}
+          >
             전체 포지션 청산
           </Button>
-          <Button onClick={() => void run("/api/rextora/trading/cancel-all", "LIVE")}>모든 주문 취소</Button>
+          <Button
+            onClick={() => void run("/api/rextora/trading/cancel-all", "LIVE")}
+          >
+            모든 주문 취소
+          </Button>
         </div>
         {message && <p className="mt-3 text-sm text-slate-300">{message}</p>}
         <div className="mt-3 space-y-1 text-xs text-slate-400">
@@ -158,7 +220,10 @@ export default function LiveTradingPage() {
             </thead>
             <tbody>
               {s?.positions?.map((p) => (
-                <tr key={String(p.symbol)} className="border-t border-slate-900">
+                <tr
+                  key={String(p.symbol)}
+                  className="border-t border-slate-900"
+                >
                   <td className="py-2">{String(p.symbol)}</td>
                   <td>{String(p.side)}</td>
                   <td>{String(p.quantity)}</td>
