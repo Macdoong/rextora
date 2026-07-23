@@ -5,6 +5,7 @@ import {
 import {
   getMarketSnapshot,
   refreshMarketData,
+  isMarketDataStale,
 } from "@/src/lib/rextora/marketDataStore";
 import {
   getMarketWatcherSummary,
@@ -20,12 +21,15 @@ export async function GET(request: Request) {
   const force = new URL(request.url).searchParams.get("force") === "true";
 
   try {
-    if (force) {
-      await refreshMarketData({ force: true });
-    } else {
-      const snapshot = getMarketSnapshot();
-      if (snapshot.updatedAt === 0) {
+    const before = getMarketSnapshot();
+    const needsRefresh =
+      force || before.updatedAt === 0 || isMarketDataStale();
+
+    if (needsRefresh) {
+      try {
         await refreshMarketData({ force: true });
+      } catch {
+        // Keep previous snapshot; metadata will report stale if applicable.
       }
     }
 
@@ -67,18 +71,24 @@ export async function GET(request: Request) {
       };
     });
 
+    const refreshed = needsRefresh && !isMarketDataStale() && snapshot.source === "real";
+
     return apiJsonResponse(
       {
         coins: snapshot.coins,
         signals,
         source: cacheMeta.source,
         summary: getMarketWatcherSummary(),
+        /** UI 2/4 badges are heuristics (volume/volatility/side), not full SAFE indicator breakdown. */
+        signalHeuristicNote:
+          "조건 배지는 거래대금·변동성·스캔 방향 휴리스틱이며 SAFE 지표 4조건의 독립 계산이 아닙니다.",
       },
       {
         source: cacheMeta.source,
-        cached: !force && cacheMeta.cached,
+        cached: !force && !refreshed && cacheMeta.cached,
         durationMs: Date.now() - start,
         updatedAt: cacheMeta.updatedAt,
+        ageMs: cacheMeta.ageMs,
       },
     );
   } catch (error) {

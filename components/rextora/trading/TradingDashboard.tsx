@@ -218,7 +218,7 @@ export function TradingDashboard() {
             value={status?.activeStrategy?.paramsHash ?? "-"}
           />
         </div>
-        <p className="rextora-helper mt-3 text-slate-500">
+        <p className="rextora-helper mt-3 rx-text-muted">
           마지막 갱신: {formatLastCheckTime(status?.lastUpdatedAt)}
         </p>
       </Card>
@@ -302,7 +302,7 @@ export function TradingDashboard() {
             긴급 중지
           </Button>
         </div>
-        <div className="rextora-helper mt-3 space-y-1 text-slate-400">
+        <div className="rextora-helper mt-3 space-y-1 rx-text-muted">
           <p>모의 거래는 실제 주문을 넣지 않습니다.</p>
           <p>실전 거래는 Binance Futures에 실제 주문을 넣습니다.</p>
           <p>서버 손절/익절은 진입 직후 Binance에 보호 주문을 등록합니다.</p>
@@ -313,7 +313,7 @@ export function TradingDashboard() {
         {(status?.positions.length ?? 0) > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm text-slate-200">
-              <thead className="border-b border-slate-800 text-slate-400">
+              <thead className="border-b border-slate-800 rx-text-muted">
                 <tr>
                   <th className="px-2 py-2">코인</th>
                   <th className="px-2 py-2">방향</th>
@@ -368,7 +368,7 @@ export function TradingDashboard() {
             </table>
           </div>
         ) : (
-          <p className="rextora-helper text-slate-400">
+          <p className="rextora-helper rx-text-muted">
             열린 포지션이 없습니다.
           </p>
         )}
@@ -376,7 +376,7 @@ export function TradingDashboard() {
 
       <Card title="감시 중인 기회" data-testid="trading-opportunities">
         <p
-          className="rextora-helper mb-3 text-slate-400"
+          className="rextora-helper mb-3 rx-text-muted"
           data-testid="opportunity-guide"
         >
           SAFE_v44 수학 시그널입니다. AI는 진입을 결정하지 않습니다. 진입 가능:
@@ -385,7 +385,7 @@ export function TradingDashboard() {
         {(status?.opportunities.length ?? 0) > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm text-slate-200">
-              <thead className="border-b border-slate-800 text-slate-400">
+              <thead className="border-b border-slate-800 rx-text-muted">
                 <tr>
                   <th className="px-2 py-2">코인</th>
                   <th className="px-2 py-2">방향</th>
@@ -410,14 +410,14 @@ export function TradingDashboard() {
                         {row.judgment}
                       </Badge>
                     </td>
-                    <td className="px-2 py-2 text-slate-400">{row.reason}</td>
+                    <td className="px-2 py-2 rx-text-muted">{row.reason}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <p className="rextora-helper text-slate-400">
+          <p className="rextora-helper rx-text-muted">
             현재 감시 중인 기회가 없습니다.
           </p>
         )}
@@ -427,7 +427,7 @@ export function TradingDashboard() {
         {(status?.recentTrades.length ?? 0) > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm text-slate-200">
-              <thead className="border-b border-slate-800 text-slate-400">
+              <thead className="border-b border-slate-800 rx-text-muted">
                 <tr>
                   <th className="px-2 py-2">시간</th>
                   <th className="px-2 py-2">코인</th>
@@ -465,7 +465,7 @@ export function TradingDashboard() {
                     >
                       {formatPnlPct(trade.pnlPct)}
                     </td>
-                    <td className="px-2 py-2 text-slate-400">
+                    <td className="px-2 py-2 rx-text-muted">
                       {trade.exitReasonLabel}
                     </td>
                     <td className="px-2 py-2">{trade.modeLabel}</td>
@@ -475,7 +475,7 @@ export function TradingDashboard() {
             </table>
           </div>
         ) : (
-          <p className="rextora-helper text-slate-400">
+          <p className="rextora-helper rx-text-muted">
             아직 완료된 거래가 없습니다.
           </p>
         )}
@@ -487,7 +487,7 @@ export function TradingDashboard() {
             "완료된 거래 후 AI 분석 보고서가 여기에 표시됩니다."}
         </p>
         {(status?.aiReports?.length ?? 0) > 0 && (
-          <ul className="mt-3 space-y-2 text-sm text-slate-400">
+          <ul className="mt-3 space-y-2 text-sm rx-text-muted">
             {status?.aiReports.map((report) => (
               <li key={report.id}>
                 <span className="text-slate-200">{report.symbol}</span> ·{" "}
@@ -521,7 +521,7 @@ export function TradingDashboard() {
             value={status?.learningView.worstStrategy ?? "-"}
           />
         </div>
-        <p className="rextora-helper mt-3 text-slate-400">
+        <p className="rextora-helper mt-3 rx-text-muted">
           최근 반영 내용:{" "}
           {status?.learningView.recentAdjustment ??
             "아직 학습 반영 내역이 없습니다."}

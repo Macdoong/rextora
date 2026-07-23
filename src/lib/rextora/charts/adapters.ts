@@ -137,7 +137,7 @@ export function backtestTradeTimeline(
 export function monthlyHeatmap(report: BacktestReport): HeatmapCell[] {
   return report.monthlyReturns.map((m) => ({
     row: report.symbol,
-    col: m.month,
+    col: m.labelKo ?? m.month,
     value: m.returnPct * 100,
   }));
 }

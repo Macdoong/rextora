@@ -10,9 +10,12 @@ export default function RiskPage() {
   const risk = { ...base, riskState: resolveRiskState(base), riskView };
 
   return (
-    <>
-      <PageHeader title="리스크 관리" description="손실 한도, 거래 횟수, 레버리지, 동시 포지션 제한을 관리합니다." />
+    <div className="rextora-page">
+      <PageHeader
+        title="리스크 관리"
+        description="손실 한도 사용률, 남은 여유, 거래·포지션 용량을 시각적으로 관리합니다."
+      />
       <RiskPanelEditable initialRisk={risk} />
-    </>
+    </div>
   );
 }

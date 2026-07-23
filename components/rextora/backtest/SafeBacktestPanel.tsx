@@ -7,6 +7,10 @@ import type { BacktestReport } from "@/src/lib/rextora/backtest/backtestTypes";
 import { BacktestAnalysisView } from "@/components/rextora/charts/BacktestAnalysisView";
 import type { OhlcvCandle } from "@/src/lib/rextora/data/ohlcvTypes";
 import {
+  MultiSymbolWorkspace,
+  type SymbolResultPayload,
+} from "@/components/rextora/backtest/MultiSymbolWorkspace";
+import {
   displayDirection,
   displayParamsHashLabel,
   displaySignalReason,
@@ -62,6 +66,16 @@ export function BacktestWorkbench() {
   const [equityCurve, setEquityCurve] = useState<number[]>([]);
   const [candles, setCandles] = useState<OhlcvCandle[]>([]);
   const [message, setMessage] = useState("");
+  const [symbolResults, setSymbolResults] = useState<SymbolResultPayload[]>([]);
+  const [selectedSymbol, setSelectedSymbol] = useState("BTCUSDT");
+  const [combinedReport, setCombinedReport] = useState<BacktestReport | null>(
+    null,
+  );
+  const [requestedSymbols, setRequestedSymbols] = useState<string[]>([]);
+  const [successSymbols, setSuccessSymbols] = useState<string[]>([]);
+  const [failedSymbols, setFailedSymbols] = useState<string[]>([]);
+  const [chartSamplingApplied, setChartSamplingApplied] = useState(false);
+  const [processedCandleCount, setProcessedCandleCount] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -92,6 +106,12 @@ export function BacktestWorkbench() {
   async function run(save = false) {
     setLoading(true);
     setMessage("");
+    setReport(null);
+    setTrades([]);
+    setEquityCurve([]);
+    setCandles([]);
+    setSymbolResults([]);
+    setCombinedReport(null);
     try {
       const symbols = symbolsText
         .split(/[,\s]+/)
@@ -104,8 +124,10 @@ export function BacktestWorkbench() {
           strategyId,
           symbols,
           timeframe,
-          fromOpenTime: fromDate ? Date.parse(fromDate) : undefined,
-          toOpenTime: toDate ? Date.parse(toDate) + 86400000 - 1 : undefined,
+          fromOpenTime: fromDate ? Date.parse(`${fromDate}T00:00:00.000Z`) : undefined,
+          toOpenTime: toDate
+            ? Date.parse(`${toDate}T23:59:59.999Z`)
+            : undefined,
           balance,
           feeRate,
           slippageRate,
@@ -124,14 +146,50 @@ export function BacktestWorkbench() {
         setMessage(json.error ?? "백테스트 실패");
         return;
       }
-      setReport(payload.report);
-      setTrades(payload.trades ?? []);
-      setEquityCurve(payload.equityCurve ?? []);
-      setCandles(payload.candles ?? []);
+
+      const results = (payload.symbolResults ?? []) as SymbolResultPayload[];
+      const normalized: SymbolResultPayload[] =
+        results.length > 0
+          ? results
+          : [
+              {
+                symbol: payload.report.symbol ?? symbols[0] ?? "BTCUSDT",
+                status:
+                  payload.report.tradeCount === 0 ? "zero_trades" : "ok",
+                report: payload.report,
+                trades: payload.trades ?? [],
+                equityCurve: payload.equityCurve ?? [],
+                candles: payload.candles ?? payload.chartCandles ?? [],
+                chartCandles: payload.chartCandles ?? payload.candles ?? [],
+                chartSamplingApplied: Boolean(payload.chartSamplingApplied),
+                processedCandleCount:
+                  payload.processedCandleCount ??
+                  payload.report.processedCandleCount ??
+                  0,
+              },
+            ];
+
+      setSymbolResults(normalized);
+      setCombinedReport(payload.combinedReport ?? null);
+      setRequestedSymbols(payload.requestedSymbols ?? symbols);
+      setSuccessSymbols(
+        payload.successSymbols ??
+          normalized.filter((r) => r.report).map((r) => r.symbol),
+      );
+      setFailedSymbols(
+        payload.failedSymbols ??
+          normalized.filter((r) => r.status === "failed").map((r) => r.symbol),
+      );
+
+      const firstOk =
+        normalized.find((r) => r.report != null) ?? normalized[0];
+      const pickSymbol = firstOk?.symbol ?? symbols[0] ?? "BTCUSDT";
+      setSelectedSymbol(pickSymbol);
+      applySymbolPayload(firstOk, payload);
       setMessage(
         save
           ? "결과가 저장되었고 전략 성과에 반영되었습니다."
-          : "백테스트 완료 (실주문 없음)",
+          : `백테스트 완료 (실주문 없음) · 심볼 ${normalized.length}개`,
       );
     } catch (error) {
       setMessage(
@@ -142,6 +200,36 @@ export function BacktestWorkbench() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function applySymbolPayload(
+    active: SymbolResultPayload | undefined,
+    payload?: { chartSamplingApplied?: boolean; processedCandleCount?: number },
+  ) {
+    if (!active?.report) return;
+    setReport(active.report);
+    setTrades((active.trades as TradeRow[]) ?? []);
+    setEquityCurve(active.equityCurve ?? []);
+    setCandles(
+      (active.chartCandles as OhlcvCandle[]) ??
+        (active.candles as OhlcvCandle[]) ??
+        [],
+    );
+    setChartSamplingApplied(
+      Boolean(active.chartSamplingApplied ?? payload?.chartSamplingApplied),
+    );
+    setProcessedCandleCount(
+      active.processedCandleCount ??
+        payload?.processedCandleCount ??
+        active.report.processedCandleCount ??
+        0,
+    );
+  }
+
+  function selectSymbol(symbol: string) {
+    setSelectedSymbol(symbol);
+    const active = symbolResults.find((r) => r.symbol === symbol);
+    applySymbolPayload(active);
   }
 
   return (
@@ -174,6 +262,7 @@ export function BacktestWorkbench() {
           </label>
           <div className="flex flex-wrap items-end gap-2">
             <Button
+              data-testid="backtest-top10"
               onClick={() =>
                 setSymbolsText(
                   "BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,ADAUSDT,DOGEUSDT,AVAXUSDT,LINKUSDT,DOTUSDT",
@@ -353,14 +442,44 @@ export function BacktestWorkbench() {
             결과 저장 / 전략 성과 반영
           </Button>
         </div>
-        <p className="rextora-helper mt-3 text-slate-400">
+        <p className="rextora-helper mt-3 rx-text-muted">
           실거래 주문은 절대 발생하지 않습니다.
         </p>
-        {message && <p className="mt-2 text-sm text-emerald-300">{message}</p>}
+        {message && (
+          <p
+            className="mt-2 text-sm text-emerald-300"
+            data-testid="backtest-message"
+          >
+            {message}
+          </p>
+        )}
       </Card>
 
+      {symbolResults.length > 1 && (
+        <MultiSymbolWorkspace
+          symbolResults={symbolResults}
+          selectedSymbol={selectedSymbol}
+          onSelectSymbol={selectSymbol}
+          combinedReport={combinedReport}
+          requestedSymbols={requestedSymbols}
+          successSymbols={successSymbols}
+          failedSymbols={failedSymbols}
+        />
+      )}
+
       {report && (
-        <>
+        <div
+          key={`${selectedSymbol}:${report.tradeCount}:${processedCandleCount}:${report.requestedFrom ?? ""}:${report.requestedTo ?? ""}`}
+          data-testid="selected-symbol-workspace"
+        >
+          {symbolResults.length > 1 && (
+            <p className="mb-2 text-sm rx-text-muted">
+              상세 분석:{" "}
+              <span className="font-semibold rx-text-primary">
+                {selectedSymbol}
+              </span>
+            </p>
+          )}
           <BacktestAnalysisView
             report={report}
             trades={trades.map((t) => ({
@@ -382,12 +501,14 @@ export function BacktestWorkbench() {
                 : [report.startingBalance, report.endingBalance]
             }
             candles={candles}
+            chartSamplingApplied={chartSamplingApplied}
+            processedCandleCount={processedCandleCount}
           />
 
           {report.costStress && (
             <Card title="비용 스트레스 비교" data-testid="backtest-cost-stress">
               <table className="w-full text-left text-sm">
-                <thead className="text-slate-400">
+                <thead className="rx-text-muted">
                   <tr>
                     <th>배율</th>
                     <th>수익률</th>
@@ -413,59 +534,7 @@ export function BacktestWorkbench() {
               </table>
             </Card>
           )}
-
-          <Card title="거래 리스트">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="text-slate-400">
-                  <tr>
-                    <th>코인</th>
-                    <th>방향</th>
-                    <th>진입</th>
-                    <th>청산</th>
-                    <th>손익</th>
-                    <th>청산 이유</th>
-                    <th>수수료</th>
-                    <th>슬리피지</th>
-                    <th>레버리지</th>
-                    <th>보유</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trades.slice(0, 100).map((t, i) => (
-                    <tr
-                      key={`${t.symbol}-${t.entryBar}-${i}`}
-                      className="border-t border-slate-900"
-                    >
-                      <td className="py-2">{t.symbol}</td>
-                      <td>
-                        <Badge>{displayDirection(t.side)}</Badge>
-                      </td>
-                      <td>
-                        #{t.entryBar} / {t.entryPrice.toFixed(4)}
-                      </td>
-                      <td>
-                        #{t.exitBar} / {t.exitPrice.toFixed(4)}
-                      </td>
-                      <td
-                        className={
-                          t.pnlPct >= 0 ? "text-green-300" : "text-red-300"
-                        }
-                      >
-                        {(t.pnlPct * 100).toFixed(2)}%
-                      </td>
-                      <td>{displaySignalReason(t.exitReason)}</td>
-                      <td>{(t.feePct * 100).toFixed(3)}%</td>
-                      <td>{((t.slippagePct ?? 0) * 100).toFixed(3)}%</td>
-                      <td>{t.leverage.toFixed(2)}</td>
-                      <td>{t.holdBars ?? t.exitBar - t.entryBar}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </>
+        </div>
       )}
     </div>
   );

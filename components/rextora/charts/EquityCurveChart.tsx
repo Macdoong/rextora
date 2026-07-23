@@ -8,47 +8,77 @@ import {
   niceDomain,
   ticks,
 } from "@/src/lib/rextora/charts/scales";
+import {
+  formatKoreanDateTime,
+  formatUsdt,
+} from "@/src/lib/rextora/backtest/visualAnalysis";
 import type { ChartSeries } from "@/src/lib/rextora/charts/types";
 
 export function EquityCurveChart({
   title = "자산 곡선",
+  help,
   series,
   height = 220,
   area = true,
+  unit = "usdt",
+  onCrosshairX,
+  syncCrosshairX,
 }: {
   title?: string;
+  help?: string;
   series: ChartSeries | ChartSeries[];
   height?: number;
   area?: boolean;
+  unit?: "usdt" | "percent" | "raw";
+  onCrosshairX?: (xFraction: number | null) => void;
+  syncCrosshairX?: number | null;
 }) {
   const list = Array.isArray(series) ? series : [series];
   const empty = list.every((s) => s.data.length === 0);
   return (
     <ChartShell
       title={title}
+      help={help}
       height={height}
       empty={empty}
       legend={list.map((s) => ({
         label: s.name,
         color: s.color ?? CHART_THEME.equity,
       }))}
+      onCrosshairX={onCrosshairX}
+      syncCrosshairX={syncCrosshairX}
     >
-      {(ctx) => <LinePlot ctx={ctx} series={list} area={area} />}
+      {(ctx) => <LinePlot ctx={ctx} series={list} area={area} unit={unit} />}
     </ChartShell>
   );
 }
 
 export function DrawdownChart({
   title = "낙폭",
+  help,
   series,
   height = 180,
+  onCrosshairX,
+  syncCrosshairX,
 }: {
   title?: string;
+  help?: string;
   series: ChartSeries;
   height?: number;
+  onCrosshairX?: (xFraction: number | null) => void;
+  syncCrosshairX?: number | null;
 }) {
   return (
-    <EquityCurveChart title={title} series={series} height={height} area />
+    <EquityCurveChart
+      title={title}
+      help={help}
+      series={series}
+      height={height}
+      area
+      unit="percent"
+      onCrosshairX={onCrosshairX}
+      syncCrosshairX={syncCrosshairX}
+    />
   );
 }
 
@@ -66,16 +96,24 @@ export function BalanceCurveChart(props: {
   );
 }
 
+function formatY(unit: "usdt" | "percent" | "raw", y: number): string {
+  if (unit === "usdt") return formatUsdt(y);
+  if (unit === "percent") return `${y.toFixed(2)}%`;
+  return formatAxisNumber(y);
+}
+
 function LinePlot({
   ctx,
   series,
   area,
+  unit,
 }: {
   ctx: ChartRenderContext;
   series: ChartSeries[];
   area: boolean;
+  unit: "usdt" | "percent" | "raw";
 }) {
-  const { pad, plotW, plotH, zoom, setTooltip } = ctx;
+  const { pad, plotW, plotH, zoom, setTooltip, crosshair } = ctx;
   const all = series.flatMap((s) => s.data);
   if (!all.length) return null;
   const xMin = Math.min(...all.map((p) => p.x));
@@ -97,6 +135,25 @@ function LinePlot({
   );
   const yScale = createLinearScale(yDom, [pad.top + plotH, pad.top]);
 
+  // Snap tooltip to nearest point via crosshair x
+  let snap: { sName: string; p: { x: number; y: number; label?: string } } | null =
+    null;
+  if (crosshair) {
+    const xVal = xScale.invert(crosshair.x);
+    for (const s of visible) {
+      if (!s.data.length) continue;
+      const nearest = s.data.reduce((a, b) =>
+        Math.abs(a.x - xVal) < Math.abs(b.x - xVal) ? a : b,
+      );
+      if (
+        !snap ||
+        Math.abs(nearest.x - xVal) < Math.abs(snap.p.x - xVal)
+      ) {
+        snap = { sName: s.name, p: nearest };
+      }
+    }
+  }
+
   return (
     <g>
       {ticks(yDom, 5).map((t) => (
@@ -115,7 +172,7 @@ function LinePlot({
             fill={CHART_THEME.axisLabel}
             fontSize={10}
           >
-            {formatAxisNumber(t)}
+            {unit === "percent" ? `${t.toFixed(1)}%` : formatAxisNumber(t)}
           </text>
         </g>
       ))}
@@ -131,14 +188,6 @@ function LinePlot({
               cy={yScale(point.y)}
               r={4}
               fill={color}
-              onMouseEnter={() =>
-                setTooltip({
-                  x: xScale(point.x),
-                  y: yScale(point.y),
-                  lines: [s.name, formatAxisNumber(point.y)],
-                })
-              }
-              onMouseLeave={() => setTooltip(null)}
             />
           );
         }
@@ -149,30 +198,43 @@ function LinePlot({
         return (
           <g key={s.id}>
             {area && <path d={areaPath} fill={color} opacity={0.12} />}
-            <path
-              d={d}
-              fill="none"
-              stroke={color}
-              strokeWidth={2}
-              onMouseMove={(e) => {
-                const rect = (
-                  e.currentTarget.ownerSVGElement as SVGSVGElement
-                ).getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const nearest = s.data.reduce((a, b) =>
-                  Math.abs(xScale(a.x) - x) < Math.abs(xScale(b.x) - x) ? a : b,
-                );
-                setTooltip({
-                  x,
-                  y: yScale(nearest.y),
-                  lines: [s.name, formatAxisNumber(nearest.y)],
-                });
-              }}
-              onMouseLeave={() => setTooltip(null)}
-            />
+            <path d={d} fill="none" stroke={color} strokeWidth={2} />
           </g>
         );
       })}
+      {/* Invisible hit area for reliable tooltip */}
+      <rect
+        x={pad.left}
+        y={pad.top}
+        width={plotW}
+        height={plotH}
+        fill="transparent"
+        onMouseMove={() => {
+          if (!snap) return;
+          setTooltip({
+            x: xScale(snap.p.x),
+            y: yScale(snap.p.y),
+            lines: [
+              snap.p.x > 1e11
+                ? formatKoreanDateTime(snap.p.x)
+                : snap.p.label ?? `구간 ${snap.p.x}`,
+              `${snap.sName}: ${formatY(unit, snap.p.y)}`,
+            ],
+          });
+        }}
+        onMouseLeave={() => setTooltip(null)}
+      />
+      {snap && (
+        <circle
+          cx={xScale(snap.p.x)}
+          cy={yScale(snap.p.y)}
+          r={4}
+          fill={CHART_THEME.accentAlt}
+          stroke="#fff"
+          strokeWidth={1}
+          pointerEvents="none"
+        />
+      )}
     </g>
   );
 }

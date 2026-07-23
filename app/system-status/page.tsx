@@ -114,10 +114,13 @@ export default function SystemStatusPage() {
   }, [load]);
 
   return (
-    <>
-      <PageHeader title="시스템 상태" description="시장 감시부터 주문 실행까지 각 엔진 상태와 Binance 연결을 확인합니다." />
+    <div className="rextora-page">
+      <PageHeader
+        title="시스템 상태"
+        description="연결 헬스, 파이프라인 모듈, 복구 가이드를 한곳에서 확인합니다."
+      />
       {runtime && (
-        <p className="rextora-helper mb-3 text-slate-500" data-testid="runtime-meta">
+        <p className="rextora-caption" data-testid="runtime-meta">
           {formatRuntimeMeta(runtime)}
         </p>
       )}
@@ -125,9 +128,13 @@ export default function SystemStatusPage() {
         {loading ? (
           <LoadingState lines={10} />
         ) : error || !status ? (
-          <ErrorState onRetry={() => void load(true)} />
+          <ErrorState
+            message="시스템 상태를 불러오지 못했습니다."
+            why={error ? "서버 응답 오류 또는 네트워크 실패" : "응답이 비어 있습니다."}
+            fix="네트워크와 서버 로그를 확인한 뒤 다시 시도하세요."
+            onRetry={() => void load(true)}
+          />
         ) : (
-          <>
           <SystemStatusPanel
             status={status}
             lastCheckTime={runtime?.lastHeartbeat}
@@ -135,9 +142,8 @@ export default function SystemStatusPage() {
             diagnosticsLoading={diagnosticsLoading}
             onRefreshDiagnostics={() => void refreshDiagnostics()}
           />
-          </>
         )}
       </PanelErrorBoundary>
-    </>
+    </div>
   );
 }

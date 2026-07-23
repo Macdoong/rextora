@@ -126,15 +126,45 @@ export async function getAllMarketTickers(): Promise<ReadOnlyResult<BinanceTicke
 }
 
 export async function getKlines(symbol = "BTCUSDT", interval = "1h", limit = 100): Promise<ReadOnlyResult<BinanceKline[]>> {
+  return getKlinesRange(symbol, interval, limit);
+}
+
+/**
+ * Public market-data klines with optional startTime/endTime (ms).
+ * Does not require account credentials. Never places orders.
+ */
+export async function getKlinesRange(
+  symbol = "BTCUSDT",
+  interval = "1h",
+  limit = 100,
+  startTime?: number,
+  endTime?: number
+): Promise<ReadOnlyResult<BinanceKline[]>> {
   try {
-    const data = await publicGet<BinanceKline[]>("/fapi/v1/klines", {
+    const params: Record<string, string | number | boolean | undefined> = {
       symbol: sanitizeSymbol(symbol),
       interval: sanitizeInterval(interval),
-      limit: sanitizeLimit(limit)
-    });
-    return { ok: true, configured: hasBinanceCredentials(), serviceState: "read-only", source: "Binance public market data", message: "Binance public market data", data };
-  } catch {
-    return { ok: false, configured: hasBinanceCredentials(), serviceState: hasBinanceCredentials() ? "read-only" : "mock", source: "mock", message: "mock market data" };
+      limit: Math.max(1, Math.min(1500, Number.isFinite(limit) ? Math.floor(limit) : 100))
+    };
+    if (startTime != null && Number.isFinite(startTime)) params.startTime = Math.floor(startTime);
+    if (endTime != null && Number.isFinite(endTime)) params.endTime = Math.floor(endTime);
+    const data = await publicGet<BinanceKline[]>("/fapi/v1/klines", params);
+    return {
+      ok: true,
+      configured: hasBinanceCredentials(),
+      serviceState: "read-only",
+      source: "Binance public market data",
+      message: "Binance public market data",
+      data
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      configured: hasBinanceCredentials(),
+      serviceState: hasBinanceCredentials() ? "read-only" : "mock",
+      source: "mock",
+      message: error instanceof Error ? error.message : "klines fetch failed"
+    };
   }
 }
 

@@ -74,10 +74,10 @@ function DiagnosticRow({ label, status, reason, nextAction, errorCode }: {
         <span className="rextora-body font-medium text-slate-100">{label}</span>
         <Badge tone={tone}>{displayDiagnosticStatus(status)}</Badge>
       </div>
-      <p className="rextora-helper mt-2 text-slate-400">사유: {reason}</p>
+      <p className="rextora-helper mt-2 rx-text-muted">사유: {reason}</p>
       <p className="rextora-helper mt-1 text-slate-300">다음 조치: {nextAction}</p>
       {errorCode !== undefined && (
-        <p className="rextora-helper mt-1 text-slate-500" data-testid="diagnostic-error-code">오류 코드: {errorCode}</p>
+        <p className="rextora-helper mt-1 rx-text-muted" data-testid="diagnostic-error-code">오류 코드: {errorCode}</p>
       )}
     </div>
   );
@@ -146,9 +146,9 @@ export function SystemStatusPanel({
         }
       >
         {!advancedOpen ? (
-          <p className="rextora-helper text-slate-400">계정·권한·User Data Stream 등 상세 진단은 필요할 때만 펼쳐서 확인하세요.</p>
+          <p className="rextora-helper rx-text-muted">계정·권한·User Data Stream 등 상세 진단은 필요할 때만 펼쳐서 확인하세요.</p>
         ) : diagnosticsLoading && !binanceDiagnostics ? (
-          <p className="rextora-helper text-slate-400">Binance 연결을 점검하는 중입니다...</p>
+          <p className="rextora-helper rx-text-muted">Binance 연결을 점검하는 중입니다...</p>
         ) : (
           <div className="space-y-3">
             {simpleItems.map((item) => (
@@ -159,7 +159,7 @@ export function SystemStatusPanel({
                 <DiagnosticRow key={item.id} label={item.label} status={item.status} reason={item.reason} nextAction={item.nextAction} errorCode={item.errorCode} />
               ))
             ) : (
-              <p className="rextora-helper text-slate-400">고급 진단 정보가 없습니다. 「Binance 연결 다시 점검」을 실행하세요.</p>
+              <p className="rextora-helper rx-text-muted">고급 진단 정보가 없습니다. 「Binance 연결 다시 점검」을 실행하세요.</p>
             )}
             {status.userStream && (
               <div className="rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2" data-testid="user-stream-status">
@@ -169,7 +169,7 @@ export function SystemStatusPanel({
                     {status.userStream.displayStatus ?? (status.userStream.connected ? displayLabel("connected") : displayLabel("not connected"))}
                   </Badge>
                 </div>
-                {status.userStream.description && <p className="rextora-helper mt-2 text-slate-400">{status.userStream.description}</p>}
+                {status.userStream.description && <p className="rextora-helper mt-2 rx-text-muted">{status.userStream.description}</p>}
               </div>
             )}
           </div>
@@ -197,7 +197,7 @@ export function SystemStatusPanel({
           <Metric label="시장 데이터" value={status.binance.marketData} tone={permTone(status.binance.marketData)} />
         </div>
         {tpSlDisplay && (
-          <div className="rextora-helper mt-3 space-y-1 text-slate-400" data-testid="tpsl-readiness-detail">
+          <div className="rextora-helper mt-3 space-y-1 rx-text-muted" data-testid="tpsl-readiness-detail">
             <p>매니저 상태: {tpSlDisplay.managerStatusLabel ?? (tpSlDisplay.managerReady ? "준비됨" : "준비 필요")}</p>
             {tpSlDisplay.reason && <p>설명: {tpSlDisplay.reason}</p>}
           </div>

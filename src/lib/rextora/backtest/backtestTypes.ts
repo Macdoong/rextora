@@ -6,6 +6,46 @@ export interface MonthlyReturnRow {
   trades: number;
   mdd: number;
   fees: number;
+  /** Additive calendar fields */
+  netPnlUsdt?: number;
+  winRate?: number;
+  totalCostUsdt?: number;
+  labelKo?: string;
+}
+
+export type BacktestDataMode = "binance" | "synthetic-test";
+
+export interface BacktestCostBreakdown {
+  fees: number;
+  slippage: number;
+  funding: number;
+  spread: number;
+  totalTradingCost: number;
+  /** Additive explicit-denominator fields (USDT / % of initial capital) */
+  feeCostUsdt?: number;
+  feeCostPctOfInitialCapital?: number;
+  slippageCostUsdt?: number;
+  slippageCostPctOfInitialCapital?: number;
+  spreadCostUsdt?: number;
+  spreadCostPctOfInitialCapital?: number;
+  fundingCostUsdt?: number;
+  fundingCostPctOfInitialCapital?: number;
+  totalCostUsdt?: number;
+  totalCostPctOfInitialCapital?: number;
+  grossPnLBeforeCosts?: number;
+  netPnLAfterCosts?: number;
+  /** Explains legacy `fees` etc. are sum of per-trade rate fractions */
+  rateSumNoteKo?: string;
+}
+
+export interface BacktestZeroTradeDiagnostics {
+  loadedCandleCount: number;
+  evaluatedCandleCount: number;
+  warmUpCandleCount: number;
+  longSignalCandidateCount: number;
+  shortSignalCandidateCount: number;
+  rejectionReasons: Record<string, number>;
+  explanationKo: string;
 }
 
 export interface BacktestReport {
@@ -18,7 +58,15 @@ export interface BacktestReport {
   timeframe: string;
   fromDate: string | null;
   toDate: string | null;
+  /** ISO requested range start */
+  requestedFrom: string | null;
+  /** ISO requested range end */
+  requestedTo: string | null;
+  actualFirstCandleTime: string | null;
+  actualLastCandleTime: string | null;
   candleCount: number;
+  processedCandleCount: number;
+  dataSource: "binance" | "synthetic-test";
   totalReturn: number;
   mdd: number;
   tradeCount: number;
@@ -29,6 +77,9 @@ export interface BacktestReport {
   feeImpact: number;
   feeTotal: number;
   slippageTotal: number;
+  fundingTotal: number;
+  spreadTotal: number;
+  costs: BacktestCostBreakdown;
   monthlyReturns: MonthlyReturnRow[];
   negativeMonths: number;
   startingBalance: number;
@@ -40,11 +91,13 @@ export interface BacktestReport {
     tradeCount: number;
     negativeMonths: number;
   }>;
+  zeroTradeDiagnostics?: BacktestZeroTradeDiagnostics | null;
   validation: {
     paramsHashVerified: boolean;
     feesApplied: boolean;
     slippageApplied: boolean;
     fundingApplied: boolean;
+    spreadApplied: boolean;
     noRealOrders: true;
   };
 }
@@ -66,6 +119,11 @@ export interface BacktestConfig {
   costGuardK: number;
   baseBalPct?: number;
   maxConcurrent?: number;
+  /**
+   * Production / UI must use "binance".
+   * "synthetic-test" is only for unit tests and explicit fixtures.
+   */
+  dataMode?: BacktestDataMode;
 }
 
 export interface SavedBacktestResult {

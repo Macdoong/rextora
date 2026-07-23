@@ -38,6 +38,8 @@ export interface TradeMarker {
   price: number;
   kind: TradeMarkerKind;
   label?: string;
+  tradeId?: string;
+  meta?: Record<string, unknown>;
 }
 
 export interface LevelLine {

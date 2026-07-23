@@ -1,17 +1,36 @@
-import { Badge, Card, Metric, ProgressBar } from "@/components/ui/primitives";
+import type { ReactNode } from "react";
+import { Badge, Card, Metric, ProgressBar, StatusBadge } from "@/components/ui/primitives";
 import { displayLabel } from "@/src/lib/rextora/displayLabels";
 import { formatUsdt } from "@/src/lib/rextora/displayFormat";
 import type { ApiStatus, BotStatus, TodayPnlSummary } from "@/lib/types";
 
-export function PageHeader({ title, description, compact = false }: { title: string; description: string; compact?: boolean }) {
+export function PageHeader({
+  title,
+  description,
+  compact = false,
+  actions,
+}: {
+  title: string;
+  description: string;
+  compact?: boolean;
+  actions?: ReactNode;
+}) {
   return (
-    <header className={`${compact ? "mb-2" : "mb-4"} flex flex-wrap items-center justify-between gap-3`}>
-      <div>
-        <h1 className="rextora-page-title font-black tracking-tight">{title}</h1>
-        <p className="rextora-helper mt-1">{description}</p>
+    <header
+      className={`${compact ? "mb-2" : "mb-5"} flex flex-wrap items-start justify-between gap-3 rx-fade-in`}
+    >
+      <div className="min-w-0">
+        <h1 className="rextora-page-title">{title}</h1>
+        <p className="rextora-helper mt-2 max-w-2xl leading-relaxed">{description}</p>
       </div>
-      <div className="rextora-badge rounded-full border border-violet-500/40 bg-violet-500/10 px-3 py-1 text-violet-200" data-testid="page-mode-banner">
-        모의 거래 기본 · 실전 거래 차단
+      <div className="flex flex-wrap items-center gap-2">
+        {actions}
+        <div
+          className="rextora-badge rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-emerald-200"
+          data-testid="page-mode-banner"
+        >
+          모의 거래 기본 · 실전 거래 차단
+        </div>
       </div>
     </header>
   );
@@ -19,17 +38,24 @@ export function PageHeader({ title, description, compact = false }: { title: str
 
 export function BotStatusCard({ bot, api, className = "" }: { bot: BotStatus; api: ApiStatus; className?: string }) {
   const runState = bot.running ? (bot.state === "오류" ? "오류" : "실행 중") : "중지";
-  const runTone = runState === "실행 중" ? "success" : runState === "오류" ? "danger" : "muted";
   const binanceLabel = api.binanceFuturesConnected ? displayLabel("connected") : displayLabel("read-only/mock");
   const telegramLabel = api.configured.telegramToken ? displayLabel("configured") : displayLabel("mock");
 
   return (
-    <Card title="봇 상태" action={<Badge tone={runTone}>{runState}</Badge>} className={className}>
+    <Card title="봇 상태" action={<StatusBadge status={runState} />} className={className}>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="봇 상태" value={runState} tone={runTone === "success" ? "success" : runTone === "danger" ? "danger" : "default"} />
-        <Metric label="모드" value={displayLabel(bot.mode)} tone={bot.mode === "LIVE" ? "danger" : "success"} />
-        <Metric label="Binance" value={binanceLabel} tone={api.binanceFuturesConnected ? "success" : "default"} />
-        <Metric label="Telegram" value={telegramLabel} />
+        <Metric label="봇 상태" value={<StatusBadge status={runState} />} />
+        <Metric
+          label="모드"
+          value={<StatusBadge status={displayLabel(bot.mode)} />}
+          tone={bot.mode === "LIVE" ? "danger" : "success"}
+        />
+        <Metric
+          label="Binance"
+          value={<StatusBadge status={binanceLabel} />}
+          tone={api.binanceFuturesConnected ? "success" : "default"}
+        />
+        <Metric label="Telegram" value={<StatusBadge status={telegramLabel} />} />
       </div>
       <p className="rextora-helper mt-3">마지막 상태 확인 {bot.lastHeartbeat}</p>
     </Card>

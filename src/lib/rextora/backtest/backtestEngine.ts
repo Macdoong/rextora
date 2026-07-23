@@ -1,4 +1,4 @@
-import { generateSyntheticCandles, type OhlcvCandle } from "../data/ohlcvTypes";
+import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { computeIndicators } from "../indicator/indicatorEngine";
 import { evaluateSafeV44Signal } from "../signal/safeV44SignalEngine";
 import { evaluateCostGuard } from "../cost/costGuard";
@@ -6,6 +6,7 @@ import { calculateSafeV44Risk, updateTrailingStop } from "../risk/safeV44RiskEng
 import { loadSafeV44Strategy } from "../strategy/safeV44Strategy";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { buildBacktestReport, type BacktestReport } from "./backtestReport";
+import type { BacktestZeroTradeDiagnostics } from "./backtestTypes";
 
 export interface BacktestTrade {
   symbol: string;
@@ -21,15 +22,28 @@ export interface BacktestTrade {
   pnlPct: number;
   feePct: number;
   slippagePct?: number;
+  fundingPct?: number;
+  spreadPct?: number;
   exitReason: "take_profit" | "stop_loss" | "trailing_stop" | "max_hold" | "end";
   entryTime?: number;
   exitTime?: number;
   holdBars?: number;
+  /** Additive ledger fields for analysis UX */
+  id?: string;
+  marginUsdt?: number;
+  quantity?: number;
+  grossPnlUsdt?: number;
+  netPnlUsdt?: number;
+  feeCostUsdt?: number;
+  slippageCostUsdt?: number;
+  spreadCostUsdt?: number;
+  fundingCostUsdt?: number;
 }
 
 export interface BacktestRunInput {
   symbol: string;
-  candles?: OhlcvCandle[];
+  /** Required — caller must supply candles. No silent synthetic fallback. */
+  candles: OhlcvCandle[];
   params?: SafeV44Params;
   paramsHash?: string;
   strategyName?: string;
@@ -41,15 +55,53 @@ export interface BacktestRunInput {
   slippageRate?: number;
   fundingRate?: number;
   applyFunding?: boolean;
+  applySpread?: boolean;
+  spreadRate?: number;
   costGuardK?: number;
-  fromOpenTime?: number;
-  toOpenTime?: number;
+  dataSource?: "binance" | "synthetic-test";
+  requestedFrom?: string | null;
+  requestedTo?: string | null;
 }
 
 export interface BacktestRunResult {
   report: BacktestReport;
   trades: BacktestTrade[];
   equityCurve: number[];
+  /** Exact candles processed by the engine (post any prior filtering by loader) */
+  processedCandles: OhlcvCandle[];
+}
+
+function bumpReason(map: Record<string, number>, reason: string) {
+  map[reason] = (map[reason] ?? 0) + 1;
+}
+
+function ledgerFields(
+  margin: number,
+  leverage: number,
+  raw: number,
+  feePct: number,
+  slipPct: number,
+  fundingPct: number,
+  spreadPct: number,
+  pnlPct: number,
+  quantity: number,
+) {
+  const feeCostUsdt = Number((margin * feePct * leverage).toFixed(6));
+  const slippageCostUsdt = Number((margin * slipPct * leverage).toFixed(6));
+  const spreadCostUsdt = Number((margin * spreadPct * leverage).toFixed(6));
+  const fundingCostUsdt = Number((margin * fundingPct * leverage).toFixed(6));
+  const grossPnlUsdt = Number((margin * raw * leverage).toFixed(6));
+  const netPnlUsdt = Number((margin * pnlPct).toFixed(6));
+  return {
+    marginUsdt: Number(margin.toFixed(6)),
+    quantity: Number(quantity.toFixed(8)),
+    feeCostUsdt,
+    slippageCostUsdt,
+    spreadCostUsdt,
+    fundingCostUsdt,
+    grossPnlUsdt,
+    netPnlUsdt,
+  };
 }
 
 export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
@@ -57,15 +109,22 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
   const feeRate = input.feeRate ?? 0.0004;
   const slippageRate = input.slippageRate ?? 0.0002;
   const fundingRate = input.applyFunding ? input.fundingRate ?? 0.0001 : 0;
+  const spreadRate = input.applySpread ? input.spreadRate ?? 0.0001 : 0;
   const balance0 = input.balance ?? 10_000;
   const params = input.params
     ? { ...input.params, cost_guard_k: input.costGuardK ?? input.params.cost_guard_k }
     : strategy.params;
   const paramsHash = input.paramsHash ?? strategy.paramsHash;
 
-  let candles = input.candles ?? generateSyntheticCandles(400, 100, 0.00015);
-  if (input.fromOpenTime != null) candles = candles.filter((c) => c.openTime >= input.fromOpenTime!);
-  if (input.toOpenTime != null) candles = candles.filter((c) => c.openTime <= input.toOpenTime!);
+  if (!Array.isArray(input.candles)) {
+    throw new Error("backtest requires candles — synthetic fallback disabled");
+  }
+  const candles = input.candles;
+  const warmUp = params.ema_slow;
+  const rejectionReasons: Record<string, number> = {};
+  let longSignalCandidateCount = 0;
+  let shortSignalCandidateCount = 0;
+  let evaluatedCandleCount = 0;
 
   const series = computeIndicators(candles, params);
   const trades: BacktestTrade[] = [];
@@ -111,7 +170,6 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       if (hitSl) {
         exitPrice = stop;
         exitReason = params.use_trailing && stop !== open.stopLoss ? "trailing_stop" : "stop_loss";
-        // Prefer SL if both in same bar for conservative estimate
       } else if (hitTp) {
         exitPrice = open.takeProfit;
         exitReason = "take_profit";
@@ -127,9 +185,11 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
           open.side === "LONG"
             ? (px - open.entryPrice) / open.entryPrice
             : (open.entryPrice - px) / open.entryPrice;
-        const feePct = feeRate * 2 + fundingRate;
+        const feePct = feeRate * 2;
+        const fundingPct = fundingRate;
         const slipPct = slip * 2;
-        const pnlPct = (raw - feePct - slipPct) * open.leverage;
+        const spreadPct = spreadRate;
+        const pnlPct = (raw - feePct - slipPct - fundingPct - spreadPct) * open.leverage;
         equity = equity + open.margin * pnlPct;
         peak = Math.max(peak, equity);
         equityCurve.push(equity);
@@ -148,10 +208,23 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
           pnlPct,
           feePct,
           slippagePct: slipPct,
+          fundingPct,
+          spreadPct,
           exitReason,
           entryTime: candles[open.entryBar]?.openTime,
           exitTime: candle.openTime,
-          holdBars: i - open.entryBar
+          holdBars: i - open.entryBar,
+          ...ledgerFields(
+            open.margin,
+            open.leverage,
+            raw,
+            feePct,
+            slipPct,
+            fundingPct,
+            spreadPct,
+            pnlPct,
+            open.quantity,
+          ),
         });
         lastEntryBar = open.entryBar;
         open = null;
@@ -160,6 +233,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
 
     if (open) continue;
 
+    evaluatedCandleCount += 1;
     const signal = evaluateSafeV44Signal({
       symbol: input.symbol,
       series,
@@ -168,7 +242,14 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       barIndex: i,
       lastEntryBarIndex: lastEntryBar
     });
-    if (!signal.passed || signal.side === "NONE" || !ind) continue;
+
+    if (!signal.passed || signal.side === "NONE" || !ind) {
+      if (signal.rejectReason) bumpReason(rejectionReasons, signal.rejectReason);
+      continue;
+    }
+
+    if (signal.side === "LONG") longSignalCandidateCount += 1;
+    if (signal.side === "SHORT") shortSignalCandidateCount += 1;
 
     const dd = peak > 0 ? (equity - peak) / peak : 0;
     const risk = calculateSafeV44Risk({
@@ -187,9 +268,16 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       takeProfitPrice: risk.takeProfitPrice,
       side: signal.side,
       atr: ind.atr,
-      params
+      params,
+      feeRate,
+      slippageRate,
+      spreadRate: input.applySpread ? spreadRate : 0,
+      fundingRate
     });
-    if (!cost.passed) continue;
+    if (!cost.passed) {
+      bumpReason(rejectionReasons, cost.reason || "비용 가드 차단");
+      continue;
+    }
 
     const entrySlip = signal.side === "LONG" ? 1 + slippageRate : 1 - slippageRate;
     open = {
@@ -215,7 +303,10 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
         ? (px - open.entryPrice) / open.entryPrice
         : (open.entryPrice - px) / open.entryPrice;
     const feePct = feeRate * 2;
-    const pnlPct = (raw - feePct) * open.leverage;
+    const fundingPct = fundingRate;
+    const spreadPct = spreadRate;
+    const slipPct = 0;
+    const pnlPct = (raw - feePct - fundingPct - spreadPct) * open.leverage;
     equity = equity + open.margin * pnlPct;
     equityCurve.push(equity);
     trades.push({
@@ -231,10 +322,51 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       leverage: open.leverage,
       pnlPct,
       feePct,
-      exitReason: "end"
+      fundingPct,
+      spreadPct,
+      exitReason: "end",
+      entryTime: candles[open.entryBar]?.openTime,
+      exitTime: last.openTime,
+      holdBars: candles.length - 1 - open.entryBar,
+      ...ledgerFields(
+        open.margin,
+        open.leverage,
+        raw,
+        feePct,
+        slipPct,
+        fundingPct,
+        spreadPct,
+        pnlPct,
+        open.quantity,
+      ),
     });
   }
 
+  let zeroTradeDiagnostics: BacktestZeroTradeDiagnostics | null = null;
+  if (trades.length === 0 && candles.length > 0) {
+    const topReasons = Object.entries(rejectionReasons)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([reason, count]) => `${reason} (${count})`)
+      .join(", ");
+    zeroTradeDiagnostics = {
+      loadedCandleCount: candles.length,
+      evaluatedCandleCount,
+      warmUpCandleCount: Math.min(warmUp, candles.length),
+      longSignalCandidateCount,
+      shortSignalCandidateCount,
+      rejectionReasons,
+      explanationKo:
+        candles.length <= warmUp
+          ? `캔들 ${candles.length}개로는 지표 워밍업(${warmUp}봉)에 부족합니다.`
+          : longSignalCandidateCount + shortSignalCandidateCount === 0
+            ? `전략이 ${evaluatedCandleCount}개 봉을 평가했지만 진입 후보 신호가 없었습니다.${topReasons ? ` 주요 사유: ${topReasons}` : ""}`
+            : `진입 후보는 있었으나 비용 가드 등에서 차단되어 체결된 거래가 없습니다.${topReasons ? ` 주요 사유: ${topReasons}` : ""}`
+    };
+  }
+
+  const first = candles[0];
+  const last = candles[candles.length - 1];
   const report = buildBacktestReport({
     symbol: input.symbol,
     paramsHash,
@@ -242,9 +374,15 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
     strategyId: input.strategyId ?? strategy.name,
     sourceStatus: input.sourceStatus ?? strategy.sourceStatus,
     timeframe: input.timeframe ?? "15m",
-    fromDate: candles[0] ? new Date(candles[0].openTime).toISOString().slice(0, 10) : null,
-    toDate: candles.length ? new Date(candles[candles.length - 1].openTime).toISOString().slice(0, 10) : null,
+    fromDate: first ? new Date(first.openTime).toISOString().slice(0, 10) : null,
+    toDate: last ? new Date(last.openTime).toISOString().slice(0, 10) : null,
+    requestedFrom: input.requestedFrom ?? null,
+    requestedTo: input.requestedTo ?? null,
+    actualFirstCandleTime: first ? new Date(first.openTime).toISOString() : null,
+    actualLastCandleTime: last ? new Date(last.openTime).toISOString() : null,
     candleCount: candles.length,
+    processedCandleCount: candles.length,
+    dataSource: input.dataSource ?? "binance",
     startingBalance: balance0,
     endingBalance: equity,
     equityCurve,
@@ -252,8 +390,10 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
     feesApplied: true,
     slippageApplied: true,
     fundingApplied: Boolean(input.applyFunding),
-    paramsHashVerified: paramsHash === strategy.paramsHash || Boolean(input.paramsHash)
+    spreadApplied: Boolean(input.applySpread),
+    paramsHashVerified: paramsHash === strategy.paramsHash || Boolean(input.paramsHash),
+    zeroTradeDiagnostics
   });
 
-  return { report, trades, equityCurve };
+  return { report, trades, equityCurve, processedCandles: candles };
 }

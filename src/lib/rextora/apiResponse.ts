@@ -5,6 +5,7 @@ export type ApiMeta = {
   cached: boolean;
   durationMs: number;
   updatedAt: string | null;
+  ageMs?: number;
 };
 
 export type RextoraApiResponse<T> = {
@@ -19,7 +20,8 @@ export function buildApiMeta(partial: Partial<ApiMeta> & { durationMs: number })
     source: partial.source ?? "rextora",
     cached: partial.cached ?? false,
     durationMs: partial.durationMs,
-    updatedAt: partial.updatedAt ?? new Date().toISOString()
+    updatedAt: partial.updatedAt ?? new Date().toISOString(),
+    ...(partial.ageMs != null ? { ageMs: partial.ageMs } : {})
   };
 }
 

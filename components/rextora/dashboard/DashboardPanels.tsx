@@ -139,7 +139,7 @@ export function DashboardPanels() {
           <div data-section="recent-trades">
             <Card title="최근 거래 (5건)" className="!p-3" data-testid="dashboard-recent-trades">
               {recentTrades.length === 0 ? (
-                <p className="text-sm text-slate-400">완료 거래 없음</p>
+                <p className="text-sm rx-text-muted">완료 거래 없음</p>
               ) : (
                 <ul className="space-y-1 text-sm text-slate-300">
                   {recentTrades.map((t, i) => (
@@ -160,7 +160,7 @@ export function DashboardPanels() {
         </div>
 
         {meta && (
-          <p className="rextora-helper text-slate-500" data-testid="dashboard-meta">
+          <p className="rextora-helper rx-text-muted" data-testid="dashboard-meta">
             {formatDataSourceMeta(meta.source, meta.cached, meta.durationMs)} · 폴링 {POLL_MS / 1000}s
           </p>
         )}

@@ -7,6 +7,7 @@ const navItems: Array<[string, string]> = [
   ["대시보드", "/dashboard"],
   ["전략 관리", "/strategies"],
   ["백테스트", "/backtest"],
+  ["전략 탐색", "/strategy-search"],
   ["전략 성과", "/strategy-performance"],
   ["멀티코인 감시", "/market-watch"],
   ["모의 매매", "/paper-trading"],
@@ -30,7 +31,7 @@ export function Sidebar() {
           </div>
           <div>
             <div className="text-xl font-black tracking-tight">Rextora</div>
-            <div className="text-[11px] tracking-wide text-slate-400">
+            <div className="text-[11px] tracking-wide rx-text-muted">
               수학적 Quant Futures
             </div>
           </div>
@@ -41,7 +42,7 @@ export function Sidebar() {
             <span className="text-xs text-slate-300">현재 거래 모드</span>
             <ModeBadge />
           </div>
-          <p className="mt-2 text-[11px] text-slate-400">
+          <p className="mt-2 text-[11px] rx-text-muted">
             실전 매매는 명시적 시작 후에만 실제 주문이 실행됩니다.
           </p>
         </div>
@@ -68,7 +69,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="absolute bottom-4 left-4 right-4 text-[11px] text-slate-500">
+        <div className="absolute bottom-4 left-4 right-4 text-[11px] rx-text-muted">
           Rextora Quant · SAFE_v44
         </div>
       </aside>

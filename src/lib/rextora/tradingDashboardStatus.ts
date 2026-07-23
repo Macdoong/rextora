@@ -599,7 +599,7 @@ export function buildTradingDashboardStatus(
 
   const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
   const metrics = getUnifiedMetrics();
-  const aiReports = listAiTradeReports(5).map((r) => ({
+  const aiReports = listAiTradeReports(12).map((r) => ({
     id: r.id,
     symbol: r.symbol,
     summary: r.summary,
@@ -619,6 +619,11 @@ export function buildTradingDashboardStatus(
     entryPrice: r.raw?.entryPrice,
     exitPrice: r.raw?.exitPrice,
     realizedPnlPct: r.raw?.realizedPnlPct,
+    feeImpactPct: r.raw?.feeImpactPct,
+    slippageImpactPct: r.raw?.slippageImpactPct,
+    leverage: r.raw?.leverage,
+    signalType: r.raw?.signalType,
+    exitReason: r.raw?.exitReason,
     holdingTimeLabel: r.tradeId
       ? metrics.recentTrades.find((trade) => trade.id === r.tradeId)
           ?.holdingTimeLabel
