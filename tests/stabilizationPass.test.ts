@@ -11,6 +11,7 @@ import { backtestResultHash } from "../src/lib/rextora/backtest/backtestStore";
 import { getStrategyPublicMeta } from "../src/lib/rextora/strategy/strategyMetadata";
 import { ensureStrategyStore, copyStrategy, deleteStrategy, setLiveActiveStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
 describe("riskFormulas stabilization", () => {
   it("zero loss produces 0% usage", () => {
@@ -58,26 +59,36 @@ describe("localization mapper", () => {
 
 describe("strategy metadata consistency", () => {
   it("SAFE timeframe is consistent 15분봉", () => {
-    ensureStrategyStore();
-    const meta = getStrategyPublicMeta(SAFE_STRATEGY_ID);
-    expect(meta?.timeframe).toBe("15m");
-    expect(meta?.timeframeLabel).toBe("15분봉");
-    expect(meta?.sourceStatusLabel).toBe("기본 설정 사용 중");
+    const { cleanup } = installIsolatedStrategyStore();
+    try {
+      ensureStrategyStore();
+      const meta = getStrategyPublicMeta(SAFE_STRATEGY_ID);
+      expect(meta?.timeframe).toBe("15m");
+      expect(meta?.timeframeLabel).toBe("15분봉");
+      expect(meta?.sourceStatusLabel).toBe("기본 설정 사용 중");
+    } finally {
+      cleanup();
+    }
   });
 
   it("clone gets unique Korean name and test names cannot be live candidates", () => {
-    ensureStrategyStore();
-    const a = copyStrategy(SAFE_STRATEGY_ID);
-    const b = copyStrategy(SAFE_STRATEGY_ID);
-    expect(a.name).toMatch(/복사본 \d+$/);
-    expect(b.name).toMatch(/복사본 \d+$/);
-    expect(a.name).not.toBe(b.name);
-    const testCopy = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
-    expect(isTestStrategyRecord(testCopy as never)).toBe(true);
-    expect(() => setLiveActiveStrategy(testCopy.id)).toThrow(/테스트 전략/);
-    deleteStrategy(a.id);
-    deleteStrategy(b.id);
-    deleteStrategy(testCopy.id);
+    const { cleanup } = installIsolatedStrategyStore();
+    try {
+      ensureStrategyStore();
+      const a = copyStrategy(SAFE_STRATEGY_ID);
+      const b = copyStrategy(SAFE_STRATEGY_ID);
+      expect(a.name).toMatch(/복사본 \d+$/);
+      expect(b.name).toMatch(/복사본 \d+$/);
+      expect(a.name).not.toBe(b.name);
+      const testCopy = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
+      expect(isTestStrategyRecord(testCopy as never)).toBe(true);
+      expect(() => setLiveActiveStrategy(testCopy.id)).toThrow(/테스트 전략/);
+      deleteStrategy(a.id);
+      deleteStrategy(b.id);
+      deleteStrategy(testCopy.id);
+    } finally {
+      cleanup();
+    }
   });
 
   it("pollution names are detected", () => {

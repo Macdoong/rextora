@@ -30,6 +30,14 @@ import type {
   ScatterPoint,
 } from "@/src/lib/rextora/charts/types";
 import { displayParamSourceLabel } from "@/src/lib/rextora/displayLabels";
+import {
+  runSaveAndNext,
+  shouldConfirmUnsavedNext,
+  canShowSaveActions,
+  getNavButtonMode,
+  getStepChipState,
+  SKIP_SAVE_CONFIRM_MESSAGE,
+} from "@/components/rextora/strategy/builder/saveAndNext";
 
 const STEPS = [
   "전략 선택",
@@ -169,9 +177,16 @@ export function StrategyBuilderPanel() {
     scatter: ScatterPoint[];
   } | null>(null);
   const [advanced, setAdvanced] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [skipConfirmOpen, setSkipConfirmOpen] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(
+    () => new Set(),
+  );
 
   const selected = strategies.find((s) => s.id === selectedId) ?? null;
   const isLocked = Boolean(selected?.locked);
+  const navMode = getNavButtonMode(dirty);
+  const showSaveActions = canShowSaveActions(step, isLocked);
 
   const load = useCallback(async () => {
     const [sRes, cRes] = await Promise.all([
@@ -209,11 +224,89 @@ export function StrategyBuilderPanel() {
       body: JSON.stringify({ action, id: selectedId, ...extra }),
     });
     const json = await res.json();
-    setMessage(json.ok ? "완료" : (json.error ?? "실패했습니다."));
-    setDirty(false);
-    await load();
-    if (json.data?.id) setSelectedId(json.data.id);
+    if (json.ok) {
+      setMessage(action === "save" ? "저장되었습니다." : "완료");
+      setDirty(false);
+      await load();
+      if (json.data?.id) setSelectedId(json.data.id);
+    } else {
+      setMessage(json.error ?? "실패했습니다.");
+    }
     return json;
+  }
+
+  function validateCurrentStep(): string | null {
+    if (!editName.trim()) return "전략 이름을 입력하세요.";
+    if (!editParams) return "전략 파라미터가 없습니다.";
+    return null;
+  }
+
+  async function persistCurrentStrategy(): Promise<boolean> {
+    if (isLocked) {
+      setMessage("원본 보호 전략은 저장할 수 없습니다. 복사본을 만드세요.");
+      return false;
+    }
+    const params = editParams
+      ? {
+          ...editParams,
+          sl_atr_mult: sl,
+          tp_atr_mult: tp,
+          max_hold_bars: maxHold,
+          base_bal_pct: basePct,
+          cost_guard_k: costK,
+        }
+      : undefined;
+    const definition = buildDefinition();
+    const json = await act("save", {
+      patch: { name: editName, timeframe, params, definition },
+    });
+    return Boolean(json?.ok);
+  }
+
+  async function saveAndNext() {
+    if (saving) return;
+    setSkipConfirmOpen(false);
+    setSaving(true);
+    try {
+      const stepAtSave = step;
+      const { result, validationMessage } = await runSaveAndNext({
+        isLocked,
+        saving: false,
+        validate: validateCurrentStep,
+        persist: persistCurrentStrategy,
+        advance: () => {
+          setCompletedSteps((prev) => new Set(prev).add(stepAtSave));
+          setStep((s) => Math.min(STEPS.length - 1, s + 1));
+        },
+      });
+      if (result === "locked") {
+        setMessage("원본 보호 전략은 저장할 수 없습니다. 복사본을 만드세요.");
+        return;
+      }
+      if (result === "validation") {
+        setMessage(validationMessage ?? "입력값을 확인하세요.");
+        return;
+      }
+      if (result === "persist_failed") {
+        return;
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function goNextWithoutSave() {
+    if (shouldConfirmUnsavedNext(dirty)) {
+      setSkipConfirmOpen(true);
+      return;
+    }
+    setSkipConfirmOpen(false);
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  }
+
+  function confirmSkipWithoutSave() {
+    setSkipConfirmOpen(false);
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
   }
 
   function buildDefinition(): CanonicalStrategyDefinition {
@@ -272,27 +365,6 @@ export function StrategyBuilderPanel() {
     };
   }
 
-  async function saveAll() {
-    if (isLocked) {
-      setMessage("원본 보호 전략은 저장할 수 없습니다. 복사본을 만드세요.");
-      return;
-    }
-    const params = editParams
-      ? {
-          ...editParams,
-          sl_atr_mult: sl,
-          tp_atr_mult: tp,
-          max_hold_bars: maxHold,
-          base_bal_pct: basePct,
-          cost_guard_k: costK,
-        }
-      : undefined;
-    const definition = buildDefinition();
-    await act("save", {
-      patch: { name: editName, timeframe, params, definition },
-    });
-  }
-
   async function loadPreview() {
     const res = await fetch(
       `/api/rextora/strategies/preview?id=${selectedId}&symbol=BTCUSDT&interval=${timeframe}`,
@@ -349,8 +421,15 @@ export function StrategyBuilderPanel() {
     setDirty(true);
   }
 
+  function isSearchStrategy(s: StoredStrategy | null | undefined): boolean {
+    if (!s || s.locked) return false;
+    const desc = (s.description ?? "").toString();
+    return desc.includes("전략 탐색") || desc.includes("job=");
+  }
+
   function statusBadge(s: StoredStrategy) {
     if (s.locked) return <Badge tone="warning">원본 보호 전략</Badge>;
+    if (isSearchStrategy(s)) return <Badge tone="info">탐색 합격 전략</Badge>;
     if (s.liveEligible) return <Badge tone="success">사용 가능</Badge>;
     return <Badge>검증 필요</Badge>;
   }
@@ -359,7 +438,10 @@ export function StrategyBuilderPanel() {
     <div className="space-y-4" data-testid="strategy-builder">
       <div className="sr-only" data-testid="strategy-manager" />
       {dirty && (
-        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+        <div
+          className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100"
+          data-testid="strategy-unsaved-banner"
+        >
           저장되지 않은 변경이 있습니다.
         </div>
       )}
@@ -388,17 +470,39 @@ export function StrategyBuilderPanel() {
             style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
           />
         </div>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {STEPS.slice(0, step).map((label, i) => (
-            <button
-              key={label}
-              type="button"
-              className="rounded border border-emerald-500/30 px-2 py-1 text-[11px] text-emerald-300"
-              onClick={() => setStep(i)}
-            >
-              ✓ {label}
-            </button>
-          ))}
+        <div
+          className="mt-2 flex flex-wrap gap-1"
+          data-testid="strategy-step-chips"
+        >
+          {STEPS.map((label, i) => {
+            const state = getStepChipState({
+              index: i,
+              currentStep: step,
+              dirty,
+              completedSteps,
+            });
+            const chipClass =
+              state === "completed"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                : state === "current"
+                  ? "border-sky-500/50 bg-sky-500/15 text-sky-100"
+                  : state === "unsaved"
+                    ? "border-amber-500/50 bg-amber-500/15 text-amber-100"
+                    : "border-slate-700 bg-slate-900/40 text-slate-500";
+            return (
+              <button
+                key={label}
+                type="button"
+                data-testid={`strategy-step-chip-${i}`}
+                data-state={state}
+                className={`rounded border px-2 py-1 text-[11px] ${chipClass}`}
+                onClick={() => setStep(i)}
+              >
+                {state === "completed" ? "✓ " : state === "unsaved" ? "● " : ""}
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -445,13 +549,14 @@ export function StrategyBuilderPanel() {
             )}
           </>
         )}
-        {step >= 1 && step <= 5 && !isLocked && (
+        {showSaveActions && navMode === "dirty" && (
           <Button
             tone="success"
             data-testid="strategy-save"
-            onClick={() => void saveAll()}
+            disabled={saving}
+            onClick={() => void saveAndNext()}
           >
-            저장 후 다음
+            {saving ? "저장 중..." : "저장 후 다음"}
           </Button>
         )}
         {step === 6 && (
@@ -481,16 +586,54 @@ export function StrategyBuilderPanel() {
             실전 후보 등록
           </Button>
         )}
-        {step < STEPS.length - 1 && (
+        {step < STEPS.length - 1 && showSaveActions && navMode === "dirty" && (
           <Button
-            onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
+            tone="muted"
+            data-testid="strategy-next-skip"
+            disabled={saving}
+            onClick={() => goNextWithoutSave()}
           >
-            다음
+            저장하지 않고 다음
           </Button>
         )}
+        {step < STEPS.length - 1 &&
+          (!showSaveActions || navMode === "clean") && (
+            <Button
+              data-testid="strategy-next"
+              disabled={saving}
+              onClick={() => goNextWithoutSave()}
+            >
+              다음
+            </Button>
+          )}
         <Button onClick={() => setAdvanced((v) => !v)}>
           {advanced ? "고급 설정 닫기" : "고급 설정"}
         </Button>
+        {skipConfirmOpen && (
+          <div
+            className="w-full rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-50"
+            data-testid="strategy-skip-confirm"
+            role="alertdialog"
+          >
+            <p className="whitespace-pre-line">{SKIP_SAVE_CONFIRM_MESSAGE}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button
+                tone="muted"
+                data-testid="strategy-skip-cancel"
+                onClick={() => setSkipConfirmOpen(false)}
+              >
+                취소
+              </Button>
+              <Button
+                tone="warning"
+                data-testid="strategy-skip-continue"
+                onClick={() => confirmSkipWithoutSave()}
+              >
+                계속
+              </Button>
+            </div>
+          </div>
+        )}
         {advanced && !isLocked && (
           <details className="w-full rounded-lg border border-slate-700 p-2 text-sm text-slate-300">
             <summary className="cursor-pointer text-slate-200">
@@ -617,11 +760,23 @@ export function StrategyBuilderPanel() {
               <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
                 <Metric
                   label="전략 구분"
-                  value={isLocked ? "SAFE 원본" : "사용자 복사본"}
+                  value={
+                    isLocked
+                      ? "SAFE 원본"
+                      : isSearchStrategy(selected)
+                        ? "탐색 합격 전략"
+                        : "사용자 복사 전략"
+                  }
                 />
                 <Metric
-                  label="상태"
-                  value={isLocked ? "원본 보호" : "복사본 전략"}
+                  label="출처"
+                  value={
+                    isLocked
+                      ? "원본 보호"
+                      : isSearchStrategy(selected)
+                        ? "전략 탐색"
+                        : "사용자"
+                  }
                 />
                 <Metric
                   label="모의 적용"
@@ -632,6 +787,12 @@ export function StrategyBuilderPanel() {
                   value={selected?.liveEligible ? "예" : "아니오"}
                 />
               </div>
+              {isSearchStrategy(selected) ? (
+                <p className="mt-3 text-sm text-slate-400">
+                  전략 탐색에서 등록된 합격 후보입니다. 백테스트·모의·실전 후보는
+                  별도 단계에서만 진행됩니다. 원본 SAFE와는 다른 전략입니다.
+                </p>
+              ) : null}
             </Card>
           )}
 

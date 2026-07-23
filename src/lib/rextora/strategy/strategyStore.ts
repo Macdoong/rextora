@@ -19,18 +19,123 @@ import { definitionToStoredPatch, storedToDefinition, type StoredStrategyV1 } fr
 import type { CanonicalStrategyDefinition } from "./definition/types";
 import { isTestStrategyRecord } from "./strategyTestFilter";
 
-const ROOT = () => path.join(/* turbopackIgnore: true */ process.cwd(), "data", "rextora", "strategies");
+export const UNSAFE_TEST_STRATEGY_STORE =
+  "UNSAFE_TEST_STRATEGY_STORE: Test strategy storage must use an isolated REXTORA_STRATEGIES_DIR.";
+
+export const PROTECTED_STRATEGY_INTEGRITY = "PROTECTED_STRATEGY_INTEGRITY";
+
+/** Detect Vitest / NODE_ENV=test without relying on a single flag. */
+export function isStrategyStoreTestRuntime(): boolean {
+  if (process.env.VITEST === "true" || process.env.VITEST === "1") return true;
+  if (typeof process.env.VITEST_WORKER_ID !== "undefined") return true;
+  if (process.env.NODE_ENV === "test") return true;
+  return false;
+}
+
+export function productionStrategiesRoot(): string {
+  return path.resolve(
+    /* turbopackIgnore: true */ process.cwd(),
+    "data",
+    "rextora",
+    "strategies"
+  );
+}
+
+export function canonicalSafeSourceDir(): string {
+  return path.resolve(/* turbopackIgnore: true */ process.cwd(), "data", "strategies");
+}
+
+function isPathInside(child: string, parent: string): boolean {
+  const c = path.resolve(child);
+  const p = path.resolve(parent);
+  if (c === p) return true;
+  const prefix = p.endsWith(path.sep) ? p : p + path.sep;
+  return c.startsWith(prefix);
+}
+
+function assertIsolatedRootNotProduction(resolvedRoot: string): void {
+  if (!resolvedRoot || resolvedRoot.trim() === "") {
+    throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
+  }
+  const root = path.resolve(resolvedRoot);
+  const prod = productionStrategiesRoot();
+  const canonical = canonicalSafeSourceDir();
+  const cwd = path.resolve(/* turbopackIgnore: true */ process.cwd());
+  const fsRoot = path.parse(root).root;
+  if (root === fsRoot || root === cwd || root === prod || root === canonical) {
+    throw new StrategyValidationError(
+      `${UNSAFE_TEST_STRATEGY_STORE} Isolated root collides with a protected path.`
+    );
+  }
+  if (isPathInside(prod, root) || isPathInside(canonical, root) || isPathInside(cwd, root)) {
+    throw new StrategyValidationError(
+      `${UNSAFE_TEST_STRATEGY_STORE} Isolated root must not contain production paths.`
+    );
+  }
+  if (isPathInside(root, prod) || isPathInside(root, canonical)) {
+    throw new StrategyValidationError(
+      `${UNSAFE_TEST_STRATEGY_STORE} Isolated root must not sit inside production paths.`
+    );
+  }
+}
+
+/**
+ * Optional test/isolation override via REXTORA_STRATEGIES_DIR.
+ * Under Vitest / NODE_ENV=test the override is mandatory (fail-closed).
+ */
+const ROOT = () => {
+  const override = process.env.REXTORA_STRATEGIES_DIR?.trim();
+  if (isStrategyStoreTestRuntime()) {
+    if (!override) {
+      throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
+    }
+    const resolved = path.resolve(/* turbopackIgnore: true */ override);
+    assertIsolatedRootNotProduction(resolved);
+    return resolved;
+  }
+  if (override) return path.resolve(/* turbopackIgnore: true */ override);
+  return productionStrategiesRoot();
+};
+
 const INDEX = () => path.join(ROOT(), "index.json");
+
+export function getStrategiesRoot(): string {
+  return ROOT();
+}
 
 function ensureDir(): void {
   fs.mkdirSync(ROOT(), { recursive: true });
+}
+
+function assertDestructiveTargetAllowed(targetFile: string): void {
+  const resolved = path.resolve(targetFile);
+  if (path.basename(resolved) === `${SAFE_STRATEGY_ID}.json`) {
+    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
+  }
+  const canonicalSafeFile = path.join(canonicalSafeSourceDir(), `${SAFE_STRATEGY_ID}.json`);
+  if (resolved === path.resolve(canonicalSafeFile)) {
+    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
+  }
+  if (isStrategyStoreTestRuntime()) {
+    const root = ROOT();
+    if (!isPathInside(resolved, root)) {
+      throw new StrategyValidationError(
+        `${UNSAFE_TEST_STRATEGY_STORE} Destructive path is outside the isolated test root.`
+      );
+    }
+    return;
+  }
+  const prod = productionStrategiesRoot();
+  if (!isPathInside(resolved, prod)) {
+    throw new StrategyValidationError("잘못된 전략 경로입니다.");
+  }
 }
 
 function strategyFilePath(id: string): string {
   assertSafeStrategyId(id);
   const root = path.resolve(ROOT());
   const file = path.resolve(root, `${id}.json`);
-  if (!file.startsWith(root + path.sep)) {
+  if (!isPathInside(file, root) || file === root) {
     throw new StrategyValidationError("잘못된 전략 경로입니다.");
   }
   return file;
@@ -86,16 +191,58 @@ function buildLockedSafeStrategy(): StoredStrategyV1 {
   };
 }
 
-function writeStrategyFile(strategy: StoredStrategy): void {
-  ensureDir();
-  const file = strategyFilePath(strategy.id);
-  // Direct write avoids cross-process tmp rename races during parallel tests
-  fs.writeFileSync(file, JSON.stringify(strategy, null, 2), "utf8");
+function assertExistingSafeIntegrity(filePath: string): StoredStrategyV1 {
+  let parsed: StoredStrategyV1;
+  try {
+    parsed = JSON.parse(fs.readFileSync(filePath, "utf8")) as StoredStrategyV1;
+  } catch {
+    throw new StrategyValidationError(
+      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE strategy file is corrupt and will not be overwritten.`
+    );
+  }
+  if (parsed.id !== SAFE_STRATEGY_ID || parsed.name !== SAFE_STRATEGY_NAME) {
+    throw new StrategyValidationError(
+      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE identity mismatch.`
+    );
+  }
+  if (parsed.paramsHash !== EXPECTED_SAFE_PARAMS_HASH) {
+    throw new StrategyValidationError(
+      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE params hash mismatch (expected ${EXPECTED_SAFE_PARAMS_HASH}).`
+    );
+  }
+  if (!parsed.locked) {
+    throw new StrategyValidationError(
+      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE must remain locked.`
+    );
+  }
+  return parsed;
 }
 
-function writeIndex(strategies: StoredStrategy[]): void {
-  ensureDir();
-  const index: StrategyIndexFile = {
+function indexStrategiesEqual(
+  a: StrategyIndexFile["strategies"],
+  b: StrategyIndexFile["strategies"]
+): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    const x = a[i]!;
+    const y = b[i]!;
+    if (
+      x.id !== y.id ||
+      x.name !== y.name ||
+      x.paramsHash !== y.paramsHash ||
+      x.locked !== y.locked ||
+      x.paperActive !== y.paperActive ||
+      x.liveActive !== y.liveActive ||
+      x.file !== y.file
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function buildIndexPayload(strategies: StoredStrategy[]): StrategyIndexFile {
+  return {
     version: 1,
     updatedAt: new Date().toISOString(),
     strategies: strategies.map((s) => ({
@@ -108,38 +255,59 @@ function writeIndex(strategies: StoredStrategy[]): void {
       file: `${s.id}.json`
     }))
   };
+}
+
+function writeStrategyFile(strategy: StoredStrategy): void {
+  ensureDir();
+  const file = strategyFilePath(strategy.id);
+  if (strategy.id === SAFE_STRATEGY_ID && fs.existsSync(file)) {
+    throw new StrategyValidationError(
+      `${PROTECTED_STRATEGY_INTEGRITY}: existing SAFE strategy file must not be rewritten.`
+    );
+  }
+  if (strategy.id !== SAFE_STRATEGY_ID) {
+    assertDestructiveTargetAllowed(file);
+  } else if (isStrategyStoreTestRuntime()) {
+    const root = ROOT();
+    if (!isPathInside(file, root)) {
+      throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
+    }
+  }
+  fs.writeFileSync(file, JSON.stringify(strategy, null, 2), "utf8");
+}
+
+function writeIndex(strategies: StoredStrategy[]): void {
+  ensureDir();
+  const index = buildIndexPayload(strategies);
   fs.writeFileSync(INDEX(), JSON.stringify(index, null, 2), "utf8");
 }
 
-export function ensureStrategyStore(): StoredStrategy[] {
-  ensureDir();
-  const locked = buildLockedSafeStrategy();
-  const safePath = strategyFilePath(SAFE_STRATEGY_ID);
-  if (!fs.existsSync(safePath)) {
-    writeStrategyFile(locked);
+/** Write index only when strategy rows actually changed. */
+function writeIndexIfChanged(strategies: StoredStrategy[]): void {
+  const next = buildIndexPayload(strategies);
+  if (fs.existsSync(INDEX())) {
+    try {
+      const cur = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+      if (indexStrategiesEqual(cur.strategies ?? [], next.strategies)) {
+        return;
+      }
+    } catch {
+      /* rewrite corrupt index */
+    }
   }
+  writeIndex(strategies);
+}
 
-  const loaded = readAllStrategyFiles();
-  const refreshed = loaded.length
-    ? loaded.map((s) => {
-        if (s.id !== SAFE_STRATEGY_ID) return s;
-        const next = {
-          ...locked,
-          paperActive: s.paperActive,
-          liveActive: s.liveActive,
-          lastBacktest: s.lastBacktest ?? locked.lastBacktest
-        };
-        writeStrategyFile(next);
-        return next;
-      })
-    : [locked];
-
-  if (!refreshed.some((s) => s.id === SAFE_STRATEGY_ID)) {
-    refreshed.unshift(locked);
-    writeStrategyFile(locked);
-  }
-  writeIndex(refreshed);
-  return refreshed;
+function overlaySafeActivationFromIndex(
+  strategy: StoredStrategyV1,
+  row: StrategyIndexFile["strategies"][number] | undefined
+): StoredStrategyV1 {
+  if (strategy.id !== SAFE_STRATEGY_ID || !row) return strategy;
+  return {
+    ...strategy,
+    paperActive: row.paperActive,
+    liveActive: row.liveActive
+  };
 }
 
 function readAllStrategyFiles(): StoredStrategyV1[] {
@@ -156,12 +324,98 @@ function readAllStrategyFiles(): StoredStrategyV1[] {
       }
       const full = strategyFilePath(row.id);
       if (!fs.existsSync(full)) continue;
-      out.push(JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1);
+      if (row.id === SAFE_STRATEGY_ID) {
+        const safe = assertExistingSafeIntegrity(full);
+        out.push(overlaySafeActivationFromIndex(safe, row));
+      } else {
+        out.push(JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1);
+      }
     }
     return out;
-  } catch {
+  } catch (error) {
+    if (error instanceof StrategyValidationError) throw error;
     return [];
   }
+}
+
+function discoverStrategyFilesOnDisk(): StoredStrategyV1[] {
+  ensureDir();
+  if (!fs.existsSync(ROOT())) return [];
+  const names = fs.readdirSync(ROOT()).filter((n) => n.endsWith(".json") && n !== "index.json");
+  const out: StoredStrategyV1[] = [];
+  for (const name of names) {
+    const id = name.replace(/\.json$/, "");
+    try {
+      assertSafeStrategyId(id);
+    } catch {
+      continue;
+    }
+    const full = strategyFilePath(id);
+    if (id === SAFE_STRATEGY_ID) {
+      out.push(assertExistingSafeIntegrity(full));
+    } else {
+      out.push(JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1);
+    }
+  }
+  return out;
+}
+
+/**
+ * Ensure the management store exists. Never rewrite an existing valid SAFE file.
+ * Index is written only when missing or missing the SAFE entry.
+ */
+export function ensureStrategyStore(): StoredStrategy[] {
+  ensureDir();
+  const safePath = strategyFilePath(SAFE_STRATEGY_ID);
+
+  if (!fs.existsSync(safePath)) {
+    writeStrategyFile(buildLockedSafeStrategy());
+  } else {
+    assertExistingSafeIntegrity(safePath);
+  }
+
+  let loaded = readAllStrategyFiles();
+  let indexNeedsRepair = !fs.existsSync(INDEX());
+
+  if (!loaded.length && fs.existsSync(INDEX())) {
+    // Index present but empty/unreadable entries — discover from disk once
+    loaded = discoverStrategyFilesOnDisk();
+    indexNeedsRepair = true;
+  }
+
+  if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
+    const safe = assertExistingSafeIntegrity(safePath);
+    let paperActive = true;
+    let liveActive = false;
+    if (fs.existsSync(INDEX())) {
+      try {
+        const index = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+        const row = index.strategies.find((r) => r.id === SAFE_STRATEGY_ID);
+        if (row) {
+          paperActive = row.paperActive;
+          liveActive = row.liveActive;
+        }
+      } catch {
+        /* keep defaults */
+      }
+    }
+    loaded = [{ ...safe, paperActive, liveActive }, ...loaded.filter((s) => s.id !== SAFE_STRATEGY_ID)];
+    indexNeedsRepair = true;
+  }
+
+  if (!fs.existsSync(INDEX())) {
+    loaded = discoverStrategyFilesOnDisk();
+    if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
+      loaded = [assertExistingSafeIntegrity(safePath), ...loaded];
+    }
+    indexNeedsRepair = true;
+  }
+
+  if (indexNeedsRepair) {
+    writeIndexIfChanged(loaded);
+  }
+
+  return loaded;
 }
 
 export function listStrategies(): StoredStrategy[] {
@@ -169,8 +423,13 @@ export function listStrategies(): StoredStrategy[] {
   if (!fs.existsSync(INDEX()) || !fs.existsSync(strategyFilePath(SAFE_STRATEGY_ID))) {
     return ensureStrategyStore();
   }
+  // Validate SAFE in place without rewriting
+  assertExistingSafeIntegrity(strategyFilePath(SAFE_STRATEGY_ID));
   const loaded = readAllStrategyFiles();
-  return loaded.length ? loaded : ensureStrategyStore();
+  if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
+    return ensureStrategyStore();
+  }
+  return loaded;
 }
 
 export function getStrategyById(id: string): StoredStrategyV1 | undefined {
@@ -313,6 +572,9 @@ export function saveStrategy(
   patch: Partial<StoredStrategyV1> & { params?: SafeV44Params; definition?: CanonicalStrategyDefinition }
 ): StoredStrategyV1 {
   assertSafeStrategyId(id);
+  if (id === SAFE_STRATEGY_ID) {
+    throw new StrategyValidationError("잠긴 원본 보호 전략은 직접 저장할 수 없습니다. 먼저 복사본을 만드세요.");
+  }
   const current = getStrategyById(id);
   if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
   if (current.locked || current.id === SAFE_STRATEGY_ID) {
@@ -359,15 +621,26 @@ export function saveStrategy(
 
 export function deleteStrategy(id: string): void {
   assertSafeStrategyId(id);
+  if (id === SAFE_STRATEGY_ID) {
+    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
+  }
   const current = getStrategyById(id);
   if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
   if (current.locked || current.id === SAFE_STRATEGY_ID) {
     throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
   }
   const file = strategyFilePath(id);
+  assertDestructiveTargetAllowed(file);
   if (fs.existsSync(file)) fs.unlinkSync(file);
   const all = listStrategies().filter((s) => s.id !== id);
   writeIndex(all);
+}
+
+function writeNonSafeStrategyFiles(all: StoredStrategy[]): void {
+  for (const s of all) {
+    if (s.id === SAFE_STRATEGY_ID) continue;
+    writeStrategyFile(s);
+  }
 }
 
 export function setPaperActiveStrategy(id: string): StoredStrategy {
@@ -385,7 +658,8 @@ export function setPaperActiveStrategy(id: string): StoredStrategy {
     if (!v.ok) throw new StrategyValidationError(`설정 오류: ${v.errors.join(" · ")}`);
   }
   const all = listStrategies().map((s) => ({ ...s, paperActive: s.id === id }));
-  for (const s of all) writeStrategyFile(s);
+  // Never rewrite the protected SAFE file; activation for SAFE lives in the index overlay.
+  writeNonSafeStrategyFiles(all);
   writeIndex(all);
   const active = all.find((s) => s.id === id);
   if (!active) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
@@ -411,7 +685,7 @@ export function setLiveActiveStrategy(id: string): StoredStrategy {
     liveActive: s.id === id,
     liveEligible: s.id === id ? true : s.liveEligible
   }));
-  for (const s of all) writeStrategyFile(s);
+  writeNonSafeStrategyFiles(all);
   writeIndex(all);
   return all.find((s) => s.id === id)!;
 }
@@ -429,6 +703,7 @@ export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
     }
     if (isTestStrategyRecord(s as StoredStrategyV1 & { testData?: boolean })) {
       const file = strategyFilePath(s.id);
+      assertDestructiveTargetAllowed(file);
       if (fs.existsSync(file)) fs.unlinkSync(file);
       removed.push(s.id);
     } else {
@@ -436,9 +711,11 @@ export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
     }
   }
   if (!kept.some((s) => s.id === SAFE_STRATEGY_ID)) {
-    const locked = buildLockedSafeStrategy();
-    writeStrategyFile(locked);
-    kept.unshift(locked);
+    const safePath = strategyFilePath(SAFE_STRATEGY_ID);
+    if (!fs.existsSync(safePath)) {
+      writeStrategyFile(buildLockedSafeStrategy());
+    }
+    kept.unshift(assertExistingSafeIntegrity(strategyFilePath(SAFE_STRATEGY_ID)));
   }
   writeIndex(kept);
   return { removed, kept: kept.map((s) => s.id) };
@@ -448,6 +725,7 @@ export function updateStrategyLastBacktest(
   id: string,
   stats: { totalReturn: number; mdd: number; trades: number; winRate: number }
 ): void {
+  if (id === SAFE_STRATEGY_ID) return;
   const current = getStrategyById(id);
   if (!current) return;
   const next: StoredStrategy = {

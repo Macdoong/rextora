@@ -12,6 +12,7 @@ import {
   setPaperActiveStrategy,
   validateStrategyById
 } from "../src/lib/rextora/strategy/strategyStore";
+import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { isTestStrategyRecord } from "../src/lib/rextora/strategy/strategyTestFilter";
 import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import { emptyGroup, newLeafId, type LeafCondition } from "../src/lib/rextora/strategy/definition/types";
@@ -41,7 +42,11 @@ function leaf(partial: Partial<LeafCondition> & Pick<LeafCondition, "type" | "ca
 }
 
 describe("Priority #3 strategy builder", () => {
+  let cleanupIsolated: (() => void) | undefined;
+
   beforeEach(() => {
+    cleanupIsolated?.();
+    cleanupIsolated = installIsolatedStrategyStore().cleanup;
     ensureStrategyStore();
   });
 
@@ -54,6 +59,8 @@ describe("Priority #3 strategy builder", () => {
         /* ignore */
       }
     }
+    cleanupIsolated?.();
+    cleanupIsolated = undefined;
   });
 
   it("1. SAFE remains immutable", () => {
@@ -232,9 +239,9 @@ describe("Priority #3 strategy builder", () => {
     expect(() => deleteStrategy(SAFE_STRATEGY_ID)).toThrow(StrategyValidationError);
   });
 
-  it("19. backtest integration for SAFE and clone", () => {
+  it("19. backtest integration for SAFE and clone", async () => {
     const copy = copyStrategy(SAFE_STRATEGY_ID);
-    const result = runConfiguredBacktest({
+    const result = await runConfiguredBacktest({
       strategyId: copy.id,
       symbols: ["BTCUSDT"],
       timeframe: "15m",
@@ -246,10 +253,12 @@ describe("Priority #3 strategy builder", () => {
       applySpread: false,
       spreadRate: 0,
       costStressMultipliers: [1],
-      costGuardK: 3
+      costGuardK: 3,
+      dataMode: "synthetic-test",
     });
     expect(result.report.validation.noRealOrders).toBe(true);
     expect(result.trades.length).toBeGreaterThanOrEqual(0);
+    expect(result.report.dataSource).toBe("synthetic-test");
   });
 
   it("20-21. paper apply and live candidate mark", () => {

@@ -5,6 +5,7 @@ import {
   copyStrategy,
   deleteStrategy,
   ensureStrategyStore,
+  getStrategiesRoot,
   getStrategyById,
   listStrategies,
   saveStrategy,
@@ -14,12 +15,15 @@ import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
 import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import { runConfiguredBacktest } from "../src/lib/rextora/backtest/backtestRunner";
 import { isTestStrategyRecord } from "../src/lib/rextora/strategy/strategyTestFilter";
+import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
-const DIR = path.join(process.cwd(), "data", "rextora", "strategies");
 const createdIds: string[] = [];
+let cleanupIsolated: (() => void) | undefined;
 
 describe("strategyStore", () => {
   beforeEach(() => {
+    cleanupIsolated?.();
+    cleanupIsolated = installIsolatedStrategyStore().cleanup;
     ensureStrategyStore();
     createdIds.length = 0;
   });
@@ -32,7 +36,7 @@ describe("strategyStore", () => {
         /* already gone */
       }
     }
-    // Sweep leftover pollution clones from interrupted runs
+    // Sweep leftover pollution clones from interrupted runs (isolated root only)
     for (const s of listStrategies()) {
       if (s.id === SAFE_STRATEGY_ID) continue;
       if (isTestStrategyRecord(s as never)) {
@@ -43,6 +47,8 @@ describe("strategyStore", () => {
         }
       }
     }
+    cleanupIsolated?.();
+    cleanupIsolated = undefined;
   });
 
   it("lists protected SAFE_v44_i4060 with verified hash", () => {
@@ -52,7 +58,7 @@ describe("strategyStore", () => {
     expect(safe!.locked).toBe(true);
     expect(safe!.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
     expect(safe!.timeframe).toBe("15m");
-    expect(fs.existsSync(path.join(DIR, "index.json"))).toBe(true);
+    expect(fs.existsSync(path.join(getStrategiesRoot(), "index.json"))).toBe(true);
   });
 
   it("copy creates editable strategy with new hash", () => {
@@ -85,24 +91,32 @@ describe("strategyStore", () => {
 });
 
 describe("backtestRunner", () => {
-  it("runs configured backtest without live orders", () => {
-    ensureStrategyStore();
-    const result = runConfiguredBacktest({
-      strategyId: SAFE_STRATEGY_ID,
-      symbols: ["BTCUSDT"],
-      timeframe: "15m",
-      balance: 10000,
-      feeRate: 0.0004,
-      slippageRate: 0.0002,
-      fundingRate: 0.0001,
-      applyFunding: false,
-      applySpread: false,
-      spreadRate: 0,
-      costStressMultipliers: [1, 1.5, 2],
-      costGuardK: 3
-    });
-    expect(result.report.validation.noRealOrders).toBe(true);
-    expect(result.report.costStress?.length).toBe(3);
-    expect(result.report.strategyHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+  it("runs configured backtest without live orders", async () => {
+    const { cleanup } = installIsolatedStrategyStore();
+    try {
+      ensureStrategyStore();
+      const result = await runConfiguredBacktest({
+        strategyId: SAFE_STRATEGY_ID,
+        symbols: ["BTCUSDT"],
+        timeframe: "15m",
+        balance: 10000,
+        feeRate: 0.0004,
+        slippageRate: 0.0002,
+        fundingRate: 0.0001,
+        applyFunding: false,
+        applySpread: false,
+        spreadRate: 0,
+        costStressMultipliers: [1, 1.5, 2],
+        costGuardK: 3,
+        dataMode: "synthetic-test",
+      });
+      expect(result.report.validation.noRealOrders).toBe(true);
+      expect(result.report.costStress?.length).toBe(3);
+      expect(result.report.strategyHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+      expect(result.report.dataSource).toBe("synthetic-test");
+      expect(result.candles.length).toBe(result.report.candleCount);
+    } finally {
+      cleanup();
+    }
   });
 });
