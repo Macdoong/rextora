@@ -1,0 +1,871 @@
+  const worstLossTrade = model.trades.reduce<EnrichedTrade | null>((worst, t) => {
+    if (!worst || t.pnlPct < worst.pnlPct) return t;
+    return worst;
+  }, null);
+  const previewTradeRows = (() => {
+    if (tradeListExpanded) return pageRows;
+    const pick = new Map<string, EnrichedTrade>();
+    if (selectedTradeId) {
+      const sel = filtered.find((t) => t.id === selectedTradeId);
+      if (sel) pick.set(sel.id, sel);
+    }
+    if (worstLossTrade) pick.set(worstLossTrade.id, worstLossTrade);
+    for (const t of filtered) {
+      if (pick.size >= TRADE_PREVIEW_SIZE) break;
+      pick.set(t.id, t);
+    }
+    return [...pick.values()];
+  })();
+  const winCount = model.winLossSummary.wins;
+  const lossCount = model.winLossSummary.losses;
+  const hasEquity = model.equitySeries.data.length > 1;
+  const simpleCostPct =
+    costRatios.totalCostPctOfGrossProfit == null
+      ? null
+      : (costRatios.totalCostPctOfGrossProfit * 100).toFixed(1);
+  const costVsNet =
+    costRatios.netProfitAfterCosts !== 0
+      ? Math.abs(costRatios.totalCostUsdt / costRatios.netProfitAfterCosts)
+      : null;
+
+  return (
+    <div className="space-y-4 overflow-x-hidden" data-testid="backtest-analysis" ref={rootRef}>
+      {report.zeroTradeDiagnostics && report.tradeCount === 0 && (
+        <Card title="진단" data-testid="backtest-zero-trade">
+          <p className="text-sm text-slate-300">{report.zeroTradeDiagnostics.explanationKo}</p>
+        </Card>
+      )}
+
+      {chartReproWarning ? (
+        <p
+          className="rounded-lg border border-amber-500/50 bg-amber-950/40 px-3 py-2 text-sm text-amber-100"
+          data-testid="chart-repro-warning"
+        >
+          {chartReproWarning}
+        </p>
+      ) : chartSource === "persisted" ? (
+        <p className="text-[11px] text-emerald-300/80" data-testid="chart-repro-ok">
+          저장된 차트 증거로 복원됨 (외부 API 불필요)
+        </p>
+      ) : null}
+
+      <SectionAnchor id="summary">
+        <Card title="핵심 성과" data-testid="backtest-summary">
+          <div className="mb-3 flex flex-wrap gap-3 text-xs rx-text-muted">
+            <span>데이터 출처: {dataSourceLabel}</span>
+            <span>
+              실제 캔들:{" "}
+              {report.actualFirstCandleTime
+                ? formatKoreanDateTime(new Date(report.actualFirstCandleTime).getTime())
+                : "-"}{" "}
+              ~{" "}
+              {report.actualLastCandleTime
+                ? formatKoreanDateTime(new Date(report.actualLastCandleTime).getTime())
+                : "-"}
+            </span>
+            <span>처리 캔들: {processed.toLocaleString("ko-KR")}</span>
+            {samplingNote && <span data-testid="chart-sampling-note">{samplingNote}</span>}
+          </div>
+          <div className="mb-3 flex flex-wrap gap-2" data-testid="status-chips">
+            {chips.map((c) => (
+              <Badge key={c.id} tone={c.tone}>
+                {c.labelKo}
+              </Badge>
+            ))}
+          </div>
+          <MetricsGrid
+            items={[
+              { label: "최종 자산", value: formatUsdt(report.endingBalance) },
+              {
+                label: "순손익",
+                value: formatUsdt(netProfit),
+                tone: netProfit >= 0 ? "success" : "danger",
+              },
+              {
+                label: "순수익률",
+                value: formatPct(report.totalReturn),
+                tone: report.totalReturn >= 0 ? "success" : "danger",
+              },
+              { label: "최대 낙폭", value: formatPct(report.mdd), tone: "danger" },
+              { label: "거래 수", value: report.tradeCount },
+              { label: "승률", value: formatPct(report.winRate, 1) },
+              { label: "손익비", value: report.profitFactor.toFixed(2) },
+              {
+                label: "총 거래비용",
+                value: formatUsdt(model.costs.totalCostUsdt),
+              },
+            ]}
+          />
+          <HelpTitle
+            title="거래 손실 지표"
+            help={maxLossStats.helpKo}
+          />
+          <MetricsGrid
+            cols="md:grid-cols-3"
+            items={[
+              {
+                label: maxLossStats.labelKo,
+                value:
+                  maxLossStats.accountEquityImpactPct == null
+                    ? "—"
+                    : formatPct(maxLossStats.accountEquityImpactPct),
+                tone: "danger",
+                help: maxLossStats.helpKo,
+              },
+              {
+                label: LEVERAGED_POSITION_PNL_LABEL_KO,
+                value:
+                  maxLossStats.leveragedPnlPct == null
+                    ? "—"
+                    : formatPct(maxLossStats.leveragedPnlPct),
+                tone: "danger",
+                help: "레버리지가 반영된 포지션(증거금) 기준 손익률입니다.",
+              },
+              {
+                label: "적용 레버리지",
+                value:
+                  maxLossStats.worstTradeLeverage == null
+                    ? "—"
+                    : `${maxLossStats.worstTradeLeverage.toFixed(2)}x`,
+              },
+            ]}
+          />
+          <p className="mb-1 text-xs rx-text-muted" data-testid="max-loss-equity-impact">
+            {ACCOUNT_EQUITY_IMPACT_LABEL_KO}:{" "}
+            {maxLossStats.accountEquityImpactPct == null
+              ? "—"
+              : formatPct(maxLossStats.accountEquityImpactPct)}
+            {maxLossStats.leveragedPnlPct != null
+              ? ` · ${LEVERAGED_POSITION_PNL_LABEL_KO} ${formatPct(maxLossStats.leveragedPnlPct)}`
+              : ""}
+            {maxLossStats.worstTradeLeverage != null
+              ? ` · 적용 레버리지 ${maxLossStats.worstTradeLeverage.toFixed(2)}x`
+              : ""}
+          </p>
+        </Card>
+      </SectionAnchor>
+
+      <SectionAnchor id="price">
+        <div data-testid="backtest-price-chart">
+          <div
+            className="mb-3 space-y-2 rounded-xl border border-slate-800 bg-slate-950/40 p-3"
+            data-testid="trade-overlay-toggles"
+          >
+            <div>
+              <p className="mb-1 text-[11px] font-semibold text-slate-300">기본 표시</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-1 text-xs rx-text-muted">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.entry}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        entry: !s.entry,
+                        exit: !s.entry,
+                      }))
+                    }
+                  />
+                  진입·청산
+                </label>
+                <label className="flex items-center gap-1 text-xs rx-text-muted">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.stop}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        stop: !s.stop,
+                        target: !s.stop,
+                      }))
+                    }
+                  />
+                  손절·익절
+                </label>
+                <label className="flex items-center gap-1 text-xs rx-text-muted" title="거래량">
+                  <input
+                    type="checkbox"
+                    checked={showVolume}
+                    onChange={() => setShowVolume((v) => !v)}
+                    data-testid="overlay-toggle-volume"
+                  />
+                  거래량
+                </label>
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] font-semibold text-slate-300">기술 패턴</p>
+              <div className="flex flex-wrap items-center gap-3">
+                {patternAvailability.map((p) => (
+                  <label
+                    key={p.kind}
+                    className={`flex items-center gap-1 text-xs ${p.status === "available" ? "rx-text-muted" : "text-slate-600"}`}
+                    title={p.reasonKo}
+                    data-testid={`overlay-toggle-${p.kind}`}
+                  >
+                    <input
+                      type="checkbox"
+                      disabled={p.status !== "available"}
+                      checked={patternToggleOn(p.kind)}
+                      onChange={() =>
+                        setPatternToggleOverride((s) => ({
+                          ...s,
+                          [p.kind]: !patternToggleOn(p.kind),
+                        }))
+                      }
+                    />
+                    {p.labelKo}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] font-semibold text-slate-300">이벤트</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-1 text-xs rx-text-muted" title="재접촉">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.revisit}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({ ...s, revisit: !s.revisit }))
+                    }
+                  />
+                  재접촉
+                </label>
+                <label className="flex items-center gap-1 text-xs rx-text-muted">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.confirmation}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        confirmation: !s.confirmation,
+                      }))
+                    }
+                  />
+                  확인
+                </label>
+                <label className="flex items-center gap-1 text-xs rx-text-muted">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.invalidation}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        invalidation: !s.invalidation,
+                      }))
+                    }
+                  />
+                  무효화
+                </label>
+                <label className="flex items-center gap-1 text-xs rx-text-muted">
+                  <input
+                    type="checkbox"
+                    checked={overlayOpts.rejected}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        rejected: !s.rejected,
+                      }))
+                    }
+                    data-testid="overlay-toggle-rejected"
+                  />
+                  거부 셋업
+                </label>
+              </div>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => selectTrade(null, "clear")}>
+              선택 해제
+            </Button>
+          </div>
+          {patternAvailability.some((p) => p.status !== "available") ? (
+            <p
+              className="mb-2 text-[11px] text-slate-500"
+              data-testid="overlay-missing-geometry-note"
+            >
+              {patternAvailability.find((p) => p.status === "missing_geometry")
+                ?.reasonKo ??
+                patternAvailability.find((p) => p.status === "strategy_unused")
+                  ?.reasonKo}
+            </p>
+          ) : null}
+          {linkStatus ? (
+            <p
+              className="mb-2 rounded border border-sky-700/50 bg-sky-950/40 px-3 py-2 text-sm text-sky-100"
+              data-testid="chart-trade-link-status"
+              aria-live="polite"
+            >
+              {linkStatus}
+            </p>
+          ) : null}
+          {hasProcessedCandles ? (
+            <CandlestickChart
+              title={`${report.symbol} · ${tfLabel}`}
+              help="실제 OHLCV입니다. 일반 휠은 페이지 스크롤만 합니다. Ctrl+휠로 확대/축소합니다."
+              candles={model.sampledPriceCandles}
+              markers={markers}
+              levels={patternLevels}
+              zones={patternZones}
+              height={600}
+              showVolume={showVolume}
+              selectedTradeId={selectedTradeId}
+              onSelectTrade={(id) => selectTrade(id, "chart")}
+              focusTimeRange={focusTimeRange}
+              symbolLabel={report.symbol}
+              timeframeLabel={tfLabel}
+              strategyName={report.strategyName}
+            />
+          ) : (
+            <p className="text-sm rx-text-muted" data-testid="price-chart-empty">
+              이 실행에는 표시할 가격 캔들이 없습니다.
+            </p>
+          )}
+        </div>
+      </SectionAnchor>
+
+      <SectionAnchor id="trades">
+        {hasTrades ? (
+          <Card title="거래 목록" data-testid="backtest-trade-list">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <input
+                className="min-h-11 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                placeholder="거래번호 또는 심볼 검색"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(0);
+                }}
+                data-testid="trade-search"
+              />
+              <select
+                className="min-h-11 rounded border border-slate-700 bg-slate-950 px-2 py-2 text-sm"
+                value={tradeSort}
+                onChange={(e) => setTradeSort(e.target.value as TradeSort)}
+                data-testid="trade-sort"
+              >
+                {SORTS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+              <div className="flex flex-wrap gap-1">
+                {FILTERS.map((f) => (
+                  <Button
+                    key={f.id}
+                    size="sm"
+                    variant={tradeFilter === f.id ? "primary" : "outline"}
+                    onClick={() => {
+                      setTradeFilter(f.id);
+                      setPage(0);
+                    }}
+                  >
+                    {f.label}
+                  </Button>
+                ))}
+              </div>
+              <span className="text-xs rx-text-muted">
+                {filtered.length}건
+                {tradeListExpanded
+                  ? ` · ${safePage + 1}/${pageCount} 페이지`
+                  : " · 미리보기"}
+              </span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1100px] text-left text-sm">
+                <thead className="sticky top-0 bg-slate-950 rx-text-muted">
+                  <tr>
+                    {TRADE_HEADERS.map((h) => (
+                      <th key={h} className="whitespace-nowrap px-2 py-2 font-medium">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewTradeRows.map((t) => (
+                    <TradeTableRow
+                      key={t.id}
+                      t={t}
+                      selected={selectedTradeId === t.id}
+                      onSelect={() => selectTrade(t.id, "list")}
+                      rowRef={(el) => {
+                        if (el) rowRefs.current.set(t.id, el);
+                      }}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {!tradeListExpanded ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  data-testid="trade-list-expand"
+                  onClick={() => setTradeListExpanded(true)}
+                >
+                  전체 {filtered.length}개 거래 보기
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    data-testid="trade-list-collapse"
+                    onClick={() => setTradeListExpanded(false)}
+                  >
+                    미리보기로 접기
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={safePage === 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    이전
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={safePage >= pageCount - 1}
+                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                  >
+                    다음
+                  </Button>
+                </>
+              )}
+            </div>
+          </Card>
+        ) : (
+          <p className="text-sm rx-text-muted">표시할 거래가 없습니다.</p>
+        )}
+      </SectionAnchor>
+
+      {hasTrades ? (
+        <SectionAnchor id="monthly">
+          <Card title="월별 성과" data-testid="backtest-monthly">
+            <HelpTitle
+              title="달력 월 집계"
+              help="UTC 달력 월 기준으로 청산 시각을 묶어 시작 자본 대비 수익률을 계산합니다."
+            />
+            <MetricsGrid
+              cols="sm:grid-cols-3 lg:grid-cols-7"
+              items={[
+                { label: "수익 월", value: model.monthlySummary.profitableMonths },
+                { label: "손실 월", value: model.monthlySummary.losingMonths },
+                {
+                  label: "최고 월",
+                  value: model.monthlySummary.bestMonth?.labelKo ?? "-",
+                  help: formatPct(
+                    model.monthlySummary.bestMonth?.returnPctOfInitial ?? 0,
+                  ),
+                },
+                {
+                  label: "최저 월",
+                  value: model.monthlySummary.worstMonth?.labelKo ?? "-",
+                  help: formatPct(
+                    model.monthlySummary.worstMonth?.returnPctOfInitial ?? 0,
+                  ),
+                },
+                {
+                  label: "월평균 수익률",
+                  value: formatPct(model.monthlySummary.avgMonthlyReturnPct),
+                },
+                {
+                  label: "월별 표준편차",
+                  value: formatPct(model.monthlySummary.stdMonthlyReturnPct),
+                },
+                {
+                  label: "연속 손실 월",
+                  value: model.monthlySummary.consecutiveLosingMonths,
+                },
+              ]}
+            />
+            <BarChart title="월별 수익률" series={monthlySeries} height={300} diverging />
+          </Card>
+        </SectionAnchor>
+      ) : null}
+
+      {hasTrades ? (
+        <SectionAnchor id="cost">
+          <Card title="비용 요약" data-testid="backtest-cost-analysis">
+            <MetricsGrid
+              cols="md:grid-cols-4"
+              items={[
+                {
+                  label: "비용 전 총이익",
+                  value: formatUsdt(costRatios.grossProfitBeforeCosts),
+                },
+                { label: "총 비용", value: formatUsdt(costRatios.totalCostUsdt) },
+                {
+                  label: "비용 후 순손익",
+                  value: formatUsdt(costRatios.netProfitAfterCosts),
+                  tone:
+                    costRatios.netProfitAfterCosts >= 0 ? "success" : "danger",
+                },
+                {
+                  label: "원장 일치",
+                  value: costRatios.identityHolds ? "일치" : "확인 필요",
+                  tone: costRatios.identityHolds ? "success" : "warning",
+                  help: `${formatUsdt(costRatios.grossProfitBeforeCosts)} − ${formatUsdt(costRatios.totalCostUsdt)} = ${formatUsdt(costRatios.netProfitAfterCosts)}`,
+                },
+              ]}
+            />
+            {costRatios.criticalCostOfGross && simpleCostPct != null ? (
+              <div
+                className="mb-3 rounded-lg border border-rose-600/50 bg-rose-950/30 p-3 text-sm text-rose-50"
+                data-testid="cost-critical-warning"
+              >
+                <p>거래비용이 총수익의 {simpleCostPct}%를 차지합니다.</p>
+                <p className="mt-1">
+                  수익 대부분이 수수료와 슬리피지로 줄어들었습니다.
+                </p>
+                {costVsNet != null && costVsNet > 1 ? (
+                  <p className="mt-1 text-rose-100/90">
+                    순수익보다 거래비용이 약 {costVsNet.toFixed(1)}배 큽니다.
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+            <details className="text-sm text-slate-300">
+              <summary className="cursor-pointer rx-text-muted">상세 비용 비율</summary>
+              <div className="mt-2">
+                <MetricsGrid
+                  cols="md:grid-cols-4"
+                  items={[
+                    {
+                      label: "비용/총이익",
+                      value:
+                        costRatios.totalCostPctOfGrossProfit == null
+                          ? "—"
+                          : formatPct(costRatios.totalCostPctOfGrossProfit, 1),
+                    },
+                    {
+                      label: "비용/순손익",
+                      value:
+                        costRatios.totalCostPctOfNetProfit == null
+                          ? "—"
+                          : formatPct(costRatios.totalCostPctOfNetProfit, 1),
+                    },
+                    {
+                      label: "수수료 비중",
+                      value:
+                        costRatios.feePctOfTotalCost == null
+                          ? "—"
+                          : formatPct(costRatios.feePctOfTotalCost, 1),
+                    },
+                    {
+                      label: "슬리피지 비중",
+                      value:
+                        costRatios.slippagePctOfTotalCost == null
+                          ? "—"
+                          : formatPct(costRatios.slippagePctOfTotalCost, 1),
+                    },
+                  ]}
+                />
+                <div className="mb-2 flex h-4 overflow-hidden rounded">
+                  {costParts.map((p) => (
+                    <div
+                      key={p.label}
+                      style={{
+                        width: `${(p.v / costSum) * 100}%`,
+                        background: p.c,
+                      }}
+                      title={`${p.label} ${formatUsdt(p.v)}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </details>
+          </Card>
+        </SectionAnchor>
+      ) : null}
+
+      <SectionAnchor id="equity">
+        <Card title="자산·낙폭" data-testid="backtest-equity-section">
+          {!equityExpanded ? (
+            <button
+              type="button"
+              className="w-full text-left text-sm text-slate-200"
+              data-testid="equity-collapse-summary"
+              onClick={() => setEquityExpanded(true)}
+            >
+              최대 낙폭 {formatPct(report.mdd)} · 자세히 보기
+            </button>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mb-3"
+                onClick={() => setEquityExpanded(false)}
+              >
+                접기
+              </Button>
+              {hasEquity ? (
+                <div className="grid gap-4 xl:grid-cols-2">
+                  <EquityCurveChart
+                    title="자산 곡선"
+                    help="세로축은 USDT 자산입니다."
+                    series={model.equitySeries}
+                    height={320}
+                    unit="usdt"
+                    syncCrosshairX={syncX}
+                    onCrosshairX={setSyncX}
+                  />
+                  <DrawdownChart
+                    title="낙폭"
+                    help="최고점 대비 하락률(%)입니다."
+                    series={model.drawdownSeries}
+                    height={320}
+                    syncCrosshairX={syncX}
+                    onCrosshairX={setSyncX}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm rx-text-muted" data-testid="equity-empty">
+                  이 실행에는 저장된 자산곡선이 없습니다.
+                </p>
+              )}
+            </>
+          )}
+        </Card>
+      </SectionAnchor>
+
+      <SectionAnchor id="timeline">
+        <Card title="거래 타임라인" data-testid="backtest-timeline">
+          {!timelineExpanded ? (
+            <button
+              type="button"
+              className="w-full text-left text-sm text-slate-200"
+              onClick={() => setTimelineExpanded(true)}
+            >
+              {hasTrades
+                ? `${model.timelineSummary.total}개 거래 · 평균 보유 ${formatDurationMs(model.timelineSummary.avgHoldMs)} · 자세히 보기`
+                : "표시할 거래 구간이 없습니다."}
+            </button>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mb-3"
+                onClick={() => setTimelineExpanded(false)}
+              >
+                접기
+              </Button>
+              {hasTrades ? (
+                <>
+                  <MetricsGrid
+                    cols="sm:grid-cols-4 lg:grid-cols-7"
+                    items={[
+                      { label: "총 거래", value: model.timelineSummary.total },
+                      { label: "롱", value: model.timelineSummary.longCount },
+                      { label: "숏", value: model.timelineSummary.shortCount },
+                      {
+                        label: "평균 보유",
+                        value: formatDurationMs(model.timelineSummary.avgHoldMs),
+                      },
+                      {
+                        label: "중앙 보유",
+                        value: formatDurationMs(
+                          model.timelineSummary.medianHoldMs,
+                        ),
+                      },
+                      {
+                        label: "최장 보유",
+                        value: formatDurationMs(model.timelineSummary.maxHoldMs),
+                      },
+                      {
+                        label: "일평균 거래",
+                        value: model.timelineSummary.tradesPerDay.toFixed(1),
+                      },
+                    ]}
+                  />
+                  <TimelineLanes
+                    long={model.tradeTimelineGroups.long}
+                    short={model.tradeTimelineGroups.short}
+                    selectedId={selectedTradeId}
+                    onSelect={(id) => selectTrade(id, "list")}
+                    range={timelineRange}
+                    sideFilter={timelineSide}
+                    resultFilter={timelineResult}
+                    domainStartMs={
+                      model.ledgerRange.firstCandleMs ??
+                      model.ledgerRange.firstEntryMs
+                    }
+                    domainEndMs={
+                      model.ledgerRange.lastCandleMs ??
+                      model.ledgerRange.lastExitMs
+                    }
+                  />
+                </>
+              ) : (
+                <p className="text-sm rx-text-muted">표시할 거래 구간이 없습니다.</p>
+              )}
+            </>
+          )}
+        </Card>
+      </SectionAnchor>
+
+      <SectionAnchor id="advanced">
+        <Card title="상세 분석" data-testid="backtest-advanced">
+          {!advancedExpanded ? (
+            <div className="space-y-1 text-sm text-slate-300">
+              <p>
+                거래 분포 · {report.tradeCount}개 거래 · 이익 {winCount}개 · 손실{" "}
+                {lossCount}개
+              </p>
+              <p>
+                보유시간 · 평균{" "}
+                {formatDurationMs(model.timelineSummary.avgHoldMs)} · 중앙값{" "}
+                {formatDurationMs(model.timelineSummary.medianHoldMs)}
+              </p>
+              <p className="rx-text-muted">
+                롤링 지표 · 일부 구간에서 승률과 손익비가 급격히 악화됐을 수
+                있습니다.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-2"
+                data-testid="advanced-expand"
+                onClick={() => setAdvancedExpanded(true)}
+              >
+                상세 분석 펼치기
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mb-3"
+                onClick={() => setAdvancedExpanded(false)}
+              >
+                접기
+              </Button>
+              {hasTrades ? (
+                <div className="grid gap-4 xl:grid-cols-2" data-testid="backtest-distribution">
+                  <Card title="손익·청산 분포">
+                    <div className="space-y-3">
+                      {model.exitCategoryBuckets.map((b) => (
+                        <ExitBucketRow key={b.id} b={b} />
+                      ))}
+                    </div>
+                  </Card>
+                  <Card title="보유 시간 분석">
+                    <div className="space-y-3">
+                      {model.holdingTimeBuckets.map((b) => (
+                        <HoldBucketRow
+                          key={b.label}
+                          b={b}
+                          best={bestHold?.label}
+                          costly={costliestHold?.label}
+                        />
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+              ) : null}
+              {hasTrades ? (
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <EquityCurveChart
+                    title={`롤링 승률 (최근 ${ROLLING_WINDOW}거래)`}
+                    series={{
+                      id: "rw",
+                      name: "승률 %",
+                      color: CHART_THEME.up,
+                      data: model.rollingWinRatePoints,
+                    }}
+                    height={280}
+                    unit="percent"
+                    area={false}
+                  />
+                  <EquityCurveChart
+                    title={`롤링 손익비 (최근 ${ROLLING_WINDOW}거래)`}
+                    series={{
+                      id: "rpf",
+                      name: "손익비",
+                      color: CHART_THEME.accent,
+                      data: model.rollingProfitFactorPoints,
+                    }}
+                    height={280}
+                    unit="raw"
+                    area={false}
+                  />
+                </div>
+              ) : null}
+              <div className="mt-4" data-testid="backtest-engine-assumptions">
+                <p className="mb-1 text-sm font-medium text-slate-200">
+                  백테스트 엔진 가정
+                </p>
+                <ul className="list-disc space-y-1 pl-4 text-xs rx-text-muted">
+                  {engineAssumptions.map((a) => (
+                    <li key={a}>{a}</li>
+                  ))}
+                </ul>
+              </div>
+              <p
+                className="mt-3 text-sm rx-text-muted"
+                data-testid="rejected-setups-empty"
+              >
+                {rejectedSetups.length === 0 && rejectedFromTraces.length === 0
+                  ? strategyType === "safe_params" || !strategyType
+                    ? "이 전략은 해당 패턴을 사용하지 않습니다."
+                    : "거부된 셋업 없음"
+                  : `거부 셋업 ${rejectedSetups.length + rejectedFromTraces.length}건`}
+              </p>
+            </>
+          )}
+        </Card>
+      </SectionAnchor>
+
+      {drawerTrade && (
+        <TradeDetailDrawer
+          trade={drawerTrade}
+          trace={tracesById.get(drawerTrade.id) ?? null}
+          candles={model.sampledPriceCandles}
+          techOpen={techOpen}
+          setTechOpen={setTechOpen}
+          onPrev={() => navigateTrade(-1)}
+          onNext={() => navigateTrade(1)}
+          onFocusChart={() => scrollToSection("price")}
+          onClose={() => {
+            setDrawerTrade(null);
+            setSelectedTradeId(null);
+            setLinkStatus(null);
+          }}
+          onCopyId={() => {
+            void navigator.clipboard?.writeText(drawerTrade.id);
+          }}
+        />
+      )}
+
+      <SectionAnchor id="validation">
+        <Card title="검증 결과" data-testid="backtest-validation">
+          <ValidationGrid
+            report={report}
+            processed={processed}
+            backtestRunId={backtestRunId}
+            eligibility={eligibility}
+            sampleMin={SAMPLE_MIN_TRADES}
+            paperEligible={paperEligible}
+            liveEligible={liveEligible}
+            paperBlockReason={paperBlockReason}
+            liveBlockReason={liveBlockReason}
+            hasTraceGeometry={patternAvailability.some(
+              (p) => p.status === "available",
+            )}
+            hasRejectedTraces={
+              rejectedSetups.length > 0 || rejectedFromTraces.length > 0
+            }
+            detailsOpen={validationDetailsOpen}
+            onToggleDetails={() => setValidationDetailsOpen((v) => !v)}
+          />
+        </Card>
+      </SectionAnchor>
+    </div>
+  );
+}

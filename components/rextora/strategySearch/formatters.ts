@@ -4,11 +4,19 @@ export type StrategySearchCompletionReason =
   | "QUALIFIED_TARGET_REACHED"
   | "MAX_CANDIDATE_BUDGET"
   | "MAX_RUNTIME"
+  | "DEADLINE_REACHED"
+  | "HARD_SAFETY_LIMIT"
   | "SEARCH_SPACE_EXHAUSTED"
   | "USER_CANCELLED"
   | "FATAL_ERROR"
   | "MAX_ITERATIONS"
   | "PAUSED"
+  | "CONFIGURATION_INVALID"
+  | "DATA_UNAVAILABLE"
+  | "RECOVERY_FAILED"
+  | "RESOURCE_SAFETY_LIMIT"
+  | "USER_STOPPED"
+  | "ENGINE_ERROR"
   | null
   | string;
 
@@ -27,22 +35,87 @@ export function completionReasonLabelKo(
     case "QUALIFIED_TARGET_REACHED":
       return "합격 목표 달성";
     case "MAX_CANDIDATE_BUDGET":
-      return "연구 예산 소진";
+    case "MAX_ITERATIONS":
+      return "자원 안전 한도 소진";
+    case "DEADLINE_REACHED":
     case "MAX_RUNTIME":
-      return "연구 시간 한도 도달";
+      return "연구 시간 종료";
+    case "HARD_SAFETY_LIMIT":
+    case "RESOURCE_SAFETY_LIMIT":
+      return "자원 안전 한도 도달";
     case "SEARCH_SPACE_EXHAUSTED":
       return "연구 범위 소진";
     case "USER_CANCELLED":
+    case "USER_STOPPED":
       return "사용자가 중지함";
+    case "CONFIGURATION_INVALID":
+      return "탐색 설정 오류";
+    case "DATA_UNAVAILABLE":
+      return "시장 데이터 없음";
+    case "RECOVERY_FAILED":
+      return "복구 실패";
     case "FATAL_ERROR":
-      return "오류로 종료";
-    case "MAX_ITERATIONS":
-      return "연구 예산 소진";
+    case "ENGINE_ERROR":
+      return "엔진 오류";
     case "PAUSED":
       return "일시정지";
     default:
       return null;
   }
+}
+
+function inferFailedReasonFromMessage(
+  failureMessage: string | null | undefined,
+): string {
+  const msg = (failureMessage ?? "").toLowerCase();
+  if (!msg.trim()) return "ENGINE_ERROR";
+  if (
+    msg.includes("invalid parameterranges") ||
+    msg.includes("defaultvalue is outside") ||
+    msg.includes("parameterranges")
+  ) {
+    return "CONFIGURATION_INVALID";
+  }
+  if (msg.includes("candle") || msg.includes("data") || msg.includes("klines")) {
+    return "DATA_UNAVAILABLE";
+  }
+  if (msg.includes("recover") || msg.includes("orphan")) {
+    return "RECOVERY_FAILED";
+  }
+  if (msg.includes("safety") || msg.includes("budget ceiling")) {
+    return "RESOURCE_SAFETY_LIMIT";
+  }
+  return "ENGINE_ERROR";
+}
+
+/**
+ * Prefer plan completionReason; for failed jobs always resolve a non-blank
+ * reason from failureMessage when needed.
+ */
+export function resolveDisplayTerminationReason(input: {
+  status: StrategySearchJobStatus | string;
+  completionReason?: StrategySearchCompletionReason | null;
+  terminationReason?: string | null;
+  failureMessage?: string | null;
+}): string {
+  if (input.terminationReason) {
+    return (
+      completionReasonLabelKo(input.terminationReason) ??
+      input.terminationReason
+    );
+  }
+  if (input.completionReason) {
+    return (
+      completionReasonLabelKo(input.completionReason) ??
+      String(input.completionReason)
+    );
+  }
+  if (input.status === "failed") {
+    const inferred = inferFailedReasonFromMessage(input.failureMessage);
+    return completionReasonLabelKo(inferred) ?? "엔진 오류";
+  }
+  if (input.status === "cancelled") return "사용자가 중지함";
+  return "—";
 }
 
 /**

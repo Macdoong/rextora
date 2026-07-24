@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
@@ -13,37 +14,99 @@ import {
 
 type Metrics = UnifiedMetricsSnapshot;
 
+type PaperStrategy = {
+  id: string;
+  name: string;
+  paramsHash: string;
+};
+
+type PaperSession = {
+  id: string;
+  strategyId: string;
+  strategyHash: string;
+  strategyName: string;
+  status: "active" | "paused" | "stopped";
+  virtualBalance: number;
+  realizedPnl: number;
+  unrealizedPnl: number;
+  tradeCount: number;
+  signalCount: number;
+};
+
+type CanonicalPaperStatus =
+  | "idle"
+  | "starting"
+  | "active"
+  | "paused"
+  | "stopping"
+  | "stopped"
+  | "error";
+
+const PAPER_STATUS_LABEL: Record<CanonicalPaperStatus, string> = {
+  idle: "대기",
+  starting: "시작 중",
+  active: "활성",
+  paused: "일시정지",
+  stopping: "종료 중",
+  stopped: "종료됨",
+  error: "오류",
+};
+
 export default function PaperTradingPage() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
-  const [strategy, setStrategy] = useState<{
-    name: string;
-    paramsHash: string;
-  } | null>(null);
+  const [strategy, setStrategy] = useState<PaperStrategy | null>(null);
+  const [session, setSession] = useState<PaperSession | null>(null);
   const [riskView, setRiskView] = useState<UnifiedRiskView | null>(null);
   const [origin, setOrigin] = useState("");
+  const [sessionBusy, setSessionBusy] = useState(false);
+  const [identityLoading, setIdentityLoading] = useState(true);
+  const [identityError, setIdentityError] = useState<string | null>(null);
+  const [pendingPhase, setPendingPhase] = useState<
+    "starting" | "stopping" | null
+  >(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   async function refresh() {
-    const [dash, strategies, bot] = await Promise.all([
-      fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
-      fetch("/api/rextora/strategies").then((r) => r.json()),
-      fetch("/api/rextora/bot/status").then((r) => r.json()),
-    ]);
-    setStatus(dash.data?.status ?? dash.status ?? null);
-    if (dash.meta)
-      setOrigin(
-        formatDataSourceMeta(
-          dash.meta.source,
-          dash.meta.cached,
-          dash.meta.durationMs,
-        ),
+    try {
+      const [dash, strategies, bot, sessionRes] = await Promise.all([
+        fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
+        fetch("/api/rextora/strategies").then((r) => r.json()),
+        fetch("/api/rextora/bot/status").then((r) => r.json()),
+        fetch("/api/rextora/paper/session?active=1").then((r) => r.json()),
+      ]);
+      setStatus(dash.data?.status ?? dash.status ?? null);
+      if (dash.meta)
+        setOrigin(
+          formatDataSourceMeta(
+            dash.meta.source,
+            dash.meta.cached,
+            dash.meta.durationMs,
+          ),
+        );
+      setRiskView(bot.data?.riskView ?? null);
+      const active = (strategies.data ?? []).find(
+        (s: { paperActive?: boolean }) => s.paperActive,
       );
-    setRiskView(bot.data?.riskView ?? null);
-    const active = (strategies.data ?? []).find(
-      (s: { paperActive?: boolean }) => s.paperActive,
-    );
-    if (active)
-      setStrategy({ name: active.name, paramsHash: active.paramsHash });
+      if (active)
+        setStrategy({
+          id: active.id,
+          name: active.name,
+          paramsHash: active.paramsHash,
+        });
+      else setStrategy(null);
+      setSession(sessionRes.data?.active ?? null);
+      setIdentityError(null);
+      setLoadError(null);
+    } catch (e) {
+      setIdentityError(
+        e instanceof Error ? e.message : "모의매매 데이터를 불러오지 못했습니다.",
+      );
+      setLoadError("모의매매 상태를 불러오지 못했습니다.");
+    } finally {
+      setIdentityLoading(false);
+      setPendingPhase(null);
+    }
   }
 
   useEffect(() => {
@@ -57,17 +120,87 @@ export default function PaperTradingPage() {
     };
   }, []);
 
-  async function run(path: string, mode = "PAPER") {
-    const res = await fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode }),
-    });
-    const json = await res.json();
-    setMessage(
-      json.message ?? json.data?.message ?? (json.ok ? "완료" : "실패"),
-    );
-    await refresh();
+  const canonicalStatus: CanonicalPaperStatus = (() => {
+    if (loadError && !session) return "error";
+    if (pendingPhase === "starting") return "starting";
+    if (pendingPhase === "stopping") return "stopping";
+    if (!session) return "idle";
+    if (session.status === "active") return "active";
+    if (session.status === "paused") return "paused";
+    if (session.status === "stopped") return "stopped";
+    return "error";
+  })();
+
+  async function startPaper() {
+    if (!strategy?.id) {
+      setMessage("활성 모의 전략이 없습니다. 탐색 결과에서 등록하세요.");
+      return;
+    }
+    setSessionBusy(true);
+    setPendingPhase("starting");
+    try {
+      const res = await fetch("/api/rextora/paper/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ strategyId: strategy.id }),
+      });
+      const json = await res.json();
+      if (!json.ok) {
+        setMessage(json.error ?? "세션 생성 실패");
+        return;
+      }
+      const botRes = await fetch("/api/bot/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "PAPER" }),
+      });
+      const botJson = await botRes.json();
+      setMessage(
+        botJson.ok
+          ? `모의매매 시작 · 전략 ${strategy.id} · ${strategy.paramsHash.slice(0, 12)}`
+          : (botJson.error ?? botJson.message ?? "봇 시작 실패"),
+      );
+      await refresh();
+    } finally {
+      setSessionBusy(false);
+      setPendingPhase(null);
+    }
+  }
+
+  async function sessionAction(action: "pause" | "resume" | "stop") {
+    if (!session?.id) {
+      setMessage("활성 세션이 없습니다.");
+      return;
+    }
+    setSessionBusy(true);
+    if (action === "stop") setPendingPhase("stopping");
+    try {
+      const res = await fetch(
+        `/api/rextora/paper/session/${encodeURIComponent(session.id)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action }),
+        },
+      );
+      const json = await res.json();
+      if (action === "stop" && json.ok) {
+        await fetch("/api/bot/stop", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "PAPER" }),
+        });
+      }
+      setMessage(
+        json.ok
+          ? `세션 ${action}: ${json.data?.session?.status ?? ""}`
+          : (json.error ?? "세션 작업 실패"),
+      );
+      await refresh();
+    } finally {
+      setSessionBusy(false);
+      setPendingPhase(null);
+    }
   }
 
   const s = status as {
@@ -99,16 +232,57 @@ export default function PaperTradingPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">모의 매매</h1>
         <p className="mt-1 text-sm text-slate-400">
-          실제 주문 없음. SAFE 수학 시그널로만 모의 진입합니다.
+          활성 모의 전략을 실행합니다. 실제 주문은 없습니다.
         </p>
       </div>
 
       <Card title="활성 모의 전략">
+        {identityLoading ? (
+          <div
+            className="mb-3 animate-pulse rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-6 text-sm text-slate-400"
+            data-testid="paper-strategy-loading"
+          >
+            전략·세션 정보를 확인하는 중…
+          </div>
+        ) : identityError ? (
+          <div
+            className="mb-3 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-3 text-sm text-red-100"
+            data-testid="paper-strategy-error"
+            role="alert"
+          >
+            {identityError}
+          </div>
+        ) : (
+          <div
+            className="mb-3 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-50"
+            data-testid="paper-active-strategy"
+          >
+            <p>
+              전략 ID:{" "}
+              <span className="font-mono">{strategy?.id ?? "미등록"}</span>
+            </p>
+            <p className="mt-1">
+              이름: {strategy?.name ?? "등록된 모의 전략 없음"}
+            </p>
+            <p className="mt-1">
+              {displayParamsHashLabel()}:{" "}
+              <span className="font-mono">
+                {strategy?.paramsHash ?? "—"}
+              </span>
+            </p>
+            {session ? (
+              <p className="mt-1 text-xs text-sky-100/80">
+                세션 전략: {session.strategyId} ·{" "}
+                {session.strategyHash.slice(0, 12)}
+              </p>
+            ) : null}
+          </div>
+        )}
         <div className="grid gap-3 md:grid-cols-4">
           <Metric
             label="전략"
             value={
-              strategy?.name ?? s?.activeStrategy?.name ?? "SAFE_v44_i4060"
+              strategy?.name ?? s?.activeStrategy?.name ?? "—"
             }
           />
           <Metric
@@ -161,27 +335,168 @@ export default function PaperTradingPage() {
         <p className="text-xs text-slate-500">{origin} · 모의 거래 데이터</p>
       )}
 
-      <Card title="제어">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            tone="success"
-            data-testid="paper-start"
-            onClick={() => void run("/api/bot/start", "PAPER")}
-          >
-            모의 매매 시작
-          </Button>
-          <Button
-            tone="warning"
-            data-testid="paper-stop"
-            onClick={() => void run("/api/bot/stop", "PAPER")}
-          >
-            모의 매매 중지
-          </Button>
+      <Card title="모의매매 제어" data-testid="paper-control-bar">
+        <div className="grid gap-3 md:grid-cols-4">
+          <div data-testid="paper-canonical-status">
+            <Metric
+              label="세션 상태"
+              value={PAPER_STATUS_LABEL[canonicalStatus]}
+            />
+          </div>
+          <Metric
+            label="세션 ID"
+            value={session?.id ? session.id.slice(0, 18) + "…" : "—"}
+          />
+          <Metric
+            label="가상 잔고"
+            value={
+              session
+                ? `${session.virtualBalance.toFixed(2)} USDT`
+                : "—"
+            }
+          />
+          <Metric
+            label="세션 거래"
+            value={String(session?.tradeCount ?? 0)}
+          />
+        </div>
+        <p className="mt-2 text-xs text-slate-500" data-testid="paper-status-source">
+          상태 원본: {session?.status ?? "none"} → UI: {canonicalStatus}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {canonicalStatus === "idle" || canonicalStatus === "stopped" ? (
+            <Button
+              tone="success"
+              loading={sessionBusy}
+              data-testid="paper-start"
+              disabled={identityLoading || !strategy?.id}
+              onClick={() => void startPaper()}
+            >
+              {canonicalStatus === "stopped" ? "새 세션 시작" : "모의매매 시작"}
+            </Button>
+          ) : null}
+          {canonicalStatus === "starting" ? (
+            <Button tone="muted" disabled data-testid="paper-starting">
+              시작 중…
+            </Button>
+          ) : null}
+          {canonicalStatus === "active" ? (
+            <>
+              <Button
+                tone="warning"
+                loading={sessionBusy}
+                data-testid="paper-session-pause"
+                onClick={() => void sessionAction("pause")}
+              >
+                일시정지
+              </Button>
+              <Button
+                tone="danger"
+                loading={sessionBusy}
+                data-testid="paper-session-stop"
+                onClick={() => void sessionAction("stop")}
+              >
+                종료
+              </Button>
+            </>
+          ) : null}
+          {canonicalStatus === "paused" ? (
+            <>
+              <Button
+                tone="success"
+                loading={sessionBusy}
+                data-testid="paper-session-resume"
+                onClick={() => void sessionAction("resume")}
+              >
+                재개
+              </Button>
+              <Button
+                tone="danger"
+                loading={sessionBusy}
+                data-testid="paper-session-stop"
+                onClick={() => void sessionAction("stop")}
+              >
+                종료
+              </Button>
+            </>
+          ) : null}
+          {canonicalStatus === "stopping" ? (
+            <Button tone="muted" disabled data-testid="paper-stopping">
+              종료 중…
+            </Button>
+          ) : null}
+          {canonicalStatus === "stopped" ? (
+            <Link
+              href="/results"
+              className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
+              data-testid="paper-view-results"
+            >
+              결과 보기
+            </Link>
+          ) : null}
+          {canonicalStatus === "error" ? (
+            <Button
+              tone="warning"
+              data-testid="paper-retry"
+              onClick={() => void refresh()}
+            >
+              안전 재시도
+            </Button>
+          ) : null}
         </div>
         {message && <p className="mt-3 text-sm text-slate-300">{message}</p>}
-        <p className="mt-2 text-xs text-slate-500">
-          상태: {s?.botStatusLabel ?? "-"} · 모드: {s?.modeLabel ?? "모의 거래"}
+      </Card>
+
+      <Card
+        title="모의 피드백 · 재탐색"
+        description="모의 결과를 연구 루프로 되돌립니다."
+        data-testid="paper-feedback-actions"
+      >
+        {session ? (
+          <div
+            className="mb-3 grid gap-2 md:grid-cols-3"
+            data-testid="paper-backtest-comparison"
+          >
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
+              <p className="text-xs text-slate-400">모의 거래 수</p>
+              <p className="font-semibold text-white">{session.tradeCount}</p>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
+              <p className="text-xs text-slate-400">모의 신호 수</p>
+              <p className="font-semibold text-white">{session.signalCount}</p>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
+              <p className="text-xs text-slate-400">전략 해시</p>
+              <p className="font-mono text-xs text-sky-200">
+                {session.strategyHash.slice(0, 12)}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="mb-3 text-sm text-slate-400">
+            세션을 생성하면 백테스트 비교 카드가 표시됩니다.
+          </p>
+        )}
+        <p className="rextora-helper mb-3 text-slate-400">
+          활성 모의 전략을 실행합니다. 임의 가상 롱/숏 수동 진입은 제공하지
+          않습니다.
         </p>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/strategy-search?researchBasis=paper"
+            className="rextora-btn-text inline-flex items-center justify-center rounded-lg border border-sky-500/40 bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-500"
+            data-testid="paper-feedback-research"
+          >
+            결과로 재탐색
+          </Link>
+          <Link
+            href="/backtest"
+            className="rextora-btn-text inline-flex items-center justify-center rounded-lg border border-slate-600/80 bg-slate-800/90 px-3 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700/90"
+            data-testid="paper-feedback-backtest"
+          >
+            백테스트 비교
+          </Link>
+        </div>
       </Card>
 
       <TradingChartsPanel

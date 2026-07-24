@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
+import { LiveActivationGates } from "@/components/rextora/live/LiveActivationGates";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 import { displayParamsHashLabel } from "@/src/lib/rextora/displayLabels";
@@ -86,9 +87,27 @@ export default function LiveTradingPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">실전 매매</h1>
         <p className="mt-1 text-sm text-slate-400">
-          Binance Futures 실주문. 명시적 시작 전에는 주문이 발생하지 않습니다.
+          활성화 게이트와 드라이런으로 검증합니다. 실주문은 별도 승인 후에만
+          가능합니다.
         </p>
       </div>
+
+      <div
+        className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"
+        data-testid="live-dry-run-banner"
+        role="status"
+      >
+        현재 검증 모드입니다. 실제 주문은 전송되지 않습니다. 드라이런 어댑터만
+        사용합니다.
+      </div>
+
+      <Suspense
+        fallback={
+          <p className="rextora-helper text-slate-400">게이트를 불러오는 중…</p>
+        }
+      >
+        <LiveActivationGates />
+      </Suspense>
 
       <Card title="실전 준비 상태" data-testid="live-readiness">
         <div className="grid gap-3 md:grid-cols-3">
@@ -98,7 +117,7 @@ export default function LiveTradingPage() {
           <Metric label="안전 상태" value={s?.safetyLabel ?? "-"} />
           <Metric
             label="활성 전략"
-            value={s?.activeStrategy?.name ?? "SAFE_v44_i4060"}
+            value={s?.activeStrategy?.name ?? "미선택"}
           />
           <Metric
             label={displayParamsHashLabel()}
@@ -198,7 +217,10 @@ export default function LiveTradingPage() {
         </div>
         {message && <p className="mt-3 text-sm text-slate-300">{message}</p>}
         <div className="mt-3 space-y-1 text-xs text-slate-400">
-          <p>실전 거래는 Binance Futures에 실제 주문을 실행합니다.</p>
+          <p>
+            실전 제어는 게이트 통과 후에만 활성화됩니다. 현재 검증은 드라이런
+            어댑터만 사용하며 실제 주문은 전송되지 않습니다.
+          </p>
           <p>진입 직후 거래소 서버 손절/익절을 등록합니다.</p>
           <p>손절/익절 등록 실패 시 포지션을 즉시 정리합니다.</p>
         </div>

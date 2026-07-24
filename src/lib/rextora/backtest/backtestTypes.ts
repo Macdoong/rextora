@@ -92,6 +92,10 @@ export interface BacktestReport {
     negativeMonths: number;
   }>;
   zeroTradeDiagnostics?: BacktestZeroTradeDiagnostics | null;
+  /** Derived trade event traces for chart explanation UI. */
+  tradeEventTraces?: import("./tradeEventTrace").TradeEventTrace[];
+  /** Rejected setups from event-sequence engine (optional; legacy runs omit). */
+  rejectedSetups?: import("./patternOverlayAvailability").PersistedRejectedSetup[];
   validation: {
     paramsHashVerified: boolean;
     feesApplied: boolean;
@@ -126,10 +130,61 @@ export interface BacktestConfig {
   dataMode?: BacktestDataMode;
 }
 
+/** Distinguishes search-time evaluation summaries from user-executed runs. */
+export type BacktestRunSourceType = "research_evaluation" | "user_backtest_run";
+
+export type BacktestRunStatus =
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
 export interface SavedBacktestResult {
   id: string;
   createdAt: string;
   config: BacktestConfig;
   report: BacktestReport;
   trades: BacktestTrade[];
+  /** Alias of id for lifecycle handoff clarity. Always unique per execution. */
+  backtestRunId?: string;
+  strategyId?: string;
+  strategyHash?: string;
+  sourceType?: BacktestRunSourceType;
+  status?: BacktestRunStatus;
+  requestedAt?: string;
+  startedAt?: string;
+  completedAt?: string | null;
+  errorCode?: string | null;
+  errorDetail?: string | null;
+  engineVersion?: string;
+  dataVersion?: string | null;
+  /**
+   * Deterministic hash of strategy + period + costs + key result metrics.
+   * Identical executions share this hash but never share backtestRunId.
+   */
+  resultHash?: string;
+  /** True when an earlier immutable result matched resultHash. */
+  deduplicatedResult?: boolean;
+  /** Prior execution id whose resultHash matched (if deduplicated). */
+  reusedResultFromRunId?: string | null;
+  /**
+   * Canonical artifact id for the immutable result payload.
+   * For first occurrence equals this run's id; later identical runs may
+   * reference the first.
+   */
+  resultArtifactId?: string | null;
+  /**
+   * When set, chart sidecar is loaded from this run id (content-identical
+   * reuse). Own path data/rextora/backtests/<id>.chart.json is preferred
+   * when present.
+   */
+  chartEvidenceRef?: string | null;
+  /**
+   * When true, OHLCV + equity/drawdown evidence lives in
+   * data/rextora/backtests/<id>.chart.json (schema v1), or via chartEvidenceRef.
+   * Absent/false on legacy runs → best-effort remote hydrate.
+   */
+  hasChartEvidence?: boolean;
+  chartEvidenceSchemaVersion?: number;
 }

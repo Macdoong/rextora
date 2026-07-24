@@ -84,23 +84,21 @@ describe("strategy search Korean localization polish", () => {
   it("Korean field labels and primary CTA render", () => {
     const form = read("JobCreateForm.tsx");
     expect(form).toContain("탐색 목표 설정");
-    expect(form).toContain("탐색 이름");
-    expect(form).toContain("탐색 수준");
-    expect(form).toContain("합격 기준");
-    expect(form).toContain("필요한 합격 전략 수");
-    expect(form).toContain("최소 거래 수");
-    expect(form).toContain("최소 수익률(%)");
-    expect(form).toContain("최대 낙폭(%)");
+    expect(form).toContain("탐색 대상");
+    expect(form).toContain("탐색 시간");
+    expect(form).toContain("초보자 프리셋");
+    expect(form).toContain("최대 허용 낙폭");
+    expect(form).toContain("탐색 기준");
     expect(form).toContain("고급 설정");
-    expect(form).toContain("최대 후보 예산");
-    expect(form).toContain("비용 검증");
-    expect(form).toContain("안정성 검증");
-    expect(form).toContain("전문가 조건");
-    expect(form).toContain("최소 승률(%)");
-    expect(form).toContain("최소 연구 점수");
     expect(form).toContain("탐색 시작");
     expect(form).toContain("showAdvanced");
     expect(form).toMatch(/open=\{form\.showAdvanced\}/);
+    // Advanced still retains expert controls
+    expect(form).toContain("탐색 이름");
+    expect(form).toContain("목표 합격 전략 수");
+    expect(form).toContain("비용 검증");
+    expect(form).toContain("안정성 검증");
+    expect(form).toContain("전문가 조건");
   });
 
   it("advanced groups use Korean titles", () => {
@@ -131,8 +129,8 @@ describe("strategy search Korean localization polish", () => {
     const src = read("ResearchCompletionPanel.tsx");
     expect(src).toContain("AI 연구 완료");
     expect(src).toContain("연구 시간");
-    expect(src).toContain("검증한 전략");
-    expect(src).toContain("연구 예산 사용");
+    expect(src).toContain("평가한 후보");
+    expect(src).toContain("자원 안전 제한");
     expect(src).toContain("합격 전략");
     expect(src).toContain("최고 전략");
     expect(src).toContain("최고 수익률");
@@ -147,8 +145,9 @@ describe("strategy search Korean localization polish", () => {
     expect(src).toContain("기록 삭제");
     expect(src).toContain("이전 기록 보기");
     const wb = read("StrategySearchWorkbench.tsx");
-    expect(wb).toContain("이 탐색 기록과 관련 평가 결과를 삭제하시겠습니까?");
-    expect(wb).toContain("deleteStrategySearchJob");
+    expect(wb).toContain("STRATEGY_SEARCH_HISTORY_RETENTION_NOTE");
+    expect(wb).toContain("ss-open-results");
+    expect(wb).toContain("탐색 결과 열기");
   });
 
   it("API payload behavior remains unchanged", () => {

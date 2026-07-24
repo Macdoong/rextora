@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/rextora/StatusCards";
-import { DashboardPanelsLazy } from "@/components/rextora/dashboard/DashboardPanels";
+import { LifecycleDashboard } from "@/components/rextora/dashboard/LifecycleDashboard";
 
 export default function DashboardPage() {
   return (
@@ -7,11 +7,9 @@ export default function DashboardPage() {
       <PageHeader
         compact
         title="대시보드"
-        description="봇 상태, 활성 전략, 손익, 포지션, 긴급 제어를 한 화면에서 확인합니다."
+        description="연구·검토·모의·실전 상태를 확인하고 다음 승인 결정을 내립니다."
       />
-      <div data-layout="dashboard-compact">
-        <DashboardPanelsLazy />
-      </div>
+      <LifecycleDashboard />
     </div>
   );
 }

@@ -14,12 +14,15 @@ import {
 } from "../strategy/strategyStore";
 import { runSafeV44Backtest, type BacktestTrade } from "./backtestEngine";
 import { saveBacktestResult } from "./backtestStore";
+import { saveChartEvidence } from "./chartEvidenceStore";
 import type { BacktestConfig, BacktestReport } from "./backtestTypes";
 import {
   storedToDefinition,
   type StoredStrategyV1,
 } from "../strategy/definition/bridge";
 import { runConditionBuilderBacktest } from "../strategy/conditionBacktest";
+import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
+import { validateEventSequence } from "../strategy/definition/eventSequence";
 import { validateCanonicalDefinition } from "../strategy/definition/validator";
 import { buildBacktestReport } from "./backtestReport";
 
@@ -319,8 +322,62 @@ export async function runConfiguredBacktest(
       let resultEquity: number[] = [];
       let resultReport: BacktestReport;
 
-      if (strategy.strategyType === "condition_builder") {
-        const def = storedToDefinition(strategy);
+      const def = storedToDefinition(strategy);
+      const useEventSequence =
+        !!def.eventSequence && validateEventSequence(def.eventSequence).ok;
+
+      if (useEventSequence) {
+        const es = runEventSequenceBacktest({
+          def,
+          symbol,
+          candles: loaded.candles,
+          balance: perSymbolBalance,
+          feeRate,
+          slippageRate,
+        });
+        resultTrades = es.trades;
+        resultEquity = es.equityCurve;
+        resultReport = buildBacktestReport({
+          strategyName: strategy.name,
+          paramsHash: strategy.paramsHash,
+          strategyId: strategy.id,
+          sourceStatus: strategy.sourceStatus,
+          symbol,
+          symbols: [symbol],
+          timeframe: config.timeframe,
+          fromDate: loaded.actualFirstCandleTime?.slice(0, 10) ?? null,
+          toDate: loaded.actualLastCandleTime?.slice(0, 10) ?? null,
+          requestedFrom: loaded.requestedFrom,
+          requestedTo: loaded.requestedTo,
+          actualFirstCandleTime: loaded.actualFirstCandleTime,
+          actualLastCandleTime: loaded.actualLastCandleTime,
+          candleCount: loaded.candles.length,
+          processedCandleCount: loaded.candles.length,
+          dataSource: loaded.dataSource,
+          startingBalance: perSymbolBalance,
+          endingBalance: es.endingBalance,
+          equityCurve: es.equityCurve,
+          trades: es.trades,
+          paramsHashVerified:
+            strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
+          feesApplied: true,
+          slippageApplied: true,
+          fundingApplied: config.applyFunding,
+          spreadApplied: config.applySpread,
+          rejectedSetups: (es.rejectedSetups ?? []).map((r) => ({
+            bar: r.bar,
+            at:
+              loaded.candles[r.bar]?.openTime != null
+                ? new Date(loaded.candles[r.bar]!.openTime).toISOString()
+                : null,
+            reasonCode: r.reasonCode,
+            patternType: r.patternType,
+            measured: r.measured,
+            required: r.required,
+            rejectionStage: "invalidation",
+          })),
+        });
+      } else if (strategy.strategyType === "condition_builder") {
         const cb = runConditionBuilderBacktest({
           def,
           symbol,
@@ -396,8 +453,27 @@ export async function runConfiguredBacktest(
         const f = config.feeRate * mult;
         const s = config.slippageRate * mult;
         const sp = (config.applySpread ? config.spreadRate : 0) * mult;
-        if (strategy.strategyType === "condition_builder") {
-          const def = storedToDefinition(strategy);
+        if (useEventSequence) {
+          const es = runEventSequenceBacktest({
+            def,
+            symbol,
+            candles: loaded.candles,
+            balance: perSymbolBalance,
+            feeRate: f,
+            slippageRate: s,
+          });
+          const totalReturn =
+            perSymbolBalance > 0
+              ? (es.endingBalance - perSymbolBalance) / perSymbolBalance
+              : 0;
+          stress.push({
+            multiplier: mult,
+            totalReturn: Number(totalReturn.toFixed(6)),
+            mdd: 0,
+            tradeCount: es.trades.length,
+            negativeMonths: 0,
+          });
+        } else if (strategy.strategyType === "condition_builder") {
           const cb = runConditionBuilderBacktest({
             def,
             symbol,
@@ -588,6 +664,8 @@ export async function runConfiguredBacktest(
 }
 
 export async function runAndSaveBacktest(config: BacktestConfig) {
+  const requestedAt = new Date().toISOString();
+  const startedAt = new Date().toISOString();
   const result = await runConfiguredBacktest(config);
   updateStrategyLastBacktest(config.strategyId, {
     totalReturn: result.report.totalReturn,
@@ -599,6 +677,36 @@ export async function runAndSaveBacktest(config: BacktestConfig) {
     config,
     report: result.report,
     trades: result.trades,
+    strategyId: config.strategyId,
+    strategyHash: result.report.strategyHash ?? undefined,
+    sourceType: "user_backtest_run",
+    status: "completed",
+    requestedAt,
+    startedAt,
+    completedAt: new Date().toISOString(),
+    engineVersion: "rextora-backtest-1",
+    dataVersion: result.report.dataSource ?? null,
+    hasChartEvidence: true,
+    chartEvidenceSchemaVersion: 1,
   });
+  // Sidecar chart evidence — write only when this execution owns the artifact.
+  // Deduplicated runs reuse chartEvidenceRef to the prior identical sidecar.
+  if (!saved.chartEvidenceRef || saved.chartEvidenceRef === saved.id) {
+    saveChartEvidence({
+      runId: saved.id,
+      symbol: result.report.symbol ?? config.symbols[0] ?? "BTCUSDT",
+      timeframe: config.timeframe,
+      dataVersion: result.report.dataSource ?? null,
+      actualFirstCandleTime: result.report.actualFirstCandleTime ?? null,
+      actualLastCandleTime: result.report.actualLastCandleTime ?? null,
+      processedCandleCount:
+        result.processedCandleCount ?? result.report.processedCandleCount ?? 0,
+      candles: result.chartCandles?.length
+        ? result.chartCandles
+        : result.candles ?? [],
+      equityCurve: result.equityCurve ?? [],
+      chartSamplingApplied: Boolean(result.chartSamplingApplied),
+    });
+  }
   return { ...result, saved };
 }

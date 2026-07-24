@@ -32,10 +32,14 @@ import {
   type StrategySearchStoreOptions,
 } from "./jobStore";
 import {
+  activeElapsedMs,
   createEmptySearchPlan,
   getSearchPlan,
+  markPlanPaused,
+  markPlanResumed,
   saveSearchPlan,
 } from "./searchPlan";
+import { resolveTerminationReason } from "./terminationReason";
 import { resolveSpacesForDepth } from "./operatorProfiles";
 import { getSearchSpaceById, rangesForSpace } from "./searchSpaces";
 import { listStrategies } from "../strategy/strategyStore";
@@ -100,6 +104,16 @@ export interface StrategySearchJobSummary {
   updatedAt: string;
   startedAt: string | null;
   finishedAt: string | null;
+  /** Flat active elapsed for Dashboard/Research (null for legacy). */
+  elapsedMs?: number | null;
+  /** Remaining active duration vs maxRuntimeMs (null for legacy). */
+  remainingMs?: number | null;
+  maxRuntimeMs?: number | null;
+  campaignStartedAtMs?: number | null;
+  pausedAtMs?: number | null;
+  accumulatedPauseMs?: number | null;
+  resumedAtMs?: number | null;
+  expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
   completedIterations: number;
   nextIteration: number;
@@ -122,6 +136,8 @@ export interface StrategySearchJobSummary {
   bestCandidateHash: string | null;
   bestPassedCandidateHash: string | null;
   failureMessage: string | null;
+  /** Canonical termination reason — never blank when status=failed. */
+  terminationReason?: string | null;
   executionActive: boolean;
   searchVersion: string;
   symbols: string[];
@@ -170,6 +186,22 @@ export interface StrategySearchJobSummary {
   currentImprovementStage?: string | null;
   /** Active family remaining budget. */
   familyBudgetRemaining?: number | null;
+  /**
+   * Applied search-space mutation summary from plan.lastMutation (null if none/advisory-only).
+   * Only present when mutations were actually applied to ranges.
+   */
+  lastMutation?: {
+    appliedAt: string;
+    weaknessCategories: string[];
+    mutationCount: number;
+    firstChange: {
+      key: string;
+      field: "min" | "max" | "step";
+      from: number;
+      to: number;
+      reason: string;
+    } | null;
+  } | null;
 }
 
 export interface StrategySearchJobDetail extends StrategySearchJobSummary {
@@ -384,6 +416,18 @@ function summarizeJob(
     }
   }
 
+  const planActiveElapsed =
+    plan?.campaignStartedAtMs != null ? activeElapsedMs(plan) : null;
+  const elapsedMs =
+    statistics?.elapsedMs ??
+    plan?.elapsedMs ??
+    planActiveElapsed ??
+    null;
+  const remainingMs =
+    plan?.maxRuntimeMs != null && elapsedMs != null
+      ? Math.max(0, plan.maxRuntimeMs - elapsedMs)
+      : (statistics?.remainingEstimateMs ?? null);
+
   return {
     id: job.id,
     status: job.status,
@@ -391,6 +435,15 @@ function summarizeJob(
     updatedAt: job.updatedAt,
     startedAt: job.startedAt,
     finishedAt: job.finishedAt,
+    /** Flat timing for Dashboard / Research (canonical deadline fields). */
+    elapsedMs,
+    remainingMs,
+    maxRuntimeMs: plan?.maxRuntimeMs ?? null,
+    campaignStartedAtMs: plan?.campaignStartedAtMs ?? null,
+    pausedAtMs: plan?.pausedAtMs ?? null,
+    accumulatedPauseMs: plan?.accumulatedPauseMs ?? null,
+    resumedAtMs: plan?.resumedAtMs ?? null,
+    expectedCompletionAtMs: plan?.expectedCompletionAtMs ?? null,
     maxIterations: job.config.maxIterations,
     completedIterations: job.checkpoint.completedIterations,
     nextIteration: job.checkpoint.nextIteration,
@@ -401,6 +454,11 @@ function summarizeJob(
     bestPassedCandidateHash:
       job.checkpoint.bestPassedCandidate?.paramsHash ?? null,
     failureMessage: job.failureMessage,
+    terminationReason: resolveTerminationReason({
+      status: job.status,
+      completionReason: plan?.completionReason ?? null,
+      failureMessage: job.failureMessage,
+    }),
     executionActive: isSearchJobExecutionActive(job.id),
     searchVersion: job.config.searchVersion,
     symbols: [...job.config.symbols],
@@ -411,7 +469,8 @@ function summarizeJob(
     depthProfile: plan?.depthProfile ?? null,
     qualificationProfile: plan?.qualificationProfile ?? null,
     qualifiedTarget: plan?.qualifiedTarget ?? null,
-    qualifiedCount: plan?.qualifiedHashes.length ?? statistics?.passed ?? null,
+    // Never fall back to statistics.passed — that is total PASS trials, not target-qualified.
+    qualifiedCount: plan?.qualifiedHashes.length ?? 0,
     uniqueEvaluatedCount:
       plan?.uniqueEvaluatedCount ?? statistics?.evaluated ?? null,
     duplicateSkippedCount:
@@ -440,15 +499,17 @@ function summarizeJob(
       ? Math.max(0, plan.candidateBudget - plan.candidateBudgetUsed)
       : null,
     candidateBudgetUsed: plan?.candidateBudgetUsed ?? null,
-    overallProgressPct: plan
-      ? Math.min(
+    // Time-based progress for deadline jobs; never present budget as completion %.
+    overallProgressPct: (() => {
+      if (plan?.maxRuntimeMs != null && plan.maxRuntimeMs > 0) {
+        const elapsed = elapsedMs ?? 0;
+        return Math.min(
           100,
-          Math.round(
-            (plan.candidateBudgetUsed / Math.max(1, plan.candidateBudget)) *
-              100,
-          ),
-        )
-      : null,
+          Math.round((elapsed / plan.maxRuntimeMs) * 100),
+        );
+      }
+      return null;
+    })(),
     currentImprovementStage: activeSpace?.labelKo ?? null,
     familyBudgetRemaining: plan
       ? Math.max(
@@ -457,6 +518,25 @@ function summarizeJob(
             (activeSpace?.budgetSpent ?? activeSpace?.uniqueEvaluated ?? 0),
         )
       : null,
+    lastMutation: (() => {
+      const mut = plan?.lastMutation;
+      if (!mut || !Array.isArray(mut.mutations) || mut.mutations.length === 0) {
+        return null;
+      }
+      const first = mut.mutations[0]!;
+      return {
+        appliedAt: mut.appliedAt,
+        weaknessCategories: [...(mut.weaknessCategories ?? [])],
+        mutationCount: mut.mutations.length,
+        firstChange: {
+          key: first.key,
+          field: first.field,
+          from: first.from,
+          to: first.to,
+          reason: first.reason,
+        },
+      };
+    })(),
   };
 }
 
@@ -536,6 +616,8 @@ export function createStrategySearchJobApi(
           depthProfile: validated.operatorPlan.depthProfile,
           qualificationProfile: validated.operatorPlan.qualificationProfile,
           qualifiedTarget: validated.operatorPlan.qualifiedTarget,
+          stopWhenQualifiedTarget:
+            validated.operatorPlan.stopWhenQualifiedTarget === true,
           candidateBudget: validated.operatorPlan.candidateBudget,
           stageBatchSize: validated.operatorPlan.stageBatchSize,
           maxRuntimeMs: validated.operatorPlan.maxRuntimeMs,
@@ -673,6 +755,10 @@ export function pauseStrategySearchJobApi(
       );
     }
     requestSearchJobPause(jobId, store);
+    const plan = getSearchPlan(jobId, store);
+    if (plan) {
+      saveSearchPlan(jobId, markPlanPaused(plan), store);
+    }
     return detailJob(requireJob(jobId, store), store);
   } catch (err) {
     mapCaught(err);
@@ -700,6 +786,10 @@ export function resumeStrategySearchJobApi(
         `cannot resume strategy-search job in status: ${job.status}`,
         409,
       );
+    }
+    const plan = getSearchPlan(jobId, store);
+    if (plan) {
+      saveSearchPlan(jobId, markPlanResumed(plan), store);
     }
     resumeSearchJobForRun(jobId, store);
     startSearchJobExecution(jobId, merged);

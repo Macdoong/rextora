@@ -53,6 +53,11 @@ export interface ChartShellProps {
   seriesKey?: string;
   /** Optional pad override (candlestick uses tighter vertical margins). */
   pad?: Partial<{ top: number; right: number; bottom: number; left: number }>;
+  /**
+   * When set, zooms the viewport to this fraction range [0,1].
+   * Used for trade-row → chart focus without fabricating candles.
+   */
+  focusRange?: { start: number; end: number } | null;
 }
 
 /** Trading-terminal tooltip row (label / value with optional swatch). */
@@ -138,6 +143,7 @@ export function ChartShell({
   readout,
   pad: padOverride,
   seriesKey,
+  focusRange = null,
 }: ChartShellProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -220,6 +226,18 @@ export function ChartShell({
     });
     return () => cancelAnimationFrame(id);
   }, [preferRecentWindow, dataPointCount, width, zoomInitialized, PAD.left, PAD.right]);
+
+  useEffect(() => {
+    if (!focusRange) return;
+    const start = clamp(focusRange.start, 0, 1);
+    const end = clamp(focusRange.end, 0, 1);
+    if (end <= start) return;
+    const id = requestAnimationFrame(() => {
+      setZoom({ start, end });
+      setZoomInitialized(true);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [focusRange]);
 
   function resetDefaultZoom() {
     if (preferRecentWindow && dataPointCount && dataPointCount > 2) {

@@ -111,6 +111,25 @@ export function validateStrategySearchForm(
     }
   }
 
+  // Duration + advanced runtime must stay consistent when both set.
+  if (
+    form.durationPreset !== "custom" &&
+    form.maxRuntimeMinutesOverride.trim() !== ""
+  ) {
+    const expected = Number(form.durationPreset);
+    const actual = Number(form.maxRuntimeMinutesOverride);
+    if (
+      Number.isFinite(expected) &&
+      Number.isFinite(actual) &&
+      expected !== actual
+    ) {
+      errors.push({
+        field: "maxRuntime",
+        message: `탐색 시간(${expected}분)과 고급 실행 시간(${actual}분)이 일치하지 않습니다.`,
+      });
+    }
+  }
+
   if (form.minTradeCount.trim() !== "") {
     const n = Number(form.minTradeCount);
     if (!isFiniteNumber(n) || n < 0) {
@@ -178,6 +197,15 @@ export function validateStrategySearchForm(
     });
   }
 
+  // Standard search requires robustness checks (stress and/or jitter).
+  if (!form.stressEnabled && !form.jitterEnabled) {
+    errors.push({
+      field: "stressEnabled",
+      message:
+        "표준 탐색에는 비용 스트레스 또는 파라미터 지터 검증이 필요합니다.",
+    });
+  }
+
   if (typeof form.maxSearchCount !== "string") {
     const budget = resolveCandidateBudget(form);
     if (!Number.isInteger(budget) || budget < 1) {
@@ -189,6 +217,33 @@ export function validateStrategySearchForm(
   }
 
   return errors;
+}
+
+export type ConfigValidationSummary = {
+  status: "ok" | "needs_fix" | "auto_correctable";
+  labelKo: string;
+  errors: FormFieldError[];
+};
+
+export function summarizeStrategySearchConfig(
+  form: StrategySearchOperatorFormState,
+): ConfigValidationSummary {
+  const errors = validateStrategySearchForm(form);
+  if (errors.length === 0) {
+    return { status: "ok", labelKo: "정상", errors: [] };
+  }
+  const auto =
+    errors.length > 0 &&
+    errors.every(
+      (e) =>
+        e.field === "maxRuntime" ||
+        e.message.includes("일치하지 않습니다"),
+    );
+  return {
+    status: auto ? "auto_correctable" : "needs_fix",
+    labelKo: auto ? "자동 보정 가능" : "수정 필요",
+    errors,
+  };
 }
 
 export function buildCreateBodyIfValid(

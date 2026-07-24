@@ -1,0 +1,227 @@
+[
+  {
+    "route": "/strategy-search",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_strategy-search.png"
+  },
+  {
+    "route": "/market-watch",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_market-watch.png"
+  },
+  {
+    "route": "/paper-trading",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_paper-trading.png"
+  },
+  {
+    "route": "/live-trading",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_live-trading.png"
+  },
+  {
+    "route": "/trades",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_trades.png"
+  },
+  {
+    "route": "/ai-reports",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_ai-reports.png"
+  },
+  {
+    "route": "/risk",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_risk.png"
+  },
+  {
+    "route": "/settings",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_settings.png"
+  },
+  {
+    "route": "/system-status",
+    "httpStatus": 200,
+    "stylesheets": [
+      {
+        "href": "http://127.0.0.1:3000/_next/static/chunks/09cjoucgaf8wh.css",
+        "disabled": false
+      }
+    ],
+    "failedAssets": [],
+    "consoleErrors": [],
+    "title": "Rextora — Quant Futures Platform",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyBgImage": "radial-gradient(80% 50% at 0px -10%, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0) 5",
+    "fontFamily": "\"Plus Jakarta Sans\", \"Plus Jakarta Sans Fallback\", \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif",
+    "hasShell": true,
+    "shellDisplay": "grid",
+    "shellColumns": "252px 1188px",
+    "hasAside": true,
+    "asideDisplay": "block",
+    "hasMain": true,
+    "hasNav": true,
+    "htmlClass": "plus_jakarta_sans_6c5b95d1-module__DpEtSa__variable",
+    "screenshot": "C:\\Rextora\\tmp\\style-audit\\_system-status.png"
+  }
+]

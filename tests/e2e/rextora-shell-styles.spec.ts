@@ -1,15 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const ROUTES = [
+  "/dashboard",
   "/strategy-search",
-  "/market-watch",
+  "/results",
+  "/backtest",
   "/paper-trading",
   "/live-trading",
-  "/trades",
-  "/ai-reports",
-  "/risk",
   "/settings",
-  "/system-status",
 ] as const;
 
 async function assertStyledShell(page: Page, route: string) {
@@ -37,7 +35,6 @@ async function assertStyledShell(page: Page, route: string) {
   });
   expect(body.fontFamily.toLowerCase()).toContain("jakarta");
   expect(body.backgroundImage).not.toBe("none");
-  // Dark theme text should not be browser-default black on white
   expect(body.color).not.toBe("rgb(0, 0, 0)");
 }
 
@@ -56,13 +53,13 @@ test.describe("Rextora shell styles (production)", () => {
     });
   }
 
-  test("client navigation between affected routes keeps shell", async ({
+  test("client navigation between lifecycle routes keeps shell", async ({
     page,
   }) => {
     await page.goto("/strategy-search", { waitUntil: "networkidle" });
     await expect(page.getByTestId("main-nav")).toBeVisible();
-    await page.getByTestId("nav-market-watch").click();
-    await expect(page).toHaveURL(/\/market-watch/);
+    await page.getByTestId("nav-results").click();
+    await expect(page).toHaveURL(/\/results/);
     await expect(page.locator(".dashboard-shell")).toBeVisible();
     await expect(page.getByTestId("main-nav")).toBeVisible();
     await page.reload({ waitUntil: "networkidle" });

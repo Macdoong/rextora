@@ -115,7 +115,7 @@ describe("orchestrator family handoff simulation", () => {
     expect(plan.spaces[4]!.labelKo).toBe("SAFE 종합");
   });
 
-  it("stops early when PASS target is reached (budget conserved)", () => {
+  it("tracks qualified target as a soft milestone without implying hard stop", () => {
     let plan = createEmptySearchPlan({
       searchName: "pass-stop",
       depthProfile: "fast",
@@ -142,6 +142,7 @@ describe("orchestrator family handoff simulation", () => {
     };
     plan = updateCurrentFamilySpent(plan, 5);
     expect(plan.qualifiedHashes.length >= plan.qualifiedTarget).toBe(true);
+    expect(plan.stopWhenQualifiedTarget).toBe(false);
     expect(remainingGlobal(plan)).toBe(95);
     expect(plan.spaces[1]!.status).toBe("pending");
     expect(plan.spaces[0]!.status).toBe("active");

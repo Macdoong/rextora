@@ -6,7 +6,6 @@ import { ConfirmDialog } from "@/components/ui/primitives";
 import {
   cancelStrategySearchJob,
   createStrategySearchJob,
-  deleteStrategySearchJob,
   getStrategySearchJob,
   isOperationallyActiveStatus,
   listStrategySearchJobs,
@@ -25,9 +24,7 @@ import {
 import { createDefaultOperatorFormState } from "./formDefaults";
 import { buildCreateBodyIfValid, type FormFieldError } from "./formValidation";
 import { JobCreateForm } from "./JobCreateForm";
-import { JobList } from "./JobList";
 import {
-  QualifiedResultsPanel,
   type QualifiedStrategyCardModel,
   type RegistrationStateUi,
   type RegistrationSummary,
@@ -118,10 +115,49 @@ function trialToCard(
   };
 }
 
+function readSearchQueryBootstrap(): {
+  jobId: string | null;
+  formPatch: Partial<FormState> | null;
+} {
+  if (typeof window === "undefined") {
+    return { jobId: null, formPatch: null };
+  }
+  const params = new URLSearchParams(window.location.search);
+  const basis = params.get("researchBasis");
+  const followUp = params.get("followUp");
+  const jobId = params.get("jobId");
+  const patch: Partial<FormState> = {};
+  if (
+    basis === "paper" ||
+    basis === "live" ||
+    basis === "backtest" ||
+    basis === "fresh"
+  ) {
+    patch.researchBasis =
+      basis === "paper"
+        ? "paper_supplement"
+        : basis === "live"
+          ? "live_supplement"
+          : basis === "backtest"
+            ? "backtest_supplement"
+            : "fresh";
+  }
+  if (followUp) {
+    patch.researchBasis = "improve_best";
+    patch.searchName = `후속 탐색 · ${followUp.slice(0, 12)}`;
+  }
+  return {
+    jobId,
+    formPatch: Object.keys(patch).length ? patch : null,
+  };
+}
+
 export function StrategySearchWorkbench() {
-  const [form, setForm] = useState<FormState>(() =>
-    createDefaultOperatorFormState(),
-  );
+  const boot = readSearchQueryBootstrap();
+  const [form, setForm] = useState<FormState>(() => ({
+    ...createDefaultOperatorFormState(),
+    ...(boot.formPatch ?? {}),
+  }));
   const [formErrors, setFormErrors] = useState<FormFieldError[]>([]);
   const [creating, setCreating] = useState(false);
 
@@ -129,7 +165,7 @@ export function StrategySearchWorkbench() {
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(boot.jobId);
   const [detail, setDetail] = useState<StrategySearchJobDetail | null>(null);
   const [trials, setTrials] = useState<StrategySearchTrialsPage | null>(null);
 
@@ -147,11 +183,11 @@ export function StrategySearchWorkbench() {
   } | null>(null);
 
   const [strategiesSavedHint, setStrategiesSavedHint] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [pendingDeleteJob, setPendingDeleteJob] =
-    useState<StrategySearchJobSummary | null>(null);
-  const [hasMoreHistory, setHasMoreHistory] = useState(false);
-  const [loadingMoreHistory, setLoadingMoreHistory] = useState(false);
+  const [generationMeta, setGenerationMeta] = useState<{
+    generationCount: number;
+    latestWeaknessKo: string | null;
+    latestAdjustmentKo: string | null;
+  } | null>(null);
 
   const detailInflight = useRef(false);
   const listInflight = useRef(false);
@@ -171,7 +207,6 @@ export function StrategySearchWorkbench() {
         offset: 0,
       });
       setJobs(data.slice(0, HISTORY_PAGE));
-      setHasMoreHistory(data.length >= HISTORY_PAGE);
       setListError(null);
     } catch (err) {
       const mapped = toUserError(err);
@@ -181,57 +216,6 @@ export function StrategySearchWorkbench() {
       setListLoading(false);
     }
   }, [HISTORY_PAGE]);
-
-  const loadMoreHistory = useCallback(async () => {
-    if (loadingMoreHistory || !hasMoreHistory) return;
-    setLoadingMoreHistory(true);
-    try {
-      const page = await listStrategySearchJobs({
-        limit: HISTORY_PAGE,
-        offset: jobs.length,
-      });
-      setJobs((prev) => {
-        const seen = new Set(prev.map((j) => j.id));
-        const merged = [...prev];
-        for (const row of page) {
-          if (!seen.has(row.id)) merged.push(row);
-        }
-        return merged;
-      });
-      setHasMoreHistory(page.length >= HISTORY_PAGE);
-    } catch (err) {
-      const mapped = toUserError(err);
-      setFeedback({ ...mapped, tone: "error" });
-    } finally {
-      setLoadingMoreHistory(false);
-    }
-  }, [HISTORY_PAGE, hasMoreHistory, jobs.length, loadingMoreHistory]);
-
-  async function handleDeleteHistory(job: StrategySearchJobSummary) {
-    if (deletingId) return;
-    setDeletingId(job.id);
-    setFeedback(null);
-    try {
-      await deleteStrategySearchJob(job.id);
-      setPendingDeleteJob(null);
-      if (selectedId === job.id) {
-        setSelectedId(null);
-        setDetail(null);
-        setTrials(null);
-      }
-      setFeedback({
-        message: "탐색 기록을 삭제했습니다.",
-        detail: null,
-        tone: "success",
-      });
-      await refreshList();
-    } catch (err) {
-      const mapped = toUserError(err);
-      setFeedback({ ...mapped, tone: "error" });
-    } finally {
-      setDeletingId(null);
-    }
-  }
 
   const refreshTrials = useCallback(async (jobId: string) => {
     try {
@@ -256,6 +240,27 @@ export function StrategySearchWorkbench() {
         if (selectedIdRef.current !== jobId) return data;
         setDetail(data);
         await refreshTrials(jobId);
+        try {
+          const gRes = await fetch(
+            `/api/rextora/strategy-search/${encodeURIComponent(jobId)}/generations`,
+          );
+          const gJson = await gRes.json();
+          if (selectedIdRef.current === jobId && gJson?.data) {
+            const latest = gJson.data.latestWeakness;
+            const finding = latest?.findings?.[0]?.messageKo ?? null;
+            const adj =
+              latest?.adjustment?.actions?.[0]?.reasonKo ??
+              gJson.data.latest?.adjustmentPlan?.actions?.[0]?.reasonKo ??
+              null;
+            setGenerationMeta({
+              generationCount: gJson.data.generationCount ?? 0,
+              latestWeaknessKo: finding,
+              latestAdjustmentKo: adj,
+            });
+          }
+        } catch {
+          /* generations optional for older jobs */
+        }
         return data;
       } catch (err) {
         const mapped = toUserError(err);
@@ -326,6 +331,8 @@ export function StrategySearchWorkbench() {
   }, [pollActive, selectedId, refreshDetail, refreshList]);
 
   function handleSelect(id: string) {
+    // Keep ref in sync before async detail load so setDetail is not skipped.
+    selectedIdRef.current = id;
     setSelectedId(id);
     setFeedback(null);
     setStrategiesSavedHint(false);
@@ -333,6 +340,16 @@ export function StrategySearchWorkbench() {
     setTrials(null);
     void refreshDetail(id);
   }
+
+  useEffect(() => {
+    if (!boot.jobId) return;
+    const timer = window.setTimeout(() => {
+      handleSelect(boot.jobId!);
+    }, 0);
+    return () => clearTimeout(timer);
+    // Boot once from URL jobId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleRegister(iterations: number[]) {
     if (!selectedId || iterations.length === 0 || registering) return;
@@ -568,6 +585,9 @@ export function StrategySearchWorkbench() {
           <SearchStatusCard
             job={detail}
             qualifiedCountFallback={qualifiedFromTrials.length}
+            generationCount={generationMeta?.generationCount ?? null}
+            latestWeaknessKo={generationMeta?.latestWeaknessKo ?? null}
+            latestAdjustmentKo={generationMeta?.latestAdjustmentKo ?? null}
           />
 
           {detail.status === "completed" ||
@@ -628,62 +648,71 @@ export function StrategySearchWorkbench() {
         />
       ) : null}
 
-      <QualifiedResultsPanel
-        items={qualifiedFromTrials}
-        researchRunning={
-          !!detail &&
-          (detail.status === "running" ||
-            detail.executionActive ||
-            detail.status === "pause_requested")
-        }
-        researchCompleted={
-          !!detail &&
-          (detail.status === "completed" ||
-            detail.status === "cancelled" ||
-            detail.status === "failed")
-        }
-        onNewResearch={() => {
-          setSelectedId(null);
-          setDetail(null);
-          setTrials(null);
-          setFeedback(null);
-          setRegistrationSummary(null);
-          setStrategiesSavedHint(false);
-          setCompletionRegisterIter(null);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-        registering={registering}
-        registrationSummary={registrationSummary}
-        onRegister={handleRegister}
-      />
-
-      <JobList
-        jobs={jobs}
-        loading={listLoading}
-        error={listError}
-        selectedId={selectedId}
-        deletingId={deletingId}
-        hasMore={hasMoreHistory}
-        loadingMore={loadingMoreHistory}
-        onSelect={handleSelect}
-        onRetry={() => void refreshList()}
-        onRequestDelete={(job) => setPendingDeleteJob(job)}
-        onLoadMore={() => void loadMoreHistory()}
-      />
-
-      {pendingDeleteJob ? (
-        <ConfirmDialog
-          open
-          title="탐색 기록 삭제"
-          description="이 탐색 기록과 관련 평가 결과를 삭제하시겠습니까?"
-          confirmLabel="기록 삭제"
-          cancelLabel="취소"
-          tone="danger"
-          loading={deletingId === pendingDeleteJob.id}
-          onCancel={() => setPendingDeleteJob(null)}
-          onConfirm={() => void handleDeleteHistory(pendingDeleteJob)}
-        />
-      ) : null}
+      <section
+        className="rextora-card space-y-3 p-4"
+        data-testid="ss-results-handoff"
+      >
+        <h3 className="ss-section-title">탐색 결과</h3>
+        <p className="text-sm text-slate-400">
+          합격 전략 카드, 순위, 등록·삭제·보관 작업은 탐색 결과 페이지에서
+          확인합니다. 연구 페이지에는 현재 연구 상태만 표시합니다.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/results"
+            className="inline-flex items-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-100"
+            data-testid="ss-open-results"
+          >
+            탐색 결과 열기
+          </Link>
+          {detail?.id ? (
+            <Link
+              href={`/results?jobId=${encodeURIComponent(detail.id)}`}
+              className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
+              data-testid="ss-open-results-job"
+            >
+              이 연구 결과 보기
+            </Link>
+          ) : null}
+        </div>
+        {jobs.length > 0 ? (
+          <label className="block text-sm text-slate-300">
+            최근 연구 선택
+            <select
+              className="mt-1 w-full max-w-xl rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              value={selectedId ?? ""}
+              onChange={(e) => {
+                const id = e.target.value || null;
+                if (id) void handleSelect(id);
+                else {
+                  setSelectedId(null);
+                  setDetail(null);
+                }
+              }}
+              data-testid="ss-recent-job-select"
+            >
+              <option value="">선택…</option>
+              {jobs.slice(0, 12).map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.searchName || j.id} · {j.status}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+        {listError ? (
+          <p className="text-sm text-red-300" role="alert">
+            {listError}
+          </p>
+        ) : null}
+        {listLoading ? (
+          <p className="text-xs text-slate-500">연구 목록 불러오는 중…</p>
+        ) : null}
+        <p className="text-xs text-slate-500" data-testid="ss-history-retention-note">
+          최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.
+          전체 합격 전략·기록 관리는 탐색 결과에서 확인하세요.
+        </p>
+      </section>
     </div>
   );
 }

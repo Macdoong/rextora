@@ -4,6 +4,8 @@
  * Extends existing StoredStrategy fields for backward compatibility.
  */
 
+import type { StrategyEventSequence } from "./eventSequence";
+
 export const STRATEGY_SCHEMA_VERSION = 1 as const;
 export const MAX_CONDITION_DEPTH = 4;
 export const MAX_CONDITIONS_PER_GROUP = 32;
@@ -172,6 +174,11 @@ export interface CanonicalStrategyDefinition {
   paramsHash: string;
   /** SAFE-compatible numeric params (required for safe_params strategies) */
   safeParams?: Record<string, number | boolean>;
+  /**
+   * Optional ordered event-sequence executor (additive).
+   * Schema version stays 1 for old records; presence selects the new path.
+   */
+  eventSequence?: StrategyEventSequence;
 }
 
 export function emptyGroup(operator: "AND" | "OR" = "AND"): ConditionGroup {

@@ -1,0 +1,343 @@
+{
+  "startedAt": "2026-07-22T07:45:01.979Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "safeBefore": {
+    "path": "C:\\Rextora\\data\\strategies\\SAFE_v44_i4060.json",
+    "length": 1228,
+    "mtimeMs": 1784608943337.6213,
+    "mtimeIso": "2026-07-21T04:42:23.338Z",
+    "paramsHashLine": "7893ca3f0e30",
+    "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475"
+  },
+  "safeAfter": {
+    "path": "C:\\Rextora\\data\\strategies\\SAFE_v44_i4060.json",
+    "length": 1228,
+    "mtimeMs": 1784608943337.6213,
+    "mtimeIso": "2026-07-21T04:42:23.338Z",
+    "paramsHashLine": "7893ca3f0e30",
+    "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475"
+  },
+  "consoleErrors": [
+    {
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "loc": {
+        "url": "http://127.0.0.1:3000/api/rextora/strategy-search",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "pageErrors": [],
+  "networkFailures": [],
+  "detailPollIntervalsMs": [
+    68,
+    2006,
+    1996,
+    5047,
+    2009,
+    1996,
+    2002,
+    2842,
+    50,
+    2007,
+    1997,
+    4295,
+    9417,
+    445
+  ],
+  "listPollIntervalsMs": [
+    1223,
+    138,
+    42,
+    3223,
+    410,
+    347,
+    2618,
+    2411,
+    34,
+    3065,
+    1889,
+    602,
+    472,
+    2716,
+    120,
+    33,
+    2253,
+    37,
+    1696,
+    678,
+    7994,
+    4698,
+    771,
+    27
+  ],
+  "statusesObserved": [
+    "running",
+    "pause_requested",
+    "paused",
+    "queued",
+    "completed",
+    "cancel_requested",
+    "cancelled"
+  ],
+  "overlappingDetail": [],
+  "steps": {
+    "page_render": {
+      "ok": true,
+      "at": "2026-07-22T07:45:02.294Z",
+      "url": "http://127.0.0.1:3000/strategy-search"
+    },
+    "nav_item": {
+      "ok": true,
+      "at": "2026-07-22T07:45:02.298Z"
+    },
+    "error_invalid_create_blocked": {
+      "ok": true,
+      "at": "2026-07-22T07:45:02.597Z",
+      "via": "form-errors",
+      "text": "입력 오류 1건 — 제출이 차단되었습니다."
+    },
+    "error_zero_required_windows": {
+      "ok": true,
+      "at": "2026-07-22T07:45:03.121Z",
+      "text": "입력 오류 1건 — 제출이 차단되었습니다.입력값을 확인하세요.\n필수 평가 창(requiredForPass)이 최소 하나 필요합니다."
+    },
+    "job_created_appears_in_list": {
+      "ok": true,
+      "at": "2026-07-22T07:45:03.504Z",
+      "jobId": "search_758d50a2-f1d1-4487-8373-be985db21241",
+      "status": "queued",
+      "http": 201
+    },
+    "job_selected": {
+      "ok": true,
+      "at": "2026-07-22T07:45:03.580Z",
+      "jobId": "search_758d50a2-f1d1-4487-8373-be985db21241"
+    },
+    "start_running": {
+      "ok": true,
+      "at": "2026-07-22T07:45:06.452Z",
+      "status": "running",
+      "executionActive": true,
+      "failureMessage": null,
+      "uiHasPause": true
+    },
+    "binance_load_inferred": {
+      "ok": true,
+      "at": "2026-07-22T07:45:06.452Z",
+      "status": "running",
+      "failureMessage": null,
+      "note": "Runner loads Binance candles in-process after start"
+    },
+    "progress_updates": {
+      "ok": true,
+      "at": "2026-07-22T07:45:06.907Z",
+      "completedIterations": 5,
+      "statistics": {
+        "generated": 5,
+        "evaluated": 5,
+        "passed": 5,
+        "failed": 0,
+        "stressPassed": 5,
+        "jitterPassed": 5,
+        "duplicates": 0,
+        "errors": 0,
+        "bestScore": 0.09887987,
+        "averageScore": 0.09735539,
+        "elapsedMs": 2075,
+        "remainingEstimateMs": 31125
+      },
+      "status": "running"
+    },
+    "pause": {
+      "ok": true,
+      "at": "2026-07-22T07:45:08.138Z",
+      "status": "paused",
+      "completedIterations": 6,
+      "executionActive": false
+    },
+    "paused_progress_stable": {
+      "ok": true,
+      "at": "2026-07-22T07:45:12.648Z",
+      "status": "paused",
+      "completedIterations": 6,
+      "executionActive": false
+    },
+    "resume": {
+      "ok": true,
+      "at": "2026-07-22T07:45:14.606Z",
+      "status": "running",
+      "executionActive": true,
+      "completedIterations": 9
+    },
+    "completion": {
+      "ok": true,
+      "at": "2026-07-22T07:45:18.901Z",
+      "status": "completed",
+      "completedIterations": 80,
+      "maxIterations": 80,
+      "failureMessage": null
+    },
+    "completed_iterations_equal_target": {
+      "ok": true,
+      "at": "2026-07-22T07:45:18.901Z",
+      "completedIterations": 80,
+      "maxIterations": 80
+    },
+    "trials_visible": {
+      "ok": true,
+      "at": "2026-07-22T07:45:19.556Z",
+      "trialCount": 50
+    },
+    "trial_pagination": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.083Z",
+      "afterLimit": 20,
+      "nextEnabled": true
+    },
+    "passed_only_filter_request": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.242Z"
+    },
+    "best_results": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.301Z",
+      "apiBestIteration": null,
+      "apiBestPassedIteration": null,
+      "scoredCount": 1,
+      "passedCount": 1,
+      "uiSnippet": "최고 결과\n\ntrial.passed / bestPassedCandidate means final PASS (base ∧ cost-stress ∧ jitter)\n\n최고 점수 후보\n최종 통과\n\n점수가 가장 높은 후보입니다. 최종 통과와는 다를 수 있습니다.\n\n해시\n2618583310a1\n점수\n0.0989\n후보 PASS 플래그\n통과\n비용 스트레스\n통과\n지터 검증\n통과\n최종 통과\n통과\n후보 파라미터\n최종 통과 후보\n최종 통과\n\n기본 PASS ∧ 비용 스트레스 ∧ 지터 검증을 모두 통과한 최고 점수 후보입"
+    },
+    "best_scored_vs_passed_distinct": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.301Z",
+      "note": "ss-best-scored and ss-best-passed are separate panels; empty passed is valid",
+      "scoredCount": 1,
+      "passedCount": 1,
+      "sameIteration": false
+    },
+    "gate_statuses_displayed": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.302Z",
+      "snippet": "최고 결과\n\ntrial.passed / bestPassedCandidate means final PASS (base ∧ cost-stress ∧ jitter)\n\n최고 점수 후보\n최종 통과\n\n점수가 가장 높은 후보입니다. 최종 통과와는 다를 수 있습니다.\n\n해시\n2618583310a1\n점수\n0.0989\n후보 PASS 플래그\n통과\n비용 스트레스\n통과\n지터 검증"
+    },
+    "no_save_approve_publish_live": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.307Z",
+      "matchingButtons": 0
+    },
+    "invalid_state_actions_not_offered": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.309Z",
+      "terminalHint": 1
+    },
+    "cancel_job_created": {
+      "ok": true,
+      "at": "2026-07-22T07:45:21.472Z",
+      "cancelJobId": "search_223dfcea-12b1-4f41-a0d8-b50a8b2db8a8"
+    },
+    "cancel_flow": {
+      "ok": true,
+      "at": "2026-07-22T07:45:24.699Z",
+      "status": "cancelled",
+      "completedIterations": 4,
+      "sawCancelRequested": true
+    },
+    "cancel_no_further_evals": {
+      "ok": true,
+      "at": "2026-07-22T07:45:29.712Z",
+      "status": "cancelled",
+      "completedIterations": 4,
+      "executionActive": false
+    },
+    "cancel_controls_disabled": {
+      "ok": true,
+      "at": "2026-07-22T07:45:29.714Z",
+      "term": 1
+    },
+    "api_failure_korean": {
+      "ok": true,
+      "at": "2026-07-22T07:45:29.847Z",
+      "feedback": "요청 설정이 올바르지 않습니다. 입력값을 확인하세요.\n코드: INVALID_REQUEST · evaluationWindows must be a non-empty array",
+      "detail": "코드: INVALID_REQUEST · evaluationWindows must be a non-empty array"
+    },
+    "polling_stops_on_terminal": {
+      "ok": true,
+      "at": "2026-07-22T07:45:36.409Z",
+      "status": "completed",
+      "executionActive": false,
+      "detailPollDeltaWhileTerminal": 0,
+      "recentDetailPollMs": [
+        2002,
+        2842,
+        50,
+        2007,
+        1997,
+        4295
+      ],
+      "recentListPollMs": [
+        33,
+        2253,
+        37,
+        1696,
+        678,
+        7994
+      ],
+      "overlappingDetailCount": 0
+    },
+    "temp_failure_keeps_last_data": {
+      "ok": true,
+      "at": "2026-07-22T07:45:38.912Z",
+      "hasJobId": true
+    },
+    "duplicate_action_prevented": {
+      "ok": true,
+      "at": "2026-07-22T07:45:39.742Z",
+      "dupId": "search_a35397c0-3bef-45cd-af49-b455aa150ff3",
+      "disabled": true
+    },
+    "persistence": {
+      "ok": true,
+      "at": "2026-07-22T07:45:39.809Z",
+      "jobFile": true,
+      "executionProfile": true,
+      "checkpointValid": true,
+      "trialFiles": 80,
+      "strategyFiles": [
+        "SAFE_v44_i4060.json"
+      ]
+    },
+    "trial_count_matches_iterations": {
+      "ok": true,
+      "at": "2026-07-22T07:45:39.809Z",
+      "trialFiles": 80,
+      "completedIterations": 80
+    },
+    "safe_unchanged": {
+      "ok": true,
+      "at": "2026-07-22T07:45:39.810Z",
+      "before": {
+        "path": "C:\\Rextora\\data\\strategies\\SAFE_v44_i4060.json",
+        "length": 1228,
+        "mtimeMs": 1784608943337.6213,
+        "mtimeIso": "2026-07-21T04:42:23.338Z",
+        "paramsHashLine": "7893ca3f0e30",
+        "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475"
+      },
+      "after": {
+        "path": "C:\\Rextora\\data\\strategies\\SAFE_v44_i4060.json",
+        "length": 1228,
+        "mtimeMs": 1784608943337.6213,
+        "mtimeIso": "2026-07-21T04:42:23.338Z",
+        "paramsHashLine": "7893ca3f0e30",
+        "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475"
+      }
+    }
+  },
+  "defects": [],
+  "selectedJobId": "search_758d50a2-f1d1-4487-8373-be985db21241",
+  "cancelJobId": "search_223dfcea-12b1-4f41-a0d8-b50a8b2db8a8",
+  "finishedAt": "2026-07-22T07:45:39.810Z"
+}

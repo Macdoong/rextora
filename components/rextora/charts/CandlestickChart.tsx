@@ -37,6 +37,7 @@ import {
 import type {
   CandlePoint,
   LevelLine,
+  ZoneRect,
   TradeMarker,
 } from "@/src/lib/rextora/charts/types";
 
@@ -112,6 +113,7 @@ export function CandlestickChart({
   candles,
   markers = [],
   levels = [],
+  zones = [],
   height = 600,
   showVolume = true,
   selectedTradeId,
@@ -120,12 +122,14 @@ export function CandlestickChart({
   symbolLabel,
   timeframeLabel,
   strategyName,
+  focusTimeRange = null,
 }: {
   title?: string;
   help?: string;
   candles: CandlePoint[];
   markers?: TradeMarker[];
   levels?: LevelLine[];
+  zones?: ZoneRect[];
   height?: number;
   showVolume?: boolean;
   selectedTradeId?: string | null;
@@ -134,6 +138,8 @@ export function CandlestickChart({
   symbolLabel?: string;
   timeframeLabel?: string;
   strategyName?: string;
+  /** Absolute ms range to focus; derived from trade entry/exit times. */
+  focusTimeRange?: { fromMs: number; toMs: number } | null;
 }) {
   const empty = candles.length === 0;
   const [groups, setGroups] = useState<Record<MarkerGroup, boolean>>({
@@ -154,6 +160,21 @@ export function CandlestickChart({
     if (!candles.length) return "empty";
     return `${candles.length}:${candles[0].time}:${candles[candles.length - 1].time}`;
   }, [candles]);
+
+  const focusRange = useMemo(() => {
+    if (!focusTimeRange || candles.length < 2) return null;
+    const t0 = candles[0]!.time;
+    const t1 = candles[candles.length - 1]!.time;
+    const span = t1 - t0;
+    if (!(span > 0)) return null;
+    const padMs = span * 0.08;
+    const from = Math.max(t0, focusTimeRange.fromMs - padMs);
+    const to = Math.min(t1, focusTimeRange.toMs + padMs);
+    const start = (from - t0) / span;
+    const end = (to - t0) / span;
+    if (!(end > start)) return null;
+    return { start: Math.max(0, start), end: Math.min(1, end) };
+  }, [focusTimeRange, candles]);
 
   return (
     <div data-testid="candlestick-chart-root">
@@ -189,6 +210,7 @@ export function CandlestickChart({
         dataPointCount={candles.length}
         preferRecentWindow
         seriesKey={seriesKey}
+        focusRange={focusRange}
         pad={CANDLE_PAD}
         readout={readout || undefined}
         legend={[
@@ -206,6 +228,7 @@ export function CandlestickChart({
             candles={candles}
             markers={filteredMarkers}
             levels={levels}
+            zones={zones}
             showVolume={showVolume}
             selectedTradeId={selectedTradeId}
             onSelectTrade={onSelectTrade}
@@ -243,6 +266,7 @@ function CandlePlot({
   candles,
   markers,
   levels,
+  zones = [],
   showVolume,
   selectedTradeId,
   onSelectTrade,
@@ -256,6 +280,7 @@ function CandlePlot({
   candles: CandlePoint[];
   markers: TradeMarker[];
   levels: LevelLine[];
+  zones?: ZoneRect[];
   showVolume: boolean;
   selectedTradeId?: string | null;
   onSelectTrade?: (tradeId: string | null) => void;
@@ -533,6 +558,43 @@ function CandlePlot({
           </text>
         </g>
       ))}
+
+      {zones.map((z) => {
+        const y1 = yScale(Math.max(z.high, z.low));
+        const y2 = yScale(Math.min(z.high, z.low));
+        const timeToX = (t: number | null | undefined): number | null => {
+          if (t == null || !Number.isFinite(t) || view.length === 0) return null;
+          const idx = view.findIndex((c) => c.time >= t);
+          if (idx < 0) return pad.left + plotW;
+          return pad.left + (idx / Math.max(1, view.length - 1)) * plotW;
+        };
+        const x1 = timeToX(z.fromTime) ?? pad.left;
+        const x2 = timeToX(z.toTime) ?? pad.left + plotW;
+        const left = Math.min(x1, x2);
+        const width = Math.max(2, Math.abs(x2 - x1));
+        return (
+          <g key={`zone-${z.label}-${z.high}-${z.low}`}>
+            <rect
+              x={left}
+              y={Math.min(y1, y2)}
+              width={width}
+              height={Math.max(2, Math.abs(y2 - y1))}
+              fill={z.color}
+              opacity={z.opacity ?? 0.18}
+              data-testid="chart-zone-rect"
+            />
+            <text
+              x={left + 4}
+              y={Math.min(y1, y2) + 12}
+              fill={z.color}
+              fontSize={10}
+              opacity={0.9}
+            >
+              {z.label}
+            </text>
+          </g>
+        );
+      })}
 
       {levels.map((lv) => (
         <g key={lv.label + lv.price + (lv.endPrice ?? "")}>

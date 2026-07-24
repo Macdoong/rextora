@@ -300,9 +300,14 @@ export type {
   StrategySearchPlan,
 } from "./searchPlan";
 export {
+  SAFETY_BUDGET_CEILING,
+  activeElapsedMs,
   createEmptySearchPlan,
   getSearchPlan,
+  markPlanPaused,
+  markPlanResumed,
   saveSearchPlan,
+  replenishDeadlineBudget,
 } from "./searchPlan";
 
 export {
@@ -316,6 +321,44 @@ export {
 } from "./performanceSummary";
 
 export { runOrchestratedSearchJob, retryFailedPromotions } from "./searchOrchestrator";
+
+export type {
+  StrategyWeaknessCategory,
+  StrategyWeaknessFinding,
+  StrategySearchAdjustmentPlan,
+  WeaknessAnalysisResult,
+  CandidateMetricsSnapshot,
+} from "./weaknessAnalysis";
+export {
+  analyzeCandidateWeaknesses,
+  snapshotFromTrial,
+} from "./weaknessAnalysis";
+
+export type { SearchSpaceMutationRecord } from "./searchSpaceMutation";
+export { applySearchSpaceMutation } from "./searchSpaceMutation";
+
+export type { ResearchGeneration, ResearchGenerationFile } from "./researchGeneration";
+export {
+  listResearchGenerations,
+  appendResearchGeneration,
+  createResearchGenerationId,
+} from "./researchGeneration";
+
+export type { PaperFeedback } from "./paperFeedback";
+export { buildPaperFeedback } from "./paperFeedback";
+
+export { recoverOrphanSearchJobs } from "./orphanJobRecovery";
+export type { OrphanJobRecoveryResult } from "./orphanJobRecovery";
+
+export type {
+  FollowUpSource,
+  FollowUpResearchRequest,
+  FollowUpResearchResult,
+} from "./followUpResearch";
+export {
+  buildFollowUpResearch,
+  FollowUpResearchError,
+} from "./followUpResearch";
 
 export type { ValidatedCreateSearchJob } from "./jobApiValidation";
 export {

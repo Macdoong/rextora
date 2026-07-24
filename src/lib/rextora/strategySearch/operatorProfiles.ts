@@ -97,7 +97,7 @@ export const SEARCH_DEPTH_PROFILES: Record<
     stressEnabled: true,
     stressFeeMultiplier: 1.5,
     stressSlippageMultiplier: 1.5,
-    jitterEnabled: false,
+    jitterEnabled: true,
     jitterSamples: 2,
     jitterMutationScale: 0.2,
     spaceIds: [

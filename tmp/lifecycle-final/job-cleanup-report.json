@@ -1,0 +1,90 @@
+{
+  "removed": [
+    {
+      "file": "search_1af7f69f-afa0-4e21-b381-0639f2eef807.plan.json",
+      "searchName": "lifecycle-browser-verify",
+      "evidence": "verification artifact name"
+    }
+  ],
+  "kept": [
+    {
+      "file": "search_1af7f69f-afa0-4e21-b381-0639f2eef807.execution.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_1af7f69f-afa0-4e21-b381-0639f2eef807.generations.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_1af7f69f-afa0-4e21-b381-0639f2eef807.json",
+      "id": "search_1af7f69f-afa0-4e21-b381-0639f2eef807",
+      "searchName": "",
+      "status": "completed"
+    },
+    {
+      "file": "search_2257d781-43aa-4118-a881-bc0f05831fc6.execution.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_2257d781-43aa-4118-a881-bc0f05831fc6.json",
+      "id": "search_2257d781-43aa-4118-a881-bc0f05831fc6",
+      "searchName": "",
+      "status": "completed"
+    },
+    {
+      "file": "search_2257d781-43aa-4118-a881-bc0f05831fc6.plan.json",
+      "searchName": "BTCUSDT 15m 탐색"
+    },
+    {
+      "file": "search_419733b1-30fc-47ce-8270-6d11de24b5a8.execution.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_419733b1-30fc-47ce-8270-6d11de24b5a8.json",
+      "id": "search_419733b1-30fc-47ce-8270-6d11de24b5a8",
+      "searchName": "",
+      "status": "cancel_requested"
+    },
+    {
+      "file": "search_78467d53-ddb9-49ad-a93a-43adad733c40.execution.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_78467d53-ddb9-49ad-a93a-43adad733c40.generations.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_78467d53-ddb9-49ad-a93a-43adad733c40.json",
+      "id": "search_78467d53-ddb9-49ad-a93a-43adad733c40",
+      "searchName": "",
+      "status": "completed"
+    },
+    {
+      "file": "search_78467d53-ddb9-49ad-a93a-43adad733c40.plan.json",
+      "searchName": "BTCUSDT 15m 탐색"
+    },
+    {
+      "file": "search_880e0a45-785f-46c3-a679-765a06ceae55.generations.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_9a1e080f-b61e-4e44-861d-0ed4b965ccc1.execution.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_9a1e080f-b61e-4e44-861d-0ed4b965ccc1.generations.json",
+      "searchName": ""
+    },
+    {
+      "file": "search_9a1e080f-b61e-4e44-861d-0ed4b965ccc1.json",
+      "id": "search_9a1e080f-b61e-4e44-861d-0ed4b965ccc1",
+      "searchName": "",
+      "status": "paused"
+    },
+    {
+      "file": "search_9a1e080f-b61e-4e44-861d-0ed4b965ccc1.plan.json",
+      "searchName": "BTCUSDT 15m 탐색"
+    }
+  ],
+  "scanned": 18
+}

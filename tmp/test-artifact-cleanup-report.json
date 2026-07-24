@@ -1,0 +1,43 @@
+{
+  "removed": [
+    {
+      "id": "copy_mrx5vl77_432949",
+      "name": "검증용복사_persist",
+      "file": "copy_mrx5vl77_432949.json",
+      "evidence": "verified verification artifact name"
+    },
+    {
+      "id": "custom_mrx5vncg",
+      "name": "탐색등록_검증persist",
+      "file": "custom_mrx5vncg.json",
+      "evidence": "verified verification artifact name"
+    },
+    {
+      "id": "copy_mrx6u4v1_53de5f",
+      "name": "검증용복사_persist 복사본 1",
+      "file": "copy_mrx6u4v1_53de5f.json",
+      "evidence": "verified verification artifact name"
+    },
+    {
+      "id": "copy_mrx6vvig_ecaafc",
+      "name": "UI_TEST_SAFE_COPY_15m",
+      "file": "copy_mrx6vvig_ecaafc.json",
+      "evidence": "verified verification artifact name"
+    }
+  ],
+  "kept": [
+    {
+      "id": "custom_mrx6v0xy",
+      "name": "변동성 돌파 · 공격형"
+    },
+    {
+      "id": "custom_mrx92bsk",
+      "name": "변동성 돌파 · 공격형"
+    },
+    {
+      "id": "custom_mrxjff7z",
+      "name": "변동성 돌파 · 공격형"
+    }
+  ],
+  "skippedSafe": true
+}

@@ -9,6 +9,7 @@ import {
   formatMs,
   formatPct,
   researchStatusLabelKo,
+  resolveDisplayTerminationReason,
 } from "./formatters";
 import { cleanStrategyDisplayName } from "./displayNames";
 
@@ -39,11 +40,21 @@ export function ResearchCompletionPanel(props: {
   bestStrategyId?: string | null;
 }) {
   const { job, passCount, bestStrategyName, onNewResearch } = props;
-  const reason =
-    completionReasonLabelKo(job.completionReason ?? null) ??
-    (job.searchSpaceExhausted && job.status === "completed"
-      ? "연구 범위 소진"
-      : null);
+  // Never show completion card while research is still running.
+  if (
+    job.status === "running" ||
+    job.status === "pause_requested" ||
+    job.status === "queued" ||
+    job.executionActive
+  ) {
+    return null;
+  }
+  const reason = resolveDisplayTerminationReason({
+    status: job.status,
+    completionReason: job.completionReason,
+    terminationReason: job.terminationReason,
+    failureMessage: job.failureMessage,
+  });
   const status = researchStatusLabelKo(job.status, {
     completionReason: job.completionReason,
   });
@@ -66,10 +77,7 @@ export function ResearchCompletionPanel(props: {
       ? cleanStrategyDisplayName(job.currentBestSummary)
       : null;
 
-  const budgetLabel =
-    budget != null
-      ? `${formatCount(budgetUsed)} / ${formatCount(budget)}`
-      : formatCount(budgetUsed);
+  const evaluatedLabel = `평가한 후보 ${formatCount(budgetUsed)}개`;
 
   return (
     <section
@@ -79,7 +87,7 @@ export function ResearchCompletionPanel(props: {
     >
       <div>
         <h3 id="ss-research-completion-title" className="ss-section-title">
-          AI 연구 완료
+          {job.status === "failed" ? "AI 연구 종료 (실패)" : "AI 연구 완료"}
         </h3>
         <p
           className="mt-1.5 text-sm text-emerald-100"
@@ -88,6 +96,12 @@ export function ResearchCompletionPanel(props: {
           {status}
           {reason ? ` · ${reason}` : ""}
         </p>
+        {job.status === "failed" && passCount > 0 ? (
+          <p className="mt-2 text-sm text-amber-100" data-testid="ss-completion-preserved">
+            탐색 작업은 실패했지만 검증된 후보 {formatCount(passCount)}개는
+            저장되었습니다.
+          </p>
+        ) : null}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -97,13 +111,17 @@ export function ResearchCompletionPanel(props: {
           testId="ss-completion-time"
         />
         <BigStat
-          label="검증한 전략"
-          value={formatCount(tested)}
+          label="평가한 후보"
+          value={evaluatedLabel}
           testId="ss-completion-tested"
         />
         <BigStat
-          label="연구 예산 사용"
-          value={budgetLabel}
+          label="자원 안전 제한"
+          value={
+            budget != null
+              ? `${formatCount(budget)}개 (정상 종료 조건 아님)`
+              : "—"
+          }
           testId="ss-completion-budget"
         />
         <BigStat
@@ -123,8 +141,13 @@ export function ResearchCompletionPanel(props: {
         />
         <BigStat
           label="종료 사유"
-          value={reason ?? status}
+          value={reason || status}
           testId="ss-completion-stop-reason"
+        />
+        <BigStat
+          label="실제 심볼"
+          value={(job.symbols ?? []).join(", ") || "—"}
+          testId="ss-completion-symbols"
         />
         <BigStat
           label="연구 상태"
@@ -134,6 +157,26 @@ export function ResearchCompletionPanel(props: {
       </div>
 
       <div className="flex flex-wrap gap-2">
+        <Link
+          href={
+            props.job.id
+              ? `/results?jobId=${encodeURIComponent(props.job.id)}`
+              : "/results"
+          }
+          className="ss-btn-primary inline-flex items-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-emerald-100"
+          data-testid="ss-completion-open-results"
+        >
+          탐색 결과 열기
+        </Link>
+        <Button
+          type="button"
+          variant="ghost"
+          className="ss-btn-primary"
+          data-testid="ss-completion-new-research"
+          onClick={onNewResearch}
+        >
+          다시 탐색
+        </Button>
         {passCount > 0 && props.onRegisterBest ? (
           <Button
             type="button"
@@ -143,31 +186,6 @@ export function ResearchCompletionPanel(props: {
           >
             최고 전략 등록
           </Button>
-        ) : null}
-        <Button
-          type="button"
-          variant="ghost"
-          className="ss-btn-primary"
-          data-testid="ss-completion-new-research"
-          onClick={onNewResearch}
-        >
-          새 탐색
-        </Button>
-        <Link
-          href="/strategies"
-          className="ss-btn-primary inline-flex items-center rounded-lg border border-[var(--border-strong)] px-3 py-2 text-[var(--text-primary)] hover:bg-[var(--panel-hover)]"
-          data-testid="ss-completion-open-sm"
-        >
-          전략 관리 열기
-        </Link>
-        {props.bestStrategyId ? (
-          <Link
-            href={`/strategies?id=${encodeURIComponent(props.bestStrategyId)}`}
-            className="ss-btn-primary inline-flex items-center rounded-lg border border-emerald-600/50 px-3 py-2 text-emerald-100 hover:bg-emerald-900/30"
-            data-testid="ss-completion-view-strategy"
-          >
-            전략 열기
-          </Link>
         ) : null}
       </div>
     </section>

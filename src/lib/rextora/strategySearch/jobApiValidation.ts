@@ -30,6 +30,8 @@ export interface ValidatedOperatorPlanInput {
   depthProfile: SearchDepthProfileId;
   qualificationProfile: QualificationProfileId;
   qualifiedTarget: number;
+  /** Default false — continue past first PASS until runtime/budget. */
+  stopWhenQualifiedTarget: boolean;
   candidateBudget: number;
   stageBatchSize: number;
   maxRuntimeMs: number | null;
@@ -496,6 +498,7 @@ export function validateCreateSearchJobBody(
         depthProfile: depth,
         qualificationProfile: qual,
         qualifiedTarget: qt,
+        stopWhenQualifiedTarget: op.stopWhenQualifiedTarget === true,
         candidateBudget: budget,
         stageBatchSize: stageBatch,
         maxRuntimeMs,

@@ -51,6 +51,18 @@ export interface LevelLine {
   endPrice?: number;
 }
 
+/** Filled rectangular zone (Order Block / FVG) using stored geometry. */
+export interface ZoneRect {
+  high: number;
+  low: number;
+  color: string;
+  label: string;
+  /** Optional time bounds in ms; when absent, spans full visible width. */
+  fromTime?: number | null;
+  toTime?: number | null;
+  opacity?: number;
+}
+
 export interface TimelineEvent {
   time: number;
   label: string;

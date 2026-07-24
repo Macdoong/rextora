@@ -27,6 +27,68 @@ export type HistoricalPeriodPresetId =
   | "long"
   | "custom";
 export type QualifiedTargetPreset = "1" | "3" | "5" | "custom";
+export type MarketMode = "recommended" | "manual";
+export type DurationPresetId =
+  | "60"
+  | "180"
+  | "360"
+  | "720"
+  | "1440"
+  | "custom";
+export type MddPresetId = "10" | "15" | "20" | "25" | "custom";
+export type TradingStyleId = "scalping" | "balanced" | "stable";
+
+/** Beginner-facing preset aliases mapped onto verified trading styles. */
+export type BeginnerPresetId = "safe" | "balanced" | "aggressive";
+
+export const BEGINNER_PRESET_MAP: Record<
+  BeginnerPresetId,
+  {
+    labelKo: string;
+    tradingStyle: TradingStyleId;
+    criteriaKo: string[];
+  }
+> = {
+  safe: {
+    labelKo: "안전형",
+    tradingStyle: "stable",
+    criteriaKo: [
+      "합격 프로필: 안정형 (max MDD 15%, 최소 거래 20회, 최소 수익 5%)",
+      "탐색 깊이: 심층 (지터 검증 ON, 비용 스트레스 ON)",
+      "비용 반영 필수",
+      "강건성 검증 사용",
+      "과적합 위험 검사 (지터·스트레스 결과 기반)",
+    ],
+  },
+  balanced: {
+    labelKo: "균형형",
+    tradingStyle: "balanced",
+    criteriaKo: [
+      "합격 프로필: 균형형 (max MDD 25%, 최소 거래 10회, 최소 수익 0%)",
+      "탐색 깊이: 표준 (비용 스트레스 ON)",
+      "비용 반영 필수",
+      "강건성 검증 사용",
+      "과적합 위험 검사",
+    ],
+  },
+  aggressive: {
+    labelKo: "공격형",
+    tradingStyle: "scalping",
+    criteriaKo: [
+      "합격 프로필: 수익형 (max MDD 40%, 최소 거래 5회)",
+      "탐색 깊이: 빠른 탐색 (비용 스트레스 ON)",
+      "비용 반영 필수",
+      "빠른 후보 평가",
+      "과적합 위험 검사",
+    ],
+  },
+};
+export type ResearchBasisId =
+  | "fresh"
+  | "improve_best"
+  | "backtest_supplement"
+  | "paper_supplement"
+  | "live_supplement";
 
 /** Markets used elsewhere in Rextora backtest UI (mirrored from server). */
 export const OPERATOR_SUPPORTED_SYMBOLS = [
@@ -108,7 +170,7 @@ export const SEARCH_DEPTH_PROFILES: Record<
     stressEnabled: true,
     stressFeeMultiplier: 1.5,
     stressSlippageMultiplier: 1.5,
-    jitterEnabled: false,
+    jitterEnabled: true,
     jitterSamples: 2,
     jitterMutationScale: 0.2,
   },
@@ -188,6 +250,8 @@ export interface StrategySearchOperatorFormState {
   qualificationProfile: QualificationProfileId;
   qualifiedTargetPreset: QualifiedTargetPreset;
   qualifiedTargetCustom: string;
+  /** Explicit hard stop when qualified target is met (default false). */
+  stopWhenQualifiedTarget: boolean;
   minTradeCount: string;
   minTotalReturn: string;
   maxMdd: string;
@@ -195,6 +259,16 @@ export interface StrategySearchOperatorFormState {
   minScore: string;
   availableFromDate: string;
   availableToDate: string;
+  /** Primary UX: recommended coin vs manual symbol pick. */
+  marketMode: MarketMode;
+  /** Primary UX: runtime budget preset (minutes as string id). */
+  durationPreset: DurationPresetId;
+  /** Primary UX: max drawdown preset (percent string id). */
+  mddPreset: MddPresetId;
+  /** Primary UX: trading style mapped to qual + depth. */
+  tradingStyle: TradingStyleId;
+  /** Primary UX: research intent metadata for follow-up jobs. */
+  researchBasis: ResearchBasisId;
   /** Advanced (collapsed) */
   seed: string;
   balance: string;
@@ -417,8 +491,10 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     periodPreset: "standard",
     depthProfile: "standard",
     qualificationProfile: "balanced",
-    qualifiedTargetPreset: "1",
-    qualifiedTargetCustom: "1",
+    qualifiedTargetPreset: "3",
+    qualifiedTargetCustom: "3",
+    /** Soft goal only — research continues until time budget by default. */
+    stopWhenQualifiedTarget: false,
     minTradeCount: qual.minTradeCount,
     minTotalReturn: qual.minTotalReturn,
     maxMdd: qual.maxMdd,
@@ -426,6 +502,11 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     minScore: qual.minScore,
     availableFromDate: dates.from,
     availableToDate: dates.to,
+    marketMode: "recommended",
+    durationPreset: "180",
+    mddPreset: "25",
+    tradingStyle: "balanced",
+    researchBasis: "fresh",
     seed: "42",
     balance: "10000",
     feeRate: "0.0004",
@@ -441,7 +522,8 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     jitterSamples: depth.jitterSamples,
     jitterMutationScale: depth.jitterMutationScale,
     candidateBudgetOverride: depth.candidateBudgetOverride,
-    maxRuntimeMinutesOverride: depth.maxRuntimeMinutesOverride,
+    /** Primary duration default: 3 hours. */
+    maxRuntimeMinutesOverride: "180",
     showAdvanced: false,
   };
 }
@@ -512,6 +594,8 @@ export function operatorFormToCreateBody(
     depthProfile: depthId,
     qualificationProfile: qualId,
     qualifiedTarget,
+    // Standard lifecycle never stops at qualified target (Expert Mode only).
+    stopWhenQualifiedTarget: false,
     candidateBudget,
     stageBatchSize,
     maxRuntimeMs,

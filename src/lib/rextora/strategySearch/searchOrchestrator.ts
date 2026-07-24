@@ -20,6 +20,7 @@ import {
   type StrategySearchStoreOptions,
 } from "./jobStore";
 import {
+  activeElapsedMs,
   advanceToNextSpace,
   allocateCurrentFamilyBudget,
   familyBudgetRemaining,
@@ -27,6 +28,7 @@ import {
   markSpaceCompleted,
   markSpaceExhausted,
   mergeSeenHashes,
+  replenishDeadlineBudget,
   saveSearchPlan,
   updateCurrentFamilySpent,
   type StrategySearchCompletionReason,
@@ -38,6 +40,18 @@ import {
   type RunSearchJobInput,
   type RunSearchJobResult,
 } from "./jobRunner";
+import {
+  analyzeCandidateWeaknesses,
+  snapshotFromTrial,
+} from "./weaknessAnalysis";
+import {
+  appendResearchGeneration,
+  createResearchGenerationId,
+  listResearchGenerations,
+} from "./researchGeneration";
+import { applySearchSpaceMutation } from "./searchSpaceMutation";
+import type { StrategySearchParameterRange } from "./types";
+import { classifyRunFailureReason } from "./terminationReason";
 
 export interface OrchestratedSearchResult {
   jobId: string;
@@ -54,7 +68,62 @@ function runtimeExceeded(plan: StrategySearchPlan): boolean {
   if (plan.maxRuntimeMs == null || plan.campaignStartedAtMs == null) {
     return false;
   }
-  return Date.now() - plan.campaignStartedAtMs >= plan.maxRuntimeMs;
+  // Exclude paused wall-clock so pause/resume does not burn the deadline.
+  return activeElapsedMs(plan) >= plan.maxRuntimeMs;
+}
+
+function isDeadlineMode(plan: StrategySearchPlan): boolean {
+  return plan.maxRuntimeMs != null;
+}
+
+/**
+ * Soft budget exhausted in deadline mode → replenish another chunk.
+ * Returns updated plan, or a terminal completion reason when safety ceiling hits.
+ */
+function tryReplenishOrStop(
+  plan: StrategySearchPlan,
+):
+  | { kind: "continue"; plan: StrategySearchPlan }
+  | { kind: "stop"; plan: StrategySearchPlan; reason: StrategySearchCompletionReason } {
+  if (!isDeadlineMode(plan)) {
+    return {
+      kind: "stop",
+      plan: { ...plan, completionReason: "MAX_CANDIDATE_BUDGET" },
+      reason: "MAX_CANDIDATE_BUDGET",
+    };
+  }
+  if (runtimeExceeded(plan)) {
+    return {
+      kind: "stop",
+      plan: { ...plan, completionReason: "DEADLINE_REACHED" },
+      reason: "DEADLINE_REACHED",
+    };
+  }
+  const replenished = replenishDeadlineBudget(plan);
+  if (!replenished) {
+    return {
+      kind: "stop",
+      plan: { ...plan, completionReason: "HARD_SAFETY_LIMIT" },
+      reason: "HARD_SAFETY_LIMIT",
+    };
+  }
+  return { kind: "continue", plan: replenished };
+}
+
+function activeSpaceRanges(
+  plan: StrategySearchPlan,
+  jobRanges: StrategySearchParameterRange[],
+): StrategySearchParameterRange[] {
+  if (
+    plan.mutatedParameterRanges != null &&
+    plan.mutatedParameterRanges.length > 0
+  ) {
+    return plan.mutatedParameterRanges;
+  }
+  const spaceState = plan.spaces[plan.currentSpaceIndex];
+  if (!spaceState) return jobRanges;
+  const spaceDef = getSearchSpaceById(spaceState.id);
+  return spaceDef ? rangesForSpace(spaceDef) : jobRanges;
 }
 
 function applyStageConfig(
@@ -66,10 +135,7 @@ function applyStageConfig(
   if (!job) return;
   const spaceState = plan.spaces[plan.currentSpaceIndex];
   if (!spaceState) return;
-  const spaceDef = getSearchSpaceById(spaceState.id);
-  const ranges = spaceDef
-    ? rangesForSpace(spaceDef)
-    : job.config.parameterRanges;
+  const ranges = activeSpaceRanges(plan, job.config.parameterRanges);
   const remGlobal = remainingBudget(plan);
   const remFamily = familyBudgetRemaining(plan);
   const rem = Math.min(remGlobal, remFamily);
@@ -155,7 +221,7 @@ function syncPlanAfterRun(
     duplicateSkippedCount: plan.duplicateSkippedCount + dupDelta,
     elapsedMs:
       plan.campaignStartedAtMs != null
-        ? Date.now() - plan.campaignStartedAtMs
+        ? activeElapsedMs(next)
         : next.elapsedMs + result.statistics.elapsedMs,
   };
   const space = next.spaces[next.currentSpaceIndex];
@@ -173,13 +239,29 @@ function syncPlanAfterRun(
 /**
  * Advance to the next family, carrying unused global budget forward.
  * Returns null when no further family remains.
+ * Also records a ResearchGeneration with weakness analysis for the leaving space.
  */
 function handoffToNextFamily(
   plan: StrategySearchPlan,
   mode: "exhausted" | "completed",
+  jobId?: string,
+  store?: StrategySearchStoreOptions,
 ): StrategySearchPlan | null {
+  let working = plan;
+  const leaving = working.spaces[working.currentSpaceIndex];
+  let leavingAdjustment = working.lastMutation;
+  if (jobId && leaving) {
+    try {
+      working = recordGenerationForSpace(jobId, working, leaving, store);
+      leavingAdjustment = working.lastMutation;
+    } catch {
+      /* non-fatal — generation sidecar must not abort campaign */
+    }
+  }
   let next =
-    mode === "exhausted" ? markSpaceExhausted(plan) : markSpaceCompleted(plan);
+    mode === "exhausted"
+      ? markSpaceExhausted(working)
+      : markSpaceCompleted(working);
   const before = next.currentSpaceIndex;
   next = advanceToNextSpace(next);
   if (
@@ -190,12 +272,135 @@ function handoffToNextFamily(
   }
   // Fresh allocation for the newly active family from remaining global budget.
   next = allocateCurrentFamilyBudget(next);
+  // Re-apply weakness mutations against the next family's base ranges so
+  // overlapping keys carry forward; non-overlapping keys stay at catalog defaults.
+  if (leavingAdjustment && next.spaces[next.currentSpaceIndex]) {
+    const nextSpace = next.spaces[next.currentSpaceIndex]!;
+    const nextDef = getSearchSpaceById(nextSpace.id);
+    const job = jobId ? getSearchJob(jobId, store) : null;
+    const base = nextDef
+      ? rangesForSpace(nextDef)
+      : (job?.config.parameterRanges ?? []);
+    const { ranges, record } = applySearchSpaceMutation(
+      base,
+      null,
+      leavingAdjustment.weaknessCategories,
+    );
+    next = {
+      ...next,
+      mutatedParameterRanges: ranges,
+      lastMutation: record,
+    };
+  } else {
+    next = {
+      ...next,
+      mutatedParameterRanges: null,
+      lastMutation: null,
+    };
+  }
   return next;
 }
 
 /**
+ * Record a research generation for the active space, apply search-space
+ * mutation from weakness analysis, and return the plan with mutated ranges.
+ */
+function recordGenerationForSpace(
+  jobId: string,
+  plan: StrategySearchPlan,
+  space: StrategySearchPlan["spaces"][number],
+  store?: StrategySearchStoreOptions,
+): StrategySearchPlan {
+  const existing = listResearchGenerations(jobId, store);
+  const generationNumber = existing.length + 1;
+  const trials = listSearchTrials(jobId, store);
+  const bestHash =
+    plan.qualifiedHashes[plan.qualifiedHashes.length - 1] ??
+    trials.find((t) => t.passed)?.paramsHash ??
+    null;
+  const bestTrial = bestHash
+    ? trials.find((t) => t.paramsHash === bestHash) ?? null
+    : null;
+  const nextSpace = plan.spaces[plan.currentSpaceIndex + 1];
+  const analysis = analyzeCandidateWeaknesses(
+    bestTrial
+      ? snapshotFromTrial({
+          paramsHash: bestTrial.paramsHash,
+          passed: bestTrial.passed,
+          score: bestTrial.score,
+          windowResults: bestTrial.windowResults as Array<
+            Record<string, unknown>
+          >,
+          costStressResults: bestTrial.costStressResults as Array<
+            Record<string, unknown>
+          >,
+          jitterResults: bestTrial.jitterResults as Array<
+            Record<string, unknown>
+          >,
+        })
+      : null,
+    { nextFamilyLabelKo: nextSpace?.labelKo ?? null },
+  );
+  const job = getSearchJob(jobId, store);
+  const currentRanges = activeSpaceRanges(
+    plan,
+    job?.config.parameterRanges ?? [],
+  );
+  const weaknessCategories = [
+    ...analysis.findings.filter((f) => f.available).map((f) => f.category),
+    ...analysis.adjustment.actions.map((a) => a.type),
+  ];
+  const { ranges: mutatedRanges, record: mutationRecord } =
+    applySearchSpaceMutation(
+      currentRanges,
+      analysis.adjustment,
+      weaknessCategories,
+    );
+
+  appendResearchGeneration(
+    {
+      version: 1,
+      id: createResearchGenerationId(jobId, generationNumber),
+      jobId,
+      generationNumber,
+      parentGenerationId: existing[existing.length - 1]?.id ?? null,
+      spaceId: space.id,
+      spaceLabelKo: space.labelKo,
+      searchSpaceConfig: {
+        spaceId: space.id,
+        labelKo: space.labelKo,
+        uniqueEvaluated: space.uniqueEvaluated,
+        budgetAllocated: space.budgetAllocated ?? null,
+        budgetSpent: space.budgetSpent ?? null,
+      },
+      weaknessAnalysis: analysis,
+      adjustmentPlan: analysis.adjustment,
+      mutatedParameterRanges: mutatedRanges,
+      searchSpaceMutation: mutationRecord,
+      candidateHashes: [...plan.globalSeenHashes],
+      bestCandidateHash: bestHash,
+      qualifiedHashes: [...plan.qualifiedHashes],
+      seed: job?.config.seed ?? null,
+      engineVersion: job?.config.searchVersion ?? "1",
+      dataVersion: job?.config.dataVersion ?? "unknown",
+      feeVersion: "v1",
+      slippageVersion: "v1",
+      startedAt: new Date(plan.campaignStartedAtMs ?? Date.now()).toISOString(),
+      endedAt: new Date().toISOString(),
+    },
+    store,
+  );
+
+  return {
+    ...plan,
+    mutatedParameterRanges: mutatedRanges,
+    lastMutation: mutationRecord,
+  };
+}
+
+/**
  * Record Final PASS candidates as search-qualified only.
- * Does NOT write to Strategy Management — registration is explicit/user-driven.
+ * Does NOT write to Strategy Management ??registration is explicit/user-driven.
  */
 function recordQualifiedPasses(
   jobId: string,
@@ -231,7 +436,7 @@ function nextQualified(
 
 /**
  * @deprecated Auto-promotion removed. Kept name for callers that previously
- * promoted — now only records qualification hashes (no Strategy Management write).
+ * promoted ??now only records qualification hashes (no Strategy Management write).
  */
 function promoteNewPasses(
   jobId: string,
@@ -289,28 +494,63 @@ export async function runOrchestratedSearchJob(
 
   for (;;) {
     if (runtimeExceeded(plan)) {
-      plan = { ...plan, completionReason: "MAX_RUNTIME" };
+      const reason: StrategySearchCompletionReason = isDeadlineMode(plan)
+        ? "DEADLINE_REACHED"
+        : "MAX_RUNTIME";
+      plan = { ...plan, completionReason: reason };
       saveSearchPlan(jobId, plan, store);
       return {
         jobId,
-        finalStopReason: "MAX_RUNTIME",
+        finalStopReason: reason,
         plan,
         lastRun,
       };
     }
     if (remainingBudget(plan) <= 0) {
-      plan = { ...plan, completionReason: "MAX_CANDIDATE_BUDGET" };
+      const outcome = tryReplenishOrStop(plan);
+      if (outcome.kind === "stop") {
+        plan = outcome.plan;
+        saveSearchPlan(jobId, plan, store);
+        return {
+          jobId,
+          finalStopReason: outcome.reason,
+          plan,
+          lastRun,
+        };
+      }
+      plan = outcome.plan;
       saveSearchPlan(jobId, plan, store);
-      return {
-        jobId,
-        finalStopReason: "MAX_CANDIDATE_BUDGET",
-        plan,
-        lastRun,
-      };
+      applyStageConfig(jobId, plan, store);
+      continue;
     }
     if (familyBudgetRemaining(plan) <= 0) {
-      const handed = handoffToNextFamily(plan, "completed");
+      const handed = handoffToNextFamily(plan, "completed", jobId, store);
       if (!handed) {
+        // No more families — in deadline mode replenish and stay / stop on safety.
+        if (isDeadlineMode(plan) && !runtimeExceeded(plan)) {
+          const outcome = tryReplenishOrStop(plan);
+          if (outcome.kind === "continue") {
+            // Re-activate last family with replenished budget rather than ending early.
+            const spaces = outcome.plan.spaces.map((s, i) =>
+              i === outcome.plan.currentSpaceIndex
+                ? { ...s, status: "active" as const }
+                : s,
+            );
+            plan = { ...outcome.plan, spaces, completionReason: null };
+            saveSearchPlan(jobId, plan, store);
+            reopenSearchJobForNextSpace(jobId, store);
+            applyStageConfig(jobId, plan, store);
+            continue;
+          }
+          plan = outcome.plan;
+          saveSearchPlan(jobId, plan, store);
+          return {
+            jobId,
+            finalStopReason: outcome.reason,
+            plan,
+            lastRun,
+          };
+        }
         plan = { ...plan, completionReason: "SEARCH_SPACE_EXHAUSTED" };
         saveSearchPlan(jobId, plan, store);
         return {
@@ -327,14 +567,17 @@ export async function runOrchestratedSearchJob(
       continue;
     }
     if (plan.qualifiedHashes.length >= plan.qualifiedTarget) {
-      plan = { ...plan, completionReason: "QUALIFIED_TARGET_REACHED" };
-      saveSearchPlan(jobId, plan, store);
-      return {
-        jobId,
-        finalStopReason: "QUALIFIED_TARGET_REACHED",
-        plan,
-        lastRun,
-      };
+      if (plan.stopWhenQualifiedTarget === true) {
+        plan = { ...plan, completionReason: "QUALIFIED_TARGET_REACHED" };
+        saveSearchPlan(jobId, plan, store);
+        return {
+          jobId,
+          finalStopReason: "QUALIFIED_TARGET_REACHED",
+          plan,
+          lastRun,
+        };
+      }
+      // Soft milestone: continue until runtime / budget / cancel.
     }
 
     const profile = getJobExecutionProfile(jobId, store);
@@ -374,41 +617,81 @@ export async function runOrchestratedSearchJob(
       return { jobId, finalStopReason: "PAUSED", plan, lastRun };
     }
     if (lastRun.stopReason === "failed") {
-      plan = { ...plan, completionReason: "FATAL_ERROR" };
+      const failureHint = lastRun.job.failureMessage ?? null;
+      const reason = classifyRunFailureReason(failureHint);
+      plan = { ...plan, completionReason: reason };
       saveSearchPlan(jobId, plan, store);
       return {
         jobId,
-        finalStopReason: "FATAL_ERROR",
+        finalStopReason: reason,
         plan,
         lastRun,
       };
     }
 
     if (plan.qualifiedHashes.length >= plan.qualifiedTarget) {
-      plan = { ...plan, completionReason: "QUALIFIED_TARGET_REACHED" };
-      saveSearchPlan(jobId, plan, store);
-      return {
-        jobId,
-        finalStopReason: "QUALIFIED_TARGET_REACHED",
-        plan,
-        lastRun,
-      };
+      if (plan.stopWhenQualifiedTarget === true) {
+        plan = { ...plan, completionReason: "QUALIFIED_TARGET_REACHED" };
+        saveSearchPlan(jobId, plan, store);
+        return {
+          jobId,
+          finalStopReason: "QUALIFIED_TARGET_REACHED",
+          plan,
+          lastRun,
+        };
+      }
     }
 
     if (remainingBudget(plan) <= 0) {
-      plan = { ...plan, completionReason: "MAX_CANDIDATE_BUDGET" };
+      const outcome = tryReplenishOrStop(plan);
+      if (outcome.kind === "stop") {
+        plan = outcome.plan;
+        saveSearchPlan(jobId, plan, store);
+        return {
+          jobId,
+          finalStopReason: outcome.reason,
+          plan,
+          lastRun,
+        };
+      }
+      plan = outcome.plan;
       saveSearchPlan(jobId, plan, store);
-      return {
-        jobId,
-        finalStopReason: "MAX_CANDIDATE_BUDGET",
-        plan,
-        lastRun,
-      };
+      // Fall through to continue same/next stage with replenished budget.
     }
 
     if (lastRun.stopReason === "search_space_exhausted") {
-      const handed = handoffToNextFamily(plan, "exhausted");
+      const handed = handoffToNextFamily(plan, "exhausted", jobId, store);
       if (!handed) {
+        if (isDeadlineMode(plan) && !runtimeExceeded(plan)) {
+          const outcome = tryReplenishOrStop({
+            ...plan,
+            // Ensure replenish can add room even if budget appears full.
+            candidateBudget: Math.max(
+              plan.candidateBudget,
+              plan.candidateBudgetUsed,
+            ),
+          });
+          if (outcome.kind === "continue") {
+            const spaces = outcome.plan.spaces.map((s, i) =>
+              i === outcome.plan.currentSpaceIndex
+                ? { ...s, status: "active" as const }
+                : s,
+            );
+            plan = { ...outcome.plan, spaces, completionReason: null };
+            saveSearchPlan(jobId, plan, store);
+            reopenSearchJobForNextSpace(jobId, store);
+            applyStageConfig(jobId, plan, store);
+            continue;
+          }
+          plan = outcome.plan;
+          saveSearchPlan(jobId, plan, store);
+          return {
+            jobId,
+            finalStopReason: outcome.reason,
+            plan,
+            lastRun,
+          };
+        }
         plan = { ...plan, completionReason: "SEARCH_SPACE_EXHAUSTED" };
         saveSearchPlan(jobId, plan, store);
         return {
@@ -426,16 +709,29 @@ export async function runOrchestratedSearchJob(
     }
 
     if (lastRun.stopReason === "max_iterations") {
-      // Family budget spent → hand remaining global budget to next family.
+      // Family budget spent — hand remaining global budget to next family.
       if (familyBudgetRemaining(plan) <= 0) {
-        const handed = handoffToNextFamily(plan, "completed");
+        const handed = handoffToNextFamily(plan, "completed", jobId, store);
         if (!handed) {
           if (remainingBudget(plan) <= 0) {
-            plan = { ...plan, completionReason: "MAX_CANDIDATE_BUDGET" };
+            const outcome = tryReplenishOrStop(plan);
+            if (outcome.kind === "continue") {
+              const spaces = outcome.plan.spaces.map((s, i) =>
+                i === outcome.plan.currentSpaceIndex
+                  ? { ...s, status: "active" as const }
+                  : s,
+              );
+              plan = { ...outcome.plan, spaces, completionReason: null };
+              saveSearchPlan(jobId, plan, store);
+              reopenSearchJobForNextSpace(jobId, store);
+              applyStageConfig(jobId, plan, store);
+              continue;
+            }
+            plan = outcome.plan;
             saveSearchPlan(jobId, plan, store);
             return {
               jobId,
-              finalStopReason: "MAX_CANDIDATE_BUDGET",
+              finalStopReason: outcome.reason,
               plan,
               lastRun,
             };
@@ -455,8 +751,31 @@ export async function runOrchestratedSearchJob(
         applyStageConfig(jobId, plan, store);
         continue;
       }
-      // Continue same family with remaining family budget.
-      if (remainingBudget(plan) > 0) {
+      // Continue same family with remaining family budget — mutate ranges first.
+      if (remainingBudget(plan) > 0 || isDeadlineMode(plan)) {
+        if (remainingBudget(plan) <= 0) {
+          const outcome = tryReplenishOrStop(plan);
+          if (outcome.kind === "stop") {
+            plan = outcome.plan;
+            saveSearchPlan(jobId, plan, store);
+            return {
+              jobId,
+              finalStopReason: outcome.reason,
+              plan,
+              lastRun,
+            };
+          }
+          plan = outcome.plan;
+        }
+        const space = plan.spaces[plan.currentSpaceIndex];
+        if (space) {
+          try {
+            plan = recordGenerationForSpace(jobId, plan, space, store);
+          } catch {
+            /* non-fatal */
+          }
+        }
+        saveSearchPlan(jobId, plan, store);
         reopenSearchJobForNextSpace(jobId, store);
         applyStageConfig(jobId, plan, store);
         continue;

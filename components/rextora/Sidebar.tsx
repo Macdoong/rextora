@@ -3,21 +3,45 @@
 import { usePathname } from "next/navigation";
 import { ModeBadge } from "@/components/rextora/ModeBadge";
 
+/** Primary lifecycle navigation — seven items only. */
 const navItems: Array<[string, string]> = [
   ["대시보드", "/dashboard"],
-  ["전략 관리", "/strategies"],
-  ["백테스트", "/backtest"],
   ["전략 탐색", "/strategy-search"],
-  ["전략 성과", "/strategy-performance"],
-  ["멀티코인 감시", "/market-watch"],
+  ["탐색 결과", "/results"],
+  ["백테스트", "/backtest"],
   ["모의 매매", "/paper-trading"],
   ["실전 매매", "/live-trading"],
-  ["거래 기록", "/trades"],
-  ["AI 분석 보고", "/ai-reports"],
-  ["리스크 관리", "/risk"],
-  ["설정", "/settings"],
-  ["시스템 상태", "/system-status"],
+  ["시스템 설정", "/settings"],
 ];
+
+function navActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard") return pathname === "/dashboard" || pathname === "/";
+  if (href === "/settings") {
+    return (
+      pathname === "/settings" ||
+      pathname.startsWith("/system-status") ||
+      pathname.startsWith("/risk") ||
+      pathname.startsWith("/strategies")
+    );
+  }
+  if (href === "/results") {
+    return (
+      pathname === "/results" ||
+      pathname.startsWith("/strategy-performance") ||
+      pathname.startsWith("/ai-reports")
+    );
+  }
+  if (href === "/paper-trading") {
+    return pathname.startsWith("/paper-trading") || pathname.startsWith("/trades");
+  }
+  if (href === "/strategy-search") {
+    return (
+      pathname.startsWith("/strategy-search") ||
+      pathname.startsWith("/market-watch")
+    );
+  }
+  return pathname === href || pathname.startsWith(href);
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -32,7 +56,7 @@ export function Sidebar() {
           <div>
             <div className="text-xl font-black tracking-tight">Rextora</div>
             <div className="text-[11px] tracking-wide rx-text-muted">
-              수학적 Quant Futures
+              AI 전략 연구 · 거래 수명주기
             </div>
           </div>
         </div>
@@ -43,15 +67,13 @@ export function Sidebar() {
             <ModeBadge />
           </div>
           <p className="mt-2 text-[11px] rx-text-muted">
-            실전 매매는 명시적 시작 후에만 실제 주문이 실행됩니다.
+            실전 매매는 게이트·승인·위험 제한을 모두 통과한 뒤에만 실행됩니다.
           </p>
         </div>
 
         <nav className="space-y-1 overflow-y-auto pb-16" data-testid="main-nav">
           {navItems.map(([label, href]) => {
-            const active =
-              pathname === href ||
-              (href !== "/dashboard" && pathname.startsWith(href));
+            const active = navActive(pathname, href);
             return (
               <a
                 key={href}
@@ -70,7 +92,7 @@ export function Sidebar() {
         </nav>
 
         <div className="absolute bottom-4 left-4 right-4 text-[11px] rx-text-muted">
-          Rextora Quant · SAFE_v44
+          Rextora Quant · SAFE_v44 보호
         </div>
       </aside>
       <div className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 px-3 py-2 backdrop-blur lg:hidden">
@@ -91,7 +113,11 @@ export function Sidebar() {
                 <a
                   key={href}
                   href={href}
-                  className={`rounded-lg px-3 py-2 text-sm ${pathname === href ? "bg-violet-600 text-white" : "text-slate-300"}`}
+                  className={`rounded-lg px-3 py-2 text-sm ${
+                    navActive(pathname, href)
+                      ? "bg-violet-600 text-white"
+                      : "text-slate-300"
+                  }`}
                 >
                   {label}
                 </a>

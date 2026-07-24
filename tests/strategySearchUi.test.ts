@@ -62,10 +62,12 @@ describe("strategySearch operator UX", () => {
     expect(page).toContain("StrategySearchWorkbench");
     const workbench = readUi("StrategySearchWorkbench.tsx");
     expect(workbench).toContain("JobCreateForm");
-    expect(workbench).toContain("JobList");
     expect(workbench).toContain("SearchStatusCard");
-    expect(workbench).toContain("QualifiedResultsPanel");
     expect(workbench).toContain("ResearchCompletionPanel");
+    expect(workbench).toContain("ss-open-results");
+    expect(workbench).toContain("ss-results-handoff");
+    expect(workbench).not.toContain("<QualifiedResultsPanel");
+    expect(workbench).not.toContain("<JobList");
     expect(workbench).toContain("promoteStrategySearchTrials");
     expect(workbench).toContain("runUntilQualified");
   });
@@ -75,8 +77,9 @@ describe("strategySearch operator UX", () => {
     expect(src).toContain("ss-advanced-toggle");
     expect(src).toContain("ss-intensity");
     expect(src).toContain("ss-goal");
-    expect(src).toContain("ss-run-until-qualified");
     expect(src).toContain("<details");
+    expect(src).not.toContain("ss-stop-when-qualified");
+    expect(src).toContain("ss-deadline-completion-note");
   });
 
   it("operator defaults build a valid API body", () => {
@@ -149,8 +152,13 @@ describe("strategySearch operator UX", () => {
 
   it("status card separates goal/budget/status and never shows bare progress %", () => {
     const src = readUi("SearchStatusCard.tsx");
-    expect(src).toContain("합격 목표");
-    expect(src).toContain("연구 예산 사용");
+    expect(src).toContain("합격 후보");
+    expect(src).toContain("최소 확보 기준");
+    expect(src).toContain(
+      "최소 확보 기준을 충족해도 설정된 탐색 시간이 끝날 때까지 개선을 계속합니다.",
+    );
+    expect(src).toContain("평가한 후보");
+    expect(src).toContain("자원 안전 제한");
     expect(src).toContain("연구 상태");
     expect(src).toContain("종료 사유");
     expect(src).toContain("pipelineStageLabelKo");
@@ -159,6 +167,8 @@ describe("strategySearch operator UX", () => {
     expect(src).toContain("탐색 파이프라인");
     expect(src).toContain("기술 정보");
     expect(src).toContain("<details");
+    expect(src).not.toContain("PIPELINE_ORDER");
+    expect(src).not.toContain("합격 목표");
     expect(src).not.toContain("ProgressBar");
     expect(src).not.toContain("진행 ${");
     expect(src).not.toContain("overallPct");

@@ -11,19 +11,32 @@ import {
 } from "./jobStore";
 import { assertStrategySearchJobId } from "./searchId";
 import type { SearchDepthProfileId, QualificationProfileId } from "./operatorProfiles";
+import type { SearchSpaceMutationRecord } from "./searchSpaceMutation";
+import type { StrategySearchParameterRange } from "./types";
 
 export const STRATEGY_SEARCH_PLAN_VERSION = 1 as const;
+
+/** Hard ceiling on unique evaluations even in deadline (maxRuntimeMs) mode. */
+export const SAFETY_BUDGET_CEILING = 50_000;
 
 /** Operator-facing / API completion reasons (additive). */
 export type StrategySearchCompletionReason =
   | "QUALIFIED_TARGET_REACHED"
   | "MAX_CANDIDATE_BUDGET"
   | "MAX_RUNTIME"
+  | "DEADLINE_REACHED"
+  | "HARD_SAFETY_LIMIT"
   | "SEARCH_SPACE_EXHAUSTED"
   | "USER_CANCELLED"
   | "FATAL_ERROR"
   | "MAX_ITERATIONS"
   | "PAUSED"
+  | "CONFIGURATION_INVALID"
+  | "DATA_UNAVAILABLE"
+  | "RECOVERY_FAILED"
+  | "RESOURCE_SAFETY_LIMIT"
+  | "USER_STOPPED"
+  | "ENGINE_ERROR"
   | null;
 
 export type StrategyPromotionStatus =
@@ -60,12 +73,26 @@ export interface StrategySearchPlan {
   depthProfile: SearchDepthProfileId;
   qualificationProfile: QualificationProfileId;
   qualifiedTarget: number;
+  /**
+   * When false (default), reaching qualifiedTarget is a soft milestone —
+   * research continues until maxRuntimeMs / budget / cancel / failure.
+   * When true, campaign stops at QUALIFIED_TARGET_REACHED (explicit hard stop).
+   */
+  stopWhenQualifiedTarget: boolean;
   candidateBudget: number;
   /** Per-stage batch size from depth profile. */
   stageBatchSize: number;
   maxRuntimeMs: number | null;
   /** Absolute ms timestamp when campaign started (first start). */
   campaignStartedAtMs: number | null;
+  /** When set, campaign is currently paused (wall clock excluded from deadline). */
+  pausedAtMs: number | null;
+  /** Cumulative paused wall-clock ms across pause/resume cycles. */
+  accumulatedPauseMs: number;
+  /** Last resume timestamp (null until first resume). */
+  resumedAtMs: number | null;
+  /** Expected absolute completion after latest resume (null when unknown/legacy). */
+  expectedCompletionAtMs: number | null;
   currentSpaceIndex: number;
   spaces: StrategySearchPlanSpaceState[];
   /** Global hashes already evaluated across spaces. */
@@ -80,6 +107,13 @@ export interface StrategySearchPlan {
   promotions: StrategySearchPromotionRecord[];
   /** Optional min score gate applied after Final PASS (operator). */
   minScore: number | null;
+  /**
+   * Working parameter ranges after weakness-driven mutation.
+   * When set, candidate generation uses these instead of rangesForSpace.
+   */
+  mutatedParameterRanges: StrategySearchParameterRange[] | null;
+  /** Last applied search-space mutation record (audit). */
+  lastMutation: SearchSpaceMutationRecord | null;
 }
 
 function defaultRoot(): string {
@@ -125,6 +159,8 @@ export function createEmptySearchPlan(input: {
   maxRuntimeMs: number | null;
   spaces: Array<{ id: string; labelKo: string }>;
   minScore?: number | null;
+  /** Default false: run until deadline/budget, not first PASS. */
+  stopWhenQualifiedTarget?: boolean;
 }): StrategySearchPlan {
   return {
     version: STRATEGY_SEARCH_PLAN_VERSION,
@@ -132,10 +168,15 @@ export function createEmptySearchPlan(input: {
     depthProfile: input.depthProfile,
     qualificationProfile: input.qualificationProfile,
     qualifiedTarget: Math.max(1, Math.trunc(input.qualifiedTarget)),
+    stopWhenQualifiedTarget: input.stopWhenQualifiedTarget === true,
     candidateBudget: Math.max(1, Math.trunc(input.candidateBudget)),
     stageBatchSize: Math.max(1, Math.trunc(input.stageBatchSize)),
     maxRuntimeMs: input.maxRuntimeMs,
     campaignStartedAtMs: null,
+    pausedAtMs: null,
+    accumulatedPauseMs: 0,
+    resumedAtMs: null,
+    expectedCompletionAtMs: null,
     currentSpaceIndex: 0,
     spaces: input.spaces.map((s, i) => ({
       id: s.id,
@@ -153,6 +194,8 @@ export function createEmptySearchPlan(input: {
     completionReason: null,
     promotions: [],
     minScore: input.minScore ?? null,
+    mutatedParameterRanges: null,
+    lastMutation: null,
   };
 }
 
@@ -183,10 +226,126 @@ export function getSearchPlan(
     const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as StrategySearchPlan;
     if (!parsed || parsed.version !== STRATEGY_SEARCH_PLAN_VERSION) return null;
     if (!Array.isArray(parsed.spaces)) return null;
-    return parsed;
+    return {
+      ...parsed,
+      stopWhenQualifiedTarget: parsed.stopWhenQualifiedTarget === true,
+      mutatedParameterRanges: parsed.mutatedParameterRanges ?? null,
+      lastMutation: parsed.lastMutation ?? null,
+      pausedAtMs: parsed.pausedAtMs ?? null,
+      accumulatedPauseMs:
+        typeof parsed.accumulatedPauseMs === "number" &&
+        Number.isFinite(parsed.accumulatedPauseMs)
+          ? Math.max(0, parsed.accumulatedPauseMs)
+          : 0,
+      resumedAtMs: parsed.resumedAtMs ?? null,
+      expectedCompletionAtMs: parsed.expectedCompletionAtMs ?? null,
+    };
   } catch {
     return null;
   }
+}
+
+/** Active (non-paused) elapsed ms for deadline accounting. */
+export function activeElapsedMs(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): number {
+  if (plan.campaignStartedAtMs == null) {
+    return Math.max(0, plan.elapsedMs ?? 0);
+  }
+  const openPause =
+    plan.pausedAtMs != null ? Math.max(0, now - plan.pausedAtMs) : 0;
+  return Math.max(
+    0,
+    now -
+      plan.campaignStartedAtMs -
+      (plan.accumulatedPauseMs ?? 0) -
+      openPause,
+  );
+}
+
+export function markPlanPaused(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): StrategySearchPlan {
+  if (plan.pausedAtMs != null) return plan;
+  return {
+    ...plan,
+    pausedAtMs: now,
+    elapsedMs: activeElapsedMs(plan, now),
+  };
+}
+
+export function markPlanResumed(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): StrategySearchPlan {
+  let accumulatedPauseMs = plan.accumulatedPauseMs ?? 0;
+  if (plan.pausedAtMs != null) {
+    accumulatedPauseMs += Math.max(0, now - plan.pausedAtMs);
+  } else if (plan.campaignStartedAtMs != null) {
+    // Legacy paused jobs lack pausedAtMs — preserve known active elapsed and
+    // absorb the unaccounted wall-clock gap into pause accumulation.
+    const knownActive = Math.max(0, plan.elapsedMs ?? 0);
+    const wall = Math.max(0, now - plan.campaignStartedAtMs);
+    accumulatedPauseMs = Math.max(accumulatedPauseMs, wall - knownActive);
+  }
+  const next: StrategySearchPlan = {
+    ...plan,
+    pausedAtMs: null,
+    accumulatedPauseMs,
+    resumedAtMs: now,
+  };
+  const active = activeElapsedMs(next, now);
+  const expectedCompletionAtMs =
+    next.maxRuntimeMs != null
+      ? now + Math.max(0, next.maxRuntimeMs - active)
+      : null;
+  return {
+    ...next,
+    elapsedMs: active,
+    expectedCompletionAtMs,
+  };
+}
+
+/**
+ * Deadline mode: when the soft candidate budget is exhausted but wall-clock
+ * deadline remains, replenish another chunk so research can continue.
+ * Returns null when the hard safety ceiling is hit.
+ */
+export function replenishDeadlineBudget(
+  plan: StrategySearchPlan,
+): StrategySearchPlan | null {
+  if (plan.uniqueEvaluatedCount >= SAFETY_BUDGET_CEILING) {
+    return null;
+  }
+  const remainingFamilies = Math.max(
+    1,
+    plan.spaces.length - plan.currentSpaceIndex,
+  );
+  const chunk = Math.max(
+    plan.stageBatchSize,
+    plan.stageBatchSize * remainingFamilies,
+  );
+  const room = Math.max(0, SAFETY_BUDGET_CEILING - plan.candidateBudget);
+  const add = Math.min(chunk, room);
+  if (add <= 0) return null;
+
+  const spaces = plan.spaces.map((s, i) => {
+    if (i !== plan.currentSpaceIndex) return s;
+    const allocated = s.budgetAllocated ?? s.budgetSpent ?? 0;
+    return {
+      ...s,
+      budgetAllocated: allocated + add,
+      status: "active" as const,
+    };
+  });
+
+  return {
+    ...plan,
+    candidateBudget: plan.candidateBudget + add,
+    spaces,
+  };
 }
 
 export function markSpaceExhausted(

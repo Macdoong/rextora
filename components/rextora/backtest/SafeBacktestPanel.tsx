@@ -18,6 +18,7 @@ import {
   displayTimeframeLabel,
   uiLabel,
 } from "@/src/lib/rextora/displayLabels";
+import { computeDayPresetRange } from "@/src/lib/rextora/backtest/backtestDateRange";
 
 type TradeRow = {
   side: string;
@@ -37,6 +38,7 @@ type TradeRow = {
   takeProfit?: number;
 };
 
+/** Expert panel keeps the extra 10-month preset; day math is shared. */
 const PRESETS: Array<[string, number]> = [
   ["최근 1개월", 30],
   ["최근 3개월", 90],
@@ -97,10 +99,9 @@ export function BacktestWorkbench() {
   );
 
   function applyPreset(days: number) {
-    const to = new Date();
-    const from = new Date(to.getTime() - days * 86400000);
-    setToDate(to.toISOString().slice(0, 10));
-    setFromDate(from.toISOString().slice(0, 10));
+    const range = computeDayPresetRange(days);
+    setFromDate(range.fromDate);
+    setToDate(range.toDate);
   }
 
   async function run(save = false) {

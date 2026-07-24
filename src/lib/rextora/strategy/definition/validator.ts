@@ -193,6 +193,7 @@ export function defaultDefinition(partial: Partial<CanonicalStrategyDefinition> 
     },
     metadata: partial.metadata ?? {},
     paramsHash: partial.paramsHash ?? "",
-    safeParams: partial.safeParams
+    safeParams: partial.safeParams,
+    eventSequence: partial.eventSequence
   };
 }

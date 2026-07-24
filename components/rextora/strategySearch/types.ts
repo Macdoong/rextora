@@ -43,6 +43,8 @@ export type StrategySearchCompletionReason =
   | "QUALIFIED_TARGET_REACHED"
   | "MAX_CANDIDATE_BUDGET"
   | "MAX_RUNTIME"
+  | "DEADLINE_REACHED"
+  | "HARD_SAFETY_LIMIT"
   | "SEARCH_SPACE_EXHAUSTED"
   | "USER_CANCELLED"
   | "FATAL_ERROR"
@@ -55,6 +57,8 @@ export interface StrategySearchOperatorPlan {
   depthProfile: "fast" | "standard" | "deep";
   qualificationProfile: "conservative" | "balanced" | "aggressive" | "custom";
   qualifiedTarget: number;
+  /** When true, stop at qualified target. Default omitted/false = run to deadline. */
+  stopWhenQualifiedTarget?: boolean;
   candidateBudget: number;
   stageBatchSize: number;
   maxRuntimeMs: number | null;
@@ -69,6 +73,14 @@ export interface StrategySearchJobSummary {
   updatedAt: string;
   startedAt: string | null;
   finishedAt: string | null;
+  elapsedMs?: number | null;
+  remainingMs?: number | null;
+  maxRuntimeMs?: number | null;
+  campaignStartedAtMs?: number | null;
+  pausedAtMs?: number | null;
+  accumulatedPauseMs?: number | null;
+  resumedAtMs?: number | null;
+  expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
   completedIterations: number;
   nextIteration: number;
@@ -78,6 +90,7 @@ export interface StrategySearchJobSummary {
   bestCandidateHash: string | null;
   bestPassedCandidateHash: string | null;
   failureMessage: string | null;
+  terminationReason?: string | null;
   executionActive: boolean;
   searchVersion: string;
   symbols: string[];
@@ -114,6 +127,19 @@ export interface StrategySearchJobSummary {
   overallProgressPct?: number | null;
   currentImprovementStage?: string | null;
   familyBudgetRemaining?: number | null;
+  /** Applied search-space mutation from plan (only when mutations were applied). */
+  lastMutation?: {
+    appliedAt: string;
+    weaknessCategories: string[];
+    mutationCount: number;
+    firstChange: {
+      key: string;
+      field: "min" | "max" | "step";
+      from: number;
+      to: number;
+      reason: string;
+    } | null;
+  } | null;
 }
 
 export interface StrategySearchJobDetail extends StrategySearchJobSummary {

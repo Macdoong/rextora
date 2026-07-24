@@ -271,6 +271,14 @@ function startHeartbeat(): void {
 
 export async function startBotRuntime(): Promise<EngineResult> {
   clearEmergencyStop();
+  try {
+    const { recoverOrphanSearchJobs } = await import(
+      "./strategySearch/orphanJobRecovery"
+    );
+    recoverOrphanSearchJobs();
+  } catch {
+    // Non-fatal: paper bot can start even if search recovery fails.
+  }
   const result = await startPaperBot();
   if (!result.ok) return result;
 

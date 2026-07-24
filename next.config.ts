@@ -6,7 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
 };
 
 export default withBundleAnalyzer(nextConfig);

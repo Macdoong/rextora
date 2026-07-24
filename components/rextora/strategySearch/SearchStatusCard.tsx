@@ -3,7 +3,6 @@
 import { Metric } from "@/components/ui/primitives";
 import type { StrategySearchJobDetail } from "./types";
 import {
-  completionReasonLabelKo,
   formatCount,
   formatMs,
   formatPct,
@@ -11,17 +10,10 @@ import {
   pipelineStageLabelKo,
   pipelineStageUiStatus,
   researchStatusLabelKo,
+  resolveDisplayTerminationReason,
   type PipelineUiStatus,
 } from "./formatters";
 import { cleanStrategyDisplayName } from "./displayNames";
-
-const PIPELINE_ORDER = [
-  { id: "ema_core", label: "EMA 추세" },
-  { id: "rsi_pullback", label: "RSI 되돌림" },
-  { id: "breakout", label: "변동성 돌파" },
-  { id: "risk_exits", label: "ATR 손익" },
-  { id: "full_safe", label: "SAFE 종합" },
-] as const;
 
 function toneClass(ui: PipelineUiStatus): string {
   switch (ui) {
@@ -70,12 +62,16 @@ function StatBlock(props: {
 export function SearchStatusCard(props: {
   job: StrategySearchJobDetail;
   qualifiedCountFallback?: number;
+  generationCount?: number | null;
+  latestWeaknessKo?: string | null;
+  latestAdjustmentKo?: string | null;
 }) {
-  const { job } = props;
+  const { job, generationCount, latestWeaknessKo, latestAdjustmentKo } = props;
   const stats = job.statistics;
   const qualifiedTarget = job.qualifiedTarget ?? null;
+  // Use plan-qualified count only — never statistics.passed (avoids X/Y goal confusion).
   const qualifiedCount =
-    job.qualifiedCount ?? props.qualifiedCountFallback ?? stats?.passed ?? 0;
+    job.qualifiedCount ?? props.qualifiedCountFallback ?? 0;
   const tested =
     job.uniqueEvaluatedCount ??
     job.candidateBudgetUsed ??
@@ -97,20 +93,25 @@ export function SearchStatusCard(props: {
     completionReason: job.completionReason,
     executionActive: job.executionActive,
   });
-  const reason =
-    completionReasonLabelKo(job.completionReason ?? null) ??
-    (job.searchSpaceExhausted && job.status === "completed"
-      ? "연구 범위 소진"
-      : null);
+  const reason = resolveDisplayTerminationReason({
+    status: job.status,
+    completionReason: job.completionReason,
+    terminationReason: job.terminationReason,
+    failureMessage: job.failureMessage,
+  });
   const earlyGoal = isEarlyFinishReason(job.completionReason);
-  const elapsed = formatMs(stats?.elapsedMs ?? null);
+  const elapsed = formatMs(job.elapsedMs ?? stats?.elapsedMs ?? null);
+  const remaining = formatMs(job.remainingMs ?? stats?.remainingEstimateMs ?? null);
+  const expectedCompletion =
+    job.expectedCompletionAtMs != null
+      ? new Date(job.expectedCompletionAtMs).toLocaleString("ko-KR")
+      : null;
   const bestReturn = formatPct(job.bestReturn);
   const progression = job.searchProgression ?? [];
   const bestSummary = job.currentBestSummary
     ? cleanStrategyDisplayName(job.currentBestSummary)
     : null;
 
-  const byId = new Map(progression.map((s) => [s.id, s]));
   const baseStages =
     progression.length > 0
       ? progression.map((s) => ({
@@ -118,11 +119,7 @@ export function SearchStatusCard(props: {
           label: s.labelKo,
           status: s.status,
         }))
-      : PIPELINE_ORDER.map((p) => ({
-          id: p.id,
-          label: p.label,
-          status: byId.get(p.id)?.status ?? "pending",
-        }));
+      : [];
 
   const activeIndex = Math.max(
     0,
@@ -144,15 +141,9 @@ export function SearchStatusCard(props: {
     };
   });
 
-  const goalValue =
-    qualifiedTarget != null
-      ? `${formatCount(qualifiedCount)} / ${qualifiedTarget}`
-      : formatCount(qualifiedCount);
-
-  const budgetValue =
-    budget != null
-      ? `${formatCount(budgetUsed)} / ${formatCount(budget)}`
-      : formatCount(budgetUsed);
+  const evaluatedLabel = `${formatCount(budgetUsed)}개`;
+  const safetyLimitLabel =
+    budget != null ? `${formatCount(budget)}개` : null;
 
   return (
     <section
@@ -179,15 +170,23 @@ export function SearchStatusCard(props: {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatBlock
-          label="합격 목표"
-          value={goalValue}
+          label="합격 후보"
+          value={`${formatCount(qualifiedCount)}개`}
+          hint={
+            qualifiedTarget != null
+              ? `최소 확보 기준: ${qualifiedTarget}개`
+              : null
+          }
           testId="ss-approval-goal"
           emphasize
         />
         <StatBlock
-          label="연구 예산 사용"
-          value={budgetValue}
-          testId="ss-research-budget"
+          label="최소 확보 기준"
+          value={
+            qualifiedTarget != null ? `${qualifiedTarget}개` : "설정 없음"
+          }
+          hint="최소 확보 기준을 충족해도 설정된 탐색 시간이 끝날 때까지 개선을 계속합니다."
+          testId="ss-qualified-target"
         />
         <StatBlock
           label="연구 상태"
@@ -197,13 +196,70 @@ export function SearchStatusCard(props: {
         />
         <StatBlock
           label="종료 사유"
-          value={reason ?? (researching ? "연구 진행 중" : "—")}
+          value={
+            researching
+              ? "연구 진행 중"
+              : reason
+          }
           testId="ss-stop-reason"
         />
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <StatBlock
+          label="평가한 후보"
+          value={`평가한 후보 ${evaluatedLabel}`}
+          hint={
+            safetyLimitLabel
+              ? `자원 안전 제한 ${safetyLimitLabel} — 정상 종료 조건이 아닙니다.`
+              : "정상 종료는 탐색 시간 마감(DEADLINE_REACHED)입니다."
+          }
+          testId="ss-research-budget"
+        />
+        <StatBlock
+          label={job.status === "paused" ? "활성 경과" : "경과 시간"}
+          value={elapsed ?? "레거시 타이밍 없음"}
+          testId="ss-elapsed"
+        />
+        <StatBlock
+          label={job.status === "paused" ? "재개 후 남은 시간" : "남은 시간"}
+          value={remaining ?? "레거시 타이밍 없음"}
+          testId="ss-remaining"
+        />
+        <StatBlock
+          label="예상 완료"
+          value={expectedCompletion ?? "—"}
+          testId="ss-expected-completion"
+        />
+        <StatBlock
+          label="현재 최고 수익"
+          value={bestReturn ?? "—"}
+          testId="ss-best-return"
+          emphasize
+        />
+        <StatBlock
+          label="실제 선택 심볼"
+          value={(job.symbols ?? []).join(", ") || "—"}
+          testId="ss-actual-symbols"
+        />
+      </div>
+      {safetyLimitLabel ? (
+        <p
+          className="text-xs text-slate-500"
+          data-testid="ss-resource-safety-limit"
+        >
+          자원 안전 제한: {safetyLimitLabel} (정상 완료 목표가 아님)
+        </p>
+      ) : null}
+
       <div data-testid="ss-search-progression" className="space-y-3">
         <div className="ss-subsection-title">탐색 파이프라인</div>
+        {stages.length === 0 ? (
+          <p className="text-sm text-slate-400" data-testid="ss-pipeline-empty">
+            활성 탐색 공간이 아직 로드되지 않았습니다. 연구가 시작되면 실제
+            후보 가족이 표시됩니다.
+          </p>
+        ) : null}
         <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2">
           {stages.map((step, idx) => (
             <li key={step.id} className="flex items-center gap-2">
@@ -226,13 +282,23 @@ export function SearchStatusCard(props: {
         </ol>
       </div>
 
-      {job.failureMessage && job.status === "failed" ? (
+      {job.status === "failed" ? (
         <div
-          className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-100"
+          className="space-y-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-100"
           data-testid="ss-failure-message"
           role="alert"
         >
-          {job.failureMessage}
+          <p className="font-semibold">
+            탐색 작업은 실패했지만 검증된 후보 {formatCount(qualifiedCount)}개는
+            저장되었습니다.
+          </p>
+          <p data-testid="ss-failure-cause">원인: {reason}</p>
+          <details className="text-xs text-red-50/90">
+            <summary className="cursor-pointer select-none">기술 정보</summary>
+            <pre className="mt-2 whitespace-pre-wrap break-all opacity-90">
+              {job.failureMessage || job.terminationReason || job.completionReason || "—"}
+            </pre>
+          </details>
         </div>
       ) : null}
 
@@ -245,7 +311,39 @@ export function SearchStatusCard(props: {
         <Metric label="검증한 전략" value={formatCount(tested)} />
         {bestReturn ? <Metric label="최고 수익률" value={bestReturn} /> : null}
         {bestSummary ? <Metric label="현재 최고" value={bestSummary} /> : null}
+        {generationCount != null ? (
+          <div data-testid="ss-generation-count">
+            <Metric label="연구 세대" value={formatCount(generationCount)} />
+          </div>
+        ) : null}
       </div>
+
+      {(latestWeaknessKo || latestAdjustmentKo) && (
+        <div
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-50"
+          data-testid="ss-weakness-adjustment"
+        >
+          {latestWeaknessKo ? <p>최신 약점: {latestWeaknessKo}</p> : null}
+          {latestAdjustmentKo ? (
+            <p className="mt-1">자동 보완: {latestAdjustmentKo}</p>
+          ) : null}
+        </div>
+      )}
+
+      {job.lastMutation?.firstChange ? (
+        <div
+          className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-50"
+          data-testid="ss-applied-mutation"
+        >
+          <p className="font-medium">적용된 탐색 보완</p>
+          <p className="mt-1">
+            {job.lastMutation.firstChange.key}.
+            {job.lastMutation.firstChange.field}:{" "}
+            {job.lastMutation.firstChange.from}→
+            {job.lastMutation.firstChange.to}
+          </p>
+        </div>
+      ) : null}
 
       <details className="ss-advanced-group">
         <summary className="ss-subsection-title cursor-pointer">

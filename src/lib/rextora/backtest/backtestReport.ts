@@ -5,6 +5,7 @@ import type {
   BacktestZeroTradeDiagnostics,
   MonthlyReturnRow,
 } from "./backtestTypes";
+import { buildTradeEventTraces } from "./tradeEventTrace";
 
 export type { BacktestReport, MonthlyReturnRow };
 
@@ -218,6 +219,7 @@ export function buildBacktestReport(input: {
   paramsHashVerified?: boolean;
   costStress?: BacktestReport["costStress"];
   zeroTradeDiagnostics?: BacktestZeroTradeDiagnostics | null;
+  rejectedSetups?: BacktestReport["rejectedSetups"];
 }): BacktestReport {
   const { startingBalance, endingBalance, trades } = input;
   const metrics = aggregateBacktestMetrics(input);
@@ -247,6 +249,11 @@ export function buildBacktestReport(input: {
     endingBalance: Number(endingBalance.toFixed(4)),
     costStress: input.costStress,
     zeroTradeDiagnostics: input.zeroTradeDiagnostics ?? null,
+    tradeEventTraces: buildTradeEventTraces(
+      trades as Array<BacktestTrade & Record<string, unknown>>,
+      { symbol: input.symbol, timeframe: input.timeframe },
+    ),
+    rejectedSetups: input.rejectedSetups ?? undefined,
     validation: {
       paramsHashVerified: input.paramsHashVerified ?? true,
       feesApplied: input.feesApplied ?? true,
