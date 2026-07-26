@@ -41,45 +41,94 @@ export type TradingStyleId = "scalping" | "balanced" | "stable";
 /** Beginner-facing preset aliases mapped onto verified trading styles. */
 export type BeginnerPresetId = "safe" | "balanced" | "aggressive";
 
+export type LeverageModeId =
+  | "automatic"
+  | "fixed"
+  | "range"
+  | "disabled";
+
+export const SEARCHABLE_SPACE_OPTIONS = [
+  { id: "ema_core", labelKo: "EMA / 추세 추종" },
+  { id: "rsi_pullback", labelKo: "RSI / 되돌림" },
+  { id: "breakout", labelKo: "변동성 돌파" },
+  { id: "risk_exits", labelKo: "ATR 위험 관리" },
+  { id: "full_safe", labelKo: "통합 SafeV44" },
+] as const;
+
+/** Pattern Search spaces selectable from the capability matrix (not SafeV44 families). */
+export const SEARCHABLE_PATTERN_SPACE_OPTIONS = [
+  { id: "order_block", labelKo: "Order Block" },
+  { id: "fvg", labelKo: "Fair Value Gap" },
+  { id: "trendline", labelKo: "Trendline" },
+  { id: "support_resistance", labelKo: "Support / Resistance" },
+] as const;
+
 export const BEGINNER_PRESET_MAP: Record<
   BeginnerPresetId,
   {
     labelKo: string;
     tradingStyle: TradingStyleId;
+    /** Compact chips for beginner UI scan. */
+    criteriaChips: string[];
+    /** Longer lines kept for accessibility / tests. */
     criteriaKo: string[];
   }
 > = {
   safe: {
     labelKo: "안전형",
     tradingStyle: "stable",
+    criteriaChips: [
+      "최대낙폭 15%",
+      "최소거래 20회",
+      "최소수익 5%",
+      "비용반영",
+      "거래 안정성",
+      "과거데이터 검사",
+    ],
     criteriaKo: [
-      "합격 프로필: 안정형 (max MDD 15%, 최소 거래 20회, 최소 수익 5%)",
-      "탐색 깊이: 심층 (지터 검증 ON, 비용 스트레스 ON)",
-      "비용 반영 필수",
-      "강건성 검증 사용",
-      "과적합 위험 검사 (지터·스트레스 결과 기반)",
+      "합격 기준: 안정형 (최대 낙폭 15%, 최소 거래 20회, 최소 수익 5%)",
+      "탐색 깊이: 심층 (비용·안정성 검증 강화)",
+      "수수료·슬리피지 반영 필수",
+      "거래 안정성 검증 사용",
+      "과거 데이터 편중 위험 검사",
     ],
   },
   balanced: {
     labelKo: "균형형",
     tradingStyle: "balanced",
+    criteriaChips: [
+      "최대낙폭 25%",
+      "최소거래 10회",
+      "최소수익 0%",
+      "비용반영",
+      "거래 안정성",
+      "과거데이터 검사",
+    ],
     criteriaKo: [
-      "합격 프로필: 균형형 (max MDD 25%, 최소 거래 10회, 최소 수익 0%)",
-      "탐색 깊이: 표준 (비용 스트레스 ON)",
-      "비용 반영 필수",
-      "강건성 검증 사용",
-      "과적합 위험 검사",
+      "합격 기준: 균형형 (최대 낙폭 25%, 최소 거래 10회, 최소 수익 0%)",
+      "탐색 깊이: 표준 (비용 검증 포함)",
+      "수수료·슬리피지 반영 필수",
+      "거래 안정성 검증 사용",
+      "과거 데이터 편중 위험 검사",
     ],
   },
   aggressive: {
     labelKo: "공격형",
     tradingStyle: "scalping",
+    criteriaChips: [
+      "최대낙폭 40%",
+      "최소거래 5회",
+      "빠른 탐색",
+      "비용반영",
+      "거래 안정성",
+      "과거데이터 검사",
+    ],
     criteriaKo: [
-      "합격 프로필: 수익형 (max MDD 40%, 최소 거래 5회)",
-      "탐색 깊이: 빠른 탐색 (비용 스트레스 ON)",
-      "비용 반영 필수",
-      "빠른 후보 평가",
-      "과적합 위험 검사",
+      "합격 기준: 수익형 (최대 낙폭 40%, 최소 거래 5회)",
+      "탐색 깊이: 빠른 탐색 (비용 검증 포함)",
+      "수수료·슬리피지 반영 필수",
+      "빠른 탐색 전략 평가",
+      "과거 데이터 편중 위험 검사",
     ],
   },
 };
@@ -149,7 +198,7 @@ export const SEARCH_DEPTH_PROFILES: Record<
   fast: {
     id: "fast",
     labelKo: "빠른 탐색",
-    descriptionKo: "빠르게 후보를 확인합니다.",
+    descriptionKo: "빠르게 탐색 전략을 확인합니다.",
     stageBatchSize: 20,
     candidateBudget: 100,
     maxRuntimeMs: 10 * 60 * 1000,
@@ -221,7 +270,7 @@ export const QUALIFICATION_PROFILES: Record<
   aggressive: {
     id: "aggressive",
     labelKo: "수익형",
-    descriptionKo: "최소 수익률 제한 없음. 낙폭 허용 폭이 넓어 손실 후보도 합격할 수 있습니다.",
+    descriptionKo: "최소 수익률 제한 없음. 낙폭 허용 폭이 넓어 손실 전략도 합격할 수 있습니다.",
     minTradeCount: 5,
     minTotalReturn: null,
     maxMddAbs: 0.4,
@@ -288,7 +337,30 @@ export interface StrategySearchOperatorFormState {
   candidateBudgetOverride: string;
   /** Empty = use depth profile; minutes when set */
   maxRuntimeMinutesOverride: string;
+  /** Advanced: auto-pause when error rate exceeds thresholds */
+  errorWarningRate: string;
+  errorAutoPauseRate: string;
+  repeatedSignatureThreshold: string;
   showAdvanced: boolean;
+  /** Strategy family spaces (SafeV44 only). Empty = depth profile default. */
+  selectedSpaceIds: string[];
+  /** When true, use depth-profile space list automatically. */
+  autoStrategyCombo: boolean;
+  /** Pattern Search configuration depth (UI → applied ranges). */
+  patternConfigLevel: "automatic" | "basic" | "expert";
+  /** Basic pattern knobs (applied when patternConfigLevel is basic/expert). */
+  patternDirection: "both" | "long" | "short";
+  patternRetestMode: "required" | "optional" | "disabled";
+  patternConfirmStrength: "standard" | "strict";
+  patternConfirmClose: "required" | "disabled";
+  patternExpiryBars: string;
+  patternRiskStyle: "conservative" | "balanced" | "aggressive";
+  patternStrength: "loose" | "standard" | "strict";
+  patternSrSensitivity: "tight" | "standard" | "loose";
+  leverageMode: LeverageModeId;
+  leverageFixed: string;
+  leverageMin: string;
+  leverageMax: string;
   /**
    * Legacy aliases kept for older unit tests / transitional callers.
    * Prefer symbol / depthProfile / qualificationProfile / minTotalReturn.
@@ -521,10 +593,29 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     jitterEnabled: depth.jitterEnabled,
     jitterSamples: depth.jitterSamples,
     jitterMutationScale: depth.jitterMutationScale,
-    candidateBudgetOverride: depth.candidateBudgetOverride,
+    /** Empty = use depth profile candidateBudget (not a hard total evaluation count). */
+    candidateBudgetOverride: "",
     /** Primary duration default: 3 hours. */
     maxRuntimeMinutesOverride: "180",
+    errorWarningRate: "0.35",
+    errorAutoPauseRate: "0.55",
+    repeatedSignatureThreshold: "25",
     showAdvanced: false,
+    selectedSpaceIds: SEARCHABLE_SPACE_OPTIONS.map((s) => s.id),
+    autoStrategyCombo: true,
+    patternConfigLevel: "automatic",
+    patternDirection: "both",
+    patternRetestMode: "required",
+    patternConfirmStrength: "standard",
+    patternConfirmClose: "required",
+    patternExpiryBars: "48",
+    patternRiskStyle: "balanced",
+    patternStrength: "standard",
+    patternSrSensitivity: "standard",
+    leverageMode: "automatic",
+    leverageFixed: "3",
+    leverageMin: "1",
+    leverageMax: "5",
   };
 }
 
@@ -590,6 +681,9 @@ export function operatorFormToCreateBody(
       ]
     : [];
 
+  const warnRate = optionalNum(form.errorWarningRate);
+  const autoPauseRate = optionalNum(form.errorAutoPauseRate);
+  const repeatedSig = optionalNum(form.repeatedSignatureThreshold);
   const operatorPlan: StrategySearchOperatorPlan = {
     depthProfile: depthId,
     qualificationProfile: qualId,
@@ -601,6 +695,53 @@ export function operatorFormToCreateBody(
     maxRuntimeMs,
     minScore,
     searchName: searchName.slice(0, 80),
+    errorWarningRate:
+      warnRate != null && warnRate >= 0 && warnRate <= 1 ? warnRate : 0.35,
+    errorAutoPauseRate:
+      autoPauseRate != null && autoPauseRate >= 0 && autoPauseRate <= 1
+        ? autoPauseRate
+        : 0.55,
+    repeatedSignatureThreshold:
+      repeatedSig != null && Number.isFinite(repeatedSig)
+        ? Math.max(1, Math.trunc(repeatedSig))
+        : 25,
+    selectedSpaceIds: form.autoStrategyCombo
+      ? null
+      : form.selectedSpaceIds.length > 0
+        ? [...form.selectedSpaceIds]
+        : null,
+    leverageMode: form.leverageMode,
+    leverageFixed:
+      form.leverageMode === "fixed"
+        ? Math.max(1, Number(form.leverageFixed) || 1)
+        : null,
+    leverageMin:
+      form.leverageMode === "range" || form.leverageMode === "automatic"
+        ? Math.max(1, Number(form.leverageMin) || 1)
+        : form.leverageMode === "disabled"
+          ? 1
+          : null,
+    leverageMax:
+      form.leverageMode === "range" || form.leverageMode === "automatic"
+        ? Math.max(1, Number(form.leverageMax) || 1)
+        : form.leverageMode === "disabled"
+          ? 1
+          : form.leverageMode === "fixed"
+            ? Math.max(1, Number(form.leverageFixed) || 1)
+            : null,
+    adaptiveLeverageEnabled: form.leverageMode === "automatic",
+    patternConfigLevel: form.patternConfigLevel,
+    patternDirection: form.patternDirection,
+    patternRetestMode: form.patternRetestMode,
+    patternConfirmStrength: form.patternConfirmStrength,
+    patternConfirmClose: form.patternConfirmClose,
+    patternExpiryBars: Math.max(
+      12,
+      Math.min(96, Math.trunc(Number(form.patternExpiryBars) || 48)),
+    ),
+    patternRiskStyle: form.patternRiskStyle,
+    patternStrength: form.patternStrength,
+    patternSrSensitivity: form.patternSrSensitivity,
   };
 
   return {
@@ -664,6 +805,7 @@ export function operatorFormToCreateBody(
       availableTo,
     },
     operatorPlan,
+    marketMode: form.marketMode,
   };
 }
 

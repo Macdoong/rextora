@@ -512,8 +512,8 @@ a {
 }
 
 [data-testid="strategy-search-page"] .ss-field-label {
-  font-size: 0.8125rem;
-  line-height: 1.35;
+  font-size: 1rem;
+  line-height: 1.4;
   font-weight: 650;
   letter-spacing: 0.01em;
   color: color-mix(in srgb, var(--text-secondary) 92%, var(--text-primary));
@@ -539,14 +539,21 @@ a {
 }
 
 [data-testid="strategy-search-page"] .ss-input {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   width: 100%;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-strong);
+  border: 2px solid var(--border-strong);
   background: var(--bg-elevated);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9375rem; /* 15px */
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
   color: var(--text-primary);
+}
+
+[data-testid="strategy-search-page"] .ss-section-card {
+  border: 2px solid var(--border);
+  background: var(--panel-strong);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
 }
 
 [data-testid="strategy-search-page"] .ss-input::placeholder {

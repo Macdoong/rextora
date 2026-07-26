@@ -9,6 +9,7 @@ export type StrategySearchJobStatus =
   | "pause_requested"
   | "paused"
   | "cancel_requested"
+  | "cancelling"
   | "cancelled"
   | "completed"
   | "failed";
@@ -413,6 +414,12 @@ export interface StrategySearchJob {
   startedAt: string | null;
   finishedAt: string | null;
   failureMessage: string | null;
+  /** When the operator requested stop (cancel_requested). */
+  cancelRequestedAt?: string | null;
+  /** When cancellation was acknowledged / finalized. */
+  cancellationAcknowledgedAt?: string | null;
+  /** True when trials/Top-10 were preserved through cancellation. */
+  resultsPreserved?: boolean | null;
 }
 
 export interface StrategySearchFailureReason {

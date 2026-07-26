@@ -2,8 +2,13 @@ import type { StrategySearchCreateJobBody } from "./types";
 import {
   OPERATOR_SUPPORTED_SYMBOLS,
   OPERATOR_SUPPORTED_TIMEFRAMES,
+  SEARCHABLE_PATTERN_SPACE_OPTIONS,
+  SEARCHABLE_SPACE_OPTIONS,
+  getDepthProfile,
   operatorFormToCreateBody,
   resolveCandidateBudget,
+  resolveDepthProfileId,
+  resolveMaxRuntimeMs,
   resolveQualifiedTarget,
   resolveSymbol,
   type StrategySearchOperatorFormState,
@@ -12,6 +17,55 @@ import {
 export interface FormFieldError {
   field: string;
   message: string;
+}
+
+const ALLOWED_SPACE_IDS = new Set<string>([
+  ...SEARCHABLE_SPACE_OPTIONS.map((s) => s.id),
+  ...SEARCHABLE_PATTERN_SPACE_OPTIONS.map((s) => s.id),
+]);
+
+const PATTERN_SPACE_IDS = new Set<string>(
+  SEARCHABLE_PATTERN_SPACE_OPTIONS.map((s) => s.id),
+);
+
+/**
+ * Validate selected strategy-family / pattern combination before Research start.
+ * Blocks unknown ids and empty manual selections.
+ */
+export function validatePatternCombination(
+  selectedSpaceIds: string[],
+  opts?: { autoStrategyCombo?: boolean },
+): FormFieldError[] {
+  const errors: FormFieldError[] = [];
+  if (opts?.autoStrategyCombo) return errors;
+  if (!Array.isArray(selectedSpaceIds) || selectedSpaceIds.length === 0) {
+    errors.push({
+      field: "selectedSpaceIds",
+      message:
+        "전략 계열 또는 패턴을 하나 이상 선택하세요. (자동 조합을 켜도 됩니다)",
+    });
+    return errors;
+  }
+  const unknown = selectedSpaceIds.filter((id) => !ALLOWED_SPACE_IDS.has(id));
+  if (unknown.length > 0) {
+    errors.push({
+      field: "selectedSpaceIds",
+      message: `지원하지 않는 탐색 공간: ${unknown.join(", ")}`,
+    });
+  }
+  // Contradictory: exclusive pattern-only short-circuit not needed; all four
+  // patterns can co-exist with SafeV44. Reject duplicate-only empty after filter.
+  const known = selectedSpaceIds.filter((id) => ALLOWED_SPACE_IDS.has(id));
+  if (known.length === 0) {
+    errors.push({
+      field: "selectedSpaceIds",
+      message: "지원되는 전략 계열/패턴이 없습니다.",
+    });
+  }
+  // Pattern + indicator confirmation is allowed; flag only if patterns alone
+  // request incompatible timeframe is handled elsewhere.
+  void PATTERN_SPACE_IDS;
+  return errors;
 }
 
 function isFiniteNumber(n: number): boolean {
@@ -96,7 +150,7 @@ export function validateStrategySearchForm(
     if (!Number.isInteger(n) || n < 1) {
       errors.push({
         field: "candidateBudget",
-        message: "후보 예산은 1 이상의 정수여야 합니다.",
+        message: "탐색 전략 한도는 1 이상의 정수여야 합니다.",
       });
     }
   }
@@ -206,12 +260,18 @@ export function validateStrategySearchForm(
     });
   }
 
+  errors.push(
+    ...validatePatternCombination(form.selectedSpaceIds, {
+      autoStrategyCombo: form.autoStrategyCombo,
+    }),
+  );
+
   if (typeof form.maxSearchCount !== "string") {
     const budget = resolveCandidateBudget(form);
     if (!Number.isInteger(budget) || budget < 1) {
       errors.push({
         field: "candidateBudget",
-        message: "후보 예산을 확인할 수 없습니다.",
+        message: "탐색 전략 한도를 확인할 수 없습니다.",
       });
     }
   }
@@ -244,6 +304,136 @@ export function summarizeStrategySearchConfig(
     labelKo: auto ? "자동 보정 가능" : "수정 필요",
     errors,
   };
+}
+
+export type AppliedSettingsPreviewRow = {
+  labelKo: string;
+  valueKo: string;
+  hintKo?: string;
+};
+
+function formatRuntimeKo(ms: number | null): string {
+  if (ms == null || !Number.isFinite(ms) || ms <= 0) return "—";
+  const minutes = Math.round(ms / 60_000);
+  if (minutes >= 60 && minutes % 60 === 0) {
+    return `${minutes / 60}시간`;
+  }
+  if (minutes >= 60) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
+  }
+  return `${minutes}분`;
+}
+
+/** Operator-facing applied settings preview (no internal resource ceilings). */
+export function buildAppliedSettingsPreview(
+  form: StrategySearchOperatorFormState,
+): {
+  summary: ConfigValidationSummary;
+  rows: AppliedSettingsPreviewRow[];
+} {
+  const summary = summarizeStrategySearchConfig(form);
+  const depth = getDepthProfile(resolveDepthProfileId(form));
+  const candidateBudget = resolveCandidateBudget(form);
+  const rows: AppliedSettingsPreviewRow[] = [
+    {
+      labelKo: "심볼",
+      valueKo: form.symbol || "—",
+    },
+    {
+      labelKo: "타임프레임",
+      valueKo: form.timeframe || "—",
+    },
+    {
+      labelKo: "연구 시간",
+      valueKo: formatRuntimeKo(resolveMaxRuntimeMs(form)),
+    },
+    {
+      labelKo: "전략 패밀리",
+      valueKo: form.autoStrategyCombo
+        ? "자동 조합"
+        : form.selectedSpaceIds.length > 0
+          ? form.selectedSpaceIds.join(", ")
+          : "깊이 프로필 기본",
+    },
+    {
+      labelKo: "레버리지",
+      valueKo:
+        form.leverageMode === "fixed"
+          ? `고정 ${form.leverageFixed}x`
+          : form.leverageMode === "range"
+            ? `범위 ${form.leverageMin}x–${form.leverageMax}x`
+            : form.leverageMode === "disabled"
+              ? "사용 안 함 (1x)"
+              : "자동 추천",
+    },
+    {
+      labelKo: "목표 수익",
+      valueKo: form.minTotalReturn.trim()
+        ? `${Number(form.minTotalReturn).toFixed(1)}%`
+        : "프로필 기본",
+    },
+    {
+      labelKo: "최대 낙폭",
+      valueKo: form.maxMdd.trim()
+        ? `${Number(form.maxMdd).toFixed(1)}%`
+        : "프로필 기본",
+    },
+    {
+      labelKo: "최소 거래",
+      valueKo: form.minTradeCount.trim() || "프로필 기본",
+    },
+    {
+      labelKo: "합격 프로필",
+      valueKo: form.qualificationProfile,
+    },
+    {
+      labelKo: "비용 스트레스",
+      valueKo: form.stressEnabled ? "사용" : "미사용",
+    },
+    {
+      labelKo: "견고성(지터)",
+      valueKo: form.jitterEnabled ? "사용" : "미사용",
+    },
+    {
+      labelKo: "패턴 설정",
+      valueKo:
+        form.patternConfigLevel === "automatic"
+          ? "자동 추천"
+          : [
+              form.patternDirection,
+              `리테스트 ${form.patternRetestMode}`,
+              `강도 ${form.patternStrength}`,
+              `확인종가 ${form.patternConfirmClose}`,
+            ].join(" · "),
+    },
+    {
+      labelKo: "세대당 생성 수",
+      valueKo: String(depth.stageBatchSize),
+    },
+    {
+      labelKo: "초기 평가 묶음",
+      valueKo: String(candidateBudget),
+      hintKo:
+        "마감 시간 모드에서는 예산이 소진되면 추가 묶음으로 보충될 수 있습니다. 총 평가 수가 아닙니다.",
+    },
+    {
+      labelKo: "합격 목표",
+      valueKo: String(resolveQualifiedTarget(form)),
+    },
+    {
+      labelKo: "장기 저장 결과",
+      valueKo: "TOP 10",
+    },
+  ];
+  if (form.candidateBudgetOverride.trim() !== "") {
+    rows.splice(rows.findIndex((r) => r.labelKo === "초기 평가 묶음") + 1, 0, {
+      labelKo: "초기 평가 묶음(재정의)",
+      valueKo: form.candidateBudgetOverride.trim(),
+    });
+  }
+  return { summary, rows };
 }
 
 export function buildCreateBodyIfValid(

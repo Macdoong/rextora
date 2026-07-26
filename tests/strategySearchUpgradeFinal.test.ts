@@ -135,6 +135,10 @@ describe("strategy search upgrade — presets and form", () => {
     expect(BEGINNER_PRESET_MAP.balanced.tradingStyle).toBe("balanced");
     expect(BEGINNER_PRESET_MAP.aggressive.tradingStyle).toBe("scalping");
     expect(BEGINNER_PRESET_MAP.balanced.criteriaKo.length).toBeGreaterThan(2);
+    expect(BEGINNER_PRESET_MAP.balanced.criteriaChips.length).toBeGreaterThan(3);
+    expect(BEGINNER_PRESET_MAP.balanced.criteriaChips.join(" ")).toContain(
+      "최대낙폭",
+    );
   });
 
   it("standard create body enables robustness checks and keeps duration", () => {
@@ -240,13 +244,23 @@ describe("strategy search upgrade — UI contracts + SAFE", () => {
       path.join(process.cwd(), "components/rextora/results/ResultsWorkbench.tsx"),
       "utf8",
     );
+    const currentResearch = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components/rextora/results/CurrentResearchResultsPanel.tsx",
+      ),
+      "utf8",
+    );
     expect(status).toContain("resolveDisplayTerminationReason");
     expect(status).toContain("자원 안전 제한");
-    expect(status).toContain("검증된 후보");
+    expect(status).toContain("검증된 전략");
     expect(completion).toContain("정상 종료 조건 아님");
     expect(completion).not.toMatch(/\$\{formatCount\(budgetUsed\)\} \/ \$\{formatCount\(budget\)\}/);
-    expect(results).toContain("새 기간으로 백테스트");
-    expect(results).toContain("strategyHash=");
+    expect(currentResearch).toContain("새 기간으로 백테스트");
+    expect(currentResearch).toContain("전략 등록 후 백테스트");
+    expect(currentResearch).toMatch(/strategyHash/);
+    expect(currentResearch).toContain("sourceResearchJobId");
+    expect(currentResearch).toContain("sourceTrialIteration");
     expect(results).toContain("추천 가능한 안정 전략 없음");
   });
 

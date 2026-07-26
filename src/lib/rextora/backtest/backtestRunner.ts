@@ -327,6 +327,16 @@ export async function runConfiguredBacktest(
         !!def.eventSequence && validateEventSequence(def.eventSequence).ok;
 
       if (useEventSequence) {
+        const meta = def.metadata ?? {};
+        const levParams =
+          meta.lev_base != null || meta.use_dynamic_leverage != null
+            ? {
+                lev_min: meta.lev_min,
+                lev_base: meta.lev_base,
+                lev_max: meta.lev_max,
+                use_dynamic_leverage: meta.use_dynamic_leverage,
+              }
+            : null;
         const es = runEventSequenceBacktest({
           def,
           symbol,
@@ -334,6 +344,7 @@ export async function runConfiguredBacktest(
           balance: perSymbolBalance,
           feeRate,
           slippageRate,
+          params: levParams,
         });
         resultTrades = es.trades;
         resultEquity = es.equityCurve;
@@ -454,6 +465,16 @@ export async function runConfiguredBacktest(
         const s = config.slippageRate * mult;
         const sp = (config.applySpread ? config.spreadRate : 0) * mult;
         if (useEventSequence) {
+          const meta = def.metadata ?? {};
+          const levParams =
+            meta.lev_base != null || meta.use_dynamic_leverage != null
+              ? {
+                  lev_min: meta.lev_min,
+                  lev_base: meta.lev_base,
+                  lev_max: meta.lev_max,
+                  use_dynamic_leverage: meta.use_dynamic_leverage,
+                }
+              : null;
           const es = runEventSequenceBacktest({
             def,
             symbol,
@@ -461,6 +482,7 @@ export async function runConfiguredBacktest(
             balance: perSymbolBalance,
             feeRate: f,
             slippageRate: s,
+            params: levParams,
           });
           const totalReturn =
             perSymbolBalance > 0

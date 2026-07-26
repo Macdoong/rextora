@@ -19,6 +19,12 @@ import {
   generateUniqueCandidate,
 } from "./candidateGenerator";
 import {
+  classifyEngineError,
+  isRecoverableGenerationError,
+} from "./engineErrorClassification";
+import { StrategySearchJitterError } from "./jitterEvaluator";
+import { createStrategySearchCandidateId } from "./searchId";
+import {
   buildPersistedCheckpoint,
   createInitialRunnerPayload,
   readRunnerPayloadFromCheckpoint,
@@ -32,6 +38,13 @@ import {
   updateSearchCheckpoint,
   type StrategySearchStoreOptions,
 } from "./jobStore";
+import {
+  getSearchPlan,
+  markPlanPaused,
+  saveSearchPlan,
+} from "./searchPlan";
+import { refreshLiveResearchTop10 } from "./researchResultsSummary";
+import { finalizeResearchTop10 } from "./researchTop10";
 import {
   createEmptyJobStatistics,
   isBetterScore,
@@ -47,6 +60,7 @@ import {
   isTerminalJobStatus,
   transitionJobToCancelRequested,
   transitionJobToCancelled,
+  transitionJobToCancelling,
   transitionJobToCompleted,
   transitionJobToFailed,
   transitionJobToPauseRequested,
@@ -128,6 +142,17 @@ export interface RunSearchJobResult {
     | "failed"
     | "max_iterations"
     | "search_space_exhausted";
+}
+
+function freezeLiveTop10OnTerminal(
+  jobId: string,
+  store?: StrategySearchStoreOptions,
+): void {
+  try {
+    finalizeResearchTop10(jobId, store);
+  } catch {
+    /* non-fatal — live snapshot remains usable */
+  }
 }
 
 function cloneBest(
@@ -283,8 +308,16 @@ export async function runSearchJob(
   }
 
   // Cancel requested before the runner loop starts (e.g. during candle load).
-  if (job.status === "cancel_requested") {
+  if (job.status === "cancel_requested" || job.status === "cancelling") {
+    if (job.status === "cancel_requested") {
+      try {
+        transitionJobToCancelling(job.id, store);
+      } catch {
+        /* race with external finalize — still settle cancelled */
+      }
+    }
     job = transitionJobToCancelled(job.id, store);
+    freezeLiveTop10OnTerminal(job.id, store);
     return {
       job,
       statistics: createEmptyJobStatistics(),
@@ -361,6 +394,8 @@ export async function runSearchJob(
     }
   }
   let iterationsThisRun = 0;
+  let lastLiveTop10Passed = 0;
+  const LIVE_TOP10_EVERY_PASSED = 5;
   const startedMs = Date.now() - statistics.elapsedMs;
 
   const maxIterations = job.config.maxIterations;
@@ -380,8 +415,25 @@ export async function runSearchJob(
       }
       job = latest;
 
-      if (job.status === "cancel_requested") {
+      if (job.status === "cancelled") {
+        freezeLiveTop10OnTerminal(job.id, store);
+        return {
+          job,
+          statistics,
+          iterationsCompletedThisRun: iterationsThisRun,
+          stopReason: "cancelled",
+        };
+      }
+      if (job.status === "cancel_requested" || job.status === "cancelling") {
+        if (job.status === "cancel_requested") {
+          try {
+            transitionJobToCancelling(job.id, store);
+          } catch {
+            /* race with external finalize — still settle cancelled */
+          }
+        }
         job = transitionJobToCancelled(job.id, store);
+        freezeLiveTop10OnTerminal(job.id, store);
         return {
           job,
           statistics,
@@ -447,6 +499,7 @@ export async function runSearchJob(
           maxCheckpointRetries,
         );
         job = transitionJobToCompleted(job.id, store);
+        freezeLiveTop10OnTerminal(job.id, store);
         return {
           job,
           statistics,
@@ -459,28 +512,33 @@ export async function runSearchJob(
       // Re-run generation to advance PRNG deterministically, then verify hash match.
       const existingTrial = getSearchTrial(job.id, iteration, store);
       if (existingTrial) {
-        let replayed: StrategySearchCandidate;
-        try {
-          replayed = generateNextCandidate({
-            job,
-            iteration,
-            random,
-            seenHashes,
-            baseParams,
-            lastParent,
-          });
-        } catch (err) {
-          throw new StrategySearchJobRunnerError(
-            "FATAL",
-            "failed to replay candidate generation for existing trial",
-            err,
-          );
-        }
-        if (replayed.paramsHash !== existingTrial.paramsHash) {
-          throw new StrategySearchJobRunnerError(
-            "FATAL",
-            `checkpoint/trial mismatch at iteration ${iteration}: expected ${existingTrial.paramsHash}, replayed ${replayed.paramsHash}`,
-          );
+        const isInvalidPlaceholder =
+          typeof existingTrial.paramsHash === "string" &&
+          existingTrial.paramsHash.startsWith("invalid_");
+        if (!isInvalidPlaceholder) {
+          let replayed: StrategySearchCandidate;
+          try {
+            replayed = generateNextCandidate({
+              job,
+              iteration,
+              random,
+              seenHashes,
+              baseParams,
+              lastParent,
+            });
+          } catch (err) {
+            throw new StrategySearchJobRunnerError(
+              "FATAL",
+              "failed to replay candidate generation for existing trial",
+              err,
+            );
+          }
+          if (replayed.paramsHash !== existingTrial.paramsHash) {
+            throw new StrategySearchJobRunnerError(
+              "FATAL",
+              `checkpoint/trial mismatch at iteration ${iteration}: expected ${existingTrial.paramsHash}, replayed ${replayed.paramsHash}`,
+            );
+          }
         }
         seenHashes.add(existingTrial.paramsHash);
         // Stats were not checkpointed for this trial yet when completed === iteration.
@@ -528,18 +586,23 @@ export async function runSearchJob(
             passed: true,
           };
         }
-        lastParent = {
-          candidateId: existingTrial.candidateId,
-          jobId: job.id,
-          iteration: existingTrial.iteration,
-          generatorType: existingTrial.generatorType,
-          parentCandidateIds: [...existingTrial.parentCandidateIds],
-          params: {
-            ...(existingTrial.params as Record<string, StrategySearchParameterValue>),
-          },
-          paramsHash: existingTrial.paramsHash,
-          createdAt: existingTrial.createdAt,
-        };
+        if (!isInvalidPlaceholder) {
+          lastParent = {
+            candidateId: existingTrial.candidateId,
+            jobId: job.id,
+            iteration: existingTrial.iteration,
+            generatorType: existingTrial.generatorType,
+            parentCandidateIds: [...existingTrial.parentCandidateIds],
+            params: {
+              ...(existingTrial.params as Record<
+                string,
+                StrategySearchParameterValue
+              >),
+            },
+            paramsHash: existingTrial.paramsHash,
+            createdAt: existingTrial.createdAt,
+          };
+        }
         completed += 1;
         iteration += 1;
         continue;
@@ -596,6 +659,7 @@ export async function runSearchJob(
             maxCheckpointRetries,
           );
           job = transitionJobToCompleted(job.id, store);
+          freezeLiveTop10OnTerminal(job.id, store);
           return {
             job,
             statistics,
@@ -603,9 +667,81 @@ export async function runSearchJob(
             stopReason: "search_space_exhausted",
           };
         }
+        // Recoverable candidate generation errors (e.g. OUT_OF_RANGE after
+        // space mutation) must not kill the Research Job.
+        if (isRecoverableGenerationError(err)) {
+          const classified = classifyEngineError(err, "candidate_generation");
+          statistics = recordError(statistics);
+          statistics = recordEvaluation(statistics, {
+            score: null,
+            passed: false,
+            stressPassed: false,
+            jitterPassed: false,
+            evaluationFailed: true,
+          });
+          const placeholderId = createStrategySearchCandidateId(
+            job.id,
+            iteration,
+          );
+          const invalidTrial: StrategySearchTrial = {
+            jobId: job.id,
+            iteration,
+            candidateId: placeholderId,
+            generatorType: "random",
+            parentCandidateIds: lastParent ? [lastParent.candidateId] : [],
+            params: {},
+            paramsHash: `invalid_${iteration}`,
+            createdAt: new Date().toISOString(),
+            score: null,
+            passed: false,
+            windowResults: [],
+            costStressResults: [],
+            jitterResults: [],
+            durationMs: 0,
+            failureReasons: [
+              {
+                code: classified.code,
+                message: classified.message,
+              },
+            ],
+          };
+          saveSearchTrial(invalidTrial, store);
+          completed += 1;
+          iteration += 1;
+          iterationsThisRun += 1;
+          statistics = recordElapsed(
+            statistics,
+            Date.now() - startedMs,
+            completed,
+            maxIterations,
+          );
+          payload = {
+            version: 1,
+            prng: random.getState(),
+            statistics: { ...statistics },
+            seenHashes: [...seenHashes],
+            lastParentCandidateId: lastParent?.candidateId ?? null,
+            lastParentParamsHash: lastParent?.paramsHash ?? null,
+            jobStatus: "running",
+          };
+          job = await persistCheckpointWithRetry(
+            job.id,
+            buildPersistedCheckpoint({
+              completedIterations: completed,
+              nextIteration: iteration,
+              payload,
+              bestCandidate,
+              bestPassedCandidate,
+            }),
+            store,
+            maxCheckpointRetries,
+          );
+          continue;
+        }
+        const classified = classifyEngineError(err, "candidate_generation");
         throw new StrategySearchJobRunnerError(
           "FATAL",
-          err instanceof Error ? err.message : "candidate generation failed",
+          `[${classified.class}/${classified.stage}] ${classified.message}`,
           err,
         );
       }
@@ -643,20 +779,30 @@ export async function runSearchJob(
           });
         }
       } catch (err) {
-        // Recoverable evaluation failure
-        statistics = recordError(statistics);
+        const classified = classifyEngineError(err, "evaluation");
+        const jitterCode =
+          err instanceof StrategySearchJitterError ? err.code : null;
+        // Robustness sampling exhaustion / soft robustness failures are
+        // qualification-style rejections, not engine calculation errors.
+        const robustnessReject =
+          jitterCode === "JITTER_DUPLICATE_EXHAUSTED" ||
+          classified.class === "robustness_failed";
+        if (!robustnessReject) {
+          statistics = recordError(statistics);
+        }
         statistics = recordEvaluation(statistics, {
           score: null,
           passed: false,
           stressPassed: false,
           jitterPassed: false,
-          evaluationFailed: true,
+          evaluationFailed: !robustnessReject,
         });
         failureReasons.push({
           code:
-            err && typeof err === "object" && "code" in err
+            jitterCode ??
+            (err && typeof err === "object" && "code" in err
               ? String((err as { code: unknown }).code)
-              : "EVALUATION_ERROR",
+              : classified.code),
           message: err instanceof Error ? err.message : "evaluation failed",
         });
       }
@@ -671,6 +817,20 @@ export async function runSearchJob(
         durationMs,
       });
       saveSearchTrial(trial, store);
+
+      // Live Top-10: refresh when enough new qualified candidates appear.
+      if (
+        trial.passed &&
+        statistics.passed > 0 &&
+        statistics.passed - lastLiveTop10Passed >= LIVE_TOP10_EVERY_PASSED
+      ) {
+        try {
+          refreshLiveResearchTop10(job.id, store);
+          lastLiveTop10Passed = statistics.passed;
+        } catch {
+          /* non-fatal — UI can still show current best */
+        }
+      }
 
       // Best candidate updates (never overwrite with worse)
       const ref: StrategySearchBestCandidateReference = {
@@ -724,6 +884,47 @@ export async function runSearchJob(
         store,
         maxCheckpointRetries,
       );
+
+      // Configurable error-rate auto-pause (Advanced Settings). Never silent stop.
+      const plan = getSearchPlan(job.id, store);
+      const autoPauseRate = plan?.errorAutoPauseRate;
+      if (
+        autoPauseRate != null &&
+        Number.isFinite(autoPauseRate) &&
+        statistics.evaluated >= 20 &&
+        statistics.errors / statistics.evaluated >= autoPauseRate
+      ) {
+        payload = {
+          ...payload,
+          prng: random.getState(),
+          statistics,
+          seenHashes: [...seenHashes],
+          jobStatus: "paused",
+          stopReason: "error_rate_auto_pause",
+        };
+        job = await persistCheckpointWithRetry(
+          job.id,
+          buildPersistedCheckpoint({
+            completedIterations: completed,
+            nextIteration: iteration,
+            payload,
+            bestCandidate,
+            bestPassedCandidate,
+          }),
+          store,
+          maxCheckpointRetries,
+        );
+        job = transitionJobToPaused(job.id, store);
+        if (plan) {
+          saveSearchPlan(job.id, markPlanPaused(plan), store);
+        }
+        return {
+          job,
+          statistics,
+          iterationsCompletedThisRun: iterationsThisRun,
+          stopReason: "paused",
+        };
+      }
     }
   } catch (err) {
     if (err instanceof StrategySearchJobRunnerError) {

@@ -7,7 +7,7 @@ export default function DashboardPage() {
       <PageHeader
         compact
         title="대시보드"
-        description="연구·검토·모의·실전 상태를 확인하고 다음 승인 결정을 내립니다."
+        description="지금 진행 중인 연구와 다음으로 확인할 단계를 한눈에 봅니다. 실전 주문은 승인 전까지 차단됩니다."
       />
       <LifecycleDashboard />
     </div>

@@ -25,6 +25,7 @@ import type {
   QualificationProfileId,
   SearchDepthProfileId,
 } from "./operatorProfiles";
+import { ALL_SEARCH_SPACES } from "./searchSpaces";
 
 export interface ValidatedOperatorPlanInput {
   depthProfile: SearchDepthProfileId;
@@ -37,6 +38,24 @@ export interface ValidatedOperatorPlanInput {
   maxRuntimeMs: number | null;
   minScore: number | null;
   searchName: string;
+  errorWarningRate?: number | null;
+  errorAutoPauseRate?: number | null;
+  repeatedSignatureThreshold?: number | null;
+  selectedSpaceIds?: string[] | null;
+  leverageMode?: "automatic" | "fixed" | "range" | "disabled" | null;
+  leverageFixed?: number | null;
+  leverageMin?: number | null;
+  leverageMax?: number | null;
+  adaptiveLeverageEnabled?: boolean | null;
+  patternConfigLevel?: "automatic" | "basic" | "expert" | null;
+  patternDirection?: "both" | "long" | "short" | null;
+  patternRetestMode?: "required" | "optional" | "disabled" | null;
+  patternConfirmStrength?: "standard" | "strict" | null;
+  patternConfirmClose?: "required" | "disabled" | null;
+  patternExpiryBars?: number | null;
+  patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
+  patternStrength?: "loose" | "standard" | "strict" | null;
+  patternSrSensitivity?: "tight" | "standard" | "loose" | null;
 }
 
 export class StrategySearchApiValidationError extends Error {
@@ -493,7 +512,156 @@ export function validateCreateSearchJobBody(
         details,
       );
     }
+    const parseRate = (raw: unknown, label: string): number | null => {
+      if (raw == null || raw === "") return null;
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0 || n > 1) {
+        details.push(`${label} must be a number between 0 and 1`);
+        return null;
+      }
+      return n;
+    };
+    const errorWarningRate = parseRate(
+      op.errorWarningRate,
+      "operatorPlan.errorWarningRate",
+    );
+    const errorAutoPauseRate = parseRate(
+      op.errorAutoPauseRate,
+      "operatorPlan.errorAutoPauseRate",
+    );
+    let repeatedSignatureThreshold: number | null = null;
+    if (op.repeatedSignatureThreshold != null && op.repeatedSignatureThreshold !== "") {
+      const n = Number(op.repeatedSignatureThreshold);
+      if (!Number.isInteger(n) || n < 1 || n > 10_000) {
+        details.push(
+          "operatorPlan.repeatedSignatureThreshold must be an integer 1–10000",
+        );
+      } else {
+        repeatedSignatureThreshold = n;
+      }
+    }
     if (details.length === 0 && depthOk && qualOk && qt != null && budget != null && stageBatch != null) {
+      const allowedSpaces = new Set(ALL_SEARCH_SPACES.map((s) => s.id));
+      let selectedSpaceIds: string[] | null = null;
+      if (Array.isArray(op.selectedSpaceIds)) {
+        selectedSpaceIds = op.selectedSpaceIds.filter(
+          (id): id is string =>
+            typeof id === "string" && allowedSpaces.has(id),
+        );
+        if (selectedSpaceIds.length === 0) selectedSpaceIds = null;
+      }
+      const levModeRaw = op.leverageMode;
+      const leverageMode =
+        levModeRaw === "automatic" ||
+        levModeRaw === "fixed" ||
+        levModeRaw === "range" ||
+        levModeRaw === "disabled"
+          ? levModeRaw
+          : null;
+      const patternLevelRaw = op.patternConfigLevel;
+      const patternConfigLevel =
+        patternLevelRaw === "automatic" ||
+        patternLevelRaw === "basic" ||
+        patternLevelRaw === "expert"
+          ? patternLevelRaw
+          : patternLevelRaw == null
+            ? "automatic"
+            : null;
+      if (patternLevelRaw != null && patternConfigLevel == null) {
+        details.push("operatorPlan.patternConfigLevel invalid");
+      }
+      const patternDirectionRaw = op.patternDirection;
+      const patternDirection =
+        patternDirectionRaw === "both" ||
+        patternDirectionRaw === "long" ||
+        patternDirectionRaw === "short"
+          ? patternDirectionRaw
+          : patternDirectionRaw == null
+            ? "both"
+            : null;
+      if (patternDirectionRaw != null && patternDirection == null) {
+        details.push("operatorPlan.patternDirection invalid");
+      }
+      const patternRetestRaw = op.patternRetestMode;
+      const patternRetestMode =
+        patternRetestRaw === "required" ||
+        patternRetestRaw === "optional" ||
+        patternRetestRaw === "disabled"
+          ? patternRetestRaw
+          : patternRetestRaw == null
+            ? "required"
+            : null;
+      if (patternRetestRaw != null && patternRetestMode == null) {
+        details.push("operatorPlan.patternRetestMode invalid");
+      }
+      const patternConfirmRaw = op.patternConfirmStrength;
+      const patternConfirmStrength =
+        patternConfirmRaw === "standard" || patternConfirmRaw === "strict"
+          ? patternConfirmRaw
+          : patternConfirmRaw == null
+            ? "standard"
+            : null;
+      if (patternConfirmRaw != null && patternConfirmStrength == null) {
+        details.push("operatorPlan.patternConfirmStrength invalid");
+      }
+      const patternConfirmCloseRaw = op.patternConfirmClose;
+      const patternConfirmClose =
+        patternConfirmCloseRaw === "required" ||
+        patternConfirmCloseRaw === "disabled"
+          ? patternConfirmCloseRaw
+          : patternConfirmCloseRaw == null
+            ? "required"
+            : null;
+      if (patternConfirmCloseRaw != null && patternConfirmClose == null) {
+        details.push("operatorPlan.patternConfirmClose invalid");
+      }
+      let patternExpiryBars: number | null = null;
+      if (op.patternExpiryBars != null && op.patternExpiryBars !== "") {
+        const n = Number(op.patternExpiryBars);
+        if (!Number.isInteger(n) || n < 12 || n > 96) {
+          details.push("operatorPlan.patternExpiryBars must be an integer 12–96");
+        } else {
+          patternExpiryBars = n;
+        }
+      } else {
+        patternExpiryBars = 48;
+      }
+      const patternRiskRaw = op.patternRiskStyle;
+      const patternRiskStyle =
+        patternRiskRaw === "conservative" ||
+        patternRiskRaw === "balanced" ||
+        patternRiskRaw === "aggressive"
+          ? patternRiskRaw
+          : patternRiskRaw == null
+            ? "balanced"
+            : null;
+      if (patternRiskRaw != null && patternRiskStyle == null) {
+        details.push("operatorPlan.patternRiskStyle invalid");
+      }
+      const patternStrengthRaw = op.patternStrength;
+      const patternStrength =
+        patternStrengthRaw === "loose" ||
+        patternStrengthRaw === "standard" ||
+        patternStrengthRaw === "strict"
+          ? patternStrengthRaw
+          : patternStrengthRaw == null
+            ? "standard"
+            : null;
+      if (patternStrengthRaw != null && patternStrength == null) {
+        details.push("operatorPlan.patternStrength invalid");
+      }
+      const patternSrSensRaw = op.patternSrSensitivity;
+      const patternSrSensitivity =
+        patternSrSensRaw === "tight" ||
+        patternSrSensRaw === "standard" ||
+        patternSrSensRaw === "loose"
+          ? patternSrSensRaw
+          : patternSrSensRaw == null
+            ? "standard"
+            : null;
+      if (patternSrSensRaw != null && patternSrSensitivity == null) {
+        details.push("operatorPlan.patternSrSensitivity invalid");
+      }
       operatorPlan = {
         depthProfile: depth,
         qualificationProfile: qual,
@@ -507,6 +675,33 @@ export function validateCreateSearchJobBody(
           typeof op.searchName === "string" && op.searchName.trim()
             ? op.searchName.trim().slice(0, 80)
             : String(body.strategyTemplateId).slice(0, 80),
+        errorWarningRate,
+        errorAutoPauseRate,
+        repeatedSignatureThreshold,
+        selectedSpaceIds,
+        leverageMode,
+        leverageFixed:
+          typeof op.leverageFixed === "number" && Number.isFinite(op.leverageFixed)
+            ? Math.max(1, op.leverageFixed)
+            : null,
+        leverageMin:
+          typeof op.leverageMin === "number" && Number.isFinite(op.leverageMin)
+            ? Math.max(1, op.leverageMin)
+            : null,
+        leverageMax:
+          typeof op.leverageMax === "number" && Number.isFinite(op.leverageMax)
+            ? Math.max(1, op.leverageMax)
+            : null,
+        adaptiveLeverageEnabled: op.adaptiveLeverageEnabled === true,
+        patternConfigLevel: patternConfigLevel ?? "automatic",
+        patternDirection: patternDirection ?? "both",
+        patternRetestMode: patternRetestMode ?? "required",
+        patternConfirmStrength: patternConfirmStrength ?? "standard",
+        patternConfirmClose: patternConfirmClose ?? "required",
+        patternExpiryBars,
+        patternRiskStyle: patternRiskStyle ?? "balanced",
+        patternStrength: patternStrength ?? "standard",
+        patternSrSensitivity: patternSrSensitivity ?? "standard",
       };
     }
   }

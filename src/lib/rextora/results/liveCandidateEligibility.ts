@@ -30,7 +30,7 @@ export function evaluateLiveCandidateRegistration(
   if (input.isSafe) {
     return {
       allowed: false,
-      reasonKo: "SAFE 원본은 실전 후보로 등록할 수 없습니다.",
+      reasonKo: "SAFE 원본은 실전매매 검토 대상으로 등록할 수 없습니다.",
     };
   }
   if (input.liveActive) {
@@ -39,7 +39,7 @@ export function evaluateLiveCandidateRegistration(
   if (input.liveEligible === false) {
     return {
       allowed: false,
-      reasonKo: "전략 liveEligible=false — 서버 실전 자격이 없습니다.",
+      reasonKo: "이 전략은 아직 실전 검토 자격이 없습니다. 모의 매매 검증을 먼저 완료하세요.",
     };
   }
   if (!input.paperActive) {

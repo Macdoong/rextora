@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ConfirmDialog } from "@/components/ui/primitives";
+import { Button, ConfirmDialog } from "@/components/ui/primitives";
 import {
   cancelStrategySearchJob,
   createStrategySearchJob,
-  getStrategySearchJob,
+  fetchStrategySearchRecoveryStatus,
+  getStrategySearchJobWithRetry,
   isOperationallyActiveStatus,
   listStrategySearchJobs,
   listStrategySearchTrials,
@@ -25,6 +26,10 @@ import { createDefaultOperatorFormState } from "./formDefaults";
 import { buildCreateBodyIfValid, type FormFieldError } from "./formValidation";
 import { JobCreateForm } from "./JobCreateForm";
 import {
+  loadOperatorFormSession,
+  saveOperatorFormSession,
+} from "./operatorFormSession";
+import {
   type QualifiedStrategyCardModel,
   type RegistrationStateUi,
   type RegistrationSummary,
@@ -40,7 +45,7 @@ import type {
 } from "./types";
 import type { StrategySearchOperatorFormState as FormState } from "./formDefaults";
 import { cleanStrategyDisplayName } from "./displayNames";
-import { completionReasonLabelKo } from "./formatters";
+import { completionReasonLabelKo, historyStatusLabelKo } from "./formatters";
 
 /** Server operatorPlan owns runUntilQualified / multi-space progression. */
 const OPERATOR_RUN_UNTIL_QUALIFIED = true as const;
@@ -48,6 +53,29 @@ void OPERATOR_RUN_UNTIL_QUALIFIED;
 
 const DETAIL_POLL_MS = 2000;
 const LIST_POLL_MS = 8000;
+const SELECTED_JOB_LS_KEY = "rextora.strategySearch.selectedJobId";
+
+function syncJobIdToUrl(jobId: string | null) {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (jobId) url.searchParams.set("jobId", jobId);
+  else url.searchParams.delete("jobId");
+  window.history.replaceState(null, "", url.toString());
+}
+
+function persistSelectedJobId(jobId: string | null) {
+  if (typeof window === "undefined") return;
+  if (jobId) localStorage.setItem(SELECTED_JOB_LS_KEY, jobId);
+  else localStorage.removeItem(SELECTED_JOB_LS_KEY);
+}
+
+function readInitialJobId(
+  bootJobId: string | null,
+): string | null {
+  if (bootJobId) return bootJobId;
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(SELECTED_JOB_LS_KEY);
+}
 
 function toUserError(err: unknown): { message: string; detail: string | null } {
   if (err instanceof StrategySearchClientError) {
@@ -66,6 +94,9 @@ function mapRegistrationState(
   trial: StrategySearchTrialRow,
 ): RegistrationStateUi {
   if (trial.registrationState === "duplicate") return "duplicate";
+  if (trial.registrationState === "registration_failed") {
+    return "registration_failed";
+  }
   if (
     trial.registrationState === "registered" ||
     trial.registeredStrategyId
@@ -85,7 +116,9 @@ function trialToCard(
       ? "이미 등록됨"
       : registrationState === "registered"
         ? "등록됨"
-        : "미등록";
+        : registrationState === "registration_failed"
+          ? "등록 실패"
+          : "미등록";
   return {
     key: trial.paramsHash || `${trial.iteration}`,
     name: cleanStrategyDisplayName(
@@ -153,21 +186,24 @@ function readSearchQueryBootstrap(): {
 }
 
 export function StrategySearchWorkbench() {
-  const boot = readSearchQueryBootstrap();
-  const [form, setForm] = useState<FormState>(() => ({
-    ...createDefaultOperatorFormState(),
-    ...(boot.formPatch ?? {}),
-  }));
+  // Hydration-safe: never read window/localStorage/sessionStorage during first render.
+  const [form, setForm] = useState<FormState>(() =>
+    createDefaultOperatorFormState(),
+  );
   const [formErrors, setFormErrors] = useState<FormFieldError[]>([]);
   const [creating, setCreating] = useState(false);
+  const [clientReady, setClientReady] = useState(false);
 
   const [jobs, setJobs] = useState<StrategySearchJobSummary[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
 
-  const [selectedId, setSelectedId] = useState<string | null>(boot.jobId);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<StrategySearchJobDetail | null>(null);
   const [trials, setTrials] = useState<StrategySearchTrialsPage | null>(null);
+  const [jobMissing, setJobMissing] = useState(false);
+  const [missingJobId, setMissingJobId] = useState<string | null>(null);
+  const [recoveryBanner, setRecoveryBanner] = useState<string | null>(null);
 
   const [actionPending, setActionPending] = useState(false);
   const [registering, setRegistering] = useState(false);
@@ -189,18 +225,39 @@ export function StrategySearchWorkbench() {
     latestAdjustmentKo: string | null;
   } | null>(null);
 
-  const detailInflight = useRef(false);
-  const listInflight = useRef(false);
   const selectedIdRef = useRef<string | null>(null);
+  const bootDoneRef = useRef(false);
   const HISTORY_PAGE = STRATEGY_SEARCH_HISTORY_RETENTION_NOTE;
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
 
+  useEffect(() => {
+    if (!clientReady) return;
+    const timer = window.setTimeout(() => {
+      saveOperatorFormSession(form);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [form, clientReady]);
+
+  // Reload form session after external tab focus or hash navigation refresh.
+  useEffect(() => {
+    const syncFromSession = () => {
+      if (!bootDoneRef.current) return;
+      const stored = loadOperatorFormSession();
+      if (!stored) return;
+      setForm((prev) => ({ ...prev, ...stored }));
+    };
+    window.addEventListener("focus", syncFromSession);
+    window.addEventListener("pageshow", syncFromSession);
+    return () => {
+      window.removeEventListener("focus", syncFromSession);
+      window.removeEventListener("pageshow", syncFromSession);
+    };
+  }, []);
+
   const refreshList = useCallback(async () => {
-    if (listInflight.current) return;
-    listInflight.current = true;
     try {
       const data = await listStrategySearchJobs({
         limit: HISTORY_PAGE,
@@ -212,10 +269,35 @@ export function StrategySearchWorkbench() {
       const mapped = toUserError(err);
       setListError(mapped.message);
     } finally {
-      listInflight.current = false;
       setListLoading(false);
     }
   }, [HISTORY_PAGE]);
+
+  // Hard stop: never leave "연구 목록 불러오는 중…" forever.
+  useEffect(() => {
+    if (!listLoading) return;
+    const t = window.setTimeout(() => {
+      setListLoading(false);
+      setListError((prev) =>
+        prev ?? "연구 목록 응답이 지연됩니다. 새로고침하거나 다시 시도하세요.",
+      );
+    }, 15_000);
+    return () => window.clearTimeout(t);
+  }, [listLoading]);
+
+  // Hard stop: never leave job detail blank forever after selection.
+  useEffect(() => {
+    if (!selectedId || detail || jobMissing) return;
+    const t = window.setTimeout(() => {
+      if (selectedIdRef.current !== selectedId) return;
+      setFeedback({
+        message: "연구 상세 응답이 지연됩니다",
+        detail: "새로고침하거나 목록에서 다시 선택하세요.",
+        tone: "error",
+      });
+    }, 20_000);
+    return () => window.clearTimeout(t);
+  }, [selectedId, detail, jobMissing]);
 
   const refreshTrials = useCallback(async (jobId: string) => {
     try {
@@ -231,13 +313,35 @@ export function StrategySearchWorkbench() {
     }
   }, []);
 
+  const clearJobSelection = useCallback(() => {
+    selectedIdRef.current = null;
+    setSelectedId(null);
+    setDetail(null);
+    setTrials(null);
+    setGenerationMeta(null);
+    persistSelectedJobId(null);
+    syncJobIdToUrl(null);
+  }, []);
+
+  const handleJobNotFound = useCallback(
+    (jobId: string) => {
+      clearJobSelection();
+      setJobMissing(true);
+      setMissingJobId(jobId);
+      setFeedback(null);
+    },
+    [clearJobSelection],
+  );
+
   const refreshDetail = useCallback(
-    async (jobId: string) => {
-      if (detailInflight.current) return null;
-      detailInflight.current = true;
+    async (jobId: string, opts?: { retryNotFound?: boolean }) => {
       try {
-        const data = await getStrategySearchJob(jobId);
+        const data = await getStrategySearchJobWithRetry(jobId, {
+          retryNotFound: opts?.retryNotFound,
+        });
         if (selectedIdRef.current !== jobId) return data;
+        setJobMissing(false);
+        setMissingJobId(null);
         setDetail(data);
         await refreshTrials(jobId);
         try {
@@ -263,14 +367,19 @@ export function StrategySearchWorkbench() {
         }
         return data;
       } catch (err) {
+        if (
+          err instanceof StrategySearchClientError &&
+          err.code === "JOB_NOT_FOUND"
+        ) {
+          handleJobNotFound(jobId);
+          return null;
+        }
         const mapped = toUserError(err);
         setFeedback({ ...mapped, tone: "error" });
         return null;
-      } finally {
-        detailInflight.current = false;
       }
     },
-    [refreshTrials],
+    [handleJobNotFound, refreshTrials],
   );
 
   useEffect(() => {
@@ -331,24 +440,60 @@ export function StrategySearchWorkbench() {
   }, [pollActive, selectedId, refreshDetail, refreshList]);
 
   function handleSelect(id: string) {
-    // Keep ref in sync before async detail load so setDetail is not skipped.
     selectedIdRef.current = id;
     setSelectedId(id);
+    setJobMissing(false);
+    setMissingJobId(null);
     setFeedback(null);
     setStrategiesSavedHint(false);
     setRegistrationSummary(null);
     setTrials(null);
+    setDetail(null);
+    setGenerationMeta(null);
+    persistSelectedJobId(id);
+    syncJobIdToUrl(id);
     void refreshDetail(id);
   }
 
+  // Client-only bootstrap: session form + URL/localStorage jobId (hydration-safe).
   useEffect(() => {
-    if (!boot.jobId) return;
-    const timer = window.setTimeout(() => {
-      handleSelect(boot.jobId!);
-    }, 0);
-    return () => clearTimeout(timer);
-    // Boot once from URL jobId
+    if (bootDoneRef.current) return;
+    bootDoneRef.current = true;
+    const boot = readSearchQueryBootstrap();
+    const stored = loadOperatorFormSession();
+    setForm({
+      ...createDefaultOperatorFormState(),
+      ...(stored ?? {}),
+      ...(boot.formPatch ?? {}),
+    });
+    setClientReady(true);
+    const jobId = readInitialJobId(boot.jobId);
+    if (jobId) {
+      // Defer selection so bootstrap setState is not nested in the same turn.
+      window.setTimeout(() => {
+        handleSelect(jobId);
+      }, 0);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchStrategySearchRecoveryStatus()
+      .then((data) => {
+        if (cancelled) return;
+        const recovered = data.recordRecovered ?? [];
+        if (recovered.length === 0) return;
+        setRecoveryBanner(
+          `서버 재시작 후 ${recovered.length}건의 탐색 기록을 복구했습니다. 일시정지 상태로 복원되었으니 재개 여부를 확인하세요.`,
+        );
+      })
+      .catch(() => {
+        /* recovery probe is best-effort */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function handleRegister(iterations: number[]) {
@@ -446,11 +591,16 @@ export function StrategySearchWorkbench() {
     setRegistrationSummary(null);
     try {
       const created = await createStrategySearchJob(validated.body);
+      selectedIdRef.current = created.id;
       setSelectedId(created.id);
+      setJobMissing(false);
+      setMissingJobId(null);
+      persistSelectedJobId(created.id);
+      syncJobIdToUrl(created.id);
       setDetail(created);
       setTrials(null);
       await startStrategySearchJob(created.id);
-      const started = await getStrategySearchJob(created.id);
+      const started = await getStrategySearchJobWithRetry(created.id);
       setDetail(started);
       await refreshList();
       setFeedback({
@@ -506,15 +656,164 @@ export function StrategySearchWorkbench() {
           .map((t) => trialToCard(t, detail))
       : [];
 
+  const showOutcomeFirst = Boolean(
+    detail &&
+      (detail.status === "completed" ||
+        detail.status === "cancelled" ||
+        detail.status === "cancel_requested" ||
+        detail.status === "failed" ||
+        detail.status === "paused" ||
+        detail.outcomePresentation === "partial_completed" ||
+        (qualifiedFromTrials.length > 0 &&
+          detail.status !== "running" &&
+          detail.status !== "queued" &&
+          detail.status !== "pause_requested" &&
+          !detail.executionActive)),
+  );
+
   return (
     <div className="space-y-4" data-testid="strategy-search-workbench">
-      <JobCreateForm
-        form={form}
-        errors={formErrors}
-        submitting={creating}
-        onChange={setForm}
-        onSubmit={() => void handleStartSearch()}
-      />
+      {!clientReady ? (
+        <div
+          className="rextora-card p-4 text-sm text-slate-400"
+          data-testid="ss-form-hydrating"
+        >
+          탐색 설정을 준비하는 중…
+        </div>
+      ) : showOutcomeFirst ? (
+        <details className="rextora-card p-4" data-testid="ss-config-collapsed">
+          <summary className="cursor-pointer text-sm text-slate-200">
+            탐색 설정(접힘) · 새 탐색을 시작할 때만 펼치세요
+          </summary>
+          <div className="mt-3">
+            <JobCreateForm
+              form={form}
+              errors={formErrors}
+              submitting={creating}
+              onChange={setForm}
+              onSubmit={() => void handleStartSearch()}
+              activeJobSummary={null}
+            />
+          </div>
+        </details>
+      ) : (
+        <JobCreateForm
+          form={form}
+          errors={formErrors}
+          submitting={creating}
+          onChange={setForm}
+          onSubmit={() => void handleStartSearch()}
+          activeJobSummary={
+            detail &&
+            (detail.status === "running" ||
+              detail.status === "pause_requested" ||
+              detail.status === "queued" ||
+              detail.executionActive)
+              ? {
+                  searchName: detail.searchName || "전략 탐색",
+                  symbols: detail.symbols,
+                  timeframe: detail.timeframe,
+                  maxRuntimeMs: detail.maxRuntimeMs ?? null,
+                  expectedCompletionAtMs: detail.expectedCompletionAtMs ?? null,
+                  appliedSummary:
+                    (
+                      detail as {
+                        appliedSearchSummary?: {
+                          titleKo: string;
+                          subtitleKo: string;
+                          sections: Array<{
+                            id: string;
+                            titleKo: string;
+                            rows: Array<{ labelKo: string; valueKo: string }>;
+                          }>;
+                          developerPayload: Record<string, unknown>;
+                        } | null;
+                      }
+                    ).appliedSearchSummary ?? null,
+                }
+              : null
+          }
+        />
+      )}
+
+      {recoveryBanner ? (
+        <div
+          className="rounded-lg border border-sky-500/35 bg-sky-500/10 px-3 py-2.5 text-sm text-sky-100"
+          role="status"
+          data-testid="ss-recovery-banner"
+        >
+          {recoveryBanner}
+        </div>
+      ) : null}
+
+      {jobMissing ? (
+        <section
+          className="rextora-card space-y-3 p-4"
+          data-testid="ss-recovery-chooser"
+          role="alert"
+        >
+          <h3 className="ss-section-title">탐색 작업을 찾을 수 없습니다</h3>
+          <p className="text-sm text-slate-300">
+            선택한 탐색 ID가 삭제되었거나 아직 저장되지 않았을 수 있습니다.
+            아래에서 다시 조회하거나 다른 탐색을 선택하세요.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="ss-recovery-retry"
+              onClick={() => {
+                if (!missingJobId) return;
+                void refreshDetail(missingJobId, { retryNotFound: true });
+              }}
+            >
+              다시 조회
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="ss-recovery-pick-newest"
+              disabled={jobs.length === 0}
+              onClick={() => {
+                const newest = jobs[0];
+                if (newest) handleSelect(newest.id);
+              }}
+            >
+              최근 탐색 선택
+            </Button>
+            {missingJobId ? (
+              <Link
+                href={`/results?jobId=${encodeURIComponent(missingJobId)}`}
+                className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
+                data-testid="ss-recovery-open-results"
+              >
+                보존 결과 열기
+              </Link>
+            ) : null}
+            <Button
+              type="button"
+              className="ss-btn-primary"
+              data-testid="ss-recovery-new-search"
+              onClick={() => {
+                clearJobSelection();
+                setJobMissing(false);
+                setMissingJobId(null);
+                setFeedback(null);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.setTimeout(() => {
+                  document
+                    .querySelector<HTMLElement>(
+                      '[data-testid="strategy-search-create"]',
+                    )
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              }}
+            >
+              새 탐색 시작
+            </Button>
+          </div>
+        </section>
+      ) : null}
 
       {feedback ? (
         <div
@@ -551,7 +850,21 @@ export function StrategySearchWorkbench() {
         </div>
       ) : null}
 
-      {detail ? (
+      {selectedId && !detail && !jobMissing ? (
+        <section
+          className="rextora-card space-y-3 p-4"
+          data-testid="ss-job-detail-loading"
+          role="status"
+        >
+          <h2 className="ss-section-title">연구 상세 불러오는 중…</h2>
+          <p className="text-sm text-slate-400">
+            진행률·TOP10·파이프라인을 불러옵니다. 응답이 지연되면 목록에서 다시
+            선택하거나 새로고침하세요.
+          </p>
+        </section>
+      ) : null}
+
+      {detail && !jobMissing ? (
         <section
           className="rextora-card space-y-3 p-4"
           data-testid="ss-job-detail"
@@ -575,6 +888,8 @@ export function StrategySearchWorkbench() {
             <ExecutionControls
               status={detail.status}
               pending={actionPending}
+              retryable={detail.retryable === true}
+              jobMissing={jobMissing}
               onStart={() => void runAction("start")}
               onPause={() => void runAction("pause")}
               onResume={() => void runAction("resume")}
@@ -592,7 +907,14 @@ export function StrategySearchWorkbench() {
 
           {detail.status === "completed" ||
           detail.status === "cancelled" ||
-          detail.status === "failed" ? (
+          detail.status === "cancel_requested" ||
+          detail.status === "failed" ||
+          detail.outcomePresentation === "partial_completed" ||
+          (qualifiedFromTrials.length > 0 &&
+            detail.status !== "running" &&
+            detail.status !== "queued" &&
+            detail.status !== "pause_requested" &&
+            !detail.executionActive) ? (
             <ResearchCompletionPanel
               job={detail}
               passCount={qualifiedFromTrials.length}
@@ -615,10 +937,47 @@ export function StrategySearchWorkbench() {
                     }
                   : null
               }
+              onPromoteTop={() => {
+                void (async () => {
+                  try {
+                    setRegistering(true);
+                    const { promoteStrategySearchTrials } = await import(
+                      "./apiClient"
+                    );
+                    const data = await promoteStrategySearchTrials(detail.id, {
+                      mode: "top",
+                      limit: 10,
+                    });
+                    const n = Array.isArray(data.promoted)
+                      ? data.promoted.length
+                      : 0;
+                    setFeedback({
+                      message: "상위 전략 등록",
+                      detail: `상위 전략 ${n}개를 전략 라이브러리에 등록했습니다.`,
+                      tone: "success",
+                    });
+                    setStrategiesSavedHint(true);
+                  } catch (e) {
+                    setFeedback({
+                      message: "일괄 등록 실패",
+                      detail:
+                        e instanceof Error ? e.message : "일괄 등록 실패",
+                      tone: "error",
+                    });
+                  } finally {
+                    setRegistering(false);
+                  }
+                })();
+              }}
+              onResume={
+                detail.status === "paused" || detail.retryable === true
+                  ? () => void runAction("resume")
+                  : null
+              }
               onNewResearch={() => {
-                setSelectedId(null);
-                setDetail(null);
-                setTrials(null);
+                clearJobSelection();
+                setJobMissing(false);
+                setMissingJobId(null);
                 setFeedback(null);
                 setRegistrationSummary(null);
                 setStrategiesSavedHint(false);
@@ -685,8 +1044,9 @@ export function StrategySearchWorkbench() {
                 const id = e.target.value || null;
                 if (id) void handleSelect(id);
                 else {
-                  setSelectedId(null);
-                  setDetail(null);
+                  clearJobSelection();
+                  setJobMissing(false);
+                  setMissingJobId(null);
                 }
               }}
               data-testid="ss-recent-job-select"
@@ -694,7 +1054,10 @@ export function StrategySearchWorkbench() {
               <option value="">선택…</option>
               {jobs.slice(0, 12).map((j) => (
                 <option key={j.id} value={j.id}>
-                  {j.searchName || j.id} · {j.status}
+                  {j.searchName || j.id} ·{" "}
+                  {historyStatusLabelKo(j.status, {
+                    completionReason: j.completionReason,
+                  })}
                 </option>
               ))}
             </select>
@@ -705,8 +1068,10 @@ export function StrategySearchWorkbench() {
             {listError}
           </p>
         ) : null}
-        {listLoading ? (
-          <p className="text-xs text-slate-500">연구 목록 불러오는 중…</p>
+        {listLoading && jobs.length === 0 ? (
+          <p className="text-xs text-slate-500" data-testid="ss-list-loading">
+            연구 목록 불러오는 중…
+          </p>
         ) : null}
         <p className="text-xs text-slate-500" data-testid="ss-history-retention-note">
           최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.

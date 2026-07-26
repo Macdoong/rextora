@@ -24,6 +24,7 @@ export type StrategySearchRunnerStopReason =
   | "search_space_exhausted"
   | "cancelled"
   | "paused"
+  | "error_rate_auto_pause"
   | "failed";
 
 export interface StrategySearchRunnerCheckpointPayload {
@@ -231,6 +232,7 @@ export function decodeRunnerCheckpointPayload(
       "pause_requested",
       "paused",
       "cancel_requested",
+      "cancelling",
       "cancelled",
       "completed",
       "failed",

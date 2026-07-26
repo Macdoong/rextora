@@ -31,6 +31,7 @@ import {
   type StrategyEventSequence,
   type StrategyEventStep,
 } from "./definition/eventSequence";
+import { resolveEventSequenceLeverage } from "../strategySearch/leverageMode";
 
 export interface RejectedSetup {
   bar: number;
@@ -91,6 +92,7 @@ interface SideMachine {
   entryPrice?: number;
   stop?: number;
   tp?: number;
+  leverage?: number;
 }
 
 const ASSUMPTIONS_KO = [
@@ -269,13 +271,12 @@ function detectPatternAt(
   }
 
   if (fam === "fvg") {
-    const { zone } = detectFvg(
-      candles,
-      bar,
-      atr,
-      obSide,
-      defaultFvgParams(lookback),
-    );
+    const { zone } = detectFvg(candles, bar, atr, obSide, {
+      ...defaultFvgParams(lookback),
+      atrRelativeMult: numParam(creationStep, "atrRelativeMult", 0.15),
+      minGapPct: numParam(creationStep, "minGapPct", 0.05),
+      maxAgeBars: lookback,
+    });
     if (!zone) return null;
     if (bar - zone.createdAt > 2) return null;
     return {
@@ -289,12 +290,15 @@ function detectPatternAt(
   if (fam === "trendline") {
     const kind =
       side === "LONG" ? "support_trend_line" : "resistance_trend_line";
-    const { hit, line } = detectTrendLine(
-      candles,
-      bar,
-      kind,
-      defaultTlParams(lookback),
-    );
+    const { hit, line } = detectTrendLine(candles, bar, kind, {
+      ...defaultTlParams(lookback),
+      slopeMin: numParam(creationStep, "slopeMin", 0),
+      slopeMax: numParam(creationStep, "slopeMax", 1e9),
+      tolerancePct: numParam(creationStep, "tolerancePct", 0.35),
+      minTouchCount: Math.trunc(numParam(creationStep, "minTouchCount", 2)),
+      minPivotCount: Math.trunc(numParam(creationStep, "minPivotCount", 2)),
+      maxAgeBars: lookback,
+    });
     if (!hit || !line) return null;
     const lo = Math.min(line.startPrice, line.endPrice);
     const hi = Math.max(line.startPrice, line.endPrice);
@@ -313,12 +317,14 @@ function detectPatternAt(
 
   if (fam === "support_resistance") {
     const kind = side === "LONG" ? "support_zone" : "resistance_zone";
-    const { hit, zone } = detectSupportResistance(
-      candles,
-      bar,
-      kind,
-      defaultSrParams(lookback),
-    );
+    const { hit, zone } = detectSupportResistance(candles, bar, kind, {
+      ...defaultSrParams(lookback),
+      lookback,
+      minTouches: Math.trunc(numParam(creationStep, "minTouches", 2)),
+      tolerancePct: numParam(creationStep, "tolerancePct", 0.35),
+      zoneWidthPct: numParam(creationStep, "zoneWidthPct", 0.25),
+      maxAgeBars: lookback,
+    });
     if (!hit || !zone) return null;
     return {
       patternType: "support_resistance",
@@ -356,6 +362,8 @@ export function runEventSequenceBacktest(input: {
   balance: number;
   feeRate: number;
   slippageRate: number;
+  /** Optional Search candidate params (lev_*, direction passthrough already in def). */
+  params?: Record<string, unknown> | null;
 }): EventSequenceBacktestResult {
   const seq = input.def.eventSequence;
   if (!seq || !validateEventSequence(seq).ok) {
@@ -418,8 +426,10 @@ export function runEventSequenceBacktest(input: {
   const trades: EventSequenceTrade[] = [];
   const rejectedSetups: RejectedSetup[] = [];
   let equity = input.balance;
+  let peakEquity = input.balance;
   const equityCurve = [equity];
   let cooldown = 0;
+  const levParams = input.params ?? null;
 
   const sides: Array<"LONG" | "SHORT"> = [];
   if (
@@ -497,7 +507,9 @@ export function runEventSequenceBacktest(input: {
               ? (exitPrice - (m.entryPrice ?? exitPrice)) / (m.entryPrice ?? 1)
               : ((m.entryPrice ?? exitPrice) - exitPrice) / (m.entryPrice ?? 1);
           const pnlPct = raw - feePct - slipPct;
-          equity *= 1 + pnlPct * def.positionSizing.baseBalancePct;
+          const lev = m.leverage ?? 1;
+          equity *= 1 + pnlPct * def.positionSizing.baseBalancePct * lev;
+          if (equity > peakEquity) peakEquity = equity;
 
           const geo = m.geo;
           trades.push({
@@ -512,8 +524,8 @@ export function runEventSequenceBacktest(input: {
             takeProfit: m.tp,
             stopPrice: m.stop,
             takeProfitPrice: m.tp,
-            leverage: 1,
-            pnlPct,
+            leverage: lev,
+            pnlPct: pnlPct * lev,
             feePct,
             slippagePct: slipPct,
             exitReason,
@@ -545,6 +557,7 @@ export function runEventSequenceBacktest(input: {
           m.entryPrice = undefined;
           m.stop = undefined;
           m.tp = undefined;
+          m.leverage = undefined;
           cooldown = def.execution.cooldownBars;
           equityCurve.push(equity);
         }
@@ -664,6 +677,13 @@ export function runEventSequenceBacktest(input: {
         m.entryPrice = entryPrice;
         m.stop = stop;
         m.tp = tp;
+        m.leverage = resolveEventSequenceLeverage({
+          params: levParams,
+          atr,
+          price: entryPrice,
+          peakEquity,
+          equity,
+        });
       }
     }
   }
@@ -679,7 +699,9 @@ export function runEventSequenceBacktest(input: {
         ? (last.close - m.entryPrice) / m.entryPrice
         : (m.entryPrice - last.close) / m.entryPrice;
     const pnlPct = raw - feePct - slipPct;
-    equity *= 1 + pnlPct * def.positionSizing.baseBalancePct;
+    const lev = m.leverage ?? 1;
+    equity *= 1 + pnlPct * def.positionSizing.baseBalancePct * lev;
+    if (equity > peakEquity) peakEquity = equity;
     const geo = m.geo;
     trades.push({
       symbol,
@@ -693,8 +715,8 @@ export function runEventSequenceBacktest(input: {
       takeProfit: m.tp ?? m.entryPrice,
       stopPrice: m.stop,
       takeProfitPrice: m.tp,
-      leverage: 1,
-      pnlPct,
+      leverage: lev,
+      pnlPct: pnlPct * lev,
       feePct,
       slippagePct: slipPct,
       exitReason: "end",

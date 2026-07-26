@@ -50,7 +50,7 @@ function formatMs(
   opts?: { legacyLabel?: string },
 ): string {
   if (ms == null || !Number.isFinite(ms)) {
-    return opts?.legacyLabel ?? "레거시 타이밍 없음";
+    return opts?.legacyLabel ?? "시간 정보 없음";
   }
   const s = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(s / 3600);
@@ -149,7 +149,7 @@ export function LifecycleDashboard() {
   if (completedRecent && completedRecent.status === "completed") {
     reviewItems.push({
       what: `완료된 탐색: ${completedRecent.searchName || completedRecent.id}`,
-      why: "합격 후보를 검토하고 백테스트·모의 매매로 이어갈지 결정이 필요합니다.",
+      why: "합격 전략을 검토하고 백테스트·모의 매매로 이어갈지 결정이 필요합니다.",
       href: `/results?jobId=${encodeURIComponent(completedRecent.id)}`,
       actionLabel: "탐색 결과 확인",
     });
@@ -231,7 +231,7 @@ export function LifecycleDashboard() {
                       : "경과"
                   }
                   value={formatMs(activeResearch.elapsedMs, {
-                    legacyLabel: "레거시 타이밍 없음",
+                    legacyLabel: "시간 정보 없음",
                   })}
                 />
                 <Metric
@@ -241,11 +241,11 @@ export function LifecycleDashboard() {
                       : "남은 시간"
                   }
                   value={formatMs(activeResearch.remainingMs ?? null, {
-                    legacyLabel: "레거시 타이밍 없음",
+                    legacyLabel: "시간 정보 없음",
                   })}
                 />
                 <Metric
-                  label="평가 후보"
+                  label="평가한 전략"
                   value={activeResearch.uniqueEvaluatedCount ?? 0}
                 />
                 <Metric
@@ -266,11 +266,14 @@ export function LifecycleDashboard() {
         </Card>
 
         <Card
-          title="대표님 확인 필요 · 검토"
+          title="확인이 필요한 항목"
           data-testid="dash-review-required"
         >
           {reviewItems.length === 0 ? (
-            <EmptyState message="지금 당장 승인할 항목이 없습니다." />
+            <EmptyState
+              message="지금 확인할 항목이 없습니다."
+              hint="탐색이 끝나면 여기에 다음 단계가 표시됩니다."
+            />
           ) : (
             <ul className="space-y-3 text-sm text-slate-200">
               {reviewItems.map((item) => (
@@ -312,8 +315,8 @@ export function LifecycleDashboard() {
             />
           </div>
           <p className="mt-2 text-xs rx-text-muted">
-            모의 실행 엔진은 활성 모의 전략(선택 후보)을 실행합니다. SAFE는
-            명시적으로 선택된 경우에만 사용됩니다.
+            모의 매매는 실제 주문 없이 등록한 전략만 실행합니다. 보호 전략(SAFE)은
+            직접 선택한 경우에만 사용됩니다.
           </p>
         </Card>
 
@@ -342,7 +345,8 @@ export function LifecycleDashboard() {
             <p className="mt-2 text-xs text-amber-200">{status.liveBlockReason}</p>
           ) : (
             <p className="mt-2 text-xs rx-text-muted">
-              실전은 게이트·승인·위험 제한을 모두 통과해야 합니다.
+              아직 실전 주문이 전송되지 않습니다. 승인·안전 조건을 모두 통과한
+              뒤에만 시작할 수 있습니다.
             </p>
           )}
         </Card>

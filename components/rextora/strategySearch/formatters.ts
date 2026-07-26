@@ -127,18 +127,26 @@ export function researchStatusLabelKo(
   opts?: {
     completionReason?: StrategySearchCompletionReason | null;
     executionActive?: boolean;
+    /** When > 0 on failed jobs, present as partial completion (compat; status stays failed). */
+    preservedCandidateCount?: number | null;
   },
 ): string {
   if (status === "running" || status === "pause_requested") {
     return "연구 중";
   }
-  if (status === "cancel_requested") return "중지 중";
+  if (status === "cancel_requested") {
+    return opts?.executionActive ? "중지 요청 중" : "결과 정리 중";
+  }
+  if (status === "cancelling") return "결과 정리 중";
   if (status === "paused") return "일시정지";
   if (status === "queued") {
     return opts?.executionActive ? "준비 중" : "준비";
   }
-  if (status === "cancelled") return "중지됨";
-  if (status === "failed") return "실패";
+  if (status === "cancelled") return "사용자 중지";
+  if (status === "failed") {
+    if ((opts?.preservedCandidateCount ?? 0) > 0) return "부분 완료";
+    return "실패";
+  }
   if (status === "completed") {
     if (isEarlyFinishReason(opts?.completionReason)) return "조기 완료";
     return "완료";
@@ -147,8 +155,8 @@ export function researchStatusLabelKo(
 }
 
 /**
- * History list status values only:
- * 완료 | 조기 종료 | 중지됨 | 실패 | 실행 중
+ * History list status values — operator-facing Korean labels.
+ * Raw status codes belong in technical details only.
  */
 export function historyStatusLabelKo(
   status: StrategySearchJobStatus,
@@ -156,22 +164,125 @@ export function historyStatusLabelKo(
     completionReason?: StrategySearchCompletionReason | null;
   },
 ): string {
-  if (
-    status === "running" ||
-    status === "pause_requested" ||
-    status === "queued" ||
-    status === "paused" ||
-    status === "cancel_requested"
-  ) {
-    return "실행 중";
+  if (status === "running" || status === "pause_requested" || status === "queued") {
+    return "연구 중";
   }
-  if (status === "cancelled") return "중지됨";
+  if (status === "paused") return "일시정지";
+  if (status === "cancel_requested") return "중지 요청 중";
+  if (status === "cancelling") return "결과 정리 중";
+  if (status === "cancelled") return "사용자 중지";
   if (status === "failed") return "실패";
   if (status === "completed") {
     if (isEarlyFinishReason(opts?.completionReason)) return "조기 종료";
-    return "완료";
+    return "정상 완료";
   }
   return status;
+}
+
+/** Verified per-trial evaluation pipeline stages (operator Korean). */
+export const EVALUATION_PIPELINE_STAGES = [
+  { id: "market_data", labelKo: "시장 데이터 준비" },
+  { id: "strategy_generation", labelKo: "전략 생성" },
+  { id: "base_backtest", labelKo: "기본 백테스트" },
+  { id: "qualification_gate", labelKo: "조건 탈락 판정" },
+  { id: "cost_stress", labelKo: "비용 검증" },
+  { id: "trade_stability", labelKo: "안정성 검증" },
+  { id: "overfitting", labelKo: "과거 데이터 편중 검사" },
+  { id: "weakness_analysis", labelKo: "약점 분석" },
+  { id: "search_improvement", labelKo: "탐색 범위 개선" },
+  { id: "clustering", labelKo: "유사 전략 정리" },
+  { id: "top10_selection", labelKo: "TOP 10 선정" },
+  { id: "persistence", labelKo: "결과 저장" },
+] as const;
+
+const ENGINE_STAGE_TO_PIPELINE: Record<string, string> = {
+  market_data: "market_data",
+  data: "market_data",
+  candidate_generation: "strategy_generation",
+  strategy_generation: "strategy_generation",
+  candidate_invalid: "strategy_generation",
+  generation: "strategy_generation",
+  evaluation: "base_backtest",
+  backtest: "base_backtest",
+  backtest_failed: "base_backtest",
+  orchestrator: "base_backtest",
+  qualification: "qualification_gate",
+  qualification_gate: "qualification_gate",
+  pass_policy: "qualification_gate",
+  rejected: "qualification_gate",
+  cost_stress: "cost_stress",
+  robustness: "trade_stability",
+  jitter: "trade_stability",
+  trade_stability: "trade_stability",
+  overfitting: "overfitting",
+  weakness: "weakness_analysis",
+  weakness_analysis: "weakness_analysis",
+  mutation: "search_improvement",
+  search_improvement: "search_improvement",
+  search_space: "search_improvement",
+  clustering: "clustering",
+  recommendation: "top10_selection",
+  top10: "top10_selection",
+  top10_selection: "top10_selection",
+  persistence: "persistence",
+  worker: "persistence",
+};
+
+export function mapEngineStageToPipelineId(
+  stage: string | null | undefined,
+): string | null {
+  if (!stage) return null;
+  const key = stage.trim().toLowerCase();
+  if (ENGINE_STAGE_TO_PIPELINE[key]) return ENGINE_STAGE_TO_PIPELINE[key]!;
+  for (const [pattern, id] of Object.entries(ENGINE_STAGE_TO_PIPELINE)) {
+    if (key.includes(pattern)) return id;
+  }
+  return null;
+}
+
+export function evaluationPipelineStageLabelKo(
+  stageId: string,
+): string | null {
+  return EVALUATION_PIPELINE_STAGES.find((s) => s.id === stageId)?.labelKo ?? null;
+}
+
+export function resolveCurrentStageLabelKo(input: {
+  currentSearchFamily?: string | null;
+  currentImprovementStage?: string | null;
+  searchProgression?: Array<{
+    id: string;
+    labelKo: string;
+    status: string;
+  }> | null;
+  failedStage?: string | null;
+  status: StrategySearchJobStatus | string;
+}): string {
+  const active = input.searchProgression?.find((s) => s.status === "active");
+  if (active?.labelKo) return active.labelKo;
+  if (input.currentSearchFamily) return input.currentSearchFamily;
+  if (input.currentImprovementStage) return input.currentImprovementStage;
+  if (input.failedStage) return input.failedStage;
+  if (input.status === "queued") return "시장 데이터 준비";
+  if (
+    input.status === "running" ||
+    input.status === "pause_requested" ||
+    input.status === "cancel_requested"
+  ) {
+    return "전략 생성";
+  }
+  if (input.status === "paused") return "일시정지";
+  if (input.status === "completed") return "정상 완료";
+  if (input.status === "cancelled") return "사용자 중지";
+  if (input.status === "failed") return "실패";
+  return "—";
+}
+
+export function formatErrorStatusKo(
+  evaluationErrors: number | null | undefined,
+): string {
+  const n = evaluationErrors ?? 0;
+  if (n <= 0) return "정상";
+  return `오류 ${formatCount(n)}건`;
 }
 
 /** @deprecated Prefer researchStatusLabelKo / historyStatusLabelKo */
@@ -207,11 +318,11 @@ export function pipelineStageUiStatus(input: {
   if (raw === "failed") return "failed";
   if (raw === "completed" || raw === "exhausted") return "completed";
   if (raw === "active") {
-    if (
-      input.jobStatus === "completed" ||
-      input.jobStatus === "cancelled" ||
-      input.jobStatus === "failed"
-    ) {
+    if (input.jobStatus === "failed") {
+      // Active stage at failure time is the failed stage — never mark completed.
+      return "failed";
+    }
+    if (input.jobStatus === "completed" || input.jobStatus === "cancelled") {
       return "completed";
     }
     return "running";

@@ -5,7 +5,7 @@
  *   CREATED     → queued
  *   RUNNING     → running
  *   PAUSED      → paused
- *   CANCELLING  → cancel_requested
+ *   CANCELLING  → cancel_requested | cancelling
  *   CANCELLED   → cancelled
  *   COMPLETED   → completed
  *   FAILED      → failed
@@ -16,6 +16,7 @@
 import {
   StrategySearchPersistenceError,
   markSearchJobCancelled,
+  markSearchJobCancelling,
   markSearchJobCompleted,
   markSearchJobFailed,
   markSearchJobPaused,
@@ -71,8 +72,12 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   ["pause_requested", "cancel_requested"],
   ["paused", "queued"],
   ["paused", "cancel_requested"],
+  ["cancel_requested", "cancelling"],
   ["cancel_requested", "cancelled"],
+  ["cancelling", "cancelled"],
   ["completed", "queued"],
+  /** Recoverable engine failure → operator retry/resume. */
+  ["failed", "queued"],
 ];
 
 export function toJobStateLabel(
@@ -88,6 +93,8 @@ export function toJobStateLabel(
     case "paused":
       return "PAUSED";
     case "cancel_requested":
+      return "CANCELLING";
+    case "cancelling":
       return "CANCELLING";
     case "cancelled":
       return "CANCELLED";
@@ -203,6 +210,17 @@ export function transitionJobToCancelRequested(
   }
 }
 
+export function transitionJobToCancelling(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob {
+  try {
+    return markSearchJobCancelling(jobId, options);
+  } catch (err) {
+    wrapStoreError(err);
+  }
+}
+
 export function transitionJobToCancelled(
   jobId: string,
   options?: StrategySearchStoreOptions,
@@ -213,6 +231,8 @@ export function transitionJobToCancelled(
     wrapStoreError(err);
   }
 }
+
+export { markSearchJobCancelling };
 
 export function transitionJobToCompleted(
   jobId: string,

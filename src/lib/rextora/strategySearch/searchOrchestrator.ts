@@ -1,8 +1,9 @@
 /**
  * Continuous goal-driven orchestration around runSearchJob.
- * Advances verified SafeV44 search spaces; never invents families.
+ * Advances verified SafeV44 + Order Block search spaces; never invents families.
  */
 
+import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import {
   encodeRunnerCheckpointPayload,
   readRunnerPayloadFromCheckpoint,
@@ -19,6 +20,19 @@ import {
   updateSearchCheckpoint,
   type StrategySearchStoreOptions,
 } from "./jobStore";
+import {
+  applyLeverageModeToParams,
+  filterRangesForLeverageMode,
+} from "./leverageMode";
+import {
+  applyPatternOperatorConfigToBaseParams,
+  applyPatternOperatorConfigToRanges,
+  patternConfigFromPlanFields,
+} from "./patternSearchConfig";
+import {
+  baseParamsForPatternSpaceId,
+  isPatternSearchSpaceId,
+} from "./patternSearchSpaces";
 import {
   activeElapsedMs,
   advanceToNextSpace,
@@ -126,6 +140,20 @@ function activeSpaceRanges(
   return spaceDef ? rangesForSpace(spaceDef) : jobRanges;
 }
 
+function resolveStageBaseParams(plan: StrategySearchPlan) {
+  const space = plan.spaces[plan.currentSpaceIndex];
+  const patternConfig = patternConfigFromPlanFields(plan);
+  if (space && isPatternSearchSpaceId(space.id)) {
+    const base = baseParamsForPatternSpaceId(space.id) ?? {};
+    const withPattern = applyPatternOperatorConfigToBaseParams(
+      base,
+      patternConfig,
+    );
+    return applyLeverageModeToParams(withPattern, plan);
+  }
+  return applyLeverageModeToParams(CONTEXT_FALLBACK_PARAMS, plan);
+}
+
 function applyStageConfig(
   jobId: string,
   plan: StrategySearchPlan,
@@ -135,7 +163,15 @@ function applyStageConfig(
   if (!job) return;
   const spaceState = plan.spaces[plan.currentSpaceIndex];
   if (!spaceState) return;
-  const ranges = activeSpaceRanges(plan, job.config.parameterRanges);
+  const ranges = filterRangesForLeverageMode(
+    activeSpaceRanges(plan, job.config.parameterRanges),
+    plan,
+  );
+  const patternConfig = patternConfigFromPlanFields(plan);
+  const stageRanges =
+    spaceState && isPatternSearchSpaceId(spaceState.id)
+      ? applyPatternOperatorConfigToRanges(ranges, patternConfig)
+      : ranges;
   const remGlobal = remainingBudget(plan);
   const remFamily = familyBudgetRemaining(plan);
   const rem = Math.min(remGlobal, remFamily);
@@ -148,7 +184,7 @@ function applyStageConfig(
     ...job,
     config: {
       ...job.config,
-      parameterRanges: ranges,
+      parameterRanges: stageRanges,
       maxIterations,
     },
     finishedAt: null,
@@ -594,7 +630,7 @@ export async function runOrchestratedSearchJob(
 
     lastRun = await runSearchJob({
       ...input,
-      // Fresh windows each stage; caller already built them
+      baseParams: resolveStageBaseParams(plan),
     });
 
     plan = syncPlanAfterRun(plan, lastRun);

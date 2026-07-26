@@ -5,12 +5,17 @@
 
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import type { SafeV44Params } from "../strategy/strategyTypes";
+import { resolvePatternFamilyFromParams } from "./patternSearchSpaces";
 
 export type StrategyFamilyId =
   | "ema_trend"
   | "rsi_mean_reversion"
   | "volatility_breakout"
-  | "mixed_safe";
+  | "mixed_safe"
+  | "order_block"
+  | "fvg"
+  | "trendline"
+  | "support_resistance";
 
 export type StyleProfileId = "conservative" | "balanced" | "aggressive";
 
@@ -39,6 +44,8 @@ function bool(v: unknown, fallback: boolean): boolean {
 export function classifySafeV44Family(
   params: Record<string, unknown>,
 ): StrategyFamilyId {
+  const pattern = resolvePatternFamilyFromParams(params);
+  if (pattern) return pattern;
   const confirmBull = bool(
     params.confirm_bull,
     CONTEXT_FALLBACK_PARAMS.confirm_bull,
@@ -79,6 +86,14 @@ function familyLabel(family: StrategyFamilyId): {
       return { name: "RSI 되돌림", typeKo: "되돌림" };
     case "ema_trend":
       return { name: "EMA 추세", typeKo: "추세" };
+    case "order_block":
+      return { name: "Order Block", typeKo: "패턴" };
+    case "fvg":
+      return { name: "Fair Value Gap", typeKo: "패턴" };
+    case "trendline":
+      return { name: "Trendline", typeKo: "패턴" };
+    case "support_resistance":
+      return { name: "Support / Resistance", typeKo: "패턴" };
     default:
       return { name: "SAFE 종합", typeKo: "종합" };
   }

@@ -1,14 +1,18 @@
 /**
  * Production backtest adapter for strategy search (Phase 3).
- * Calls runSafeV44Backtest directly — no scoring, PASS, persistence, or cost stress.
+ * SafeV44 → runSafeV44Backtest; Order Block → runEventSequenceBacktest.
  */
 
+import { buildBacktestReport } from "../backtest/backtestReport";
 import { runSafeV44Backtest } from "../backtest/backtestEngine";
 import type { BacktestReport } from "../backtest/backtestTypes";
 import { loadHistoricalCandles } from "../data/historicalCandleLoader";
 import type { OhlcvCandle } from "../data/ohlcvTypes";
+import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
 import { isLockedSafeHash } from "../strategy/strategyHash";
 import type { SafeV44Params } from "../strategy/strategyTypes";
+import { buildPatternSearchDefinition } from "./patternEventSequence";
+import { isPatternCandidateParams } from "./patternSearchSpaces";
 import type {
   StrategySearchBacktestCostConfig,
   StrategySearchCandidate,
@@ -478,9 +482,102 @@ async function runCandidateWindowEvaluation(input: {
     input.candidate.candidateId,
   );
 
-  const params = input.candidate.params as unknown as SafeV44Params;
   const requestedFromIso = new Date(input.window.requestedFrom).toISOString();
   const requestedToIso = new Date(input.window.requestedTo).toISOString();
+
+  // Pattern Search → event-sequence backtest (not SafeV44).
+  if (isPatternCandidateParams(input.candidate.params)) {
+    const tf =
+      input.timeframe === "5m" ||
+      input.timeframe === "15m" ||
+      input.timeframe === "1h"
+        ? input.timeframe
+        : "15m";
+    const def = buildPatternSearchDefinition({
+      candidateId: input.candidate.candidateId,
+      strategyName: input.candidate.candidateId,
+      timeframe: tf,
+      params: input.candidate.params as Record<string, unknown>,
+    });
+    if (!def) {
+      throw new StrategySearchAdapterError(
+        "INVALID_CANDIDATE",
+        "pattern candidate could not build eventSequence",
+        {
+          symbol: input.symbol,
+          windowId: input.window.id,
+          candidateId: input.candidate.candidateId,
+        },
+      );
+    }
+
+    let obResult;
+    try {
+      obResult = runEventSequenceBacktest({
+        def,
+        symbol: input.symbol,
+        candles,
+        balance: input.balance,
+        feeRate: input.feeRate,
+        slippageRate: input.slippageRate,
+        params: input.candidate.params as Record<string, unknown>,
+      });
+    } catch (err) {
+      if (err instanceof StrategySearchAdapterError) throw err;
+      const message = err instanceof Error ? err.message : "backtest failed";
+      throw new StrategySearchAdapterError("BACKTEST_FAILED", message, {
+        symbol: input.symbol,
+        windowId: input.window.id,
+        candidateId: input.candidate.candidateId,
+      });
+    }
+
+    const report = buildBacktestReport({
+      symbol: input.symbol,
+      paramsHash: input.candidate.paramsHash,
+      strategyName: input.candidate.candidateId,
+      strategyId: input.candidate.candidateId,
+      sourceStatus: "user_created",
+      timeframe: input.timeframe,
+      requestedFrom: requestedFromIso,
+      requestedTo: requestedToIso,
+      candleCount: candles.length,
+      processedCandleCount: candles.length,
+      dataSource: input.preloadedCandles != null ? "synthetic-test" : "binance",
+      startingBalance: input.balance,
+      endingBalance: obResult.endingBalance,
+      equityCurve: obResult.equityCurve,
+      trades: obResult.trades,
+      feesApplied: true,
+      slippageApplied: true,
+      fundingApplied: false,
+      spreadApplied: input.applySpread,
+      rejectedSetups: obResult.rejectedSetups.map((r) => ({
+        bar: r.bar,
+        reasonCode: r.reasonCode,
+        patternType: r.patternType,
+        measured: r.measured,
+        required: r.required,
+      })),
+    });
+
+    const durationMs = Date.now() - started;
+    return {
+      window: Object.freeze({ ...input.window }),
+      symbol: input.symbol,
+      timeframe: input.timeframe,
+      candidateId: input.candidate.candidateId,
+      paramsHash: input.candidate.paramsHash,
+      metrics: mapReportMetrics(report),
+      tradeCount: report.tradeCount,
+      processedCandleCount: report.processedCandleCount,
+      firstProcessedOpenTime: candles[0]?.openTime ?? null,
+      lastProcessedOpenTime: candles[candles.length - 1]?.openTime ?? null,
+      durationMs,
+    };
+  }
+
+  const params = input.candidate.params as unknown as SafeV44Params;
 
   // Base: omit costGuardK → engine uses candidate.params.cost_guard_k.
   // Stress: pass stressCostGuardKOverride only (never candidate mutation).

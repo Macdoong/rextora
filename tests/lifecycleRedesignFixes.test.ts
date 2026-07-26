@@ -50,19 +50,30 @@ describe("lifecycle redesign fixes", () => {
     }
   });
 
-  it("advanced settings default collapsed and isolated from five-field workflow", () => {
+  it("advanced settings integrated on main form with expert section collapsed", () => {
     const defaults = createDefaultOperatorFormState();
     expect(defaults.showAdvanced).toBe(false);
     const form = fs.readFileSync(
       path.join(ROOT, "components/rextora/strategySearch/JobCreateForm.tsx"),
       "utf8",
     );
-    expect(form).toMatch(/open=\{form\.showAdvanced\}/);
+    expect(form).toContain("ss-advanced-settings-link");
+    expect(form).toContain("고급 탐색 설정");
+    expect(form).toContain("#ss-section-engine");
+    expect(form).not.toMatch(/open=\{form\.showAdvanced\}/);
     expect(form).toContain("탐색 대상");
     expect(form).toContain("탐색 시간");
     expect(form).toContain("초보자 프리셋");
     expect(form).toContain("최대 허용 낙폭");
     expect(form).toContain("탐색 기준");
+    expect(form).toContain("ss-section-expert");
+    expect(form).toContain("전문가 조건");
+    expect(form).toContain("ss-config-manager");
+    const advancedPage = fs.readFileSync(
+      path.join(ROOT, "app/strategy-search/advanced/page.tsx"),
+      "utf8",
+    );
+    expect(advancedPage).toContain("#ss-section-engine");
   });
 
   it("research workbench does not embed full qualified library", () => {

@@ -1,4 +1,5 @@
 import type {
+  ResearchResultsSummaryView,
   StrategySearchApiEnvelope,
   StrategySearchBestResult,
   StrategySearchCreateJobBody,
@@ -76,6 +77,54 @@ export async function getStrategySearchJob(
   return parseEnvelope(res);
 }
 
+const JOB_GET_RETRY_DELAYS_MS = [200, 400, 800] as const;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** GET job with bounded backoff for transient post-create 404 windows. */
+export async function getStrategySearchJobWithRetry(
+  jobId: string,
+  opts?: { retryNotFound?: boolean },
+): Promise<StrategySearchJobDetail> {
+  const retryNotFound = opts?.retryNotFound !== false;
+  let lastErr: unknown;
+  const attempts = retryNotFound ? JOB_GET_RETRY_DELAYS_MS.length + 1 : 1;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await getStrategySearchJob(jobId);
+    } catch (err) {
+      lastErr = err;
+      const notFound =
+        err instanceof StrategySearchClientError && err.code === "JOB_NOT_FOUND";
+      if (!notFound || attempt >= JOB_GET_RETRY_DELAYS_MS.length) break;
+      await sleep(JOB_GET_RETRY_DELAYS_MS[attempt]!);
+    }
+  }
+  throw lastErr;
+}
+
+export interface StrategySearchRecoveryStatus {
+  scanned: number;
+  resumed: string[];
+  skipped: string[];
+  recordRecovered: string[];
+  errors: Array<{ jobId: string; message: string }>;
+  audits?: Array<{
+    jobId: string;
+    previousState: string | null;
+    recoveredState: string | null;
+    reason: string;
+  }>;
+}
+
+/** GET /recover — idempotent orphan / missing-record recovery probe. */
+export async function fetchStrategySearchRecoveryStatus(): Promise<StrategySearchRecoveryStatus> {
+  const res = await fetch(`${BASE}/recover`, { cache: "no-store" });
+  return parseEnvelope(res);
+}
+
 export async function startStrategySearchJob(
   jobId: string,
 ): Promise<StrategySearchJobDetail> {
@@ -145,7 +194,13 @@ export async function getStrategySearchBest(
 
 export async function promoteStrategySearchTrials(
   jobId: string,
-  body: { iteration?: number; iterations?: number[]; name?: string },
+  body: {
+    iteration?: number;
+    iterations?: number[];
+    name?: string;
+    mode?: "top" | "register_for_backtest";
+    limit?: number;
+  },
 ): Promise<{
   promoted?: Array<{
     strategyId: string;
@@ -177,6 +232,12 @@ export async function promoteStrategySearchTrials(
   paramsHash?: string;
   alreadyExists?: boolean;
   registrationState?: string;
+  mode?: string;
+  counts?: Record<string, number>;
+  backtestHref?: string;
+  reused?: boolean;
+  messageKo?: string;
+  clusterId?: string | null;
 }> {
   const res = await fetch(`${BASE}/${encodeURIComponent(jobId)}/promote`, {
     method: "POST",
@@ -184,6 +245,16 @@ export async function promoteStrategySearchTrials(
     body: JSON.stringify(body),
     cache: "no-store",
   });
+  return parseEnvelope(res);
+}
+
+export async function fetchResearchResultsSummary(
+  jobId: string,
+): Promise<ResearchResultsSummaryView> {
+  const res = await fetch(
+    `${BASE}/${encodeURIComponent(jobId)}/results-summary`,
+    { cache: "no-store" },
+  );
   return parseEnvelope(res);
 }
 
@@ -196,6 +267,7 @@ export function isOperationallyActiveStatus(
   return (
     status === "running" ||
     status === "pause_requested" ||
-    status === "cancel_requested"
+    status === "cancel_requested" ||
+    status === "cancelling"
   );
 }

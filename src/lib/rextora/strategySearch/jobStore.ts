@@ -59,9 +59,13 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   ["pause_requested", "cancel_requested"],
   ["paused", "queued"],
   ["paused", "cancel_requested"],
+  ["cancel_requested", "cancelling"],
   ["cancel_requested", "cancelled"],
+  ["cancelling", "cancelled"],
   /** Orchestrator: advance to next verified search space after stage completion. */
   ["completed", "queued"],
+  /** Recoverable engine failure → operator retry/resume. */
+  ["failed", "queued"],
 ];
 
 function defaultRoot(): string {
@@ -586,16 +590,13 @@ export function resumeSearchJob(
 ): StrategySearchJob {
   const root = resolveRoot(options);
   const current = loadJobOrThrow(root, jobId);
-  if (
-    current.status === "completed" ||
-    current.status === "cancelled" ||
-    current.status === "failed"
-  ) {
+  if (current.status === "completed" || current.status === "cancelled") {
     throw new StrategySearchPersistenceError(
       "INVALID_TRANSITION",
       `cannot resume strategy-search job in terminal status: ${current.status}`,
     );
   }
+  // paused → queued (normal resume) or failed → queued (recoverable retry)
   return transitionJob(root, jobId, "queued", {
     finishedAt: null,
     failureMessage: null,
@@ -606,14 +607,55 @@ export function requestCancelSearchJob(
   jobId: string,
   options?: StrategySearchStoreOptions,
 ): StrategySearchJob {
-  return transitionJob(resolveRoot(options), jobId, "cancel_requested");
+  const root = resolveRoot(options);
+  const next = transitionJob(root, jobId, "cancel_requested");
+  if (next.cancelRequestedAt) return next;
+  return persistJob(root, {
+    ...next,
+    cancelRequestedAt: next.updatedAt,
+  });
+}
+
+export function markSearchJobCancelling(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob {
+  return transitionJob(resolveRoot(options), jobId, "cancelling");
 }
 
 export function markSearchJobCancelled(
   jobId: string,
   options?: StrategySearchStoreOptions,
 ): StrategySearchJob {
-  return transitionJob(resolveRoot(options), jobId, "cancelled");
+  const root = resolveRoot(options);
+  const current = loadJobOrThrow(root, jobId);
+  if (current.status === "cancelled") {
+    // Ensure terminal cancel stamps exist even for legacy recoveries.
+    if (
+      current.cancellationAcknowledgedAt &&
+      current.resultsPreserved === true &&
+      current.finishedAt
+    ) {
+      return current;
+    }
+    const at = nowIso();
+    return persistJob(root, {
+      ...current,
+      finishedAt: current.finishedAt ?? at,
+      cancellationAcknowledgedAt: current.cancellationAcknowledgedAt ?? at,
+      resultsPreserved: true,
+      updatedAt: at,
+    });
+  }
+  // Allow cancel_requested → cancelled or cancelling → cancelled.
+  const cancelled = transitionJob(root, jobId, "cancelled");
+  const at = cancelled.finishedAt ?? cancelled.updatedAt;
+  return persistJob(root, {
+    ...cancelled,
+    cancelRequestedAt: cancelled.cancelRequestedAt ?? current.cancelRequestedAt,
+    cancellationAcknowledgedAt: cancelled.cancellationAcknowledgedAt ?? at,
+    resultsPreserved: true,
+  });
 }
 
 export function markSearchJobRunning(
@@ -770,11 +812,35 @@ export function deleteSearchJob(
     root,
     path.join(jobsDir(root), `${jobId}.execution.json`),
   );
+  const generationsPath = assertInsideRoot(
+    root,
+    path.join(jobsDir(root), `${jobId}.generations.json`),
+  );
+  const top10Path = assertInsideRoot(
+    root,
+    path.join(jobsDir(root), `${jobId}.top10.json`),
+  );
+  const top10HistoryPath = assertInsideRoot(
+    root,
+    path.join(jobsDir(root), `${jobId}.top10.history.jsonl`),
+  );
+  const archivePath = assertInsideRoot(
+    root,
+    path.join(jobsDir(root), `${jobId}.archive.json`),
+  );
   const trialsPath = trialDirPath(root, jobId);
 
   // Remove job-owned artifacts first (index update last keeps index parseable).
   safeRmDir(trialsPath);
-  for (const target of [jobPath, planPath, executionPath]) {
+  for (const target of [
+    jobPath,
+    planPath,
+    executionPath,
+    generationsPath,
+    top10Path,
+    top10HistoryPath,
+    archivePath,
+  ]) {
     safeUnlink(target);
     safeUnlink(tmpPathFor(target));
     safeUnlink(bakPathFor(target));

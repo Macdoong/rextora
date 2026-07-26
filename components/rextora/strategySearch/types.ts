@@ -9,6 +9,7 @@ export type StrategySearchJobStatus =
   | "pause_requested"
   | "paused"
   | "cancel_requested"
+  | "cancelling"
   | "cancelled"
   | "completed"
   | "failed";
@@ -64,6 +65,28 @@ export interface StrategySearchOperatorPlan {
   maxRuntimeMs: number | null;
   minScore: number | null;
   searchName: string;
+  /** Calculation-error rate warning threshold (0–1). */
+  errorWarningRate?: number | null;
+  /** Auto-pause when error rate exceeds this (0–1). */
+  errorAutoPauseRate?: number | null;
+  /** Block repeated invalid failure fingerprints after N hits. */
+  repeatedSignatureThreshold?: number | null;
+  /** Optional override of SafeV44 search space ids (null = depth default). */
+  selectedSpaceIds?: string[] | null;
+  leverageMode?: "automatic" | "fixed" | "range" | "disabled" | null;
+  leverageFixed?: number | null;
+  leverageMin?: number | null;
+  leverageMax?: number | null;
+  adaptiveLeverageEnabled?: boolean | null;
+  patternConfigLevel?: "automatic" | "basic" | "expert" | null;
+  patternDirection?: "both" | "long" | "short" | null;
+  patternRetestMode?: "required" | "optional" | "disabled" | null;
+  patternConfirmStrength?: "standard" | "strict" | null;
+  patternConfirmClose?: "required" | "disabled" | null;
+  patternExpiryBars?: number | null;
+  patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
+  patternStrength?: "loose" | "standard" | "strict" | null;
+  patternSrSensitivity?: "tight" | "standard" | "loose" | null;
 }
 
 export interface StrategySearchJobSummary {
@@ -122,6 +145,73 @@ export interface StrategySearchJobSummary {
   bestReturn?: number | null;
   bestMdd?: number | null;
   currentBestSummary?: string | null;
+  /** Live Research Top-10 (persisted; polled with job detail). */
+  liveTop10?: {
+    updatedAt: string;
+    finalizedAt: string | null;
+    phase: "live" | "final";
+    entries: Array<{
+      rank: number;
+      previousRank?: number | null;
+      displayAlias: string;
+      readableName: string;
+      strategyFamily?: string;
+      strategyHash: string;
+      netReturn: number | null;
+      maxDrawdown: number | null;
+      tradeCount: number | null;
+      profitFactor: number | null;
+      costStatus: string;
+      robustnessStatus: string;
+      sampleConfidence: string;
+      leverageLabel?: string;
+      rankReason?: string;
+      rankChange: string;
+      rankChangeShort: string;
+      movementReasonKo?: string;
+      roleBadges: string[];
+      eligibilityStatus?: string;
+      recommendable?: boolean;
+      registrationState?: string;
+      overfittingRisk?: string;
+      score?: number | null;
+      previousNetReturn?: number | null;
+      previousMaxDrawdown?: number | null;
+      previousTradeCount?: number | null;
+      previousScore?: number | null;
+    }>;
+    finalEntries?: Array<{
+      rank: number;
+      displayAlias: string;
+      readableName: string;
+      strategyHash: string;
+      netReturn: number | null;
+      maxDrawdown: number | null;
+      tradeCount: number | null;
+      profitFactor: number | null;
+      costStatus: string;
+      robustnessStatus: string;
+      sampleConfidence: string;
+      leverageLabel?: string;
+      rankReason?: string;
+      rankChange: string;
+      rankChangeShort: string;
+      movementReasonKo?: string;
+      roleBadges: string[];
+      overfittingRisk?: string;
+      score?: number | null;
+      previousNetReturn?: number | null;
+      previousMaxDrawdown?: number | null;
+      previousTradeCount?: number | null;
+      previousScore?: number | null;
+    }>;
+    finalVsLive?: Array<{
+      strategyHash: string;
+      liveRank: number | null;
+      finalRank: number | null;
+      exclusionReasonKo: string | null;
+    }>;
+  } | null;
   remainingBudget?: number | null;
   candidateBudgetUsed?: number | null;
   overallProgressPct?: number | null;
@@ -134,11 +224,65 @@ export interface StrategySearchJobSummary {
     mutationCount: number;
     firstChange: {
       key: string;
-      field: "min" | "max" | "step";
+      field: "min" | "max" | "step" | "defaultValue";
       from: number;
       to: number;
       reason: string;
     } | null;
+  } | null;
+  counters?: {
+    evaluated: number;
+    qualified: number;
+    rejected: number;
+    evaluationErrors: number;
+    invariantOk: boolean;
+    equation: string;
+  } | null;
+  initialCandidateBudget?: number | null;
+  resourceSafetyCeiling?: number | null;
+  outcomePresentation?:
+    | "running"
+    | "completed"
+    | "user_stopped"
+    | "cancelled"
+    | "partial_completed"
+    | "failed"
+    | null;
+  candidatesPreserved?: boolean;
+  preservedCandidateCount?: number | null;
+  retryable?: boolean;
+  failedStage?: string | null;
+  lastSuccessfulStage?: string | null;
+  terminationDetail?: string | null;
+  symbolSelection?: {
+    mode: "recommended" | "manual";
+    selectedSymbol: string;
+    reasonKo: string;
+    liquidityStatus: string;
+    volatilityStatus: string;
+    dataAvailability: string;
+    excludedAlternatives: Array<{ symbol: string; reasonKo: string }>;
+  } | null;
+  currentBestRisk?: {
+    netReturn: number | null;
+    maxDrawdown: number | null;
+    tradeCount: number | null;
+    totalCost: number | null;
+    profitFactor: number | null;
+    robustnessStatus: string;
+    overfittingRisk: string;
+    eligibilityStatus: string;
+    recommendable: boolean;
+  } | null;
+  appliedSearchSummary?: {
+    titleKo: string;
+    subtitleKo: string;
+    sections: Array<{
+      id: string;
+      titleKo: string;
+      rows: Array<{ labelKo: string; valueKo: string }>;
+    }>;
+    developerPayload?: Record<string, unknown>;
   } | null;
 }
 
@@ -200,6 +344,7 @@ export interface StrategySearchTrialRow {
     | "not_registered"
     | "registered"
     | "duplicate"
+    | "registration_failed"
     | null;
 }
 
@@ -336,6 +481,144 @@ export interface StrategySearchCreateJobBody {
   };
   /** When set, server owns multi-space orchestration / completion. */
   operatorPlan?: StrategySearchOperatorPlan;
+  /** Symbol selection mode for persisted selection evidence. */
+  marketMode?: "recommended" | "manual";
+}
+
+/** Client mirror of GET …/results-summary (no server imports). */
+export interface ResearchResultCountsView {
+  evaluatedStrategies: number;
+  qualifiedStrategies: number;
+  uniqueQualifiedStrategies: number;
+  clusteredRepresentatives: number;
+  duplicateOrNearDuplicateMembers: number;
+  promotedStrategies: number;
+  registeredStrategies: number;
+  recommendationEligibleStrategies: number;
+  backtestRecommendedStrategies: number;
+  /** Persistent Top-10 shortlist size (≤10). */
+  top10Saved: number;
+  /** Qualification stage funnel counts (evidence-based). */
+  stageBasicQualified: number;
+  stageStabilityPassed: number;
+  stageCostPassed: number;
+  stageSampleOk: number;
+  stageOverfitOk: number;
+  stageFinalRecommendable: number;
+}
+
+export type Top10RankChangeView =
+  | "신규 진입"
+  | "순위 상승"
+  | "순위 하락"
+  | "순위 유지"
+  | "TOP 10 제외";
+
+export interface Top10RankChangeEntryView {
+  strategyHash: string;
+  change: Top10RankChangeView | string;
+  previousRank: number | null;
+  currentRank: number | null;
+}
+
+export interface ResearchOutcomeViewClient {
+  id: string;
+  titleKo: string;
+  detailKo: string;
+  usable: boolean;
+  isPresentedAsCompleted: boolean;
+}
+
+export interface BestReturnViewClient {
+  labelKo: string;
+  netReturn: number | null;
+  iteration: number | null;
+  paramsHash: string | null;
+  readableName: string | null;
+  explanationKo: string;
+}
+
+export interface ResearchResultCardView {
+  iteration: number;
+  candidateId: string;
+  paramsHash: string;
+  readableName: string;
+  displayAlias: string;
+  strategyFamily: string;
+  symbol: string;
+  timeframe: string;
+  sourceResearchJobId: string;
+  netReturn: number | null;
+  maxDrawdown: number | null;
+  tradeCount: number | null;
+  profitFactor: number | null;
+  totalCost: number | null;
+  costStatus: string;
+  sampleConfidence: string;
+  sampleConfidenceDetail: string;
+  score: number | null;
+  stressPassed: boolean | null;
+  jitterPassed: boolean | null;
+  robustnessStatus: string;
+  overfittingRisk: string;
+  eligibilityStatus: string;
+  recommendable: boolean;
+  finalRecommendable: boolean;
+  roles: string[];
+  registrationState: "미등록" | "등록됨" | "중복" | "등록 실패";
+  registeredStrategyId: string | null;
+  clusterId: string;
+  isRepresentative: boolean;
+  memberCount: number;
+  strongestPoint: string;
+  primaryWeakness: string;
+  recommendationReason: string;
+  leverageLabel?: string;
+  whyNotRank1?: string;
+  vsPreviousRankNote?: string;
+}
+
+export interface ResearchClusterView {
+  clusterId: string;
+  representativeIteration: number;
+  representativeParamsHash: string;
+  memberCount: number;
+  memberIterations: number[];
+  similarityReason: string;
+  family: string;
+}
+
+export interface ResearchResultsSummaryView {
+  jobId: string;
+  searchName: string;
+  status: string;
+  symbol: string;
+  timeframe: string;
+  outcome: ResearchOutcomeViewClient;
+  counts: ResearchResultCountsView;
+  equation: string;
+  liveSearchBest: BestReturnViewClient;
+  finalizedBest: BestReturnViewClient;
+  topProfit: ResearchResultCardView | null;
+  topStable: ResearchResultCardView | null;
+  topRecommend: ResearchResultCardView | null;
+  backtestRecommendations: ResearchResultCardView[];
+  /** Persistent Top-10 shortlist (canonical Results focus). */
+  top10: ResearchResultCardView[];
+  top10RankChanges: Top10RankChangeEntryView[];
+  clusters: ResearchClusterView[];
+  /** Full representatives — secondary “원본 후보” explorer only. */
+  representatives: ResearchResultCardView[];
+  selectionSummary: {
+    whyTopSelected: string[];
+    whyExcluded: string[];
+    overfittingNote: string;
+    costSensitivityNote: string;
+    drawdownRiskNote: string;
+    tradeConfidenceNote: string;
+    nextActions: string[];
+  };
+  provenanceNote: string;
 }
 
 export class StrategySearchClientError extends Error {

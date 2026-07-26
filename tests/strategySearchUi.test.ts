@@ -72,14 +72,28 @@ describe("strategySearch operator UX", () => {
     expect(workbench).toContain("runUntilQualified");
   });
 
-  it("create form hides advanced settings by default", () => {
+  it("create form integrates advanced settings on one page", () => {
     const src = readUi("JobCreateForm.tsx");
-    expect(src).toContain("ss-advanced-toggle");
+    expect(src).toContain("ss-advanced-settings-link");
+    expect(src).toContain("#ss-section-engine");
+    expect(src).toContain("고급 탐색 설정");
     expect(src).toContain("ss-intensity");
     expect(src).toContain("ss-goal");
-    expect(src).toContain("<details");
+    expect(src).not.toContain("ss-advanced-toggle");
     expect(src).not.toContain("ss-stop-when-qualified");
+    expect(src).toContain("ss-applied-settings-preview");
+    expect(src).toContain("ss-max-search");
+    expect(src).toContain("ss-config-manager");
     expect(src).toContain("ss-deadline-completion-note");
+    expect(src).toContain("ss-error-warning-rate");
+    expect(src).toContain("ss-section-execution");
+    expect(src).toContain("ss-section-engine");
+    expect(src).toContain("설정 저장 및 관리");
+    const advancedPage = fs.readFileSync(
+      path.join(process.cwd(), "app/strategy-search/advanced/page.tsx"),
+      "utf8",
+    );
+    expect(advancedPage).toContain("#ss-section-engine");
   });
 
   it("operator defaults build a valid API body", () => {
@@ -133,7 +147,7 @@ describe("strategySearch operator UX", () => {
     expect(historyStatusLabelKo("completed", {
       completionReason: "QUALIFIED_TARGET_REACHED",
     })).toBe("조기 종료");
-    expect(historyStatusLabelKo("running")).toBe("실행 중");
+    expect(historyStatusLabelKo("running")).toBe("연구 중");
   });
 
   it("history list shows operator columns only", () => {
@@ -152,12 +166,12 @@ describe("strategySearch operator UX", () => {
 
   it("status card separates goal/budget/status and never shows bare progress %", () => {
     const src = readUi("SearchStatusCard.tsx");
-    expect(src).toContain("합격 후보");
+    expect(src).toContain("합격 전략");
     expect(src).toContain("최소 확보 기준");
     expect(src).toContain(
       "최소 확보 기준을 충족해도 설정된 탐색 시간이 끝날 때까지 개선을 계속합니다.",
     );
-    expect(src).toContain("평가한 후보");
+    expect(src).toContain("평가한 전략");
     expect(src).toContain("자원 안전 제한");
     expect(src).toContain("연구 상태");
     expect(src).toContain("종료 사유");

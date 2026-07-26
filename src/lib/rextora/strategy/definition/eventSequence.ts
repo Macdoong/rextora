@@ -87,16 +87,24 @@ export function buildOrderBlockLongSequence(params: {
   tpAtrMult: number;
   maxHoldBars: number;
   zoneLookback: number;
+  direction?: "long" | "short" | "both";
+  requireTouch?: boolean;
+  requireCloseInDirection?: boolean;
 }): StrategyEventSequence {
+  const direction = params.direction ?? "long";
+  const bullish =
+    direction === "short" ? "bearish" : "bullish";
+  const requireTouch = params.requireTouch !== false;
+  const requireCloseInDirection = params.requireCloseInDirection !== false;
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
-    direction: "long",
+    direction,
     steps: [
       {
         kind: "pattern_creation",
         labelKo: "오더블록 생성",
         patternFamily: "order_block",
-        params: { lookback: params.zoneLookback, direction: "bullish" },
+        params: { lookback: params.zoneLookback, direction: bullish },
       },
       {
         kind: "pattern_validity",
@@ -108,7 +116,7 @@ export function buildOrderBlockLongSequence(params: {
         kind: "revisit",
         labelKo: "존 재방문",
         patternFamily: "order_block",
-        params: { requireTouch: true },
+        params: { requireTouch },
       },
       {
         kind: "penetration",
@@ -120,7 +128,7 @@ export function buildOrderBlockLongSequence(params: {
         kind: "confirmation",
         labelKo: "확인 봉",
         patternFamily: "indicator",
-        params: { requireCloseInDirection: true },
+        params: { requireCloseInDirection },
       },
       {
         kind: "entry",
@@ -130,7 +138,277 @@ export function buildOrderBlockLongSequence(params: {
       {
         kind: "stop_loss",
         labelKo: "손절",
-        params: { atrMult: params.stopAtrMult, anchor: "zone_low" },
+        params: {
+          atrMult: params.stopAtrMult,
+          anchor: direction === "short" ? "zone_high" : "zone_low",
+        },
+      },
+      {
+        kind: "take_profit",
+        labelKo: "익절",
+        params: { atrMult: params.tpAtrMult },
+      },
+      {
+        kind: "invalidation",
+        labelKo: "무효화",
+        params: { rule: "close_beyond_zone" },
+      },
+      {
+        kind: "max_hold_exit",
+        labelKo: "최대 보유 청산",
+        params: { maxHoldBars: params.maxHoldBars },
+      },
+    ],
+  };
+}
+
+/** Fair Value Gap long/both sequence — uses FVG detector in eventSequenceBacktest. */
+export function buildFvgSequence(params: {
+  penetrationPct: number;
+  stopAtrMult: number;
+  tpAtrMult: number;
+  maxHoldBars: number;
+  zoneLookback: number;
+  atrRelativeMult: number;
+  minGapPct: number;
+  direction?: "long" | "short" | "both";
+  requireTouch?: boolean;
+  requireCloseInDirection?: boolean;
+}): StrategyEventSequence {
+  const direction = params.direction ?? "long";
+  const bullish = direction === "short" ? "bearish" : "bullish";
+  const requireTouch = params.requireTouch !== false;
+  const requireCloseInDirection = params.requireCloseInDirection !== false;
+  return {
+    version: STRATEGY_EVENT_SEQUENCE_VERSION,
+    direction,
+    steps: [
+      {
+        kind: "pattern_creation",
+        labelKo: "FVG 생성",
+        patternFamily: "fvg",
+        params: {
+          lookback: params.zoneLookback,
+          direction: bullish,
+          atrRelativeMult: params.atrRelativeMult,
+          minGapPct: params.minGapPct,
+        },
+      },
+      {
+        kind: "pattern_validity",
+        labelKo: "갭 유효",
+        patternFamily: "fvg",
+        params: { invalidation: "close_beyond_zone" },
+      },
+      {
+        kind: "revisit",
+        labelKo: "갭 재방문",
+        patternFamily: "fvg",
+        params: { requireTouch },
+      },
+      {
+        kind: "penetration",
+        labelKo: "채움 비율",
+        patternFamily: "fvg",
+        params: { penetrationPct: params.penetrationPct },
+      },
+      {
+        kind: "confirmation",
+        labelKo: "확인 봉",
+        patternFamily: "indicator",
+        params: { requireCloseInDirection },
+      },
+      {
+        kind: "entry",
+        labelKo: "진입",
+        params: { rule: "confirmation_close" },
+      },
+      {
+        kind: "stop_loss",
+        labelKo: "손절",
+        params: {
+          atrMult: params.stopAtrMult,
+          anchor: direction === "short" ? "zone_high" : "zone_low",
+        },
+      },
+      {
+        kind: "take_profit",
+        labelKo: "익절",
+        params: { atrMult: params.tpAtrMult },
+      },
+      {
+        kind: "invalidation",
+        labelKo: "무효화",
+        params: { rule: "close_beyond_zone" },
+      },
+      {
+        kind: "max_hold_exit",
+        labelKo: "최대 보유 청산",
+        params: { maxHoldBars: params.maxHoldBars },
+      },
+    ],
+  };
+}
+
+/** Trendline sequence — anchors persisted via detector lineAnchors. */
+export function buildTrendlineSequence(params: {
+  penetrationPct: number;
+  stopAtrMult: number;
+  tpAtrMult: number;
+  maxHoldBars: number;
+  zoneLookback: number;
+  slopeMin: number;
+  slopeMax: number;
+  tolerancePct: number;
+  minTouchCount: number;
+  direction?: "long" | "short" | "both";
+  requireTouch?: boolean;
+  requireCloseInDirection?: boolean;
+}): StrategyEventSequence {
+  const direction = params.direction ?? "long";
+  const requireTouch = params.requireTouch !== false;
+  const requireCloseInDirection = params.requireCloseInDirection !== false;
+  return {
+    version: STRATEGY_EVENT_SEQUENCE_VERSION,
+    direction,
+    steps: [
+      {
+        kind: "pattern_creation",
+        labelKo: "추세선 생성",
+        patternFamily: "trendline",
+        params: {
+          lookback: params.zoneLookback,
+          slopeMin: params.slopeMin,
+          slopeMax: params.slopeMax,
+          tolerancePct: params.tolerancePct,
+          minTouchCount: params.minTouchCount,
+          minPivotCount: 2,
+        },
+      },
+      {
+        kind: "pattern_validity",
+        labelKo: "추세선 유효",
+        patternFamily: "trendline",
+        params: { invalidation: "close_beyond_zone" },
+      },
+      {
+        kind: "revisit",
+        labelKo: "라인 재접촉",
+        patternFamily: "trendline",
+        params: { requireTouch },
+      },
+      {
+        kind: "penetration",
+        labelKo: "침투 깊이",
+        patternFamily: "trendline",
+        params: { penetrationPct: params.penetrationPct },
+      },
+      {
+        kind: "confirmation",
+        labelKo: "확인 봉",
+        patternFamily: "indicator",
+        params: { requireCloseInDirection },
+      },
+      {
+        kind: "entry",
+        labelKo: "진입",
+        params: { rule: "confirmation_close" },
+      },
+      {
+        kind: "stop_loss",
+        labelKo: "손절",
+        params: {
+          atrMult: params.stopAtrMult,
+          anchor: direction === "short" ? "zone_high" : "zone_low",
+        },
+      },
+      {
+        kind: "take_profit",
+        labelKo: "익절",
+        params: { atrMult: params.tpAtrMult },
+      },
+      {
+        kind: "invalidation",
+        labelKo: "무효화",
+        params: { rule: "close_beyond_zone" },
+      },
+      {
+        kind: "max_hold_exit",
+        labelKo: "최대 보유 청산",
+        params: { maxHoldBars: params.maxHoldBars },
+      },
+    ],
+  };
+}
+
+/** Support / Resistance zone sequence. */
+export function buildSupportResistanceSequence(params: {
+  penetrationPct: number;
+  stopAtrMult: number;
+  tpAtrMult: number;
+  maxHoldBars: number;
+  zoneLookback: number;
+  minTouches: number;
+  tolerancePct: number;
+  zoneWidthPct: number;
+  direction?: "long" | "short" | "both";
+  requireTouch?: boolean;
+  requireCloseInDirection?: boolean;
+}): StrategyEventSequence {
+  const direction = params.direction ?? "long";
+  const requireTouch = params.requireTouch !== false;
+  const requireCloseInDirection = params.requireCloseInDirection !== false;
+  return {
+    version: STRATEGY_EVENT_SEQUENCE_VERSION,
+    direction,
+    steps: [
+      {
+        kind: "pattern_creation",
+        labelKo: "지지·저항 생성",
+        patternFamily: "support_resistance",
+        params: {
+          lookback: params.zoneLookback,
+          minTouches: params.minTouches,
+          tolerancePct: params.tolerancePct,
+          zoneWidthPct: params.zoneWidthPct,
+        },
+      },
+      {
+        kind: "pattern_validity",
+        labelKo: "존 유효",
+        patternFamily: "support_resistance",
+        params: { invalidation: "close_beyond_zone" },
+      },
+      {
+        kind: "revisit",
+        labelKo: "존 재방문",
+        patternFamily: "support_resistance",
+        params: { requireTouch },
+      },
+      {
+        kind: "penetration",
+        labelKo: "침투 깊이",
+        patternFamily: "support_resistance",
+        params: { penetrationPct: params.penetrationPct },
+      },
+      {
+        kind: "confirmation",
+        labelKo: "확인 봉",
+        patternFamily: "indicator",
+        params: { requireCloseInDirection },
+      },
+      {
+        kind: "entry",
+        labelKo: "진입",
+        params: { rule: "confirmation_close" },
+      },
+      {
+        kind: "stop_loss",
+        labelKo: "손절",
+        params: {
+          atrMult: params.stopAtrMult,
+          anchor: direction === "short" ? "zone_high" : "zone_low",
+        },
       },
       {
         kind: "take_profit",

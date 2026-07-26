@@ -24,21 +24,43 @@ export function recommendStrategyAction(input: {
   paperActive: boolean;
   liveActive: boolean;
   isSafe: boolean;
+  /** When false, strategy must not become final/paper/live recommendation. */
+  evaluationComplete?: boolean | null;
+  hasRobustnessEvidence?: boolean | null;
+  sourceJobOutcome?:
+    | "completed"
+    | "failed"
+    | "partial_completed"
+    | "cancelled"
+    | null;
 }): StrategyRecommendation {
   if (input.isSafe) {
     return { code: "protected_safe", labelKo: "SAFE 기준 (보호)" };
   }
+  if (
+    input.evaluationComplete === false ||
+    input.hasRobustnessEvidence === false
+  ) {
+    return {
+      code: "review_backtest",
+      labelKo:
+        input.sourceJobOutcome === "failed" ||
+        input.sourceJobOutcome === "partial_completed"
+          ? "추가 검증 필요 · 실패 작업에서 보존됨"
+          : "추가 검증 필요",
+    };
+  }
   if (input.liveActive) {
-    return { code: "live_candidate", labelKo: "실전매매 후보 검토 가능" };
+    return { code: "live_candidate", labelKo: "실전매매 검토 가능" };
   }
   if (input.paperActive) {
-    return { code: "paper_candidate", labelKo: "모의매매 후보 적합" };
+    return { code: "paper_candidate", labelKo: "모의매매 적합" };
   }
   if (input.passed === true) {
     const mddOk = input.mdd == null || Math.abs(input.mdd) <= 0.25;
     const tradesOk = input.tradeCount == null || input.tradeCount >= 5;
     if (mddOk && tradesOk && (input.totalReturn ?? 0) > 0) {
-      return { code: "paper_candidate", labelKo: "모의매매 후보 적합" };
+      return { code: "paper_candidate", labelKo: "모의매매 적합" };
     }
     return { code: "review_backtest", labelKo: "백테스트 상세 검토 권장" };
   }

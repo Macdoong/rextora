@@ -1,10 +1,13 @@
 /**
- * Verified SafeV44 search-space stages for multi-space progression.
- * Only uses keys present in getDefaultSafeV44SearchSpace() / SafeV44Params.
+ * Verified SafeV44 + Pattern search-space stages for multi-space progression.
  */
 
 import { getDefaultSafeV44SearchSpace } from "./paramSpace";
 import type { StrategySearchParameterRange } from "./types";
+import {
+  ALL_PATTERN_SEARCH_SPACES,
+  rangesForPatternSpaceId,
+} from "./patternSearchSpaces";
 
 export interface SearchSpaceDefinition {
   id: string;
@@ -14,7 +17,7 @@ export interface SearchSpaceDefinition {
 }
 
 /**
- * Ordered catalog of supported spaces.
+ * Ordered catalog of supported SafeV44 spaces.
  * Progression expands across indicator groups already in SafeV44 — no invented templates.
  */
 export const SAFE_V44_SEARCH_SPACES: SearchSpaceDefinition[] = [
@@ -67,9 +70,17 @@ export const SAFE_V44_SEARCH_SPACES: SearchSpaceDefinition[] = [
   },
 ];
 
+/** All Search spaces including verified pattern spaces. */
+export const ALL_SEARCH_SPACES: SearchSpaceDefinition[] = [
+  ...SAFE_V44_SEARCH_SPACES,
+  ...ALL_PATTERN_SEARCH_SPACES,
+];
+
 export function rangesForSpace(
   space: SearchSpaceDefinition,
 ): StrategySearchParameterRange[] {
+  const patternRanges = rangesForPatternSpaceId(space.id);
+  if (patternRanges) return patternRanges;
   const full = getDefaultSafeV44SearchSpace();
   if (space.id === "full_safe" || space.keys.length === 0) {
     return full;
@@ -77,7 +88,6 @@ export function rangesForSpace(
   const keySet = new Set(space.keys);
   const selected = full.filter((r) => keySet.has(r.key));
   if (selected.length === 0) {
-    // Fallback: never return empty — use ema_fast from catalog
     return full.filter((r) => r.key === "ema_fast");
   }
   return selected;
@@ -86,7 +96,7 @@ export function rangesForSpace(
 export function buildSearchSpacesForDepth(
   spaceIds: string[],
 ): SearchSpaceDefinition[] {
-  const byId = new Map(SAFE_V44_SEARCH_SPACES.map((s) => [s.id, s]));
+  const byId = new Map(ALL_SEARCH_SPACES.map((s) => [s.id, s]));
   const out: SearchSpaceDefinition[] = [];
   for (const id of spaceIds) {
     const space = byId.get(id);
@@ -99,5 +109,17 @@ export function buildSearchSpacesForDepth(
 }
 
 export function getSearchSpaceById(id: string): SearchSpaceDefinition | null {
-  return SAFE_V44_SEARCH_SPACES.find((s) => s.id === id) ?? null;
+  return ALL_SEARCH_SPACES.find((s) => s.id === id) ?? null;
+}
+
+/** Resolve operator-selected space ids (SafeV44 + searchable patterns). */
+export function resolveSelectedSearchSpaces(
+  selectedIds: string[] | null | undefined,
+  depthFallbackIds: string[],
+): SearchSpaceDefinition[] {
+  if (selectedIds && selectedIds.length > 0) {
+    const resolved = buildSearchSpacesForDepth(selectedIds);
+    if (resolved.length > 0) return resolved;
+  }
+  return buildSearchSpacesForDepth(depthFallbackIds);
 }

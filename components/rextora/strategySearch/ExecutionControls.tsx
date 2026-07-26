@@ -10,20 +10,39 @@ export function ExecutionControls(props: {
   onPause: () => void;
   onResume: () => void;
   onCancel: () => void;
+  /** When failed job is safely retryable. */
+  retryable?: boolean;
+  /** True missing job — disable pause/stop and other execution actions. */
+  jobMissing?: boolean;
 }) {
   const { status, pending, onStart, onPause, onResume, onCancel } = props;
+
+  if (props.jobMissing) {
+    return (
+      <div
+        className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-100"
+        data-testid="ss-controls-missing"
+      >
+        탐색 작업을 찾을 수 없어 제어할 수 없습니다.
+      </div>
+    );
+  }
 
   const showStart = status === "queued";
   const showPause = status === "running";
   const showResume = status === "paused";
+  const showRetry = status === "failed" && props.retryable === true;
   const showCancel =
     status === "queued" ||
     status === "running" ||
     status === "paused" ||
     status === "pause_requested";
-  const cancelling = status === "cancel_requested";
+  const cancelling =
+    status === "cancel_requested" || status === "cancelling";
   const terminal =
-    status === "completed" || status === "cancelled" || status === "failed";
+    status === "completed" ||
+    status === "cancelled" ||
+    (status === "failed" && !showRetry);
 
   if (terminal) {
     return (
@@ -78,6 +97,18 @@ export function ExecutionControls(props: {
           재개
         </Button>
       ) : null}
+      {showRetry ? (
+        <Button
+          type="button"
+          variant="success"
+          className="ss-btn-primary"
+          data-testid="ss-action-retry"
+          disabled={pending}
+          onClick={onResume}
+        >
+          이어서 재시도
+        </Button>
+      ) : null}
       {showCancel ? (
         <Button
           type="button"
@@ -95,7 +126,7 @@ export function ExecutionControls(props: {
           className="self-center text-xs text-amber-200"
           data-testid="ss-cancelling"
         >
-          중지 요청 처리 중…
+          {status === "cancelling" ? "결과 정리 중…" : "중지 요청 중…"}
         </span>
       ) : null}
     </div>

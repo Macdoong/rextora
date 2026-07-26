@@ -84,18 +84,20 @@ export function LifecycleSettingsShell(props: {
           data-testid="settings-tab-research"
         >
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <Metric label="워커 동시성" value="프로세스 내 순차/버짓 가드" />
-            <Metric label="CPU 한도" value="OS 기본 (별도 cgroup 없음)" />
-            <Metric label="메모리 한도" value="Node 힙 기본" />
-            <Metric label="이력 보존" value="전략 탐색 Job 스토어" />
-            <Metric label="자동 복구" value="orphanJobRecovery + instrumentation" />
-            <Metric label="하트비트 타임아웃" value="잡 스토어 기준" />
-            <Metric label="기본 탐색 시간" value="폼 durationPreset (예: 180분)" />
+            <Metric label="기본 탐색 방식" value="설정한 시간까지 계속 연구" />
+            <Metric label="정상 종료" value="탐색 시간 마감" />
+            <Metric label="안전 제한" value="탐색 전략 한도 · 합격 최소 확보" />
+            <Metric label="이력 보존" value="최근 탐색 기록 보관" />
+            <Metric label="자동 복구" value="중단된 연구 작업 복구" />
+            <Metric label="기본 탐색 시간" value="3시간 (변경 가능)" />
           </div>
-          <p className="mt-3 text-sm text-slate-400">
-            후보 예산·합격 최소 목표는 안전 가드이며, 정상 종료는 DEADLINE_REACHED
-            입니다.
-          </p>
+          <details className="mt-3 text-xs text-slate-500">
+            <summary className="cursor-pointer select-none">기술 세부</summary>
+            <p className="mt-2">
+              워커는 프로세스 내 순차 실행이며, 탐색 전략 한도와 합격 최소 확보는
+              안전 가드입니다. 정상 종료 코드는 연구 시간 종료입니다.
+            </p>
+          </details>
         </Card>
       ),
       exchange: (

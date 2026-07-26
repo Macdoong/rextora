@@ -106,8 +106,8 @@ describe("user Backtest Run workflow", () => {
     const listed = listSavedBacktestsForStrategy("custom_non_safe");
     expect(listed.length).toBeGreaterThanOrEqual(2);
     // Must not write under production repo storage
-    expect(process.cwd()).toBe(tmp);
-    expect(process.cwd()).not.toBe(ROOT);
+    expect(fs.realpathSync(process.cwd())).toBe(fs.realpathSync(tmp));
+    expect(fs.realpathSync(process.cwd())).not.toBe(fs.realpathSync(ROOT));
     expect(
       fs.existsSync(path.join(tmp, "data", "rextora", "backtests", "index.json")),
     ).toBe(true);

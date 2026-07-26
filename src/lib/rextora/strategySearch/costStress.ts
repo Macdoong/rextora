@@ -11,6 +11,7 @@ import {
   calculateCandidateScore,
   evaluateCandidatePass,
 } from "./evaluationPolicy";
+import { isPatternCandidateParams } from "./patternSearchSpaces";
 import type {
   StrategySearchBacktestCostConfig,
   StrategySearchCandidate,
@@ -68,14 +69,19 @@ function resolveCandidateCostGuardK(
   scenarioId?: string | null,
 ): number {
   const raw = candidate.params.cost_guard_k;
-  if (typeof raw !== "number" || !Number.isFinite(raw) || raw <= 0) {
-    throw new StrategySearchCostStressError(
-      "INVALID_STRESS_SCENARIO",
-      "candidate.params.cost_guard_k must be a finite number > 0",
-      { candidateId: candidate.candidateId, scenarioId: scenarioId ?? null },
-    );
+  if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
+    return raw;
   }
-  return raw;
+  // Pattern / event-sequence candidates do not carry SafeV44 cost_guard_k.
+  // Use a conservative default so optional cost-stress overlays can still run.
+  if (isPatternCandidateParams(candidate.params as Record<string, unknown>)) {
+    return 3;
+  }
+  throw new StrategySearchCostStressError(
+    "INVALID_STRESS_SCENARIO",
+    "candidate.params.cost_guard_k must be a finite number > 0",
+    { candidateId: candidate.candidateId, scenarioId: scenarioId ?? null },
+  );
 }
 
 export function validateCostStressScenarios(
@@ -220,6 +226,7 @@ export async function evaluateCostStress(
   input: EvaluateCostStressInput,
 ): Promise<StrategySearchCostStressResult[]> {
   validateCostStressScenarios(input.scenarios);
+  if (input.scenarios.length === 0) return [];
   const candidateCostGuardK = resolveCandidateCostGuardK(input.candidate);
   const baseSnapshot: StrategySearchBacktestCostConfig = {
     feeRate: input.baseCostConfig.feeRate,

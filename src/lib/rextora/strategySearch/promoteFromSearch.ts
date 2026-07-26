@@ -1,6 +1,7 @@
 /**
  * Promote a Final PASS Strategy Search trial into Strategy Management.
  * Always creates a new strategy — never overwrites SAFE or existing ids.
+ * SafeV44 trials → safe_params; Order Block trials → condition_builder + eventSequence.
  */
 
 import { mergeSafeParams } from "../strategy/safeV44Params";
@@ -21,6 +22,9 @@ import {
   listSearchTrials,
   type StrategySearchStoreOptions,
 } from "./jobStore";
+import { describeLeverageFromParams } from "./leverageMode";
+import { buildPatternSearchDefinition } from "./patternEventSequence";
+import { resolvePatternFamilyFromParams } from "./patternSearchSpaces";
 import {
   getSearchPlan,
   saveSearchPlan,
@@ -34,6 +38,7 @@ export interface PromoteSearchCandidateInput {
   jobId: string;
   iteration: number;
   name?: string;
+  clusterId?: string;
   storeOptions?: StrategySearchStoreOptions;
 }
 
@@ -101,6 +106,51 @@ function recordPlanPromotion(
   );
 }
 
+function findExistingByCandidateHash(candidateParamsHash: string) {
+  return listStrategies().find(
+    (s) =>
+      !s.locked &&
+      (s.paramsHash === candidateParamsHash ||
+        (typeof s.description === "string" &&
+          s.description.includes(
+            `candidateParamsHash=${candidateParamsHash}`,
+          ))),
+  );
+}
+
+function buildProvenanceDescription(input: {
+  jobId: string;
+  iteration: number;
+  candidateId: string;
+  candidateParamsHash: string;
+  clusterId?: string;
+  searchFamily: string;
+  pattern: string | null;
+  leverageLabel: string;
+  identityLabel: string;
+  symbols: string[];
+  timeframe: string;
+}): string {
+  const clusterPart = input.clusterId
+    ? ` · sourceClusterId=${input.clusterId}`
+    : "";
+  const patternPart = input.pattern
+    ? ` · pattern=${input.pattern}`
+    : "";
+  return (
+    `전략 탐색 · sourceResearchJobId=${input.jobId}` +
+    ` · sourceTrialIteration=${input.iteration}${clusterPart}` +
+    ` · candidateId=${input.candidateId}` +
+    ` · candidateParamsHash=${input.candidateParamsHash}` +
+    ` · structureFingerprint=${input.candidateParamsHash}` +
+    ` · searchFamily=${input.searchFamily}${patternPart}` +
+    ` · leverage=${input.leverageLabel}` +
+    ` · ${input.identityLabel}` +
+    ` · ${input.symbols.join(",")}` +
+    ` · ${input.timeframe}`
+  );
+}
+
 export function promoteSearchCandidateToStrategy(
   input: PromoteSearchCandidateInput,
 ): PromoteSearchCandidateResult {
@@ -139,24 +189,13 @@ export function promoteSearchCandidateToStrategy(
     );
   }
 
-  const params = mergeSafeParams(trial.params as Partial<SafeV44Params>);
-  const paramsHash = computeParamsHash(params);
-  if (
-    paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-    paramsHash === "7893ca3f0e30" ||
-    trial.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-    trial.paramsHash === "7893ca3f0e30"
-  ) {
-    throw new StrategySearchApiError(
-      "PROTECTED_STRATEGY_VIOLATION",
-      "protected SAFE strategy cannot be promoted or overwritten",
-      403,
-    );
-  }
-
+  const patternFamily = resolvePatternFamilyFromParams(
+    trial.params as Record<string, unknown>,
+  );
+  const isPattern = patternFamily != null;
   const identity = buildReadableStrategyIdentity(
-    params as unknown as Record<string, unknown>,
-    paramsHash,
+    trial.params as Record<string, unknown>,
+    trial.paramsHash,
   );
   const market = job.config.symbols[0] ?? null;
   const primary = trial.windowResults[0] ?? null;
@@ -179,6 +218,150 @@ export function promoteSearchCandidateToStrategy(
               : null,
         }
       : null;
+
+  const tf = job.config.timeframe;
+  const timeframe: "5m" | "15m" | "1h" =
+    tf === "5m" || tf === "15m" || tf === "1h" ? tf : "15m";
+
+  if (isPattern && patternFamily) {
+    if (
+      trial.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
+      trial.paramsHash === "7893ca3f0e30"
+    ) {
+      throw new StrategySearchApiError(
+        "PROTECTED_STRATEGY_VIOLATION",
+        "protected SAFE strategy cannot be promoted or overwritten",
+        403,
+      );
+    }
+
+    const existing = findExistingByCandidateHash(trial.paramsHash);
+    if (existing) {
+      const dup: PromoteSearchCandidateResult = {
+        strategyId: existing.id,
+        strategyName: existing.name,
+        paramsHash: existing.paramsHash,
+        alreadyExists: true,
+        existingStrategyId: existing.id,
+        registrationState: "duplicate",
+        strategyFamily: identity.strategyFamily,
+        strategyTypeLabelKo: identity.strategyTypeLabelKo,
+        market,
+        timeframe: job.config.timeframe,
+        params: { ...trial.params },
+        lastBacktest,
+      };
+      recordPlanPromotion(input.jobId, dup, input.iteration, store);
+      return dup;
+    }
+
+    const stop =
+      typeof trial.params.stopAtrMult === "number"
+        ? (trial.params.stopAtrMult as number)
+        : 1.2;
+    const tp =
+      typeof trial.params.tpAtrMult === "number"
+        ? (trial.params.tpAtrMult as number)
+        : 2;
+    const hold =
+      typeof trial.params.maxHoldBars === "number"
+        ? Math.trunc(trial.params.maxHoldBars as number)
+        : 48;
+    const shellParams = mergeSafeParams({
+      sl_atr_mult: stop,
+      tp_atr_mult: tp,
+      max_hold_bars: hold,
+    });
+    const name =
+      (input.name && input.name.trim()) || identity.readableName;
+    const definition = buildPatternSearchDefinition({
+      candidateId: "pending",
+      strategyName: name,
+      timeframe,
+      symbols: [...job.config.symbols],
+      params: trial.params as Record<string, unknown>,
+      family: patternFamily,
+    });
+    if (!definition) {
+      throw new StrategySearchApiError(
+        "INVALID_REQUEST",
+        "pattern trial could not build eventSequence definition",
+        400,
+      );
+    }
+
+    const created = createStrategy({
+      name,
+      description: buildProvenanceDescription({
+        jobId: job.id,
+        iteration: input.iteration,
+        candidateId: trial.candidateId,
+        candidateParamsHash: trial.paramsHash,
+        clusterId: input.clusterId,
+        searchFamily: patternFamily,
+        pattern: patternFamily,
+        leverageLabel: describeLeverageFromParams(
+          trial.params as Record<string, unknown>,
+        ),
+        identityLabel: identity.strategyTypeLabelKo,
+        symbols: job.config.symbols,
+        timeframe: job.config.timeframe,
+      }),
+      params: shellParams,
+      timeframe,
+      strategyType: "condition_builder",
+      definition,
+    });
+
+    if (lastBacktest) {
+      try {
+        updateStrategyLastBacktest(created.id, {
+          totalReturn: lastBacktest.totalReturn,
+          mdd: lastBacktest.mdd,
+          trades: lastBacktest.trades,
+          winRate: lastBacktest.winRate,
+        });
+      } catch {
+        /* non-fatal enrichment */
+      }
+    }
+
+    const createdResult: PromoteSearchCandidateResult = {
+      strategyId: created.id,
+      strategyName: created.name,
+      paramsHash: created.paramsHash,
+      alreadyExists: false,
+      existingStrategyId: null,
+      registrationState: "registered",
+      strategyFamily: identity.strategyFamily,
+      strategyTypeLabelKo: identity.strategyTypeLabelKo,
+      market,
+      timeframe: job.config.timeframe,
+      params: { ...trial.params },
+      lastBacktest,
+    };
+    recordPlanPromotion(input.jobId, createdResult, input.iteration, store);
+    return createdResult;
+  }
+
+  const params = mergeSafeParams(trial.params as Partial<SafeV44Params>);
+  const paramsHash = computeParamsHash(params);
+  if (
+    paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
+    paramsHash === "7893ca3f0e30" ||
+    trial.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
+    trial.paramsHash === "7893ca3f0e30"
+  ) {
+    throw new StrategySearchApiError(
+      "PROTECTED_STRATEGY_VIOLATION",
+      "protected SAFE strategy cannot be promoted or overwritten",
+      403,
+    );
+  }
+
+  const leverageLabel = describeLeverageFromParams(
+    params as unknown as Record<string, unknown>,
+  );
 
   const existing = listStrategies().find(
     (s) =>
@@ -207,13 +390,21 @@ export function promoteSearchCandidateToStrategy(
   const name =
     (input.name && input.name.trim()) || identity.readableName;
 
-  const tf = job.config.timeframe;
-  const timeframe: "5m" | "15m" | "1h" =
-    tf === "5m" || tf === "15m" || tf === "1h" ? tf : "15m";
-
   const created = createStrategy({
     name,
-    description: `전략 탐색 · 출처 job=${job.id} · iteration=${input.iteration} · ${identity.strategyTypeLabelKo} · ${job.config.symbols.join(",")} · ${job.config.timeframe}`,
+    description: buildProvenanceDescription({
+      jobId: job.id,
+      iteration: input.iteration,
+      candidateId: trial.candidateId,
+      candidateParamsHash: trial.paramsHash,
+      clusterId: input.clusterId,
+      searchFamily: "safe_v44",
+      pattern: null,
+      leverageLabel,
+      identityLabel: identity.strategyTypeLabelKo,
+      symbols: job.config.symbols,
+      timeframe: job.config.timeframe,
+    }),
     params,
     timeframe,
     strategyType: "safe_params",

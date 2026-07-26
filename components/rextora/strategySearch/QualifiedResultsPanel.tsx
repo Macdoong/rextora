@@ -19,7 +19,8 @@ import {
 export type RegistrationStateUi =
   | "not_registered"
   | "registered"
-  | "duplicate";
+  | "duplicate"
+  | "registration_failed";
 
 export interface QualifiedStrategyCardModel {
   key: string;
@@ -57,12 +58,18 @@ export interface RegistrationSummary {
 type FilterId = "all" | "not_registered" | "registered";
 type SortId = "return" | "mdd" | "trades" | "winRate";
 
-function registrationLabel(state: RegistrationStateUi): string {
+function registrationLabel(
+  state: RegistrationStateUi,
+  pending?: boolean,
+): string {
+  if (pending) return "등록 중";
   switch (state) {
     case "registered":
       return "등록됨";
     case "duplicate":
       return "이미 등록됨";
+    case "registration_failed":
+      return "등록 실패";
     default:
       return "미등록";
   }
@@ -70,9 +77,12 @@ function registrationLabel(state: RegistrationStateUi): string {
 
 function registrationTone(
   state: RegistrationStateUi,
-): "success" | "muted" | "warning" {
+  pending?: boolean,
+): "success" | "muted" | "warning" | "danger" {
+  if (pending) return "warning";
   if (state === "registered") return "success";
   if (state === "duplicate") return "muted";
+  if (state === "registration_failed") return "danger";
   return "warning";
 }
 
@@ -266,8 +276,8 @@ function DetailDrawer(props: {
                 추천 {stars.label}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={registrationTone(item.registrationState)}>
-                  {registrationLabel(item.registrationState)}
+                <Badge tone={registrationTone(item.registrationState, props.registering)}>
+                  {registrationLabel(item.registrationState, props.registering)}
                 </Badge>
                 {item.finalPass ? <Badge tone="success">합격</Badge> : null}
               </div>
@@ -481,8 +491,8 @@ function StrategyCard(props: {
             </div>
           </div>
         </div>
-        <Badge tone={registrationTone(item.registrationState)}>
-          {registrationLabel(item.registrationState)}
+        <Badge tone={registrationTone(item.registrationState, props.registering)}>
+          {registrationLabel(item.registrationState, props.registering)}
         </Badge>
       </div>
 
@@ -634,7 +644,7 @@ export function QualifiedResultsPanel(props: {
             다시 탐색해 보세요.
           </p>
           <ul className="list-disc space-y-1 pl-5 text-[0.9375rem] text-[var(--text-secondary)]">
-            <li>후보 예산 늘리기</li>
+            <li>탐색 전략 한도 늘리기</li>
             <li>기간 늘리기</li>
             <li>최대 손실 완화</li>
             <li>최소 거래 수 줄이기</li>

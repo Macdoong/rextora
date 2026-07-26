@@ -28,14 +28,18 @@ describe("strategy search progress / status UX labels", () => {
     })).toBe("완료");
     expect(historyStatusLabelKo("completed", {
       completionReason: "SEARCH_SPACE_EXHAUSTED",
-    })).toBe("완료");
+    })).toBe("정상 완료");
   });
 
   it("history statuses stay within operator vocabulary", () => {
-    expect(historyStatusLabelKo("running")).toBe("실행 중");
-    expect(historyStatusLabelKo("paused")).toBe("실행 중");
-    expect(historyStatusLabelKo("cancelled")).toBe("중지됨");
+    expect(historyStatusLabelKo("running")).toBe("연구 중");
+    expect(historyStatusLabelKo("paused")).toBe("일시정지");
+    expect(historyStatusLabelKo("cancel_requested")).toBe("중지 요청 중");
+    expect(historyStatusLabelKo("cancelling")).toBe("결과 정리 중");
+    expect(historyStatusLabelKo("cancelled")).toBe("사용자 중지");
+    expect(historyStatusLabelKo("cancelled")).toBe("사용자 중지");
     expect(historyStatusLabelKo("failed")).toBe("실패");
+    expect(historyStatusLabelKo("completed")).toBe("정상 완료");
   });
 
   it("marks remaining pipeline stages as skipped when goal already reached", () => {

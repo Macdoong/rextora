@@ -67,7 +67,7 @@ export function evaluateOverfittingEvidence(
       overfittingRisk: "unavailable",
       riskLevelKo: levelKo("unavailable"),
       evidence: [],
-      reasons: ["강건성·지터·스트레스 증거가 부족합니다."],
+      reasons: ["거래 안정성 검증 증거가 부족합니다."],
       recommendedNextTest: "다른 기간으로 백테스트를 실행하세요.",
     };
   }
@@ -76,21 +76,21 @@ export function evaluateOverfittingEvidence(
   if (hasJitterSignal) {
     evidence.push(
       input.jitterPassed
-        ? "파라미터 지터 검증 통과"
-        : "파라미터 지터 검증 실패",
+        ? "소폭 파라미터 변경 검증 통과"
+        : "소폭 파라미터 변경 검증 실패",
     );
     if (!input.jitterPassed) {
       score += 2;
-      reasons.push("파라미터 구간에 성과가 민감합니다.");
+      reasons.push("설정값을 조금 바꿔도 성과가 크게 달라집니다.");
     }
   }
   if (hasStressSignal) {
     evidence.push(
-      input.stressPassed ? "비용 스트레스 통과" : "비용 스트레스 실패",
+      input.stressPassed ? "비용 부담 검증 통과" : "비용 부담 검증 실패",
     );
     if (!input.stressPassed) {
       score += 1;
-      reasons.push("수수료·슬리피지 스트레스에 취약합니다.");
+      reasons.push("수수료·슬리피지가 커지면 성과가 약해집니다.");
     }
   }
   if (hasTradeSignal) {
@@ -126,7 +126,7 @@ export function evaluateOverfittingEvidence(
     reasons:
       reasons.length > 0
         ? reasons
-        : ["현재 증거 범위에서 뚜렷한 과적합 신호는 없습니다."],
+        : ["현재 증거 범위에서 뚜렷한 과거 데이터 편중 신호는 없습니다."],
     recommendedNextTest:
       level === "high"
         ? "다른 기간으로 백테스트가 필요합니다."

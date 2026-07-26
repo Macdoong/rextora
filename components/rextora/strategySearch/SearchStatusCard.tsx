@@ -1,19 +1,65 @@
 "use client";
 
+import { useState } from "react";
 import { Metric } from "@/components/ui/primitives";
 import type { StrategySearchJobDetail } from "./types";
 import {
+  EVALUATION_PIPELINE_STAGES,
   formatCount,
+  formatErrorStatusKo,
   formatMs,
   formatPct,
   isEarlyFinishReason,
+  mapEngineStageToPipelineId,
   pipelineStageLabelKo,
   pipelineStageUiStatus,
   researchStatusLabelKo,
+  resolveCurrentStageLabelKo,
   resolveDisplayTerminationReason,
   type PipelineUiStatus,
 } from "./formatters";
 import { cleanStrategyDisplayName } from "./displayNames";
+
+function formatClock(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return "—";
+  return d.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
+function formatSignedDelta(
+  current: number | null | undefined,
+  previous: number | null | undefined,
+  asPct = false,
+): string | null {
+  if (
+    current == null ||
+    previous == null ||
+    !Number.isFinite(current) ||
+    !Number.isFinite(previous)
+  ) {
+    return null;
+  }
+  const delta = current - previous;
+  if (Math.abs(delta) < 1e-12) return asPct ? "±0.00%" : "±0";
+  const sign = delta > 0 ? "+" : "";
+  if (asPct) return `${sign}${(delta * 100).toFixed(2)}%p`;
+  if (Number.isInteger(delta)) return `${sign}${delta}`;
+  return `${sign}${delta.toFixed(2)}`;
+}
+
+function movementArrow(short: string): string {
+  if (short === "신규") return "NEW";
+  if (short === "상승") return "↑";
+  if (short === "하락") return "↓";
+  if (short === "유지") return "KEEP";
+  return short;
+}
 
 function toneClass(ui: PipelineUiStatus): string {
   switch (ui) {
@@ -59,6 +105,103 @@ function StatBlock(props: {
   );
 }
 
+function buildAiWorkNarrative(input: {
+  job: StrategySearchJobDetail;
+  latestWeaknessKo?: string | null;
+  latestAdjustmentKo?: string | null;
+}): Array<{ label: string; value: string }> {
+  const { job, latestWeaknessKo, latestAdjustmentKo } = input;
+  const sections: Array<{ label: string; value: string }> = [];
+
+  const currentTask =
+    job.currentSearchFamily ??
+    job.searchProgression?.find((s) => s.status === "active")?.labelKo ??
+    job.currentImprovementStage ??
+    null;
+  if (currentTask) {
+    sections.push({ label: "현재 AI 작업", value: currentTask });
+  }
+
+  if (latestWeaknessKo) {
+    sections.push({ label: "최근 발견한 약점", value: latestWeaknessKo });
+  }
+
+  if (latestAdjustmentKo) {
+    sections.push({ label: "적용한 개선", value: latestAdjustmentKo });
+  }
+
+  const nextSpace = job.searchProgression?.find((s) => s.status === "pending");
+  if (nextSpace?.labelKo) {
+    sections.push({ label: "다음 단계", value: nextSpace.labelKo });
+  } else if (job.status === "running" && job.currentSearchFamily) {
+    sections.push({
+      label: "다음 단계",
+      value: "현재 전략군 평가를 계속합니다",
+    });
+  }
+
+  return sections;
+}
+
+function deriveEvaluationPipelineStages(job: StrategySearchJobDetail): Array<{
+  id: string;
+  label: string;
+  ui: PipelineUiStatus;
+  statusLabel: string;
+}> {
+  const evaluated =
+    job.counters?.evaluated ??
+    job.statistics?.evaluated ??
+    job.uniqueEvaluatedCount ??
+    0;
+  const failedPipelineId = mapEngineStageToPipelineId(
+    job.failedStage ?? job.terminationDetail ?? null,
+  );
+  const lastOkId = mapEngineStageToPipelineId(job.lastSuccessfulStage);
+
+  let activeIndex = 0;
+  if (failedPipelineId) {
+    activeIndex = EVALUATION_PIPELINE_STAGES.findIndex(
+      (s) => s.id === failedPipelineId,
+    );
+  } else if (lastOkId) {
+    activeIndex =
+      EVALUATION_PIPELINE_STAGES.findIndex((s) => s.id === lastOkId) + 1;
+  } else if (job.symbolSelection?.selectedSymbol || job.status !== "queued") {
+    activeIndex = evaluated > 0 ? 2 : 1;
+  }
+
+  return EVALUATION_PIPELINE_STAGES.map((stage, idx) => {
+    let ui: PipelineUiStatus = "waiting";
+    if (job.status === "failed" && failedPipelineId === stage.id) {
+      ui = "failed";
+    } else if (idx < activeIndex) {
+      ui = "completed";
+    } else if (
+      idx === activeIndex &&
+      (job.executionActive ||
+        job.status === "running" ||
+        job.status === "pause_requested")
+    ) {
+      ui = "running";
+    } else if (
+      job.status === "completed" ||
+      job.status === "cancelled" ||
+      (job.status === "failed" && idx < activeIndex)
+    ) {
+      ui = idx <= activeIndex ? "completed" : "skipped";
+    }
+    return {
+      id: stage.id,
+      label: stage.labelKo,
+      ui,
+      statusLabel: pipelineStageLabelKo(ui, {
+        earlyGoal: isEarlyFinishReason(job.completionReason),
+      }),
+    };
+  });
+}
+
 export function SearchStatusCard(props: {
   job: StrategySearchJobDetail;
   qualifiedCountFallback?: number;
@@ -67,9 +210,9 @@ export function SearchStatusCard(props: {
   latestAdjustmentKo?: string | null;
 }) {
   const { job, generationCount, latestWeaknessKo, latestAdjustmentKo } = props;
+  const [top10Expanded, setTop10Expanded] = useState(false);
   const stats = job.statistics;
   const qualifiedTarget = job.qualifiedTarget ?? null;
-  // Use plan-qualified count only — never statistics.passed (avoids X/Y goal confusion).
   const qualifiedCount =
     job.qualifiedCount ?? props.qualifiedCountFallback ?? 0;
   const tested =
@@ -89,10 +232,19 @@ export function SearchStatusCard(props: {
     job.executionActive ||
     job.status === "pause_requested";
 
+  const preserved =
+    job.preservedCandidateCount ??
+    job.qualifiedCount ??
+    props.qualifiedCountFallback ??
+    0;
   const researchStatus = researchStatusLabelKo(job.status, {
     completionReason: job.completionReason,
     executionActive: job.executionActive,
+    preservedCandidateCount: preserved,
   });
+  const counters = job.counters;
+  const risk = job.currentBestRisk;
+  const symbolSel = job.symbolSelection;
   const reason = resolveDisplayTerminationReason({
     status: job.status,
     completionReason: job.completionReason,
@@ -106,11 +258,43 @@ export function SearchStatusCard(props: {
     job.expectedCompletionAtMs != null
       ? new Date(job.expectedCompletionAtMs).toLocaleString("ko-KR")
       : null;
+  const progressPct =
+    typeof job.progressRatio === "number" && Number.isFinite(job.progressRatio)
+      ? Math.max(0, Math.min(100, Math.round(job.progressRatio * 100)))
+      : null;
+  const progressLine =
+    progressPct != null
+      ? "탐색 진행 " + String(progressPct) + "%"
+      : researching
+        ? "시간 정보를 복구하는 중입니다."
+        : null;
   const bestReturn = formatPct(job.bestReturn);
   const progression = job.searchProgression ?? [];
   const bestSummary = job.currentBestSummary
     ? cleanStrategyDisplayName(job.currentBestSummary)
     : null;
+  const currentStage = resolveCurrentStageLabelKo({
+    currentSearchFamily: job.currentSearchFamily,
+    currentImprovementStage: job.currentImprovementStage,
+    searchProgression: progression,
+    failedStage: job.failedStage,
+    status: job.status,
+  });
+  const errorStatus = formatErrorStatusKo(
+    counters?.evaluationErrors ?? stats?.errors ?? 0,
+  );
+  const evaluatedCount = counters?.evaluated ?? stats?.evaluated ?? tested;
+  const rejectedCount =
+    counters?.rejected ??
+    Math.max(0, (stats?.failed ?? 0) - (stats?.errors ?? 0));
+  const safetyLimitLabel =
+    budget != null ? `${formatCount(budget)}개` : null;
+  const aiNarrative = buildAiWorkNarrative({
+    job,
+    latestWeaknessKo,
+    latestAdjustmentKo,
+  });
+  const evalPipelineStages = deriveEvaluationPipelineStages(job);
 
   const baseStages =
     progression.length > 0
@@ -126,7 +310,7 @@ export function SearchStatusCard(props: {
     baseStages.findIndex((s) => s.status === "active"),
   );
 
-  const stages = baseStages.map((step, idx) => {
+  const familyStages = baseStages.map((step, idx) => {
     const ui = pipelineStageUiStatus({
       stageStatus: step.status,
       jobStatus: job.status,
@@ -141,9 +325,41 @@ export function SearchStatusCard(props: {
     };
   });
 
-  const evaluatedLabel = `${formatCount(budgetUsed)}개`;
-  const safetyLimitLabel =
-    budget != null ? `${formatCount(budget)}개` : null;
+  const elapsedRemainingValue =
+    elapsed && remaining
+      ? `${elapsed} / ${remaining}`
+      : elapsed ?? remaining ?? "시간 정보 없음";
+
+  const elapsedMsNum = job.elapsedMs ?? stats?.elapsedMs ?? null;
+  const evalPerSec =
+    elapsedMsNum != null &&
+    elapsedMsNum > 0 &&
+    evaluatedCount > 0 &&
+    Number.isFinite(evaluatedCount)
+      ? evaluatedCount / (elapsedMsNum / 1000)
+      : null;
+  const remainingEvals =
+    job.candidateBudget != null &&
+    job.uniqueEvaluatedCount != null &&
+    Number.isFinite(job.candidateBudget) &&
+    Number.isFinite(job.uniqueEvaluatedCount)
+      ? Math.max(0, job.candidateBudget - job.uniqueEvaluatedCount)
+      : job.maxIterations != null &&
+          job.completedIterations != null &&
+          Number.isFinite(job.maxIterations)
+        ? Math.max(0, job.maxIterations - job.completedIterations)
+        : null;
+  const leverageSummaryRow = job.appliedSearchSummary?.sections
+    ?.flatMap((s) => s.rows)
+    ?.find(
+      (r) =>
+        r.labelKo.includes("레버리지") ||
+        r.labelKo.toLowerCase().includes("leverage"),
+    );
+  const patternSummaryRows =
+    job.appliedSearchSummary?.sections?.find((s) =>
+      s.titleKo.includes("패턴"),
+    )?.rows ?? [];
 
   return (
     <section
@@ -168,9 +384,42 @@ export function SearchStatusCard(props: {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatBlock
-          label="합격 후보"
+          label="탐색 진행"
+          value={
+            progressPct != null
+              ? `${progressPct}%`
+              : progressLine ?? "—"
+          }
+          hint={
+            expectedCompletion
+              ? `예상 종료: ${expectedCompletion}`
+              : researching
+                ? "시간 정보를 복구하는 중입니다."
+                : null
+          }
+          testId="ss-time-progress"
+        />
+        <StatBlock
+          label="경과/남은 시간"
+          value={elapsedRemainingValue}
+          hint={
+            job.status === "paused"
+              ? "일시정지 중에는 남은 시간이 재개 후 기준입니다."
+              : expectedCompletion
+                ? `예상 완료 ${expectedCompletion}`
+                : null
+          }
+          testId="ss-elapsed-remaining"
+        />
+        <StatBlock
+          label="평가 전략"
+          value={`${formatCount(evaluatedCount)}개`}
+          testId="ss-counter-evaluated"
+        />
+        <StatBlock
+          label="합격 전략"
           value={`${formatCount(qualifiedCount)}개`}
           hint={
             qualifiedTarget != null
@@ -181,190 +430,460 @@ export function SearchStatusCard(props: {
           emphasize
         />
         <StatBlock
-          label="최소 확보 기준"
-          value={
-            qualifiedTarget != null ? `${qualifiedTarget}개` : "설정 없음"
-          }
-          hint="최소 확보 기준을 충족해도 설정된 탐색 시간이 끝날 때까지 개선을 계속합니다."
-          testId="ss-qualified-target"
-        />
-        <StatBlock
-          label="연구 상태"
-          value={researchStatus}
-          testId="ss-research-status"
-          emphasize={!researching}
-        />
-        <StatBlock
-          label="종료 사유"
-          value={
-            researching
-              ? "연구 진행 중"
-              : reason
-          }
-          testId="ss-stop-reason"
-        />
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <StatBlock
-          label="평가한 후보"
-          value={`평가한 후보 ${evaluatedLabel}`}
-          hint={
-            safetyLimitLabel
-              ? `자원 안전 제한 ${safetyLimitLabel} — 정상 종료 조건이 아닙니다.`
-              : "정상 종료는 탐색 시간 마감(DEADLINE_REACHED)입니다."
-          }
-          testId="ss-research-budget"
-        />
-        <StatBlock
-          label={job.status === "paused" ? "활성 경과" : "경과 시간"}
-          value={elapsed ?? "레거시 타이밍 없음"}
-          testId="ss-elapsed"
-        />
-        <StatBlock
-          label={job.status === "paused" ? "재개 후 남은 시간" : "남은 시간"}
-          value={remaining ?? "레거시 타이밍 없음"}
-          testId="ss-remaining"
-        />
-        <StatBlock
-          label="예상 완료"
-          value={expectedCompletion ?? "—"}
-          testId="ss-expected-completion"
-        />
-        <StatBlock
-          label="현재 최고 수익"
-          value={bestReturn ?? "—"}
+          label="현재 최고"
+          value={bestSummary ?? bestReturn ?? "—"}
+          hint={bestSummary && bestReturn ? bestReturn : null}
           testId="ss-best-return"
           emphasize
         />
         <StatBlock
-          label="실제 선택 심볼"
-          value={(job.symbols ?? []).join(", ") || "—"}
-          testId="ss-actual-symbols"
+          label="현재 단계"
+          value={currentStage}
+          testId="ss-current-stage"
+        />
+        <StatBlock
+          label="현재 반복"
+          value={
+            job.nextIteration != null
+              ? `#${formatCount(job.nextIteration)}`
+              : job.completedIterations != null
+                ? `완료 ${formatCount(job.completedIterations)}`
+                : "—"
+          }
+          hint={
+            job.currentSearchFamily
+              ? `패밀리: ${job.currentSearchFamily}`
+              : null
+          }
+          testId="ss-current-iteration"
+        />
+        {evalPerSec != null ? (
+          <StatBlock
+            label="평가 속도"
+            value={`${evalPerSec.toFixed(2)}/초`}
+            hint={
+              remainingEvals != null
+                ? `예상 남은 평가 ${formatCount(remainingEvals)}개`
+                : null
+            }
+            testId="ss-eval-speed"
+          />
+        ) : null}
+        {leverageSummaryRow ? (
+          <StatBlock
+            label="레버리지"
+            value={leverageSummaryRow.valueKo}
+            testId="ss-live-leverage-mode"
+          />
+        ) : null}
+        {patternSummaryRows.length > 0 ? (
+          <StatBlock
+            label="패턴 설정"
+            value={
+              patternSummaryRows
+                .slice(0, 2)
+                .map((r) => `${r.labelKo} ${r.valueKo}`)
+                .join(" · ") || "—"
+            }
+            hint={
+              patternSummaryRows.length > 2
+                ? patternSummaryRows
+                    .slice(2)
+                    .map((r) => `${r.labelKo} ${r.valueKo}`)
+                    .join(" · ")
+                : null
+            }
+            testId="ss-live-pattern-config"
+          />
+        ) : null}
+        <StatBlock
+          label="오류 상태"
+          value={errorStatus}
+          hint={
+            counters && !counters.invariantOk
+              ? "계수 불일치 — 상세 정보를 확인하세요."
+              : "계산 오류는 조건 탈락과 겹치지 않습니다."
+          }
+          testId="ss-error-status"
         />
       </div>
-      {safetyLimitLabel ? (
-        <p
-          className="text-xs text-slate-500"
-          data-testid="ss-resource-safety-limit"
-        >
-          자원 안전 제한: {safetyLimitLabel} (정상 완료 목표가 아님)
-        </p>
-      ) : null}
 
-      <div data-testid="ss-search-progression" className="space-y-3">
-        <div className="ss-subsection-title">탐색 파이프라인</div>
-        {stages.length === 0 ? (
-          <p className="text-sm text-slate-400" data-testid="ss-pipeline-empty">
-            활성 탐색 공간이 아직 로드되지 않았습니다. 연구가 시작되면 실제
-            후보 가족이 표시됩니다.
+      <div
+        className="rounded-xl border border-[var(--border)] bg-[var(--panel-strong)] px-4 py-3"
+        data-testid="ss-live-top10"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="ss-field-label">실시간 TOP 10</div>
+          <div
+            className="text-xs text-[var(--text-muted)]"
+            data-testid="ss-live-top10-updated"
+          >
+            마지막 갱신: {formatClock(job.liveTop10?.updatedAt)}
+          </div>
+        </div>
+        {!job.liveTop10 || job.liveTop10.entries.length === 0 ? (
+          <p
+            className="mt-2 text-sm text-[var(--text-muted)]"
+            data-testid="ss-live-top10-empty"
+          >
+            아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다.
           </p>
-        ) : null}
-        <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2">
-          {stages.map((step, idx) => (
-            <li key={step.id} className="flex items-center gap-2">
-              <div
-                className={`flex min-w-[8.5rem] flex-col items-center justify-center rounded-lg border px-3 py-2.5 text-center ${toneClass(step.ui)}`}
-                data-testid={`ss-pipeline-${step.id}`}
+        ) : (
+          <>
+            <ul className="mt-3 space-y-2" data-testid="ss-live-top10-list">
+              {(top10Expanded
+                ? job.liveTop10.entries
+                : job.liveTop10.entries.slice(0, 3)
+              ).map((row) => (
+                <li
+                  key={`${row.rank}-${row.strategyHash}`}
+                  className="rounded-lg border border-slate-800/80 px-3 py-2 text-sm"
+                  data-testid={`ss-live-top10-row-${row.rank}`}
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <div className="font-medium text-[var(--text-primary)]">
+                      {row.rank}.{" "}
+                      {cleanStrategyDisplayName(row.displayAlias) ||
+                        row.readableName}
+                    </div>
+                    <span
+                      className="text-xs font-semibold tracking-wide text-sky-200/90"
+                      data-testid={`ss-live-top10-move-${row.rank}`}
+                    >
+                      {movementArrow(row.rankChangeShort)} ·{" "}
+                      {row.rankChangeShort}
+                      {row.movementReasonKo
+                        ? ` · ${row.movementReasonKo}`
+                        : ""}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-[var(--text-muted)]">
+                    {row.previousRank != null
+                      ? `${row.previousRank}위 → ${row.rank}위`
+                      : `신규 ${row.rank}위`}{" "}
+                    · {row.strategyFamily ?? "—"} · 순수익{" "}
+                    {formatPct(row.netReturn)}
+                    {formatSignedDelta(
+                      row.netReturn,
+                      row.previousNetReturn,
+                      true,
+                    )
+                      ? ` (${formatSignedDelta(row.netReturn, row.previousNetReturn, true)})`
+                      : ""}{" "}
+                    · MDD {formatPct(row.maxDrawdown)}
+                    {formatSignedDelta(
+                      row.maxDrawdown,
+                      row.previousMaxDrawdown,
+                      true,
+                    )
+                      ? ` (${formatSignedDelta(row.maxDrawdown, row.previousMaxDrawdown, true)})`
+                      : ""}{" "}
+                    · 거래 {formatCount(row.tradeCount ?? 0)}
+                    {formatSignedDelta(row.tradeCount, row.previousTradeCount)
+                      ? ` (${formatSignedDelta(row.tradeCount, row.previousTradeCount)})`
+                      : ""}{" "}
+                    · 점수{" "}
+                    {row.score != null && Number.isFinite(row.score)
+                      ? row.score.toFixed(2)
+                      : "—"}
+                    {formatSignedDelta(row.score, row.previousScore)
+                      ? ` (이전 ${row.previousScore != null ? row.previousScore.toFixed(2) : "—"} · ${formatSignedDelta(row.score, row.previousScore)})`
+                      : ""}{" "}
+                    · 레버리지 {row.leverageLabel || "—"}
+                  </div>
+                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">
+                    선정: {row.rankReason || "—"}
+                    {row.eligibilityStatus
+                      ? ` · 적격 ${row.eligibilityStatus}`
+                      : ""}
+                    {row.registrationState
+                      ? ` · 등록 ${row.registrationState}`
+                      : ""}
+                  </div>
+                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">
+                    {row.costStatus} · {row.robustnessStatus} ·{" "}
+                    {row.sampleConfidence}
+                    {row.overfittingRisk
+                      ? ` · 과적합 ${row.overfittingRisk}`
+                      : ""}
+                    {row.recommendable === true
+                      ? " · 추천 후보"
+                      : row.recommendable === false
+                        ? " · 추천 보류"
+                        : ""}
+                    {row.roleBadges.length > 0
+                      ? ` · ${row.roleBadges.join(", ")}`
+                      : ""}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {job.liveTop10.entries.length > 3 ? (
+              <button
+                type="button"
+                className="mt-2 text-xs text-sky-300 underline-offset-2 hover:underline"
+                onClick={() => setTop10Expanded((v) => !v)}
+                data-testid="ss-live-top10-toggle"
               >
-                <span className="text-xs font-semibold">{step.label}</span>
-                <span className="mt-1 text-[11px] opacity-90">
-                  {step.statusLabel}
-                </span>
-              </div>
-              {idx < stages.length - 1 ? (
-                <span className="text-slate-600" aria-hidden>
-                  ↓
-                </span>
-              ) : null}
-            </li>
-          ))}
-        </ol>
+                {top10Expanded
+                  ? "접기"
+                  : `전체 ${job.liveTop10.entries.length}개 펼치기`}
+              </button>
+            ) : null}
+          </>
+        )}
       </div>
+
+      {aiNarrative.length > 0 ? (
+        <div
+          className="space-y-2 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-3 text-sm text-sky-50"
+          data-testid="ss-ai-work-narrative"
+        >
+          {aiNarrative.map((row) => (
+            <p key={row.label}>
+              <span className="font-medium">{row.label}: </span>
+              {row.value}
+            </p>
+          ))}
+        </div>
+      ) : null}
 
       {job.status === "failed" ? (
         <div
-          className="space-y-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-100"
+          className="space-y-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-50"
           data-testid="ss-failure-message"
           role="alert"
         >
-          <p className="font-semibold">
-            탐색 작업은 실패했지만 검증된 후보 {formatCount(qualifiedCount)}개는
-            저장되었습니다.
+          <p className="font-semibold" data-testid="ss-partial-completion">
+            {preserved > 0
+              ? `부분 완료 · 엔진 오류로 탐색이 조기 종료됐지만 검증된 전략 ${formatCount(preserved)}개를 저장했습니다.`
+              : "탐색이 실패했습니다. 저장된 합격 전략이 없습니다."}
           </p>
-          <p data-testid="ss-failure-cause">원인: {reason}</p>
-          <details className="text-xs text-red-50/90">
-            <summary className="cursor-pointer select-none">기술 정보</summary>
-            <pre className="mt-2 whitespace-pre-wrap break-all opacity-90">
-              {job.failureMessage || job.terminationReason || job.completionReason || "—"}
-            </pre>
-          </details>
-        </div>
-      ) : null}
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric label="현재 연구" value={job.searchName || "전략 탐색"} />
-        {researching && job.currentSearchFamily ? (
-          <Metric label="현재 전략군" value={job.currentSearchFamily} />
-        ) : null}
-        {elapsed ? <Metric label="연구 시간" value={elapsed} /> : null}
-        <Metric label="검증한 전략" value={formatCount(tested)} />
-        {bestReturn ? <Metric label="최고 수익률" value={bestReturn} /> : null}
-        {bestSummary ? <Metric label="현재 최고" value={bestSummary} /> : null}
-        {generationCount != null ? (
-          <div data-testid="ss-generation-count">
-            <Metric label="연구 세대" value={formatCount(generationCount)} />
-          </div>
-        ) : null}
-      </div>
-
-      {(latestWeaknessKo || latestAdjustmentKo) && (
-        <div
-          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-50"
-          data-testid="ss-weakness-adjustment"
-        >
-          {latestWeaknessKo ? <p>최신 약점: {latestWeaknessKo}</p> : null}
-          {latestAdjustmentKo ? (
-            <p className="mt-1">자동 보완: {latestAdjustmentKo}</p>
+          <p data-testid="ss-failure-cause">
+            원인: {reason}
+            {job.failedStage ? ` · 실패 단계: ${job.failedStage}` : ""}
+          </p>
+          {job.failureMessage ? (
+            <p className="text-xs opacity-90" data-testid="ss-failure-detail">
+              {job.failureMessage}
+            </p>
+          ) : null}
+          {job.lastSuccessfulStage ? (
+            <p className="text-xs opacity-90">
+              마지막 완료 단계: {job.lastSuccessfulStage}
+            </p>
           ) : null}
         </div>
-      )}
-
-      {job.lastMutation?.firstChange ? (
-        <div
-          className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-50"
-          data-testid="ss-applied-mutation"
-        >
-          <p className="font-medium">적용된 탐색 보완</p>
-          <p className="mt-1">
-            {job.lastMutation.firstChange.key}.
-            {job.lastMutation.firstChange.field}:{" "}
-            {job.lastMutation.firstChange.from}→
-            {job.lastMutation.firstChange.to}
-          </p>
-        </div>
       ) : null}
 
-      <details className="ss-advanced-group">
+      <details className="ss-advanced-group" data-testid="ss-runtime-details">
         <summary className="ss-subsection-title cursor-pointer">
-          기술 정보
+          상세 실행 정보
         </summary>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="검증" value={formatCount(stats?.evaluated)} />
-          <Metric label="실패" value={formatCount(stats?.failed)} />
-          <Metric label="오류" value={formatCount(stats?.errors)} />
-          {budget != null ? (
-            <Metric label="최대 후보 예산" value={formatCount(budget)} />
-          ) : null}
-          {job.remainingBudget != null ? (
-            <Metric
-              label="남은 후보 예산"
-              value={formatCount(job.remainingBudget)}
+        <div className="mt-4 space-y-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <StatBlock
+              label="조건 탈락"
+              value={`${formatCount(rejectedCount)}개`}
+              testId="ss-counter-rejected"
             />
+            <StatBlock
+              label="계산 오류"
+              value={`${formatCount(counters?.evaluationErrors ?? stats?.errors ?? 0)}개`}
+              testId="ss-counter-errors"
+            />
+            <StatBlock
+              label="연구 세대"
+              value={
+                generationCount != null
+                  ? `${formatCount(generationCount)}회`
+                  : "—"
+              }
+              testId="ss-generation-count"
+            />
+            <StatBlock
+              label="최소 확보 기준"
+              value={
+                qualifiedTarget != null ? `${qualifiedTarget}개` : "설정 없음"
+              }
+              hint="최소 확보 기준을 충족해도 설정된 탐색 시간이 끝날 때까지 개선을 계속합니다."
+              testId="ss-qualified-target"
+            />
+            <StatBlock
+              label="연구 상태"
+              value={researchStatus}
+              testId="ss-research-status"
+            />
+            <StatBlock
+              label="종료 사유"
+              value={researching ? "연구 진행 중" : reason}
+              testId="ss-stop-reason"
+            />
+            <StatBlock
+              label="평가한 전략"
+              value={`평가한 전략 ${formatCount(budgetUsed)}개`}
+              hint={
+                job.initialCandidateBudget != null
+                  ? `저장 한도 ${formatCount(job.initialCandidateBudget)}개 · 자원 예산 ${safetyLimitLabel ?? "—"} (정상 종료 조건 아님)`
+                  : safetyLimitLabel
+                    ? `자원 안전 제한 ${safetyLimitLabel} — 정상 종료 조건이 아닙니다.`
+                    : "정상 종료는 설정한 탐색 시간이 끝나는 시점입니다."
+              }
+              testId="ss-research-budget"
+            />
+            <StatBlock
+              label="실제 선택 심볼"
+              value={
+                symbolSel?.selectedSymbol ??
+                ((job.symbols ?? []).join(", ") || "—")
+              }
+              hint={
+                symbolSel
+                  ? `${symbolSel.reasonKo} · 유동성 ${symbolSel.liquidityStatus} · 데이터 ${symbolSel.dataAvailability}`
+                  : null
+              }
+              testId="ss-actual-symbols"
+            />
+          </div>
+
+          {safetyLimitLabel ? (
+            <p
+              className="text-xs text-slate-500"
+              data-testid="ss-resource-safety-limit"
+            >
+              자원 안전 제한: {safetyLimitLabel} (정상 완료 목표가 아님
+              {job.resourceSafetyCeiling != null
+                ? ` · 하드 한도 ${formatCount(job.resourceSafetyCeiling)}`
+                : ""}
+              )
+            </p>
           ) : null}
-          {job.seed != null ? (
-            <Metric label="시드" value={String(job.seed)} />
+
+          <div data-testid="ss-evaluation-pipeline" className="space-y-3">
+            <div className="ss-subsection-title">평가 파이프라인</div>
+            <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2">
+              {evalPipelineStages.map((step, idx) => (
+                <li key={step.id} className="flex items-center gap-2">
+                  <div
+                    className={`flex min-w-[8.5rem] flex-col items-center justify-center rounded-lg border px-3 py-2.5 text-center ${toneClass(step.ui)}`}
+                    data-testid={`ss-eval-pipeline-${step.id}`}
+                  >
+                    <span className="text-xs font-semibold">{step.label}</span>
+                    <span className="mt-1 text-[11px] opacity-90">
+                      {step.statusLabel}
+                    </span>
+                  </div>
+                  {idx < evalPipelineStages.length - 1 ? (
+                    <span className="text-slate-600" aria-hidden>
+                      ↓
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div data-testid="ss-search-progression" className="space-y-3">
+            <div className="ss-subsection-title">탐색 파이프라인</div>
+            {familyStages.length === 0 ? (
+              <p
+                className="text-sm text-slate-400"
+                data-testid="ss-pipeline-empty"
+              >
+                연구가 시작되면 AI가 지금 어떤 전략군을 검토 중인지 여기에
+                표시됩니다.
+              </p>
+            ) : null}
+            <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2">
+              {familyStages.map((step, idx) => (
+                <li key={step.id} className="flex items-center gap-2">
+                  <div
+                    className={`flex min-w-[8.5rem] flex-col items-center justify-center rounded-lg border px-3 py-2.5 text-center ${toneClass(step.ui)}`}
+                    data-testid={`ss-pipeline-${step.id}`}
+                  >
+                    <span className="text-xs font-semibold">{step.label}</span>
+                    <span className="mt-1 text-[11px] opacity-90">
+                      {step.statusLabel}
+                    </span>
+                  </div>
+                  {idx < familyStages.length - 1 ? (
+                    <span className="text-slate-600" aria-hidden>
+                      ↓
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {(latestWeaknessKo || latestAdjustmentKo) && (
+            <div
+              className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-50"
+              data-testid="ss-weakness-adjustment"
+            >
+              {latestWeaknessKo ? <p>최신 약점: {latestWeaknessKo}</p> : null}
+              {latestAdjustmentKo ? (
+                <p className="mt-1">자동 보완: {latestAdjustmentKo}</p>
+              ) : null}
+            </div>
+          )}
+
+          {job.lastMutation?.firstChange ? (
+            <div
+              className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-50"
+              data-testid="ss-applied-mutation"
+            >
+              <p className="font-medium">적용된 탐색 보완</p>
+              <p className="mt-1">
+                {job.lastMutation.firstChange.key}.
+                {job.lastMutation.firstChange.field}:{" "}
+                {job.lastMutation.firstChange.from}→
+                {job.lastMutation.firstChange.to}
+              </p>
+            </div>
           ) : null}
+
+          <details className="ss-advanced-group">
+            <summary className="ss-subsection-title cursor-pointer">
+              기술 정보
+            </summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Metric label="검증" value={formatCount(stats?.evaluated)} />
+              <Metric label="실패" value={formatCount(stats?.failed)} />
+              <Metric label="오류" value={formatCount(stats?.errors)} />
+              <Metric
+                label="상태 코드"
+                value={job.status}
+              />
+              {budget != null ? (
+                <Metric label="최대 탐색 전략 한도" value={formatCount(budget)} />
+              ) : null}
+              {job.remainingBudget != null ? (
+                <Metric
+                  label="남은 탐색 전략 한도"
+                  value={formatCount(job.remainingBudget)}
+                />
+              ) : null}
+              {job.config?.maxIterations != null ? (
+                <Metric
+                  label="배치 크기"
+                  value={formatCount(job.config.maxIterations)}
+                />
+              ) : null}
+              {job.seed != null ? (
+                <Metric label="시드" value={String(job.seed)} />
+              ) : null}
+            </div>
+            {job.status === "failed" ? (
+              <pre className="mt-3 whitespace-pre-wrap break-all text-xs text-slate-400">
+                {job.terminationDetail ||
+                  job.failureMessage ||
+                  job.terminationReason ||
+                  job.completionReason ||
+                  "—"}
+              </pre>
+            ) : null}
+          </details>
         </div>
       </details>
     </section>

@@ -317,7 +317,8 @@ describe("strategy search history retention", () => {
     expect(normalizeJobStatusForRetention("COMPLETED")).toBe("completed");
     expect(normalizeJobStatusForRetention("CANCELLED")).toBe("cancelled");
     expect(normalizeJobStatusForRetention("FAILED")).toBe("failed");
-    expect(normalizeJobStatusForRetention("CANCELLING")).toBe(
+    expect(normalizeJobStatusForRetention("CANCELLING")).toBe("cancelling");
+    expect(normalizeJobStatusForRetention("CANCEL_REQUESTED")).toBe(
       "cancel_requested",
     );
   });

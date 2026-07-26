@@ -80,8 +80,25 @@ export interface StrategySearchPlan {
    */
   stopWhenQualifiedTarget: boolean;
   candidateBudget: number;
+  /**
+   * Operator-configured soft budget at job creation (before deadline replenish).
+   * Distinct from runtime `candidateBudget` which may grow via replenishDeadlineBudget.
+   */
+  initialCandidateBudget?: number;
   /** Per-stage batch size from depth profile. */
   stageBatchSize: number;
+  /**
+   * Automatic symbol selection evidence (additive; null/omitted for manual/legacy).
+   */
+  symbolSelection?: {
+    mode: "recommended" | "manual";
+    selectedSymbol: string;
+    reasonKo: string;
+    liquidityStatus: string;
+    volatilityStatus: string;
+    dataAvailability: string;
+    excludedAlternatives: Array<{ symbol: string; reasonKo: string }>;
+  } | null;
   maxRuntimeMs: number | null;
   /** Absolute ms timestamp when campaign started (first start). */
   campaignStartedAtMs: number | null;
@@ -114,6 +131,30 @@ export interface StrategySearchPlan {
   mutatedParameterRanges: StrategySearchParameterRange[] | null;
   /** Last applied search-space mutation record (audit). */
   lastMutation: SearchSpaceMutationRecord | null;
+  /**
+   * Error-rate monitoring (Advanced Settings). Fractions in [0, 1].
+   * Auto-pause only when evaluated > 0 and rate exceeds threshold.
+   */
+  errorWarningRate?: number | null;
+  errorAutoPauseRate?: number | null;
+  /** Block regenerating the same invalid failure fingerprint after N hits. */
+  repeatedSignatureThreshold?: number | null;
+  /** Operator leverage policy snapshot (additive). */
+  leverageMode?: "automatic" | "fixed" | "range" | "disabled" | null;
+  leverageMin?: number | null;
+  leverageMax?: number | null;
+  leverageFixed?: number | null;
+  adaptiveLeverageEnabled?: boolean | null;
+  /** Pattern Search operator configuration snapshot (immutable at create). */
+  patternConfigLevel?: "automatic" | "basic" | "expert" | null;
+  patternDirection?: "both" | "long" | "short" | null;
+  patternRetestMode?: "required" | "optional" | "disabled" | null;
+  patternConfirmStrength?: "standard" | "strict" | null;
+  patternConfirmClose?: "required" | "disabled" | null;
+  patternExpiryBars?: number | null;
+  patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
+  patternStrength?: "loose" | "standard" | "strict" | null;
+  patternSrSensitivity?: "tight" | "standard" | "loose" | null;
 }
 
 function defaultRoot(): string {
@@ -161,6 +202,24 @@ export function createEmptySearchPlan(input: {
   minScore?: number | null;
   /** Default false: run until deadline/budget, not first PASS. */
   stopWhenQualifiedTarget?: boolean;
+  symbolSelection?: StrategySearchPlan["symbolSelection"];
+  errorWarningRate?: number | null;
+  errorAutoPauseRate?: number | null;
+  repeatedSignatureThreshold?: number | null;
+  leverageMode?: StrategySearchPlan["leverageMode"];
+  leverageMin?: number | null;
+  leverageMax?: number | null;
+  leverageFixed?: number | null;
+  adaptiveLeverageEnabled?: boolean | null;
+  patternConfigLevel?: StrategySearchPlan["patternConfigLevel"];
+  patternDirection?: StrategySearchPlan["patternDirection"];
+  patternRetestMode?: StrategySearchPlan["patternRetestMode"];
+  patternConfirmStrength?: StrategySearchPlan["patternConfirmStrength"];
+  patternConfirmClose?: StrategySearchPlan["patternConfirmClose"];
+  patternExpiryBars?: StrategySearchPlan["patternExpiryBars"];
+  patternRiskStyle?: StrategySearchPlan["patternRiskStyle"];
+  patternStrength?: StrategySearchPlan["patternStrength"];
+  patternSrSensitivity?: StrategySearchPlan["patternSrSensitivity"];
 }): StrategySearchPlan {
   return {
     version: STRATEGY_SEARCH_PLAN_VERSION,
@@ -170,8 +229,27 @@ export function createEmptySearchPlan(input: {
     qualifiedTarget: Math.max(1, Math.trunc(input.qualifiedTarget)),
     stopWhenQualifiedTarget: input.stopWhenQualifiedTarget === true,
     candidateBudget: Math.max(1, Math.trunc(input.candidateBudget)),
+    initialCandidateBudget: Math.max(1, Math.trunc(input.candidateBudget)),
     stageBatchSize: Math.max(1, Math.trunc(input.stageBatchSize)),
     maxRuntimeMs: input.maxRuntimeMs,
+    symbolSelection: input.symbolSelection ?? null,
+    errorWarningRate: input.errorWarningRate ?? 0.35,
+    errorAutoPauseRate: input.errorAutoPauseRate ?? 0.55,
+    repeatedSignatureThreshold: input.repeatedSignatureThreshold ?? 25,
+    leverageMode: input.leverageMode ?? null,
+    leverageMin: input.leverageMin ?? null,
+    leverageMax: input.leverageMax ?? null,
+    leverageFixed: input.leverageFixed ?? null,
+    adaptiveLeverageEnabled: input.adaptiveLeverageEnabled ?? null,
+    patternConfigLevel: input.patternConfigLevel ?? "automatic",
+    patternDirection: input.patternDirection ?? null,
+    patternRetestMode: input.patternRetestMode ?? null,
+    patternConfirmStrength: input.patternConfirmStrength ?? null,
+    patternConfirmClose: input.patternConfirmClose ?? null,
+    patternExpiryBars: input.patternExpiryBars ?? null,
+    patternRiskStyle: input.patternRiskStyle ?? null,
+    patternStrength: input.patternStrength ?? null,
+    patternSrSensitivity: input.patternSrSensitivity ?? null,
     campaignStartedAtMs: null,
     pausedAtMs: null,
     accumulatedPauseMs: 0,

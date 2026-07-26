@@ -1,6 +1,14 @@
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import { getSafeParamCatalog } from "../strategy/definition/safeParamCatalog";
 import type { SafeV44Params } from "../strategy/strategyTypes";
+import {
+  baseParamsForFamily,
+  isPatternParameterRanges,
+  patternParamKeysForFamily,
+  resolvePatternFamilyFromRanges,
+  PATTERN_LEVERAGE_PARAM_KEYS,
+  PATTERN_OPERATOR_PASSTHROUGH_KEYS,
+} from "./patternSearchSpaces";
 import type {
   StrategySearchParameterRange,
   StrategySearchParameterValue,
@@ -86,6 +94,17 @@ function roundFloat(n: number): number {
   return Math.round(n * f) / f;
 }
 
+/** Relative float tolerance so round-trip align/validate survives FP noise. */
+function rangeEpsilon(min: number, max: number): number {
+  const scale = Math.max(1, Math.abs(min), Math.abs(max));
+  return Math.max(1e-12, scale * 1e-9);
+}
+
+function isWithinRange(value: number, min: number, max: number): boolean {
+  const eps = rangeEpsilon(min, max);
+  return value + eps >= min && value - eps <= max;
+}
+
 function alignNumeric(
   value: number,
   min: number,
@@ -105,8 +124,23 @@ function alignNumeric(
   }
   if (aligned < min) aligned = valueType === "integer" ? Math.ceil(min) : min;
   if (aligned > max) aligned = valueType === "integer" ? Math.floor(max) : max;
-  if (valueType === "integer") return Math.round(aligned);
-  return roundFloat(Math.min(max, Math.max(min, aligned)));
+  if (valueType === "integer") {
+    const asInt = Math.round(aligned);
+    // Empty integer domain after float-mutated bounds: pin to nearest in-range int.
+    if (asInt < min || asInt > max) {
+      const lo = Math.ceil(min);
+      const hi = Math.floor(max);
+      if (lo <= hi) return Math.min(hi, Math.max(lo, asInt));
+      return Math.round(Math.min(max, Math.max(min, value)));
+    }
+    return asInt;
+  }
+  // Keep the post-round value inside [min,max] even when min≈max after mutation.
+  const clamped = Math.min(max, Math.max(min, aligned));
+  const rounded = roundFloat(clamped);
+  if (isWithinRange(rounded, min, max)) return rounded;
+  // Degenerate / ultra-narrow ranges: prefer the midpoint (still finite).
+  return roundFloat((min + max) / 2);
 }
 
 /**
@@ -186,6 +220,12 @@ export function validateSearchParameterRanges(
   }
 
   const seen = new Set<string>();
+  const patternFamily = resolvePatternFamilyFromRanges(ranges);
+  const patternMode = patternFamily != null;
+  const patternKeySet = patternFamily
+    ? new Set<string>(patternParamKeysForFamily(patternFamily))
+    : null;
+
   for (const range of ranges) {
     if (!range || typeof range.key !== "string" || !range.key) {
       issues.push(
@@ -199,6 +239,54 @@ export function validateSearchParameterRanges(
       );
     }
     seen.add(range.key);
+
+    if (patternMode && patternKeySet) {
+      const isLevPassthrough = (
+        PATTERN_LEVERAGE_PARAM_KEYS as readonly string[]
+      ).includes(range.key);
+      if (!patternKeySet.has(range.key) && !isLevPassthrough) {
+        issues.push(
+          issue(
+            "UNKNOWN_PARAMETER",
+            range.key,
+            `parameter is not a ${patternFamily} search field`,
+            range.key,
+          ),
+        );
+        continue;
+      }
+      const valueType = resolveValueType(range);
+      if (valueType !== "integer" && valueType !== "float") {
+        issues.push(
+          issue(
+            "TYPE_MISMATCH",
+            range.key,
+            "pattern parameters must be numeric",
+          ),
+        );
+        continue;
+      }
+      if (!isFiniteNumber(range.min) || !isFiniteNumber(range.max)) {
+        issues.push(
+          issue(
+            "NON_FINITE_BOUNDS",
+            range.key,
+            "pattern parameters require finite min/max",
+          ),
+        );
+        continue;
+      }
+      if (range.min > range.max) {
+        issues.push(
+          issue(
+            "NAN_BOUNDS",
+            range.key,
+            "min must be <= max",
+          ),
+        );
+      }
+      continue;
+    }
 
     if (!(range.key in CONTEXT_FALLBACK_PARAMS)) {
       issues.push(
@@ -498,6 +586,116 @@ export function validateCandidateParams(
   const rangeCheck = validateSearchParameterRanges(ranges);
   if (!rangeCheck.ok) return rangeCheck;
 
+  // Pattern Search candidates are event-sequence params, not SafeV44.
+  if (isPatternParameterRanges(ranges)) {
+    const family = resolvePatternFamilyFromRanges(ranges)!;
+    const keys = patternParamKeysForFamily(family);
+    const issues: StrategySearchValidationIssue[] = [];
+    const rangeByKey = new Map(ranges.map((r) => [r.key, r]));
+    const allowed = new Set<string>([
+      ...keys,
+      ...PATTERN_OPERATOR_PASSTHROUGH_KEYS,
+      ...PATTERN_LEVERAGE_PARAM_KEYS,
+    ]);
+    for (const key of keys) {
+      const value = params[key];
+      if (value === undefined) {
+        issues.push(
+          issue(
+            "MISSING_PARAMETER",
+            key,
+            `${family} candidate requires this field`,
+          ),
+        );
+        continue;
+      }
+      if (!isFiniteNumber(value)) {
+        issues.push(
+          issue("TYPE_MISMATCH", key, "expected finite number", value),
+        );
+        continue;
+      }
+      const range = rangeByKey.get(key);
+      if (
+        range &&
+        typeof range.min === "number" &&
+        typeof range.max === "number" &&
+        (value < range.min || value > range.max)
+      ) {
+        issues.push(
+          issue(
+            "OUT_OF_RANGE",
+            key,
+            `value must be within ${range.min}..${range.max}`,
+            value,
+          ),
+        );
+      }
+    }
+    // Optional operator / leverage passthroughs — validate when present.
+    for (const key of PATTERN_LEVERAGE_PARAM_KEYS) {
+      const value = params[key];
+      if (value === undefined) continue;
+      if (key === "use_dynamic_leverage") {
+        if (typeof value !== "boolean" && value !== 0 && value !== 1) {
+          issues.push(
+            issue("TYPE_MISMATCH", key, "expected boolean", value),
+          );
+        }
+        continue;
+      }
+      if (!isFiniteNumber(value) || value < 1) {
+        issues.push(
+          issue("TYPE_MISMATCH", key, "expected leverage >= 1", value),
+        );
+      }
+      const range = rangeByKey.get(key);
+      if (
+        range &&
+        typeof range.min === "number" &&
+        typeof range.max === "number" &&
+        (Number(value) < range.min || Number(value) > range.max)
+      ) {
+        issues.push(
+          issue(
+            "OUT_OF_RANGE",
+            key,
+            `value must be within ${range.min}..${range.max}`,
+            value,
+          ),
+        );
+      }
+    }
+    if (
+      params.direction !== undefined &&
+      params.direction !== "long" &&
+      params.direction !== "short" &&
+      params.direction !== "both"
+    ) {
+      issues.push(
+        issue(
+          "TYPE_MISMATCH",
+          "direction",
+          "expected long|short|both",
+          params.direction,
+        ),
+      );
+    }
+    for (const key of Object.keys(params)) {
+      if (!allowed.has(key)) {
+        issues.push(
+          issue(
+            "UNKNOWN_PARAMETER",
+            key,
+            `parameter is not a ${family} search field`,
+            params[key] ?? null,
+          ),
+        );
+      }
+    }
+    return { ok: issues.length === 0, issues };
+  }
+
   const issues: StrategySearchValidationIssue[] = [];
   const rangeByKey = new Map(ranges.map((r) => [r.key, r]));
 
@@ -593,7 +791,7 @@ export function validateCandidateParams(
       continue;
     }
     if (!isFiniteNumber(range.min) || !isFiniteNumber(range.max)) continue;
-    if (value < range.min || value > range.max) {
+    if (!isWithinRange(value, range.min, range.max)) {
       issues.push(
         issue(
           "OUT_OF_RANGE",
@@ -633,6 +831,71 @@ export function normalizeCandidateParams(
     throw new Error(
       `cannot normalize with invalid ranges: ${rangeCheck.issues[0]?.message}`,
     );
+  }
+
+  if (isPatternParameterRanges(ranges)) {
+    const family = resolvePatternFamilyFromRanges(ranges)!;
+    const keys = patternParamKeysForFamily(family);
+    const base = baseParamsForFamily(family);
+    const rangeByKey = new Map(ranges.map((r) => [r.key, r]));
+    const out: Record<string, StrategySearchParameterValue> = {};
+    for (const key of keys) {
+      const range = rangeByKey.get(key);
+      const fallback = (base[key] as StrategySearchParameterValue) ?? 0;
+      const raw = params[key];
+      if (!range) {
+        out[key] =
+          raw !== undefined && isFiniteNumber(raw) ? raw : fallback;
+        continue;
+      }
+      if (raw === undefined || !isFiniteNumber(raw)) {
+        out[key] =
+          (range.defaultValue as StrategySearchParameterValue) ??
+          fallback;
+        continue;
+      }
+      const valueType = resolveValueType(range);
+      const step =
+        range.step ?? (valueType === "integer" ? 1 : 0.01);
+      const min = range.min as number;
+      const max = range.max as number;
+      const clamped = Math.min(max, Math.max(min, raw));
+      out[key] = alignNumeric(
+        clamped,
+        min,
+        max,
+        step,
+        valueType === "integer" ? "integer" : "float",
+      );
+    }
+    // Preserve operator / leverage passthroughs when present.
+    for (const key of PATTERN_OPERATOR_PASSTHROUGH_KEYS) {
+      const raw = params[key];
+      if (raw === undefined) continue;
+      out[key] = raw as StrategySearchParameterValue;
+    }
+    for (const key of PATTERN_LEVERAGE_PARAM_KEYS) {
+      const raw = params[key];
+      if (raw === undefined) continue;
+      if (key === "use_dynamic_leverage") {
+        out[key] = Boolean(raw);
+        continue;
+      }
+      if (!isFiniteNumber(raw)) continue;
+      const range = rangeByKey.get(key);
+      if (
+        range &&
+        typeof range.min === "number" &&
+        typeof range.max === "number"
+      ) {
+        const step = range.step ?? 0.5;
+        const clamped = Math.min(range.max, Math.max(range.min, raw));
+        out[key] = alignNumeric(clamped, range.min, range.max, step, "float");
+      } else {
+        out[key] = Math.max(1, raw);
+      }
+    }
+    return out;
   }
 
   const out: Record<string, StrategySearchParameterValue> = {};

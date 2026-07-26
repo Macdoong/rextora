@@ -48,14 +48,14 @@ const BLOCKER_KO: Record<HighlightEligibilityBlocker, string> = {
   no_backtest: "완료된 백테스트가 없습니다",
   invalid_metrics: "유효한 성과 지표가 없습니다",
   insufficient_trades: "최소 거래 수 미달",
-  not_passed: "PASS 자격 미충족",
+  not_passed: "합격 자격 미충족",
   non_finite_return: "순수익이 유효하지 않습니다",
   non_finite_mdd: "최대 낙폭이 유효하지 않습니다",
   zero_evidence: "검증 증거가 없습니다",
   mdd_exceeded: "최대 낙폭 한도 초과",
   missing_cost_evidence: "비용 증거 없음",
-  missing_robustness: "강건성·과적합 증거 없음",
-  high_overfitting: "과적합 위험 높음",
+  missing_robustness: "거래 안정성·과거 데이터 편중 증거 없음",
+  high_overfitting: "과거 데이터 편중 위험 높음",
   identity_incomplete: "전략 ID/해시 불완전",
 };
 
@@ -143,5 +143,5 @@ export function metricStatusKo(input: {
   ) {
     return "계산 불가";
   }
-  return input.passed ? "PASS" : "미통과";
+  return input.passed ? "합격" : "미통과";
 }

@@ -24,9 +24,23 @@ function jobDetail(input: {
   executionActive?: boolean;
   failureMessage?: string | null;
   searchSpaceExhausted?: boolean;
+  completionReason?: string | null;
+  terminationReason?: string | null;
 }) {
   const maxIterations = input.maxIterations ?? 10;
   const completedIterations = input.completedIterations ?? 0;
+  const completionReason =
+    input.completionReason ??
+    (input.searchSpaceExhausted
+      ? "SEARCH_SPACE_EXHAUSTED"
+      : input.status === "completed"
+        ? "DEADLINE_REACHED"
+        : input.status === "cancelled"
+          ? "USER_CANCELLED"
+          : null);
+  const terminationReason =
+    input.terminationReason ??
+    (input.status === "failed" ? "ENGINE_ERROR" : null);
   return {
     id: input.id,
     status: input.status,
@@ -65,6 +79,8 @@ function jobDetail(input: {
     seed: 42,
     searchName: "전략 탐색",
     searchSpaceExhausted: input.searchSpaceExhausted ?? false,
+    completionReason,
+    terminationReason,
     config: {
       searchVersion: "1",
       strategyTemplateId: "전략 탐색",
@@ -99,6 +115,16 @@ async function fulfillJson(route: Route, status: number, body: unknown) {
     status,
     contentType: "application/json",
     body: JSON.stringify(body),
+  });
+}
+
+async function openSearchJob(
+  page: import("@playwright/test").Page,
+  jobId: string,
+) {
+  await page.goto(`/strategy-search?jobId=${encodeURIComponent(jobId)}`);
+  await expect(page.getByTestId("ss-job-detail")).toBeVisible({
+    timeout: 15_000,
   });
 }
 
@@ -217,6 +243,19 @@ async function installSearchMocks(
       return;
     }
 
+    if (method === "GET" && path.endsWith(`/${jobId}/generations`)) {
+      await fulfillJson(
+        route,
+        200,
+        envelope({
+          generationCount: 0,
+          latestWeakness: null,
+          latest: null,
+        }),
+      );
+      return;
+    }
+
     if (method === "GET" && path.endsWith(`/${jobId}/best`)) {
       await fulfillJson(
         route,
@@ -324,6 +363,63 @@ async function installSearchMocks(
       return;
     }
 
+    if (method === "GET" && path.endsWith("/recover")) {
+      await fulfillJson(
+        route,
+        200,
+        envelope({
+          scanned: 0,
+          resumed: [],
+          skipped: [],
+          recordRecovered: [],
+          errors: [],
+          audits: [],
+        }),
+      );
+      return;
+    }
+
+    if (method === "GET" && path.endsWith("/configs")) {
+      await fulfillJson(route, 200, envelope([]));
+      return;
+    }
+
+    if (method === "GET" && path.includes("/results-summary")) {
+      await fulfillJson(
+        route,
+        200,
+        envelope({
+          jobId,
+          status: state.status,
+          counts: {
+            qualifiedStrategies: 0,
+            uniqueQualifiedStrategies: 0,
+            clusters: 0,
+            registered: 0,
+            recommendable: 0,
+            backtestRecommended: 0,
+          },
+          topProfit: null,
+          topStable: null,
+          topRecommend: null,
+          backtestRecommendations: [],
+          clusters: [],
+          representatives: [],
+          selectionSummary: {
+            whyTopSelected: [],
+            whyExcluded: [],
+            overfittingNote: "",
+            costSensitivityNote: "",
+            drawdownRiskNote: "",
+            tradeConfidenceNote: "",
+            nextActions: [],
+          },
+          provenanceNote: "",
+        }),
+      );
+      return;
+    }
+
     await fulfillJson(route, 404, {
       ok: false,
       error: "unmocked",
@@ -353,13 +449,13 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-intensity")).toBeVisible();
     await expect(page.getByTestId("ss-goal")).toBeVisible();
     await expect(page.getByTestId("ss-run-until-qualified")).toBeAttached();
-    await expect(page.getByTestId("ss-advanced-toggle")).toBeVisible();
+    await expect(page.getByTestId("ss-advanced-settings-link")).toBeVisible();
     await expect(
       page.getByTestId("main-nav").getByText("전략 탐색", { exact: true }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "전략 탐색" })).toBeVisible();
     await expect(
-      page.getByText(/목표만 정하면 AI가 연구합니다/),
+      page.getByText(/시장·시간봉·연구 시간만 정하면 AI가 탐색 전략을 만들고/),
     ).toBeVisible();
   });
 
@@ -379,17 +475,42 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await page.goto("/strategy-search");
     await expect(page.getByTestId("strategy-search-workbench")).toBeVisible();
 
-    await page.getByTestId("ss-advanced-toggle").click();
-    await page.getByTestId("ss-max-search").fill("0");
+    await page.goto("/strategy-search/advanced");
+    await expect(page).toHaveURL(/\/strategy-search#ss-section-engine$/);
+    await expect(page.getByTestId("strategy-search-create")).toBeVisible();
+    await expect(page.getByTestId("ss-max-search")).toBeVisible();
+    // Seed invalid advanced override into the canonical session schema.
+    await page.evaluate(() => {
+      const key = "rextora.strategySearch.operatorForm.v1";
+      const raw = sessionStorage.getItem(key);
+      const base = raw ? JSON.parse(raw) : { schemaVersion: 1, form: {} };
+      base.schemaVersion = 1;
+      base.updatedAt = new Date().toISOString();
+      base.form = { ...(base.form ?? {}), candidateBudgetOverride: "0" };
+      sessionStorage.setItem(key, JSON.stringify(base));
+    });
+    await page.goto("/strategy-search");
+    await expect(page.getByTestId("strategy-search-create")).toBeVisible();
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-form-errors")).toBeVisible();
 
-    await page.getByTestId("ss-max-search").fill("50");
+    await page.evaluate(() => {
+      const key = "rextora.strategySearch.operatorForm.v1";
+      const raw = sessionStorage.getItem(key);
+      const base = raw ? JSON.parse(raw) : { schemaVersion: 1, form: {} };
+      base.schemaVersion = 1;
+      base.updatedAt = new Date().toISOString();
+      base.form = { ...(base.form ?? {}), candidateBudgetOverride: "50" };
+      sessionStorage.setItem(key, JSON.stringify(base));
+    });
+    await page.goto("/strategy-search");
     await page.getByTestId("ss-create-submit").click();
-    await expect(page.getByTestId(`ss-job-row-${state.jobId}`)).toBeVisible();
     await expect(page.getByTestId("ss-job-detail")).toBeVisible();
     await expect(page.getByTestId("ss-statistics")).toContainText("연구");
-    await expect(page.getByTestId("ss-qualified-results")).toBeVisible();
+    await expect(page.getByTestId("ss-recent-job-select")).toHaveValue(
+      state.jobId,
+    );
+    await expect(page.getByTestId("ss-results-handoff")).toBeVisible();
 
     await page.getByTestId("ss-action-pause").click();
     await expect(page.getByTestId("ss-statistics")).toContainText("일시정지");
@@ -406,6 +527,13 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     ).toHaveCount(0);
 
     state.rejectCreate = true;
+    const collapsed = page.getByTestId("ss-config-collapsed");
+    if (await collapsed.count()) {
+      await collapsed
+        .locator("summary")
+        .filter({ hasText: "탐색 설정" })
+        .click();
+    }
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-feedback")).toContainText(
       "요청 설정이 올바르지 않습니다",
@@ -428,8 +556,7 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     };
     await installSearchMocks(page, state);
 
-    await page.goto("/strategy-search");
-    await page.getByTestId(`ss-job-row-${state.jobId}`).click({ force: true });
+    await openSearchJob(page, state.jobId);
     await expect(page.getByTestId("ss-action-pause")).toBeVisible();
 
     await expect
@@ -444,6 +571,9 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-controls-terminal")).toBeVisible({
       timeout: 15_000,
     });
+    // Stay on Search after completion — never auto-navigate to Results.
+    await expect(page.getByTestId("ss-completion-open-results")).toBeVisible();
+    await expect(page).toHaveURL(/\/strategy-search/);
     const atTerminal = state.detailGets.length;
     await page.waitForTimeout(5500);
     expect(state.detailGets.length - atTerminal).toBeLessThanOrEqual(2);
@@ -476,9 +606,9 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     };
     await installSearchMocks(page, failState);
 
-    await page.goto("/strategy-search");
-    await page.getByTestId(`ss-job-row-${failState.jobId}`).click({ force: true });
-    await expect(page.getByTestId("ss-failure-message")).toContainText(
+    await openSearchJob(page, failState.jobId);
+    await expect(page.getByTestId("ss-failure-message")).toBeVisible();
+    await expect(page.getByTestId("ss-failure-detail")).toContainText(
       "캔들 로드 실패",
     );
 
@@ -492,9 +622,8 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
       searchSpaceExhausted: true,
     };
     await installSearchMocks(page, exhausted);
-    await page.goto("/strategy-search");
-    await page.getByTestId(`ss-job-row-${exhausted.jobId}`).click({ force: true });
-    await expect(page.getByTestId("ss-statistics")).toContainText(
+    await openSearchJob(page, exhausted.jobId);
+    await expect(page.getByTestId("ss-stop-reason")).toContainText(
       "연구 범위 소진",
     );
   });

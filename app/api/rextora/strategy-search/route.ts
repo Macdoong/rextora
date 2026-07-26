@@ -24,7 +24,14 @@ export async function GET(request?: Request) {
       offsetParam != null && offsetParam !== ""
         ? Number(offsetParam)
         : undefined;
-    const data = listStrategySearchJobsApi({ limit, offset });
+    const includeArchived = url.searchParams.get("includeArchived") === "true";
+    const archivedOnly = url.searchParams.get("archivedOnly") === "true";
+    const data = listStrategySearchJobsApi({
+      limit,
+      offset,
+      includeArchived,
+      archivedOnly,
+    });
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {
     return strategySearchError(err, Date.now() - start);

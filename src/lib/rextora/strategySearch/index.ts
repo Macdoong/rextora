@@ -61,6 +61,7 @@ export {
   listSearchJobs,
   listSearchTrials,
   markSearchJobCancelled,
+  markSearchJobCancelling,
   markSearchJobCompleted,
   markSearchJobFailed,
   markSearchJobPaused,
@@ -197,9 +198,14 @@ export {
   transitionJobToRunning,
 } from "./jobState";
 
-export type { StrategySearchJobStatistics } from "./jobStatistics";
+export type {
+  StrategySearchCanonicalCounters,
+  StrategySearchJobStatistics,
+} from "./jobStatistics";
 export {
+  assertCanonicalCounterInvariant,
   createEmptyJobStatistics,
+  deriveCanonicalCounters,
   isBetterScore,
   recordDuplicate,
   recordElapsed,
@@ -207,6 +213,45 @@ export {
   recordEvaluation,
   recordGenerated,
 } from "./jobStatistics";
+
+export {
+  classifyEngineError,
+  isRecoverableGenerationError,
+} from "./engineErrorClassification";
+export type { StrategySearchEngineErrorClass } from "./engineErrorClassification";
+
+export {
+  buildSymbolSelectionEvidence,
+  SELECTABLE_SYMBOLS,
+} from "./symbolSelection";
+
+export {
+  areStructurallyNearDuplicates,
+  buildResearchResultsSummary,
+  buildStructureFingerprint,
+  parseSourceResearchJobId,
+  parseSourceTrialIteration,
+  promoteTopResearchResults,
+  refreshLiveResearchTop10,
+  registerTrialForBacktest,
+  validateResearchResultsIntegrity,
+} from "./researchResultsSummary";
+export type {
+  BestReturnView,
+  ResearchCluster,
+  ResearchResultCard,
+  ResearchResultCounts,
+  ResearchResultsSummary,
+} from "./researchResultsSummary";
+
+export {
+  resolveResearchOutcome,
+} from "./researchOutcome";
+export type {
+  ResearchOutcomeId,
+  ResearchOutcomeInput,
+  ResearchOutcomeView,
+} from "./researchOutcome";
 
 export type { StrategySearchRunnerCheckpointPayload } from "./jobCheckpoint";
 export {
@@ -266,6 +311,7 @@ export {
   listStrategySearchTrialsApi,
   pauseStrategySearchJobApi,
   readProtectedSafeSnapshot,
+  restoreStrategySearchJobApi,
   resumeStrategySearchJobApi,
   startStrategySearchJobApi,
   setStrategySearchApiStoreOptionsForTests,
@@ -349,6 +395,128 @@ export { buildPaperFeedback } from "./paperFeedback";
 
 export { recoverOrphanSearchJobs } from "./orphanJobRecovery";
 export type { OrphanJobRecoveryResult } from "./orphanJobRecovery";
+
+export {
+  CANCEL_ACK_TIMEOUT_MS,
+  requestCancelWithFinalization,
+  finalizeCancellation,
+  recoverStaleCancelRequestedJobs,
+} from "./cancellationLifecycle";
+export type {
+  CancellationFinalizeResult,
+  CancellationFinalizeBlockReason,
+} from "./cancellationLifecycle";
+
+export {
+  recoverMissingJobRecord,
+  recoverOrphanIndexEntries,
+} from "./jobRecordRecovery";
+export type { JobRecordRecoveryResult } from "./jobRecordRecovery";
+
+export { appendRecoveryAudit, listRecoveryAudits } from "./recoveryAudit";
+export type { StrategySearchRecoveryAuditRecord } from "./recoveryAudit";
+
+export {
+  buildCalculationErrorBreakdown,
+  calculationErrorRate,
+} from "./calculationErrorBreakdown";
+export type {
+  CalculationErrorBreakdown,
+  CalculationErrorCategory,
+} from "./calculationErrorBreakdown";
+
+export {
+  selectResearchTop10,
+  buildAndPersistResearchTop10,
+  getResearchTop10,
+  findLatestSameScopeTop10,
+  buildResearchScopeKey,
+  finalizeResearchTop10,
+  rankChangeLabelShort,
+  movementReasonForChange,
+  RESEARCH_TOP10_LIMIT,
+} from "./researchTop10";
+export type {
+  ResearchTop10Snapshot,
+  ResearchTop10Entry,
+  ResearchTop10FinalDiff,
+  Top10RankChange,
+} from "./researchTop10";
+
+export {
+  applyLeverageModeToParams,
+  describeLeverageFromParams,
+  filterRangesForLeverageMode,
+  leverageModeMutatesLev,
+  resolveLeverageMode,
+} from "./leverageMode";
+export type { LeverageModePolicy } from "./leverageMode";
+
+export {
+  SEARCHABLE_STRATEGY_FAMILIES,
+  PATTERN_SEARCH_SUPPORT,
+  isSearchableSpaceId,
+  defaultSelectedSpaceIds,
+  patternCapabilityMatrixRows,
+} from "./patternSupportMatrix";
+export type {
+  PatternSupportLevel,
+  PatternSupportEntry,
+} from "./patternSupportMatrix";
+
+export { buildPersistedSearchSummary } from "./persistedSearchSummary";
+export type {
+  AppliedSearchSummaryView,
+  AppliedSearchSummarySection,
+  LeverageModeId,
+} from "./persistedSearchSummary";
+
+export {
+  previewStrategyDeletion,
+  detachResearchProvenance,
+  deleteStrategyWithSafety,
+  classificationLabelKo as strategyDeletionClassificationLabelKo,
+} from "./strategyDeletionSafety";
+export type {
+  StrategyDeletionClass,
+  StrategyDeletionImpact,
+} from "./strategyDeletionSafety";
+
+export { isProvenanceDetached } from "./researchProvenance";
+
+export {
+  previewResearchJobDeletion,
+  writeDeletionAudit,
+  executeResearchJobDeletion,
+  ResearchJobDeletionError,
+} from "./deletionSafety";
+export type { DeletionImpactPreview, DeletionClass } from "./deletionSafety";
+
+export {
+  archiveResearchJob,
+  restoreArchivedResearchJob,
+  isJobArchived,
+  listArchivedResearchJobs,
+  listVisibleResearchJobs,
+} from "./jobArchive";
+
+export {
+  getRawTrialRetentionPolicy,
+  setRawTrialRetentionPolicy,
+  previewRawTrialCleanup,
+  executeRawTrialCleanup,
+  DEFAULT_RAW_TRIAL_RETENTION,
+} from "./rawTrialRetention";
+
+export {
+  listStrategySearchConfigs,
+  saveStrategySearchConfig,
+  loadStrategySearchConfig,
+  deleteStrategySearchConfig,
+  renameStrategySearchConfig,
+  duplicateStrategySearchConfig,
+  setDefaultStrategySearchConfig,
+} from "./searchConfigStore";
 
 export type {
   FollowUpSource,

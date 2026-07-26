@@ -6,8 +6,6 @@ import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPan
 import { LiveActivationGates } from "@/components/rextora/live/LiveActivationGates";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
-import { displayParamsHashLabel } from "@/src/lib/rextora/displayLabels";
-
 export default function LiveTradingPage() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
@@ -52,7 +50,7 @@ export default function LiveTradingPage() {
     liveAllowed?: boolean;
     canStartLive?: boolean;
     liveBlockReason?: string | null;
-    botStatusLabel?: string;
+    botStatusLabel?: "대기 중" | "실행 중" | "중지됨" | "오류" | string;
     serverTpSlLabel?: string;
     safetyLabel?: string;
     activeStrategy?: { name: string; paramsHash: string };
@@ -81,14 +79,15 @@ export default function LiveTradingPage() {
   const liveEnabled = Boolean(s?.canStartLive);
   const m = s?.metrics;
   const ts = s?.todayStats;
+  const liveSessionActive = s?.botStatusLabel === "실행 중";
 
   return (
     <div className="space-y-4" data-testid="live-trading-page">
       <div>
         <h1 className="text-2xl font-bold text-white">실전 매매</h1>
         <p className="mt-1 text-sm text-slate-400">
-          활성화 게이트와 드라이런으로 검증합니다. 실주문은 별도 승인 후에만
-          가능합니다.
+          아직 실전 주문을 보내지 않습니다. 안전 점검·승인·시작을 모두 통과한
+          뒤에만 실주문이 가능합니다.
         </p>
       </div>
 
@@ -97,8 +96,15 @@ export default function LiveTradingPage() {
         data-testid="live-dry-run-banner"
         role="status"
       >
-        현재 검증 모드입니다. 실제 주문은 전송되지 않습니다. 드라이런 어댑터만
-        사용합니다.
+        <p className="font-semibold">
+          {liveSessionActive
+            ? "실전 세션이 실행 중입니다. 위험 한도를 계속 확인하세요."
+            : "지금은 거래 중이 아닙니다."}
+        </p>
+        <p className="mt-1 text-amber-100/90">
+          현재는 검증 모드입니다. 실제 주문은 전송되지 않으며, 가상 점검(드라이런)만
+          사용합니다.
+        </p>
       </div>
 
       <Suspense
@@ -113,63 +119,83 @@ export default function LiveTradingPage() {
         <div className="grid gap-3 md:grid-cols-3">
           <Metric label="실전 허용" value={s?.liveAllowed ? "허용" : "차단"} />
           <Metric label="시작 가능" value={liveEnabled ? "가능" : "불가"} />
-          <Metric label="서버 손절/익절" value={s?.serverTpSlLabel ?? "-"} />
-          <Metric label="안전 상태" value={s?.safetyLabel ?? "-"} />
+          <Metric
+            label="봇 상태"
+            value={s?.botStatusLabel ?? "대기 중"}
+          />
           <Metric
             label="활성 전략"
             value={s?.activeStrategy?.name ?? "미선택"}
           />
+          <Metric label="안전 상태" value={s?.safetyLabel ?? "-"} />
           <Metric
-            label={displayParamsHashLabel()}
-            value={s?.activeStrategy?.paramsHash ?? "-"}
+            label="다음 행동"
+            value={
+              liveSessionActive
+                ? "위험·포지션 모니터링"
+                : liveEnabled
+                  ? "실전 매매 시작"
+                  : "게이트·승인 확인"
+            }
           />
         </div>
-        {!liveEnabled && (
-          <p
-            className="mt-3 rounded-lg border border-orange-500/30 bg-orange-500/10 p-3 text-sm text-orange-100"
-            data-testid="live-start-helper"
+        {!liveSessionActive ? (
+          <div
+            className="mt-3 rounded-xl border border-dashed border-slate-700/80 bg-slate-950/40 px-4 py-5 text-center"
+            data-testid="live-idle-status"
           >
-            {s?.liveBlockReason ??
-              "설정에서 실전 거래 허용을 켜고 안전 조건을 통과해야 합니다."}
-          </p>
-        )}
+            <p className="font-medium text-slate-100">
+              현재 실전매매가 시작되지 않았습니다.
+            </p>
+            <p
+              className="mt-2 text-sm text-slate-400"
+              data-testid="live-start-helper"
+            >
+              {s?.liveBlockReason ??
+                "안전 게이트와 승인을 통과한 뒤 아래에서 시작할 수 있습니다. 시작 전에도 실제 주문은 전송되지 않습니다."}
+            </p>
+          </div>
+        ) : null}
       </Card>
 
-      <Card title="통일 지표">
-        <div className="grid gap-3 md:grid-cols-4">
-          <Metric
-            label="오늘 실현"
-            value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}
-          />
-          <Metric
-            label="오늘 미실현"
-            value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
-          />
-          <Metric
-            label="현재 자본"
-            value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`}
-          />
-          <Metric
-            label="계정 수익률"
-            value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`}
-          />
-          <Metric
-            label="수수료"
-            value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`}
-          />
-          <Metric
-            label="펀딩"
-            value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`}
-          />
-          <Metric
-            label="슬리피지"
-            value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`}
-          />
-        </div>
-      </Card>
+      {liveSessionActive ? (
+        <Card title="통일 지표">
+          <div className="grid gap-3 md:grid-cols-4">
+            <Metric
+              label="오늘 실현"
+              value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}
+            />
+            <Metric
+              label="오늘 미실현"
+              value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
+            />
+            <Metric
+              label="현재 자본"
+              value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`}
+            />
+            <Metric
+              label="계정 수익률"
+              value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`}
+            />
+            <Metric
+              label="수수료"
+              value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`}
+            />
+            <Metric
+              label="펀딩"
+              value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`}
+            />
+            <Metric
+              label="슬리피지"
+              value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`}
+            />
+          </div>
+        </Card>
+      ) : null}
 
       <TradingChartsPanel
         mode="LIVE"
+        sessionActive={liveSessionActive}
         metrics={(s?.metrics as UnifiedMetricsSnapshot) ?? null}
         riskView={riskView}
         symbol={
@@ -226,43 +252,45 @@ export default function LiveTradingPage() {
         </div>
       </Card>
 
-      <Card title="현재 실전 포지션">
-        {(s?.positions?.length ?? 0) > 0 ? (
-          <table className="w-full text-left text-sm">
-            <thead className="text-slate-400">
-              <tr>
-                <th>코인</th>
-                <th>방향</th>
-                <th>수량</th>
-                <th>진입가</th>
-                <th>현재가</th>
-                <th>미실현 손익</th>
-                <th>보호</th>
-              </tr>
-            </thead>
-            <tbody>
-              {s?.positions?.map((p) => (
-                <tr
-                  key={String(p.symbol)}
-                  className="border-t border-slate-900"
-                >
-                  <td className="py-2">{String(p.symbol)}</td>
-                  <td>{String(p.side)}</td>
-                  <td>{String(p.quantity)}</td>
-                  <td>{String(p.entryPrice)}</td>
-                  <td>{String(p.currentPrice)}</td>
-                  <td>{String(p.unrealizedPnl)}</td>
-                  <td>
-                    <Badge>{String(p.protectionLabel)}</Badge>
-                  </td>
+      {liveSessionActive ? (
+        <Card title="현재 실전 포지션">
+          {(s?.positions?.length ?? 0) > 0 ? (
+            <table className="w-full text-left text-sm">
+              <thead className="text-slate-400">
+                <tr>
+                  <th>코인</th>
+                  <th>방향</th>
+                  <th>수량</th>
+                  <th>진입가</th>
+                  <th>현재가</th>
+                  <th>미실현 손익</th>
+                  <th>보호</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-sm text-slate-400">열린 실전 포지션이 없습니다.</p>
-        )}
-      </Card>
+              </thead>
+              <tbody>
+                {s?.positions?.map((p) => (
+                  <tr
+                    key={String(p.symbol)}
+                    className="border-t border-slate-900"
+                  >
+                    <td className="py-2">{String(p.symbol)}</td>
+                    <td>{String(p.side)}</td>
+                    <td>{String(p.quantity)}</td>
+                    <td>{String(p.entryPrice)}</td>
+                    <td>{String(p.currentPrice)}</td>
+                    <td>{String(p.unrealizedPnl)}</td>
+                    <td>
+                      <Badge>{String(p.protectionLabel)}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-sm text-slate-400">열린 실전 포지션이 없습니다.</p>
+          )}
+        </Card>
+      ) : null}
     </div>
   );
 }

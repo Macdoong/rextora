@@ -142,3 +142,66 @@ export function isBetterScore(
   if (currentBest == null || !Number.isFinite(currentBest)) return true;
   return candidateScore > currentBest;
 }
+
+/**
+ * Canonical UI counters.
+ *
+ * Invariant:
+ *   evaluated = qualified + rejected + evaluationErrors
+ *
+ * where:
+ *   qualified = passed
+ *   evaluationErrors = errors  (subset of failed; evaluation exceptions)
+ *   rejected = failed - errors (gate failures without thrown errors)
+ *
+ * `failed` and `errors` must not be shown as independent additive totals.
+ */
+export interface StrategySearchCanonicalCounters {
+  evaluated: number;
+  qualified: number;
+  rejected: number;
+  evaluationErrors: number;
+  /** failed = rejected + evaluationErrors (diagnostic) */
+  failed: number;
+  invariantOk: boolean;
+  equation: string;
+}
+
+export function deriveCanonicalCounters(
+  stats: Pick<
+    StrategySearchJobStatistics,
+    "evaluated" | "passed" | "failed" | "errors"
+  >,
+): StrategySearchCanonicalCounters {
+  const evaluated = Math.max(0, stats.evaluated);
+  const qualified = Math.max(0, stats.passed);
+  const failed = Math.max(0, stats.failed);
+  const evaluationErrors = Math.min(failed, Math.max(0, stats.errors));
+  const rejected = Math.max(0, failed - evaluationErrors);
+  const sum = qualified + rejected + evaluationErrors;
+  const invariantOk = sum === evaluated;
+  return {
+    evaluated,
+    qualified,
+    rejected,
+    evaluationErrors,
+    failed,
+    invariantOk,
+    equation:
+      "evaluated = qualified + rejected + evaluationErrors (failed = rejected + evaluationErrors)",
+  };
+}
+
+export function assertCanonicalCounterInvariant(
+  stats: Pick<
+    StrategySearchJobStatistics,
+    "evaluated" | "passed" | "failed" | "errors"
+  >,
+): void {
+  const c = deriveCanonicalCounters(stats);
+  if (!c.invariantOk) {
+    throw new Error(
+      `strategy-search counter invariant violated: evaluated=${c.evaluated} qualified=${c.qualified} rejected=${c.rejected} evaluationErrors=${c.evaluationErrors}`,
+    );
+  }
+}

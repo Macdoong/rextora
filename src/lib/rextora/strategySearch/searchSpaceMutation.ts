@@ -89,6 +89,64 @@ function clampMinMax(
       next = { ...r, min: max };
       ranges[i] = next;
     }
+    const step =
+      typeof next.step === "number" && next.step > 0
+        ? next.step
+        : next.valueType === "integer"
+          ? 1
+          : 0.01;
+    // Degenerate point ranges (min≈max) break float round-trip validation
+    // (proven: cost_guard_k min=max → OUT_OF_RANGE after roundFloat).
+    const span = max - min;
+    const degenerateEps = Math.max(1e-12, Math.abs(max) * 1e-12);
+    if (span <= degenerateEps) {
+      const mid = (min + max) / 2;
+      const half = Math.max(step / 2, Math.abs(mid) * 1e-9, 1e-12);
+      const repairedMin =
+        next.valueType === "integer" ? Math.floor(mid) : mid - half;
+      const repairedMax =
+        next.valueType === "integer"
+          ? Math.max(Math.floor(mid), Math.ceil(mid))
+          : mid + half;
+      if (repairedMin !== min || repairedMax !== max) {
+        mutations?.push({
+          key: next.key,
+          field: "min",
+          from: min,
+          to: repairedMin,
+          reason: "normalize_domain: expand collapsed min/max for sampling",
+        });
+        mutations?.push({
+          key: next.key,
+          field: "max",
+          from: max,
+          to: repairedMax,
+          reason: "normalize_domain: expand collapsed min/max for sampling",
+        });
+        min = repairedMin;
+        max = repairedMax;
+        next = { ...next, min, max };
+        ranges[i] = next;
+      }
+    }
+    if (next.valueType === "integer") {
+      const ceilMin = Math.ceil(min);
+      const floorMax = Math.floor(max);
+      if (ceilMin > floorMax) {
+        const pin = Math.round((min + max) / 2);
+        next = { ...next, min: pin, max: pin };
+        ranges[i] = next;
+        min = pin;
+        max = pin;
+        mutations?.push({
+          key: next.key,
+          field: "min",
+          from: r.min as number,
+          to: pin,
+          reason: "normalize_domain: pin empty integer domain",
+        });
+      }
+    }
     if (
       typeof next.defaultValue === "number" &&
       Number.isFinite(next.defaultValue)
@@ -297,26 +355,36 @@ export function applySearchSpaceMutation(
       const cgIdx = findIndex(next, "cost_guard_k");
       if (cgIdx >= 0 && isNumericRange(next[cgIdx]!)) {
         const min = next[cgIdx]!.min as number;
-        setNumericField(
-          next,
-          "cost_guard_k",
-          "min",
-          min * 1.1,
-          "raise_cost_guard: raise cost_guard_k min",
-          mutations,
-        );
+        const max = next[cgIdx]!.max as number;
+        // Never raise min through/above max — that collapses the domain and
+        // previously fatalized jobs with candidate validation OUT_OF_RANGE.
+        const raised = Math.min(min * 1.1, max);
+        if (raised > min) {
+          setNumericField(
+            next,
+            "cost_guard_k",
+            "min",
+            raised,
+            "raise_cost_guard: raise cost_guard_k min",
+            mutations,
+          );
+        }
       }
       const volIdx = findIndex(next, "vol_ratio_min");
       if (volIdx >= 0 && isNumericRange(next[volIdx]!)) {
         const min = next[volIdx]!.min as number;
-        setNumericField(
-          next,
-          "vol_ratio_min",
-          "min",
-          min * 1.05,
-          "raise_cost_guard: raise vol_ratio_min",
-          mutations,
-        );
+        const max = next[volIdx]!.max as number;
+        const raised = Math.min(min * 1.05, max);
+        if (raised > min) {
+          setNumericField(
+            next,
+            "vol_ratio_min",
+            "min",
+            raised,
+            "raise_cost_guard: raise vol_ratio_min",
+            mutations,
+          );
+        }
       }
     }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Activity, LineChart, Loader2, WifiOff } from "lucide-react";
 import { Card, Metric } from "@/components/ui/primitives";
 import {
   CandlestickChart,
@@ -20,33 +22,85 @@ import {
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 import type { CandlePoint } from "@/src/lib/rextora/charts/types";
-import { uiLabel } from "@/src/lib/rextora/displayLabels";
+import type { ReactNode } from "react";
+
+function IdlePanel(props: {
+  message: string;
+  hint: string;
+  icon: ReactNode;
+  actionHref?: string;
+  actionLabel?: string;
+  testId?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/80 bg-slate-950/40 px-6 text-center ${
+        props.compact ? "py-6" : "py-10"
+      }`}
+      data-testid={props.testId ?? "chart-empty-state"}
+    >
+      <div className="mb-3 grid h-12 w-12 place-items-center rounded-xl border border-slate-700/70 bg-slate-900/80 text-slate-400">
+        {props.icon}
+      </div>
+      <p className="rextora-body font-medium text-slate-200">{props.message}</p>
+      <p className="rextora-helper mt-2 max-w-md">{props.hint}</p>
+      {props.actionHref && props.actionLabel ? (
+        <Link
+          href={props.actionHref}
+          className="mt-4 inline-flex items-center rounded-lg border border-sky-500/40 bg-sky-600/90 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-500"
+        >
+          {props.actionLabel}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
 
 export function TradingChartsPanel({
   mode,
   metrics,
   riskView,
   symbol,
+  sessionActive = true,
 }: {
   mode: "PAPER" | "LIVE";
   metrics: UnifiedMetricsSnapshot | null;
   riskView?: UnifiedRiskView | null;
   symbol?: string;
+  /** When false, hide zero-filled metric grids and show idle guidance. */
+  sessionActive?: boolean;
 }) {
   const [candles, setCandles] = useState<CandlePoint[]>([]);
+  const [candlesLoading, setCandlesLoading] = useState(true);
+  const [candlesFailed, setCandlesFailed] = useState(false);
   const activeSymbol = symbol ?? metrics?.positions[0]?.symbol ?? "BTCUSDT";
   const isLive = mode === "LIVE";
 
   useEffect(() => {
+    if (!sessionActive) return;
     let active = true;
     const load = async () => {
-      const res = await fetch(
-        `/api/rextora/charts/candles?symbol=${activeSymbol}&interval=15m&limit=180`,
-      );
-      const json = await res.json();
-      if (!active) return;
-      if (json.ok && json.data?.candles) {
-        setCandles(candlesToPoints(json.data.candles));
+      setCandlesLoading(true);
+      try {
+        const res = await fetch(
+          `/api/rextora/charts/candles?symbol=${activeSymbol}&interval=15m&limit=180`,
+        );
+        const json = await res.json();
+        if (!active) return;
+        if (json.ok && json.data?.candles?.length) {
+          setCandles(candlesToPoints(json.data.candles));
+          setCandlesFailed(false);
+        } else {
+          setCandles([]);
+          setCandlesFailed(true);
+        }
+      } catch {
+        if (!active) return;
+        setCandles([]);
+        setCandlesFailed(true);
+      } finally {
+        if (active) setCandlesLoading(false);
       }
     };
     void load();
@@ -55,7 +109,7 @@ export function TradingChartsPanel({
       active = false;
       clearInterval(t);
     };
-  }, [activeSymbol, isLive]);
+  }, [activeSymbol, isLive, sessionActive]);
 
   const pos = metrics?.positions[0];
   const { markers, levels } = useMemo(() => {
@@ -86,6 +140,33 @@ export function TradingChartsPanel({
   const warnTone = isLive ? "danger" : "default";
   const usage = metrics?.riskUsagePct ?? riskView?.usagePct ?? 0;
   const limitAbs = Math.abs(riskView?.dailyLossLimitPct ?? 5);
+  const hasTrades = (metrics?.recentTrades?.length ?? 0) > 0;
+
+  if (!sessionActive) {
+    return (
+      <div
+        className="space-y-4"
+        data-testid={`trading-charts-${mode.toLowerCase()}`}
+      >
+        <Card title={isLive ? "실전 차트·지표" : "모의 차트·지표"}>
+          <IdlePanel
+            testId={isLive ? "live-charts-idle" : "paper-charts-idle"}
+            icon={<Activity className="h-5 w-5" aria-hidden />}
+            message="아직 거래가 시작되지 않았습니다."
+            hint={
+              isLive
+                ? "안전 게이트를 통과한 뒤 실전 매매를 시작하면 차트와 지표가 표시됩니다."
+                : "모의매매를 시작하면 차트·손익·거래 내역이 여기에 표시됩니다."
+            }
+            actionHref={isLive ? "/settings" : "/results"}
+            actionLabel={
+              isLive ? "시스템 설정에서 실전 허용 확인" : "탐색 결과에서 전략 등록"
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -156,18 +237,34 @@ export function TradingChartsPanel({
         </div>
       </Card>
 
-      <CandlestickChart
-        title={`${activeSymbol} · ${mode === "LIVE" ? "실전 매매" : "모의 매매"}`}
-        candles={candles}
-        markers={markers}
-        levels={levels}
-        height={320}
-      />
-
-      {candles.length === 0 && (
-        <p className="text-sm text-slate-400">
-          차트 데이터가 없습니다. 네트워크 연결 또는 심볼을 확인하세요.
-        </p>
+      {candlesLoading ? (
+        <Card title={`${activeSymbol} · ${isLive ? "실전 매매" : "모의 매매"}`}>
+          <IdlePanel
+            testId="chart-loading"
+            icon={<Loader2 className="h-5 w-5 animate-spin" aria-hidden />}
+            message="데이터를 불러오는 중입니다."
+            hint="차트와 시장 데이터를 준비하고 있습니다."
+          />
+        </Card>
+      ) : candlesFailed || candles.length === 0 ? (
+        <Card title={`${activeSymbol} · ${isLive ? "실전 매매" : "모의 매매"}`}>
+          <IdlePanel
+            testId="chart-no-market-data"
+            icon={<WifiOff className="h-5 w-5" aria-hidden />}
+            message="시장 데이터를 불러오지 못했습니다."
+            hint="네트워크 연결과 심볼 설정을 확인한 뒤 다시 시도하세요."
+            actionHref="/settings"
+            actionLabel="시스템 설정 확인"
+          />
+        </Card>
+      ) : (
+        <CandlestickChart
+          title={`${activeSymbol} · ${mode === "LIVE" ? "실전 매매" : "모의 매매"}`}
+          candles={candles}
+          markers={markers}
+          levels={levels}
+          height={320}
+        />
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -175,9 +272,12 @@ export function TradingChartsPanel({
           <EquityCurveChart title="손익 곡선" series={equity} height={180} />
         ) : (
           <Card title="손익 곡선">
-            <p className="text-sm text-slate-400">
-              거래가 쌓이면 손익 곡선이 표시됩니다.
-            </p>
+            <IdlePanel
+              testId="chart-no-trades-equity"
+              icon={<LineChart className="h-5 w-5" aria-hidden />}
+              message="아직 거래가 발생하지 않았습니다."
+              hint="전략 신호가 체결되면 손익 곡선이 표시됩니다."
+            />
           </Card>
         )}
         {daily && daily.data.length > 0 ? (
@@ -189,9 +289,12 @@ export function TradingChartsPanel({
           />
         ) : (
           <Card title="일별 자산·손익">
-            <p className="text-sm text-slate-400">
-              일별 손익 데이터가 아직 없습니다.
-            </p>
+            <IdlePanel
+              testId="chart-no-trades-daily"
+              icon={<LineChart className="h-5 w-5" aria-hidden />}
+              message="아직 거래가 발생하지 않았습니다."
+              hint="일별 손익은 거래가 쌓인 뒤 표시됩니다."
+            />
           </Card>
         )}
       </div>
@@ -200,10 +303,13 @@ export function TradingChartsPanel({
         <BarChart title="코인별 포지션 노출도" series={exposure} height={180} />
       ) : (
         <Card title="포지션 노출도" className="!p-3">
-          <p className="text-sm text-slate-400">
-            열린 포지션이 없습니다. 포지션이 생성되면 코인별 노출·증거금·포지션
-            규모가 표시됩니다.
-          </p>
+          <IdlePanel
+            testId="chart-no-positions"
+            icon={<Activity className="h-5 w-5" aria-hidden />}
+            message="아직 거래가 발생하지 않았습니다."
+            hint="포지션이 열리면 코인별 노출·증거금이 표시됩니다."
+            compact
+          />
         </Card>
       )}
 
@@ -225,7 +331,18 @@ export function TradingChartsPanel({
           </div>
         )}
 
-      <TimelineChart title="최근 거래" events={timeline} height={140} />
+      {hasTrades ? (
+        <TimelineChart title="최근 거래" events={timeline} height={140} />
+      ) : (
+        <Card title="최근 거래">
+          <IdlePanel
+            testId="chart-no-trades-timeline"
+            icon={<Activity className="h-5 w-5" aria-hidden />}
+            message="아직 거래가 발생하지 않았습니다."
+            hint="체결된 거래가 생기면 타임라인에 표시됩니다."
+          />
+        </Card>
+      )}
 
       {isLive && (
         <p className="text-xs text-orange-300">

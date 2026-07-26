@@ -40,27 +40,51 @@ import {
   saveSearchPlan,
 } from "./searchPlan";
 import { resolveTerminationReason } from "./terminationReason";
+import { deriveCanonicalCounters } from "./jobStatistics";
+import { SAFETY_BUDGET_CEILING } from "./searchPlan";
+import { buildSymbolSelectionEvidence } from "./symbolSelection";
+import { classifyEngineError } from "./engineErrorClassification";
+import { recoverMissingJobRecord } from "./jobRecordRecovery";
 import { resolveSpacesForDepth } from "./operatorProfiles";
-import { getSearchSpaceById, rangesForSpace } from "./searchSpaces";
+import {
+  getSearchSpaceById,
+  rangesForSpace,
+  resolveSelectedSearchSpaces,
+} from "./searchSpaces";
 import { listStrategies } from "../strategy/strategyStore";
 import { buildReadableStrategyIdentity } from "./readableStrategyName";
 import {
   STRATEGY_SEARCH_HISTORY_VISIBLE_DEFAULT,
   compareJobsNewestFirst,
-  deleteSearchJobIfAllowed,
   manualDeleteBlockMessageKo,
   runHistoryRetentionAfterCreate,
   type ManualDeleteBlockReason,
 } from "./historyRetention";
 import {
+  executeResearchJobDeletion,
+  ResearchJobDeletionError,
+} from "./deletionSafety";
+import {
+  isJobArchived,
+  listArchivedResearchJobs,
+  listVisibleResearchJobs,
+  restoreArchivedResearchJob,
+} from "./jobArchive";
+import {
   StrategySearchJobRunnerError,
-  requestSearchJobCancel,
   requestSearchJobPause,
   resumeSearchJobForRun,
 } from "./jobRunner";
 import {
   StrategySearchJobStateError,
+  transitionJobToQueued,
 } from "./jobState";
+import { requestCancelWithFinalization } from "./cancellationLifecycle";
+import {
+  getResearchTop10,
+  rankChangeLabelShort,
+} from "./researchTop10";
+import { buildPersistedSearchSummary } from "./persistedSearchSummary";
 import type {
   StrategySearchBestCandidateReference,
   StrategySearchJob,
@@ -174,7 +198,6 @@ export interface StrategySearchJobSummary {
   }> | null;
   /** Best verified return from best-passed trial, when available. */
   bestReturn?: number | null;
-  /** Short label for current best strategy when known. */
   currentBestSummary?: string | null;
   /** Global candidates remaining. */
   remainingBudget?: number | null;
@@ -196,11 +219,97 @@ export interface StrategySearchJobSummary {
     mutationCount: number;
     firstChange: {
       key: string;
-      field: "min" | "max" | "step";
+      field: "min" | "max" | "step" | "defaultValue";
       from: number;
       to: number;
       reason: string;
     } | null;
+  } | null;
+  /** Canonical counter breakdown (errors ⊆ failed). */
+  counters?: {
+    evaluated: number;
+    qualified: number;
+    rejected: number;
+    evaluationErrors: number;
+    invariantOk: boolean;
+    equation: string;
+  } | null;
+  /** Soft operator budget at create time (before deadline replenish). */
+  initialCandidateBudget?: number | null;
+  /** Hard safety ceiling — never a normal completion target. */
+  resourceSafetyCeiling?: number | null;
+  /** Presentation outcome; persisted status may remain failed. */
+  outcomePresentation?:
+    | "running"
+    | "completed"
+    | "user_stopped"
+    | "cancelled"
+    | "partial_completed"
+    | "failed"
+    | null;
+  candidatesPreserved?: boolean;
+  preservedCandidateCount?: number | null;
+  retryable?: boolean;
+  failedStage?: string | null;
+  lastSuccessfulStage?: string | null;
+  terminationDetail?: string | null;
+  symbolSelection?: {
+    mode: "recommended" | "manual";
+    selectedSymbol: string;
+    reasonKo: string;
+    liquidityStatus: string;
+    volatilityStatus: string;
+    dataAvailability: string;
+    excludedAlternatives: Array<{ symbol: string; reasonKo: string }>;
+  } | null;
+  currentBestRisk?: {
+    netReturn: number | null;
+    maxDrawdown: number | null;
+    tradeCount: number | null;
+    totalCost: number | null;
+    profitFactor: number | null;
+    robustnessStatus: string;
+    overfittingRisk: string;
+    eligibilityStatus: string;
+    recommendable: boolean;
+  } | null;
+  /** True when job has an active archive sidecar (hidden from default history). */
+  isArchived?: boolean;
+  /** Live Research Top-10 shortlist (persisted; updated during run). */
+  liveTop10?: {
+    updatedAt: string;
+    finalizedAt: string | null;
+    phase: "live" | "final";
+    entries: Array<{
+      rank: number;
+      previousRank: number | null;
+      displayAlias: string;
+      readableName: string;
+      strategyFamily?: string;
+      strategyHash: string;
+      netReturn: number | null;
+      maxDrawdown: number | null;
+      tradeCount: number | null;
+      profitFactor: number | null;
+      costStatus: string;
+      robustnessStatus: string;
+      sampleConfidence: string;
+      leverageLabel: string;
+      rankReason: string;
+      rankChange: string;
+      rankChangeShort: string;
+      movementReasonKo: string;
+      roleBadges: string[];
+      eligibilityStatus?: string;
+      recommendable?: boolean;
+      registrationState?: string;
+      overfittingRisk?: string;
+      score?: number | null;
+      previousNetReturn?: number | null;
+      previousMaxDrawdown?: number | null;
+      previousTradeCount?: number | null;
+      previousScore?: number | null;
+    }>;
   } | null;
 }
 
@@ -225,6 +334,7 @@ export interface StrategySearchJobDetail extends StrategySearchJobSummary {
     updatedAt: string;
     hasRunnerPayload: boolean;
   };
+  appliedSearchSummary?: ReturnType<typeof buildPersistedSearchSummary>;
 }
 
 export interface StrategySearchBestResultResponse {
@@ -330,7 +440,19 @@ function requireJob(
   options?: StrategySearchStoreOptions,
 ): StrategySearchJob {
   try {
-    const job = getSearchJob(jobId, options);
+    let job = getSearchJob(jobId, options);
+    if (!job) {
+      // Recover missing job.json when plan/execution/trials/index remain.
+      // Never deletes trials. Restores as paused (no silent auto-resume).
+      try {
+        const recovery = recoverMissingJobRecord(jobId, options);
+        if (recovery.recovered) {
+          job = getSearchJob(jobId, options);
+        }
+      } catch {
+        /* recovery best-effort; fall through to NOT_FOUND */
+      }
+    }
     if (!job) {
       throw new StrategySearchApiError(
         "JOB_NOT_FOUND",
@@ -340,6 +462,7 @@ function requireJob(
     }
     return job;
   } catch (err) {
+    if (err instanceof StrategySearchApiError) throw err;
     if (
       err instanceof StrategySearchPersistenceError &&
       err.code === "INVALID_IDENTIFIER"
@@ -537,6 +660,202 @@ function summarizeJob(
         },
       };
     })(),
+    counters: statistics
+      ? deriveCanonicalCounters(statistics)
+      : null,
+    initialCandidateBudget: plan?.initialCandidateBudget ?? null,
+    resourceSafetyCeiling: SAFETY_BUDGET_CEILING,
+    outcomePresentation: (() => {
+      if (
+        job.status === "running" ||
+        job.status === "pause_requested" ||
+        job.status === "queued"
+      ) {
+        return "running";
+      }
+      if (job.status === "paused") return "user_stopped";
+      if (job.status === "cancelled" || job.status === "cancel_requested") {
+        return "cancelled";
+      }
+      if (job.status === "completed") return "completed";
+      if (job.status === "failed") {
+        const preserved = plan?.qualifiedHashes.length ?? statistics?.passed ?? 0;
+        return preserved > 0 ? "partial_completed" : "failed";
+      }
+      return null;
+    })(),
+    candidatesPreserved:
+      job.status === "failed" &&
+      (plan?.qualifiedHashes.length ?? statistics?.passed ?? 0) > 0,
+    preservedCandidateCount:
+      plan?.qualifiedHashes.length ?? statistics?.passed ?? 0,
+    retryable: (() => {
+      if (job.status === "paused") return true;
+      if (job.status !== "failed") return false;
+      const msg = (job.failureMessage ?? "").toLowerCase();
+      // Proven recoverable generation failures (OUT_OF_RANGE after mutation).
+      if (
+        msg.includes("candidate validation failed") ||
+        msg.includes("out_of_range") ||
+        msg.includes("validation_failed")
+      ) {
+        return true;
+      }
+      const classified = classifyEngineError(
+        new Error(job.failureMessage ?? "engine error"),
+        "candidate_generation",
+      );
+      return classified.retryable && classified.class !== "fatal_engine_error";
+    })(),
+    failedStage: (() => {
+      if (job.status !== "failed" || !plan) return null;
+      const active = plan.spaces[plan.currentSpaceIndex];
+      return active?.labelKo ?? active?.id ?? null;
+    })(),
+    lastSuccessfulStage: (() => {
+      if (!plan) return null;
+      const done = [...plan.spaces]
+        .reverse()
+        .find((s) => s.status === "completed" || s.status === "exhausted");
+      return done?.labelKo ?? done?.id ?? null;
+    })(),
+    terminationDetail: job.failureMessage,
+    symbolSelection: plan?.symbolSelection ?? null,
+    currentBestRisk: (() => {
+      if (!bestRef) {
+        return {
+          netReturn: null,
+          maxDrawdown: null,
+          tradeCount: null,
+          totalCost: null,
+          profitFactor: null,
+          robustnessStatus: "검증 대기",
+          overfittingRisk: "검증 대기",
+          eligibilityStatus: "추천 불가",
+          recommendable: false,
+        };
+      }
+      try {
+        const trial = getSearchTrial(job.id, bestRef.iteration, options);
+        const primary = trial?.windowResults?.[0] as
+          | {
+              totalReturn?: number;
+              mdd?: number;
+              trades?: number;
+              profitFactor?: number;
+              totalCost?: number;
+            }
+          | undefined;
+        const stressOk =
+          (trial?.costStressResults?.length ?? 0) > 0 &&
+          (trial?.costStressResults ?? []).every((r) => r.passed);
+        const jitterOk =
+          (trial?.jitterResults?.length ?? 0) === 0
+            ? null
+            : (trial?.jitterResults ?? []).every((r) => r.passed);
+        const hasRisk =
+          primary != null &&
+          typeof primary.mdd === "number" &&
+          typeof primary.trades === "number";
+        const recommendable = bestRef.passed === true && hasRisk && stressOk;
+        return {
+          netReturn:
+            typeof primary?.totalReturn === "number" ? primary.totalReturn : null,
+          maxDrawdown: typeof primary?.mdd === "number" ? primary.mdd : null,
+          tradeCount: typeof primary?.trades === "number" ? primary.trades : null,
+          totalCost:
+            typeof primary?.totalCost === "number" ? primary.totalCost : null,
+          profitFactor:
+            typeof primary?.profitFactor === "number"
+              ? primary.profitFactor
+              : null,
+          robustnessStatus: !hasRisk
+            ? "검증 대기"
+            : stressOk
+              ? "거래 안정성 통과"
+              : "거래 안정성 미통과",
+          overfittingRisk:
+            jitterOk == null
+              ? "검증 대기"
+              : jitterOk
+                ? "낮음"
+                : "높음",
+          eligibilityStatus: recommendable ? "검토 가능" : "추천 불가",
+          recommendable,
+        };
+      } catch {
+        return {
+          netReturn: bestReturn,
+          maxDrawdown: null,
+          tradeCount: null,
+          totalCost: null,
+          profitFactor: null,
+          robustnessStatus: "검증 대기",
+          overfittingRisk: "검증 대기",
+          eligibilityStatus: "추천 불가",
+          recommendable: false,
+        };
+      }
+    })(),
+    liveTop10: (() => {
+      const snap = getResearchTop10(job.id, options);
+      if (!snap) return null;
+      const mapEntry = (e: (typeof snap.entries)[number]) => {
+        const changeRow = snap.rankChanges.find(
+          (c) => c.strategyHash === e.strategyHash,
+        );
+        const change = changeRow?.change ?? "순위 유지";
+        const prev =
+          snap.previousEntries?.find((p) => p.strategyHash === e.strategyHash) ??
+          null;
+        return {
+          rank: e.rank,
+          previousRank: changeRow?.previousRank ?? prev?.rank ?? null,
+          displayAlias: e.displayAlias,
+          readableName: e.readableName,
+          strategyFamily: e.strategyFamily,
+          strategyHash: e.strategyHash,
+          netReturn: e.netReturn,
+          maxDrawdown: e.maxDrawdown,
+          tradeCount: e.tradeCount,
+          profitFactor: e.profitFactor,
+          score: e.score ?? null,
+          previousNetReturn: prev?.netReturn ?? null,
+          previousMaxDrawdown: prev?.maxDrawdown ?? null,
+          previousTradeCount: prev?.tradeCount ?? null,
+          previousScore: prev?.score ?? null,
+          costStatus: e.costStatus,
+          robustnessStatus: e.robustnessStatus,
+          sampleConfidence: e.sampleConfidence,
+          leverageLabel: e.leverageLabel ?? "—",
+          rankReason: e.rankReason,
+          rankChange: change,
+          rankChangeShort: rankChangeLabelShort(change),
+          movementReasonKo:
+            e.movementReasonKo ||
+            changeRow?.movementReasonKo ||
+            "",
+          roleBadges: [...e.roleBadges],
+          eligibilityStatus: e.eligibilityStatus,
+          recommendable: e.recommendable,
+          registrationState: e.registrationState,
+          overfittingRisk: e.overfittingRisk,
+        };
+      };
+      return {
+        updatedAt: snap.updatedAt,
+        finalizedAt: snap.finalizedAt ?? null,
+        phase: snap.phase ?? (snap.finalizedAt ? "final" : "live"),
+        entries: snap.entries.map(mapEntry),
+        finalEntries: (snap.finalEntries ?? []).map(mapEntry),
+        finalVsLive: (snap.finalVsLive ?? []).map((d) => ({
+          strategyHash: d.strategyHash,
+          liveRank: d.liveRank,
+          finalRank: d.finalRank,
+          exclusionReasonKo: d.exclusionReasonKo,
+        })),
+      };
+    })(),
   };
 }
 
@@ -577,6 +896,7 @@ function detailJob(
       updatedAt: job.checkpoint.updatedAt,
       hasRunnerPayload,
     },
+    appliedSearchSummary: buildPersistedSearchSummary(job.id, options),
   };
 }
 
@@ -589,8 +909,12 @@ export function createStrategySearchJobApi(
     const validated = validateCreateSearchJobBody(body);
     let config = validated.config;
     if (validated.operatorPlan) {
-      const spaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
-      const first = spaces[0];
+      const depthSpaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
+      const effectiveSpaces = resolveSelectedSearchSpaces(
+        validated.operatorPlan.selectedSpaceIds,
+        depthSpaces.map((s) => s.id),
+      );
+      const first = effectiveSpaces[0];
       if (first) {
         const spaceDef = getSearchSpaceById(first.id);
         if (spaceDef) {
@@ -608,7 +932,16 @@ export function createStrategySearchJobApi(
     const job = createSearchJob(config, store);
     saveJobExecutionProfile(job.id, validated.execution, store);
     if (validated.operatorPlan) {
-      const spaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
+      const depthSpaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
+      const effectiveSpaces = resolveSelectedSearchSpaces(
+        validated.operatorPlan.selectedSpaceIds,
+        depthSpaces.map((s) => s.id),
+      );
+      const selectedSymbol = config.symbols[0] ?? "BTCUSDT";
+      const marketMode =
+        (body as { marketMode?: string } | null)?.marketMode === "manual"
+          ? "manual"
+          : "recommended";
       saveSearchPlan(
         job.id,
         createEmptySearchPlan({
@@ -621,8 +954,31 @@ export function createStrategySearchJobApi(
           candidateBudget: validated.operatorPlan.candidateBudget,
           stageBatchSize: validated.operatorPlan.stageBatchSize,
           maxRuntimeMs: validated.operatorPlan.maxRuntimeMs,
-          spaces: spaces.map((s) => ({ id: s.id, labelKo: s.labelKo })),
+          spaces: effectiveSpaces.map((s) => ({ id: s.id, labelKo: s.labelKo })),
           minScore: validated.operatorPlan.minScore,
+          symbolSelection: buildSymbolSelectionEvidence({
+            mode: marketMode,
+            selectedSymbol,
+          }),
+          errorWarningRate: validated.operatorPlan.errorWarningRate,
+          errorAutoPauseRate: validated.operatorPlan.errorAutoPauseRate,
+          repeatedSignatureThreshold:
+            validated.operatorPlan.repeatedSignatureThreshold,
+          leverageMode: validated.operatorPlan.leverageMode,
+          leverageFixed: validated.operatorPlan.leverageFixed,
+          leverageMin: validated.operatorPlan.leverageMin,
+          leverageMax: validated.operatorPlan.leverageMax,
+          adaptiveLeverageEnabled:
+            validated.operatorPlan.adaptiveLeverageEnabled,
+          patternConfigLevel: validated.operatorPlan.patternConfigLevel,
+          patternDirection: validated.operatorPlan.patternDirection,
+          patternRetestMode: validated.operatorPlan.patternRetestMode,
+          patternConfirmStrength: validated.operatorPlan.patternConfirmStrength,
+          patternConfirmClose: validated.operatorPlan.patternConfirmClose,
+          patternExpiryBars: validated.operatorPlan.patternExpiryBars,
+          patternRiskStyle: validated.operatorPlan.patternRiskStyle,
+          patternStrength: validated.operatorPlan.patternStrength,
+          patternSrSensitivity: validated.operatorPlan.patternSrSensitivity,
         }),
         store,
       );
@@ -630,7 +986,26 @@ export function createStrategySearchJobApi(
     // Retention runs only after the new job is fully persisted.
     // Cleanup failures are non-fatal and never roll back this create.
     runHistoryRetentionAfterCreate(store);
-    return detailJob(job, store);
+    // Canonical create contract: return only after job + plan read-back succeed.
+    const readBack = getSearchJob(job.id, store);
+    if (!readBack) {
+      throw new StrategySearchApiError(
+        "INTERNAL_EXECUTION_FAILURE",
+        `strategy-search create read-back failed for job ${job.id}`,
+        500,
+      );
+    }
+    if (validated.operatorPlan) {
+      const planReadBack = getSearchPlan(job.id, store);
+      if (!planReadBack) {
+        throw new StrategySearchApiError(
+          "INTERNAL_EXECUTION_FAILURE",
+          `strategy-search plan read-back failed for job ${job.id}`,
+          500,
+        );
+      }
+    }
+    return detailJob(readBack, store);
   } catch (err) {
     mapCaught(err);
   }
@@ -641,6 +1016,10 @@ export function listStrategySearchJobsApi(
     /** Default: newest 20. Pass a larger value only for pagination. */
     limit?: number | null;
     offset?: number | null;
+    /** When false (default), archived jobs are hidden from history lists. */
+    includeArchived?: boolean;
+    /** When true, only archived (non-restored) jobs are returned. */
+    archivedOnly?: boolean;
   },
 ): StrategySearchJobSummary[] {
   const offsetRaw = options?.offset;
@@ -664,11 +1043,27 @@ export function listStrategySearchJobsApi(
         : Math.trunc(limitRaw),
     ),
   );
-  return listSearchJobs(store)
+
+  let sourceJobs: StrategySearchJob[];
+  if (options?.archivedOnly) {
+    const archivedIds = new Set(
+      listArchivedResearchJobs(store).map((r) => r.jobId),
+    );
+    sourceJobs = listSearchJobs(store).filter((j) => archivedIds.has(j.id));
+  } else if (options?.includeArchived) {
+    sourceJobs = listSearchJobs(store);
+  } else {
+    sourceJobs = listVisibleResearchJobs(store);
+  }
+
+  return sourceJobs
     .slice()
     .sort(compareJobsNewestFirst)
     .slice(offset, offset + limit)
-    .map((job) => summarizeJob(job, store));
+    .map((job) => ({
+      ...summarizeJob(job, store),
+      isArchived: isJobArchived(job.id, store),
+    }));
 }
 
 export function deleteStrategySearchJobApi(
@@ -677,8 +1072,16 @@ export function deleteStrategySearchJobApi(
 ): { deleted: true; jobId: string } {
   try {
     const store = resolveStore(options);
-    return deleteSearchJobIfAllowed(jobId, store);
+    return executeResearchJobDeletion(jobId, store);
   } catch (err) {
+    if (err instanceof ResearchJobDeletionError) {
+      throw new StrategySearchApiError(
+        err.code === "protected" ? "INVALID_STATE" : "INVALID_STATE",
+        err.message,
+        409,
+        err.preview.reasonsKo,
+      );
+    }
     const code = (err as { code?: ManualDeleteBlockReason }).code;
     if (code) {
       throw new StrategySearchApiError(
@@ -686,6 +1089,30 @@ export function deleteStrategySearchJobApi(
         manualDeleteBlockMessageKo(code),
         code === "not_found" ? 404 : 409,
       );
+    }
+    mapCaught(err);
+  }
+}
+
+export function restoreStrategySearchJobApi(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): { restored: true; jobId: string } {
+  try {
+    const store = resolveStore(options);
+    if (!isJobArchived(jobId, store)) {
+      throw new StrategySearchApiError(
+        "INVALID_STATE",
+        "보관된 작업이 아닙니다.",
+        409,
+      );
+    }
+    restoreArchivedResearchJob(jobId, store);
+    return { restored: true, jobId };
+  } catch (err) {
+    if (err instanceof StrategySearchApiError) throw err;
+    if (err instanceof Error && err.message.includes("not found")) {
+      throw new StrategySearchApiError("JOB_NOT_FOUND", err.message, 404);
     }
     mapCaught(err);
   }
@@ -780,12 +1207,39 @@ export function resumeStrategySearchJobApi(
         409,
       );
     }
-    if (job.status !== "paused") {
+    if (job.status !== "paused" && job.status !== "failed") {
       throw new StrategySearchApiError(
         "INVALID_STATE",
         `cannot resume strategy-search job in status: ${job.status}`,
         409,
       );
+    }
+    if (job.status === "failed") {
+      const detail = detailJob(job, store);
+      if (!detail.retryable) {
+        throw new StrategySearchApiError(
+          "INVALID_STATE",
+          "이 실패는 안전하게 재시도할 수 없습니다.",
+          409,
+        );
+      }
+      // Clear failure and reopen as queued; preserve trials/checkpoint.
+      transitionJobToQueued(jobId, store);
+      const planFailed = getSearchPlan(jobId, store);
+      if (planFailed) {
+        saveSearchPlan(
+          jobId,
+          {
+            ...markPlanResumed({ ...planFailed, completionReason: null }),
+            // Drop collapsed mutated ranges so retry uses a healthy domain.
+            mutatedParameterRanges: null,
+            lastMutation: null,
+          },
+          store,
+        );
+      }
+      startSearchJobExecution(jobId, merged);
+      return detailJob(requireJob(jobId, store), store);
     }
     const plan = getSearchPlan(jobId, store);
     if (plan) {
@@ -817,10 +1271,9 @@ export function cancelStrategySearchJobApi(
         409,
       );
     }
-    if (job.status === "cancel_requested") {
-      return detailJob(job, store);
-    }
-    requestSearchJobCancel(jobId, store);
+    // Cooperative cancel + immediate finalize when no active worker owns the job.
+    // Prevents paused/orphaned jobs from sticking in cancel_requested forever.
+    requestCancelWithFinalization(jobId, store);
     return detailJob(requireJob(jobId, store), store);
   } catch (err) {
     mapCaught(err);

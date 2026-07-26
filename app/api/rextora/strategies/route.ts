@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import {
   copyStrategy,
   createStrategy,
-  deleteStrategy,
   ensureStrategyStore,
   getStrategyById,
   listStrategies,
@@ -12,6 +11,11 @@ import {
   setPaperActiveStrategy,
   validateStrategyById
 } from "@/src/lib/rextora/strategy/strategyStore";
+import {
+  deleteStrategyWithSafety,
+  detachResearchProvenance,
+  previewStrategyDeletion,
+} from "@/src/lib/rextora/strategySearch/strategyDeletionSafety";
 import { listProductionStrategies } from "@/src/lib/rextora/strategy/strategyMetadata";
 import type { SafeV44Params, StrategyTimeframe } from "@/src/lib/rextora/strategy/strategyTypes";
 import type { CanonicalStrategyDefinition } from "@/src/lib/rextora/strategy/definition/types";
@@ -70,6 +74,8 @@ export async function POST(request: Request) {
     definition?: CanonicalStrategyDefinition;
     strategyType?: "safe_params" | "condition_builder";
     timeframe?: StrategyTimeframe;
+    detachRefsFirst?: boolean;
+    includeRelatedRecords?: boolean;
   };
 
   try {
@@ -109,8 +115,36 @@ export async function POST(request: Request) {
         });
       case "delete":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
-        deleteStrategy(body.id);
+        if (body.detachRefsFirst === true || body.includeRelatedRecords === true) {
+          deleteStrategyWithSafety(body.id, {
+            detachRefsFirst: body.detachRefsFirst === true,
+            includeRelatedRecords: body.includeRelatedRecords === true,
+          });
+        } else {
+          const impact = previewStrategyDeletion(body.id);
+          if (impact.classification === "absolute_protect") {
+            throw new StrategyValidationError(impact.reasonsKo[0] ?? "삭제할 수 없습니다.");
+          }
+          if (impact.classification === "detach_then_delete") {
+            throw new StrategyValidationError(
+              `${impact.reasonsKo[0]} ${impact.nextActionKo}`,
+            );
+          }
+          deleteStrategyWithSafety(body.id);
+        }
         return NextResponse.json({ ok: true });
+      case "deletion_impact":
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        return NextResponse.json({
+          ok: true,
+          data: previewStrategyDeletion(body.id),
+        });
+      case "detach_research_provenance":
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        return NextResponse.json({
+          ok: true,
+          data: detachResearchProvenance(body.id),
+        });
       case "apply_paper":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
         return NextResponse.json({ ok: true, data: setPaperActiveStrategy(body.id) });

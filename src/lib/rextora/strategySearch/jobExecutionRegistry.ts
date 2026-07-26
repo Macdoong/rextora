@@ -8,6 +8,8 @@
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { loadHistoricalCandles } from "../data/historicalCandleLoader";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
+import { applyLeverageModeToParams } from "./leverageMode";
+import { getSearchPlan } from "./searchPlan";
 import {
   buildEvaluationWindowPlans,
   type BuildEvaluationWindowPlansInput,
@@ -208,7 +210,10 @@ export function startSearchJobExecution(
         `strategy-search job disappeared after candle load: ${jobId}`,
       );
     }
-    if (afterLoad.status === "cancel_requested") {
+    if (
+      afterLoad.status === "cancel_requested" ||
+      afterLoad.status === "cancelling"
+    ) {
       transitionJobToCancelled(jobId, store);
       return;
     }
@@ -220,6 +225,11 @@ export function startSearchJobExecution(
       return;
     }
 
+    const planForLev = getSearchPlan(jobId, store);
+    const baseParams = applyLeverageModeToParams(
+      CONTEXT_FALLBACK_PARAMS,
+      planForLev,
+    );
     const orch = await runOrchestratedSearchJob({
       jobId,
       storeOptions: store,
@@ -230,7 +240,7 @@ export function startSearchJobExecution(
       scoreWeights: profile.scoreWeights,
       costStressScenarios: profile.costStressScenarios,
       jitterConfig: profile.jitterConfig,
-      baseParams: CONTEXT_FALLBACK_PARAMS,
+      baseParams,
       preloadedCandlesByKey,
       evaluate: resolved.evaluate,
     });

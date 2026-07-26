@@ -16,6 +16,8 @@ import {
 } from "./jobStore";
 import { isTerminalJobStatus } from "./jobState";
 import { getSearchPlan } from "./searchPlan";
+import { isProvenanceDetached } from "./researchProvenance";
+import { parseSourceResearchJobId } from "./researchResultsSummary";
 import type { StrategySearchJob, StrategySearchJobStatus } from "./types";
 
 /** Default maximum retained eligible (terminal, deletable) jobs on disk. */
@@ -33,6 +35,7 @@ const PROTECTED_ACTIVE_STATUSES: ReadonlySet<StrategySearchJobStatus> = new Set(
   "pause_requested",
   "paused",
   "cancel_requested",
+  "cancelling",
 ]);
 
 const LEGACY_STATUS_MAP: Readonly<Record<string, StrategySearchJobStatus>> = {
@@ -41,7 +44,7 @@ const LEGACY_STATUS_MAP: Readonly<Record<string, StrategySearchJobStatus>> = {
   RUNNING: "running",
   PAUSE_REQUESTED: "pause_requested",
   PAUSED: "paused",
-  CANCELLING: "cancel_requested",
+  CANCELLING: "cancelling",
   CANCEL_REQUESTED: "cancel_requested",
   CANCELLED: "cancelled",
   COMPLETED: "completed",
@@ -97,6 +100,7 @@ export function normalizeJobStatusForRetention(
     status === "pause_requested" ||
     status === "paused" ||
     status === "cancel_requested" ||
+    status === "cancelling" ||
     status === "cancelled" ||
     status === "completed" ||
     status === "failed"
@@ -158,7 +162,9 @@ function isReferencedByLegacyDescription(jobId: string): boolean {
         typeof (strategy as { description?: unknown }).description === "string"
           ? (strategy as { description: string }).description
           : "";
+      if (isProvenanceDetached(desc)) continue;
       if (descriptionReferencesSearchJob(desc, jobId)) return true;
+      if (parseSourceResearchJobId(desc) === jobId) return true;
     }
   } catch {
     // Strategy store unavailable — do not treat as referenced.
@@ -181,11 +187,17 @@ function hasStructuredStrategyProvenance(
 ): boolean {
   const plan = getSearchPlan(jobId, options);
   if (!plan) return false;
-  return plan.promotions.some(
-    (p) =>
-      (p.status === "promoted" || p.status === "duplicate") &&
-      strategyStillExists(p.strategyId),
-  );
+  return plan.promotions.some((p) => {
+    if (p.status !== "promoted" && p.status !== "duplicate") return false;
+    if (!strategyStillExists(p.strategyId)) return false;
+    try {
+      const s = getStrategyById(p.strategyId!);
+      if (s && isProvenanceDetached(s.description)) return false;
+    } catch {
+      /* keep structured block if we can't read */
+    }
+    return true;
+  });
 }
 
 function hasLiveStrategyProvenance(

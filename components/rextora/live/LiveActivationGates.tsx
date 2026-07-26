@@ -201,12 +201,12 @@ export function LiveActivationGates() {
         null;
       if (!selected?.id || !selected.paramsHash) {
         setMessage(
-          "드라이런에 사용할 비-SAFE 전략을 찾지 못했습니다. Results/Backtest에서 후보를 선택하세요.",
+          "드라이런에 사용할 비-SAFE 전략을 찾지 못했습니다. 탐색 결과/백테스트에서 전략을 선택하세요.",
         );
         return;
       }
       if (selected.id === SAFE_STRATEGY_ID) {
-        setMessage("SAFE 원본으로는 드라이런 후보를 등록하지 않습니다.");
+        setMessage("SAFE 원본으로는 드라이런 검토 대상을 등록하지 않습니다.");
         return;
       }
       const executionKey = `dry_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
@@ -274,7 +274,7 @@ export function LiveActivationGates() {
           className="rextora-helper mb-3 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sky-100"
           data-testid="live-candidate-identity"
         >
-          검토 후보: {candidateId}
+          검토 대상: {candidateId}
           {candidateRunId ? ` · Backtest Run ${candidateRunId}` : ""}
           （SAFE로 대체하지 않음）
         </p>
