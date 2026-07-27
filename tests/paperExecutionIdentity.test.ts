@@ -1,4 +1,7 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import {
   installIsolatedStrategyStore,
 } from "./helpers/isolatedStrategyStore";
@@ -17,13 +20,24 @@ import {
 
 describe("paper execution strategy identity", () => {
   let cleanup: (() => void) | undefined;
+  let paperRootDir: string;
+  let prevPaperSessionsDir: string | undefined;
 
   beforeEach(() => {
     cleanup = installIsolatedStrategyStore().cleanup;
+    paperRootDir = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-paper-exec-"));
+    prevPaperSessionsDir = process.env.REXTORA_PAPER_SESSIONS_DIR;
+    process.env.REXTORA_PAPER_SESSIONS_DIR = paperRootDir;
   });
 
   afterEach(() => {
     cleanup?.();
+    if (prevPaperSessionsDir === undefined) {
+      delete process.env.REXTORA_PAPER_SESSIONS_DIR;
+    } else {
+      process.env.REXTORA_PAPER_SESSIONS_DIR = prevPaperSessionsDir;
+    }
+    fs.rmSync(paperRootDir, { recursive: true, force: true });
   });
 
   it("uses paperActive copy — does not substitute SAFE", () => {

@@ -87,6 +87,41 @@ export function classifyEngineError(
   const message = err instanceof Error ? err.message : String(err ?? "unknown");
   const lower = message.toLowerCase();
   if (
+    lower.includes("nextint mininclusive") ||
+    lower.includes("nextfloat mininclusive") ||
+    lower.includes("integer range empty") ||
+    lower.includes("numeric range inverted")
+  ) {
+    return {
+      class: "parameter_out_of_range",
+      fatal: false,
+      code: "PARAMETER_OUT_OF_RANGE",
+      message,
+      stage: stage || "candidate_generation",
+      retryable: true,
+    };
+  }
+  if (lower.includes("trial already exists with different contents")) {
+    return {
+      class: "persistence_failed",
+      fatal: false,
+      code: "TRIAL_COLLISION",
+      message,
+      stage: stage || "persistence",
+      retryable: true,
+    };
+  }
+  if (lower.includes("invalid strategy-search status transition")) {
+    return {
+      class: "unknown_engine_error",
+      fatal: false,
+      code: "INVALID_STATUS_TRANSITION",
+      message,
+      stage: stage || "job_state",
+      retryable: true,
+    };
+  }
+  if (
     lower.includes("candle") ||
     lower.includes("klines") ||
     lower.includes("data unavailable") ||

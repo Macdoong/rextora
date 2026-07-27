@@ -479,31 +479,17 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page).toHaveURL(/\/strategy-search#ss-section-engine$/);
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
     await expect(page.getByTestId("ss-max-search")).toBeVisible();
-    // Seed invalid advanced override into the canonical session schema.
-    await page.evaluate(() => {
-      const key = "rextora.strategySearch.operatorForm.v1";
-      const raw = sessionStorage.getItem(key);
-      const base = raw ? JSON.parse(raw) : { schemaVersion: 1, form: {} };
-      base.schemaVersion = 1;
-      base.updatedAt = new Date().toISOString();
-      base.form = { ...(base.form ?? {}), candidateBudgetOverride: "0" };
-      sessionStorage.setItem(key, JSON.stringify(base));
-    });
+    // Seed invalid advanced override AFTER navigation settle so the deferred
+    // session autosave from the previous form cannot overwrite it.
     await page.goto("/strategy-search");
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
+    // Expand developer engine section so the budget field is visible.
+    await page.locator("details").filter({ hasText: "엔진 임계값" }).locator("summary").click();
+    await page.getByTestId("ss-max-search").fill("0", { force: true });
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-form-errors")).toBeVisible();
 
-    await page.evaluate(() => {
-      const key = "rextora.strategySearch.operatorForm.v1";
-      const raw = sessionStorage.getItem(key);
-      const base = raw ? JSON.parse(raw) : { schemaVersion: 1, form: {} };
-      base.schemaVersion = 1;
-      base.updatedAt = new Date().toISOString();
-      base.form = { ...(base.form ?? {}), candidateBudgetOverride: "50" };
-      sessionStorage.setItem(key, JSON.stringify(base));
-    });
-    await page.goto("/strategy-search");
+    await page.getByTestId("ss-max-search").fill("50", { force: true });
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-job-detail")).toBeVisible();
     await expect(page.getByTestId("ss-statistics")).toContainText("연구");
@@ -625,6 +611,66 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await openSearchJob(page, exhausted.jobId);
     await expect(page.getByTestId("ss-stop-reason")).toContainText(
       "연구 범위 소진",
+    );
+  });
+
+  test("catalog builder controls persist through intercepted create", async ({
+    page,
+  }) => {
+    const state = {
+      jobId: "search_e2e_catalog_0001",
+      status: "queued" as JobStatus,
+      completedIterations: 0,
+      executionActive: false,
+      detailGets: [] as number[],
+    };
+    let createBody: {
+      operatorPlan?: {
+        patternCombinationSpec?: {
+          operator?: string;
+          failurePolicy?: string;
+          weightedThreshold?: number;
+          blocks?: Array<Record<string, unknown>>;
+        };
+      };
+    } | null = null;
+    page.on("request", (request) => {
+      if (
+        request.method() === "POST" &&
+        /\/api\/rextora\/strategy-search$/.test(
+          request.url().replace(/\?.*$/, ""),
+        )
+      ) {
+        createBody = request.postDataJSON() as typeof createBody;
+      }
+    });
+    await installSearchMocks(page, state);
+    await page.goto("/strategy-search");
+    await page.getByTestId("ss-combo-preset-confluence").click();
+    await page.getByTestId("ss-pattern-level-expert").check();
+    await page.getByTestId("ss-combo-operator").selectOption("weighted_score");
+    await page.getByTestId("ss-combo-failure-policy").selectOption("majority");
+    await page.getByTestId("ss-combo-weighted-threshold").fill("1.5");
+    await expect(page.getByTestId("ss-pattern-block-editors")).toBeVisible();
+    await expect(page.getByTestId("ss-pattern-param-0-stopAtrMult")).toBeVisible();
+    await page.getByTestId("ss-create-submit").click();
+    await expect(page.getByTestId("ss-job-detail")).toBeVisible();
+    expect(createBody?.operatorPlan?.patternCombinationSpec).toMatchObject({
+      operator: "weighted_score",
+      failurePolicy: "majority",
+      weightedThreshold: 1.5,
+    });
+    expect(
+      createBody?.operatorPlan?.patternCombinationSpec?.blocks?.[0],
+    ).toEqual(
+      expect.objectContaining({
+        family: "order_block",
+        role: "entry_zone",
+        required: true,
+        weight: 1,
+        priority: 0,
+        params: expect.objectContaining({ stopAtrMult: 1.2 }),
+      }),
     );
   });
 });

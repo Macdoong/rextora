@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { CONTEXT_FALLBACK_PARAMS, mergeSafeParams } from "./safeV44Params";
-import { computeParamsHash } from "./strategyHash";
+import { computeParamsHash, computeStrategyHash } from "./strategyHash";
 import { loadSafeV44Strategy } from "./safeV44Strategy";
 import {
   EXPECTED_SAFE_PARAMS_HASH,
@@ -230,6 +230,8 @@ function indexStrategiesEqual(
       x.id !== y.id ||
       x.name !== y.name ||
       x.paramsHash !== y.paramsHash ||
+      x.sourceParamsHash !== y.sourceParamsHash ||
+      x.strategyHash !== y.strategyHash ||
       x.locked !== y.locked ||
       x.paperActive !== y.paperActive ||
       x.liveActive !== y.liveActive ||
@@ -249,6 +251,8 @@ function buildIndexPayload(strategies: StoredStrategy[]): StrategyIndexFile {
       id: s.id,
       name: s.name,
       paramsHash: s.paramsHash,
+      sourceParamsHash: s.sourceParamsHash,
+      strategyHash: s.strategyHash,
       locked: s.locked,
       paperActive: s.paperActive,
       liveActive: s.liveActive,
@@ -310,6 +314,20 @@ function overlaySafeActivationFromIndex(
   };
 }
 
+function hydrateStrategyIdentity(strategy: StoredStrategyV1): StoredStrategyV1 {
+  if (strategy.strategyHash) return strategy;
+  try {
+    // Compute even when definition is absent (legacy safe_params rows).
+    // Paper / Backtest / Library must share this same canonical hash.
+    return {
+      ...strategy,
+      strategyHash: computeStrategyHash(storedToDefinition(strategy)),
+    };
+  } catch {
+    return strategy;
+  }
+}
+
 function readAllStrategyFiles(): StoredStrategyV1[] {
   ensureDir();
   if (!fs.existsSync(INDEX())) return [];
@@ -328,7 +346,11 @@ function readAllStrategyFiles(): StoredStrategyV1[] {
         const safe = assertExistingSafeIntegrity(full);
         out.push(overlaySafeActivationFromIndex(safe, row));
       } else {
-        out.push(JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1);
+        out.push(
+          hydrateStrategyIdentity(
+            JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+          ),
+        );
       }
     }
     return out;
@@ -354,7 +376,11 @@ function discoverStrategyFilesOnDisk(): StoredStrategyV1[] {
     if (id === SAFE_STRATEGY_ID) {
       out.push(assertExistingSafeIntegrity(full));
     } else {
-      out.push(JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1);
+      out.push(
+        hydrateStrategyIdentity(
+          JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+        ),
+      );
     }
   }
   return out;
@@ -515,11 +541,16 @@ export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
 
 export function createStrategy(input: {
   name: string;
+  /** Editable alias — never hashed into identity. */
+  displayAlias?: string | null;
+  displayName?: string | null;
   description?: string;
   timeframe?: StrategyTimeframe;
   params?: Partial<SafeV44Params>;
   strategyType?: StrategyKind;
   definition?: CanonicalStrategyDefinition;
+  sourceParamsHash?: string;
+  strategyHash?: string;
 }): StoredStrategyV1 {
   const now = new Date().toISOString();
   const params = mergeSafeParams(input.params ?? {});
@@ -537,10 +568,13 @@ export function createStrategy(input: {
   const strategy: StoredStrategyV1 = {
     id,
     name: input.name,
+    displayAlias: input.displayAlias ?? null,
+    displayName: input.displayName ?? null,
     description: input.description ?? "사용자 생성 전략",
     type: strategyType === "condition_builder" ? "조건빌더" : "사용자",
     timeframe: input.timeframe ?? "15m",
     paramsHash,
+    sourceParamsHash: input.sourceParamsHash,
     params,
     locked: false,
     sourceFile: null,
@@ -560,11 +594,95 @@ export function createStrategy(input: {
     definition,
     ...summary
   };
+  strategy.strategyHash =
+    input.strategyHash ?? computeStrategyHash(storedToDefinition(strategy));
   const all = listStrategies();
   all.push(strategy);
   writeStrategyFile(strategy);
   writeIndex(all);
   return strategy;
+}
+
+/**
+ * Update editable display fields only. Never changes paramsHash / identity.
+ */
+export function updateStrategyDisplayMeta(
+  id: string,
+  patch: {
+    displayAlias?: string | null;
+    displayName?: string | null;
+    description?: string | null;
+    /** Optional UI label; does not affect paramsHash. */
+    name?: string | null;
+  },
+): StoredStrategyV1 {
+  assertSafeStrategyId(id);
+  if (id === SAFE_STRATEGY_ID) {
+    throw new StrategyValidationError(
+      "잠긴 원본 보호 전략의 표시 이름은 변경할 수 없습니다.",
+    );
+  }
+  const current = getStrategyById(id);
+  if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
+  if (current.locked || current.id === SAFE_STRATEGY_ID) {
+    throw new StrategyValidationError(
+      "잠긴 원본 보호 전략의 표시 이름은 변경할 수 없습니다.",
+    );
+  }
+  const nextAlias =
+    patch.displayAlias !== undefined
+      ? patch.displayAlias
+      : (current.displayAlias ?? null);
+  const nextDisplayName =
+    patch.displayName !== undefined
+      ? patch.displayName
+      : (current.displayName ?? null);
+  const nextName =
+    typeof patch.name === "string" && patch.name.trim()
+      ? patch.name.trim().slice(0, 120)
+      : current.name;
+  const at = new Date().toISOString();
+  const audit = [...(current.renameAudit ?? [])];
+  if ((current.displayAlias ?? null) !== nextAlias) {
+    audit.push({
+      at,
+      from: current.displayAlias ?? null,
+      to: nextAlias,
+      field: "displayAlias",
+    });
+  }
+  if ((current.displayName ?? null) !== nextDisplayName) {
+    audit.push({
+      at,
+      from: current.displayName ?? null,
+      to: nextDisplayName,
+      field: "displayName",
+    });
+  }
+  if (current.name !== nextName) {
+    audit.push({ at, from: current.name, to: nextName, field: "name" });
+  }
+  const next: StoredStrategyV1 = {
+    ...current,
+    displayAlias: nextAlias,
+    displayName: nextDisplayName,
+    description:
+      patch.description != null && patch.description !== undefined
+        ? patch.description
+        : current.description,
+    name: nextName,
+    renameAudit: audit.slice(-50),
+    // Identity fields frozen
+    id: current.id,
+    paramsHash: current.paramsHash,
+    params: current.params,
+    locked: false,
+    updatedAt: at,
+  };
+  const all = listStrategies().map((s) => (s.id === id ? next : s));
+  writeStrategyFile(next);
+  writeIndex(all);
+  return next;
 }
 
 export function saveStrategy(
@@ -613,6 +731,7 @@ export function saveStrategy(
     schemaVersion: STRATEGY_SCHEMA_VERSION,
     ...summary
   };
+  next.strategyHash = computeStrategyHash(storedToDefinition(next));
   const all = listStrategies().map((s) => (s.id === id ? next : s));
   writeStrategyFile(next);
   writeIndex(all);

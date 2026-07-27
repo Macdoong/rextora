@@ -155,6 +155,19 @@ export const PATTERN_SEARCH_SUPPORT: PatternSupportEntry[] = [
     paper: "partial",
     live: "partial",
   },
+  {
+    id: "supply_demand",
+    labelKo: "Supply / Demand",
+    support: "backtest_only",
+    searchable: true,
+    reasonKo:
+      "Supply/Demand 완료 봉 감지기와 이벤트 시퀀스 경로가 구현되어 있으나 브라우저 증명 전까지 Verification Required입니다.",
+    searchSpaceId: "supply_demand",
+    search: "verification_required",
+    backtest: "verification_required",
+    paper: "partial",
+    live: "partial",
+  },
 ];
 
 export function patternPartialReasonKo(): string {

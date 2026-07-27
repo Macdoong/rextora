@@ -15,6 +15,7 @@
 
 import {
   StrategySearchPersistenceError,
+  getSearchJob,
   markSearchJobCancelled,
   markSearchJobCancelling,
   markSearchJobCompleted,
@@ -182,6 +183,29 @@ export function transitionJobToPaused(
   options?: StrategySearchStoreOptions,
 ): StrategySearchJob {
   try {
+    return markSearchJobPaused(jobId, options);
+  } catch (err) {
+    wrapStoreError(err);
+  }
+}
+
+/** running → pause_requested → paused (never running → paused directly). */
+export function transitionJobCooperativelyPaused(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob {
+  try {
+    const current = getSearchJob(jobId, options);
+    if (!current) {
+      throw new StrategySearchPersistenceError(
+        "NOT_FOUND",
+        `strategy-search job not found: ${jobId}`,
+      );
+    }
+    if (current.status === "paused") return current;
+    if (current.status === "running") {
+      requestPauseSearchJob(jobId, options);
+    }
     return markSearchJobPaused(jobId, options);
   } catch (err) {
     wrapStoreError(err);

@@ -258,6 +258,9 @@ describe("strategySearch promote + search space exhausted", () => {
     expect(first.registrationState).toBe("registered");
     expect(first.strategyId).toBe(createdId);
     expect(createSpy).toHaveBeenCalledTimes(1);
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceParamsHash: paramsHash }),
+    );
 
     vi.spyOn(strategyStore, "listStrategies").mockReturnValue([
       {

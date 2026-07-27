@@ -53,149 +53,81 @@ export function buildLifecycleNextActionSteps(
     counts.recommendationEligibleStrategies ??
     0;
 
+  const make = (
+    id: string,
+    title: string,
+    status: StepStatus,
+    completionCriteria: string,
+    blockedReason: string | null,
+    nextAction: string,
+  ): LifecycleStep => ({
+    id,
+    title,
+    status,
+    statusLabel: stepStatusLabel(status),
+    completionCriteria,
+    blockedReason,
+    nextAction,
+  });
   const steps: LifecycleStep[] = [
-    {
-      id: "top10",
-      title: "TOP 10 검토",
-      status:
-        top10 > 0 ? "complete" : qualified > 0 ? "ready" : "blocked",
-      statusLabel:
-        top10 > 0
-          ? stepStatusLabel("complete")
-          : qualified > 0
-            ? stepStatusLabel("ready")
-            : stepStatusLabel("blocked"),
-      completionCriteria: "장기 저장 TOP 10 후보가 1개 이상",
-      blockedReason:
-        qualified === 0
-          ? "합격 trial이 없어 TOP 10을 만들 수 없습니다."
-          : top10 === 0
-            ? "아직 TOP 10 저장 증거가 없습니다."
-            : null,
-      nextAction:
-        top10 > 0
-          ? "TOP 10 목록을 검토하세요."
-          : "탐색 결과 요약에서 TOP 10 저장 여부를 확인하세요.",
-    },
-    {
-      id: "register",
-      title: "추천 전략 등록",
-      status:
-        registered > 0 ? "complete" : qualified > 0 ? "ready" : "blocked",
-      statusLabel:
-        registered > 0
-          ? stepStatusLabel("complete")
-          : qualified > 0
-            ? stepStatusLabel("ready")
-            : stepStatusLabel("blocked"),
-      completionCriteria: "등록된 전략 1개 이상 (summary.registeredStrategies)",
-      blockedReason:
-        qualified === 0 ? "등록할 합격 trial이 없습니다." : null,
-      nextAction:
-        registered > 0
-          ? "등록된 전략으로 백테스트를 진행하세요."
-          : "탐색 결과에서 전략 등록을 실행하세요.",
-    },
-    {
-      id: "backtest",
-      title: "기간을 선택해 백테스트",
-      status:
-        backtestRec > 0
-          ? "complete"
-          : registered > 0
-            ? "ready"
-            : qualified > 0
-              ? "waiting"
-              : "blocked",
-      statusLabel:
-        backtestRec > 0
-          ? stepStatusLabel("complete")
-          : registered > 0
-            ? stepStatusLabel("ready")
-            : stepStatusLabel("waiting"),
-      completionCriteria: "백테스트 추천 후보 1개 이상 · 기간은 사용자 선택",
-      blockedReason:
-        registered > 0 && backtestRec === 0
-          ? "백테스트 필요"
-          : qualified === 0
-            ? "백테스트할 합격 trial이 없습니다."
-            : registered === 0
-              ? "라이브러리 등록 후 백테스트를 실행하세요."
-              : null,
-      nextAction:
-        backtestRec > 0
-          ? "백테스트 추천 목록을 확인하세요."
-          : registered > 0
-            ? "등록 전략에 대해 기간을 선택해 백테스트를 실행하세요."
-            : "전략 등록 후 백테스트를 진행하세요.",
-    },
-    {
-      id: "eligibility",
-      title: "백테스트 적격성 검토",
-      status:
-        finalEligible > 0
-          ? "complete"
-          : backtestRec > 0
-            ? "ready"
-            : qualified > 0
-              ? "waiting"
-              : "blocked",
-      statusLabel:
-        finalEligible > 0
-          ? stepStatusLabel("complete")
-          : backtestRec > 0
-            ? stepStatusLabel("ready")
-            : stepStatusLabel("waiting"),
-      completionCriteria: "최종 추천 가능 후보 1개 이상 (비용·안정성·과적합 증거)",
-      blockedReason:
-        backtestRec > 0 && finalEligible === 0
-          ? "추가 검증 필요"
-          : qualified === 0
-            ? "검증할 후보가 없습니다."
-            : backtestRec === 0
-              ? "백테스트 추천 후 추가 검증을 진행하세요."
-              : null,
-      nextAction:
-        finalEligible > 0
-          ? "최종 추천 가능 후보를 확인하세요."
-          : "비용·안정성·과적합 증거를 보완하세요.",
-    },
-    {
-      id: "paper",
-      title: "모의매매 등록",
-      status: finalEligible > 0 ? "ready" : "blocked",
-      statusLabel:
-        finalEligible > 0 ? stepStatusLabel("ready") : stepStatusLabel("blocked"),
-      completionCriteria: "최종 추천 가능 후보 1개 이상 (모의 등록은 별도 실행)",
-      blockedReason:
-        finalEligible === 0 ? "추가 검증 필요" : null,
-      nextAction:
-        finalEligible > 0
-          ? "모의매매 등록 가능 — 백테스트 화면에서 모의 등록을 실행하세요."
-          : "최종 추천 가능 후보가 확보되면 모의 등록을 검토하세요.",
-    },
-    {
-      id: "paper_compare",
-      title: "모의매매 성과 비교",
-      status: "blocked",
-      statusLabel: stepStatusLabel("blocked"),
-      completionCriteria: "모의매매 세션·성과 증거가 summary에 있어야 함 (현재 미포함)",
-      blockedReason: "추가 검증 필요",
-      nextAction:
-        "모의매매 등록 후 성과 비교는 모의매매 화면에서 확인하세요.",
-    },
-    {
-      id: "live",
-      title: "실전매매 검토",
-      status: "blocked",
-      statusLabel: stepStatusLabel("blocked"),
-      completionCriteria: "실전 검토는 모의매매·승인 증거가 필요합니다 (summary만으로는 확인 불가)",
-      blockedReason: "실전매매 검토 불가",
-      nextAction:
-        finalEligible > 0
-          ? "모의매매 결과와 승인 조건을 충족한 뒤 실전 검토를 진행하세요."
-          : "최종 추천 가능 후보 확보 후 모의매매를 먼저 진행하세요.",
-    },
+    make(
+      "research",
+      "연구 완료",
+      qualified > 0 ? "complete" : "blocked",
+      "연구 종료 및 합격 trial 보존",
+      qualified > 0 ? null : "사용 가능한 합격 trial이 없습니다.",
+      qualified > 0 ? "최고 전략을 확인하세요." : "연구 조건을 조정해 다시 탐색하세요.",
+    ),
+    make(
+      "best",
+      "최고 전략",
+      top10 > 0 ? "complete" : qualified > 0 ? "ready" : "blocked",
+      "최고 전략 1개 이상 선정",
+      qualified > 0 && top10 === 0 ? "TOP 10 선정 증거가 아직 없습니다." : null,
+      "최고 수익·안정·최종 추천 역할을 확인하세요.",
+    ),
+    make(
+      "compare_top3",
+      "TOP 3 비교",
+      top10 >= 3 ? "complete" : top10 > 0 ? "ready" : "blocked",
+      "중복 역할을 병합한 TOP 3 비교",
+      top10 === 0 ? "비교할 TOP 후보가 없습니다." : null,
+      "역할·수익·낙폭·견고성을 비교하세요.",
+    ),
+    make(
+      "register",
+      "전략 등록",
+      registered > 0 ? "complete" : finalEligible > 0 ? "ready" : "blocked",
+      "최종 적격 전략을 라이브러리에 등록",
+      finalEligible === 0 ? "최종 적격 전략이 없어 등록 우선순위를 부여하지 않습니다." : null,
+      registered > 0 ? "등록 전략으로 백테스트를 실행하세요." : "검토한 전략을 선택 등록하세요.",
+    ),
+    make(
+      "backtest",
+      "백테스트 실행",
+      registered > 0 ? "ready" : "waiting",
+      "등록 전략에 대해 새 기간 백테스트 완료",
+      registered === 0 ? "전략 등록이 먼저 필요합니다." : null,
+      registered > 0 ? "기간을 선택해 백테스트를 실행하세요." : "전략 등록 후 진행하세요.",
+    ),
+    make(
+      "paper",
+      "모의매매",
+      finalEligible > 0 && registered > 0 && backtestRec > 0
+        ? "waiting"
+        : "blocked",
+      "백테스트 적격성과 모의 세션 증거",
+      "완료된 백테스트·모의 세션 증거는 이 요약에 없습니다.",
+      "백테스트 통과 후 모의매매 화면에서 등록하세요.",
+    ),
+    make(
+      "live",
+      "실전매매",
+      "blocked",
+      "모의매매 성과·승인·실전 적격성",
+      "모의매매 검증 전에는 실전매매를 우선 행동으로 제공하지 않습니다.",
+      "모의매매 검증과 승인을 모두 충족한 뒤 검토하세요.",
+    ),
   ];
 
   return steps;
@@ -203,8 +135,61 @@ export function buildLifecycleNextActionSteps(
 
 export function LifecycleNextActionsPanel(props: {
   counts: ResearchResultCountsView;
+  /** Compact progress bar; expand for blockers. */
+  compact?: boolean;
 }) {
   const steps = buildLifecycleNextActionSteps(props.counts);
+
+  if (props.compact) {
+    return (
+      <section
+        className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-3"
+        data-testid="ss-lifecycle-next-actions"
+        aria-labelledby="ss-lifecycle-next-actions-title"
+      >
+        <h4
+          id="ss-lifecycle-next-actions-title"
+          className="ss-subsection-title text-emerald-100"
+        >
+          라이프사이클 진행
+        </h4>
+        <ol className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
+          {steps.map((step, idx) => (
+            <li
+              key={step.id}
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 ${toneClass(step.status)}`}
+              data-testid={`ss-lifecycle-step-${step.id}`}
+              title={step.blockedReason ?? step.nextAction}
+            >
+              <span className="opacity-70">{idx + 1}</span>
+              <span className="font-medium">{step.title}</span>
+              <span className="opacity-80">{step.statusLabel}</span>
+              {idx < steps.length - 1 ? (
+                <span className="ml-0.5 opacity-40" aria-hidden>
+                  →
+                </span>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+        <details className="mt-2 text-xs text-emerald-100/70">
+          <summary className="cursor-pointer">단계별 차단·다음 행동</summary>
+          <ul className="mt-2 space-y-1.5">
+            {steps.map((step) => (
+              <li key={`detail-${step.id}`}>
+                <span className="font-medium">{step.title}</span>
+                {" · "}
+                {step.statusLabel}
+                {step.blockedReason ? ` · ${step.blockedReason}` : ""}
+                {" · "}
+                {step.nextAction}
+              </li>
+            ))}
+          </ul>
+        </details>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -220,8 +205,8 @@ export function LifecycleNextActionsPanel(props: {
           다음 단계 (라이프사이클)
         </h4>
         <p className="mt-1 text-xs text-emerald-100/70">
-          summary 카운트만으로 판단합니다. 모의·실전 활성 여부는 여기서 주장하지
-          않습니다.
+          저장된 연구 결과 기준으로 판단합니다. 모의·실전 활성 여부는 여기서
+          주장하지 않습니다.
         </p>
       </div>
       <ol className="space-y-2">

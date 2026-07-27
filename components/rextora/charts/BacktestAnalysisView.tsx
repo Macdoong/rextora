@@ -16,7 +16,12 @@ import {
 } from "@/src/lib/rextora/backtest/visualAnalysis";
 import { statusChips } from "@/src/lib/rextora/backtest/statusThresholds";
 import { CandlestickChart, EquityCurveChart, DrawdownChart, BarChart, DistributionChart } from "@/components/rextora/charts";
-import type { LevelLine, ZoneRect } from "@/src/lib/rextora/charts/types";
+import type {
+  LevelLine,
+  LifecycleMarker,
+  TimeBoundLineSegment,
+  ZoneRect,
+} from "@/src/lib/rextora/charts/types";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { CHART_THEME } from "@/src/lib/rextora/charts/theme";
@@ -25,7 +30,12 @@ import type { BacktestTrade } from "@/src/lib/rextora/backtest/backtestEngine";
 import type { OhlcvCandle } from "@/src/lib/rextora/data/ohlcvTypes";
 import type { MonthlyCoverageRow } from "@/src/lib/rextora/backtest/monthlyCoverage";
 import type { TradeEventTrace } from "@/src/lib/rextora/backtest/tradeEventTrace";
-import { displayParamsHashLabel, displaySignalReason, displayTimeframeLabel } from "@/src/lib/rextora/displayLabels";
+import { formatPenetrationKo } from "@/src/lib/rextora/backtest/tradeEventTrace";
+import { displayParamsHashLabel, displaySignalReason, displayStrategyHashLabel, displayTimeframeLabel, formatShortHash } from "@/src/lib/rextora/displayLabels";
+import {
+  buildPatternBlockSections,
+  combinationOperatorKo,
+} from "@/src/lib/rextora/backtest/patternExplainability";
 import { computeCostRatios } from "@/src/lib/rextora/backtest/costRatios";
 import {
   ACCOUNT_EQUITY_IMPACT_LABEL_KO,
@@ -184,15 +194,25 @@ export function BacktestAnalysisView({
   const [timelineSide, setTimelineSide] = useState<"all" | "long" | "short">("all");
   const [timelineResult, setTimelineResult] = useState<"all" | "win" | "loss">("all");
   const [showVolume, setShowVolume] = useState(true);
-  const patternAvailability = useMemo(
-    () =>
-      classifyPatternOverlays({
-        strategyType,
-        eventSequenceFamily,
-        traces: report.tradeEventTraces ?? [],
-      }),
-    [strategyType, eventSequenceFamily, report.tradeEventTraces],
-  );
+  const patternAvailability = useMemo(() => {
+    const comboKinds = (report.tradeEventTraces ?? [])
+      .flatMap((t) => t.patternBlocks ?? [])
+      .map((b) => b.family)
+      .filter(
+        (f): f is string =>
+          f === "order_block" ||
+          f === "fvg" ||
+          f === "trendline" ||
+          f === "support_resistance" ||
+          f === "supply_demand",
+      );
+    return classifyPatternOverlays({
+      strategyType,
+      eventSequenceFamily,
+      conditionPatternKinds: [...new Set(comboKinds)],
+      traces: report.tradeEventTraces ?? [],
+    });
+  }, [strategyType, eventSequenceFamily, report.tradeEventTraces]);
   const [overlayOpts, setOverlayOpts] = useState({
     entry: true,
     exit: true,
@@ -232,10 +252,34 @@ export function BacktestAnalysisView({
   const selectedTrade = selectedTradeId
     ? model.trades.find((t) => t.id === selectedTradeId) ?? null
     : null;
-  const focusTimeRange = useMemo(
-    () => (selectedTrade ? tradeFocusTimeRange(selectedTrade) : null),
-    [selectedTrade],
-  );
+  const focusTimeRange = useMemo(() => {
+    if (!selectedTrade) return null;
+    const base = tradeFocusTimeRange(selectedTrade);
+    if (!base) return null;
+    let fromMs = base.fromMs;
+    let toMs = base.toMs;
+    const extend = (raw: unknown) => {
+      if (typeof raw !== "string" && typeof raw !== "number") return;
+      const ms =
+        typeof raw === "number" ? raw : Date.parse(String(raw));
+      if (!Number.isFinite(ms)) return;
+      fromMs = Math.min(fromMs, ms);
+      toMs = Math.max(toMs, ms);
+    };
+    if (selectedTrace) {
+      extend(selectedTrace.creationCandleTime);
+      extend(selectedTrace.revisitCandleTime);
+      extend(selectedTrace.confirmationCandleTime);
+      for (const block of selectedTrace.patternBlocks ?? []) {
+        extend(block.creationTime);
+        extend(block.revisitTime);
+        extend(block.confirmationTime);
+        extend(block.entryTime);
+        extend(block.exitTime);
+      }
+    }
+    return { fromMs, toMs };
+  }, [selectedTrade, selectedTrace]);
 
   const costRatios = useMemo(
     () =>
@@ -255,57 +299,101 @@ export function BacktestAnalysisView({
 
   const patternZones = useMemo((): ZoneRect[] => {
     const zones: ZoneRect[] = [];
-    const pushZone = (trace: TradeEventTrace, color: string) => {
+    const colorFor = (kind: string) =>
+      kind === "fvg"
+        ? "#a78bfa"
+        : kind === "order_block"
+          ? "#38bdf8"
+          : kind === "supply_demand"
+            ? "#fb923c"
+            : kind === "support_resistance"
+              ? "#2dd4bf"
+              : "#94a3b8";
+    const pushZone = (input: {
+      patternType?: string | null;
+      zoneHigh?: number | null;
+      zoneLow?: number | null;
+      creationTime?: string | null;
+      revisitTime?: string | null;
+      exitTime?: string | null;
+      touchCount?: number | null;
+      blockId?: string;
+    }) => {
       if (
-        trace.zoneHigh == null ||
-        trace.zoneLow == null ||
-        !Number.isFinite(trace.zoneHigh) ||
-        !Number.isFinite(trace.zoneLow)
+        input.zoneHigh == null ||
+        input.zoneLow == null ||
+        !Number.isFinite(input.zoneHigh) ||
+        !Number.isFinite(input.zoneLow)
       ) {
         return;
       }
-      const kind = (trace.patternType ?? "") as PatternOverlayKind;
+      const kind = (input.patternType ?? "") as PatternOverlayKind;
       if (
         (kind === "order_block" ||
           kind === "fvg" ||
           kind === "support_resistance" ||
+          kind === "supply_demand" ||
           kind === "trendline") &&
         !patternToggleOn(kind)
       ) {
         return;
       }
-      const fromMs = trace.creationCandleTime
-        ? Date.parse(trace.creationCandleTime)
-        : trace.entry?.at
-          ? Date.parse(trace.entry.at)
-          : null;
-      const toMs = trace.exit?.at
-        ? Date.parse(trace.exit.at)
-        : trace.revisitCandleTime
-          ? Date.parse(trace.revisitCandleTime)
+      const fromMs = input.creationTime ? Date.parse(input.creationTime) : null;
+      const toMs = input.exitTime
+        ? Date.parse(input.exitTime)
+        : input.revisitTime
+          ? Date.parse(input.revisitTime)
           : null;
       zones.push({
-        high: trace.zoneHigh,
-        low: trace.zoneLow,
-        color,
-        label: `${trace.patternType ?? "영역"}`,
+        high: input.zoneHigh,
+        low: input.zoneLow,
+        color: colorFor(kind),
+        label: `${input.patternType ?? "영역"}${input.touchCount != null ? ` · touches ${input.touchCount}` : ""}${input.blockId ? ` · ${input.blockId}` : ""}`,
         fromTime: fromMs != null && Number.isFinite(fromMs) ? fromMs : null,
         toTime: toMs != null && Number.isFinite(toMs) ? toMs : null,
-        opacity: 0.22,
+        opacity: 0.35,
       });
     };
     if (selectedTrace) {
-      pushZone(
-        selectedTrace,
-        selectedTrace.patternType === "fvg"
-          ? "#a78bfa"
-          : selectedTrace.patternType === "order_block"
-            ? "#38bdf8"
-            : "#94a3b8",
-      );
+      const blocks = selectedTrace.patternBlocks ?? [];
+      for (const block of blocks) {
+        if (block.status !== "detected" || block.family === "trendline") continue;
+        pushZone({
+          patternType: block.family,
+          zoneHigh: block.zoneHigh,
+          zoneLow: block.zoneLow,
+          creationTime: block.creationTime,
+          revisitTime: block.revisitTime,
+          exitTime: block.exitTime ?? selectedTrace.exit?.at,
+          touchCount: block.touchCount,
+          blockId: block.blockId,
+        });
+      }
+      if (blocks.length === 0 && selectedTrace.patternType !== "trendline") {
+        pushZone({
+          patternType: selectedTrace.patternType,
+          zoneHigh: selectedTrace.zoneHigh,
+          zoneLow: selectedTrace.zoneLow,
+          creationTime: selectedTrace.creationCandleTime,
+          revisitTime: selectedTrace.revisitCandleTime,
+          exitTime: selectedTrace.exit?.at,
+        });
+      }
+    }
+    if (overlayOpts.rejected) {
+      for (const rejection of report.rejectedSetups ?? []) {
+        pushZone({
+          patternType: rejection.patternType,
+          zoneHigh: rejection.zoneHigh,
+          zoneLow: rejection.zoneLow,
+          creationTime: rejection.creationTime,
+          exitTime: rejection.at,
+          blockId: `rejected:${rejection.reasonCode}`,
+        });
+      }
     }
     return zones;
-  }, [selectedTrace, patternToggleOn]);
+  }, [selectedTrace, patternToggleOn, overlayOpts.rejected, report.rejectedSetups]);
 
   const patternLevels = useMemo((): LevelLine[] => {
     if (!selectedTrace) return [];
@@ -324,23 +412,132 @@ export function BacktestAnalysisView({
         label: "익절",
       });
     }
-    const anchors = selectedTrace.lineAnchors;
-    if (
-      patternToggleOn("trendline") &&
-      anchors &&
-      anchors.length >= 2 &&
-      selectedTrace.patternType === "trendline"
-    ) {
-      levels.push({
-        price: anchors[0]!.price,
-        endPrice: anchors[anchors.length - 1]!.price,
+    return levels;
+  }, [selectedTrace, overlayOpts]);
+
+  const patternSegments = useMemo((): TimeBoundLineSegment[] => {
+    if (!patternToggleOn("trendline")) return [];
+    const sources: Array<{
+      blockId: string;
+      lineAnchors?: Array<{
+        bar: number;
+        price: number;
+        time?: string | null;
+      }> | null;
+    }> = selectedTrace
+      ? selectedTrace.patternBlocks?.length
+        ? selectedTrace.patternBlocks.filter(
+            (block) => block.family === "trendline" && block.status === "detected",
+          )
+        : [
+            {
+              blockId: "legacy-primary",
+              lineAnchors: selectedTrace.lineAnchors,
+            },
+          ]
+      : [];
+    if (overlayOpts.rejected) {
+      for (const rejection of report.rejectedSetups ?? []) {
+        if (rejection.patternType === "trendline" && rejection.lineAnchors?.length) {
+          sources.push({
+            blockId: `rejected:${rejection.reasonCode}`,
+            lineAnchors: rejection.lineAnchors,
+          });
+        }
+      }
+    }
+    const segments: TimeBoundLineSegment[] = [];
+    for (const source of sources) {
+      const anchors = source.lineAnchors;
+      if (!anchors || anchors.length < 2) continue;
+      const from = anchors[0]!;
+      const to = anchors[anchors.length - 1]!;
+      const fromTime = from.time ? Date.parse(from.time) : Number.NaN;
+      const toTime = to.time ? Date.parse(to.time) : Number.NaN;
+      if (!Number.isFinite(fromTime) || !Number.isFinite(toTime)) continue;
+      segments.push({
+        fromTime,
+        fromPrice: from.price,
+        toTime,
+        toPrice: to.price,
         color: "#fbbf24",
-        label: "추세선",
-        dashed: false,
+        label: `추세선 ${source.blockId}`,
+        tooltipLines: [
+          `시작 #${from.bar} @ ${from.price}`,
+          `종료 #${to.bar} @ ${to.price}`,
+        ],
       });
     }
-    return levels;
-  }, [selectedTrace, overlayOpts, patternToggleOn]);
+    return segments;
+  }, [
+    selectedTrace,
+    patternToggleOn,
+    overlayOpts.rejected,
+    report.rejectedSetups,
+  ]);
+
+  const lifecycleMarkers = useMemo((): LifecycleMarker[] => {
+    const out: LifecycleMarker[] = [];
+    const add = (
+      kind: LifecycleMarker["kind"],
+      at: string | null | undefined,
+      price: number | null | undefined,
+      label: string,
+      tooltipLines: string[],
+      blockId?: string,
+    ) => {
+      if (!at || price == null || !Number.isFinite(price)) return;
+      const time = Date.parse(at);
+      if (!Number.isFinite(time)) return;
+      out.push({ kind, time, price, label, tooltipLines, blockId });
+    };
+    if (selectedTrace) {
+      const blocks = selectedTrace.patternBlocks ?? [];
+      for (const block of blocks) {
+        const midpoint =
+          block.zoneHigh != null && block.zoneLow != null
+            ? (block.zoneHigh + block.zoneLow) / 2
+            : block.lineAnchors?.[0]?.price ?? null;
+        const evidence = [
+          block.reasonCode ? `reason ${block.reasonCode}` : null,
+          block.stage ? `stage ${block.stage}` : null,
+          `required ${String(block.required)}`,
+          `weight ${block.weight}`,
+          `priority ${block.priority}`,
+        ].filter((v): v is string => Boolean(v));
+        if (overlayOpts.sequence) {
+          add("creation", block.creationTime, midpoint, "생성", evidence, block.blockId);
+        }
+        if (overlayOpts.revisit) {
+          add("revisit", block.revisitTime, midpoint, "재접촉", evidence, block.blockId);
+        }
+        if (overlayOpts.confirmation) {
+          add("confirmation", block.confirmationTime, midpoint, "확인", evidence, block.blockId);
+        }
+        if (overlayOpts.invalidation) {
+          add("break", block.breakTime, midpoint, "돌파", evidence, block.blockId);
+          add("invalidation", block.invalidationTime, midpoint, "무효화", evidence, block.blockId);
+        }
+      }
+    }
+    if (overlayOpts.rejected) {
+      for (const rejection of report.rejectedSetups ?? []) {
+        add(
+          "rejected",
+          rejection.at,
+          rejection.eventPrice,
+          "거부",
+          [
+            `reason ${rejection.reasonCode}`,
+            `stage ${rejection.stage ?? "unknown"}`,
+            rejection.measured != null ? `measured ${rejection.measured}` : null,
+            rejection.required != null ? `required ${rejection.required}` : null,
+          ].filter((v): v is string => Boolean(v)),
+        );
+      }
+    }
+    return out;
+  }, [selectedTrace, overlayOpts, report.rejectedSetups]);
 
   useEffect(() => {
     const nodes = rootRef.current?.querySelectorAll("[data-section]");
@@ -889,6 +1086,8 @@ export function BacktestAnalysisView({
               markers={markers}
               levels={patternLevels}
               zones={patternZones}
+              segments={patternSegments}
+              lifecycleMarkers={lifecycleMarkers}
               height={600}
               showVolume={showVolume}
               selectedTradeId={selectedTradeId}
@@ -903,6 +1102,96 @@ export function BacktestAnalysisView({
               이 실행에는 표시할 가격 캔들이 없습니다.
             </p>
           )}
+          <Card title="Pattern Summary" data-testid="pattern-summary">
+            {!selectedTrace ? (
+              <p className="text-sm rx-text-muted">
+                거래를 선택하면 저장된 패턴 증거를 표시합니다.
+              </p>
+            ) : selectedTrace.patternBlocks?.length ? (
+              <div className="space-y-3">
+                {selectedTrace.patternBlocks.map((block, index) => {
+                  const params = Object.entries(block.detectorParams ?? {});
+                  const measured = Object.entries(block.measuredValues ?? {});
+                  const thresholds = Object.entries(block.thresholds ?? {});
+                  const hasGeometry =
+                    (block.zoneHigh != null && block.zoneLow != null) ||
+                    (block.lineAnchors?.length ?? 0) >= 2;
+                  return (
+                    <div
+                      key={`${block.blockId}-${block.stage ?? index}`}
+                      className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-xs text-slate-300"
+                      data-testid="pattern-summary-block"
+                    >
+                      <p className="font-semibold text-slate-100">
+                        {block.blockId} · {block.family} · {block.role} · {block.status}
+                      </p>
+                      <p className="mt-1">
+                        required {String(block.required)} · weight {block.weight} ·
+                        priority {block.priority}
+                        {block.selectedPriority != null
+                          ? ` · selected ${block.selectedPriority}`
+                          : ""}
+                      </p>
+                      {block.operator ? (
+                        <p>
+                          operator {block.operator}
+                          {block.scoreTotal != null ? ` · score ${block.scoreTotal}` : ""}
+                          {block.scoreThreshold != null
+                            ? ` / ${block.scoreThreshold}`
+                            : ""}
+                        </p>
+                      ) : null}
+                      {block.stage || block.reasonCode ? (
+                        <p>
+                          {block.stage ? `stage ${block.stage}` : ""}
+                          {block.reasonCode ? ` · reason ${block.reasonCode}` : ""}
+                        </p>
+                      ) : null}
+                      {params.length ? (
+                        <p>params {params.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}</p>
+                      ) : null}
+                      {measured.length ? (
+                        <p>
+                          measured {measured.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}
+                        </p>
+                      ) : null}
+                      {thresholds.length ? (
+                        <p>
+                          thresholds{" "}
+                          {thresholds.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}
+                        </p>
+                      ) : null}
+                      <p data-testid="pattern-summary-geometry">
+                        {hasGeometry
+                          ? block.lineAnchors?.length
+                            ? `verified line anchors ${block.lineAnchors.length}`
+                            : `verified zone ${block.zoneLow}–${block.zoneHigh}`
+                          : "missing persisted geometry"}
+                      </p>
+                      {(block.stopPrice != null ||
+                        block.targetPrice != null ||
+                        block.exitPrice != null) && (
+                        <p>
+                          risk
+                          {block.stopPrice != null ? ` · SL ${block.stopPrice}` : ""}
+                          {block.targetPrice != null ? ` · TP ${block.targetPrice}` : ""}
+                          {block.exitPrice != null ? ` · exit ${block.exitPrice}` : ""}
+                          {block.exitReason ? ` (${block.exitReason})` : ""}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-amber-200" data-testid="pattern-summary-legacy">
+                레거시 실행: 블록별 검증 증거가 없습니다.{" "}
+                {selectedTrace.zoneHigh != null && selectedTrace.zoneLow != null
+                  ? "기본 저장 geometry만 확인되었습니다."
+                  : "저장된 geometry가 없습니다."}
+              </p>
+            )}
+          </Card>
         </div>
       </SectionAnchor>
 
@@ -1421,11 +1710,14 @@ export function BacktestAnalysisView({
           setTechOpen={setTechOpen}
           onPrev={() => navigateTrade(-1)}
           onNext={() => navigateTrade(1)}
-          onFocusChart={() => scrollToSection("price")}
-          onClose={() => {
+          onFocusChart={() => {
+            // Keep trade selection so pattern zones stay on the main chart.
             setDrawerTrade(null);
-            setSelectedTradeId(null);
-            setLinkStatus(null);
+            scrollToSection("price");
+          }}
+          onClose={() => {
+            // Close the drawer only — keep selectedTradeId so overlays remain.
+            setDrawerTrade(null);
           }}
           onCopyId={() => {
             void navigator.clipboard?.writeText(drawerTrade.id);
@@ -1520,30 +1812,57 @@ function TradeTableRow({ t, selected, onSelect, rowRef }: { t: EnrichedTrade; se
 }
 
 function TradeEventTracePanel({ trace }: { trace: TradeEventTrace }) {
+  const blockSections = trace.patternBlocks?.length
+    ? buildPatternBlockSections(trace.patternBlocks)
+    : [];
+  const operator = trace.combinationOperator ?? null;
+
   return (
     <div
       className="mt-3 rounded-xl border border-sky-700/40 bg-sky-950/20 p-4"
       data-testid="trade-event-trace"
     >
       <h4 className="mb-2 text-sm font-semibold text-sky-100">거래 이벤트 추적</h4>
-      {trace.patternType ? (
+      {blockSections.length > 0 ? (
+        <div className="mb-3 space-y-3" data-testid="trade-pattern-stack">
+          <p className="text-xs font-medium text-sky-200/90">
+            전략 조합 · {combinationOperatorKo(operator)}
+          </p>
+          {blockSections.map((section) => (
+            <div
+              key={section.id}
+              className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
+              data-testid={`trade-block-${section.role}`}
+            >
+              <p className="text-sm font-medium text-slate-100">{section.title}</p>
+              <ul className="mt-1 list-inside list-disc text-xs text-slate-300">
+                {section.items.map((line) => (
+                  <li key={`${section.id}-${line}`}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : trace.patternType ? (
         <p className="mb-2 text-xs text-sky-200/90">
           패턴 {trace.patternType}
           {trace.zoneHigh != null && trace.zoneLow != null
             ? ` · 존 ${trace.zoneLow}–${trace.zoneHigh}`
             : ""}
           {trace.penetrationPct != null
-            ? ` · 침투 ${(trace.penetrationPct * 100).toFixed(0)}%`
+            ? ` · ${formatPenetrationKo(trace.penetrationPct)}`
             : ""}
         </p>
       ) : null}
       {trace.zoneHigh == null || trace.zoneLow == null ? (
-        <p
-          className="mb-2 text-xs text-amber-200/90"
-          data-testid="trade-geometry-missing"
-        >
-          이 거래 기록에는 영역 좌표가 저장되지 않았습니다.
-        </p>
+        blockSections.length === 0 ? (
+          <p
+            className="mb-2 text-xs text-amber-200/90"
+            data-testid="trade-geometry-missing"
+          >
+            이 거래 기록에는 영역 좌표가 저장되지 않았습니다.
+          </p>
+        ) : null
       ) : (
         <p className="mb-2 text-xs text-sky-200/80" data-testid="trade-geometry-present">
           영역 좌표가 저장되어 차트에 사각형 존으로 표시됩니다.
@@ -1899,10 +2218,10 @@ function ValidationGrid({
           explain: "백테스트는 실주문을 생성하지 않습니다.",
         },
         {
-          title: displayParamsHashLabel(),
+          title: displayStrategyHashLabel(),
           status: report.validation.paramsHashVerified ? "pass" : "warning",
-          value: report.strategyHash?.slice(0, 12) ?? "-",
-          explain: "파라미터 해시 검증 결과입니다.",
+          value: formatShortHash(report.strategyHash),
+          explain: "실행 시점의 canonical strategyHash 검증 결과입니다.",
         },
       ],
     },

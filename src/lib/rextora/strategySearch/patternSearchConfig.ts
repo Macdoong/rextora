@@ -4,6 +4,11 @@
  */
 
 import type { StrategySearchParameterRange } from "./types";
+import {
+  confirmationParamsForCandidate,
+  resolvePatternConfirmation,
+  type ConfirmationMode,
+} from "./patternConfirmation";
 
 export type PatternConfigLevel = "automatic" | "basic" | "expert";
 
@@ -12,8 +17,12 @@ export interface PatternOperatorConfig {
   patternDirection: "both" | "long" | "short";
   patternRetestMode: "required" | "optional" | "disabled";
   patternConfirmStrength: "standard" | "strict";
-  /** Maps to requireCloseInDirection — engine has no multi-candle confirm count. */
+  /** Legacy on/off — mapped into confirmationMode when mode omitted. */
   patternConfirmClose: "required" | "disabled";
+  /** Canonical confirmation schema (evaluator-backed). */
+  patternConfirmationMode: ConfirmationMode;
+  patternConfirmationCandleCount: number;
+  patternConfirmationWindow: number;
   patternExpiryBars: number;
   patternRiskStyle: "conservative" | "balanced" | "aggressive";
   /** Adjusts zoneLookback / touch / gap keys when present in ranges. */
@@ -28,6 +37,9 @@ export interface PatternOperatorPlanFields {
   patternRetestMode?: PatternOperatorConfig["patternRetestMode"] | null;
   patternConfirmStrength?: PatternOperatorConfig["patternConfirmStrength"] | null;
   patternConfirmClose?: PatternOperatorConfig["patternConfirmClose"] | null;
+  patternConfirmationMode?: ConfirmationMode | null;
+  patternConfirmationCandleCount?: number | null;
+  patternConfirmationWindow?: number | null;
   patternExpiryBars?: number | null;
   patternRiskStyle?: PatternOperatorConfig["patternRiskStyle"] | null;
   patternStrength?: PatternOperatorConfig["patternStrength"] | null;
@@ -108,6 +120,12 @@ export function patternConfigFromPlanFields(
       ? Math.trunc(expiryRaw)
       : 48;
   const retest = plan?.patternRetestMode;
+  const confirm = resolvePatternConfirmation({
+    confirmationMode: plan?.patternConfirmationMode,
+    confirmationCandleCount: plan?.patternConfirmationCandleCount,
+    confirmationWindow: plan?.patternConfirmationWindow,
+    patternConfirmClose: plan?.patternConfirmClose ?? "required",
+  });
   return {
     patternConfigLevel: level,
     patternDirection: plan?.patternDirection ?? "both",
@@ -116,7 +134,11 @@ export function patternConfigFromPlanFields(
         ? retest
         : "required",
     patternConfirmStrength: plan?.patternConfirmStrength ?? "standard",
-    patternConfirmClose: plan?.patternConfirmClose ?? "required",
+    patternConfirmClose:
+      confirm.confirmationMode === "none" ? "disabled" : "required",
+    patternConfirmationMode: confirm.confirmationMode,
+    patternConfirmationCandleCount: confirm.confirmationCandleCount,
+    patternConfirmationWindow: confirm.confirmationWindow,
     patternExpiryBars: clampNum(expiry, 12, 96),
     patternRiskStyle: plan?.patternRiskStyle ?? "balanced",
     patternStrength: plan?.patternStrength ?? "standard",
@@ -255,6 +277,42 @@ export function applyPatternOperatorConfigToRanges(
       : config.patternSrSensitivity === "loose"
         ? 1
         : 0;
+  // Expert: searchable confirmation count/window when multi-candle modes active.
+  if (
+    config.patternConfigLevel === "expert" &&
+    (config.patternConfirmationMode === "consecutive_closes" ||
+      config.patternConfirmationMode === "threshold_count")
+  ) {
+    const countDefault = config.patternConfirmationCandleCount;
+    const windowDefault = config.patternConfirmationWindow;
+    if (!next.some((r) => r.key === "confirmationCandleCount")) {
+      next = [
+        ...next,
+        {
+          key: "confirmationCandleCount",
+          valueType: "integer",
+          min: 1,
+          max: 8,
+          defaultValue: countDefault,
+          step: 1,
+        },
+      ];
+    }
+    if (!next.some((r) => r.key === "confirmationWindow")) {
+      next = [
+        ...next,
+        {
+          key: "confirmationWindow",
+          valueType: "integer",
+          min: countDefault,
+          max: 24,
+          defaultValue: windowDefault,
+          step: 1,
+        },
+      ];
+    }
+  }
+
   if (sensDelta !== 0) {
     for (const key of ["tolerancePct", "zoneWidthPct"] as const) {
       const row = next.find((r) => r.key === key);
@@ -282,11 +340,17 @@ export function applyPatternOperatorConfigToBaseParams(
 
   let next: Record<string, number | boolean | string> = { ...base };
 
+  const confirm = resolvePatternConfirmation({
+    confirmationMode: config.patternConfirmationMode,
+    confirmationCandleCount: config.patternConfirmationCandleCount,
+    confirmationWindow: config.patternConfirmationWindow,
+    patternConfirmClose: config.patternConfirmClose,
+  });
   next = {
     ...next,
     direction: config.patternDirection,
     requireTouch: config.patternRetestMode === "required",
-    requireCloseInDirection: config.patternConfirmClose !== "disabled",
+    ...confirmationParamsForCandidate(confirm),
   };
 
   if ("maxHoldBars" in next) {

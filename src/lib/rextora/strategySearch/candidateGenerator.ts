@@ -5,6 +5,7 @@ import {
   assertStrategySearchJobId,
   createStrategySearchCandidateId,
 } from "./searchId";
+import { mutateCombinationParams } from "./patternCombination";
 import {
   normalizeCandidateParams,
   validateCandidateParams,
@@ -119,7 +120,21 @@ function sampleFromRange(
     );
   }
   if (valueType === "integer") {
-    return random.nextInt(Math.ceil(range.min), Math.floor(range.max));
+    const minI = Math.ceil(range.min);
+    const maxI = Math.floor(range.max);
+    if (minI > maxI) {
+      throw new StrategySearchGenerationError(
+        "VALIDATION_FAILED",
+        `integer range empty after rounding for ${range.key}: [${range.min}, ${range.max}]`,
+      );
+    }
+    return random.nextInt(minI, maxI);
+  }
+  if (range.min > range.max) {
+    throw new StrategySearchGenerationError(
+      "VALIDATION_FAILED",
+      `numeric range inverted for ${range.key}: [${range.min}, ${range.max}]`,
+    );
   }
   return random.nextFloat(range.min, range.max);
 }
@@ -315,7 +330,7 @@ export function generateLocalCandidate(
   return tryFinalize(
     () => {
       // Clone parent params — never mutate parentCandidate.
-      const params = cloneParams(input.parentCandidate.params);
+      let params = cloneParams(input.parentCandidate.params);
       for (const range of input.parameterRanges) {
         const parentValue = params[range.key];
         if (parentValue === undefined) continue;
@@ -325,6 +340,14 @@ export function generateLocalCandidate(
           input.mutationScale,
           input.random,
         );
+      }
+      // Structural combination mutation (additive; skipped when absent).
+      if (
+        typeof params.combinationFamilies === "string" &&
+        params.combinationFamilies.includes("+") &&
+        input.random.nextFloat(0, 1) < 0.35
+      ) {
+        params = mutateCombinationParams(params, input.random);
       }
       return params;
     },

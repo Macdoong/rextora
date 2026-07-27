@@ -38,6 +38,12 @@ export interface ResearchTop10Entry {
   maxDrawdown: number | null;
   tradeCount: number | null;
   profitFactor: number | null;
+  winRate?: number | null;
+  sharpe?: number | null;
+  patternStack?: string;
+  confidence?: string;
+  risk?: string;
+  miniSeries?: number[] | null;
   score: number | null;
   costStatus: string;
   sampleConfidence: string;
@@ -198,6 +204,21 @@ export interface ResearchScopeKeyInput {
   researchBasis?: string | null;
   stressEnabled?: boolean | null;
   jitterEnabled?: boolean | null;
+  /** Pattern combination fingerprint — separates SafeV44 vs pattern stacks. */
+  patternStackKey?: string | null;
+}
+
+export function buildResearchScopeKey(input: ResearchScopeKeyInput): string {
+  return [
+    input.symbol.trim().toUpperCase() || "BTCUSDT",
+    input.timeframe.trim() || "15m",
+    input.qualificationProfile ?? "balanced",
+    input.depthProfile ?? "standard",
+    input.researchBasis ?? "fresh",
+    input.stressEnabled === false ? "nostress" : "stress",
+    input.jitterEnabled === false ? "nojitter" : "jitter",
+    input.patternStackKey?.trim() || "default",
+  ].join("|");
 }
 
 function defaultRoot(): string {
@@ -219,18 +240,6 @@ function top10Path(root: string, jobId: string): string {
 
 function historyPath(root: string, jobId: string): string {
   return path.join(root, "jobs", `${jobId}.top10.history.jsonl`);
-}
-
-export function buildResearchScopeKey(input: ResearchScopeKeyInput): string {
-  return [
-    input.symbol.trim().toUpperCase() || "BTCUSDT",
-    input.timeframe.trim() || "15m",
-    input.qualificationProfile ?? "balanced",
-    input.depthProfile ?? "standard",
-    input.researchBasis ?? "fresh",
-    input.stressEnabled === false ? "nostress" : "stress",
-    input.jitterEnabled === false ? "nojitter" : "jitter",
-  ].join("|");
 }
 
 function compositeScore(card: ResearchResultCard): number {
@@ -268,6 +277,12 @@ function cardToEntry(
     maxDrawdown: card.maxDrawdown,
     tradeCount: card.tradeCount,
     profitFactor: card.profitFactor,
+    winRate: card.winRate,
+    sharpe: card.sharpe,
+    patternStack: card.patternStack,
+    confidence: card.confidence,
+    risk: card.risk,
+    miniSeries: card.miniSeries ? card.miniSeries.slice(0, 30) : null,
     score: card.score,
     costStatus: card.costStatus,
     sampleConfidence: card.sampleConfidence,
@@ -442,6 +457,14 @@ export function mergeTop10AcrossScope(input: {
       maxDrawdown: prev.maxDrawdown,
       tradeCount: prev.tradeCount,
       profitFactor: prev.profitFactor,
+      winRate: prev.winRate ?? null,
+      sharpe: prev.sharpe ?? null,
+      patternStack: prev.patternStack ?? prev.strategyFamily ?? "—",
+      confidence: prev.confidence ?? prev.sampleConfidence,
+      risk: prev.risk ?? prev.overfittingRisk,
+      miniSeries: Array.isArray(prev.miniSeries)
+        ? prev.miniSeries.slice(0, 30)
+        : null,
       totalCost: null,
       costStatus: prev.costStatus as ResearchResultCard["costStatus"],
       sampleConfidence: prev.sampleConfidence as ResearchResultCard["sampleConfidence"],
@@ -554,31 +577,24 @@ export function buildAndPersistResearchTop10(input: {
 }): ResearchTop10Snapshot {
   const now = new Date().toISOString();
   const existing = getResearchTop10(input.jobId, input.options);
-  const sameScopePeer =
+  // Job-local shortlist only. Never import another Research Job's Top-10 entries
+  // into this jobId (same-scope peers may share market settings but different stacks).
+  const selected = selectResearchTop10(input.representatives);
+  const previousEntries =
+    existing?.jobId === input.jobId && existing.scopeKey === input.scopeKey
+      ? existing.entries
+      : null;
+  const peerForCompare =
+    !previousEntries &&
     input.previousSameScope &&
     input.previousSameScope.scopeKey === input.scopeKey
-      ? input.previousSameScope
-      : findLatestSameScopeTop10(input.scopeKey, input.jobId, input.options);
-  // Prefer this job's shortlist on rebuild; use same-scope peer only for first persist.
-  const mergeFrom =
-    existing?.scopeKey === input.scopeKey
-      ? existing
-      : sameScopePeer && sameScopePeer.scopeKey === input.scopeKey
-        ? sameScopePeer
-        : null;
-
-  const selected = mergeFrom
-    ? mergeTop10AcrossScope({
-        previous: mergeFrom.entries,
-        incoming: input.representatives,
-      })
-    : selectResearchTop10(input.representatives);
+      ? input.previousSameScope.entries
+      : previousEntries;
 
   const entries = selected.map((card, idx) =>
     cardToEntry(card, idx + 1, card.roles, now),
   );
-  const previousEntries = mergeFrom?.entries ?? null;
-  const rankChanges = computeRankChanges(previousEntries, entries);
+  const rankChanges = computeRankChanges(peerForCompare, entries);
   const changeByHash = new Map(
     rankChanges.map((c) => [c.strategyHash, c] as const),
   );

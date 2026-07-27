@@ -87,7 +87,14 @@ export function StrategyDetailPanel({ strategy }: { strategy: Strategy }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div className="space-y-3">
           <Metric label="전략명" value={strategy.name} />
-          <Metric label="전략 고유값" value={strategy.paramsHash} />
+          <Metric
+            label="전략 해시"
+            value={
+              (strategy as { strategyHash?: string }).strategyHash?.slice(0, 12) ??
+              strategy.paramsHash?.slice(0, 12) ??
+              "—"
+            }
+          />
           <Metric
             label="해시 검증"
             value={hash.ok ? "일치" : hash.message}

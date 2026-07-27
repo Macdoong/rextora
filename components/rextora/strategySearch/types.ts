@@ -53,6 +53,48 @@ export type StrategySearchCompletionReason =
   | "PAUSED"
   | null;
 
+export type PatternFamilyId =
+  | "order_block"
+  | "fvg"
+  | "trendline"
+  | "support_resistance"
+  | "supply_demand";
+
+export interface PatternCombinationBlockConfig {
+  id: string;
+  family: PatternFamilyId;
+  role:
+    | "entry_zone"
+    | "trend_filter"
+    | "confirmation"
+    | "invalidation"
+    | "stop_placement"
+    | "take_profit"
+    | "exit_filter";
+  order: number;
+  required?: boolean;
+  weight?: number;
+  priority?: number;
+  params: Record<string, number | string | boolean | null>;
+}
+
+export interface PatternCombinationSpecInput {
+  version: 1;
+  templateId:
+    | "single"
+    | "confluence"
+    | "entry_confirmation"
+    | "ordered_sequence"
+    | "breakout_retest"
+    | "zone_confluence"
+    | "invalidation_composite";
+  operator: "and" | "or" | "sequence" | "weighted_score" | "priority";
+  failurePolicy: "any" | "all" | "majority";
+  invalidationMode: "any" | "all";
+  weightedThreshold?: number;
+  blocks: PatternCombinationBlockConfig[];
+}
+
 /** Operator plan sent on create so the server can orchestrate the campaign. */
 export interface StrategySearchOperatorPlan {
   depthProfile: "fast" | "standard" | "deep";
@@ -83,10 +125,39 @@ export interface StrategySearchOperatorPlan {
   patternRetestMode?: "required" | "optional" | "disabled" | null;
   patternConfirmStrength?: "standard" | "strict" | null;
   patternConfirmClose?: "required" | "disabled" | null;
+  patternConfirmationMode?:
+    | "none"
+    | "single_close"
+    | "consecutive_closes"
+    | "threshold_count"
+    | null;
+  patternConfirmationCandleCount?: number | null;
+  patternConfirmationWindow?: number | null;
   patternExpiryBars?: number | null;
   patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
   patternStrength?: "loose" | "standard" | "strict" | null;
   patternSrSensitivity?: "tight" | "standard" | "loose" | null;
+  patternCombinationTemplate?:
+    | "single"
+    | "confluence"
+    | "entry_confirmation"
+    | "ordered_sequence"
+    | "breakout_retest"
+    | "zone_confluence"
+    | "invalidation_composite"
+    | null;
+  patternCombinationOperator?:
+    | "and"
+    | "or"
+    | "sequence"
+    | "weighted_score"
+    | "priority"
+    | null;
+  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationFailurePolicy?: "any" | "all" | "majority" | null;
+  patternCombinationWeightedThreshold?: number | null;
+  patternCombinationFamilies?: string[] | null;
+  patternCombinationSpec?: PatternCombinationSpecInput | null;
 }
 
 export interface StrategySearchJobSummary {
@@ -132,6 +203,9 @@ export interface StrategySearchJobSummary {
   candidateBudget?: number | null;
   promotionWarnings?: number | null;
   currentSearchFamily?: string | null;
+  currentCombinationLabel?: string | null;
+  patternCombinationFamilies?: string[] | null;
+  patternCombinationOperator?: string | null;
   searchStageIndex?: number | null;
   searchStageTotal?: number | null;
   searchProgression?: Array<{
@@ -161,6 +235,12 @@ export interface StrategySearchJobSummary {
       maxDrawdown: number | null;
       tradeCount: number | null;
       profitFactor: number | null;
+      winRate?: number | null;
+      sharpe?: number | null;
+      patternStack?: string;
+      confidence?: string;
+      risk?: string;
+      miniSeries?: number[] | null;
       costStatus: string;
       robustnessStatus: string;
       sampleConfidence: string;
@@ -189,6 +269,12 @@ export interface StrategySearchJobSummary {
       maxDrawdown: number | null;
       tradeCount: number | null;
       profitFactor: number | null;
+      winRate?: number | null;
+      sharpe?: number | null;
+      patternStack?: string;
+      confidence?: string;
+      risk?: string;
+      miniSeries?: number[] | null;
       costStatus: string;
       robustnessStatus: string;
       sampleConfidence: string;
@@ -552,6 +638,12 @@ export interface ResearchResultCardView {
   maxDrawdown: number | null;
   tradeCount: number | null;
   profitFactor: number | null;
+  winRate?: number | null;
+  sharpe?: number | null;
+  patternStack?: string;
+  confidence?: string;
+  risk?: string;
+  miniSeries?: number[] | null;
   totalCost: number | null;
   costStatus: string;
   sampleConfidence: string;

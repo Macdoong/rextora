@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   copyStrategy,
   ensureStrategyStore,
+  getPaperActiveStrategy,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
 import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
@@ -47,6 +48,9 @@ describe("paperSessionStore", () => {
     expect(created.status).toBe("active");
     expect(created.strategyId).toBe(strategyId);
     expect(created.strategyHash).toBeTruthy();
+    expect(created.sourceParamsHash).toBe(
+      getPaperActiveStrategy().paramsHash,
+    );
     expect(getActivePaperSession(opts)?.id).toBe(created.id);
 
     const paused = pausePaperSession(created.id, opts);
@@ -67,6 +71,16 @@ describe("paperSessionStore", () => {
     const safeFile = path.join(strategiesRoot, `${SAFE_STRATEGY_ID}.json`);
     expect(fs.existsSync(safeFile)).toBe(true);
     expect(rootDir.includes("strategies")).toBe(false);
+  });
+
+  it("createPaperSession syncs registry paperActive to the session strategy", () => {
+    const opts = { rootDir };
+    const other = copyStrategy(SAFE_STRATEGY_ID, "paper_other");
+    setPaperActiveStrategy(other.id);
+    const created = createPaperSession({ strategyId }, opts);
+    expect(created.strategyId).toBe(strategyId);
+    expect(getPaperActiveStrategy().id).toBe(strategyId);
+    expect(getPaperActiveStrategy().id).not.toBe(other.id);
   });
 
   it("rejects create for unknown strategy", () => {

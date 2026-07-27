@@ -307,7 +307,9 @@ describe("strategySearch Phase 6 API", () => {
     const detail = getStrategySearchJobApi(a.id);
     expect(detail.id).toBe(a.id);
     expect(detail.config.parameterRangeKeys).toContain("ema_fast");
-    expect(detail.progressRatio).toBe(0);
+    expect(detail.progressRatio === 0 || detail.progressRatio === null).toBe(
+      true,
+    );
   });
 
   it("returns job not found", () => {

@@ -402,8 +402,22 @@ export function displayTimeframeLabel(tf: string | null | undefined): string {
   return tf;
 }
 
+/** Operator-facing canonical executable strategy identity. */
+export function displayStrategyHashLabel(): string {
+  return "전략 해시";
+}
+
+/** Parameter snapshot identity — technical details only. */
 export function displayParamsHashLabel(): string {
-  return "전략 고유값";
+  return "파라미터 해시";
+}
+
+export function formatShortHash(
+  hash: string | null | undefined,
+  len = 12,
+): string {
+  if (!hash) return "—";
+  return hash.length <= len ? hash : `${hash.slice(0, len)}…`;
 }
 
 export function displayEngineLabel(nameOrLabel: string): string {

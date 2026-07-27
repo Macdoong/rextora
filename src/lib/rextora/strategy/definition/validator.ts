@@ -9,6 +9,7 @@ import {
   type LeafCondition,
   type LeafConditionType
 } from "./types";
+import { validateEventSequence } from "./eventSequence";
 
 const SUPPORTED_LEAF = new Set<LeafConditionType>([
   "higher_high",
@@ -142,6 +143,10 @@ export function validateCanonicalDefinition(def: CanonicalStrategyDefinition): {
 
   if (def.strategyType === "safe_params" && !def.safeParams) {
     errors.push("SAFE 파라미터 전략에는 파라미터 세트가 필요합니다.");
+  }
+  if (def.eventSequence) {
+    const eventValidation = validateEventSequence(def.eventSequence);
+    errors.push(...eventValidation.errors.map((error) => `eventSequence: ${error}`));
   }
 
   return errors.length ? { ok: false, errors } : { ok: true };

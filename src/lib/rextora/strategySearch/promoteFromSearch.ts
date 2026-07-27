@@ -29,6 +29,7 @@ import {
   getSearchPlan,
   saveSearchPlan,
 } from "./searchPlan";
+import { buildStrategyDisplayAlias } from "../results/researchDisplay";
 import {
   buildReadableStrategyIdentity,
   type StrategyFamilyId,
@@ -52,6 +53,10 @@ export interface PromoteSearchCandidateResult {
   strategyId: string;
   strategyName: string;
   paramsHash: string;
+  /** Canonical definition identity; distinct from SafeV44-compatible paramsHash. */
+  strategyHash: string;
+  /** Candidate identity captured by the immutable Search Plan. */
+  sourceParamsHash: string | null;
   alreadyExists: boolean;
   existingStrategyId: string | null;
   registrationState: RegistrationState;
@@ -193,11 +198,16 @@ export function promoteSearchCandidateToStrategy(
     trial.params as Record<string, unknown>,
   );
   const isPattern = patternFamily != null;
+  const market = job.config.symbols[0] ?? null;
   const identity = buildReadableStrategyIdentity(
     trial.params as Record<string, unknown>,
     trial.paramsHash,
+    {
+      comboAware: true,
+      symbol: market ?? "BTCUSDT",
+      timeframe: job.config.timeframe,
+    },
   );
-  const market = job.config.symbols[0] ?? null;
   const primary = trial.windowResults[0] ?? null;
   const lastBacktest =
     primary &&
@@ -241,6 +251,8 @@ export function promoteSearchCandidateToStrategy(
         strategyId: existing.id,
         strategyName: existing.name,
         paramsHash: existing.paramsHash,
+        strategyHash: existing.strategyHash ?? existing.paramsHash,
+        sourceParamsHash: existing.sourceParamsHash ?? trial.paramsHash,
         alreadyExists: true,
         existingStrategyId: existing.id,
         registrationState: "duplicate",
@@ -274,6 +286,10 @@ export function promoteSearchCandidateToStrategy(
     });
     const name =
       (input.name && input.name.trim()) || identity.readableName;
+    const displayAlias = buildStrategyDisplayAlias({
+      readableName: identity.readableName,
+      paramsHash: trial.paramsHash,
+    });
     const definition = buildPatternSearchDefinition({
       candidateId: "pending",
       strategyName: name,
@@ -292,6 +308,8 @@ export function promoteSearchCandidateToStrategy(
 
     const created = createStrategy({
       name,
+      displayAlias,
+      displayName: name,
       description: buildProvenanceDescription({
         jobId: job.id,
         iteration: input.iteration,
@@ -311,6 +329,7 @@ export function promoteSearchCandidateToStrategy(
       timeframe,
       strategyType: "condition_builder",
       definition,
+      sourceParamsHash: trial.paramsHash,
     });
 
     if (lastBacktest) {
@@ -330,6 +349,8 @@ export function promoteSearchCandidateToStrategy(
       strategyId: created.id,
       strategyName: created.name,
       paramsHash: created.paramsHash,
+      strategyHash: created.strategyHash ?? created.paramsHash,
+      sourceParamsHash: created.sourceParamsHash ?? trial.paramsHash,
       alreadyExists: false,
       existingStrategyId: null,
       registrationState: "registered",
@@ -373,6 +394,8 @@ export function promoteSearchCandidateToStrategy(
       strategyId: existing.id,
       strategyName: existing.name,
       paramsHash: existing.paramsHash,
+      strategyHash: existing.strategyHash ?? existing.paramsHash,
+      sourceParamsHash: existing.sourceParamsHash ?? trial.paramsHash,
       alreadyExists: true,
       existingStrategyId: existing.id,
       registrationState: "duplicate",
@@ -389,9 +412,15 @@ export function promoteSearchCandidateToStrategy(
 
   const name =
     (input.name && input.name.trim()) || identity.readableName;
+  const displayAlias = buildStrategyDisplayAlias({
+    readableName: identity.readableName,
+    paramsHash: trial.paramsHash,
+  });
 
   const created = createStrategy({
     name,
+    displayAlias,
+    displayName: name,
     description: buildProvenanceDescription({
       jobId: job.id,
       iteration: input.iteration,
@@ -408,6 +437,7 @@ export function promoteSearchCandidateToStrategy(
     params,
     timeframe,
     strategyType: "safe_params",
+    sourceParamsHash: trial.paramsHash,
   });
 
   if (lastBacktest) {
@@ -427,6 +457,8 @@ export function promoteSearchCandidateToStrategy(
     strategyId: created.id,
     strategyName: created.name,
     paramsHash: created.paramsHash,
+    strategyHash: created.strategyHash ?? created.paramsHash,
+    sourceParamsHash: created.sourceParamsHash ?? trial.paramsHash,
     alreadyExists: false,
     existingStrategyId: null,
     registrationState: "registered",
@@ -461,15 +493,10 @@ export function promoteSelectedTrialsFromJob(
     }
     if (seen.has(identityTrial.paramsHash)) continue;
     seen.add(identityTrial.paramsHash);
-    const identity = buildReadableStrategyIdentity(
-      identityTrial.params,
-      identityTrial.paramsHash,
-    );
     out.push(
       promoteSearchCandidateToStrategy({
         jobId,
         iteration,
-        name: identity.readableName,
         storeOptions,
       }),
     );

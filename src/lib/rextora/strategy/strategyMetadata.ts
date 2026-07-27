@@ -8,6 +8,7 @@ export type StrategyPublicMeta = {
   id: string;
   name: string;
   paramsHash: string;
+  strategyHash: string | null;
   timeframe: string;
   timeframeLabel: string;
   sourceStrategyId: string | null;
@@ -40,6 +41,7 @@ export function getStrategyPublicMeta(id: string): StrategyPublicMeta | null {
     id: s.id,
     name: s.name,
     paramsHash: s.paramsHash,
+    strategyHash: s.strategyHash ?? null,
     timeframe: tf,
     timeframeLabel: displayTimeframeLabel(tf),
     sourceStrategyId: s.sourceStrategyId ?? null,

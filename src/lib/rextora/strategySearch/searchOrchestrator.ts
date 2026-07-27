@@ -11,6 +11,7 @@ import {
 } from "./jobCheckpoint";
 import {
   getJobExecutionProfile,
+  saveJobExecutionProfile,
 } from "./jobExecutionProfile";
 import {
   getSearchJob,
@@ -30,8 +31,16 @@ import {
   patternConfigFromPlanFields,
 } from "./patternSearchConfig";
 import {
+  buildCombinationSpec,
+  combinationMutationRanges,
+  combinationParamsForCandidate,
+  isPatternCombinationOperator,
+  isPatternCombinationTemplateId,
+} from "./patternCombination";
+import {
   baseParamsForPatternSpaceId,
   isPatternSearchSpaceId,
+  type PatternSearchFamilyId,
 } from "./patternSearchSpaces";
 import {
   activeElapsedMs,
@@ -44,6 +53,7 @@ import {
   mergeSeenHashes,
   replenishDeadlineBudget,
   saveSearchPlan,
+  syncPlanTimingFields,
   updateCurrentFamilySpent,
   type StrategySearchCompletionReason,
   type StrategySearchPlan,
@@ -128,21 +138,68 @@ function activeSpaceRanges(
   plan: StrategySearchPlan,
   jobRanges: StrategySearchParameterRange[],
 ): StrategySearchParameterRange[] {
+  let ranges: StrategySearchParameterRange[];
   if (
     plan.mutatedParameterRanges != null &&
     plan.mutatedParameterRanges.length > 0
   ) {
-    return plan.mutatedParameterRanges;
+    ranges = plan.mutatedParameterRanges;
+  } else {
+    const spaceState = plan.spaces[plan.currentSpaceIndex];
+    if (!spaceState) ranges = jobRanges;
+    else {
+      const spaceDef = getSearchSpaceById(spaceState.id);
+      ranges = spaceDef ? rangesForSpace(spaceDef) : jobRanges;
+    }
   }
-  const spaceState = plan.spaces[plan.currentSpaceIndex];
-  if (!spaceState) return jobRanges;
-  const spaceDef = getSearchSpaceById(spaceState.id);
-  return spaceDef ? rangesForSpace(spaceDef) : jobRanges;
+  if (!plan.patternCombinationSpec || plan.patternCombinationSpec.blocks.length < 2) {
+    return ranges;
+  }
+  const blockRanges = combinationMutationRanges(plan.patternCombinationSpec);
+  const blockKeys = new Set(blockRanges.map((range) => range.key));
+  return [...ranges.filter((range) => !blockKeys.has(range.key)), ...blockRanges];
 }
 
 function resolveStageBaseParams(plan: StrategySearchPlan) {
   const space = plan.spaces[plan.currentSpaceIndex];
   const patternConfig = patternConfigFromPlanFields(plan);
+  const comboFamilies = (
+    plan.patternCombinationSpec?.blocks.map((block) => block.family) ??
+    plan.patternCombinationFamilies ??
+    []
+  ).filter(
+    isPatternSearchSpaceId,
+  ) as PatternSearchFamilyId[];
+  if (comboFamilies.length > 1) {
+    const templateId = isPatternCombinationTemplateId(
+      plan.patternCombinationTemplate,
+    )
+      ? plan.patternCombinationTemplate
+      : "confluence";
+    const operator = isPatternCombinationOperator(
+      plan.patternCombinationOperator,
+    )
+      ? plan.patternCombinationOperator
+      : "and";
+    const spec =
+      plan.patternCombinationSpec ??
+      buildCombinationSpec({
+        templateId,
+        families: comboFamilies,
+        operator,
+        invalidationMode:
+          plan.patternCombinationInvalidationMode === "all" ? "all" : "any",
+      });
+    const entryFamily =
+      spec.blocks.find((b) => b.role === "entry_zone")?.family ??
+      comboFamilies[0]!;
+    const base = baseParamsForPatternSpaceId(entryFamily) ?? {};
+    const withPattern = applyPatternOperatorConfigToBaseParams(
+      { ...base, ...combinationParamsForCandidate(spec) },
+      patternConfig,
+    );
+    return applyLeverageModeToParams(withPattern, plan);
+  }
   if (space && isPatternSearchSpaceId(space.id)) {
     const base = baseParamsForPatternSpaceId(space.id) ?? {};
     const withPattern = applyPatternOperatorConfigToBaseParams(
@@ -191,6 +248,21 @@ function applyStageConfig(
     failureMessage: null,
   };
   saveSearchJob(nextJob, store);
+
+  const profile = getJobExecutionProfile(jobId, store);
+  if (profile?.jitterConfig?.enabled) {
+    saveJobExecutionProfile(
+      jobId,
+      {
+        ...profile,
+        jitterConfig: {
+          ...profile.jitterConfig,
+          parameterRanges: stageRanges.map((r) => ({ ...r })),
+        },
+      },
+      store,
+    );
+  }
 
   const payload = readRunnerPayloadFromCheckpoint(job.checkpoint);
   const seeded: StrategySearchRunnerCheckpointPayload = payload
@@ -255,11 +327,15 @@ function syncPlanAfterRun(
   next = {
     ...next,
     duplicateSkippedCount: plan.duplicateSkippedCount + dupDelta,
-    elapsedMs:
-      plan.campaignStartedAtMs != null
-        ? activeElapsedMs(next)
-        : next.elapsedMs + result.statistics.elapsedMs,
   };
+  if (plan.campaignStartedAtMs != null) {
+    next = syncPlanTimingFields(next);
+  } else {
+    next = {
+      ...next,
+      elapsedMs: next.elapsedMs + result.statistics.elapsedMs,
+    };
+  }
   const space = next.spaces[next.currentSpaceIndex];
   if (space) {
     const delta = Math.max(
@@ -514,10 +590,14 @@ export async function runOrchestratedSearchJob(
   }
 
   if (plan.campaignStartedAtMs == null) {
-    plan = {
-      ...plan,
-      campaignStartedAtMs: Date.now(),
-    };
+    const now = Date.now();
+    plan = syncPlanTimingFields(
+      {
+        ...plan,
+        campaignStartedAtMs: now,
+      },
+      now,
+    );
     saveSearchPlan(jobId, plan, store);
   }
 

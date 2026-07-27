@@ -180,6 +180,13 @@ function strengthWeakness(s: StrategyRow): { strength: string; weakness: string 
   return { strength, weakness };
 }
 
+type LibraryLoadState =
+  | "loading"
+  | "loaded"
+  | "true_empty"
+  | "partial"
+  | "error";
+
 export function ResultsWorkbench() {
   const searchParams = useSearchParams();
   const jobIdFromUrl = searchParams.get("jobId");
@@ -192,6 +199,9 @@ export function ResultsWorkbench() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+  const [libraryLoadState, setLibraryLoadState] =
+    useState<LibraryLoadState>("loading");
+  const strategiesAuthoritativeRef = useRef(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [storageSummary, setStorageSummary] = useState<StorageSummaryView | null>(
@@ -221,41 +231,62 @@ export function ResultsWorkbench() {
       ? selectedJobIdOverride
       : jobIdFromUrl ?? jobs[0]?.id ?? null;
 
+  const refreshSeqRef = useRef(0);
+  const refreshAbortRef = useRef<AbortController | null>(null);
+
   const refresh = useCallback(async (viewOverride?: "default" | "archived") => {
     const view = viewOverride ?? historyView;
+    refreshAbortRef.current?.abort();
+    const controller = new AbortController();
+    refreshAbortRef.current = controller;
+    const seq = ++refreshSeqRef.current;
     try {
       const historyQuery =
         view === "archived"
           ? "?limit=100&archivedOnly=true"
           : "?limit=100";
       const [sRes, jRes, storageRes] = await Promise.all([
-        fetch("/api/rextora/strategies").then((r) => r.json()),
-        fetch(`/api/rextora/strategy-search${historyQuery}`).then((r) =>
-          r.json(),
+        fetch("/api/rextora/strategies", { signal: controller.signal }).then(
+          (r) => r.json(),
         ),
-        fetch("/api/rextora/strategy-search/storage-summary").then((r) =>
-          r.json(),
-        ),
+        fetch(`/api/rextora/strategy-search${historyQuery}`, {
+          signal: controller.signal,
+        }).then((r) => r.json()),
+        fetch("/api/rextora/strategy-search/storage-summary", {
+          signal: controller.signal,
+        }).then((r) => r.json()),
       ]);
-      const raw = Array.isArray(sRes.data) ? sRes.data : [];
-      setStrategies(
-        raw.filter(
+      if (seq !== refreshSeqRef.current) return;
+      // Never wipe existing lists on failed/partial polls (avoids empty flash).
+      if (sRes?.ok && Array.isArray(sRes.data)) {
+        strategiesAuthoritativeRef.current = true;
+        const next = sRes.data.filter(
           (s: StrategyRow & { testData?: boolean; metadata?: { testData?: boolean } }) =>
             !isTestStrategyRecord(s as never),
-        ),
-      );
-      const list = jRes.data?.jobs ?? jRes.data ?? [];
-      const jobList: JobSummary[] = Array.isArray(list) ? list : [];
-      setJobs(jobList);
-      if (storageRes.ok && storageRes.data) {
+        );
+        setStrategies(next);
+        setLibraryLoadState(next.length === 0 ? "true_empty" : "loaded");
+      } else if (!strategiesAuthoritativeRef.current && !(sRes?.ok)) {
+        setLibraryLoadState("error");
+      }
+      if (jRes?.ok) {
+        const list = jRes.data?.jobs ?? jRes.data ?? [];
+        const jobList: JobSummary[] = Array.isArray(list) ? list : [];
+        setJobs(jobList);
+      }
+      if (storageRes?.ok && storageRes.data) {
         setStorageSummary(storageRes.data as StorageSummaryView);
       }
-      setError(null);
+      if (sRes?.ok || jRes?.ok) setError(null);
     } catch (e) {
+      if (seq !== refreshSeqRef.current) return;
+      if (e instanceof DOMException && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "결과 로드 실패");
     } finally {
-      setLoading(false);
-      setLoadingTimedOut(false);
+      if (seq === refreshSeqRef.current) {
+        setLoading(false);
+        setLoadingTimedOut(false);
+      }
     }
   }, [historyView]);
 
@@ -267,6 +298,7 @@ export function ResultsWorkbench() {
     return () => {
       window.clearTimeout(boot);
       clearInterval(t);
+      refreshAbortRef.current?.abort();
     };
   }, [refresh]);
 
@@ -467,6 +499,84 @@ export function ResultsWorkbench() {
       const json = await res.json();
       setMessage(json.ok ? "모의매매에 등록했습니다." : (json.error ?? "실패"));
       await refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function renameDisplay(id: string) {
+    if (id === SAFE_STRATEGY_ID) {
+      setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
+      return;
+    }
+    const s = strategies.find((x) => x.id === id);
+    const current =
+      (s as { displayAlias?: string | null } | undefined)?.displayAlias ||
+      s?.name ||
+      "";
+    const next = window.prompt(
+      "표시 이름(별칭)을 입력하세요. 전략 ID·해시는 변경되지 않습니다.",
+      current,
+    );
+    if (next == null) return;
+    const trimmed = next.trim().slice(0, 120);
+    if (!trimmed) {
+      setMessage("표시 이름이 비어 있습니다.");
+      return;
+    }
+    setBusyId(id);
+    try {
+      const beforeHash = s?.paramsHash;
+      const res = await fetch("/api/rextora/strategies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "rename_display",
+          id,
+          displayAlias: trimmed,
+          displayName: trimmed,
+        }),
+      });
+      const json = await res.json();
+      if (!json.ok) {
+        setMessage(json.error ?? "이름 변경 실패");
+        return;
+      }
+      if (beforeHash && json.data?.paramsHash !== beforeHash) {
+        setMessage("오류: 이름 변경이 해시를 바꿨습니다.");
+        return;
+      }
+      setMessage(`별칭을 "${trimmed}"(으)로 저장했습니다.`);
+      await refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function updateAutomaticAlias(
+    id: string,
+    action: "restore_alias" | "regenerate_auto_name",
+  ) {
+    if (id === SAFE_STRATEGY_ID) {
+      setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
+      return;
+    }
+    setBusyId(id);
+    try {
+      const res = await fetch("/api/rextora/strategies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, id }),
+      });
+      const json = await res.json();
+      setMessage(
+        json.ok
+          ? action === "restore_alias"
+            ? "사용자 별칭을 복원했습니다. 표시 이름은 유지됩니다."
+            : "자동 이름을 다시 생성했습니다. 사용자 표시 이름은 덮어쓰지 않았습니다."
+          : (json.error ?? "별칭 변경 실패"),
+      );
+      if (json.ok) await refresh();
     } finally {
       setBusyId(null);
     }
@@ -681,7 +791,10 @@ export function ResultsWorkbench() {
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
             <Link
-              href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(s.paramsHash)}&symbol=${encodeURIComponent(
+              href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(
+                (s as StrategyRow & { strategyHash?: string }).strategyHash ??
+                  s.paramsHash,
+              )}&symbol=${encodeURIComponent(
                 (s as { symbols?: string[] }).symbols?.[0] ?? "BTCUSDT",
               )}&timeframe=${encodeURIComponent(
                 (s as { timeframe?: string }).timeframe ?? "15m",
@@ -1271,7 +1384,12 @@ export function ResultsWorkbench() {
                   </Button>
                 ))}
               </div>
-              {filtered.length === 0 ? (
+              {libraryLoadState === "loading" ? (
+                <EmptyState
+                  message="전략 라이브러리를 불러오는 중입니다…"
+                  hint="잠시만 기다려 주세요."
+                />
+              ) : filtered.length === 0 ? (
                 <EmptyState message="표시할 전략이 없습니다." />
               ) : (
                 <div className="space-y-2" data-testid="library-compact-list">
@@ -1293,8 +1411,19 @@ export function ResultsWorkbench() {
                       >
                         <div className="min-w-0">
                           <div className="text-sm font-medium text-slate-100">
-                            {s.name}
+                            {(s as {
+                              displayAlias?: string | null;
+                              displayName?: string | null;
+                            }).displayAlias ||
+                              (s as { displayName?: string | null }).displayName ||
+                              s.name}
                           </div>
+                          {(s as { displayAlias?: string | null })
+                            .displayAlias &&
+                          (s as { displayAlias?: string | null }).displayAlias !==
+                            s.name ? (
+                            <div className="text-xs text-slate-500">{s.name}</div>
+                          ) : null}
                           <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-400">
                             <Badge tone="muted">{metricState}</Badge>
                             <span>
@@ -1336,8 +1465,51 @@ export function ResultsWorkbench() {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              busyId === s.id || s.id === SAFE_STRATEGY_ID
+                            }
+                            onClick={() => void renameDisplay(s.id)}
+                            data-testid={`library-rename-${s.id}`}
+                          >
+                            이름 변경
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              busyId === s.id || s.id === SAFE_STRATEGY_ID
+                            }
+                            onClick={() =>
+                              void updateAutomaticAlias(s.id, "restore_alias")
+                            }
+                            data-testid={`library-restore-alias-${s.id}`}
+                          >
+                            별칭 복원
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              busyId === s.id || s.id === SAFE_STRATEGY_ID
+                            }
+                            onClick={() =>
+                              void updateAutomaticAlias(
+                                s.id,
+                                "regenerate_auto_name",
+                              )
+                            }
+                            data-testid={`library-regenerate-name-${s.id}`}
+                          >
+                            자동 이름 재생성
+                          </Button>
                           <Link
-                            href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(s.paramsHash)}`}
+                            href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(
+                              (s as StrategyRow & { strategyHash?: string })
+                                .strategyHash ?? s.paramsHash,
+                            )}`}
                             data-testid="results-row-backtest-handoff"
                           >
                             <Button size="sm">새 기간으로 백테스트</Button>

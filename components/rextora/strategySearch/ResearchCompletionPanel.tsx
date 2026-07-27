@@ -24,11 +24,11 @@ function BigStat(props: {
 }) {
   return (
     <div
-      className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-4"
+      className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3"
       data-testid={props.testId}
     >
       <div className="ss-field-label text-emerald-100/80">{props.label}</div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-[var(--text-primary)]">
+      <div className="mt-1.5 text-xl font-semibold tabular-nums tracking-tight text-[var(--text-primary)]">
         {props.value}
       </div>
       {props.help ? (
@@ -36,6 +36,34 @@ function BigStat(props: {
       ) : null}
     </div>
   );
+}
+
+function completionHeaderKo(input: {
+  status: string;
+  passCount: number;
+  titleKo?: string | null;
+  completionReason?: string | null;
+}): string {
+  if (input.titleKo) {
+    if (/cancelled|USER_CANCELLED|cancel/i.test(input.titleKo)) {
+      return "사용자 중지";
+    }
+    return input.titleKo;
+  }
+  if (input.status === "failed" && input.passCount > 0) return "부분 완료";
+  if (input.status === "failed") return "실패";
+  if (input.status === "paused" || input.completionReason === "PAUSED") {
+    return "일시정지";
+  }
+  if (
+    input.status === "cancelled" ||
+    input.status === "cancelling" ||
+    input.status === "cancel_requested"
+  ) {
+    return "사용자 중지";
+  }
+  if (input.status === "completed") return "정상 완료";
+  return "연구 종료";
 }
 
 export function ResearchCompletionPanel(props: {
@@ -54,12 +82,20 @@ export function ResearchCompletionPanel(props: {
   );
 
   useEffect(() => {
+    const controller = new AbortController();
     const boot = window.setTimeout(() => {
-      void fetchResearchResultsSummary(job.id)
+      void fetchResearchResultsSummary(job.id, controller.signal)
         .then((data) => setSummary(data))
-        .catch(() => setSummary(null));
+        .catch((error) => {
+          if (!(error instanceof DOMException && error.name === "AbortError")) {
+            setSummary(null);
+          }
+        });
     }, 0);
-    return () => window.clearTimeout(boot);
+    return () => {
+      window.clearTimeout(boot);
+      controller.abort();
+    };
   }, [job.id]);
 
   const activelyRunning =
@@ -88,32 +124,19 @@ export function ResearchCompletionPanel(props: {
   }
 
   const outcome = summary?.outcome;
-  const title =
-    outcome?.titleKo ??
-    (job.status === "failed" && passCount > 0
-      ? "부분 결과"
-      : job.status === "failed"
-        ? "실패"
-        : job.status === "paused" || job.completionReason === "PAUSED"
-          ? "일시정지"
-          : job.status === "cancel_requested"
-            ? "중지 요청 중"
-            : job.status === "cancelling"
-              ? "결과 정리 중"
-              : job.status === "cancelled"
-                ? "사용자 중지"
-                : job.status === "completed"
-                  ? "AI 연구 완료"
-                  : "연구 종료");
+  const title = completionHeaderKo({
+    status: job.status,
+    passCount,
+    titleKo: outcome?.titleKo,
+    completionReason: job.completionReason,
+  });
   const detail =
     outcome?.detailKo ??
-    (job.status === "cancelled"
+    (job.status === "cancelled" ||
+    job.status === "cancelling" ||
+    job.status === "cancel_requested"
       ? "결과가 안전하게 보존되었습니다."
-      : job.status === "cancelling"
-        ? "중지 후 결과를 정리하는 중입니다."
-        : job.status === "cancel_requested"
-          ? "중지 요청이 접수되었습니다."
-          : null);
+      : null);
 
   const reason = resolveDisplayTerminationReason({
     status: job.status,
@@ -141,17 +164,11 @@ export function ResearchCompletionPanel(props: {
   const finalEligible = counts?.stageFinalRecommendable ?? null;
   const usable = outcome?.usable ?? passCount > 0;
 
-  const finalizedReturn = formatPct(
-    summary?.finalizedBest?.netReturn ?? summary?.topProfit?.netReturn ?? null,
-  );
-  const liveReturn = formatPct(
-    summary?.liveSearchBest?.netReturn ?? job.bestReturn ?? null,
-  );
-  const finalizedName = summary?.finalizedBest?.readableName
-    ? cleanStrategyDisplayName(summary.finalizedBest.readableName)
-    : summary?.topProfit?.readableName
-      ? cleanStrategyDisplayName(summary.topProfit.readableName)
-      : null;
+  const topEntries = (job.liveTop10?.entries ?? []).slice(0, 3);
+  const mergedTop = topEntries.map((row) => ({
+    ...row,
+    badges: Array.from(new Set(row.roleBadges ?? [])),
+  }));
 
   const canResume =
     Boolean(props.onResume) &&
@@ -159,10 +176,11 @@ export function ResearchCompletionPanel(props: {
 
   return (
     <section
-      className="rextora-card space-y-6 border border-emerald-500/30 bg-emerald-500/5 p-6"
+      className="rextora-card space-y-5 border border-emerald-500/30 bg-emerald-500/5 p-6"
       data-testid="ss-research-completion"
       aria-labelledby="ss-research-completion-title"
     >
+      {/* 1. Completion Header */}
       <div>
         <h3 id="ss-research-completion-title" className="ss-section-title">
           {title}
@@ -172,26 +190,28 @@ export function ResearchCompletionPanel(props: {
           data-testid="ss-completion-status-line"
         >
           {detail ?? status}
-          {reason ? ` · ${reason}` : ""}
+          {reason && !/USER_|cancelled|summary\./i.test(reason)
+            ? ` · ${reason}`
+            : ""}
           {elapsed ? ` · ${elapsed}` : ""}
         </p>
         <p
-          className="mt-2 text-sm text-emerald-50/90"
+          className="mt-1 text-sm text-emerald-50/90"
           data-testid="ss-completion-result-equation"
         >
-          원본 상태 {job.status}
-          {job.completionReason ? ` · ${job.completionReason}` : ""} · 합격
-          전략은 trial 기록이며 전략 라이브러리 등록은 별도입니다.
-          {usable ? " · 결과 사용 가능" : " · 사용 가능한 합격 결과 없음"}
+          {usable
+            ? "결과가 보존되었습니다. 합격 trial은 등록과 별개입니다."
+            : "사용 가능한 합격 결과가 없습니다."}
         </p>
       </div>
 
+      {/* 2. Key Result Summary — max 6 */}
       <div
         className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
         data-testid="ss-completion-primary-metrics"
       >
         <BigStat
-          label="평가 전략"
+          label="평가"
           value={`${formatCount(tested)}개`}
           testId="ss-completion-tested"
         />
@@ -199,150 +219,94 @@ export function ResearchCompletionPanel(props: {
           label="기본 합격"
           value={`${formatCount(qualified)}개`}
           testId="ss-completion-approved"
-          help="기본 조건 통과 trial 수 · 자동 등록되지 않습니다"
         />
         <BigStat
-          label="최종 추천 가능"
+          label="최종 적격"
           value={
             finalEligible != null
               ? `${formatCount(finalEligible)}개`
               : recommendable != null
                 ? `${formatCount(recommendable)}개`
-                : "없음"
+                : "0개"
           }
           testId="ss-completion-final-eligible"
         />
         <BigStat
-          label="TOP 10 저장"
+          label="TOP 10"
           value={
-            top10Saved != null ? `${formatCount(top10Saved)}개` : "없음"
+            top10Saved != null ? `${formatCount(top10Saved)}개` : "0개"
           }
           testId="ss-completion-top10-saved"
-          help="장기 저장 단기 후보 · 최대 10개"
         />
         <BigStat
-          label="등록 전략"
+          label="등록"
           value={`${formatCount(registered)}개`}
           testId="ss-completion-registered"
         />
         <BigStat
           label="백테스트 추천"
-          value={backtestRec != null ? `${formatCount(backtestRec)}개` : "없음"}
+          value={
+            backtestRec != null ? `${formatCount(backtestRec)}개` : "0개"
+          }
           testId="ss-completion-backtest-rec"
         />
       </div>
 
-      {usable && counts ? (
-        <LifecycleNextActionsPanel counts={counts} />
-      ) : null}
-
-      {job.liveTop10?.phase === "final" &&
-      (job.liveTop10.finalVsLive?.length ?? 0) > 0 ? (
-        <div
-          className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3"
-          data-testid="ss-completion-final-vs-live"
-        >
-          <div className="ss-field-label text-emerald-100/80">
-            실시간 순위 → 최종 순위
-          </div>
-          <ul className="mt-2 space-y-1 text-sm text-[var(--text-primary)]">
-            {job.liveTop10.finalVsLive!.slice(0, 10).map((row) => (
-              <li key={row.strategyHash}>
-                {row.strategyHash.slice(0, 8)}… · 실시간{" "}
-                {row.liveRank != null ? `${row.liveRank}위` : "—"} → 최종{" "}
-                {row.finalRank != null ? `${row.finalRank}위` : "제외"}
-                {row.exclusionReasonKo ? ` (${row.exclusionReasonKo})` : ""}
+      {/* 3. Final Top 3 — only when qualified; else temporary non-qualified best */}
+      {qualified > 0 && mergedTop.length > 0 ? (
+        <div data-testid="ss-completion-final-top3">
+          <div className="ss-field-label text-emerald-100/80">최종 TOP 3</div>
+          <ul className="mt-2 space-y-2">
+            {mergedTop.map((row) => (
+              <li
+                key={`${row.rank}-${row.strategyHash}`}
+                className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {row.rank}.{" "}
+                    {cleanStrategyDisplayName(row.displayAlias) ||
+                      row.readableName}
+                  </span>
+                  <span className="tabular-nums text-emerald-100">
+                    {formatPct(row.netReturn)} · MDD{" "}
+                    {formatPct(row.maxDrawdown)}
+                  </span>
+                </div>
+                {row.badges.length > 0 ? (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {row.badges.map((b) => (
+                      <span
+                        key={b}
+                        className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[11px] text-emerald-50"
+                      >
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
         </div>
+      ) : qualified === 0 &&
+        (job.currentBestSummary || mergedTop.length > 0) ? (
+        <div data-testid="ss-completion-temporary-best">
+          <div className="ss-field-label text-amber-100/90">
+            임시 평가 상위 후보 — 합격 아님
+          </div>
+          <p className="mt-1 text-sm text-slate-300">
+            {cleanStrategyDisplayName(job.currentBestSummary) ||
+              (mergedTop[0]
+                ? cleanStrategyDisplayName(mergedTop[0].displayAlias) ||
+                  mergedTop[0].readableName
+                : "평가된 합격 전략이 없습니다.")}
+          </p>
+        </div>
       ) : null}
 
-      <details className="text-xs text-emerald-100/70" data-testid="ss-completion-details">
-        <summary className="cursor-pointer select-none">
-          최고 수익 · 연구 상세 · 기술 종료 정보
-        </summary>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <BigStat
-            label="최종 정리 후 최고"
-            value={finalizedReturn ?? "없음"}
-            testId="ss-completion-finalized-best"
-            help={
-              summary?.finalizedBest?.explanationKo ??
-              "유사 전략 정리와 최종 순위 계산 후 선정된 최고 전략"
-            }
-          />
-          <BigStat
-            label="실시간 탐색 최고"
-            value={liveReturn ?? "없음"}
-            testId="ss-completion-live-best"
-            help={
-              summary?.liveSearchBest?.explanationKo ??
-              "탐색 중 마지막으로 기록된 최고 전략"
-            }
-          />
-          <BigStat
-            label="최고 안정"
-            value={
-              summary?.topStable
-                ? (formatPct(summary.topStable.maxDrawdown) ?? "없음")
-                : "추천 가능한 안정 전략 없음"
-            }
-            testId="ss-completion-best-stable"
-          />
-          <BigStat
-            label="최종 추천 가능 여부"
-            value={
-              summary?.topRecommend
-                ? summary.topRecommend.displayAlias ||
-                  summary.topRecommend.readableName
-                : "추천 가능한 안정 전략 없음"
-            }
-            testId="ss-completion-final-recommend"
-          />
-          <BigStat
-            label="연구 시간"
-            value={elapsed ?? "없음"}
-            testId="ss-completion-time"
-          />
-          <BigStat
-            label="최종 정리 최고 전략"
-            value={finalizedName ?? "없음"}
-            testId="ss-completion-best-name"
-          />
-          <BigStat
-            label="실제 심볼"
-            value={(job.symbols ?? []).join(", ") || "없음"}
-            testId="ss-completion-symbols"
-          />
-          <BigStat
-            label="연구 상태"
-            value={status}
-            testId="ss-completion-research-status"
-          />
-          {job.candidateBudget != null ? (
-            <BigStat
-              label="자원 안전 제한"
-              value={`${formatCount(job.candidateBudget)}개 (정상 종료 조건 아님)`}
-              testId="ss-completion-budget"
-            />
-          ) : null}
-        </div>
-        <p className="mt-2">
-          실시간 탐색 최고 {liveReturn ?? "없음"}
-          {summary?.liveSearchBest?.paramsHash
-            ? ` · hash ${summary.liveSearchBest.paramsHash}`
-            : ""}
-        </p>
-        <p>
-          최종 정리 후 최고 {finalizedReturn ?? "없음"}
-          {summary?.finalizedBest?.paramsHash
-            ? ` · hash ${summary.finalizedBest.paramsHash}`
-            : ""}
-        </p>
-      </details>
-
-      <div className="flex flex-wrap gap-2">
+      {/* 4. Primary next action */}
+      <div className="flex flex-wrap items-center gap-2">
         <Link
           href={resultsHref}
           className={`ss-btn-primary inline-flex items-center rounded-lg border px-4 py-3 text-base font-semibold ${
@@ -352,58 +316,20 @@ export function ResearchCompletionPanel(props: {
           }`}
           data-testid="ss-completion-open-results"
         >
-          탐색 결과 확인
+          최종 TOP 10 검토
         </Link>
         {(usableForHandoff || usable) ? (
           <p
-            className="flex items-center text-sm text-emerald-100/80"
+            className="text-sm text-emerald-100/80"
             data-testid="ss-completion-handoff-hint"
           >
-            자동 이동하지 않습니다. 원할 때 「탐색 결과 확인」으로 이동하세요.
+            자동 이동하지 않습니다.
           </p>
         ) : null}
-        {recommendable != null && recommendable > 0 ? (
-          <Link
-            href={`/results?jobId=${encodeURIComponent(props.job.id)}`}
-            className="ss-btn-primary inline-flex items-center rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sky-100"
-            data-testid="ss-completion-backtest-recommended"
-          >
-            백테스트
-          </Link>
-        ) : null}
-        <Link
-          href="/paper-trading"
-          className="ss-btn-primary inline-flex items-center rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-slate-100"
-          data-testid="ss-completion-paper"
-        >
-          모의매매
-        </Link>
-        <Link
-          href="/live-trading"
-          className="ss-btn-primary inline-flex items-center rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-slate-100"
-          data-testid="ss-completion-live"
-        >
-          실전 검토
-        </Link>
-        {canResume ? (
-          <Button
-            type="button"
-            className="ss-btn-primary"
-            data-testid="ss-completion-resume"
-            onClick={() => props.onResume?.()}
-          >
-            이어서 탐색
-          </Button>
-        ) : null}
-        <Button
-          type="button"
-          variant="ghost"
-          className="ss-btn-primary"
-          data-testid="ss-completion-new-research"
-          onClick={onNewResearch}
-        >
-          새 탐색 시작
-        </Button>
+      </div>
+
+      {/* 5. Secondary actions */}
+      <div className="flex flex-wrap gap-2">
         {passCount > 0 && props.onPromoteTop ? (
           <Button
             type="button"
@@ -411,7 +337,7 @@ export function ResearchCompletionPanel(props: {
             data-testid="ss-completion-promote-top"
             onClick={props.onPromoteTop}
           >
-            상위 전략 일괄 등록
+            추천 전략 등록
           </Button>
         ) : null}
         {passCount > 0 && props.onRegisterBest ? (
@@ -424,19 +350,117 @@ export function ResearchCompletionPanel(props: {
             최고 전략 등록
           </Button>
         ) : null}
+        {recommendable != null && recommendable > 0 ? (
+          <Link
+            href={`/backtest?sourceResearchJobId=${encodeURIComponent(job.id)}`}
+            className="ss-btn-primary inline-flex items-center rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sky-100"
+            data-testid="ss-completion-backtest-recommended"
+          >
+            새 기간으로 백테스트
+          </Link>
+        ) : null}
+        {canResume ? (
+          <Button
+            type="button"
+            className="ss-btn-primary"
+            data-testid="ss-completion-resume"
+            onClick={() => props.onResume?.()}
+          >
+            개선 탐색
+          </Button>
+        ) : null}
+        <Button
+          type="button"
+          variant="ghost"
+          className="ss-btn-primary"
+          data-testid="ss-completion-new-research"
+          onClick={onNewResearch}
+        >
+          새 탐색 시작
+        </Button>
       </div>
-      <p
-        className="text-xs text-emerald-100/70"
-        data-testid="ss-completion-next-workflow"
-      >
-        다음 워크플로: 백테스트 → 모의매매 → 실전 검토 (자동 이동 없음)
-      </p>
-      {canResume ? (
-        <p className="text-xs text-emerald-100/80" data-testid="ss-resume-policy">
-          이어서 탐색: 기존 마감 시각을 유지하고, 이미 본 후보 해시는 건너뜁니다.
-          새 탐색 시작을 고르면 새 설정·새 마감으로 시작합니다.
-        </p>
+
+      {/* 6. Lifecycle Progress — compact */}
+      {usable && counts ? (
+        <div data-testid="ss-completion-lifecycle">
+          <LifecycleNextActionsPanel counts={counts} compact />
+        </div>
       ) : null}
+
+      {/* 7. Research details — collapsed */}
+      <details
+        className="text-xs text-emerald-100/70"
+        data-testid="ss-completion-details"
+      >
+        <summary className="cursor-pointer select-none">연구 상세</summary>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <BigStat
+            label="최종 정리 후 최고"
+            value={
+              formatPct(
+                summary?.finalizedBest?.netReturn ??
+                  summary?.topProfit?.netReturn ??
+                  null,
+              ) ?? "없음"
+            }
+            testId="ss-completion-finalized-best"
+          />
+          <BigStat
+            label="실시간 탐색 최고"
+            value={
+              formatPct(
+                summary?.liveSearchBest?.netReturn ?? job.bestReturn ?? null,
+              ) ?? "없음"
+            }
+            testId="ss-completion-live-best"
+          />
+          <BigStat
+            label="최고 안정"
+            value={
+              summary?.topStable
+                ? (formatPct(summary.topStable.maxDrawdown) ?? "없음")
+                : "없음"
+            }
+            testId="ss-completion-best-stable"
+          />
+          <BigStat
+            label="연구 시간"
+            value={elapsed ?? "없음"}
+            testId="ss-completion-time"
+          />
+          <BigStat
+            label="심볼"
+            value={(job.symbols ?? []).join(", ") || "없음"}
+            testId="ss-completion-symbols"
+          />
+          <BigStat
+            label="연구 상태"
+            value={status}
+            testId="ss-completion-research-status"
+          />
+        </div>
+      </details>
+
+      {/* 8. Technical details — collapsed */}
+      <details
+        className="text-xs text-emerald-100/60"
+        data-testid="ss-completion-tech-details"
+      >
+        <summary className="cursor-pointer select-none">개발자 정보</summary>
+        <div className="mt-2 space-y-1 font-mono">
+          <p>jobId: {job.id}</p>
+          <p>status: {job.status}</p>
+          {job.completionReason ? (
+            <p>completionReason: {job.completionReason}</p>
+          ) : null}
+          {job.terminationReason ? (
+            <p>terminationReason: {job.terminationReason}</p>
+          ) : null}
+          {summary?.finalizedBest?.paramsHash ? (
+            <p>finalizedHash: {summary.finalizedBest.paramsHash}</p>
+          ) : null}
+        </div>
+      </details>
     </section>
   );
 }

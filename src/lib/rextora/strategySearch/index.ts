@@ -193,6 +193,7 @@ export {
   transitionJobToCompleted,
   transitionJobToFailed,
   transitionJobToPauseRequested,
+  transitionJobCooperativelyPaused,
   transitionJobToPaused,
   transitionJobToQueued,
   transitionJobToRunning,
@@ -287,12 +288,28 @@ export type { SearchJobExecutionDeps } from "./jobExecutionRegistry";
 export {
   StrategySearchExecutionRegistryError,
   isSearchJobExecutionActive,
+  isSearchJobExecutionWorkerActive,
   listActiveSearchJobExecutions,
   resetSearchJobExecutionRegistryForTests,
   setDefaultSearchJobExecutionDepsForTests,
   startSearchJobExecution,
   waitForSearchJobExecution,
 } from "./jobExecutionRegistry";
+
+export type {
+  JobExecutionOwnershipAuditRecord,
+  JobExecutionOwnershipRecord,
+} from "./jobExecutionOwnership";
+export {
+  acquireJobExecutionOwnership,
+  getJobExecutionOwnership,
+  getProcessExecutionOwnerId,
+  isJobExecutionOwnedOnDisk,
+  listJobExecutionOwnershipAudits,
+  recoverStaleJobExecutionOwnership,
+  releaseJobExecutionOwnership,
+  resetJobExecutionOwnershipForTests,
+} from "./jobExecutionOwnership";
 
 export type {
   StrategySearchApiErrorCode,
@@ -348,11 +365,13 @@ export type {
 export {
   SAFETY_BUDGET_CEILING,
   activeElapsedMs,
+  computeExpectedCompletionAtMs,
   createEmptySearchPlan,
   getSearchPlan,
   markPlanPaused,
   markPlanResumed,
   saveSearchPlan,
+  syncPlanTimingFields,
   replenishDeadlineBudget,
 } from "./searchPlan";
 
@@ -483,6 +502,56 @@ export type {
 } from "./strategyDeletionSafety";
 
 export { isProvenanceDetached } from "./researchProvenance";
+
+export {
+  PATTERN_COMBINATION_VERSION,
+  PATTERN_COMBINATION_TEMPLATES,
+  buildCombinationSpec,
+  buildCombinedEventSequence,
+  validatePatternCombination,
+  combinationParamsForCandidate,
+  combinationLabelKo,
+  resolveCombinationFromParams,
+  defaultFamiliesForTemplate,
+  mutateCombinationParams,
+  normalizePatternCombinationSpec,
+  isPatternCombinationTemplateId,
+  isPatternCombinationOperator,
+} from "./patternCombination";
+export type {
+  PatternCombinationSpec,
+  PatternCombinationBlock,
+  PatternCombinationOperator,
+  PatternCombinationTemplateId,
+  PatternBlockRole,
+  PatternInvalidationMode,
+} from "./patternCombination";
+
+export {
+  PATTERN_PARAMETER_CATALOG,
+  catalogDefaultsForPatternFamily,
+  catalogForPatternFamily,
+  catalogRangesForPatternFamily,
+} from "./patternParameterCatalog";
+
+export {
+  PATTERN_SEARCH_SPACE_IDS,
+  SUPPLY_DEMAND_BASE_PARAMS,
+  SUPPLY_DEMAND_SEARCH_SPACE,
+  baseParamsForPatternSpaceId,
+  rangesForPatternSpaceId,
+  readSupplyDemandParams,
+  supplyDemandSearchRanges,
+} from "./patternSearchSpaces";
+export type {
+  PatternSearchFamilyId,
+  SupplyDemandSearchParams,
+} from "./patternSearchSpaces";
+export type {
+  PatternParameterCatalogEntry,
+  PatternParameterType,
+  PatternParameterValue,
+} from "./patternParameterCatalog";
 
 export {
   previewResearchJobDeletion,

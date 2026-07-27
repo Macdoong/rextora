@@ -250,10 +250,11 @@ export async function promoteStrategySearchTrials(
 
 export async function fetchResearchResultsSummary(
   jobId: string,
+  signal?: AbortSignal,
 ): Promise<ResearchResultsSummaryView> {
   const res = await fetch(
     `${BASE}/${encodeURIComponent(jobId)}/results-summary`,
-    { cache: "no-store" },
+    { cache: "no-store", signal },
   );
   return parseEnvelope(res);
 }

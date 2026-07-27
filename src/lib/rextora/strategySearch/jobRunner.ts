@@ -35,6 +35,7 @@ import {
   getSearchJob,
   getSearchTrial,
   saveSearchTrial,
+  StrategySearchPersistenceError,
   updateSearchCheckpoint,
   type StrategySearchStoreOptions,
 } from "./jobStore";
@@ -64,7 +65,7 @@ import {
   transitionJobToCompleted,
   transitionJobToFailed,
   transitionJobToPauseRequested,
-  transitionJobToPaused,
+  transitionJobCooperativelyPaused,
   transitionJobToQueued,
   transitionJobToRunning,
 } from "./jobState";
@@ -159,6 +160,24 @@ function cloneBest(
   ref: StrategySearchBestCandidateReference | null,
 ): StrategySearchBestCandidateReference | null {
   return ref ? { ...ref } : null;
+}
+
+function persistSearchTrialSafe(
+  trial: StrategySearchTrial,
+  store?: StrategySearchStoreOptions,
+): "saved" | "conflict" {
+  try {
+    saveSearchTrial(trial, store);
+    return "saved";
+  } catch (err) {
+    if (
+      err instanceof StrategySearchPersistenceError &&
+      err.code === "TRIAL_CONFLICT"
+    ) {
+      return "conflict";
+    }
+    throw err;
+  }
 }
 
 async function persistCheckpointWithRetry(
@@ -462,7 +481,7 @@ export async function runSearchJob(
           store,
           maxCheckpointRetries,
         );
-        job = transitionJobToPaused(job.id, store);
+        job = transitionJobCooperativelyPaused(job.id, store);
         return {
           job,
           statistics,
@@ -667,10 +686,9 @@ export async function runSearchJob(
             stopReason: "search_space_exhausted",
           };
         }
-        // Recoverable candidate generation errors (e.g. OUT_OF_RANGE after
-        // space mutation) must not kill the Research Job.
-        if (isRecoverableGenerationError(err)) {
-          const classified = classifyEngineError(err, "candidate_generation");
+        const classified = classifyEngineError(err, "candidate_generation");
+        // Recoverable candidate generation errors must not kill the Research Job.
+        if (isRecoverableGenerationError(err) || !classified.fatal) {
           statistics = recordError(statistics);
           statistics = recordEvaluation(statistics, {
             score: null,
@@ -705,7 +723,7 @@ export async function runSearchJob(
               },
             ],
           };
-          saveSearchTrial(invalidTrial, store);
+          persistSearchTrialSafe(invalidTrial, store);
           completed += 1;
           iteration += 1;
           iterationsThisRun += 1;
@@ -738,7 +756,6 @@ export async function runSearchJob(
           );
           continue;
         }
-        const classified = classifyEngineError(err, "candidate_generation");
         throw new StrategySearchJobRunnerError(
           "FATAL",
           `[${classified.class}/${classified.stage}] ${classified.message}`,
@@ -816,7 +833,40 @@ export async function runSearchJob(
         failureReasons,
         durationMs,
       });
-      saveSearchTrial(trial, store);
+      if (persistSearchTrialSafe(trial, store) === "conflict") {
+        statistics = recordError(statistics);
+        completed += 1;
+        iteration += 1;
+        iterationsThisRun += 1;
+        statistics = recordElapsed(
+          statistics,
+          Date.now() - startedMs,
+          completed,
+          maxIterations,
+        );
+        payload = {
+          version: 1,
+          prng: random.getState(),
+          statistics: { ...statistics },
+          seenHashes: [...seenHashes],
+          lastParentCandidateId: lastParent?.candidateId ?? null,
+          lastParentParamsHash: lastParent?.paramsHash ?? null,
+          jobStatus: "running",
+        };
+        job = await persistCheckpointWithRetry(
+          job.id,
+          buildPersistedCheckpoint({
+            completedIterations: completed,
+            nextIteration: iteration,
+            payload,
+            bestCandidate,
+            bestPassedCandidate,
+          }),
+          store,
+          maxCheckpointRetries,
+        );
+        continue;
+      }
 
       // Live Top-10: refresh when enough new qualified candidates appear.
       if (
@@ -914,7 +964,7 @@ export async function runSearchJob(
           store,
           maxCheckpointRetries,
         );
-        job = transitionJobToPaused(job.id, store);
+        job = transitionJobCooperativelyPaused(job.id, store);
         if (plan) {
           saveSearchPlan(job.id, markPlanPaused(plan), store);
         }

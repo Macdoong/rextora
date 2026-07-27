@@ -9,6 +9,7 @@ import {
   saveStrategy,
   setLiveActiveStrategy,
   setPaperActiveStrategy,
+  updateStrategyDisplayMeta,
   validateStrategyById
 } from "@/src/lib/rextora/strategy/strategyStore";
 import {
@@ -22,6 +23,7 @@ import type { CanonicalStrategyDefinition } from "@/src/lib/rextora/strategy/def
 import { getSafeParamCatalog } from "@/src/lib/rextora/strategy/definition/safeParamCatalog";
 import { StrategyValidationError } from "@/src/lib/rextora/strategy/definition/validator";
 import { defaultDefinition } from "@/src/lib/rextora/strategy/definition/validator";
+import { buildComboAwareStrategyName } from "@/src/lib/rextora/strategySearch/readableStrategyName";
 
 function koreanError(error: unknown): string {
   if (error instanceof StrategyValidationError) return error.message;
@@ -66,11 +68,15 @@ export async function POST(request: Request) {
     patch?: Partial<{
       name: string;
       description: string;
+      displayAlias: string | null;
+      displayName: string | null;
       timeframe: StrategyTimeframe;
       params: SafeV44Params;
       definition: CanonicalStrategyDefinition;
       strategyType: "safe_params" | "condition_builder";
     }>;
+    displayAlias?: string | null;
+    displayName?: string | null;
     definition?: CanonicalStrategyDefinition;
     strategyType?: "safe_params" | "condition_builder";
     timeframe?: StrategyTimeframe;
@@ -113,6 +119,48 @@ export async function POST(request: Request) {
           ok: true,
           data: saveStrategy(body.id, body.patch ?? { params: body.params, definition: body.definition })
         });
+      case "rename_display": {
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        return NextResponse.json({
+          ok: true,
+          data: updateStrategyDisplayMeta(body.id, {
+            displayAlias:
+              body.displayAlias !== undefined
+                ? body.displayAlias
+                : body.patch?.displayAlias,
+            displayName:
+              body.displayName !== undefined
+                ? body.displayName
+                : body.patch?.displayName,
+            description: body.description ?? body.patch?.description,
+            name: body.name ?? body.patch?.name,
+          }),
+        });
+      }
+      case "restore_alias": {
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        return NextResponse.json({
+          ok: true,
+          data: updateStrategyDisplayMeta(body.id, { displayAlias: null }),
+        });
+      }
+      case "regenerate_auto_name": {
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const strategy = getStrategyById(body.id);
+        if (!strategy) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
+        const automaticName = buildComboAwareStrategyName({
+          params: strategy.params as unknown as Record<string, unknown>,
+          symbol: strategy.symbols?.[0] ?? "BTCUSDT",
+          timeframe: strategy.timeframe,
+        });
+        return NextResponse.json({
+          ok: true,
+          // Deliberately preserve editable displayName; regenerate alias only.
+          data: updateStrategyDisplayMeta(body.id, {
+            displayAlias: automaticName,
+          }),
+        });
+      }
       case "delete":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
         if (body.detachRefsFirst === true || body.includeRelatedRecords === true) {

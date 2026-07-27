@@ -216,13 +216,23 @@ function monthLabelKo(key: string): string {
   return `${y}년 ${Number(m)}월`;
 }
 
-function enrichTrade(t: BacktestTrade, index: number, intervalMs: number): EnrichedTrade {
+function enrichTrade(
+  t: BacktestTrade,
+  index: number,
+  intervalMs: number,
+  startingBalance = 0,
+): EnrichedTrade {
   const leverage = t.leverage || 1;
-  const margin =
+  let margin =
     t.marginUsdt ??
     (t.quantity && t.entryPrice
       ? (t.quantity * t.entryPrice) / leverage
       : 0);
+  // Event-sequence trades historically omitted ledger fields — derive from
+  // starting balance × default 2% risk so USDT PnL matches pnlPct.
+  if ((!margin || margin <= 0) && startingBalance > 0) {
+    margin = startingBalance * 0.02;
+  }
   // Prefer recorded USDT fields; otherwise derive from margin × rate × leverage
   const feePct = t.feePct || 0;
   const slipPct = t.slippagePct || 0;
@@ -596,7 +606,9 @@ export function buildVisualAnalysisModel(input: {
     /* keep default */
   }
 
-  const trades = input.trades.map((t, i) => enrichTrade(t, i, intervalMs));
+  const trades = input.trades.map((t, i) =>
+    enrichTrade(t, i, intervalMs, report.startingBalance ?? 0),
+  );
   const priceCandles = candlesToPoints(candles);
   const { sampled, applied } = sampleCandles(priceCandles);
   const costs = buildCostLedger(

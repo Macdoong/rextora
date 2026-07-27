@@ -26,6 +26,10 @@ import { getSearchPlan } from "./searchPlan";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import { describeLeverageFromParams } from "./leverageMode";
 import {
+  combinationLabelKo,
+  resolveCombinationFromParams,
+} from "./patternCombination";
+import {
   buildReadableStrategyIdentity,
   classifySafeV44Family,
   classifyStyleProfile,
@@ -82,6 +86,14 @@ export interface ResearchResultCard {
   maxDrawdown: number | null;
   tradeCount: number | null;
   profitFactor: number | null;
+  winRate?: number | null;
+  /** Computed only when an actual persisted return/equity series exists. */
+  sharpe?: number | null;
+  patternStack?: string;
+  confidence?: string;
+  risk?: string;
+  /** Bounded actual persisted series; null when the trial did not store one. */
+  miniSeries?: number[] | null;
   totalCost: number | null;
   costStatus: CostStatusKo;
   sampleConfidence: SampleConfidenceKo;
@@ -204,6 +216,8 @@ function primaryWindow(trial: StrategySearchTrial): {
   profitFactor: number | null;
   totalCost: number | null;
   winRate: number | null;
+  sharpe: number | null;
+  miniSeries: number[] | null;
 } {
   const w = (trial.windowResults?.[0] ?? {}) as Record<string, unknown>;
   const num = (k: string) =>
@@ -212,6 +226,72 @@ function primaryWindow(trial: StrategySearchTrial): {
       : null;
   // Prefer totalCost; fall back to totalCostUsdt when present in newer adapters.
   const totalCost = num("totalCost") ?? num("totalCostUsdt");
+  const rawSeries = (() => {
+    for (const key of ["equityCurve", "equity", "returns", "returnSeries"]) {
+      const value = w[key];
+      if (
+        Array.isArray(value) &&
+        value.length > 1 &&
+        value.every((item) => typeof item === "number" && Number.isFinite(item))
+      ) {
+        return value as number[];
+      }
+    }
+    const monthly = w.monthlyReturns;
+    if (Array.isArray(monthly)) {
+      const values = monthly
+        .map((item) =>
+          item &&
+          typeof item === "object" &&
+          typeof (item as { returnPct?: unknown }).returnPct === "number"
+            ? (item as { returnPct: number }).returnPct
+            : null,
+        )
+        .filter((item): item is number => item != null && Number.isFinite(item));
+      if (values.length > 1) return values;
+    }
+    return null;
+  })();
+  const isEquitySeries =
+    rawSeries != null &&
+    (w.equityCurve === rawSeries || w.equity === rawSeries);
+  const returns = rawSeries
+    ? isEquitySeries
+      ? rawSeries
+          .slice(1)
+          .map((value, index) =>
+            rawSeries[index] !== 0 ? value / rawSeries[index]! - 1 : 0,
+          )
+      : [...rawSeries]
+    : null;
+  const sharpe =
+    returns && returns.length > 1
+      ? (() => {
+          const mean =
+            returns.reduce((sum, value) => sum + value, 0) / returns.length;
+          const variance =
+            returns.reduce(
+              (sum, value) => sum + (value - mean) * (value - mean),
+              0,
+            ) /
+            (returns.length - 1);
+          const deviation = Math.sqrt(variance);
+          return deviation > 0
+            ? (mean / deviation) * Math.sqrt(returns.length)
+            : null;
+        })()
+      : null;
+  const miniSeries =
+    rawSeries == null
+      ? null
+      : rawSeries.length <= 30
+        ? [...rawSeries]
+        : Array.from({ length: 30 }, (_, index) => {
+            const sourceIndex = Math.round(
+              (index * (rawSeries.length - 1)) / 29,
+            );
+            return rawSeries[sourceIndex]!;
+          });
   return {
     totalReturn: num("totalReturn"),
     mdd: num("mdd"),
@@ -219,19 +299,22 @@ function primaryWindow(trial: StrategySearchTrial): {
     profitFactor: num("profitFactor"),
     totalCost,
     winRate: num("winRate"),
+    sharpe,
+    miniSeries,
   };
 }
 
 function stressPassedOf(trial: StrategySearchTrial): boolean | null {
   const rows = trial.costStressResults ?? [];
   if (rows.length === 0) return null;
-  return rows.every((r) => (r as { passed?: boolean }).passed !== false);
+  // Strict: every row must explicitly pass (matches weaknessAnalysis).
+  return rows.every((r) => (r as { passed?: boolean }).passed === true);
 }
 
 function jitterPassedOf(trial: StrategySearchTrial): boolean | null {
   const rows = trial.jitterResults ?? [];
   if (rows.length === 0) return null;
-  return rows.every((r) => (r as { passed?: boolean }).passed !== false);
+  return rows.every((r) => (r as { passed?: boolean }).passed === true);
 }
 
 function strengthWeakness(input: {
@@ -465,7 +548,12 @@ function toCard(
   const identity = buildReadableStrategyIdentity(
     trial.params as Record<string, unknown>,
     trial.paramsHash,
-    { includeSuffix: false },
+    {
+      includeSuffix: false,
+      symbol,
+      timeframe,
+      comboAware: true,
+    },
   );
   const hasStressEvidence = (trial.costStressResults?.length ?? 0) > 0;
   const hasAbsoluteCost =
@@ -509,6 +597,9 @@ function toCard(
   });
   const finalRecommendable =
     eligibility.eligible && stressPassed === true;
+  const combination = resolveCombinationFromParams(
+    trial.params as Record<string, unknown>,
+  );
   return {
     iteration: trial.iteration,
     candidateId: trial.candidateId,
@@ -526,6 +617,15 @@ function toCard(
     maxDrawdown: w.mdd,
     tradeCount: w.trades,
     profitFactor: w.profitFactor,
+    winRate: w.winRate,
+    sharpe: w.sharpe,
+    patternStack: combination
+      ? combinationLabelKo(combination)
+      : identity.readableName.split(" · ")[1] ?? identity.readableName,
+    confidence: sample.level,
+    risk:
+      jitterPassed == null ? "검증 대기" : jitterPassed ? "낮음" : "높음",
+    miniSeries: w.miniSeries,
     totalCost: w.totalCost,
     costStatus,
     sampleConfidence: sample.level,
@@ -824,12 +924,13 @@ export function buildResearchResultsSummary(
   ).length;
   const stageCostPassed = representatives.filter(
     (c) =>
-      c.costStatus === "비용 계산 완료" ||
       c.costStatus === "비용 스트레스 통과" ||
       c.stressPassed === true,
   ).length;
   const stageSampleOk = representatives.filter(
-    (c) => c.sampleConfidence === "표본 충분",
+    (c) =>
+      c.sampleConfidence === "표본 충분" ||
+      c.sampleConfidence === "표본 보통",
   ).length;
   const stageOverfitOk = representatives.filter(
     (c) =>
@@ -839,6 +940,14 @@ export function buildResearchResultsSummary(
     (c) => c.finalRecommendable,
   ).length;
 
+  const comboFamilies =
+    plan?.patternCombinationSpec?.blocks.map((b) => b.family) ??
+    plan?.patternCombinationFamilies ??
+    null;
+  const patternStackKey =
+    comboFamilies && comboFamilies.length > 0
+      ? `${plan?.patternCombinationOperator ?? "single"}:${comboFamilies.join("+")}`
+      : (plan?.spaces ?? []).map((s) => s.id).join("+") || "default";
   const scopeKey = buildResearchScopeKey({
     symbol,
     timeframe,
@@ -846,6 +955,7 @@ export function buildResearchResultsSummary(
     depthProfile: plan?.depthProfile ?? null,
     stressEnabled: true,
     jitterEnabled: true,
+    patternStackKey,
   });
   const previousSameScope = findLatestSameScopeTop10(scopeKey, jobId, options);
   const top10Snapshot = buildAndPersistResearchTop10({
@@ -1132,7 +1242,8 @@ export function registerTrialForBacktest(
   const timeframe = summary.timeframe;
   const qs = new URLSearchParams({
     strategyId: result.strategyId,
-    strategyHash: result.paramsHash,
+    strategyHash: result.strategyHash,
+    sourceParamsHash: result.sourceParamsHash ?? result.paramsHash,
     symbol,
     timeframe,
     sourceResearchJobId: jobId,

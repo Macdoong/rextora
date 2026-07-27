@@ -297,7 +297,8 @@ describe("distribution and holding reconciliation", () => {
       expect(trade?.exitTime).toBe(seg.exitTime);
     }
 
-    expect(result.report.strategyHash.startsWith("7893ca3f0e30")).toBe(true);
+    expect(result.report.strategyHash).toHaveLength(64);
+    expect(result.report.sourceParamsHash).toBe("7893ca3f0e30");
   });
 });
 

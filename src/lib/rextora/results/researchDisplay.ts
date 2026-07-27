@@ -14,6 +14,7 @@ export const SAMPLE_ELIGIBILITY_MIN_TRADES = 5;
 export type CostStatusKo =
   | "비용 계산 완료"
   | "비용 스트레스 통과"
+  | "비용 스트레스 미통과"
   | "비용 검증 대기"
   | "비용 데이터 없음"
   | "비용 계산 불가";
@@ -61,12 +62,12 @@ export function resolveCostStatus(input: {
   totalCost: number | null | undefined;
   stressPassed: boolean | null | undefined;
 }): CostStatusKo {
+  // Stress evidence is the recommendation gate — check before raw totalCost.
+  if (input.stressPassed === true) return "비용 스트레스 통과";
+  if (input.stressPassed === false) return "비용 스트레스 미통과";
   const cost = input.totalCost;
   if (cost != null && Number.isFinite(cost)) return "비용 계산 완료";
   if (cost != null && !Number.isFinite(cost)) return "비용 계산 불가";
-  // Stress evidence is the recommendation cost gate; absolute totalCost may be absent.
-  if (input.stressPassed === true) return "비용 스트레스 통과";
-  if (input.stressPassed === false) return "비용 검증 대기";
   return "비용 데이터 없음";
 }
 

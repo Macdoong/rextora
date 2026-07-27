@@ -9,7 +9,11 @@
  */
 
 import { listSearchJobs, type StrategySearchStoreOptions } from "./jobStore";
-import { isSearchJobExecutionActive } from "./jobExecutionRegistry";
+import {
+  isSearchJobExecutionActive,
+  isSearchJobExecutionWorkerActive,
+} from "./jobExecutionRegistry";
+import { recoverStaleJobExecutionOwnership } from "./jobExecutionOwnership";
 import { startStrategySearchJobApi } from "./jobApiService";
 import { recoverOrphanIndexEntries } from "./jobRecordRecovery";
 import { appendRecoveryAudit } from "./recoveryAudit";
@@ -22,6 +26,7 @@ export interface OrphanJobRecoveryResult {
   skipped: string[];
   recordRecovered: string[];
   cancelFinalized: string[];
+  ownershipRecovered: string[];
   errors: Array<{ jobId: string; message: string }>;
   audits: Array<{
     jobId: string;
@@ -64,6 +69,16 @@ export function recoverOrphanSearchJobs(
   }
 
   const cancelFinalized: string[] = [];
+  const ownershipRecovered: string[] = [];
+  // Phase A0 — drop stale cross-process owner leases before any resume attempt.
+  try {
+    ownershipRecovered.push(...recoverStaleJobExecutionOwnership(store));
+  } catch (e) {
+    errors.push({
+      jobId: "*",
+      message: e instanceof Error ? e.message : String(e),
+    });
+  }
   // Phase B — stale cancel_requested/cancelling with no active worker → cancelled.
   try {
     const cancelRecovery = recoverStaleCancelRequestedJobs({
@@ -106,7 +121,7 @@ export function recoverOrphanSearchJobs(
       skipped.push(job.id);
       continue;
     }
-    if (isSearchJobExecutionActive(job.id)) {
+    if (isSearchJobExecutionWorkerActive(job.id, store)) {
       skipped.push(job.id);
       continue;
     }
@@ -151,6 +166,7 @@ export function recoverOrphanSearchJobs(
     skipped,
     recordRecovered,
     cancelFinalized,
+    ownershipRecovered,
     errors,
     audits,
   };

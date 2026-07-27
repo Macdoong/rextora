@@ -9,7 +9,9 @@ import type {
 import {
   displayParamsHashLabel,
   displaySourceStatus,
+  displayStrategyHashLabel,
   displayTimeframeLabel,
+  formatShortHash,
   uiLabel,
 } from "@/src/lib/rextora/displayLabels";
 
@@ -168,7 +170,7 @@ export function StrategyManagerPanel() {
                 <th className="py-2">전략명</th>
                 <th>유형</th>
                 <th>시간봉</th>
-                <th>{displayParamsHashLabel()}</th>
+                <th>{displayStrategyHashLabel()}</th>
                 <th>최근 수익률</th>
                 <th>최대 낙폭</th>
                 <th>거래 수</th>
@@ -190,7 +192,9 @@ export function StrategyManagerPanel() {
                   </td>
                   <td>{s.type}</td>
                   <td>{displayTimeframeLabel(s.timeframe)}</td>
-                  <td className="font-mono text-xs">{s.paramsHash}</td>
+                  <td className="font-mono text-xs">
+                    {formatShortHash(s.strategyHash ?? s.paramsHash)}
+                  </td>
                   <td>
                     {s.lastBacktest
                       ? `${(s.lastBacktest.totalReturn * 100).toFixed(1)}%`
@@ -255,6 +259,12 @@ export function StrategyManagerPanel() {
                   : "미사용"}
               </div>
               <div>
+                {displayStrategyHashLabel()}:{" "}
+                <span className="font-mono">
+                  {formatShortHash(selected.strategyHash ?? selected.paramsHash)}
+                </span>
+              </div>
+              <div className="text-xs text-slate-500">
                 {displayParamsHashLabel()}:{" "}
                 <span className="font-mono">{selected.paramsHash}</span>
               </div>

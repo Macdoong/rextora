@@ -53,12 +53,54 @@ function formatSignedDelta(
   return `${sign}${delta.toFixed(2)}`;
 }
 
-function movementArrow(short: string): string {
-  if (short === "신규") return "NEW";
-  if (short === "상승") return "↑";
-  if (short === "하락") return "↓";
-  if (short === "유지") return "KEEP";
-  return short;
+function movementLabelKo(short: string): string {
+  if (short === "신규" || short === "NEW") return "신규";
+  if (short === "상승" || short === "↑") return "상승";
+  if (short === "하락" || short === "↓") return "하락";
+  if (short === "유지" || short === "KEEP") return "유지";
+  if (short === "제외") return "제외";
+  return short || "—";
+}
+
+function movementTone(short: string): string {
+  const label = movementLabelKo(short);
+  if (label === "신규") return "bg-sky-500/25 text-sky-100";
+  if (label === "상승") return "bg-emerald-500/25 text-emerald-100";
+  if (label === "하락") return "bg-amber-500/25 text-amber-100";
+  return "bg-slate-700/60 text-slate-200";
+}
+
+function MiniSeries({ values }: { values: number[] | null | undefined }) {
+  if (!values || values.length < 2) {
+    return <span aria-label="미니 차트 데이터 없음">—</span>;
+  }
+  const safe = values.filter(Number.isFinite).slice(0, 30);
+  if (safe.length < 2) return <span aria-label="미니 차트 데이터 없음">—</span>;
+  const min = Math.min(...safe);
+  const max = Math.max(...safe);
+  const span = max - min || 1;
+  const points = safe
+    .map(
+      (value, index) =>
+        `${(index / (safe.length - 1)) * 72},${22 - ((value - min) / span) * 20}`,
+    )
+    .join(" ");
+  return (
+    <svg
+      width="72"
+      height="24"
+      viewBox="0 0 72 24"
+      role="img"
+      aria-label="실제 저장 성과 미니 차트"
+    >
+      <polyline
+        points={points}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
 }
 
 function toneClass(ui: PipelineUiStatus): string {
@@ -252,16 +294,25 @@ export function SearchStatusCard(props: {
     failureMessage: job.failureMessage,
   });
   const earlyGoal = isEarlyFinishReason(job.completionReason);
+  const isTerminal =
+    job.status === "completed" ||
+    job.status === "cancelled" ||
+    job.status === "failed";
   const elapsed = formatMs(job.elapsedMs ?? stats?.elapsedMs ?? null);
-  const remaining = formatMs(job.remainingMs ?? stats?.remainingEstimateMs ?? null);
+  const remaining = isTerminal
+    ? null
+    : formatMs(job.remainingMs ?? stats?.remainingEstimateMs ?? null);
   const expectedCompletion =
-    job.expectedCompletionAtMs != null
-      ? new Date(job.expectedCompletionAtMs).toLocaleString("ko-KR")
-      : null;
+    isTerminal || job.expectedCompletionAtMs == null
+      ? null
+      : new Date(job.expectedCompletionAtMs).toLocaleString("ko-KR");
   const progressPct =
-    typeof job.progressRatio === "number" && Number.isFinite(job.progressRatio)
-      ? Math.max(0, Math.min(100, Math.round(job.progressRatio * 100)))
-      : null;
+    typeof job.overallProgressPct === "number" &&
+    Number.isFinite(job.overallProgressPct)
+      ? Math.max(0, Math.min(100, Math.round(job.overallProgressPct)))
+      : typeof job.progressRatio === "number" && Number.isFinite(job.progressRatio)
+        ? Math.max(0, Math.min(100, Math.round(job.progressRatio * 100)))
+        : null;
   const progressLine =
     progressPct != null
       ? "탐색 진행 " + String(progressPct) + "%"
@@ -273,13 +324,21 @@ export function SearchStatusCard(props: {
   const bestSummary = job.currentBestSummary
     ? cleanStrategyDisplayName(job.currentBestSummary)
     : null;
-  const currentStage = resolveCurrentStageLabelKo({
-    currentSearchFamily: job.currentSearchFamily,
-    currentImprovementStage: job.currentImprovementStage,
-    searchProgression: progression,
-    failedStage: job.failedStage,
-    status: job.status,
-  });
+  const combinationLabel =
+    job.currentCombinationLabel ??
+    (job.patternCombinationFamilies &&
+    job.patternCombinationFamilies.length > 1
+      ? job.patternCombinationFamilies.join(" + ")
+      : null);
+  const currentStage =
+    combinationLabel ??
+    resolveCurrentStageLabelKo({
+      currentSearchFamily: job.currentSearchFamily,
+      currentImprovementStage: job.currentImprovementStage,
+      searchProgression: progression,
+      failedStage: job.failedStage,
+      status: job.status,
+    });
   const errorStatus = formatErrorStatusKo(
     counters?.evaluationErrors ?? stats?.errors ?? 0,
   );
@@ -377,8 +436,8 @@ export function SearchStatusCard(props: {
             data-testid="ss-live-status-label"
           >
             {researchStatus}
-            {researching && job.currentSearchFamily
-              ? ` · ${job.currentSearchFamily}`
+            {researching && (combinationLabel ?? job.currentSearchFamily)
+              ? ` · ${combinationLabel ?? job.currentSearchFamily}`
               : ""}
           </p>
         </div>
@@ -451,9 +510,11 @@ export function SearchStatusCard(props: {
                 : "—"
           }
           hint={
-            job.currentSearchFamily
-              ? `패밀리: ${job.currentSearchFamily}`
-              : null
+            combinationLabel
+              ? `현재 조합: ${combinationLabel}`
+              : job.currentSearchFamily
+                ? `패밀리: ${job.currentSearchFamily}`
+                : null
           }
           testId="ss-current-iteration"
         />
@@ -513,7 +574,11 @@ export function SearchStatusCard(props: {
         data-testid="ss-live-top10"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="ss-field-label">실시간 TOP 10</div>
+          <div className="ss-field-label">
+            {qualifiedCount > 0
+              ? "실시간 TOP 10"
+              : "임시 평가 상위 후보 — 합격 아님"}
+          </div>
           <div
             className="text-xs text-[var(--text-muted)]"
             data-testid="ss-live-top10-updated"
@@ -530,94 +595,177 @@ export function SearchStatusCard(props: {
           </p>
         ) : (
           <>
-            <ul className="mt-3 space-y-2" data-testid="ss-live-top10-list">
-              {(top10Expanded
-                ? job.liveTop10.entries
-                : job.liveTop10.entries.slice(0, 3)
-              ).map((row) => (
-                <li
-                  key={`${row.rank}-${row.strategyHash}`}
-                  className="rounded-lg border border-slate-800/80 px-3 py-2 text-sm"
-                  data-testid={`ss-live-top10-row-${row.rank}`}
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <div className="font-medium text-[var(--text-primary)]">
-                      {row.rank}.{" "}
-                      {cleanStrategyDisplayName(row.displayAlias) ||
-                        row.readableName}
-                    </div>
-                    <span
-                      className="text-xs font-semibold tracking-wide text-sky-200/90"
-                      data-testid={`ss-live-top10-move-${row.rank}`}
-                    >
-                      {movementArrow(row.rankChangeShort)} ·{" "}
-                      {row.rankChangeShort}
-                      {row.movementReasonKo
-                        ? ` · ${row.movementReasonKo}`
-                        : ""}
+            <div
+              className="mt-3 overflow-x-auto"
+              data-testid="ss-live-top10-list"
+            >
+              <table className="w-full min-w-[1180px] border-collapse text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-700 text-[var(--text-muted)]">
+                    <th scope="col" className="px-2 py-1.5 font-medium">순위</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">변동</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">전략</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">패턴 스택</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">승률</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">수익률</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">낙폭</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">Sharpe</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">견고성</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">레버리지</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">위험</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">신뢰도</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">미니 차트</th>
+                    <th scope="col" className="px-2 py-1.5 font-medium">승격 근거</th>
+                    <th className="px-2 py-1.5 font-medium">거래</th>
+                    <th className="px-2 py-1.5 font-medium">손익비</th>
+                    <th className="px-2 py-1.5 font-medium">비용</th>
+                    <th className="px-2 py-1.5 font-medium">등록</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(top10Expanded
+                    ? job.liveTop10.entries
+                    : job.liveTop10.entries.slice(0, 3)
+                  ).map((row) => {
+                    const move = movementLabelKo(row.rankChangeShort);
+                    const isTop = row.rank === 1;
+                    const isNew = move === "신규";
+                    return (
+                      <tr
+                        key={`${row.rank}-${row.strategyHash}`}
+                        className={
+                          "border-b border-slate-800/80 align-top " +
+                          (isTop
+                            ? "bg-amber-500/10"
+                            : isNew
+                              ? "bg-sky-500/10"
+                              : "")
+                        }
+                        data-testid={`ss-live-top10-row-${row.rank}`}
+                      >
+                        <td className="px-2 py-2 font-semibold tabular-nums">
+                          {row.rank}
+                        </td>
+                        <td className="px-2 py-2">
+                          <span
+                            className={
+                              "inline-flex rounded px-1.5 py-0.5 text-[11px] font-semibold " +
+                              movementTone(move)
+                            }
+                            data-testid={`ss-live-top10-move-${row.rank}`}
+                          >
+                            {move}
+                          </span>
+                        </td>
+                        <td className="px-2 py-2 font-medium text-[var(--text-primary)]">
+                          {cleanStrategyDisplayName(row.displayAlias) ||
+                            row.readableName}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.patternStack || row.strategyFamily || "—"}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {formatPct(row.winRate)}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {formatPct(row.netReturn)}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {formatPct(row.maxDrawdown)}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {row.sharpe != null && Number.isFinite(row.sharpe)
+                            ? row.sharpe.toFixed(2)
+                            : "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.robustnessStatus || "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.leverageLabel || "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.risk || row.overfittingRisk || "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.confidence || row.sampleConfidence || "—"}
+                        </td>
+                        <td className="px-2 py-2 text-sky-300">
+                          <MiniSeries values={row.miniSeries} />
+                        </td>
+                        <td className="max-w-[16rem] px-2 py-2 text-[var(--text-muted)]">
+                          {row.rankReason || "—"}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {formatCount(row.tradeCount ?? 0)}
+                        </td>
+                        <td className="px-2 py-2 tabular-nums">
+                          {row.profitFactor != null &&
+                          Number.isFinite(row.profitFactor)
+                            ? row.profitFactor.toFixed(2)
+                            : "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.costStatus || "—"}
+                        </td>
+                        <td className="px-2 py-2 text-[var(--text-muted)]">
+                          {row.registrationState === "registered"
+                            ? "등록"
+                            : row.registrationState === "not_registered"
+                              ? "미등록"
+                              : row.registrationState || "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <details
+              className="mt-2 rounded-lg border border-slate-800/80 px-3 py-2 text-xs text-[var(--text-muted)]"
+              data-testid="ss-live-top10-details"
+            >
+              <summary className="cursor-pointer text-[var(--text-primary)]">
+                선정 이유 · 변화량 상세
+              </summary>
+              <ul className="mt-2 space-y-2">
+                {(top10Expanded
+                  ? job.liveTop10.entries
+                  : job.liveTop10.entries.slice(0, 3)
+                ).map((row) => (
+                  <li key={`detail-${row.rank}-${row.strategyHash}`}>
+                    <span className="font-medium text-[var(--text-primary)]">
+                      {row.rank}위
                     </span>
-                  </div>
-                  <div className="mt-1 text-xs text-[var(--text-muted)]">
-                    {row.previousRank != null
-                      ? `${row.previousRank}위 → ${row.rank}위`
-                      : `신규 ${row.rank}위`}{" "}
-                    · {row.strategyFamily ?? "—"} · 순수익{" "}
-                    {formatPct(row.netReturn)}
+                    {" · "}
+                    {row.movementReasonKo || row.rankReason || "—"}
                     {formatSignedDelta(
                       row.netReturn,
                       row.previousNetReturn,
                       true,
                     )
-                      ? ` (${formatSignedDelta(row.netReturn, row.previousNetReturn, true)})`
-                      : ""}{" "}
-                    · MDD {formatPct(row.maxDrawdown)}
+                      ? ` · 수익 ${formatSignedDelta(row.netReturn, row.previousNetReturn, true)}`
+                      : ""}
                     {formatSignedDelta(
                       row.maxDrawdown,
                       row.previousMaxDrawdown,
                       true,
                     )
-                      ? ` (${formatSignedDelta(row.maxDrawdown, row.previousMaxDrawdown, true)})`
-                      : ""}{" "}
-                    · 거래 {formatCount(row.tradeCount ?? 0)}
+                      ? ` · MDD ${formatSignedDelta(row.maxDrawdown, row.previousMaxDrawdown, true)}`
+                      : ""}
                     {formatSignedDelta(row.tradeCount, row.previousTradeCount)
-                      ? ` (${formatSignedDelta(row.tradeCount, row.previousTradeCount)})`
-                      : ""}{" "}
-                    · 점수{" "}
-                    {row.score != null && Number.isFinite(row.score)
-                      ? row.score.toFixed(2)
-                      : "—"}
+                      ? ` · 거래 ${formatSignedDelta(row.tradeCount, row.previousTradeCount)}`
+                      : ""}
                     {formatSignedDelta(row.score, row.previousScore)
-                      ? ` (이전 ${row.previousScore != null ? row.previousScore.toFixed(2) : "—"} · ${formatSignedDelta(row.score, row.previousScore)})`
-                      : ""}{" "}
-                    · 레버리지 {row.leverageLabel || "—"}
-                  </div>
-                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">
-                    선정: {row.rankReason || "—"}
-                    {row.eligibilityStatus
-                      ? ` · 적격 ${row.eligibilityStatus}`
+                      ? ` · 점수 ${formatSignedDelta(row.score, row.previousScore)}`
                       : ""}
-                    {row.registrationState
-                      ? ` · 등록 ${row.registrationState}`
-                      : ""}
-                  </div>
-                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">
-                    {row.costStatus} · {row.robustnessStatus} ·{" "}
-                    {row.sampleConfidence}
-                    {row.overfittingRisk
-                      ? ` · 과적합 ${row.overfittingRisk}`
-                      : ""}
-                    {row.recommendable === true
-                      ? " · 추천 후보"
-                      : row.recommendable === false
-                        ? " · 추천 보류"
-                        : ""}
                     {row.roleBadges.length > 0
                       ? ` · ${row.roleBadges.join(", ")}`
                       : ""}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </details>
             {job.liveTop10.entries.length > 3 ? (
               <button
                 type="button"

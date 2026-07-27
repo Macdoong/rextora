@@ -195,6 +195,7 @@ export function buildBacktestReport(input: {
   symbol: string;
   symbols?: string[];
   paramsHash: string;
+  sourceParamsHash?: string | null;
   strategyName: string;
   strategyId: string;
   sourceStatus: string;
@@ -228,6 +229,7 @@ export function buildBacktestReport(input: {
   return {
     strategyName: input.strategyName,
     strategyHash: input.paramsHash,
+    sourceParamsHash: input.sourceParamsHash ?? null,
     strategyId: input.strategyId,
     sourceStatus: input.sourceStatus,
     symbol: input.symbol,

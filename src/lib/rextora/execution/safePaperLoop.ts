@@ -74,10 +74,18 @@ export async function runSafePaperScanLoop(options?: {
   signals: SafeScanSnapshot[];
   strategyId: string;
   paramsHash: string;
+  strategyHash: string;
 }> {
   const resolved = resolvePaperExecutionStrategy();
   assertPaperStrategyIntegrity(resolved);
-  const { strategy, paramsHash, strategyId, name, executionKind } = resolved;
+  const {
+    strategy,
+    paramsHash,
+    strategyHash,
+    strategyId,
+    name,
+    executionKind,
+  } = resolved;
 
   const maxSymbols = options?.maxSymbols ?? 40;
   const maxNewEntries = options?.maxNewEntries ?? 2;
@@ -100,7 +108,7 @@ export async function runSafePaperScanLoop(options?: {
         status: "보유중",
         reason: "이미 포지션 보유",
         strategyId,
-        strategyHash: paramsHash,
+        strategyHash,
       });
       continue;
     }
@@ -117,7 +125,7 @@ export async function runSafePaperScanLoop(options?: {
         status: "차단",
         reason: "캔들 부족",
         strategyId,
-        strategyHash: paramsHash,
+        strategyHash,
       });
       continue;
     }
@@ -197,7 +205,7 @@ export async function runSafePaperScanLoop(options?: {
         status: "관측",
         reason: signal.rejectReason ?? "조건 미충족",
         strategyId,
-        strategyHash: paramsHash,
+        strategyHash,
       });
       continue;
     }
@@ -227,7 +235,7 @@ export async function runSafePaperScanLoop(options?: {
         status: "차단",
         reason: cost.reason,
         strategyId,
-        strategyHash: paramsHash,
+        strategyHash,
       });
       continue;
     }
@@ -248,7 +256,7 @@ export async function runSafePaperScanLoop(options?: {
           status: "진입",
           reason: signal.entryReason,
           strategyId,
-          strategyHash: paramsHash,
+          strategyHash,
         });
         continue;
       }
@@ -258,7 +266,7 @@ export async function runSafePaperScanLoop(options?: {
         status: "차단",
         reason: result.message,
         strategyId,
-        strategyHash: paramsHash,
+        strategyHash,
       });
       continue;
     }
@@ -269,7 +277,7 @@ export async function runSafePaperScanLoop(options?: {
       status: "관측",
       reason: "포지션 한도 — 신호만 기록",
       strategyId,
-      strategyHash: paramsHash,
+      strategyHash,
     });
   }
 
@@ -284,6 +292,7 @@ export async function runSafePaperScanLoop(options?: {
     signals: lastSignals,
     strategyId,
     paramsHash,
+    strategyHash,
   };
 }
 

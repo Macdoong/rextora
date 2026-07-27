@@ -36,6 +36,28 @@ function formatCount(n: number | null | undefined): string {
   return n.toLocaleString("ko-KR");
 }
 
+function MiniSeries({ values }: { values: number[] | null | undefined }) {
+  if (!values || values.length < 2) {
+    return <span aria-label="미니 차트 데이터 없음">—</span>;
+  }
+  const safe = values.filter(Number.isFinite).slice(0, 30);
+  if (safe.length < 2) return <span aria-label="미니 차트 데이터 없음">—</span>;
+  const min = Math.min(...safe);
+  const max = Math.max(...safe);
+  const span = max - min || 1;
+  const points = safe
+    .map(
+      (value, index) =>
+        `${(index / (safe.length - 1)) * 72},${22 - ((value - min) / span) * 20}`,
+    )
+    .join(" ");
+  return (
+    <svg width="72" height="24" viewBox="0 0 72 24" role="img" aria-label="실제 저장 성과 미니 차트">
+      <polyline points={points} fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 function aliasOf(card: ResearchResultCard): string {
   return card.displayAlias || card.readableName;
 }
@@ -65,9 +87,10 @@ function isRegisteredCard(card: ResearchResultCard): boolean {
 
 function backtestHref(card: ResearchResultCard): string {
   if (!card.registeredStrategyId) return "/backtest";
+  // Pass strategyId only — workbench loads canonical strategyHash from store.
+  // Research paramsHash must not be sent as strategyHash (causes mismatch).
   const qs = new URLSearchParams({
     strategyId: card.registeredStrategyId,
-    strategyHash: card.paramsHash,
     symbol: card.symbol,
     timeframe: card.timeframe,
     sourceResearchJobId: card.sourceResearchJobId,
@@ -462,6 +485,7 @@ export function CurrentResearchResultsPanel(props: {
   const [pageSize, setPageSize] = useState<ExplorerPageSize>(10);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [showAllRecs, setShowAllRecs] = useState(false);
+  const [top10Expanded, setTop10Expanded] = useState(false);
   const [recDetail, setRecDetail] = useState<number | null>(null);
   const [scopedJobId, setScopedJobId] = useState<string | null | undefined>(
     undefined,
@@ -473,6 +497,7 @@ export function CurrentResearchResultsPanel(props: {
   function applyExplorerSession(jobId: string | null) {
     setExpandedRow(null);
     setShowAllRecs(false);
+    setTop10Expanded(false);
     setRecDetail(null);
     setPage(1);
     if (!jobId) {
@@ -527,6 +552,9 @@ export function CurrentResearchResultsPanel(props: {
     }
   }
 
+  const summaryAbortRef = useRef<AbortController | null>(null);
+  const summaryJobRef = useRef<string | null>(null);
+
   const load = useCallback(async () => {
     if (!props.jobId) {
       setSummary(null);
@@ -534,30 +562,40 @@ export function CurrentResearchResultsPanel(props: {
       setLoading(false);
       return;
     }
+    summaryAbortRef.current?.abort();
+    const controller = new AbortController();
+    summaryAbortRef.current = controller;
+    const requestJobId = props.jobId;
+    summaryJobRef.current = requestJobId;
     setLoading(true);
     setError(null);
-    const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20_000);
     try {
       const res = await fetch(
-        `/api/rextora/strategy-search/${encodeURIComponent(props.jobId)}/results-summary`,
+        `/api/rextora/strategy-search/${encodeURIComponent(requestJobId)}/results-summary`,
         { cache: "no-store", signal: controller.signal },
       );
       const json = await res.json();
+      if (summaryJobRef.current !== requestJobId) return;
       if (!json.ok) {
         throw new Error(json.error ?? "탐색 결과 요약을 불러오지 못했습니다.");
       }
       setSummary(json.data as ResearchResultsSummary);
       setError(null);
     } catch (e) {
+      if (summaryJobRef.current !== requestJobId) return;
+      // Superseded or cleanup abort — do not wipe a loaded summary with a timeout error.
       if (e instanceof DOMException && e.name === "AbortError") {
-        setError("결과 요약 로드가 지연되어 중단했습니다. 새로고침하세요.");
-      } else {
-        setError(e instanceof Error ? e.message : "탐색 결과 요약 실패");
+        if (summaryAbortRef.current !== controller) return;
+        setError("결과 요약 로드가 지연되어 중단했습니다. 다시 시도하세요.");
+        return;
       }
+      setError(e instanceof Error ? e.message : "탐색 결과 요약 실패");
     } finally {
       window.clearTimeout(timeout);
-      setLoading(false);
+      if (summaryJobRef.current === requestJobId) {
+        setLoading(false);
+      }
     }
   }, [props.jobId]);
 
@@ -565,7 +603,11 @@ export function CurrentResearchResultsPanel(props: {
     const boot = window.setTimeout(() => {
       void load();
     }, 0);
-    return () => window.clearTimeout(boot);
+    return () => {
+      window.clearTimeout(boot);
+      summaryAbortRef.current?.abort();
+      summaryAbortRef.current = null;
+    };
   }, [load]);
 
   useEffect(() => {
@@ -737,7 +779,7 @@ export function CurrentResearchResultsPanel(props: {
     );
   }
 
-  if (error || !summary) {
+  if (!summary) {
     return (
       <Card title="이번 탐색 요약" data-testid="current-research-error">
         <EmptyState message={error ?? "요약을 표시할 수 없습니다."} />
@@ -764,12 +806,37 @@ export function CurrentResearchResultsPanel(props: {
   const rankChanges = summary.top10RankChanges ?? [];
   const visibleRecs = showAllRecs ? recs : recs.slice(0, 3);
   const activeFilters = filters.filter((f) => f !== "all");
+  const top10Visible = top10Expanded ? top10 : top10.slice(0, 3);
+  const decisionTop3 = (() => {
+    const map = new Map<
+      string,
+      { card: ResearchResultCard; titles: string[] }
+    >();
+    for (const [title, card] of [
+      ["최고 수익 전략", summary.topProfit],
+      ["최고 안정 전략", summary.topStable],
+      ["최종 추천 전략", summary.topRecommend],
+    ] as const) {
+      if (!card) continue;
+      const current = map.get(card.paramsHash);
+      if (current) {
+        current.titles.push(title);
+        current.card = {
+          ...current.card,
+          roles: [...new Set([...current.card.roles, ...card.roles])],
+        };
+      } else {
+        map.set(card.paramsHash, { card, titles: [title] });
+      }
+    }
+    return [...map.values()];
+  })();
 
   const stageCounts = [
     { id: "stage-basic", label: "기본 조건 통과", value: c.stageBasicQualified },
     { id: "stage-stability", label: "안정성", value: c.stageStabilityPassed },
     { id: "stage-cost", label: "비용", value: c.stageCostPassed },
-    { id: "stage-sample", label: "표본", value: c.stageSampleOk },
+    { id: "stage-sample", label: "표본(보통↑)", value: c.stageSampleOk },
     { id: "stage-overfit", label: "편중", value: c.stageOverfitOk },
     { id: "stage-final", label: "최종 추천", value: c.stageFinalRecommendable },
     { id: "stage-top10", label: "TOP 10", value: c.top10Saved },
@@ -928,56 +995,95 @@ export function CurrentResearchResultsPanel(props: {
 
       <section id="results-section-top3" data-testid="results-top3">
         <div className="grid gap-4 lg:grid-cols-3">
-          <TopDecisionCard
-            title="최고 수익 전략"
-            card={summary.topProfit}
-            empty="합격 전략이 없습니다."
-            testId="highlight-최고 수익 전략"
-            busyIteration={busyIteration}
-            promoting={promoting}
-            onRegisterThenBacktest={registerThenBacktest}
-          />
-          <TopDecisionCard
-            title="최고 안정 전략"
-            card={summary.topStable}
-            empty="추천 가능한 안정 전략 없음"
-            testId="highlight-최고 안정 전략"
-            busyIteration={busyIteration}
-            promoting={promoting}
-            onRegisterThenBacktest={registerThenBacktest}
-          />
-          <TopDecisionCard
-            title="최종 추천 전략"
-            card={summary.topRecommend}
-            empty="추천 가능한 안정 전략 없음"
-            testId="highlight-최종 추천 전략"
-            busyIteration={busyIteration}
-            promoting={promoting}
-            onRegisterThenBacktest={registerThenBacktest}
-          />
+          {decisionTop3.map(({ card, titles }) => (
+            <TopDecisionCard
+              key={card.paramsHash}
+              title={titles.join(" · ")}
+              card={card}
+              empty="추천 가능한 전략 없음"
+              testId={`highlight-${titles[0]}`}
+              busyIteration={busyIteration}
+              promoting={promoting}
+              onRegisterThenBacktest={registerThenBacktest}
+            />
+          ))}
+          {decisionTop3.length === 0 ? (
+            <Card title="Best strategy">
+              <EmptyState message="합격 전략이 없습니다." />
+            </Card>
+          ) : null}
         </div>
       </section>
 
       <section id="results-section-top10" data-testid="results-top10">
-        <Card title="TOP 10 단기 후보">
+        <Card title="TOP 10 기관형 비교">
           {top10.length === 0 ? (
             <EmptyState message="저장된 TOP 10 후보가 없습니다." />
           ) : (
             <div className="space-y-2">
-              {top10.map((card, i) => (
-                <CompactRecRow
-                  key={strategyRowKey(card)}
-                  card={card}
-                  rank={i + 1}
-                  busy={busyIteration === card.iteration || promoting}
-                  onRegisterThenBacktest={registerThenBacktest}
-                  onToggleDetail={() =>
-                    setRecDetail((v) => (v === card.iteration ? null : card.iteration))
-                  }
-                  expanded={recDetail === card.iteration}
-                  testIdPrefix={`top10-row-${i + 1}`}
-                />
-              ))}
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[1180px] text-left text-xs" data-testid="results-top10-table">
+                  <thead>
+                    <tr className="border-b border-slate-700 text-slate-400">
+                      {["순위", "변동", "전략", "패턴 스택", "승률", "수익률", "낙폭", "Sharpe", "견고성", "레버리지", "위험", "신뢰도", "미니 차트", "승격 근거"].map((label) => (
+                        <th key={label} scope="col" className="px-2 py-2 font-medium">{label}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {top10Visible.map((card, index) => {
+                      const movement = rankChanges.find(
+                        (entry) => entry.strategyHash === card.paramsHash,
+                      );
+                      const expanded = recDetail === card.iteration;
+                      return (
+                        <tr
+                          key={strategyRowKey(card)}
+                          className="border-b border-slate-800 align-top"
+                          data-testid={`top10-row-${index + 1}`}
+                        >
+                          <td className="px-2 py-2 tabular-nums">{index + 1}</td>
+                          <td className="px-2 py-2">{movement?.change ?? "—"}</td>
+                          <td className="px-2 py-2">
+                            <button
+                              type="button"
+                              className="text-left font-medium text-slate-100 hover:underline"
+                              aria-expanded={expanded}
+                              onClick={() =>
+                                setRecDetail(expanded ? null : card.iteration)
+                              }
+                            >
+                              {aliasOf(card)}
+                            </button>
+                            {expanded ? <RowDetail card={card} cluster={clusterById.get(card.clusterId)} /> : null}
+                          </td>
+                          <td className="px-2 py-2">{card.patternStack || card.strategyFamily}</td>
+                          <td className="px-2 py-2 tabular-nums">{formatPct(card.winRate)}</td>
+                          <td className="px-2 py-2 tabular-nums">{formatPct(card.netReturn)}</td>
+                          <td className="px-2 py-2 tabular-nums">{formatPct(card.maxDrawdown)}</td>
+                          <td className="px-2 py-2 tabular-nums">{card.sharpe != null ? card.sharpe.toFixed(2) : "없음"}</td>
+                          <td className="px-2 py-2">{card.robustnessStatus}</td>
+                          <td className="px-2 py-2">{card.leverageLabel || "—"}</td>
+                          <td className="px-2 py-2">{card.risk || card.overfittingRisk}</td>
+                          <td className="px-2 py-2">{card.confidence || card.sampleConfidence}</td>
+                          <td className="px-2 py-2 text-sky-300"><MiniSeries values={card.miniSeries} /></td>
+                          <td className="max-w-[16rem] px-2 py-2">{card.recommendationReason}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {top10.length > 3 ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setTop10Expanded((value) => !value)}
+                  data-testid="results-top10-expand"
+                >
+                  {top10Expanded ? "상위 3개만 보기" : `전체 ${top10.length}개 보기`}
+                </Button>
+              ) : null}
             </div>
           )}
         </Card>

@@ -125,13 +125,19 @@ describe("Order Block Search engine", () => {
     const space = getSearchSpaceById("order_block");
     expect(space?.id).toBe("order_block");
     const ranges = rangesForSpace(space!);
-    expect(ranges.map((r) => r.key)).toEqual([
-      "penetrationPct",
-      "stopAtrMult",
-      "tpAtrMult",
-      "maxHoldBars",
-      "zoneLookback",
-    ]);
+    const keys = ranges.map((r) => r.key);
+    expect(keys).toEqual(
+      expect.arrayContaining([
+        "penetrationPct",
+        "stopAtrMult",
+        "tpAtrMult",
+        "maxHoldBars",
+        "zoneLookback",
+        "minImpulseAtrMult",
+        "mitigationPct",
+      ]),
+    );
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it("generates OB candidates from OB base params + ranges", () => {

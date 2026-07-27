@@ -114,7 +114,8 @@ function buildGateRows(
  */
 export function LiveActivationGates() {
   const searchParams = useSearchParams();
-  const candidateId = searchParams.get("candidate");
+  const candidateId =
+    searchParams.get("candidate") ?? searchParams.get("strategyId");
   const candidateRunId = searchParams.get("runId");
   const [data, setData] = useState<ReadinessPayload | null>(null);
   const [approvalOk, setApprovalOk] = useState<boolean | null>(null);
@@ -188,6 +189,7 @@ export function LiveActivationGates() {
       const list = (strategiesJson.data ?? []) as Array<{
         id: string;
         paramsHash: string;
+        strategyHash?: string | null;
         liveActive?: boolean;
         paperActive?: boolean;
       }>;
@@ -209,6 +211,22 @@ export function LiveActivationGates() {
         setMessage("SAFE 원본으로는 드라이런 검토 대상을 등록하지 않습니다.");
         return;
       }
+      let strategyHash = selected.strategyHash ?? null;
+      if (!strategyHash) {
+        const detailRes = await fetch(
+          `/api/rextora/strategies?id=${encodeURIComponent(selected.id)}`,
+        );
+        const detailBody = (await detailRes.json()) as ApiEnvelope<{
+          strategyHash?: string;
+        }>;
+        strategyHash = detailBody.data?.strategyHash ?? null;
+      }
+      if (!strategyHash) {
+        setMessage(
+          "드라이런에 필요한 strategyHash를 확인하지 못했습니다. 전략을 다시 등록하거나 백테스트를 실행하세요.",
+        );
+        return;
+      }
       const executionKey = `dry_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
       const res = await fetch("/api/rextora/live/dry-run", {
         method: "POST",
@@ -217,7 +235,7 @@ export function LiveActivationGates() {
           action: "submit",
           executionKey,
           strategyId: selected.id,
-          strategyHash: selected.paramsHash,
+          strategyHash,
           symbol: "BTCUSDT",
           side: "BUY",
           quantity: 0.001,

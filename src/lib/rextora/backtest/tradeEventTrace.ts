@@ -4,8 +4,22 @@
  */
 
 import type { BacktestTrade } from "../backtest/backtestEngine";
+import type {
+  EvidenceScalar,
+  PatternBlockEvidence,
+  PatternLineAnchor,
+} from "../strategy/eventSequenceBacktest";
 
 export const TRADE_EVENT_TRACE_VERSION = 1 as const;
+
+/** Zone-width ratio from measurePenetration → operator-facing Korean label. */
+export function formatPenetrationKo(penetrationPct: number): string {
+  if (!Number.isFinite(penetrationPct)) return "침투 데이터 없음";
+  if (penetrationPct <= 1.0001) {
+    return `침투 ${(penetrationPct * 100).toFixed(0)}%`;
+  }
+  return `존 대비 ${penetrationPct.toFixed(2)}배`;
+}
 
 export type TradeEventKind =
   | "entry"
@@ -49,12 +63,25 @@ export interface TradeEventTrace {
   patternType?: string | null;
   zoneHigh?: number | null;
   zoneLow?: number | null;
-  lineAnchors?: Array<{ bar: number; price: number }> | null;
+  lineAnchors?: PatternLineAnchor[] | null;
   creationCandleTime?: string | null;
   revisitCandleTime?: string | null;
   confirmationCandleTime?: string | null;
+  breakCandleTime?: string | null;
+  invalidationCandleTime?: string | null;
+  creationBar?: number | null;
+  revisitBar?: number | null;
+  confirmationBar?: number | null;
+  breakBar?: number | null;
+  invalidationBar?: number | null;
   penetrationPct?: number | null;
   rejectedReasonCode?: string | null;
+  /** Multi-pattern combination evidence (additive). */
+  patternBlocks?: PatternBlockEvidence[] | null;
+  combinationOperator?: string | null;
+  combinationResult?: boolean | null;
+  combinationScore?: number | null;
+  combinationPriority?: number | null;
 }
 
 function asNum(v: unknown): number | null {
@@ -67,16 +94,98 @@ function asStr(v: unknown): string | null {
 
 function asLineAnchors(
   v: unknown,
-): Array<{ bar: number; price: number }> | null {
+): PatternLineAnchor[] | null {
   if (!Array.isArray(v) || v.length === 0) return null;
-  const out: Array<{ bar: number; price: number }> = [];
+  const out: PatternLineAnchor[] = [];
   for (const item of v) {
     if (!item || typeof item !== "object") continue;
     const bar = asNum((item as { bar?: unknown }).bar);
     const price = asNum((item as { price?: unknown }).price);
-    if (bar != null && price != null) out.push({ bar, price });
+    const time = asStr((item as { time?: unknown }).time);
+    if (bar != null && price != null) out.push({ bar, price, time });
   }
   return out.length ? out : null;
+}
+
+function asScalarRecord(v: unknown): Record<string, EvidenceScalar> {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return {};
+  const out: Record<string, EvidenceScalar> = {};
+  for (const [key, value] of Object.entries(v)) {
+    if (
+      value == null ||
+      typeof value === "string" ||
+      typeof value === "boolean" ||
+      (typeof value === "number" && Number.isFinite(value))
+    ) {
+      out[key] = value as EvidenceScalar;
+    }
+  }
+  return out;
+}
+
+function asPatternBlock(v: unknown): PatternBlockEvidence | null {
+  if (!v || typeof v !== "object") return null;
+  const row = v as Record<string, unknown>;
+  const family = asStr(row.family);
+  if (!family) return null;
+  return {
+    blockId: String(row.blockId ?? ""),
+    family,
+    role: String(row.role ?? ""),
+    order: asNum(row.order) ?? 0,
+    status:
+      row.status === "detected" ||
+      row.status === "missing" ||
+      row.status === "failed" ||
+      row.status === "optional_skipped"
+        ? row.status
+        : "missing",
+    patternType: String(row.patternType ?? family),
+    zoneHigh: asNum(row.zoneHigh),
+    zoneLow: asNum(row.zoneLow),
+    creationBar: asNum(row.creationBar),
+    creationTime: asStr(row.creationTime),
+    revisitBar: asNum(row.revisitBar),
+    revisitTime: asStr(row.revisitTime),
+    breakBar: asNum(row.breakBar),
+    breakTime: asStr(row.breakTime),
+    confirmationBar: asNum(row.confirmationBar),
+    confirmationTime: asStr(row.confirmationTime),
+    invalidationBar: asNum(row.invalidationBar),
+    invalidationTime: asStr(row.invalidationTime),
+    entryBar: asNum(row.entryBar),
+    entryTime: asStr(row.entryTime),
+    measured: asNum(row.measured),
+    threshold: asNum(row.threshold) ?? asNum(row.required),
+    detectorParams: asScalarRecord(row.detectorParams),
+    measuredValues: asScalarRecord(row.measuredValues),
+    thresholds: asScalarRecord(row.thresholds),
+    required:
+      typeof row.required === "boolean"
+        ? row.required
+        : row.required == null
+          ? true
+          : Boolean(row.required),
+    weight: asNum(row.weight) ?? asNum(row.scoreContribution) ?? 1,
+    priority: asNum(row.priority) ?? asNum(row.priorityRank) ?? 0,
+    operatorPassed:
+      typeof row.operatorPassed === "boolean" ? row.operatorPassed : undefined,
+    scoreContribution: asNum(row.scoreContribution) ?? undefined,
+    scoreTotal: asNum(row.scoreTotal) ?? undefined,
+    scoreThreshold: asNum(row.scoreThreshold),
+    selectedPriority: asNum(row.selectedPriority),
+    operator: asStr(row.operator) ?? undefined,
+    stage: asStr(row.stage) ?? asStr(row.evaluationStage) ?? undefined,
+    reasonCode: asStr(row.reasonCode),
+    touchCount: asNum(row.touchCount),
+    lineAnchors: asLineAnchors(row.lineAnchors),
+    stopPrice: asNum(row.stopPrice),
+    targetPrice: asNum(row.targetPrice),
+    exitPrice: asNum(row.exitPrice),
+    exitBar: asNum(row.exitBar),
+    exitTime: asStr(row.exitTime),
+    exitReason: asStr(row.exitReason),
+  };
 }
 
 /** Build an auditable event trace from a BacktestTrade (no fabricated fields). */
@@ -111,12 +220,59 @@ export function buildTradeEventTrace(
     if (Number.isFinite(a) && Number.isFinite(b)) holdMs = Math.max(0, b - a);
   }
 
+  const patternType = asStr(trade.patternType);
+  const zoneHigh = asNum(trade.zoneHigh);
+  const zoneLow = asNum(trade.zoneLow);
+  const lineAnchors = asLineAnchors(trade.lineAnchors);
+  const creationCandleTime = asStr(trade.creationCandleTime);
+  const revisitCandleTime = asStr(trade.revisitCandleTime);
+  const confirmationCandleTime = asStr(trade.confirmationCandleTime);
+  const breakCandleTime = asStr(trade.breakCandleTime);
+  const invalidationCandleTime = asStr(trade.invalidationCandleTime);
+  const penetrationPct = asNum(trade.penetrationPct);
+  const rejectedReasonCode = asStr(trade.rejectedReasonCode);
+  const patternBlocksRaw = trade.patternBlocks;
+  const patternBlocks = Array.isArray(patternBlocksRaw)
+    ? patternBlocksRaw
+        .filter((b) => b && typeof b === "object")
+        .map(asPatternBlock)
+        .filter((b): b is PatternBlockEvidence => b != null)
+    : null;
+
+  const entryReasonPersisted =
+    asStr(trade.entryReason) ??
+    asStr(trade.entryReasonKo) ??
+    asStr(trade.signalReason);
+  const entryWhyParts: string[] = [];
+  if (entryReasonPersisted) entryWhyParts.push(entryReasonPersisted);
+  if (patternType) entryWhyParts.push(`패턴 ${patternType}`);
+  if (patternBlocks && patternBlocks.length > 0) {
+    entryWhyParts.push(
+      `조합 ${patternBlocks
+        .map((b) => `${b.family}${b.role ? `(${b.role})` : ""}`)
+        .join(" + ")}`,
+    );
+  }
+  if (revisitCandleTime) entryWhyParts.push("리테스트 확인");
+  if (confirmationCandleTime) entryWhyParts.push("확인 봉 통과");
+  if (penetrationPct != null) {
+    entryWhyParts.push(formatPenetrationKo(penetrationPct));
+  }
+  if (zoneHigh != null && zoneLow != null) {
+    entryWhyParts.push(`존 ${zoneLow.toFixed(2)}–${zoneHigh.toFixed(2)}`);
+  }
+  const sideLabel = side === "SHORT" || side === "short" ? "숏 진입" : "롱 진입";
+  const entryDetail =
+    entryWhyParts.length > 0
+      ? `${sideLabel} · ${entryWhyParts.join(" · ")}`
+      : sideLabel;
+
   const entry: TradeEventTraceItem = {
     kind: "entry",
     at: entryTime,
     price: entryPrice,
     labelKo: "진입",
-    detailKo: side === "SHORT" || side === "short" ? "숏 진입" : "롱 진입",
+    detailKo: entryDetail,
   };
 
   const exitKind: TradeEventKind =
@@ -146,7 +302,35 @@ export function buildTradeEventTrace(
     detailKo: exitReason,
   };
 
-  const events: TradeEventTraceItem[] = [entry];
+  const events: TradeEventTraceItem[] = [];
+  if (creationCandleTime) {
+    events.push({
+      kind: "signal",
+      at: creationCandleTime,
+      price: zoneHigh ?? zoneLow,
+      labelKo: "패턴 감지",
+      detailKo: patternType,
+    });
+  }
+  if (revisitCandleTime) {
+    events.push({
+      kind: "signal",
+      at: revisitCandleTime,
+      price: null,
+      labelKo: "리테스트",
+      detailKo: penetrationPct != null ? formatPenetrationKo(penetrationPct) : null,
+    });
+  }
+  if (confirmationCandleTime) {
+    events.push({
+      kind: "signal",
+      at: confirmationCandleTime,
+      price: null,
+      labelKo: "확인",
+      detailKo: "확인 봉 통과",
+    });
+  }
+  events.push(entry);
   if (stopPrice != null) {
     events.push({
       kind: "stop",
@@ -171,16 +355,6 @@ export function buildTradeEventTrace(
     fee != null || slippage != null
       ? `수수료 ${fee ?? "불가"} · 슬리피지 ${slippage ?? "불가"} (가용 값만 표시)`
       : "수수료·슬리피지 세부 값이 거래 기록에 없습니다.";
-
-  const patternType = asStr(trade.patternType);
-  const zoneHigh = asNum(trade.zoneHigh);
-  const zoneLow = asNum(trade.zoneLow);
-  const lineAnchors = asLineAnchors(trade.lineAnchors);
-  const creationCandleTime = asStr(trade.creationCandleTime);
-  const revisitCandleTime = asStr(trade.revisitCandleTime);
-  const confirmationCandleTime = asStr(trade.confirmationCandleTime);
-  const penetrationPct = asNum(trade.penetrationPct);
-  const rejectedReasonCode = asStr(trade.rejectedReasonCode);
 
   return {
     version: TRADE_EVENT_TRACE_VERSION,
@@ -215,8 +389,23 @@ export function buildTradeEventTrace(
     creationCandleTime,
     revisitCandleTime,
     confirmationCandleTime,
+    breakCandleTime,
+    invalidationCandleTime,
+    creationBar: asNum(trade.creationBar),
+    revisitBar: asNum(trade.revisitBar),
+    confirmationBar: asNum(trade.confirmationBar),
+    breakBar: asNum(trade.breakBar),
+    invalidationBar: asNum(trade.invalidationBar),
     penetrationPct,
     rejectedReasonCode,
+    patternBlocks,
+    combinationOperator: asStr(trade.combinationOperator),
+    combinationResult:
+      typeof trade.combinationResult === "boolean"
+        ? trade.combinationResult
+        : null,
+    combinationScore: asNum(trade.combinationScore),
+    combinationPriority: asNum(trade.combinationPriority),
   };
 }
 

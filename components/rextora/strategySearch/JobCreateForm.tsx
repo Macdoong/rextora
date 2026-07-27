@@ -13,6 +13,7 @@ import {
   SEARCH_DEPTH_PROFILES,
   datesForPeriodPreset,
   depthFieldDefaults,
+  buildCatalogPatternBlocks,
   generateDefaultSearchName,
   qualificationFieldDefaults,
   type LeverageModeId,
@@ -27,8 +28,13 @@ import {
   type TradingStyleId,
   SEARCHABLE_SPACE_OPTIONS,
 } from "./formDefaults";
+import type {
+  PatternCombinationBlockConfig,
+  PatternFamilyId,
+} from "./types";
+import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
 import type { FormFieldError } from "./formValidation";
-import { buildAppliedSettingsPreview } from "./formValidation";
+import { buildAppliedSettingsPreview, formatRuntimeKo } from "./formValidation";
 import { SearchConfigManager } from "./SearchConfigManager";
 
 /** Client-safe pattern capability matrix (mirrors patternSupportMatrix). */
@@ -42,7 +48,7 @@ const PATTERN_MATRIX = [
     paper: "partial",
     live: "partial",
     reasonKo:
-      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 Verification Required.",
+      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 검증 필요.",
   },
   {
     id: "fvg",
@@ -53,7 +59,7 @@ const PATTERN_MATRIX = [
     paper: "partial",
     live: "partial",
     reasonKo:
-      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 Verification Required.",
+      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 검증 필요.",
   },
   {
     id: "trendline",
@@ -64,7 +70,7 @@ const PATTERN_MATRIX = [
     paper: "partial",
     live: "partial",
     reasonKo:
-      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 Verification Required.",
+      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 검증 필요.",
   },
   {
     id: "support_resistance",
@@ -75,7 +81,18 @@ const PATTERN_MATRIX = [
     paper: "partial",
     live: "partial",
     reasonKo:
-      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 Verification Required.",
+      "엔진 경로는 구현됨. 폐기 가능 Search→Backtest 브라우저 증명 전까지 검증 필요.",
+  },
+  {
+    id: "supply_demand",
+    labelKo: "Supply / Demand",
+    searchable: true,
+    search: "verification_required",
+    backtest: "verification_required",
+    paper: "partial",
+    live: "partial",
+    reasonKo:
+      "완료 봉 기반 Supply/Demand 감지 및 이벤트 시퀀스 경로가 구현됨. 브라우저 증명 전까지 검증 필요.",
   },
 ] as const;
 
@@ -87,10 +104,10 @@ function lifecycleLabel(
     | "experimental"
     | "verification_required",
 ): string {
-  if (level === "supported") return "지원";
+  if (level === "supported") return "검증 완료";
   if (level === "partial") return "부분 지원";
-  if (level === "experimental") return "Experimental";
-  if (level === "verification_required") return "Verification Required";
+  if (level === "experimental") return "실험적";
+  if (level === "verification_required") return "검증 필요";
   return "미지원";
 }
 
@@ -98,6 +115,27 @@ const inputClass = "ss-input mt-1";
 const gridClass = "grid gap-4 md:grid-cols-2 xl:grid-cols-3";
 
 const RECOMMENDED_SYMBOL = "BTCUSDT";
+
+const PATTERN_FAMILY_OPTIONS: Array<{ id: PatternFamilyId; label: string }> = [
+  { id: "order_block", label: "Order Block" },
+  { id: "fvg", label: "FVG" },
+  { id: "trendline", label: "Trendline" },
+  { id: "support_resistance", label: "Support / Resistance" },
+  { id: "supply_demand", label: "Supply / Demand" },
+];
+
+const PATTERN_ROLE_OPTIONS: Array<{
+  id: PatternCombinationBlockConfig["role"];
+  label: string;
+}> = [
+  { id: "entry_zone", label: "진입 존" },
+  { id: "trend_filter", label: "방향 필터" },
+  { id: "confirmation", label: "확인" },
+  { id: "invalidation", label: "무효화" },
+  { id: "stop_placement", label: "손절 기준" },
+  { id: "take_profit", label: "목표 기준" },
+  { id: "exit_filter", label: "청산 필터" },
+];
 
 const DURATION_PRESET_MINUTES: Record<
   Exclude<DurationPresetId, "custom">,
@@ -235,6 +273,7 @@ export function JobCreateForm(props: {
     symbols: string[];
     timeframe: string;
     maxRuntimeMs: number | null;
+    status?: string | null;
     expectedCompletionAtMs?: number | null;
     /** Server-built immutable summary (설정 당시 적용값). */
     appliedSummary?: {
@@ -255,8 +294,7 @@ export function JobCreateForm(props: {
 
   if (locked && props.activeJobSummary) {
     const s = props.activeJobSummary;
-    const hours =
-      s.maxRuntimeMs != null ? Math.round(s.maxRuntimeMs / 3_600_000) : null;
+    const runtimeLabel = formatRuntimeKo(s.maxRuntimeMs ?? null);
     const summary = s.appliedSummary;
     return (
       <section
@@ -275,12 +313,26 @@ export function JobCreateForm(props: {
           </div>
         </div>
         <div className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
-          <div>이름: {s.searchName}</div>
+          <div data-testid="ss-readonly-user-name">
+            사용자 이름: {s.searchName}
+          </div>
+          <div data-testid="ss-readonly-config-summary">
+            실제 설정:{" "}
+            {summary?.sections
+              ?.find((sec) => sec.titleKo.includes("패턴"))
+              ?.rows?.map((r) => r.valueKo)
+              .filter(Boolean)
+              .slice(0, 3)
+              .join(" · ") ||
+              `${s.symbols.join(", ")} ${s.timeframe}`}
+          </div>
           <div>심볼: {s.symbols.join(", ")}</div>
           <div>타임프레임: {s.timeframe}</div>
           <div>
-            요청 시간: {hours != null ? `${hours}시간` : "—"}
-            {s.expectedCompletionAtMs != null
+            요청 시간: {runtimeLabel}
+            {s.status != null &&
+            !["completed", "cancelled", "failed", "paused"].includes(s.status) &&
+            s.expectedCompletionAtMs != null
               ? ` · 예상 완료 ${new Date(s.expectedCompletionAtMs).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}`
               : ""}
           </div>
@@ -347,6 +399,60 @@ export function JobCreateForm(props: {
     value: StrategySearchOperatorFormState[K],
   ) {
     onChange({ ...form, [key]: value });
+  }
+
+  function setMany(patch: Partial<StrategySearchOperatorFormState>) {
+    onChange({ ...form, ...patch });
+  }
+
+  function setCombinationFamilies(
+    families: string[],
+    template = form.patternCombinationTemplate,
+  ) {
+    const unique = [...new Set(families)].slice(0, 4);
+    onChange({
+      ...form,
+      patternCombinationFamilies: unique,
+      patternCombinationTemplate: template,
+      patternCombinationBlocks: buildCatalogPatternBlocks(
+        unique,
+        template,
+        form.patternCombinationBlocks,
+      ),
+      selectedSpaceIds: unique.length > 0 ? unique : form.selectedSpaceIds,
+      autoStrategyCombo: unique.length > 0 ? false : form.autoStrategyCombo,
+    });
+  }
+
+  function updatePatternBlock(
+    blockId: string,
+    patch: Partial<PatternCombinationBlockConfig>,
+  ) {
+    const blocks = (form.patternCombinationBlocks ?? []).map((block) =>
+      block.id === blockId ? { ...block, ...patch } : block,
+    );
+    const families = blocks.map((block) => block.family);
+    onChange({
+      ...form,
+      patternCombinationBlocks: blocks,
+      patternCombinationFamilies: families,
+      selectedSpaceIds: families,
+      autoStrategyCombo: false,
+    });
+  }
+
+  function updatePatternParam(
+    blockId: string,
+    key: string,
+    value: string | number | boolean,
+  ) {
+    const block = (form.patternCombinationBlocks ?? []).find(
+      (candidate) => candidate.id === blockId,
+    );
+    if (!block) return;
+    updatePatternBlock(blockId, {
+      params: { ...block.params, [key]: value },
+    });
   }
 
   function applySymbol(symbol: string) {
@@ -959,27 +1065,77 @@ export function JobCreateForm(props: {
                 </select>
               </Field>
               <Field
-                id="ss-pattern-confirm-close"
-                label="확인 종가"
-                hint="엔진은 확인 봉 개수가 아니라 종가 방향 확인 on/off만 지원합니다."
+                id="ss-pattern-confirm-mode"
+                label="종가 확인"
+                hint="평가기가 실제로 사용하는 확인 모드입니다."
               >
                 <select
-                  id="ss-pattern-confirm-close"
+                  id="ss-pattern-confirm-mode"
                   className={inputClass}
                   disabled={inputDisabled}
-                  value={form.patternConfirmClose}
-                  onChange={(e) =>
-                    set(
-                      "patternConfirmClose",
-                      e.target.value as "required" | "disabled",
-                    )
-                  }
-                  data-testid="ss-pattern-confirm-close"
+                  value={form.patternConfirmationMode}
+                  onChange={(e) => {
+                    const mode = e.target.value as
+                      | "none"
+                      | "single_close"
+                      | "consecutive_closes"
+                      | "threshold_count";
+                    onChange({
+                      ...form,
+                      patternConfirmationMode: mode,
+                      patternConfirmClose:
+                        mode === "none" ? "disabled" : "required",
+                    });
+                  }}
+                  data-testid="ss-pattern-confirm-mode"
                 >
-                  <option value="required">필수</option>
-                  <option value="disabled">사용 안 함</option>
+                  <option value="none">확인 없음</option>
+                  <option value="single_close">1개 종가 확인</option>
+                  <option value="consecutive_closes">연속 N개 확인</option>
+                  <option value="threshold_count">기간 내 N개 확인</option>
                 </select>
               </Field>
+              {form.patternConfirmationMode === "consecutive_closes" ||
+              form.patternConfirmationMode === "threshold_count" ? (
+                <>
+                  <Field id="ss-pattern-confirm-count" label="확인 봉 수(N)">
+                    <input
+                      id="ss-pattern-confirm-count"
+                      className={inputClass}
+                      disabled={inputDisabled}
+                      type="number"
+                      min={1}
+                      max={8}
+                      value={form.patternConfirmationCandleCount}
+                      onChange={(e) =>
+                        set("patternConfirmationCandleCount", e.target.value)
+                      }
+                      data-testid="ss-pattern-confirm-count"
+                    />
+                  </Field>
+                  {form.patternConfigLevel === "expert" ? (
+                    <Field
+                      id="ss-pattern-confirm-window"
+                      label="확인 허용 창(봉)"
+                      hint="N개 확인을 모을 수 있는 최대 봉 수입니다."
+                    >
+                      <input
+                        id="ss-pattern-confirm-window"
+                        className={inputClass}
+                        disabled={inputDisabled}
+                        type="number"
+                        min={1}
+                        max={24}
+                        value={form.patternConfirmationWindow}
+                        onChange={(e) =>
+                          set("patternConfirmationWindow", e.target.value)
+                        }
+                        data-testid="ss-pattern-confirm-window"
+                      />
+                    </Field>
+                  ) : null}
+                </>
+              ) : null}
               <Field id="ss-pattern-expiry" label="유효 기간(봉)">
                 <input
                   id="ss-pattern-expiry"
@@ -1071,6 +1227,481 @@ export function JobCreateForm(props: {
                 그대로 사용합니다. 원시 범위는 탐색 계획에 저장됩니다.
               </p>
             </details>
+          ) : null}
+        </div>
+
+        <div
+          className="space-y-3 rounded-lg border border-slate-800/80 p-3"
+          data-testid="ss-pattern-combination-builder"
+        >
+          <h4 className="text-sm font-medium text-slate-200">
+            전략 조합 빌더
+          </h4>
+          <p className="text-xs text-slate-500">
+            여러 패턴을 하나의 전략(eventSequence) 안에서 AND / OR / SEQUENCE로
+            결합합니다. 선택한 값은 불변 Search 계획에 저장됩니다.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                ["single", "단일 패턴"],
+                ["confluence", "패턴 중첩"],
+                ["breakout_retest", "돌파 후 재진입"],
+                ["ordered_sequence", "추세 확인"],
+                ["zone_confluence", "자동 조합"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                disabled={inputDisabled}
+                className={
+                  "rounded-lg border px-3 py-1.5 text-xs " +
+                  (form.patternCombinationTemplate === id
+                    ? "border-sky-500/60 bg-sky-500/15 text-sky-100"
+                    : "border-slate-700 text-slate-300")
+                }
+                data-testid={`ss-combo-preset-${id}`}
+                onClick={() => {
+                  const defaults: Record<string, string[]> = {
+                    single: ["order_block"],
+                    confluence: ["order_block", "fvg"],
+                    breakout_retest: ["trendline", "support_resistance"],
+                    ordered_sequence: ["order_block", "fvg"],
+                    zone_confluence: [
+                      "order_block",
+                      "fvg",
+                      "support_resistance",
+                    ],
+                  };
+                  const families = defaults[id] ?? ["order_block"];
+                  const op =
+                    id === "ordered_sequence" || id === "breakout_retest"
+                      ? "sequence"
+                      : "and";
+                  onChange({
+                    ...form,
+                    patternCombinationTemplate: id,
+                    patternCombinationOperator: op,
+                    patternCombinationFamilies: families,
+                    patternCombinationBlocks: buildCatalogPatternBlocks(
+                      families,
+                      id,
+                      form.patternCombinationBlocks,
+                    ),
+                    selectedSpaceIds: families,
+                    autoStrategyCombo: false,
+                  });
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Field id="ss-combo-operator" label="논리 관계">
+              <select
+                id="ss-combo-operator"
+                className={inputClass}
+                disabled={inputDisabled}
+                value={form.patternCombinationOperator}
+                data-testid="ss-combo-operator"
+                onChange={(e) =>
+                  set(
+                    "patternCombinationOperator",
+                    e.target
+                      .value as StrategySearchOperatorFormState["patternCombinationOperator"],
+                  )
+                }
+              >
+                <option value="and">AND (모두 충족)</option>
+                <option value="or">OR (하나 이상)</option>
+                <option value="sequence">SEQUENCE (순서)</option>
+                <option value="weighted_score">WEIGHTED SCORE (가중 점수)</option>
+                <option value="priority">PRIORITY (우선순위)</option>
+              </select>
+            </Field>
+            <Field id="ss-combo-template" label="템플릿">
+              <select
+                id="ss-combo-template"
+                className={inputClass}
+                disabled={inputDisabled}
+                value={form.patternCombinationTemplate}
+                data-testid="ss-combo-template"
+                onChange={(e) =>
+                  set(
+                    "patternCombinationTemplate",
+                    e.target.value as StrategySearchOperatorFormState["patternCombinationTemplate"],
+                  )
+                }
+              >
+                <option value="single">단일 패턴</option>
+                <option value="confluence">패턴 중첩</option>
+                <option value="entry_confirmation">진입 + 확인</option>
+                <option value="ordered_sequence">순서 시퀀스</option>
+                <option value="breakout_retest">돌파 후 재진입</option>
+                <option value="zone_confluence">존 중첩</option>
+                <option value="invalidation_composite">복합 무효화</option>
+              </select>
+            </Field>
+            <Field id="ss-combo-failure-policy" label="실패 정책">
+              <select
+                id="ss-combo-failure-policy"
+                className={inputClass}
+                disabled={inputDisabled}
+                value={form.patternCombinationFailurePolicy}
+                data-testid="ss-combo-failure-policy"
+                onChange={(e) =>
+                  set(
+                    "patternCombinationFailurePolicy",
+                    e.target
+                      .value as StrategySearchOperatorFormState["patternCombinationFailurePolicy"],
+                  )
+                }
+              >
+                <option value="any">ANY — 하나라도 실패하면 전체 조건 탈락</option>
+                <option value="all">ALL — 모든 실패 조건이 발생해야 탈락</option>
+                <option value="majority">MAJORITY — 과반 실패 시 탈락</option>
+              </select>
+              <p
+                className="mt-1 text-xs text-slate-400"
+                data-testid="ss-combo-failure-policy-help"
+              >
+                {form.patternCombinationFailurePolicy === "all"
+                  ? "ALL: 모든 실패 조건이 발생해야 탈락"
+                  : form.patternCombinationFailurePolicy === "majority"
+                    ? "MAJORITY: 과반수 블록이 실패하면 탈락"
+                    : "ANY: 하나라도 실패하면 전체 조건 탈락"}
+              </p>
+            </Field>
+            {form.patternCombinationOperator === "weighted_score" ? (
+              <Field
+                id="ss-combo-weighted-threshold"
+                label="가중 점수 임계값"
+                error={err("patternCombinationWeightedThreshold")}
+              >
+                <input
+                  id="ss-combo-weighted-threshold"
+                  className={inputClass}
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  disabled={inputDisabled}
+                  value={form.patternCombinationWeightedThreshold}
+                  data-testid="ss-combo-weighted-threshold"
+                  onChange={(e) =>
+                    set("patternCombinationWeightedThreshold", e.target.value)
+                  }
+                />
+              </Field>
+            ) : null}
+          </div>
+          <div>
+            <div className="mb-1 text-xs text-slate-400">
+              패턴 블록 (최대 4 · 첫 번째가 진입 존)
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {PATTERN_FAMILY_OPTIONS.map(({ id, label }) => {
+                const checked =
+                  form.patternCombinationFamilies.includes(id);
+                return (
+                  <label
+                    key={id}
+                    className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200"
+                  >
+                    <input
+                      type="checkbox"
+                      disabled={inputDisabled}
+                      checked={checked}
+                      data-testid={`ss-combo-family-${id}`}
+                      onChange={(e) => {
+                        let next = e.target.checked
+                          ? [
+                              ...new Set([
+                                ...form.patternCombinationFamilies,
+                                id,
+                              ]),
+                            ]
+                          : form.patternCombinationFamilies.filter(
+                              (f) => f !== id,
+                            );
+                        next = next.slice(0, 4);
+                        const template =
+                          next.length <= 1
+                            ? "single"
+                            : form.patternCombinationTemplate === "single"
+                              ? "confluence"
+                              : form.patternCombinationTemplate;
+                        setCombinationFamilies(next, template);
+                      }}
+                    />
+                    {label}
+                  </label>
+                );
+              })}
+            </div>
+            {form.patternCombinationFamilies.length > 0 ? (
+              <p
+                className="mt-2 text-xs text-slate-400"
+                data-testid="ss-combo-summary"
+              >
+                조합:{" "}
+                {form.patternCombinationFamilies
+                  .map((f) =>
+                    f === "order_block"
+                      ? "OB"
+                      : f === "fvg"
+                        ? "FVG"
+                        : f === "trendline"
+                          ? "TL"
+                          : "SR",
+                  )
+                  .join(
+                    form.patternCombinationOperator === "and"
+                      ? " AND "
+                      : form.patternCombinationOperator === "or"
+                        ? " OR "
+                        : " → ",
+                  )}
+              </p>
+            ) : null}
+          </div>
+          {(form.patternCombinationBlocks ?? []).length > 0 ? (
+            <div
+              className="space-y-3"
+              data-testid="ss-pattern-block-editors"
+            >
+              {(form.patternCombinationBlocks ?? [])
+                .slice()
+                .sort((a, b) => a.order - b.order)
+                .map((block) => (
+                  <details
+                    key={block.id}
+                    open={form.patternConfigLevel !== "automatic"}
+                    className="rounded-lg border border-slate-700 bg-slate-950/40 p-3"
+                    data-testid={`ss-pattern-block-${block.id}`}
+                  >
+                    <summary className="cursor-pointer text-sm font-medium text-slate-100">
+                      블록 {block.order + 1} ·{" "}
+                      {PATTERN_FAMILY_OPTIONS.find((f) => f.id === block.family)
+                        ?.label ?? block.family}
+                    </summary>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      <Field id={`${block.id}-family`} label="패턴 패밀리">
+                        <select
+                          id={`${block.id}-family`}
+                          className={inputClass}
+                          value={block.family}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-family-${block.order}`}
+                          onChange={(e) => {
+                            const family = e.target.value as PatternFamilyId;
+                            const catalogParams = Object.fromEntries(
+                              PATTERN_PARAMETER_CATALOG[family].map((entry) => [
+                                entry.key,
+                                entry.default,
+                              ]),
+                            );
+                            updatePatternBlock(block.id, {
+                              id: `${family}_${block.order}`,
+                              family,
+                              params: catalogParams,
+                            });
+                          }}
+                        >
+                          {PATTERN_FAMILY_OPTIONS.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                      <Field id={`${block.id}-role`} label="정규 역할">
+                        <select
+                          id={`${block.id}-role`}
+                          className={inputClass}
+                          value={block.role}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-role-${block.order}`}
+                          onChange={(e) =>
+                            updatePatternBlock(block.id, {
+                              role: e.target
+                                .value as PatternCombinationBlockConfig["role"],
+                            })
+                          }
+                        >
+                          {PATTERN_ROLE_OPTIONS.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                      <Field id={`${block.id}-order`} label="실행 순서">
+                        <input
+                          id={`${block.id}-order`}
+                          className={inputClass}
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={block.order}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-order-${block.order}`}
+                          onChange={(e) =>
+                            updatePatternBlock(block.id, {
+                              order: Math.trunc(Number(e.target.value)),
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field id={`${block.id}-weight`} label="가중치">
+                        <input
+                          id={`${block.id}-weight`}
+                          className={inputClass}
+                          type="number"
+                          min={0.01}
+                          max={100}
+                          step={0.01}
+                          value={block.weight}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-weight-${block.order}`}
+                          onChange={(e) =>
+                            updatePatternBlock(block.id, {
+                              weight: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field id={`${block.id}-priority`} label="우선순위">
+                        <input
+                          id={`${block.id}-priority`}
+                          className={inputClass}
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={block.priority}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-priority-${block.order}`}
+                          onChange={(e) =>
+                            updatePatternBlock(block.id, {
+                              priority: Math.trunc(Number(e.target.value)),
+                            })
+                          }
+                        />
+                      </Field>
+                      <label className="ss-field-label flex items-center gap-2 self-end py-2">
+                        <input
+                          type="checkbox"
+                          checked={block.required}
+                          disabled={inputDisabled}
+                          data-testid={`ss-pattern-block-required-${block.order}`}
+                          onChange={(e) =>
+                            updatePatternBlock(block.id, {
+                              required: e.target.checked,
+                            })
+                          }
+                        />
+                        필수 블록
+                      </label>
+                    </div>
+                    {form.patternConfigLevel !== "automatic" ? (
+                      <div
+                        className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                        data-testid={`ss-pattern-block-params-${block.order}`}
+                      >
+                        {PATTERN_PARAMETER_CATALOG[block.family].map((entry) => {
+                          const id = `${block.id}-${entry.key}`;
+                          const value =
+                            block.params[entry.key] ?? entry.default;
+                          const hint =
+                            form.patternConfigLevel === "expert"
+                              ? `min ${String(entry.min)} · default ${String(entry.default)} · max ${String(entry.max)}${entry.step != null ? ` · step ${entry.step}` : ""}`
+                              : entry.explanationLabel;
+                          return (
+                            <Field
+                              key={entry.key}
+                              id={id}
+                              label={entry.labelKo}
+                              hint={hint}
+                              error={err(
+                                `patternBlock.${block.id}.${entry.key}`,
+                              )}
+                            >
+                              {entry.type === "enum" ? (
+                                <select
+                                  id={id}
+                                  className={inputClass}
+                                  value={String(value)}
+                                  disabled={inputDisabled}
+                                  data-testid={`ss-pattern-param-${block.order}-${entry.key}`}
+                                  onChange={(e) =>
+                                    updatePatternParam(
+                                      block.id,
+                                      entry.key,
+                                      e.target.value,
+                                    )
+                                  }
+                                >
+                                  {entry.allowedEnumValues?.map((option) => (
+                                    <option key={option} value={option}>
+                                      {option}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : entry.type === "bool" ? (
+                                <select
+                                  id={id}
+                                  className={inputClass}
+                                  value={String(Boolean(value))}
+                                  disabled={inputDisabled}
+                                  data-testid={`ss-pattern-param-${block.order}-${entry.key}`}
+                                  onChange={(e) =>
+                                    updatePatternParam(
+                                      block.id,
+                                      entry.key,
+                                      e.target.value === "true",
+                                    )
+                                  }
+                                >
+                                  <option value="true">사용</option>
+                                  <option value="false">사용 안 함</option>
+                                </select>
+                              ) : (
+                                <input
+                                  id={id}
+                                  className={inputClass}
+                                  type="number"
+                                  min={
+                                    typeof entry.min === "number"
+                                      ? entry.min
+                                      : undefined
+                                  }
+                                  max={
+                                    typeof entry.max === "number"
+                                      ? entry.max
+                                      : undefined
+                                  }
+                                  step={entry.step ?? "any"}
+                                  value={Number(value)}
+                                  disabled={inputDisabled}
+                                  data-testid={`ss-pattern-param-${block.order}-${entry.key}`}
+                                  onChange={(e) =>
+                                    updatePatternParam(
+                                      block.id,
+                                      entry.key,
+                                      Number(e.target.value),
+                                    )
+                                  }
+                                />
+                              )}
+                            </Field>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </details>
+                ))}
+            </div>
           ) : null}
         </div>
       </section>
@@ -1609,6 +2240,49 @@ export function JobCreateForm(props: {
           className="mt-3 rounded-lg border-2 border-slate-700 bg-slate-900/40 px-3 py-2.5 text-sm"
           data-testid="ss-applied-settings-preview"
         >
+          <div className="mb-3 space-y-1 border-b border-slate-700 pb-2">
+            <p data-testid="ss-preview-user-name">
+              <span className="text-slate-400">사용자 이름: </span>
+              <span className="font-medium text-slate-100">
+                {form.searchName.trim() || "—"}
+              </span>
+            </p>
+            <p data-testid="ss-preview-config-summary">
+              <span className="text-slate-400">실제 설정: </span>
+              <span className="font-medium text-slate-100">
+                {[
+                  form.patternCombinationFamilies.length > 1
+                    ? form.patternCombinationFamilies
+                        .map((f) =>
+                          f === "order_block"
+                            ? "OB"
+                            : f === "fvg"
+                              ? "FVG"
+                              : f === "trendline"
+                                ? "TL"
+                                : f === "support_resistance"
+                                  ? "SR"
+                                  : f === "supply_demand"
+                                    ? "SD"
+                                    : f,
+                        )
+                        .join(" + ")
+                    : null,
+                  form.patternCombinationFamilies.length > 1
+                    ? form.patternCombinationOperator.toUpperCase()
+                    : null,
+                  form.patternCombinationFamilies.length > 1
+                    ? form.patternCombinationTemplate === "confluence"
+                      ? "Pattern Confluence"
+                      : form.patternCombinationTemplate
+                    : null,
+                  `${form.symbol || "BTCUSDT"} ${form.timeframe || "15m"}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </p>
+          </div>
           <dl className="grid gap-2 sm:grid-cols-2">
             {preview.rows.map((row) => (
               <div key={row.labelKo} className="space-y-0.5">

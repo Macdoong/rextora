@@ -51,6 +51,41 @@ export interface LevelLine {
   endPrice?: number;
 }
 
+/** Persisted line geometry with true time/price endpoints. */
+export interface TimeBoundLineSegment {
+  fromTime: number;
+  fromPrice: number;
+  toTime: number;
+  toPrice: number;
+  color: string;
+  label: string;
+  dashed?: boolean;
+  tooltipLines?: string[];
+}
+
+export type LifecycleMarkerKind =
+  | "creation"
+  | "revisit"
+  | "break"
+  | "confirmation"
+  | "invalidation"
+  | "entry"
+  | "stop"
+  | "target"
+  | "exit"
+  | "rejected";
+
+/** Marker sourced from persisted trace/rejection evidence only. */
+export interface LifecycleMarker {
+  time: number;
+  price: number;
+  kind: LifecycleMarkerKind;
+  label: string;
+  color?: string;
+  tooltipLines?: string[];
+  blockId?: string;
+}
+
 /** Filled rectangular zone (Order Block / FVG) using stored geometry. */
 export interface ZoneRect {
   high: number;

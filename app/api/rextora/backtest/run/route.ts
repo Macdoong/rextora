@@ -258,8 +258,8 @@ export async function POST(request: Request) {
     }
     if (
       body.strategyHash &&
-      strategy.paramsHash &&
-      body.strategyHash !== strategy.paramsHash
+      (strategy.strategyHash ?? strategy.paramsHash) &&
+      body.strategyHash !== (strategy.strategyHash ?? strategy.paramsHash)
     ) {
       return NextResponse.json(
         {

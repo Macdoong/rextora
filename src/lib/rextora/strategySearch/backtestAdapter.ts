@@ -553,11 +553,12 @@ async function runCandidateWindowEvaluation(input: {
       fundingApplied: false,
       spreadApplied: input.applySpread,
       rejectedSetups: obResult.rejectedSetups.map((r) => ({
-        bar: r.bar,
-        reasonCode: r.reasonCode,
-        patternType: r.patternType,
-        measured: r.measured,
-        required: r.required,
+        ...r,
+        at:
+          r.at ??
+          (candles[r.bar]?.openTime != null
+            ? new Date(candles[r.bar]!.openTime).toISOString()
+            : null),
       })),
     });
 

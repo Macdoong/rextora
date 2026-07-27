@@ -267,7 +267,12 @@ describe("register then backtest", () => {
     const first = registerTrialForBacktest(job.id, 1, store);
     expect(first.result.strategyId).not.toBe(SAFE_STRATEGY_ID);
     expect(first.backtestHref).toContain(`strategyId=${first.result.strategyId}`);
-    expect(first.backtestHref).toContain(`strategyHash=${first.result.paramsHash}`);
+    expect(first.backtestHref).toContain(
+      `strategyHash=${first.result.strategyHash}`,
+    );
+    expect(first.backtestHref).toContain(
+      `sourceParamsHash=${first.result.sourceParamsHash}`,
+    );
     expect(first.backtestHref).toContain("symbol=BTCUSDT");
     expect(first.backtestHref).toContain("timeframe=15m");
     expect(first.backtestHref).toContain(`sourceResearchJobId=${job.id}`);

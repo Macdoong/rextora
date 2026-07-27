@@ -109,6 +109,32 @@ describe("strategy search runtime correction", () => {
     expect(classified.class).toBe("candidate_invalid");
   });
 
+  it("nextInt range collapse is recoverable parameter_out_of_range", () => {
+    const classified = classifyEngineError(
+      new Error("nextInt minInclusive must be <= maxInclusive"),
+      "candidate_generation",
+    );
+    expect(classified.fatal).toBe(false);
+    expect(classified.class).toBe("parameter_out_of_range");
+  });
+
+  it("trial collision and invalid pause transition are non-fatal", () => {
+    const trial = classifyEngineError(
+      new Error(
+        "strategy-search trial already exists with different contents: search_x#1",
+      ),
+      "persistence",
+    );
+    expect(trial.fatal).toBe(false);
+    expect(trial.code).toBe("TRIAL_COLLISION");
+    const pause = classifyEngineError(
+      new Error("invalid strategy-search status transition: running → paused"),
+      "job_state",
+    );
+    expect(pause.fatal).toBe(false);
+    expect(pause.code).toBe("INVALID_STATUS_TRANSITION");
+  });
+
   it("fatal unclassified errors remain fatal", () => {
     const classified = classifyEngineError(
       new Error("unexpected null pointer in orchestrator"),

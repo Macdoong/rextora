@@ -123,7 +123,14 @@ export function DashboardPanels() {
           <Card title="활성 전략" className="!p-3" data-testid="dashboard-active-strategy">
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
               <Metric label="전략" value={strategy?.name ?? "SAFE_v44_i4060"} />
-              <Metric label="전략 고유값" value={strategy?.paramsHash ?? "7893ca3f0e30"} />
+              <Metric
+                label="전략 해시"
+                value={
+                  (strategy as { strategyHash?: string } | null)?.strategyHash?.slice(0, 12) ??
+                  strategy?.paramsHash?.slice(0, 12) ??
+                  "7893ca3f0e30"
+                }
+              />
               <Metric label="최근 백테스트" value={strategy?.lastReturn != null ? `${(strategy.lastReturn * 100).toFixed(1)}%` : "-"} />
               <Metric label="실전 후보" value="보호 전략" />
             </div>

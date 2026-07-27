@@ -6,6 +6,10 @@ import { detectOrderBlocks, type OrderBlockParams } from "./orderBlock";
 import { detectFvg, type FvgParams } from "./fvg";
 import { detectTrendLine, type TrendLineParams } from "./trendLine";
 import { detectSupportResistance, type SrParams } from "./supportResistance";
+import {
+  detectSupplyDemand,
+  type SupplyDemandParams,
+} from "./supplyDemand";
 import { buildIndicatorSeries, compareValues } from "./indicators";
 import { evaluateUnifiedCost } from "../../metrics/unifiedCost";
 
@@ -123,6 +127,32 @@ function evalLeaf(leaf: LeafCondition, ctx: EvalContext): boolean {
         maxAgeBars: num(p, "max_age_bars", 120)
       };
       return detectSupportResistance(candles, bar, leaf.type, sp).hit;
+    }
+    case "demand_zone":
+    case "supply_zone": {
+      const sd: SupplyDemandParams = {
+        lookback: Math.trunc(num(p, "lookback", 40)),
+        baseCandleCount: Math.trunc(num(p, "base_candle_count", 2)),
+        maxBaseRangeAtrMult: num(p, "max_base_range_atr_mult", 1),
+        minDepartureAtrMult: num(p, "min_departure_atr_mult", 1),
+        minDeparturePct: num(p, "min_departure_pct", 0.3),
+        zoneBodyOnly: bool(p, "zone_body_only", false),
+        maxAgeBars: Math.trunc(num(p, "max_age_bars", 40)),
+        firstTouchOnly: bool(p, "first_touch_only", true),
+        requireRejectionClose: bool(p, "require_rejection_close", false),
+        invalidateOnCloseBeyond: bool(
+          p,
+          "invalidate_on_close_beyond",
+          true,
+        ),
+      };
+      return detectSupplyDemand(
+        candles,
+        bar,
+        atr,
+        leaf.type === "demand_zone" ? "demand" : "supply",
+        sd,
+      ).hit;
     }
     case "sma":
     case "ema":

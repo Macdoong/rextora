@@ -16,6 +16,7 @@ import {
 } from "./windowPlanner";
 import {
   getJobExecutionProfile,
+  saveJobExecutionProfile,
   type StrategySearchExecutionProfile,
 } from "./jobExecutionProfile";
 import {
@@ -26,6 +27,15 @@ import {
   type RunSearchJobInput,
   type RunSearchJobResult,
 } from "./jobRunner";
+import {
+  acquireJobExecutionOwnership,
+  EXECUTION_OWNERSHIP_HEARTBEAT_MS,
+  getProcessExecutionOwnerId,
+  isJobExecutionOwnedOnDisk,
+  JobExecutionOwnershipError,
+  releaseJobExecutionOwnership,
+  touchJobExecutionOwnershipHeartbeat,
+} from "./jobExecutionOwnership";
 import { runOrchestratedSearchJob } from "./searchOrchestrator";
 import { transitionJobToCancelled } from "./jobState";
 import type { StrategySearchJob } from "./types";
@@ -33,6 +43,7 @@ import type { StrategySearchJob } from "./types";
 export class StrategySearchExecutionRegistryError extends Error {
   readonly code:
     | "ALREADY_RUNNING"
+    | "ALREADY_OWNED"
     | "NOT_FOUND"
     | "INVALID_STATE"
     | "MISSING_PROFILE"
@@ -61,8 +72,10 @@ export interface SearchJobExecutionDeps {
 
 type ActiveEntry = {
   jobId: string;
+  ownerId: string;
   promise: Promise<RunSearchJobResult | void>;
   startedAt: string;
+  heartbeatTimer: ReturnType<typeof setInterval> | null;
 };
 
 const activeRuns = new Map<string, ActiveEntry>();
@@ -90,6 +103,17 @@ function mergeDeps(deps: SearchJobExecutionDeps): SearchJobExecutionDeps {
 
 export function isSearchJobExecutionActive(jobId: string): boolean {
   return activeRuns.has(jobId);
+}
+
+/** True when any process holds an active in-memory or on-disk execution lease. */
+export function isSearchJobExecutionWorkerActive(
+  jobId: string,
+  storeOptions?: StrategySearchStoreOptions,
+): boolean {
+  return (
+    isSearchJobExecutionActive(jobId) ||
+    isJobExecutionOwnedOnDisk(jobId, storeOptions)
+  );
 }
 
 export function listActiveSearchJobExecutions(): string[] {
@@ -156,7 +180,7 @@ async function resolveCandles(
 export function startSearchJobExecution(
   jobId: string,
   deps: SearchJobExecutionDeps = {},
-): { jobId: string; accepted: true } {
+): { jobId: string; accepted: true; ownerId: string } {
   const resolved = mergeDeps(deps);
   if (activeRuns.has(jobId)) {
     throw new StrategySearchExecutionRegistryError(
@@ -166,8 +190,22 @@ export function startSearchJobExecution(
   }
 
   const store = resolved.storeOptions;
+  const ownerId = getProcessExecutionOwnerId();
+  try {
+    acquireJobExecutionOwnership(jobId, ownerId, store);
+  } catch (err) {
+    if (err instanceof JobExecutionOwnershipError && err.code === "ALREADY_OWNED") {
+      throw new StrategySearchExecutionRegistryError(
+        "ALREADY_OWNED",
+        err.message,
+      );
+    }
+    throw err;
+  }
+
   const job = getSearchJob(jobId, store);
   if (!job) {
+    releaseJobExecutionOwnership(jobId, ownerId, "start_rejected_not_found", store);
     throw new StrategySearchExecutionRegistryError(
       "NOT_FOUND",
       `strategy-search job not found: ${jobId}`,
@@ -177,6 +215,7 @@ export function startSearchJobExecution(
   if (job.status === "queued" || job.status === "running") {
     // ok — queued starts fresh; running without registry is orphan recovery
   } else {
+    releaseJobExecutionOwnership(jobId, ownerId, "start_rejected_invalid_state", store);
     throw new StrategySearchExecutionRegistryError(
       "INVALID_STATE",
       `cannot start strategy-search job in status: ${job.status}`,
@@ -185,20 +224,57 @@ export function startSearchJobExecution(
 
   const profile = getJobExecutionProfile(jobId, store);
   if (!profile) {
+    releaseJobExecutionOwnership(jobId, ownerId, "start_rejected_missing_profile", store);
     throw new StrategySearchExecutionRegistryError(
       "MISSING_PROFILE",
       `strategy-search execution profile missing for job: ${jobId}`,
     );
   }
 
+  // Repair placeholder jitter ranges (ema_fast) left by older create paths so
+  // pattern candidates are not rejected as UNKNOWN_PARAMETER during jitter.
+  const jitterKeys = profile.jitterConfig.parameterRanges.map((r) => r.key);
+  const looksLikePlaceholder =
+    profile.jitterConfig.enabled &&
+    (jitterKeys.length === 0 ||
+      (jitterKeys.length === 1 && jitterKeys[0] === "ema_fast") ||
+      !jitterKeys.some((k) =>
+        job.config.parameterRanges.some((r) => r.key === k),
+      ));
+  const effectiveProfile = looksLikePlaceholder
+    ? saveJobExecutionProfile(
+        jobId,
+        {
+          ...profile,
+          jitterConfig: {
+            ...profile.jitterConfig,
+            parameterRanges: job.config.parameterRanges.map((r) => ({ ...r })),
+          },
+        },
+        store,
+      )
+    : profile;
+
   const startedAt = new Date().toISOString();
+  const heartbeatTimer = setInterval(() => {
+    try {
+      touchJobExecutionOwnershipHeartbeat(jobId, ownerId, store);
+    } catch {
+      /* runner will exit and release ownership */
+    }
+  }, EXECUTION_OWNERSHIP_HEARTBEAT_MS);
+
   const promise = (async (): Promise<RunSearchJobResult | void> => {
     const plans = buildEvaluationWindowPlans({
-      availableFrom: profile.dataRef.availableFrom,
-      availableTo: profile.dataRef.availableTo,
+      availableFrom: effectiveProfile.dataRef.availableFrom,
+      availableTo: effectiveProfile.dataRef.availableTo,
       windows: job.config.evaluationWindows,
     });
-    const preloadedCandlesByKey = await resolveCandles(job, profile, resolved);
+    const preloadedCandlesByKey = await resolveCandles(
+      job,
+      effectiveProfile,
+      resolved,
+    );
 
     // Cancel may arrive while candles load (status stays queued→cancel_requested).
     // Settle to cancelled before runSearchJob, which would otherwise reject and
@@ -234,12 +310,12 @@ export function startSearchJobExecution(
       jobId,
       storeOptions: store,
       windows: plans,
-      balance: profile.balance,
-      baseCostConfig: profile.baseCostConfig,
-      passPolicy: profile.passPolicy,
-      scoreWeights: profile.scoreWeights,
-      costStressScenarios: profile.costStressScenarios,
-      jitterConfig: profile.jitterConfig,
+      balance: effectiveProfile.balance,
+      baseCostConfig: effectiveProfile.baseCostConfig,
+      passPolicy: effectiveProfile.passPolicy,
+      scoreWeights: effectiveProfile.scoreWeights,
+      costStressScenarios: effectiveProfile.costStressScenarios,
+      jitterConfig: effectiveProfile.jitterConfig,
       baseParams,
       preloadedCandlesByKey,
       evaluate: resolved.evaluate,
@@ -250,11 +326,19 @@ export function startSearchJobExecution(
     .finally(() => {
       const current = activeRuns.get(jobId);
       if (current?.startedAt === startedAt) {
+        if (current.heartbeatTimer) clearInterval(current.heartbeatTimer);
         activeRuns.delete(jobId);
+        releaseJobExecutionOwnership(jobId, ownerId, "runner_finished", store);
       }
     });
 
-  activeRuns.set(jobId, { jobId, promise, startedAt });
+  activeRuns.set(jobId, {
+    jobId,
+    ownerId,
+    promise,
+    startedAt,
+    heartbeatTimer,
+  });
   void promise;
-  return { jobId, accepted: true };
+  return { jobId, accepted: true, ownerId };
 }

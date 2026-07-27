@@ -25,6 +25,7 @@ import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
 import { validateEventSequence } from "../strategy/definition/eventSequence";
 import { validateCanonicalDefinition } from "../strategy/definition/validator";
 import { buildBacktestReport } from "./backtestReport";
+import { computeStrategyHash } from "../strategy/strategyHash";
 
 /**
  * Legacy display-sample ceiling (disabled).
@@ -32,6 +33,18 @@ import { buildBacktestReport } from "./backtestReport";
  * Viewport virtualization in CandlestickChart handles render cost.
  */
 export const CHART_CANDLE_SAMPLE_LIMIT = Number.POSITIVE_INFINITY;
+
+function strategyDisplayName(strategy: StoredStrategyV1): string {
+  return strategy.displayAlias ?? strategy.displayName ?? strategy.name;
+}
+
+/** Full canonical strategyHash — never fall back to short paramsHash. */
+function resolveReportStrategyHash(strategy: StoredStrategyV1): string {
+  if (strategy.strategyHash && strategy.strategyHash.length >= 32) {
+    return strategy.strategyHash;
+  }
+  return computeStrategyHash(storedToDefinition(strategy));
+}
 
 export class BacktestPipelineError extends Error {
   readonly code: string;
@@ -349,8 +362,9 @@ export async function runConfiguredBacktest(
         resultTrades = es.trades;
         resultEquity = es.equityCurve;
         resultReport = buildBacktestReport({
-          strategyName: strategy.name,
-          paramsHash: strategy.paramsHash,
+          strategyName: strategyDisplayName(strategy),
+          paramsHash: resolveReportStrategyHash(strategy),
+          sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
           strategyId: strategy.id,
           sourceStatus: strategy.sourceStatus,
           symbol,
@@ -376,16 +390,12 @@ export async function runConfiguredBacktest(
           fundingApplied: config.applyFunding,
           spreadApplied: config.applySpread,
           rejectedSetups: (es.rejectedSetups ?? []).map((r) => ({
-            bar: r.bar,
+            ...r,
             at:
-              loaded.candles[r.bar]?.openTime != null
+              r.at ??
+              (loaded.candles[r.bar]?.openTime != null
                 ? new Date(loaded.candles[r.bar]!.openTime).toISOString()
-                : null,
-            reasonCode: r.reasonCode,
-            patternType: r.patternType,
-            measured: r.measured,
-            required: r.required,
-            rejectionStage: "invalidation",
+                : null),
           })),
         });
       } else if (strategy.strategyType === "condition_builder") {
@@ -400,8 +410,9 @@ export async function runConfiguredBacktest(
         resultTrades = cb.trades;
         resultEquity = cb.equityCurve;
         resultReport = buildBacktestReport({
-          strategyName: strategy.name,
-          paramsHash: strategy.paramsHash,
+          strategyName: strategyDisplayName(strategy),
+          paramsHash: resolveReportStrategyHash(strategy),
+          sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
           strategyId: strategy.id,
           sourceStatus: strategy.sourceStatus,
           symbol,
@@ -437,7 +448,7 @@ export async function runConfiguredBacktest(
             base_bal_pct: config.baseBalPct ?? strategy.params.base_bal_pct,
           },
           paramsHash: strategy.paramsHash,
-          strategyName: strategy.name,
+          strategyName: strategyDisplayName(strategy),
           strategyId: strategy.id,
           sourceStatus: strategy.sourceStatus,
           timeframe: config.timeframe,
@@ -525,7 +536,7 @@ export async function runConfiguredBacktest(
               base_bal_pct: config.baseBalPct ?? strategy.params.base_bal_pct,
             },
             paramsHash: strategy.paramsHash,
-            strategyName: strategy.name,
+            strategyName: strategyDisplayName(strategy),
             strategyId: strategy.id,
             sourceStatus: strategy.sourceStatus,
             timeframe: config.timeframe,
@@ -550,7 +561,12 @@ export async function runConfiguredBacktest(
           });
         }
       }
-      resultReport = { ...resultReport, costStress: stress };
+      resultReport = {
+        ...resultReport,
+        strategyHash: resolveReportStrategyHash(strategy),
+        sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
+        costStress: stress,
+      };
 
       const { chartCandles, chartSamplingApplied } = sampleChartCandles(
         loaded.candles,
@@ -631,8 +647,9 @@ export async function runConfiguredBacktest(
       equityCurve.push(...(r.equityCurve.slice(1) ?? []));
     }
     combinedReport = buildBacktestReport({
-      strategyName: strategy.name,
-      paramsHash: strategy.paramsHash,
+      strategyName: strategyDisplayName(strategy),
+      paramsHash: resolveReportStrategyHash(strategy),
+      sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
       strategyId: strategy.id,
       sourceStatus: strategy.sourceStatus,
       symbol: "MULTI",
@@ -689,6 +706,7 @@ export async function runAndSaveBacktest(config: BacktestConfig) {
   const requestedAt = new Date().toISOString();
   const startedAt = new Date().toISOString();
   const result = await runConfiguredBacktest(config);
+  const strategySnapshot = getStrategyById(config.strategyId);
   updateStrategyLastBacktest(config.strategyId, {
     totalReturn: result.report.totalReturn,
     mdd: result.report.mdd,
@@ -701,6 +719,9 @@ export async function runAndSaveBacktest(config: BacktestConfig) {
     trades: result.trades,
     strategyId: config.strategyId,
     strategyHash: result.report.strategyHash ?? undefined,
+    sourceParamsHash: strategySnapshot?.sourceParamsHash ?? strategySnapshot?.paramsHash ?? null,
+    displayAliasSnapshot: strategySnapshot?.displayAlias ?? null,
+    displayNameSnapshot: strategySnapshot?.displayName ?? null,
     sourceType: "user_backtest_run",
     status: "completed",
     requestedAt,

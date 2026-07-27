@@ -1,10 +1,12 @@
 import type { StrategySearchCreateJobBody } from "./types";
+import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
 import {
   OPERATOR_SUPPORTED_SYMBOLS,
   OPERATOR_SUPPORTED_TIMEFRAMES,
   SEARCHABLE_PATTERN_SPACE_OPTIONS,
   SEARCHABLE_SPACE_OPTIONS,
   getDepthProfile,
+  isPatternFamilyId,
   operatorFormToCreateBody,
   resolveCandidateBudget,
   resolveDepthProfileId,
@@ -266,6 +268,133 @@ export function validateStrategySearchForm(
     }),
   );
 
+  const combinationFamilies = form.patternCombinationFamilies.filter(
+    isPatternFamilyId,
+  );
+  const blocks = form.patternCombinationBlocks ?? [];
+  if (combinationFamilies.length > 0) {
+    if (blocks.length !== combinationFamilies.length) {
+      errors.push({
+        field: "patternCombinationBlocks",
+        message: "선택한 패턴마다 저장 가능한 설정 블록이 필요합니다.",
+      });
+    } else {
+      const orders = new Set<number>();
+      const priorities = new Set<number>();
+      let entryZones = 0;
+      let totalWeight = 0;
+      for (const block of blocks) {
+        if (!combinationFamilies.includes(block.family)) {
+          errors.push({
+            field: "patternCombinationBlocks",
+            message: `${block.family} 블록이 선택한 패턴과 일치하지 않습니다.`,
+          });
+          continue;
+        }
+        if (!Number.isInteger(block.order) || block.order < 0 || orders.has(block.order)) {
+          errors.push({
+            field: "patternCombinationBlocks",
+            message: "패턴 블록 순서는 중복 없는 0 이상 정수여야 합니다.",
+          });
+        }
+        orders.add(block.order);
+        const priority = block.priority ?? block.order;
+        if (
+          !Number.isInteger(priority) ||
+          priority < 0 ||
+          (form.patternCombinationOperator === "priority" &&
+            priorities.has(priority))
+        ) {
+          errors.push({
+            field: "patternCombinationBlocks",
+            message: "우선순위는 중복 없는 0 이상 정수여야 합니다.",
+          });
+        }
+        priorities.add(priority);
+        const weight = block.weight ?? 1;
+        if (!Number.isFinite(weight) || weight <= 0 || weight > 100) {
+          errors.push({
+            field: "patternCombinationBlocks",
+            message: "블록 가중치는 0보다 크고 100 이하여야 합니다.",
+          });
+        } else {
+          totalWeight += weight;
+        }
+        if (block.role === "entry_zone") entryZones += 1;
+        const catalog = PATTERN_PARAMETER_CATALOG[block.family];
+        for (const entry of catalog) {
+          const value = block.params[entry.key];
+          const field = `patternBlock.${block.id}.${entry.key}`;
+          if (value === undefined || value === null) {
+            errors.push({ field, message: `${entry.labelKo} 값이 필요합니다.` });
+            continue;
+          }
+          if (entry.type === "enum") {
+            if (
+              typeof value !== "string" ||
+              !entry.allowedEnumValues?.includes(value)
+            ) {
+              errors.push({ field, message: `${entry.labelKo} 선택값이 올바르지 않습니다.` });
+            }
+          } else if (entry.type === "bool") {
+            if (typeof value !== "boolean") {
+              errors.push({ field, message: `${entry.labelKo} 값은 참/거짓이어야 합니다.` });
+            }
+          } else if (
+            typeof value !== "number" ||
+            !Number.isFinite(value) ||
+            (typeof entry.min === "number" && value < entry.min) ||
+            (typeof entry.max === "number" && value > entry.max) ||
+            (entry.type === "int" && !Number.isInteger(value))
+          ) {
+            errors.push({
+              field,
+              message: `${entry.labelKo} 값은 ${String(entry.min)}–${String(entry.max)} 범위여야 합니다.`,
+            });
+          }
+        }
+      }
+      if (entryZones !== 1) {
+        errors.push({
+          field: "patternCombinationBlocks",
+          message: "조합에는 진입 존 역할이 정확히 하나 필요합니다.",
+        });
+      }
+      if (
+        (form.patternCombinationOperator === "or" ||
+          form.patternCombinationOperator === "sequence") &&
+        blocks.length < 2
+      ) {
+        errors.push({
+          field: "patternCombinationOperator",
+          message: "OR/SEQUENCE 조합은 패턴 블록이 두 개 이상 필요합니다.",
+        });
+      }
+      if (form.patternCombinationOperator === "sequence") {
+        const sorted = [...orders].sort((a, b) => a - b);
+        if (sorted.some((order, index) => order !== index)) {
+          errors.push({
+            field: "patternCombinationBlocks",
+            message: "SEQUENCE 순서는 0부터 연속이어야 합니다.",
+          });
+        }
+      }
+      if (form.patternCombinationOperator === "weighted_score") {
+        const threshold = Number(form.patternCombinationWeightedThreshold);
+        if (
+          !Number.isFinite(threshold) ||
+          threshold <= 0 ||
+          threshold > totalWeight
+        ) {
+          errors.push({
+            field: "patternCombinationWeightedThreshold",
+            message: `가중 임계값은 0보다 크고 총 가중치(${totalWeight}) 이하여야 합니다.`,
+          });
+        }
+      }
+    }
+  }
+
   if (typeof form.maxSearchCount !== "string") {
     const budget = resolveCandidateBudget(form);
     if (!Number.isInteger(budget) || budget < 1) {
@@ -312,7 +441,7 @@ export type AppliedSettingsPreviewRow = {
   hintKo?: string;
 };
 
-function formatRuntimeKo(ms: number | null): string {
+export function formatRuntimeKo(ms: number | null): string {
   if (ms == null || !Number.isFinite(ms) || ms <= 0) return "—";
   const minutes = Math.round(ms / 60_000);
   if (minutes >= 60 && minutes % 60 === 0) {
@@ -405,7 +534,12 @@ export function buildAppliedSettingsPreview(
               form.patternDirection,
               `리테스트 ${form.patternRetestMode}`,
               `강도 ${form.patternStrength}`,
-              `확인종가 ${form.patternConfirmClose}`,
+              `확인 ${form.patternConfirmationMode}${
+                form.patternConfirmationMode === "consecutive_closes" ||
+                form.patternConfirmationMode === "threshold_count"
+                  ? ` N=${form.patternConfirmationCandleCount}`
+                  : ""
+              }`,
             ].join(" · "),
     },
     {

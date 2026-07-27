@@ -169,6 +169,18 @@ describe("eventSequenceBacktest", () => {
       feeRate: 0,
       slippageRate: 0,
     });
+    const forceClosed = trunc.trades.find((t) => t.exitReason === "end");
+    expect(forceClosed?.patternBlocks?.length).toBeGreaterThan(0);
+    expect(forceClosed?.patternBlocks?.[0]?.exitPrice).toBe(
+      forceClosed?.exitPrice,
+    );
+    expect(forceClosed?.patternBlocks?.[0]?.exitTime).toBeTruthy();
+    expect(forceClosed?.patternBlocks?.[0]?.stopPrice).toBe(
+      forceClosed?.stopPrice,
+    );
+    expect(forceClosed?.patternBlocks?.[0]?.targetPrice).toBe(
+      forceClosed?.takeProfitPrice,
+    );
 
     const mutated = base.map((c, idx) =>
       idx > i

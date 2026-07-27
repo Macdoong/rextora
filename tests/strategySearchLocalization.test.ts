@@ -129,24 +129,28 @@ describe("strategy search Korean localization polish", () => {
 
   it("completion panel uses clear Korean research summary fields", () => {
     const src = read("ResearchCompletionPanel.tsx");
-    expect(src).toContain("부분 결과");
-    expect(src).toContain("AI 연구 완료");
+    expect(src).toContain("부분 완료");
+    expect(src).toContain("정상 완료");
+    expect(src).toContain("사용자 중지");
     expect(src).toContain("일시정지");
     expect(src).toContain("연구 시간");
-    expect(src).toContain("평가 전략");
+    expect(src).toContain("평가");
     expect(src).toContain("기본 합격");
-    expect(src).toContain("최종 추천 가능");
-    expect(src).toContain("TOP 10 저장");
-    expect(src).toContain("등록 전략");
+    expect(src).toContain("최종 적격");
+    expect(src).toContain("TOP 10");
+    expect(src).toContain("등록");
     expect(src).toContain("백테스트 추천");
     expect(src).toContain("최종 정리 후 최고");
     expect(src).toContain("실시간 탐색 최고");
     expect(src).toContain("최고 안정");
-    expect(src).toContain("결과 확인");
-    expect(src).toContain("이어서 탐색");
+    expect(src).toContain("최종 TOP 10 검토");
+    expect(src).toContain("개선 탐색");
     expect(src).toContain("새 탐색 시작");
+    expect(src).toContain("개발자 정보");
     expect(src).toContain("ss-completion-primary-metrics");
     expect(src).toContain("ss-completion-top10-saved");
+    expect(src).not.toMatch(/\bcancelled\b.*ss-completion-status-line/);
+    expect(src).not.toContain("summary.registeredStrategies");
   });
 
   it("history list shows Korean retention note and delete label", () => {

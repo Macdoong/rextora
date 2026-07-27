@@ -51,6 +51,8 @@ export interface BacktestZeroTradeDiagnostics {
 export interface BacktestReport {
   strategyName: string;
   strategyHash: string;
+  /** Search candidate identity captured at promotion, when applicable. */
+  sourceParamsHash?: string | null;
   strategyId: string;
   sourceStatus: string;
   symbol: string;
@@ -150,6 +152,10 @@ export interface SavedBacktestResult {
   backtestRunId?: string;
   strategyId?: string;
   strategyHash?: string;
+  sourceParamsHash?: string | null;
+  /** Immutable display identity captured for this historical run. */
+  displayAliasSnapshot?: string | null;
+  displayNameSnapshot?: string | null;
   sourceType?: BacktestRunSourceType;
   status?: BacktestRunStatus;
   requestedAt?: string;

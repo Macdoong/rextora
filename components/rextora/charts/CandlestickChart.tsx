@@ -37,6 +37,8 @@ import {
 import type {
   CandlePoint,
   LevelLine,
+  LifecycleMarker,
+  TimeBoundLineSegment,
   ZoneRect,
   TradeMarker,
 } from "@/src/lib/rextora/charts/types";
@@ -114,6 +116,8 @@ export function CandlestickChart({
   markers = [],
   levels = [],
   zones = [],
+  segments = [],
+  lifecycleMarkers = [],
   height = 600,
   showVolume = true,
   selectedTradeId,
@@ -130,6 +134,8 @@ export function CandlestickChart({
   markers?: TradeMarker[];
   levels?: LevelLine[];
   zones?: ZoneRect[];
+  segments?: TimeBoundLineSegment[];
+  lifecycleMarkers?: LifecycleMarker[];
   height?: number;
   showVolume?: boolean;
   selectedTradeId?: string | null;
@@ -229,6 +235,8 @@ export function CandlestickChart({
             markers={filteredMarkers}
             levels={levels}
             zones={zones}
+            segments={segments}
+            lifecycleMarkers={lifecycleMarkers}
             showVolume={showVolume}
             selectedTradeId={selectedTradeId}
             onSelectTrade={onSelectTrade}
@@ -267,6 +275,8 @@ function CandlePlot({
   markers,
   levels,
   zones = [],
+  segments = [],
+  lifecycleMarkers = [],
   showVolume,
   selectedTradeId,
   onSelectTrade,
@@ -281,6 +291,8 @@ function CandlePlot({
   markers: TradeMarker[];
   levels: LevelLine[];
   zones?: ZoneRect[];
+  segments?: TimeBoundLineSegment[];
+  lifecycleMarkers?: LifecycleMarker[];
   showVolume: boolean;
   selectedTradeId?: string | null;
   onSelectTrade?: (tradeId: string | null) => void;
@@ -318,6 +330,10 @@ function CandlePlot({
 
   const yTicks = ticks(yDom, 5);
   const viewTimes = view.map((c) => c.time);
+  const timeToX = (time: number): number => {
+    const idx = nearestIndex(viewTimes, time);
+    return xScale(idx);
+  };
 
   let snapIdx = Math.max(0, view.length - 1);
   if (crosshair && view.length) {
@@ -610,6 +626,46 @@ function CandlePlot({
           />
         </g>
       ))}
+
+      {segments
+        .filter(
+          (segment) =>
+            segment.toTime >= view[0]!.time &&
+            segment.fromTime <= view[view.length - 1]!.time,
+        )
+        .map((segment) => {
+          const x1 = timeToX(segment.fromTime);
+          const y1 = yScale(segment.fromPrice);
+          return (
+            <line
+              key={`${segment.label}-${segment.fromTime}-${segment.toTime}`}
+              x1={x1}
+              y1={y1}
+              x2={timeToX(segment.toTime)}
+              y2={yScale(segment.toPrice)}
+              stroke={segment.color}
+              strokeWidth={1.5}
+              strokeDasharray={segment.dashed ? "4 3" : undefined}
+              data-testid="chart-line-segment"
+              data-from-time={segment.fromTime}
+              data-to-time={segment.toTime}
+              className="cursor-help"
+              onMouseEnter={() =>
+                setTooltip({
+                  x: x1,
+                  y: y1,
+                  header: segment.label,
+                  rows: (segment.tooltipLines ?? []).map((line) => ({
+                    label: "",
+                    value: line,
+                    tone: "muted",
+                  })),
+                })
+              }
+              onMouseLeave={() => setTooltip(null)}
+            />
+          );
+        })}
 
       {/* Volume first (under candles), exact same body width + pixel snap */}
       {showVolume &&
@@ -1001,6 +1057,58 @@ function CandlePlot({
               </g>
             );
           })}
+
+      {lifecycleMarkers
+        .filter(
+          (marker) =>
+            marker.time >= view[0]!.time &&
+            marker.time <= view[view.length - 1]!.time,
+        )
+        .map((marker, index) => {
+          const x = timeToX(marker.time);
+          const y = Math.max(
+            pad.top + 4,
+            Math.min(pad.top + candleH - 4, yScale(marker.price)),
+          );
+          const color =
+            marker.color ??
+            (marker.kind === "rejected" || marker.kind === "invalidation"
+              ? "#fb7185"
+              : marker.kind === "confirmation"
+                ? "#4ade80"
+                : "#fbbf24");
+          return (
+            <g
+              key={`${marker.kind}-${marker.time}-${marker.blockId ?? index}`}
+              data-testid="lifecycle-marker"
+              data-lifecycle-kind={marker.kind}
+              data-block-id={marker.blockId}
+              className="cursor-help"
+              onMouseEnter={() =>
+                setTooltip({
+                  x,
+                  y,
+                  header: marker.label,
+                  rows: (marker.tooltipLines ?? []).map((line) => ({
+                    label: "",
+                    value: line,
+                    tone: "muted",
+                  })),
+                  footer: formatKoreanDateTime(marker.time),
+                })
+              }
+              onMouseLeave={() => setTooltip(null)}
+            >
+              <circle cx={x} cy={y} r={9} fill="transparent" />
+              <polygon
+                points={`${x},${y - 5} ${x + 5},${y} ${x},${y + 5} ${x - 5},${y}`}
+                fill={color}
+                stroke="#020617"
+                strokeWidth={1.25}
+              />
+            </g>
+          );
+        })}
 
       <text
         x={pad.left}

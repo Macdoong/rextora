@@ -15,7 +15,9 @@ import {
   displayParamsHashLabel,
   displaySignalReason,
   displaySourceStatus,
+  displayStrategyHashLabel,
   displayTimeframeLabel,
+  formatShortHash,
   uiLabel,
 } from "@/src/lib/rextora/displayLabels";
 import { computeDayPresetRange } from "@/src/lib/rextora/backtest/backtestDateRange";
@@ -283,6 +285,10 @@ export function BacktestWorkbench() {
           >
             <div>전략: {strategy.name}</div>
             <div>
+              {displayStrategyHashLabel()}:{" "}
+              {formatShortHash(strategy.strategyHash ?? strategy.paramsHash)}
+            </div>
+            <div className="text-xs text-slate-500">
               {displayParamsHashLabel()}: {strategy.paramsHash}
             </div>
             <div>시간봉: {displayTimeframeLabel(strategy.timeframe)}</div>

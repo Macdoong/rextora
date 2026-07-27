@@ -214,8 +214,13 @@ export function TradingDashboard() {
             value={status?.activeStrategy?.name ?? "SAFE_v44_i4060"}
           />
           <Metric
-            label="전략 고유값"
-            value={status?.activeStrategy?.paramsHash ?? "-"}
+            label="전략 해시"
+            value={
+              (status?.activeStrategy as { strategyHash?: string } | undefined)
+                ?.strategyHash?.slice(0, 12) ??
+              status?.activeStrategy?.paramsHash?.slice(0, 12) ??
+              "-"
+            }
           />
         </div>
         <p className="rextora-helper mt-3 rx-text-muted">

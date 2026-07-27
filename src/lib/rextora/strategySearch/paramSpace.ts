@@ -9,6 +9,7 @@ import {
   PATTERN_LEVERAGE_PARAM_KEYS,
   PATTERN_OPERATOR_PASSTHROUGH_KEYS,
 } from "./patternSearchSpaces";
+import { catalogForPatternFamily } from "./patternParameterCatalog";
 import type {
   StrategySearchParameterRange,
   StrategySearchParameterValue,
@@ -47,6 +48,23 @@ const INTEGER_KEYS = new Set<keyof SafeV44Params>([
 ]);
 
 const FLOAT_PRECISION = 10;
+const ALL_PATTERN_CATALOG_KEYS = new Set(
+  (
+    [
+      "order_block",
+      "fvg",
+      "trendline",
+      "support_resistance",
+      "supply_demand",
+    ] as const
+  ).flatMap((family) => catalogForPatternFamily(family).map((entry) => entry.key)),
+);
+
+function isCatalogBlockParameterKey(key: string): boolean {
+  if (!key.startsWith("block.")) return false;
+  const field = key.slice(key.lastIndexOf(".") + 1);
+  return ALL_PATTERN_CATALOG_KEYS.has(field);
+}
 
 function valueTypeFor(key: keyof SafeV44Params): StrategySearchParameterValueType {
   if (BOOLEAN_KEYS.has(key)) return "boolean";
@@ -244,7 +262,8 @@ export function validateSearchParameterRanges(
       const isLevPassthrough = (
         PATTERN_LEVERAGE_PARAM_KEYS as readonly string[]
       ).includes(range.key);
-      if (!patternKeySet.has(range.key) && !isLevPassthrough) {
+      const isBlockParameter = range.key.startsWith("block.");
+      if (!patternKeySet.has(range.key) && !isLevPassthrough && !isBlockParameter) {
         issues.push(
           issue(
             "UNKNOWN_PARAMETER",
@@ -256,6 +275,46 @@ export function validateSearchParameterRanges(
         continue;
       }
       const valueType = resolveValueType(range);
+      if (valueType === "boolean") {
+        if (
+          typeof range.min !== "boolean" ||
+          typeof range.max !== "boolean" ||
+          (range.defaultValue !== undefined &&
+            typeof range.defaultValue !== "boolean")
+        ) {
+          issues.push(
+            issue(
+              "TYPE_MISMATCH",
+              range.key,
+              "boolean pattern parameters require boolean bounds/default",
+            ),
+          );
+        }
+        continue;
+      }
+      if (valueType === "enum") {
+        if (!range.enumValues || range.enumValues.length === 0) {
+          issues.push(
+            issue(
+              "ENUM_VALUES",
+              range.key,
+              "enum pattern parameters require enumValues",
+            ),
+          );
+        } else if (
+          range.defaultValue !== undefined &&
+          !range.enumValues.includes(range.defaultValue)
+        ) {
+          issues.push(
+            issue(
+              "DEFAULT_OUT_OF_RANGE",
+              range.key,
+              "pattern enum defaultValue is not in enumValues",
+            ),
+          );
+        }
+        continue;
+      }
       if (valueType !== "integer" && valueType !== "float") {
         issues.push(
           issue(
@@ -592,11 +651,20 @@ export function validateCandidateParams(
     const keys = patternParamKeysForFamily(family);
     const issues: StrategySearchValidationIssue[] = [];
     const rangeByKey = new Map(ranges.map((r) => [r.key, r]));
+    const catalogByKey = new Map(
+      catalogForPatternFamily(family).map((entry) => [entry.key, entry]),
+    );
     const allowed = new Set<string>([
       ...keys,
       ...PATTERN_OPERATOR_PASSTHROUGH_KEYS,
       ...PATTERN_LEVERAGE_PARAM_KEYS,
     ]);
+    for (const range of ranges) {
+      if (range.key.startsWith("block.")) allowed.add(range.key);
+    }
+    for (const key of Object.keys(params)) {
+      if (isCatalogBlockParameterKey(key)) allowed.add(key);
+    }
     for (const key of keys) {
       const value = params[key];
       if (value === undefined) {
@@ -609,13 +677,38 @@ export function validateCandidateParams(
         );
         continue;
       }
+      const range = rangeByKey.get(key);
+      const catalogEntry = catalogByKey.get(key);
+      const valueType =
+        range != null
+          ? resolveValueType(range)
+          : catalogEntry?.type === "int"
+            ? "integer"
+            : catalogEntry?.type === "bool"
+              ? "boolean"
+              : catalogEntry?.type;
+      if (valueType === "boolean") {
+        if (typeof value !== "boolean") {
+          issues.push(issue("TYPE_MISMATCH", key, "expected boolean", value));
+        }
+        continue;
+      }
+      if (valueType === "enum") {
+        const allowedValues =
+          range?.enumValues ?? catalogEntry?.allowedEnumValues ?? [];
+        if (!allowedValues.includes(value as never)) {
+          issues.push(
+            issue("ENUM_OUT_OF_RANGE", key, "value is not an allowed enum", value),
+          );
+        }
+        continue;
+      }
       if (!isFiniteNumber(value)) {
         issues.push(
           issue("TYPE_MISMATCH", key, "expected finite number", value),
         );
         continue;
       }
-      const range = rangeByKey.get(key);
       if (
         range &&
         typeof range.min === "number" &&
@@ -662,6 +755,77 @@ export function validateCandidateParams(
             key,
             `value must be within ${range.min}..${range.max}`,
             value,
+          ),
+        );
+      }
+    }
+    for (const range of ranges.filter((item) => item.key.startsWith("block."))) {
+      const value = params[range.key];
+      if (value === undefined) {
+        issues.push(
+          issue(
+            "MISSING_PARAMETER",
+            range.key,
+            "combined pattern block parameter is required",
+          ),
+        );
+        continue;
+      }
+      const valueType = resolveValueType(range);
+      if (valueType === "boolean" && typeof value !== "boolean") {
+        issues.push(issue("TYPE_MISMATCH", range.key, "expected boolean", value));
+      } else if (
+        valueType === "enum" &&
+        !range.enumValues?.includes(value)
+      ) {
+        issues.push(
+          issue("ENUM_OUT_OF_RANGE", range.key, "value is not an allowed enum", value),
+        );
+      } else if (
+        (valueType === "integer" || valueType === "float") &&
+        (!isFiniteNumber(value) ||
+          (typeof range.min === "number" && value < range.min) ||
+          (typeof range.max === "number" && value > range.max))
+      ) {
+        issues.push(
+          issue("OUT_OF_RANGE", range.key, "block parameter is outside its catalog range", value),
+        );
+      }
+    }
+    const blockIds = new Set(
+      Object.keys(params)
+        .filter((key) => key.startsWith("block."))
+        .map((key) => key.slice("block.".length, key.lastIndexOf("."))),
+    );
+    for (const id of blockIds) {
+      const prefix = `block.${id}.`;
+      const slopeMin = params[`${prefix}slopeMin`];
+      const slopeMax = params[`${prefix}slopeMax`];
+      if (
+        isFiniteNumber(slopeMin) &&
+        isFiniteNumber(slopeMax) &&
+        slopeMin > slopeMax
+      ) {
+        issues.push(
+          issue(
+            "PATTERN_RANGE_ORDER",
+            `${prefix}slopeMin`,
+            "slopeMin must be <= slopeMax",
+            slopeMin,
+            slopeMax,
+          ),
+        );
+      }
+      const count = params[`${prefix}confirmationCandleCount`];
+      const window = params[`${prefix}confirmationWindow`];
+      if (isFiniteNumber(count) && isFiniteNumber(window) && count > window) {
+        issues.push(
+          issue(
+            "PATTERN_CONFIRMATION_RANGE",
+            `${prefix}confirmationCandleCount`,
+            "confirmationCandleCount must be <= confirmationWindow",
+            count,
+            window,
           ),
         );
       }
@@ -845,7 +1009,27 @@ export function normalizeCandidateParams(
       const raw = params[key];
       if (!range) {
         out[key] =
-          raw !== undefined && isFiniteNumber(raw) ? raw : fallback;
+          raw !== undefined &&
+          (typeof raw === "number" ||
+            typeof raw === "string" ||
+            typeof raw === "boolean")
+            ? raw
+            : fallback;
+        continue;
+      }
+      const valueType = resolveValueType(range);
+      if (valueType === "boolean") {
+        out[key] =
+          typeof raw === "boolean"
+            ? raw
+            : ((range.defaultValue as StrategySearchParameterValue) ?? fallback);
+        continue;
+      }
+      if (valueType === "enum") {
+        out[key] =
+          raw !== undefined && range.enumValues?.includes(raw)
+            ? raw
+            : ((range.defaultValue as StrategySearchParameterValue) ?? fallback);
         continue;
       }
       if (raw === undefined || !isFiniteNumber(raw)) {
@@ -854,7 +1038,6 @@ export function normalizeCandidateParams(
           fallback;
         continue;
       }
-      const valueType = resolveValueType(range);
       const step =
         range.step ?? (valueType === "integer" ? 1 : 0.01);
       const min = range.min as number;
@@ -893,6 +1076,50 @@ export function normalizeCandidateParams(
         out[key] = alignNumeric(clamped, range.min, range.max, step, "float");
       } else {
         out[key] = Math.max(1, raw);
+      }
+    }
+    for (const range of ranges.filter((item) => item.key.startsWith("block."))) {
+      const raw = params[range.key];
+      const valueType = resolveValueType(range);
+      const fallback =
+        range.defaultValue ??
+        (valueType === "boolean"
+          ? false
+          : valueType === "enum"
+            ? range.enumValues?.[0] ?? ""
+            : 0);
+      if (valueType === "boolean") {
+        out[range.key] = typeof raw === "boolean" ? raw : Boolean(fallback);
+      } else if (valueType === "enum") {
+        out[range.key] =
+          raw !== undefined && range.enumValues?.includes(raw)
+            ? raw
+            : (fallback as StrategySearchParameterValue);
+      } else if (
+        isFiniteNumber(raw) &&
+        typeof range.min === "number" &&
+        typeof range.max === "number"
+      ) {
+        out[range.key] = alignNumeric(
+          Math.min(range.max, Math.max(range.min, raw)),
+          range.min,
+          range.max,
+          range.step ?? (valueType === "integer" ? 1 : 0.01),
+          valueType === "integer" ? "integer" : "float",
+        );
+      } else {
+        out[range.key] = fallback as StrategySearchParameterValue;
+      }
+    }
+    for (const [key, raw] of Object.entries(params)) {
+      if (
+        !(key in out) &&
+        isCatalogBlockParameterKey(key) &&
+        (typeof raw === "number" ||
+          typeof raw === "string" ||
+          typeof raw === "boolean")
+      ) {
+        out[key] = raw;
       }
     }
     return out;

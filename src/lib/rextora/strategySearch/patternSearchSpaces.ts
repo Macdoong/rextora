@@ -5,23 +5,31 @@
 
 import type { StrategySearchParameterRange } from "./types";
 import type { SearchSpaceDefinition } from "./searchSpaces";
+import {
+  catalogDefaultsForPatternFamily,
+  catalogForPatternFamily,
+  catalogRangesForPatternFamily,
+} from "./patternParameterCatalog";
 
 export type PatternSearchFamilyId =
   | "order_block"
   | "fvg"
   | "trendline"
-  | "support_resistance";
+  | "support_resistance"
+  | "supply_demand";
 
 export const ORDER_BLOCK_SPACE_ID = "order_block" as const;
 export const FVG_SPACE_ID = "fvg" as const;
 export const TRENDLINE_SPACE_ID = "trendline" as const;
 export const SUPPORT_RESISTANCE_SPACE_ID = "support_resistance" as const;
+export const SUPPLY_DEMAND_SPACE_ID = "supply_demand" as const;
 
 export const PATTERN_SEARCH_SPACE_IDS: PatternSearchFamilyId[] = [
   ORDER_BLOCK_SPACE_ID,
   FVG_SPACE_ID,
   TRENDLINE_SPACE_ID,
   SUPPORT_RESISTANCE_SPACE_ID,
+  SUPPLY_DEMAND_SPACE_ID,
 ];
 
 /** Shared exit / revisit knobs used by all pattern spaces. */
@@ -33,28 +41,23 @@ const SHARED_EXIT_KEYS = [
   "zoneLookback",
 ] as const;
 
-export const ORDER_BLOCK_PARAM_KEYS = [...SHARED_EXIT_KEYS] as const;
+export const ORDER_BLOCK_PARAM_KEYS = catalogForPatternFamily("order_block").map(
+  (entry) => entry.key,
+);
 
-export const FVG_PARAM_KEYS = [
-  ...SHARED_EXIT_KEYS,
-  "atrRelativeMult",
-  "minGapPct",
-] as const;
+export const FVG_PARAM_KEYS = catalogForPatternFamily("fvg").map(
+  (entry) => entry.key,
+);
 
-export const TRENDLINE_PARAM_KEYS = [
-  ...SHARED_EXIT_KEYS,
-  "slopeMin",
-  "slopeMax",
-  "tolerancePct",
-  "minTouchCount",
-] as const;
+export const TRENDLINE_PARAM_KEYS = catalogForPatternFamily("trendline").map(
+  (entry) => entry.key,
+);
 
-export const SUPPORT_RESISTANCE_PARAM_KEYS = [
-  ...SHARED_EXIT_KEYS,
-  "minTouches",
-  "tolerancePct",
-  "zoneWidthPct",
-] as const;
+export const SUPPORT_RESISTANCE_PARAM_KEYS =
+  catalogForPatternFamily("support_resistance").map((entry) => entry.key);
+
+export const SUPPLY_DEMAND_PARAM_KEYS =
+  catalogForPatternFamily("supply_demand").map((entry) => entry.key);
 
 export type OrderBlockSearchParams = {
   penetrationPct: number;
@@ -66,11 +69,33 @@ export type OrderBlockSearchParams = {
   direction?: "long" | "short" | "both";
   requireTouch?: boolean;
   requireCloseInDirection?: boolean;
+  confirmationMode?:
+    | "none"
+    | "single_close"
+    | "consecutive_closes"
+    | "threshold_count";
+  confirmationCandleCount?: number;
+  confirmationWindow?: number;
+  invalidationMode?: "close_beyond_zone" | "none";
+  bodyOnly: boolean;
+  minImpulseAtrMult: number;
+  minImpulsePct: number;
+  minVolumeMult: number;
+  mitigationPct: number;
+  firstTouchOnly: boolean;
+  retestAllowed: boolean;
+  entryInsideBlock: boolean;
+  invalidateOnCloseBeyond: boolean;
 };
 
 export type FvgSearchParams = OrderBlockSearchParams & {
   atrRelativeMult: number;
   minGapPct: number;
+  minGapAbs: number;
+  partialFillPct: number;
+  fullFillInvalidates: boolean;
+  entryInsideGap: boolean;
+  invalidateOnCloseThrough: boolean;
 };
 
 export type TrendlineSearchParams = OrderBlockSearchParams & {
@@ -78,95 +103,53 @@ export type TrendlineSearchParams = OrderBlockSearchParams & {
   slopeMax: number;
   tolerancePct: number;
   minTouchCount: number;
+  minPivotCount: number;
+  breakoutByClose: boolean;
+  breakoutByWick: boolean;
+  retestRequired: boolean;
+  detectorConfirmationCandles: number;
 };
 
 export type SupportResistanceSearchParams = OrderBlockSearchParams & {
   minTouches: number;
   tolerancePct: number;
   zoneWidthPct: number;
+  volumeConfirmation: boolean;
+  breakoutConfirmation: boolean;
+};
+
+export type SupplyDemandSearchParams = OrderBlockSearchParams & {
+  baseCandleCount: number;
+  maxBaseRangeAtrMult: number;
+  minDepartureAtrMult: number;
+  minDeparturePct: number;
+  zoneBodyOnly: boolean;
+  requireRejectionClose: boolean;
 };
 
 export type PatternSearchParams =
   | OrderBlockSearchParams
   | FvgSearchParams
   | TrendlineSearchParams
-  | SupportResistanceSearchParams;
+  | SupportResistanceSearchParams
+  | SupplyDemandSearchParams;
 
-export const ORDER_BLOCK_BASE_PARAMS: OrderBlockSearchParams = {
-  penetrationPct: 0.45,
-  stopAtrMult: 1.2,
-  tpAtrMult: 2.0,
-  maxHoldBars: 48,
-  zoneLookback: 40,
-};
+export const ORDER_BLOCK_BASE_PARAMS =
+  catalogDefaultsForPatternFamily("order_block") as OrderBlockSearchParams;
 
-export const FVG_BASE_PARAMS: FvgSearchParams = {
-  ...ORDER_BLOCK_BASE_PARAMS,
-  atrRelativeMult: 0.2,
-  minGapPct: 0.08,
-};
+export const FVG_BASE_PARAMS =
+  catalogDefaultsForPatternFamily("fvg") as FvgSearchParams;
 
-export const TRENDLINE_BASE_PARAMS: TrendlineSearchParams = {
-  ...ORDER_BLOCK_BASE_PARAMS,
-  slopeMin: 0,
-  slopeMax: 2,
-  tolerancePct: 0.35,
-  minTouchCount: 2,
-};
+export const TRENDLINE_BASE_PARAMS =
+  catalogDefaultsForPatternFamily("trendline") as TrendlineSearchParams;
 
-export const SUPPORT_RESISTANCE_BASE_PARAMS: SupportResistanceSearchParams = {
-  ...ORDER_BLOCK_BASE_PARAMS,
-  minTouches: 2,
-  tolerancePct: 0.35,
-  zoneWidthPct: 0.25,
-};
+export const SUPPORT_RESISTANCE_BASE_PARAMS =
+  catalogDefaultsForPatternFamily(
+    "support_resistance",
+  ) as SupportResistanceSearchParams;
 
-function sharedExitRanges(
-  base: OrderBlockSearchParams,
-): StrategySearchParameterRange[] {
-  return [
-    {
-      key: "penetrationPct",
-      min: 0.2,
-      max: 0.8,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: base.penetrationPct,
-    },
-    {
-      key: "stopAtrMult",
-      min: 0.5,
-      max: 2.5,
-      step: 0.1,
-      valueType: "float",
-      defaultValue: base.stopAtrMult,
-    },
-    {
-      key: "tpAtrMult",
-      min: 1.0,
-      max: 4.0,
-      step: 0.25,
-      valueType: "float",
-      defaultValue: base.tpAtrMult,
-    },
-    {
-      key: "maxHoldBars",
-      min: 12,
-      max: 96,
-      step: 6,
-      valueType: "integer",
-      defaultValue: base.maxHoldBars,
-    },
-    {
-      key: "zoneLookback",
-      min: 20,
-      max: 80,
-      step: 5,
-      valueType: "integer",
-      defaultValue: base.zoneLookback,
-    },
-  ];
-}
+export const SUPPLY_DEMAND_BASE_PARAMS =
+  catalogDefaultsForPatternFamily("supply_demand") as SupplyDemandSearchParams;
 
 export const ORDER_BLOCK_SEARCH_SPACE: SearchSpaceDefinition = {
   id: ORDER_BLOCK_SPACE_ID,
@@ -192,105 +175,38 @@ export const SUPPORT_RESISTANCE_SEARCH_SPACE: SearchSpaceDefinition = {
   keys: [...SUPPORT_RESISTANCE_PARAM_KEYS],
 };
 
+export const SUPPLY_DEMAND_SEARCH_SPACE: SearchSpaceDefinition = {
+  id: SUPPLY_DEMAND_SPACE_ID,
+  labelKo: "Supply / Demand",
+  keys: [...SUPPLY_DEMAND_PARAM_KEYS],
+};
+
 export const ALL_PATTERN_SEARCH_SPACES: SearchSpaceDefinition[] = [
   ORDER_BLOCK_SEARCH_SPACE,
   FVG_SEARCH_SPACE,
   TRENDLINE_SEARCH_SPACE,
   SUPPORT_RESISTANCE_SEARCH_SPACE,
+  SUPPLY_DEMAND_SEARCH_SPACE,
 ];
 
 export function orderBlockSearchRanges(): StrategySearchParameterRange[] {
-  return sharedExitRanges(ORDER_BLOCK_BASE_PARAMS);
+  return catalogRangesForPatternFamily("order_block");
 }
 
 export function fvgSearchRanges(): StrategySearchParameterRange[] {
-  return [
-    ...sharedExitRanges(FVG_BASE_PARAMS),
-    {
-      key: "atrRelativeMult",
-      min: 0.05,
-      max: 0.6,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: FVG_BASE_PARAMS.atrRelativeMult,
-    },
-    {
-      key: "minGapPct",
-      min: 0.02,
-      max: 0.4,
-      step: 0.02,
-      valueType: "float",
-      defaultValue: FVG_BASE_PARAMS.minGapPct,
-    },
-  ];
+  return catalogRangesForPatternFamily("fvg");
 }
 
 export function trendlineSearchRanges(): StrategySearchParameterRange[] {
-  return [
-    ...sharedExitRanges(TRENDLINE_BASE_PARAMS),
-    {
-      key: "slopeMin",
-      min: 0,
-      max: 0.5,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: TRENDLINE_BASE_PARAMS.slopeMin,
-    },
-    {
-      key: "slopeMax",
-      min: 0.5,
-      max: 5,
-      step: 0.25,
-      valueType: "float",
-      defaultValue: TRENDLINE_BASE_PARAMS.slopeMax,
-    },
-    {
-      key: "tolerancePct",
-      min: 0.1,
-      max: 1.0,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: TRENDLINE_BASE_PARAMS.tolerancePct,
-    },
-    {
-      key: "minTouchCount",
-      min: 2,
-      max: 6,
-      step: 1,
-      valueType: "integer",
-      defaultValue: TRENDLINE_BASE_PARAMS.minTouchCount,
-    },
-  ];
+  return catalogRangesForPatternFamily("trendline");
 }
 
 export function supportResistanceSearchRanges(): StrategySearchParameterRange[] {
-  return [
-    ...sharedExitRanges(SUPPORT_RESISTANCE_BASE_PARAMS),
-    {
-      key: "minTouches",
-      min: 2,
-      max: 8,
-      step: 1,
-      valueType: "integer",
-      defaultValue: SUPPORT_RESISTANCE_BASE_PARAMS.minTouches,
-    },
-    {
-      key: "tolerancePct",
-      min: 0.1,
-      max: 1.0,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: SUPPORT_RESISTANCE_BASE_PARAMS.tolerancePct,
-    },
-    {
-      key: "zoneWidthPct",
-      min: 0.1,
-      max: 1.0,
-      step: 0.05,
-      valueType: "float",
-      defaultValue: SUPPORT_RESISTANCE_BASE_PARAMS.zoneWidthPct,
-    },
-  ];
+  return catalogRangesForPatternFamily("support_resistance");
+}
+
+export function supplyDemandSearchRanges(): StrategySearchParameterRange[] {
+  return catalogRangesForPatternFamily("supply_demand");
 }
 
 export function rangesForPatternSpaceId(
@@ -305,6 +221,8 @@ export function rangesForPatternSpaceId(
       return trendlineSearchRanges();
     case SUPPORT_RESISTANCE_SPACE_ID:
       return supportResistanceSearchRanges();
+    case SUPPLY_DEMAND_SPACE_ID:
+      return supplyDemandSearchRanges();
     default:
       return null;
   }
@@ -322,6 +240,8 @@ export function baseParamsForPatternSpaceId(
       return { ...TRENDLINE_BASE_PARAMS };
     case SUPPORT_RESISTANCE_SPACE_ID:
       return { ...SUPPORT_RESISTANCE_BASE_PARAMS };
+    case SUPPLY_DEMAND_SPACE_ID:
+      return { ...SUPPLY_DEMAND_BASE_PARAMS };
     default:
       return null;
   }
@@ -334,7 +254,8 @@ export function isPatternSearchSpaceId(
     spaceId === ORDER_BLOCK_SPACE_ID ||
     spaceId === FVG_SPACE_ID ||
     spaceId === TRENDLINE_SPACE_ID ||
-    spaceId === SUPPORT_RESISTANCE_SPACE_ID
+    spaceId === SUPPORT_RESISTANCE_SPACE_ID ||
+    spaceId === SUPPLY_DEMAND_SPACE_ID
   );
 }
 
@@ -348,6 +269,19 @@ export const PATTERN_OPERATOR_PASSTHROUGH_KEYS = [
   "direction",
   "requireTouch",
   "requireCloseInDirection",
+  "confirmationMode",
+  "confirmationCandleCount",
+  "confirmationWindow",
+  /** Multi-pattern combination identity (must survive normalize → hash). */
+  "combinationTemplate",
+  "combinationOperator",
+  "combinationInvalidationMode",
+  "combinationFamilies",
+  "combinationRoles",
+  "combinationOrders",
+  "combinationBlocks",
+  "combinationFailurePolicy",
+  "combinationWeightedThreshold",
 ] as const;
 
 export const PATTERN_LEVERAGE_PARAM_KEYS = [
@@ -371,7 +305,11 @@ function isKeySubset(
 }
 
 function familyKeysOnly(keys: Set<string>): Set<string> {
-  return new Set([...keys].filter((k) => !PATTERN_NON_FAMILY_KEYS.has(k)));
+  return new Set(
+    [...keys].filter(
+      (k) => !PATTERN_NON_FAMILY_KEYS.has(k) && !k.startsWith("block."),
+    ),
+  );
 }
 
 export function resolvePatternFamilyFromRanges(
@@ -379,6 +317,12 @@ export function resolvePatternFamilyFromRanges(
 ): PatternSearchFamilyId | null {
   if (ranges.length === 0) return null;
   const keys = familyKeysOnly(new Set(ranges.map((r) => r.key)));
+  if (
+    isKeySubset(keys, SUPPLY_DEMAND_PARAM_KEYS) &&
+    (keys.has("baseCandleCount") || keys.has("minDepartureAtrMult"))
+  ) {
+    return SUPPLY_DEMAND_SPACE_ID;
+  }
   if (
     isKeySubset(keys, FVG_PARAM_KEYS) &&
     (keys.has("atrRelativeMult") || keys.has("minGapPct"))
@@ -436,6 +380,13 @@ export function resolvePatternFamilyFromParams(
   if (num("minTouches") && num("tolerancePct") && num("zoneWidthPct")) {
     return SUPPORT_RESISTANCE_SPACE_ID;
   }
+  if (
+    num("baseCandleCount") &&
+    num("maxBaseRangeAtrMult") &&
+    num("minDepartureAtrMult")
+  ) {
+    return SUPPLY_DEMAND_SPACE_ID;
+  }
   // OB: shared exits only — no FVG/TL/SR exclusive keys
   if (
     !num("atrRelativeMult") &&
@@ -472,6 +423,8 @@ export function patternParamKeysForFamily(
       return TRENDLINE_PARAM_KEYS;
     case SUPPORT_RESISTANCE_SPACE_ID:
       return SUPPORT_RESISTANCE_PARAM_KEYS;
+    case SUPPLY_DEMAND_SPACE_ID:
+      return SUPPLY_DEMAND_PARAM_KEYS;
     default:
       return ORDER_BLOCK_PARAM_KEYS;
   }
@@ -502,9 +455,32 @@ function readOptionalBool(
   return undefined;
 }
 
+function readConfirmationMode(
+  params: Record<string, unknown>,
+): OrderBlockSearchParams["confirmationMode"] | undefined {
+  const m = params.confirmationMode;
+  if (
+    m === "none" ||
+    m === "single_close" ||
+    m === "consecutive_closes" ||
+    m === "threshold_count"
+  ) {
+    return m;
+  }
+  return undefined;
+}
+
+function readInvalidationMode(
+  params: Record<string, unknown>,
+): OrderBlockSearchParams["invalidationMode"] {
+  return params.invalidationMode === "none" ? "none" : "close_beyond_zone";
+}
+
 export function readOrderBlockParams(
   params: Record<string, unknown>,
 ): OrderBlockSearchParams {
+  const countRaw = Number(params.confirmationCandleCount);
+  const windowRaw = Number(params.confirmationWindow);
   return {
     penetrationPct: Number(params.penetrationPct),
     stopAtrMult: Number(params.stopAtrMult),
@@ -517,6 +493,24 @@ export function readOrderBlockParams(
       params,
       "requireCloseInDirection",
     ),
+    confirmationMode: readConfirmationMode(params),
+    confirmationCandleCount: Number.isFinite(countRaw)
+      ? Math.max(1, Math.min(8, Math.trunc(countRaw)))
+      : undefined,
+    confirmationWindow: Number.isFinite(windowRaw)
+      ? Math.max(1, Math.min(24, Math.trunc(windowRaw)))
+      : undefined,
+    invalidationMode: readInvalidationMode(params),
+    bodyOnly: readOptionalBool(params, "bodyOnly") ?? true,
+    minImpulseAtrMult: Number(params.minImpulseAtrMult),
+    minImpulsePct: Number(params.minImpulsePct),
+    minVolumeMult: Number(params.minVolumeMult),
+    mitigationPct: Number(params.mitigationPct),
+    firstTouchOnly: readOptionalBool(params, "firstTouchOnly") ?? false,
+    retestAllowed: readOptionalBool(params, "retestAllowed") ?? true,
+    entryInsideBlock: readOptionalBool(params, "entryInsideBlock") ?? false,
+    invalidateOnCloseBeyond:
+      readOptionalBool(params, "invalidateOnCloseBeyond") ?? true,
   };
 }
 
@@ -525,6 +519,13 @@ export function readFvgParams(params: Record<string, unknown>): FvgSearchParams 
     ...readOrderBlockParams(params),
     atrRelativeMult: Number(params.atrRelativeMult),
     minGapPct: Number(params.minGapPct),
+    minGapAbs: Number(params.minGapAbs),
+    partialFillPct: Number(params.partialFillPct),
+    fullFillInvalidates:
+      readOptionalBool(params, "fullFillInvalidates") ?? true,
+    entryInsideGap: readOptionalBool(params, "entryInsideGap") ?? false,
+    invalidateOnCloseThrough:
+      readOptionalBool(params, "invalidateOnCloseThrough") ?? true,
   };
 }
 
@@ -537,6 +538,13 @@ export function readTrendlineParams(
     slopeMax: Number(params.slopeMax),
     tolerancePct: Number(params.tolerancePct),
     minTouchCount: Math.trunc(Number(params.minTouchCount)),
+    minPivotCount: Math.trunc(Number(params.minPivotCount)),
+    breakoutByClose: readOptionalBool(params, "breakoutByClose") ?? false,
+    breakoutByWick: readOptionalBool(params, "breakoutByWick") ?? false,
+    retestRequired: readOptionalBool(params, "retestRequired") ?? false,
+    detectorConfirmationCandles: Math.trunc(
+      Number(params.detectorConfirmationCandles),
+    ),
   };
 }
 
@@ -548,5 +556,24 @@ export function readSupportResistanceParams(
     minTouches: Math.trunc(Number(params.minTouches)),
     tolerancePct: Number(params.tolerancePct),
     zoneWidthPct: Number(params.zoneWidthPct),
+    volumeConfirmation:
+      readOptionalBool(params, "volumeConfirmation") ?? false,
+    breakoutConfirmation:
+      readOptionalBool(params, "breakoutConfirmation") ?? false,
+  };
+}
+
+export function readSupplyDemandParams(
+  params: Record<string, unknown>,
+): SupplyDemandSearchParams {
+  return {
+    ...readOrderBlockParams(params),
+    baseCandleCount: Math.trunc(Number(params.baseCandleCount)),
+    maxBaseRangeAtrMult: Number(params.maxBaseRangeAtrMult),
+    minDepartureAtrMult: Number(params.minDepartureAtrMult),
+    minDeparturePct: Number(params.minDeparturePct),
+    zoneBodyOnly: readOptionalBool(params, "zoneBodyOnly") ?? false,
+    requireRejectionClose:
+      readOptionalBool(params, "requireRejectionClose") ?? false,
   };
 }

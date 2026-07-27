@@ -254,8 +254,12 @@ describe("strategy search upgrade — UI contracts + SAFE", () => {
     expect(status).toContain("resolveDisplayTerminationReason");
     expect(status).toContain("자원 안전 제한");
     expect(status).toContain("검증된 전략");
-    expect(completion).toContain("정상 종료 조건 아님");
+    expect(completion).toContain("부분 완료");
+    expect(completion).toContain("정상 완료");
+    expect(completion).toContain("최종 TOP 10 검토");
+    expect(completion).toContain("개발자 정보");
     expect(completion).not.toMatch(/\$\{formatCount\(budgetUsed\)\} \/ \$\{formatCount\(budget\)\}/);
+    expect(completion).not.toContain("summary.registeredStrategies");
     expect(currentResearch).toContain("새 기간으로 백테스트");
     expect(currentResearch).toContain("전략 등록 후 백테스트");
     expect(currentResearch).toMatch(/strategyHash/);

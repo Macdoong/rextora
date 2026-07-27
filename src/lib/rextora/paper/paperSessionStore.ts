@@ -6,8 +6,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { getStrategyById } from "../strategy/strategyStore";
+import {
+  getStrategyById,
+  setPaperActiveStrategy,
+} from "../strategy/strategyStore";
 import { SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
+import {
+  storedToDefinition,
+  type StoredStrategyV1,
+} from "../strategy/definition/bridge";
+import { computeStrategyHash } from "../strategy/strategyHash";
 
 export type PaperSessionStatus = "active" | "paused" | "stopped";
 
@@ -15,7 +23,12 @@ export interface PaperSession {
   id: string;
   strategyId: string;
   strategyHash: string;
+  /** Search candidate identity captured at promotion, when applicable. */
+  sourceParamsHash?: string | null;
   strategyName: string;
+  /** Immutable display identity captured when this historical session starts. */
+  displayAliasSnapshot?: string | null;
+  displayNameSnapshot?: string | null;
   status: PaperSessionStatus;
   startedAt: string;
   updatedAt: string;
@@ -50,6 +63,9 @@ export class PaperSessionError extends Error {
 const DEFAULT_VIRTUAL_BALANCE = 10_000;
 
 function defaultRoot(): string {
+  if (process.env.REXTORA_PAPER_SESSIONS_DIR) {
+    return path.resolve(process.env.REXTORA_PAPER_SESSIONS_DIR);
+  }
   return path.join(
     /* turbopackIgnore: true */ process.cwd(),
     "data",
@@ -192,12 +208,26 @@ export function createPaperSession(
     stopPaperSession(existingActive.id, options);
   }
 
+  // Always re-assert singular paperActive so stale flags cannot diverge
+  // from the session that will execute.
+  setPaperActiveStrategy(strategy.id);
+
+  const hydrated = getStrategyById(strategy.id) ?? strategy;
+  const strategyHash =
+    hydrated.strategyHash ??
+    computeStrategyHash(storedToDefinition(hydrated as StoredStrategyV1));
+
   const now = nowIso();
   const session: PaperSession = {
     id: `paper_${crypto.randomUUID()}`,
-    strategyId: strategy.id,
-    strategyHash: strategy.paramsHash,
-    strategyName: strategy.name,
+    strategyId: hydrated.id,
+    strategyHash,
+    sourceParamsHash:
+      hydrated.sourceParamsHash ?? hydrated.paramsHash ?? null,
+    strategyName:
+      hydrated.displayAlias ?? hydrated.displayName ?? hydrated.name,
+    displayAliasSnapshot: hydrated.displayAlias ?? null,
+    displayNameSnapshot: hydrated.displayName ?? null,
     status: "active",
     startedAt: now,
     updatedAt: now,

@@ -18,6 +18,9 @@ type PaperStrategy = {
   id: string;
   name: string;
   paramsHash: string;
+  strategyHash?: string | null;
+  displayAlias?: string | null;
+  displayName?: string | null;
 };
 
 type PaperSession = {
@@ -25,12 +28,16 @@ type PaperSession = {
   strategyId: string;
   strategyHash: string;
   strategyName: string;
+  displayAliasSnapshot?: string | null;
+  displayNameSnapshot?: string | null;
+  sourceParamsHash?: string | null;
   status: "active" | "paused" | "stopped";
   virtualBalance: number;
   realizedPnl: number;
   unrealizedPnl: number;
   tradeCount: number;
   signalCount: number;
+  backtestResultId?: string | null;
 };
 
 type CanonicalPaperStatus =
@@ -85,17 +92,49 @@ export default function PaperTradingPage() {
           ),
         );
       setRiskView(bot.data?.riskView ?? null);
-      const active = (strategies.data ?? []).find(
-        (s: { paperActive?: boolean }) => s.paperActive,
-      );
-      if (active)
+      const list = (strategies.data ?? []) as Array<{
+        id: string;
+        name: string;
+        paramsHash: string;
+        strategyHash?: string | null;
+        displayAlias?: string | null;
+        displayName?: string | null;
+        paperActive?: boolean;
+      }>;
+      const activeSession = (sessionRes.data?.active ?? null) as PaperSession | null;
+      setSession(activeSession);
+
+      // Canonical identity: active/paused session wins over registry paperActive.
+      const fromSession = activeSession?.strategyId
+        ? list.find((s) => s.id === activeSession.strategyId)
+        : null;
+      const paperRegistered = list.find((s) => s.paperActive);
+      const canonical = fromSession ?? paperRegistered ?? null;
+      if (canonical || activeSession) {
         setStrategy({
-          id: active.id,
-          name: active.name,
-          paramsHash: active.paramsHash,
+          id: activeSession?.strategyId ?? canonical!.id,
+          name:
+            activeSession?.displayAliasSnapshot ??
+            activeSession?.strategyName ??
+            canonical?.displayAlias ??
+            canonical?.displayName ??
+            canonical?.name ??
+            "모의 전략",
+          paramsHash: canonical?.paramsHash ?? "",
+          strategyHash:
+            activeSession?.strategyHash ?? canonical?.strategyHash ?? null,
+          displayAlias:
+            activeSession?.displayAliasSnapshot ??
+            canonical?.displayAlias ??
+            null,
+          displayName:
+            activeSession?.displayNameSnapshot ??
+            canonical?.displayName ??
+            null,
         });
-      else setStrategy(null);
-      setSession(sessionRes.data?.active ?? null);
+      } else {
+        setStrategy(null);
+      }
       setIdentityError(null);
       setLoadError(null);
     } catch (e) {
@@ -260,22 +299,44 @@ export default function PaperTradingPage() {
             className="mb-3 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-50"
             data-testid="paper-active-strategy"
           >
-            <p className="font-medium">
-              {strategy?.name ?? "등록된 모의 전략 없음"}
+            <p className="font-medium" data-testid="paper-strategy-name">
+              {strategy?.displayAlias ??
+                strategy?.displayName ??
+                strategy?.name ??
+                "등록된 모의 전략 없음"}
             </p>
             <p className="mt-1 text-xs text-sky-100/80">
               전략 ID{" "}
-              <span className="font-mono">{strategy?.id ?? "미등록"}</span>
+              <span className="font-mono" data-testid="paper-strategy-id">
+                {strategy?.id ?? "미등록"}
+              </span>
               {strategy?.paramsHash ? (
                 <>
                   {" "}
-                  · 식별값{" "}
-                  <span className="font-mono">
+                  · paramsHash{" "}
+                  <span className="font-mono" data-testid="paper-params-hash">
                     {strategy.paramsHash.slice(0, 12)}
                   </span>
                 </>
               ) : null}
+              {strategy?.strategyHash ? (
+                <>
+                  {" "}
+                  · strategyHash{" "}
+                  <span className="font-mono" data-testid="paper-strategy-hash">
+                    {strategy.strategyHash.slice(0, 12)}
+                  </span>
+                </>
+              ) : null}
             </p>
+            {session?.backtestResultId ? (
+              <p className="mt-1 text-xs text-sky-100/70">
+                연결 Backtest{" "}
+                <span className="font-mono" data-testid="paper-linked-run">
+                  {session.backtestResultId}
+                </span>
+              </p>
+            ) : null}
           </div>
         )}
         {paperSessionActive ? (
@@ -389,15 +450,26 @@ export default function PaperTradingPage() {
         </details>
         <div className="mt-3 flex flex-wrap gap-2">
           {canonicalStatus === "idle" || canonicalStatus === "stopped" ? (
-            <Button
-              tone="success"
-              loading={sessionBusy}
-              data-testid="paper-start"
-              disabled={identityLoading || !strategy?.id}
-              onClick={() => void startPaper()}
-            >
-              {canonicalStatus === "stopped" ? "새 세션 시작" : "모의매매 시작"}
-            </Button>
+            <>
+              <Button
+                tone="success"
+                loading={sessionBusy}
+                data-testid="paper-start"
+                disabled={identityLoading || !strategy?.id}
+                onClick={() => void startPaper()}
+              >
+                {canonicalStatus === "stopped" ? "새 세션 시작" : "모의매매 시작"}
+              </Button>
+              {!identityLoading && !strategy?.id ? (
+                <p
+                  className="w-full text-sm text-amber-200"
+                  data-testid="paper-start-disabled-reason"
+                >
+                  시작 불가: 모의매매에 연결된 등록 전략이 없습니다. 탐색 결과에서
+                  전략을 등록한 뒤 「모의매매 등록」을 실행하세요.
+                </p>
+              ) : null}
+            </>
           ) : null}
           {canonicalStatus === "starting" ? (
             <Button tone="muted" disabled data-testid="paper-starting">
@@ -482,7 +554,7 @@ export default function PaperTradingPage() {
         </p>
         {session ? (
           <div
-            className="mb-3 grid gap-2 md:grid-cols-3"
+            className="mb-3 grid gap-2 md:grid-cols-3 lg:grid-cols-5"
             data-testid="paper-backtest-comparison"
           >
             <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
@@ -494,9 +566,32 @@ export default function PaperTradingPage() {
               <p className="font-semibold text-white">{session.signalCount}</p>
             </div>
             <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
-              <p className="text-xs text-slate-400">전략 식별값</p>
-              <p className="font-mono text-xs text-sky-200">
+              <p className="text-xs text-slate-400">strategyHash</p>
+              <p
+                className="font-mono text-xs text-sky-200"
+                data-testid="paper-feedback-strategy-hash"
+              >
                 {session.strategyHash.slice(0, 12)}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
+              <p className="text-xs text-slate-400">paramsHash</p>
+              <p
+                className="font-mono text-xs text-sky-200"
+                data-testid="paper-feedback-params-hash"
+              >
+                {strategy?.paramsHash
+                  ? strategy.paramsHash.slice(0, 12)
+                  : "—"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm">
+              <p className="text-xs text-slate-400">전략 ID</p>
+              <p
+                className="font-mono text-xs text-sky-200"
+                data-testid="paper-feedback-strategy-id"
+              >
+                {session.strategyId}
               </p>
             </div>
           </div>

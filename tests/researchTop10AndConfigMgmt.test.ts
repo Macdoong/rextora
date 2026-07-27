@@ -182,7 +182,7 @@ describe("selectResearchTop10", () => {
     expect(snap2.rankChanges.some((c) => c.change === "신규 진입")).toBe(true);
   });
 
-  it("merges same-scope Top-10 across different jobs and ignores unrelated scopes", () => {
+  it("keeps Top-10 job-local and does not import peer-job entries", () => {
     const store = tempStore();
     const mkJob = () =>
       createSearchJob(
@@ -248,11 +248,13 @@ describe("selectResearchTop10", () => {
       representatives: [
         card({ paramsHash: "new-c", iteration: 3, netReturn: 0.35 }),
       ],
+      previousSameScope: getResearchTop10(jobA.id, store),
       options: store,
     });
     const hashes = snapB.entries.map((e) => e.strategyHash);
-    expect(hashes).toContain("keep-a");
-    expect(hashes).toContain("new-c");
+    // Job-local shortlist only — peer job entries must not populate this jobId.
+    expect(hashes).toEqual(["new-c"]);
+    expect(hashes).not.toContain("keep-a");
     expect(hashes).not.toContain("eth-only");
     expect(snapB.entries.length).toBeLessThanOrEqual(RESEARCH_TOP10_LIMIT);
     expect(snapB.rankChanges.some((c) => c.change === "신규 진입")).toBe(true);

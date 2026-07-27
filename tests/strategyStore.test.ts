@@ -112,7 +112,8 @@ describe("backtestRunner", () => {
       });
       expect(result.report.validation.noRealOrders).toBe(true);
       expect(result.report.costStress?.length).toBe(3);
-      expect(result.report.strategyHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+      expect(result.report.strategyHash).toHaveLength(64);
+      expect(result.report.sourceParamsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
       expect(result.report.dataSource).toBe("synthetic-test");
       expect(result.candles.length).toBe(result.report.candleCount);
     } finally {

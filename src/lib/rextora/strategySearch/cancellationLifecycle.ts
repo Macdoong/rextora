@@ -18,6 +18,7 @@ import {
 } from "./jobStore";
 import {
   isSearchJobExecutionActive,
+  isSearchJobExecutionWorkerActive,
   listActiveSearchJobExecutions,
 } from "./jobExecutionRegistry";
 import { getSearchPlan, saveSearchPlan } from "./searchPlan";
@@ -127,7 +128,7 @@ export function requestCancelWithFinalization(
   }
   job = stampCancelRequested(getSearchJob(jobId, options) ?? job, options);
 
-  if (isSearchJobExecutionActive(jobId)) {
+  if (isSearchJobExecutionWorkerActive(jobId, options)) {
     return {
       jobId,
       finalized: false,
@@ -203,7 +204,7 @@ export function finalizeCancellation(
     };
   }
 
-  if (isSearchJobExecutionActive(jobId)) {
+  if (isSearchJobExecutionWorkerActive(jobId, options)) {
     return {
       jobId,
       finalized: false,

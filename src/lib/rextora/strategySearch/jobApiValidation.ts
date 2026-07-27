@@ -26,6 +26,10 @@ import type {
   SearchDepthProfileId,
 } from "./operatorProfiles";
 import { ALL_SEARCH_SPACES } from "./searchSpaces";
+import {
+  normalizePatternCombinationSpec,
+  type PatternCombinationSpec,
+} from "./patternCombination";
 
 export interface ValidatedOperatorPlanInput {
   depthProfile: SearchDepthProfileId;
@@ -52,10 +56,31 @@ export interface ValidatedOperatorPlanInput {
   patternRetestMode?: "required" | "optional" | "disabled" | null;
   patternConfirmStrength?: "standard" | "strict" | null;
   patternConfirmClose?: "required" | "disabled" | null;
+  patternConfirmationMode?:
+    | "none"
+    | "single_close"
+    | "consecutive_closes"
+    | "threshold_count"
+    | null;
+  patternConfirmationCandleCount?: number | null;
+  patternConfirmationWindow?: number | null;
   patternExpiryBars?: number | null;
   patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
   patternStrength?: "loose" | "standard" | "strict" | null;
   patternSrSensitivity?: "tight" | "standard" | "loose" | null;
+  patternCombinationTemplate?: string | null;
+  patternCombinationOperator?:
+    | "and"
+    | "or"
+    | "sequence"
+    | "weighted_score"
+    | "priority"
+    | null;
+  patternCombinationFailurePolicy?: "any" | "all" | "majority" | null;
+  patternCombinationWeightedThreshold?: number | null;
+  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationFamilies?: string[] | null;
+  patternCombinationSpec?: PatternCombinationSpec | null;
 }
 
 export class StrategySearchApiValidationError extends Error {
@@ -615,6 +640,52 @@ export function validateCreateSearchJobBody(
       if (patternConfirmCloseRaw != null && patternConfirmClose == null) {
         details.push("operatorPlan.patternConfirmClose invalid");
       }
+      const patternConfirmModeRaw = op.patternConfirmationMode;
+      const patternConfirmationMode =
+        patternConfirmModeRaw === "none" ||
+        patternConfirmModeRaw === "single_close" ||
+        patternConfirmModeRaw === "consecutive_closes" ||
+        patternConfirmModeRaw === "threshold_count"
+          ? patternConfirmModeRaw
+          : patternConfirmModeRaw == null
+            ? patternConfirmClose === "disabled"
+              ? "none"
+              : "single_close"
+            : null;
+      if (patternConfirmModeRaw != null && patternConfirmationMode == null) {
+        details.push("operatorPlan.patternConfirmationMode invalid");
+      }
+      let patternConfirmationCandleCount: number | null = 1;
+      if (
+        op.patternConfirmationCandleCount != null &&
+        op.patternConfirmationCandleCount !== ""
+      ) {
+        const n = Number(op.patternConfirmationCandleCount);
+        if (!Number.isInteger(n) || n < 1 || n > 8) {
+          details.push(
+            "operatorPlan.patternConfirmationCandleCount must be an integer 1–8",
+          );
+          patternConfirmationCandleCount = null;
+        } else {
+          patternConfirmationCandleCount = n;
+        }
+      }
+      let patternConfirmationWindow: number | null =
+        patternConfirmationCandleCount ?? 1;
+      if (
+        op.patternConfirmationWindow != null &&
+        op.patternConfirmationWindow !== ""
+      ) {
+        const n = Number(op.patternConfirmationWindow);
+        if (!Number.isInteger(n) || n < 1 || n > 24) {
+          details.push(
+            "operatorPlan.patternConfirmationWindow must be an integer 1–24",
+          );
+          patternConfirmationWindow = null;
+        } else {
+          patternConfirmationWindow = n;
+        }
+      }
       let patternExpiryBars: number | null = null;
       if (op.patternExpiryBars != null && op.patternExpiryBars !== "") {
         const n = Number(op.patternExpiryBars);
@@ -662,6 +733,12 @@ export function validateCreateSearchJobBody(
       if (patternSrSensRaw != null && patternSrSensitivity == null) {
         details.push("operatorPlan.patternSrSensitivity invalid");
       }
+      const patternCombinationSpec = normalizePatternCombinationSpec(
+        op.patternCombinationSpec,
+      );
+      if (op.patternCombinationSpec != null && patternCombinationSpec == null) {
+        details.push("operatorPlan.patternCombinationSpec invalid");
+      }
       operatorPlan = {
         depthProfile: depth,
         qualificationProfile: qual,
@@ -697,11 +774,42 @@ export function validateCreateSearchJobBody(
         patternDirection: patternDirection ?? "both",
         patternRetestMode: patternRetestMode ?? "required",
         patternConfirmStrength: patternConfirmStrength ?? "standard",
-        patternConfirmClose: patternConfirmClose ?? "required",
+        patternConfirmClose:
+          patternConfirmationMode === "none"
+            ? "disabled"
+            : (patternConfirmClose ?? "required"),
+        patternConfirmationMode: patternConfirmationMode ?? "single_close",
+        patternConfirmationCandleCount: patternConfirmationCandleCount ?? 1,
+        patternConfirmationWindow: patternConfirmationWindow ?? 1,
         patternExpiryBars,
         patternRiskStyle: patternRiskStyle ?? "balanced",
         patternStrength: patternStrength ?? "standard",
         patternSrSensitivity: patternSrSensitivity ?? "standard",
+        patternCombinationTemplate:
+          typeof op.patternCombinationTemplate === "string"
+            ? op.patternCombinationTemplate
+            : null,
+        patternCombinationOperator:
+          op.patternCombinationOperator === "and" ||
+          op.patternCombinationOperator === "or" ||
+          op.patternCombinationOperator === "sequence" ||
+          op.patternCombinationOperator === "weighted_score" ||
+          op.patternCombinationOperator === "priority"
+            ? op.patternCombinationOperator
+            : null,
+        patternCombinationInvalidationMode:
+          op.patternCombinationInvalidationMode === "any" ||
+          op.patternCombinationInvalidationMode === "all"
+            ? op.patternCombinationInvalidationMode
+            : null,
+        patternCombinationFamilies: Array.isArray(
+          op.patternCombinationFamilies,
+        )
+          ? op.patternCombinationFamilies
+              .filter((x): x is string => typeof x === "string")
+              .slice(0, 4)
+          : null,
+        patternCombinationSpec,
       };
     }
   }

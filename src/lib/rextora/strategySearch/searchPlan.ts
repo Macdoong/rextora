@@ -13,6 +13,10 @@ import { assertStrategySearchJobId } from "./searchId";
 import type { SearchDepthProfileId, QualificationProfileId } from "./operatorProfiles";
 import type { SearchSpaceMutationRecord } from "./searchSpaceMutation";
 import type { StrategySearchParameterRange } from "./types";
+import {
+  normalizePatternCombinationSpec,
+  type PatternCombinationSpec,
+} from "./patternCombination";
 
 export const STRATEGY_SEARCH_PLAN_VERSION = 1 as const;
 
@@ -151,10 +155,31 @@ export interface StrategySearchPlan {
   patternRetestMode?: "required" | "optional" | "disabled" | null;
   patternConfirmStrength?: "standard" | "strict" | null;
   patternConfirmClose?: "required" | "disabled" | null;
+  patternConfirmationMode?:
+    | "none"
+    | "single_close"
+    | "consecutive_closes"
+    | "threshold_count"
+    | null;
+  patternConfirmationCandleCount?: number | null;
+  patternConfirmationWindow?: number | null;
   patternExpiryBars?: number | null;
   patternRiskStyle?: "conservative" | "balanced" | "aggressive" | null;
   patternStrength?: "loose" | "standard" | "strict" | null;
   patternSrSensitivity?: "tight" | "standard" | "loose" | null;
+  /** Multi-pattern combination snapshot (additive). */
+  patternCombinationTemplate?: string | null;
+  patternCombinationOperator?:
+    | "and"
+    | "or"
+    | "sequence"
+    | "weighted_score"
+    | "priority"
+    | null;
+  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationFamilies?: string[] | null;
+  /** Canonical immutable block-level configuration snapshot. */
+  patternCombinationSpec?: PatternCombinationSpec | null;
 }
 
 function defaultRoot(): string {
@@ -216,11 +241,22 @@ export function createEmptySearchPlan(input: {
   patternRetestMode?: StrategySearchPlan["patternRetestMode"];
   patternConfirmStrength?: StrategySearchPlan["patternConfirmStrength"];
   patternConfirmClose?: StrategySearchPlan["patternConfirmClose"];
+  patternConfirmationMode?: StrategySearchPlan["patternConfirmationMode"];
+  patternConfirmationCandleCount?: StrategySearchPlan["patternConfirmationCandleCount"];
+  patternConfirmationWindow?: StrategySearchPlan["patternConfirmationWindow"];
   patternExpiryBars?: StrategySearchPlan["patternExpiryBars"];
   patternRiskStyle?: StrategySearchPlan["patternRiskStyle"];
   patternStrength?: StrategySearchPlan["patternStrength"];
   patternSrSensitivity?: StrategySearchPlan["patternSrSensitivity"];
+  patternCombinationTemplate?: StrategySearchPlan["patternCombinationTemplate"];
+  patternCombinationOperator?: StrategySearchPlan["patternCombinationOperator"];
+  patternCombinationInvalidationMode?: StrategySearchPlan["patternCombinationInvalidationMode"];
+  patternCombinationFamilies?: StrategySearchPlan["patternCombinationFamilies"];
+  patternCombinationSpec?: PatternCombinationSpec | null;
 }): StrategySearchPlan {
+  const combinationSpec = normalizePatternCombinationSpec(
+    input.patternCombinationSpec,
+  );
   return {
     version: STRATEGY_SEARCH_PLAN_VERSION,
     searchName: input.searchName,
@@ -246,10 +282,22 @@ export function createEmptySearchPlan(input: {
     patternRetestMode: input.patternRetestMode ?? null,
     patternConfirmStrength: input.patternConfirmStrength ?? null,
     patternConfirmClose: input.patternConfirmClose ?? null,
+    patternConfirmationMode: input.patternConfirmationMode ?? null,
+    patternConfirmationCandleCount:
+      input.patternConfirmationCandleCount ?? null,
+    patternConfirmationWindow: input.patternConfirmationWindow ?? null,
     patternExpiryBars: input.patternExpiryBars ?? null,
     patternRiskStyle: input.patternRiskStyle ?? null,
     patternStrength: input.patternStrength ?? null,
     patternSrSensitivity: input.patternSrSensitivity ?? null,
+    patternCombinationTemplate: input.patternCombinationTemplate ?? null,
+    patternCombinationOperator: input.patternCombinationOperator ?? null,
+    patternCombinationInvalidationMode:
+      input.patternCombinationInvalidationMode ?? null,
+    patternCombinationFamilies: input.patternCombinationFamilies
+      ? [...input.patternCombinationFamilies]
+      : null,
+    patternCombinationSpec: combinationSpec,
     campaignStartedAtMs: null,
     pausedAtMs: null,
     accumulatedPauseMs: 0,
@@ -277,6 +325,37 @@ export function createEmptySearchPlan(input: {
   };
 }
 
+function normalizePlanSnapshot(plan: StrategySearchPlan): StrategySearchPlan {
+  const cloned = JSON.parse(JSON.stringify(plan)) as StrategySearchPlan;
+  return {
+    ...cloned,
+    spaces: cloned.spaces.map((space) => ({ ...space })),
+    globalSeenHashes: [...cloned.globalSeenHashes],
+    qualifiedHashes: [...cloned.qualifiedHashes],
+    promotions: cloned.promotions.map((promotion) => ({ ...promotion })),
+    symbolSelection: cloned.symbolSelection
+      ? {
+          ...cloned.symbolSelection,
+          excludedAlternatives: cloned.symbolSelection.excludedAlternatives.map(
+            (item) => ({ ...item }),
+          ),
+        }
+      : null,
+    mutatedParameterRanges: cloned.mutatedParameterRanges
+      ? cloned.mutatedParameterRanges.map((range) => ({
+          ...range,
+          enumValues: range.enumValues ? [...range.enumValues] : undefined,
+        }))
+      : null,
+    patternCombinationFamilies: cloned.patternCombinationFamilies
+      ? [...cloned.patternCombinationFamilies]
+      : null,
+    patternCombinationSpec: normalizePatternCombinationSpec(
+      cloned.patternCombinationSpec,
+    ),
+  };
+}
+
 export function saveSearchPlan(
   jobId: string,
   plan: StrategySearchPlan,
@@ -289,8 +368,9 @@ export function saveSearchPlan(
       `unsupported strategy-search plan version: ${String((plan as { version?: unknown }).version)}`,
     );
   }
-  writeJsonAtomic(planPath(root, jobId), plan);
-  return plan;
+  const snapshot = normalizePlanSnapshot(plan);
+  writeJsonAtomic(planPath(root, jobId), snapshot);
+  return normalizePlanSnapshot(snapshot);
 }
 
 export function getSearchPlan(
@@ -304,7 +384,7 @@ export function getSearchPlan(
     const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as StrategySearchPlan;
     if (!parsed || parsed.version !== STRATEGY_SEARCH_PLAN_VERSION) return null;
     if (!Array.isArray(parsed.spaces)) return null;
-    return {
+    return normalizePlanSnapshot({
       ...parsed,
       stopWhenQualifiedTarget: parsed.stopWhenQualifiedTarget === true,
       mutatedParameterRanges: parsed.mutatedParameterRanges ?? null,
@@ -317,7 +397,10 @@ export function getSearchPlan(
           : 0,
       resumedAtMs: parsed.resumedAtMs ?? null,
       expectedCompletionAtMs: parsed.expectedCompletionAtMs ?? null,
-    };
+      patternCombinationSpec: normalizePatternCombinationSpec(
+        parsed.patternCombinationSpec,
+      ),
+    });
   } catch {
     return null;
   }
@@ -342,16 +425,49 @@ export function activeElapsedMs(
   );
 }
 
+/** Deterministic deadline timestamp from active elapsed (excludes pause wall time). */
+export function computeExpectedCompletionAtMs(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): number | null {
+  if (plan.maxRuntimeMs == null || plan.campaignStartedAtMs == null) {
+    return null;
+  }
+  const active = activeElapsedMs(plan, now);
+  return now + Math.max(0, plan.maxRuntimeMs - active);
+}
+
+/** Sync elapsed + expected completion onto a plan snapshot (for persistence). */
+export function syncPlanTimingFields(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): StrategySearchPlan {
+  if (plan.campaignStartedAtMs == null) {
+    return plan;
+  }
+  const elapsedMs = activeElapsedMs(plan, now);
+  return {
+    ...plan,
+    elapsedMs,
+    expectedCompletionAtMs: computeExpectedCompletionAtMs(
+      { ...plan, elapsedMs },
+      now,
+    ),
+  };
+}
+
 export function markPlanPaused(
   plan: StrategySearchPlan,
   now = Date.now(),
 ): StrategySearchPlan {
   if (plan.pausedAtMs != null) return plan;
-  return {
-    ...plan,
-    pausedAtMs: now,
-    elapsedMs: activeElapsedMs(plan, now),
-  };
+  return syncPlanTimingFields(
+    {
+      ...plan,
+      pausedAtMs: now,
+    },
+    now,
+  );
 }
 
 export function markPlanResumed(
@@ -368,22 +484,15 @@ export function markPlanResumed(
     const wall = Math.max(0, now - plan.campaignStartedAtMs);
     accumulatedPauseMs = Math.max(accumulatedPauseMs, wall - knownActive);
   }
-  const next: StrategySearchPlan = {
-    ...plan,
-    pausedAtMs: null,
-    accumulatedPauseMs,
-    resumedAtMs: now,
-  };
-  const active = activeElapsedMs(next, now);
-  const expectedCompletionAtMs =
-    next.maxRuntimeMs != null
-      ? now + Math.max(0, next.maxRuntimeMs - active)
-      : null;
-  return {
-    ...next,
-    elapsedMs: active,
-    expectedCompletionAtMs,
-  };
+  return syncPlanTimingFields(
+    {
+      ...plan,
+      pausedAtMs: null,
+      accumulatedPauseMs,
+      resumedAtMs: now,
+    },
+    now,
+  );
 }
 
 /**

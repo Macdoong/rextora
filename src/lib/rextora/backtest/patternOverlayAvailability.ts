@@ -4,12 +4,14 @@
  */
 
 import type { TradeEventTrace } from "./tradeEventTrace";
+import type { RejectedSetup } from "../strategy/eventSequenceBacktest";
 
 export type PatternOverlayKind =
   | "order_block"
   | "fvg"
   | "trendline"
-  | "support_resistance";
+  | "support_resistance"
+  | "supply_demand";
 
 export type PatternOverlayStatus =
   | "available"
@@ -25,21 +27,14 @@ export interface PatternOverlayAvailability {
   defaultOn: boolean;
 }
 
-export interface PersistedRejectedSetup {
-  bar: number;
-  at?: string | null;
-  reasonCode: string;
-  patternType: string;
-  measured: number | null;
-  required: number | null;
-  rejectionStage?: string | null;
-}
+export type PersistedRejectedSetup = RejectedSetup;
 
 const LABELS: Record<PatternOverlayKind, string> = {
   order_block: "오더블럭",
   fvg: "FVG",
   trendline: "추세선",
   support_resistance: "지지·저항",
+  supply_demand: "수요·공급",
 };
 
 function hasZoneGeometry(t: TradeEventTrace): boolean {
@@ -61,11 +56,25 @@ function strategyUsesPattern(
     strategyType?: string | null;
     eventSequenceFamily?: string | null;
     conditionPatternKinds?: string[] | null;
+    traces: TradeEventTrace[];
   },
 ): boolean {
   const family = opts.eventSequenceFamily ?? null;
   if (family === kind) return true;
   if (opts.conditionPatternKinds?.includes(kind)) return true;
+  // Persisted traces are authoritative — never invent geometry, but do not
+  // hide overlays when the run already stored this patternType.
+  if (
+    opts.traces.some(
+      (t) =>
+        t.patternType === kind ||
+        t.patternBlocks?.some(
+          (b) => b.family === kind && b.status === "detected",
+        ),
+    )
+  ) {
+    return true;
+  }
   // SAFE / params strategies do not use structural pattern families.
   if (
     !opts.strategyType ||
@@ -75,6 +84,64 @@ function strategyUsesPattern(
     return false;
   }
   return false;
+}
+
+/** Resolve pattern family from a stored strategy definition / metadata. */
+export function resolveEventSequenceFamilyFromStrategy(strategy: {
+  strategyType?: string | null;
+  definition?: {
+    eventSequence?: {
+      steps?: Array<{ kind?: string; patternFamily?: string | null }>;
+      combination?: {
+        blocks?: Array<{ family?: string; role?: string }>;
+      } | null;
+    } | null;
+    metadata?: Record<string, unknown> | null;
+  } | null;
+  metadata?: Record<string, unknown> | null;
+} | null): PatternOverlayKind | null {
+  if (!strategy) return null;
+  const comboBlocks =
+    strategy.definition?.eventSequence?.combination?.blocks ?? [];
+  const entryZone = comboBlocks.find((b) => b.role === "entry_zone");
+  if (
+    entryZone?.family === "order_block" ||
+    entryZone?.family === "fvg" ||
+    entryZone?.family === "trendline" ||
+    entryZone?.family === "support_resistance" ||
+    entryZone?.family === "supply_demand"
+  ) {
+    return entryZone.family;
+  }
+  const steps = strategy.definition?.eventSequence?.steps;
+  const creation = Array.isArray(steps)
+    ? steps.find((s) => s.kind === "pattern_creation")
+    : undefined;
+  const fromStep = creation?.patternFamily;
+  if (
+    fromStep === "order_block" ||
+    fromStep === "fvg" ||
+    fromStep === "trendline" ||
+    fromStep === "support_resistance" ||
+    fromStep === "supply_demand"
+  ) {
+    return fromStep;
+  }
+  const meta = strategy.definition?.metadata ?? strategy.metadata ?? null;
+  const raw =
+    (typeof meta?.searchFamily === "string" && meta.searchFamily) ||
+    (typeof meta?.pattern === "string" && meta.pattern) ||
+    null;
+  if (
+    raw === "order_block" ||
+    raw === "fvg" ||
+    raw === "trendline" ||
+    raw === "support_resistance" ||
+    raw === "supply_demand"
+  ) {
+    return raw;
+  }
+  return null;
 }
 
 export function classifyPatternOverlays(input: {
@@ -88,9 +155,10 @@ export function classifyPatternOverlays(input: {
     "fvg",
     "trendline",
     "support_resistance",
+    "supply_demand",
   ];
   return kinds.map((kind) => {
-    const used = strategyUsesPattern(kind, input);
+    const used = strategyUsesPattern(kind, { ...input, traces: input.traces });
     const labelKo = LABELS[kind];
     if (!used) {
       const unusedReason =
@@ -110,10 +178,23 @@ export function classifyPatternOverlays(input: {
       };
     }
     const matching = input.traces.filter((t) => t.patternType === kind);
+    const blockGeo = input.traces.some((t) =>
+      t.patternBlocks?.some(
+        (b) =>
+          b.family === kind &&
+          b.status === "detected" &&
+          (kind === "trendline"
+            ? Array.isArray(b.lineAnchors) && b.lineAnchors.length >= 2
+            : b.zoneHigh != null &&
+              b.zoneLow != null &&
+              Number.isFinite(b.zoneHigh) &&
+              Number.isFinite(b.zoneLow)),
+      ),
+    );
     const hasGeo =
       kind === "trendline"
-        ? matching.some(hasTrendlineGeometry)
-        : matching.some(hasZoneGeometry);
+        ? matching.some(hasTrendlineGeometry) || blockGeo
+        : matching.some(hasZoneGeometry) || blockGeo;
     if (!hasGeo) {
       const missingReason =
         kind === "fvg"

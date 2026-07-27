@@ -1,6 +1,6 @@
 import type { SafeV44Params, StoredStrategy, StrategyTimeframe } from "../strategyTypes";
 import { SAFE_STRATEGY_ID } from "../strategyTypes";
-import { computeParamsHash } from "../strategyHash";
+import { computeParamsHash, computeStrategyHash } from "../strategyHash";
 import {
   STRATEGY_SCHEMA_VERSION,
   emptyGroup,
@@ -106,12 +106,19 @@ export function definitionToStoredPatch(def: CanonicalStrategyDefinition, base: 
   params.cooldown_bars = def.execution.cooldownBars;
   params.confirm_bear = def.shortEnabled && def.execution.shortEnabled;
 
+  const paramsHash = computeParamsHash(params);
+  const normalizedDefinition = {
+    ...def,
+    paramsHash,
+    safeParams: params as unknown as Record<string, number | boolean>,
+  };
   return {
     name: def.strategyName,
     description: def.description,
     timeframe: def.timeframe as StrategyTimeframe,
     params,
-    paramsHash: computeParamsHash(params),
+    paramsHash,
+    strategyHash: computeStrategyHash(normalizedDefinition),
     schemaVersion: STRATEGY_SCHEMA_VERSION,
     strategyType: def.strategyType,
     sourceStrategyId: def.sourceStrategyId,
@@ -119,7 +126,7 @@ export function definitionToStoredPatch(def: CanonicalStrategyDefinition, base: 
     symbols: def.symbols,
     longEnabled: def.longEnabled,
     shortEnabled: def.shortEnabled,
-    definition: { ...def, paramsHash: computeParamsHash(params), safeParams: params as unknown as Record<string, number | boolean> }
+    definition: normalizedDefinition,
   };
 }
 

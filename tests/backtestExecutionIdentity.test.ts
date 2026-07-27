@@ -140,6 +140,7 @@ describe("backtest execution identity and UX polish", () => {
       sourceType: "user_backtest_run",
       strategyId: "custom_mrxjff7z",
       strategyHash: "dbd658af74bc",
+      sourceParamsHash: "candidate-source-hash",
       requestedAt: "2026-07-24T01:00:00.000Z",
       startedAt: "2026-07-24T01:00:01.000Z",
       completedAt: "2026-07-24T01:00:02.000Z",
@@ -176,6 +177,7 @@ describe("backtest execution identity and UX polish", () => {
     });
 
     expect(a.id).not.toBe(b.id);
+    expect(a.sourceParamsHash).toBe("candidate-source-hash");
     expect(a.backtestRunId).not.toBe(b.backtestRunId);
     expect(a.resultHash).toBe(b.resultHash);
     expect(a.resultHash).toBe(backtestResultHash(a));

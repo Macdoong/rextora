@@ -61,10 +61,28 @@ export type StrategyTimeframe = "1m" | "3m" | "5m" | "15m" | "1h" | "unknown";
 export interface StoredStrategy {
   id: string;
   name: string;
+  /**
+   * Operator-facing alias (e.g. "Z11 · 변동성 돌파 · 공격형").
+   * Editable; never participates in paramsHash / strategy identity.
+   */
+  displayAlias?: string | null;
+  /** Optional free-form display name override (editable, non-identity). */
+  displayName?: string | null;
+  /** Bounded display-only rename audit; never participates in identity hashing. */
+  renameAudit?: Array<{
+    at: string;
+    from: string | null;
+    to: string | null;
+    field: "displayAlias" | "displayName" | "name";
+  }>;
   description: string;
   type: string;
   timeframe: StrategyTimeframe;
   paramsHash: string;
+  /** Original search-candidate params hash, when this record was promoted. */
+  sourceParamsHash?: string;
+  /** Canonical definition-based behavior identity. */
+  strategyHash?: string;
   params: SafeV44Params;
   locked: boolean;
   sourceFile: string | null;
@@ -94,6 +112,8 @@ export interface StrategyIndexFile {
     id: string;
     name: string;
     paramsHash: string;
+    sourceParamsHash?: string;
+    strategyHash?: string;
     locked: boolean;
     paperActive: boolean;
     liveActive: boolean;

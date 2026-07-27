@@ -31,6 +31,7 @@ export type ConditionCategory =
   | "fvg"
   | "trend_line"
   | "support_resistance"
+  | "supply_demand"
   | "indicator"
   | "filter"
   | "group";
@@ -63,6 +64,8 @@ export type LeafConditionType =
   | "previous_low"
   | "repeated_touch_zone"
   | "sr_flip"
+  | "demand_zone"
+  | "supply_zone"
   // Indicators
   | "sma"
   | "ema"

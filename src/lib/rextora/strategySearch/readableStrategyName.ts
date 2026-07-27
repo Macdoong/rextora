@@ -6,6 +6,11 @@
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { resolvePatternFamilyFromParams } from "./patternSearchSpaces";
+import {
+  combinationLabelKo,
+  resolveCombinationFromParams,
+} from "./patternCombination";
+import { describeLeverageFromParams } from "./leverageMode";
 
 export type StrategyFamilyId =
   | "ema_trend"
@@ -15,7 +20,8 @@ export type StrategyFamilyId =
   | "order_block"
   | "fvg"
   | "trendline"
-  | "support_resistance";
+  | "support_resistance"
+  | "supply_demand";
 
 export type StyleProfileId = "conservative" | "balanced" | "aggressive";
 
@@ -28,6 +34,31 @@ export interface ReadableStrategyIdentity {
   styleLabelKo: string;
   /** Internal fingerprint only — never show in default UI. */
   suffix: string;
+}
+
+function roleSummary(params: Record<string, unknown>): string {
+  const combination = resolveCombinationFromParams(params);
+  if (!combination) return "단일 역할";
+  const roles = [...new Set(combination.blocks.map((block) => block.role))];
+  return roles.join("+");
+}
+
+/** Deterministic lifecycle name; never includes mutable ids or hashes. */
+export function buildComboAwareStrategyName(input: {
+  params: Record<string, unknown>;
+  symbol: string;
+  timeframe: string;
+}): string {
+  const family = classifySafeV44Family(input.params);
+  const combination = resolveCombinationFromParams(input.params);
+  const stack = combination
+    ? combinationLabelKo(combination)
+    : familyLabel(family).name;
+  const symbol = input.symbol.trim().toUpperCase() || "BTCUSDT";
+  const timeframe = input.timeframe.trim() || "15m";
+  const style = styleLabelKo(classifyStyleProfile(input.params));
+  const leverage = describeLeverageFromParams(input.params);
+  return `${symbol} ${timeframe} · ${stack} · ${roleSummary(input.params)} · ${style} · ${leverage}`;
 }
 
 function num(v: unknown, fallback: number): number {
@@ -94,6 +125,8 @@ function familyLabel(family: StrategyFamilyId): {
       return { name: "Trendline", typeKo: "패턴" };
     case "support_resistance":
       return { name: "Support / Resistance", typeKo: "패턴" };
+    case "supply_demand":
+      return { name: "Supply / Demand", typeKo: "패턴" };
     default:
       return { name: "SAFE 종합", typeKo: "종합" };
   }
@@ -156,7 +189,12 @@ export function stripTechnicalNameSuffix(name: string): string {
 export function buildReadableStrategyIdentity(
   params: Record<string, unknown>,
   paramsHash: string,
-  opts?: { includeSuffix?: boolean },
+  opts?: {
+    includeSuffix?: boolean;
+    symbol?: string;
+    timeframe?: string;
+    comboAware?: boolean;
+  },
 ): ReadableStrategyIdentity {
   const family = classifySafeV44Family(params);
   const { name, typeKo } = familyLabel(family);
@@ -164,7 +202,14 @@ export function buildReadableStrategyIdentity(
   const styleKo = styleLabelKo(style);
   const suffix = shortHashSuffix(paramsHash);
   // Default: human name only. Hash never shown in operator UI.
-  const base = `${name} · ${styleKo}`;
+  const base =
+    opts?.comboAware && opts.symbol && opts.timeframe
+      ? buildComboAwareStrategyName({
+          params,
+          symbol: opts.symbol,
+          timeframe: opts.timeframe,
+        })
+      : `${name} · ${styleKo}`;
   const readableName =
     opts?.includeSuffix === true ? `${base} (${suffix})` : base;
   return {

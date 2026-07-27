@@ -295,6 +295,10 @@ export function StrategySearchWorkbench() {
         detail: "새로고침하거나 목록에서 다시 선택하세요.",
         tone: "error",
       });
+      // Terminate loading UI — empty/error is not infinite spinner.
+      setJobMissing(true);
+      setMissingJobId(selectedId);
+      setDetail(null);
     }, 20_000);
     return () => window.clearTimeout(t);
   }, [selectedId, detail, jobMissing]);
@@ -714,6 +718,7 @@ export function StrategySearchWorkbench() {
                   symbols: detail.symbols,
                   timeframe: detail.timeframe,
                   maxRuntimeMs: detail.maxRuntimeMs ?? null,
+                  status: detail.status,
                   expectedCompletionAtMs: detail.expectedCompletionAtMs ?? null,
                   appliedSummary:
                     (
@@ -875,12 +880,33 @@ export function StrategySearchWorkbench() {
               <h2
                 id="ss-job-detail-title"
                 className="ss-section-title"
+                data-testid="ss-job-user-name"
               >
                 {detail.searchName || "전략 탐색"}
               </h2>
-              <p className="rextora-helper mt-1">
-                {detail.symbols.join(", ")} · {detail.timeframe}
-                {detail.currentSearchFamily
+              <p
+                className="rextora-helper mt-1"
+                data-testid="ss-job-config-summary"
+              >
+                {[
+                  detail.currentCombinationLabel ??
+                    (detail.patternCombinationFamilies &&
+                    detail.patternCombinationFamilies.length > 1
+                      ? detail.patternCombinationFamilies.join(" + ")
+                      : null),
+                  detail.patternCombinationOperator
+                    ? String(detail.patternCombinationOperator).toUpperCase()
+                    : null,
+                  `${detail.symbols.join(", ")} ${detail.timeframe}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+                {!detail.currentCombinationLabel &&
+                !(
+                  detail.patternCombinationFamilies &&
+                  detail.patternCombinationFamilies.length > 1
+                ) &&
+                detail.currentSearchFamily
                   ? ` · ${detail.currentSearchFamily}`
                   : ""}
               </p>

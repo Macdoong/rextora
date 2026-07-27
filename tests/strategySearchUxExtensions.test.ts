@@ -162,13 +162,14 @@ describe("validatePatternCombination", () => {
     ).toHaveLength(0);
   });
 
-  it("exposes all four pattern families in form defaults", () => {
+  it("exposes all five pattern families in form defaults", () => {
     const ids = SEARCHABLE_PATTERN_SPACE_OPTIONS.map((p) => p.id);
     expect(ids).toEqual([
       "order_block",
       "fvg",
       "trendline",
       "support_resistance",
+      "supply_demand",
     ]);
   });
 });
@@ -182,10 +183,11 @@ describe("lifecycle next actions panel", () => {
       ),
       "utf8",
     );
-    expect(panel).toContain("백테스트 필요");
-    expect(panel).toContain("추가 검증 필요");
-    expect(panel).toContain("모의매매 등록 가능");
-    expect(panel).toContain("실전매매 검토 불가");
+    expect(panel).toContain("백테스트 실행");
+    expect(panel).toContain("TOP 3 비교");
+    expect(panel).toContain("모의매매");
+    expect(panel).toContain("실전매매");
+    expect(panel).toContain("모의매매 검증 전에는 실전매매");
     expect(panel).toContain("ss-lifecycle-next-actions");
 
     const completion = fs.readFileSync(

@@ -15,7 +15,9 @@ import { BacktestAnalysisView } from "@/components/rextora/charts/BacktestAnalys
 import type { OhlcvCandle } from "@/src/lib/rextora/data/ohlcvTypes";
 import {
   displayParamsHashLabel,
+  displayStrategyHashLabel,
   displayTimeframeLabel,
+  formatShortHash,
 } from "@/src/lib/rextora/displayLabels";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import {
@@ -40,12 +42,24 @@ import {
 } from "@/src/lib/rextora/backtest/strategySymbolCompatibility";
 import type { StoredStrategyV1 } from "@/src/lib/rextora/strategy/definition/bridge";
 import type { AvailableCandleDateRange } from "@/src/lib/rextora/backtest/backtestDateRange";
+import { resolveEventSequenceFamilyFromStrategy } from "@/src/lib/rextora/backtest/patternOverlayAvailability";
 
 function sourceTypeLabelKo(source: string | null | undefined): string {
   if (source === "user_backtest_run") return "사용자 실행";
   if (source === "research_evaluation") return "탐색 평가";
   return source ?? "사용자 실행";
 }
+
+export type SavedRunHydrationState =
+  | "idle"
+  | "loading_strategy"
+  | "loading_runs"
+  | "loading_run"
+  | "loaded"
+  | "missing_strategy"
+  | "missing_run"
+  | "error"
+  | "retrying";
 
 function metricOrUnavailable(
   value: number | null | undefined,
@@ -58,7 +72,7 @@ function metricOrUnavailable(
 function syncBacktestStrategyUrl(
   nextStrategyId: string,
   nextSymbol?: string | null,
-  options?: { clearRunId?: boolean },
+  options?: { clearRunId?: boolean; runId?: string | null },
 ) {
   if (typeof window === "undefined") return;
   const url = new URL(window.location.href);
@@ -74,6 +88,8 @@ function syncBacktestStrategyUrl(
   }
   if (options?.clearRunId) {
     url.searchParams.delete("runId");
+  } else if (options?.runId) {
+    url.searchParams.set("runId", options.runId);
   }
   const next = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState(window.history.state, "", next);
@@ -100,6 +116,10 @@ export function BacktestReviewWorkbench() {
 
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
   const [strategyId, setStrategyId] = useState(initialStrategyId ?? "");
+  const [strategyPickerQuery, setStrategyPickerQuery] = useState("");
+  const [strategyPickerFamily, setStrategyPickerFamily] = useState<
+    "all" | "combo" | "pattern" | "general" | "safe" | "research" | "registered"
+  >("all");
   const [symbol, setSymbol] = useState(initialSymbol || "BTCUSDT");
   const [symbolQuery, setSymbolQuery] = useState("");
   const [providerSymbols, setProviderSymbols] = useState<string[]>(() =>
@@ -148,6 +168,13 @@ export function BacktestReviewWorkbench() {
   const [activeNavSection, setActiveNavSection] = useState("run");
   const [runErrorDetail, setRunErrorDetail] = useState<string | null>(null);
   const [lastDeduped, setLastDeduped] = useState(false);
+  const [hydrationState, setHydrationState] = useState<SavedRunHydrationState>(
+    initialStrategyId ? "loading_strategy" : "idle",
+  );
+  const [hydrationError, setHydrationError] = useState<string | null>(null);
+  const hydratedRunIdRef = useRef<string | null>(null);
+  const hydrationSeqRef = useRef(0);
+  const runsLoadSeqRef = useRef(0);
 
   const strategy = useMemo(
     () => strategies.find((s) => s.id === strategyId) ?? null,
@@ -178,8 +205,13 @@ export function BacktestReviewWorkbench() {
     async (id: string, sym: string, filter: "current" | "all" = "current") => {
       if (!id) {
         setSavedRuns([]);
+        setHydrationState("idle");
         return;
       }
+      const seq = ++runsLoadSeqRef.current;
+      setHydrationState((prev) =>
+        prev === "loading_strategy" || prev === "idle" ? "loading_runs" : prev,
+      );
       try {
         const qs = new URLSearchParams({ strategyId: id });
         if (filter === "all") qs.set("allSymbols", "1");
@@ -189,12 +221,11 @@ export function BacktestReviewWorkbench() {
           { cache: "no-store" },
         );
         const json = await res.json();
+        if (seq !== runsLoadSeqRef.current) return;
         const list = (
           Array.isArray(json.data) ? json.data : []
         ) as SavedBacktestResult[];
         setSavedRuns(list);
-        // Apply deep-link runId once only, and only when it belongs to the
-        // current filtered list (prevents prior-symbol results resurfacing).
         if (
           !appliedInitialRunRef.current &&
           initialRunId &&
@@ -202,9 +233,25 @@ export function BacktestReviewWorkbench() {
         ) {
           appliedInitialRunRef.current = true;
           setSelectedRunId(initialRunId);
+          setHydrationState((prev) =>
+            prev === "loading_runs" ? "idle" : prev,
+          );
+        } else if (initialRunId && !list.some((r) => r.id === initialRunId)) {
+          appliedInitialRunRef.current = true;
+          setSelectedRunId(initialRunId);
+          setHydrationState((prev) =>
+            prev === "loading_runs" ? "idle" : prev,
+          );
+        } else {
+          setHydrationState((prev) =>
+            prev === "loading_runs" ? "idle" : prev,
+          );
         }
       } catch {
+        if (seq !== runsLoadSeqRef.current) return;
         setSavedRuns([]);
+        setHydrationState("error");
+        setHydrationError("저장된 실행 목록을 불러오지 못했습니다.");
       }
     },
     [initialRunId],
@@ -243,6 +290,9 @@ export function BacktestReviewWorkbench() {
     setChartSource(null);
     setLastDeduped(false);
     chartHydrateRunIdRef.current = null;
+    hydratedRunIdRef.current = null;
+    setHydrationState("idle");
+    setHydrationError(null);
   }
 
   useEffect(() => {
@@ -285,7 +335,14 @@ export function BacktestReviewWorkbench() {
               list.some((s) => s.id === initialStrategyId)
             ) {
               setSafeFallbackNotice(false);
+              setHydrationState(initialRunId ? "loading_runs" : "idle");
               return initialStrategyId;
+            }
+            if (initialStrategyId && !list.some((s) => s.id === initialStrategyId)) {
+              setHydrationState("missing_strategy");
+              setHydrationError(
+                `전략 ${initialStrategyId}을(를) 찾을 수 없습니다.`,
+              );
             }
             if (prev && list.some((s) => s.id === prev)) {
               setSafeFallbackNotice(false);
@@ -325,10 +382,14 @@ export function BacktestReviewWorkbench() {
             return "";
           });
         })
-        .catch(() => setRunFeedback("전략 목록을 불러오지 못했습니다."));
+        .catch(() => {
+          setRunFeedback("전략 목록을 불러오지 못했습니다.");
+          setHydrationState("error");
+          setHydrationError("전략 목록을 불러오지 못했습니다.");
+        });
     }, 0);
     return () => clearTimeout(timer);
-  }, [initialStrategyId]);
+  }, [initialStrategyId, initialRunId]);
 
   useEffect(() => {
     if (!strategyId) return;
@@ -463,8 +524,58 @@ export function BacktestReviewWorkbench() {
     setRunFeedback(
       `저장된 실행 로드: ${run.id} · ${runSymbol} · ${run.report.fromDate ?? "?"} → ${run.report.toDate ?? "?"} · 실행 방식 ${sourceTypeLabelKo(run.sourceType)}`,
     );
-    syncBacktestStrategyUrl(strategyId, runSymbol);
+    syncBacktestStrategyUrl(strategyId, runSymbol, { runId: run.id });
+    hydratedRunIdRef.current = run.id;
+    setHydrationState("loaded");
     void hydrateChartForSavedRun(run.id);
+  }
+
+  async function fetchAndApplyRunById(
+    runId: string,
+    expectedStrategyId?: string | null,
+  ) {
+    const seq = ++hydrationSeqRef.current;
+    setHydrationState("loading_run");
+    setHydrationError(null);
+    try {
+      const res = await fetch(
+        `/api/rextora/backtest/run?runId=${encodeURIComponent(runId)}`,
+        { cache: "no-store" },
+      );
+      const json = await res.json();
+      if (seq !== hydrationSeqRef.current) return;
+      if (!json.ok || !json.data) {
+        setHydrationState("missing_run");
+        setHydrationError(
+          json.error ?? "요청한 저장 실행을 찾을 수 없습니다.",
+        );
+        return;
+      }
+      const run = json.data as SavedBacktestResult;
+      if (
+        expectedStrategyId &&
+        run.strategyId &&
+        run.strategyId !== expectedStrategyId
+      ) {
+        setHydrationState("missing_run");
+        setHydrationError(
+          `실행 ${runId}은(는) 다른 전략(${run.strategyId})에 속합니다.`,
+        );
+        return;
+      }
+      setSavedRuns((prev) =>
+        prev.some((r) => r.id === run.id) ? prev : [run, ...prev],
+      );
+      applySavedRun(run);
+    } catch (error) {
+      if (seq !== hydrationSeqRef.current) return;
+      setHydrationState("error");
+      setHydrationError(
+        error instanceof Error
+          ? error.message
+          : "저장 실행을 불러오지 못했습니다.",
+      );
+    }
   }
 
   async function hydrateChartForSavedRun(runId: string) {
@@ -508,15 +619,28 @@ export function BacktestReviewWorkbench() {
   }
 
   useEffect(() => {
-    if (!selectedRunId || report) return;
+    if (!selectedRunId) return;
+    if (hydratedRunIdRef.current === selectedRunId && report) return;
     const run = savedRuns.find((r) => r.id === selectedRunId);
-    if (!run) return;
-    const timer = window.setTimeout(() => {
-      applySavedRun(run);
-    }, 0);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once when runs arrive
-  }, [selectedRunId, savedRuns]);
+    if (run) {
+      const timer = window.setTimeout(() => {
+        applySavedRun(run);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+    if (
+      initialRunId &&
+      selectedRunId === initialRunId &&
+      strategyId &&
+      hydrationState !== "loading_run"
+    ) {
+      const timer = window.setTimeout(() => {
+        void fetchAndApplyRunById(selectedRunId, strategyId);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate when run selection settles
+  }, [selectedRunId, savedRuns, strategyId, initialRunId, report, hydrationState]);
 
   async function runUserBacktest() {
     setRunFeedback("백테스트를 준비하고 있습니다.");
@@ -551,7 +675,8 @@ export function BacktestReviewWorkbench() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           strategyId,
-          strategyHash: strategy.paramsHash,
+          // Canonical definition identity (not SafeV44-compatible paramsHash).
+          strategyHash: strategy.strategyHash ?? strategy.paramsHash,
           symbols: [symbol],
           timeframe:
             strategy.timeframe && strategy.timeframe !== "unknown"
@@ -779,39 +904,40 @@ export function BacktestReviewWorkbench() {
   const handoffBlocked = eligibility
     ? eligibilityBlocksPaperLive(eligibility)
     : false;
-  const mddReason =
+  const mddExceededReason =
     eligibility?.reasons.find((r) => r.code === "maximum_drawdown_exceeded") ??
-    eligibility?.reasons[0] ??
     null;
+  const primaryBlockReason =
+    mddExceededReason ?? eligibility?.reasons[0] ?? null;
+  // Always derive MDD % from actual drawdown — never from primary observedValue
+  // (e.g. trade count would become "1500%" if multiplied by 100).
   const observedMddPct =
-    eligibility?.observedValue != null
-      ? Math.abs(eligibility.observedValue * 100).toFixed(2)
-      : report?.mdd != null
-        ? Math.abs(report.mdd * 100).toFixed(2)
+    report?.mdd != null
+      ? Math.abs(report.mdd * 100).toFixed(2)
+      : mddExceededReason?.observedValue != null
+        ? Math.abs(mddExceededReason.observedValue * 100).toFixed(2)
         : null;
   const requiredMddPct =
     eligibility?.maxAllowedMddAbs != null
       ? (eligibility.maxAllowedMddAbs * 100).toFixed(2)
-      : eligibility?.requiredThreshold != null
-        ? Math.abs(eligibility.requiredThreshold * 100).toFixed(2)
-        : "20.00";
+      : "20.00";
   const paperBlockCode = handoffBlocked
-    ? (mddReason?.code ?? "backtest_incomplete")
+    ? (primaryBlockReason?.code ?? "backtest_incomplete")
     : null;
   const liveBlockCode = handoffBlocked
-    ? (mddReason?.code ?? "backtest_incomplete")
+    ? (primaryBlockReason?.code ?? "backtest_incomplete")
     : !paperRegistered && !paperSessionForStrategy
       ? "paper_required"
       : null;
   const paperBlockedReason = paperBlockCode
-    ? (mddReason?.labelKo ??
+    ? (primaryBlockReason?.labelKo ??
       eligibility?.verdictLabel ??
       "백테스트 자격 미충족")
     : null;
   const liveBlockedReason = liveBlockCode
     ? liveBlockCode === "paper_required"
       ? "모의매매 등록·검증이 필요합니다."
-      : (mddReason?.labelKo ??
+      : (primaryBlockReason?.labelKo ??
         eligibility?.verdictLabel ??
         "백테스트 자격 미충족")
     : null;
@@ -938,10 +1064,38 @@ export function BacktestReviewWorkbench() {
         data-testid="backtest-strategy-context"
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <label className="text-sm text-slate-300">
+          <label className="text-sm text-slate-300 md:col-span-2 xl:col-span-4">
             전략 선택
+            <div className="mt-1 flex flex-wrap gap-2">
+              <input
+                type="search"
+                className="min-w-[180px] flex-1 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                placeholder="별칭 · 이름 · 해시 · Research 검색"
+                value={strategyPickerQuery}
+                onChange={(e) => setStrategyPickerQuery(e.target.value)}
+                data-testid="backtest-strategy-search"
+              />
+              <select
+                className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                value={strategyPickerFamily}
+                onChange={(e) =>
+                  setStrategyPickerFamily(
+                    e.target.value as typeof strategyPickerFamily,
+                  )
+                }
+                data-testid="backtest-strategy-family-filter"
+              >
+                <option value="all">전체 그룹</option>
+                <option value="combo">패턴 조합</option>
+                <option value="pattern">단일 패턴</option>
+                <option value="general">일반</option>
+                <option value="safe">SAFE</option>
+                <option value="research">Research 등록</option>
+                <option value="registered">등록 전략</option>
+              </select>
+            </div>
             <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
               value={strategyId}
               onChange={(e) => selectStrategy(e.target.value)}
               data-testid="backtest-strategy-select"
@@ -949,11 +1103,147 @@ export function BacktestReviewWorkbench() {
               {strategies.length === 0 ? (
                 <option value="">전략 없음</option>
               ) : (
-                strategies.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))
+                (() => {
+                  const labelOf = (s: (typeof strategies)[number]) => {
+                    const alias =
+                      (s as { displayAlias?: string | null }).displayAlias ||
+                      (s as { displayName?: string | null }).displayName ||
+                      null;
+                    const hash = s.paramsHash?.slice(0, 6) ?? "";
+                    const base = alias || s.name;
+                    const tf = s.timeframe && s.timeframe !== "unknown"
+                      ? ` · ${s.timeframe}`
+                      : "";
+                    const combo =
+                      (
+                        s as {
+                          definition?: {
+                            metadata?: { patternCombination?: string };
+                          };
+                        }
+                      ).definition?.metadata?.patternCombination ?? "";
+                    const comboBit = combo ? ` · ${combo}` : "";
+                    return hash
+                      ? `${base}${tf}${comboBit} · ${hash}…`
+                      : `${base}${tf}${comboBit}`;
+                  };
+                  const isSafe = (s: (typeof strategies)[number]) =>
+                    s.id === "SAFE_v44_i4060" || s.locked;
+                  const isPattern = (s: (typeof strategies)[number]) => {
+                    const def = (
+                      s as {
+                        definition?: {
+                          eventSequence?: { combination?: unknown } | null;
+                          metadata?: { pattern?: string; searchFamily?: string };
+                        };
+                      }
+                    ).definition;
+                    return Boolean(
+                      def?.eventSequence ||
+                        def?.metadata?.pattern ||
+                        def?.metadata?.searchFamily,
+                    );
+                  };
+                  const isCombo = (s: (typeof strategies)[number]) =>
+                    Boolean(
+                      (
+                        s as {
+                          definition?: {
+                            eventSequence?: { combination?: unknown } | null;
+                          };
+                        }
+                      ).definition?.eventSequence?.combination,
+                    );
+                  const q = strategyPickerQuery.trim().toLowerCase();
+                  const matchesQuery = (s: (typeof strategies)[number]) => {
+                    if (!q) return true;
+                    const alias =
+                      (s as { displayAlias?: string | null }).displayAlias ??
+                      (s as { displayName?: string | null }).displayName ??
+                      "";
+                    const hay = [
+                      alias,
+                      s.name,
+                      s.id,
+                      s.paramsHash,
+                      s.timeframe,
+                      (
+                        s as {
+                          definition?: {
+                            metadata?: {
+                              patternCombination?: string;
+                              searchFamily?: string;
+                            };
+                          };
+                        }
+                      ).definition?.metadata?.patternCombination ?? "",
+                      (s as { sourceResearchJobId?: string | null })
+                        .sourceResearchJobId ?? "",
+                      (s as { description?: string }).description ?? "",
+                    ]
+                      .join(" ")
+                      .toLowerCase();
+                    return hay.includes(q);
+                  };
+                  const matchesFamily = (s: (typeof strategies)[number]) => {
+                    if (strategyPickerFamily === "all") return true;
+                    if (strategyPickerFamily === "safe") return isSafe(s);
+                    if (strategyPickerFamily === "registered") return !isSafe(s);
+                    if (strategyPickerFamily === "research") {
+                      return Boolean(
+                        (s as { sourceResearchJobId?: string | null })
+                          .sourceResearchJobId ||
+                          /sourceResearchJobId=/.test(s.description ?? ""),
+                      );
+                    }
+                    if (strategyPickerFamily === "combo")
+                      return !isSafe(s) && isCombo(s);
+                    if (strategyPickerFamily === "pattern")
+                      return !isSafe(s) && isPattern(s) && !isCombo(s);
+                    return !isSafe(s) && !isPattern(s);
+                  };
+                  const filtered = strategies.filter(
+                    (s) => matchesQuery(s) && matchesFamily(s),
+                  );
+                  const groups: Array<{
+                    label: string;
+                    items: typeof strategies;
+                  }> = [
+                    {
+                      label: "SAFE",
+                      items: filtered.filter(isSafe),
+                    },
+                    {
+                      label: "패턴 조합 전략",
+                      items: filtered.filter(
+                        (s) => !isSafe(s) && isCombo(s),
+                      ),
+                    },
+                    {
+                      label: "단일 패턴 전략",
+                      items: filtered.filter(
+                        (s) => !isSafe(s) && isPattern(s) && !isCombo(s),
+                      ),
+                    },
+                    {
+                      label: "일반 전략",
+                      items: filtered.filter(
+                        (s) => !isSafe(s) && !isPattern(s),
+                      ),
+                    },
+                  ];
+                  return groups
+                    .filter((g) => g.items.length > 0)
+                    .map((g) => (
+                      <optgroup key={g.label} label={g.label}>
+                        {g.items.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {labelOf(s)}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ));
+                })()
               )}
             </select>
           </label>
@@ -962,10 +1252,21 @@ export function BacktestReviewWorkbench() {
           </div>
           <div data-testid="backtest-strategy-hash">
             <Metric
-              label={displayParamsHashLabel()}
-              value={strategy?.paramsHash?.slice(0, 12) ?? "—"}
+              label={displayStrategyHashLabel()}
+              value={formatShortHash(strategy?.strategyHash)}
             />
           </div>
+          <details className="text-xs text-slate-500">
+            <summary className="cursor-pointer">개발자 정보</summary>
+            <div className="mt-1 font-mono">
+              {displayParamsHashLabel()}: {strategy?.paramsHash ?? "—"}
+            </div>
+            {strategy?.strategyHash ? (
+              <div className="mt-1 font-mono">
+                {displayStrategyHashLabel()} (full): {strategy.strategyHash}
+              </div>
+            ) : null}
+          </details>
           <Metric
             label="타임프레임"
             value={
@@ -1150,7 +1451,23 @@ export function BacktestReviewWorkbench() {
               : "전체 심볼"}
           </span>
         </div>
-        {savedRuns.length === 0 ? (
+        {hydrationState === "missing_run" || hydrationState === "missing_strategy" ? (
+          <EmptyState
+            message={
+              hydrationState === "missing_strategy"
+                ? "요청한 전략을 찾을 수 없습니다."
+                : "요청한 저장 실행을 찾을 수 없습니다."
+            }
+            hint={
+              hydrationError ??
+              "다른 실행을 선택하거나 백테스트를 새로 실행하세요."
+            }
+          />
+        ) : hydrationState === "loading_run" || hydrationState === "loading_runs" ? (
+          <p className="text-sm text-slate-400" data-testid="backtest-run-loading">
+            저장된 실행을 불러오는 중입니다…
+          </p>
+        ) : savedRuns.length === 0 ? (
           <EmptyState
             message="저장된 사용자 백테스트가 없습니다."
             hint="기간을 선택한 뒤 ‘백테스트 실행’을 누르세요. 탐색 시 평가 결과는 별도입니다."
@@ -1231,12 +1548,28 @@ export function BacktestReviewWorkbench() {
           <Button
             size="sm"
             variant="outline"
-            disabled={!selectedRun}
-            onClick={() => selectedRun && applySavedRun(selectedRun)}
+            disabled={
+              hydrationState === "loading_run" ||
+              (!selectedRun && !selectedRunId)
+            }
+            onClick={() => {
+              if (selectedRun) {
+                applySavedRun(selectedRun);
+              } else if (selectedRunId) {
+                void fetchAndApplyRunById(selectedRunId, strategyId);
+              }
+            }}
             data-testid="backtest-load-saved"
           >
-            저장된 실행 불러오기
+            {hydrationState === "loading_run"
+              ? "불러오는 중…"
+              : "저장된 실행 불러오기"}
           </Button>
+          {hydrationError ? (
+            <p className="mt-2 text-xs text-rose-300" data-testid="backtest-hydration-error">
+              {hydrationError}
+            </p>
+          ) : null}
         </div>
       </Card>
       </section>
@@ -1305,7 +1638,7 @@ export function BacktestReviewWorkbench() {
                   label="부적격 이유"
                   value={
                     !eligibility.eligible
-                      ? (mddReason?.labelKo ?? eligibility.verdictLabel)
+                      ? (primaryBlockReason?.labelKo ?? eligibility.verdictLabel)
                       : "해당 없음"
                   }
                   tone={!eligibility.eligible ? "danger" : "default"}
@@ -1330,13 +1663,25 @@ export function BacktestReviewWorkbench() {
                   help="총수익 대비 거래비용 비율"
                 />
               </div>
-              {!eligibility.eligible && observedMddPct != null ? (
+              {!eligibility.eligible && mddExceededReason && observedMddPct != null ? (
                 <p
                   className="mt-3 rounded-lg border border-rose-500/50 bg-rose-950/40 px-3 py-2 text-sm font-medium text-rose-100"
                   data-testid="backtest-mdd-fail-reason"
                 >
                   최대 낙폭 {observedMddPct}%가 허용 기준 {requiredMddPct}%를
                   초과했습니다.
+                </p>
+              ) : !eligibility.eligible && primaryBlockReason ? (
+                <p
+                  className="mt-3 rounded-lg border border-rose-500/50 bg-rose-950/40 px-3 py-2 text-sm font-medium text-rose-100"
+                  data-testid="backtest-eligibility-fail-reason"
+                >
+                  {primaryBlockReason.labelKo}
+                  {primaryBlockReason.code === "insufficient_trade_sample" &&
+                  primaryBlockReason.observedValue != null &&
+                  primaryBlockReason.requiredThreshold != null
+                    ? ` (거래 ${primaryBlockReason.observedValue}건 · 최소 ${primaryBlockReason.requiredThreshold}건)`
+                    : ""}
                 </p>
               ) : null}
               {costRatios?.criticalCostOfGross && costBurdenPct != null ? (
@@ -1478,7 +1823,8 @@ export function BacktestReviewWorkbench() {
                         {
                           runId: selectedRunId,
                           strategyId,
-                          strategyHash: strategy?.paramsHash ?? null,
+                          strategyHash:
+                            strategy?.strategyHash ?? strategy?.paramsHash ?? null,
                           report,
                           trades,
                         },
@@ -1519,10 +1865,16 @@ export function BacktestReviewWorkbench() {
             processedCandleCount={processedCandleCount}
             backtestRunId={selectedRunId || null}
             strategyType={
-              (strategy as { strategyType?: string } | null)?.strategyType ??
+              (strategy as StoredStrategyV1 | null)?.strategyType ??
+              (strategy as StoredStrategyV1 | null)?.definition?.strategyType ??
+              ((strategy as StoredStrategyV1 | null)?.definition?.eventSequence
+                ? "condition_builder"
+                : null) ??
               "safe_params"
             }
-            eventSequenceFamily={null}
+            eventSequenceFamily={resolveEventSequenceFamilyFromStrategy(
+              strategy as StoredStrategyV1 | null,
+            )}
             eligibility={eligibility}
             paperEligible={!handoffBlocked}
             liveEligible={!handoffBlocked && !liveBlockedReason}

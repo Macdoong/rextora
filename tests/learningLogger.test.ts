@@ -56,11 +56,11 @@ describe("learningLogger semantics", () => {
   it("does not count candidate-only logs in win rates", () => {
     logCandidateSnapshot({
       ...aiCandidatesSeed[0],
-      symbol: "WINRATE_TEST_USDT",
+      symbol: "WRATEUSDT",
       status: "진입 가능"
     });
     appendLearningEntry({
-      symbol: "WINRATE_TEST_USDT",
+      symbol: "WRATEUSDT",
       direction: "롱",
       entryReason: "돌파 신호",
       exitReason: "익절",
@@ -71,7 +71,7 @@ describe("learningLogger semantics", () => {
       eventCategory: "거래 기록"
     });
 
-    const rates = getCoinWinRates().find((row) => row.symbol === "WINRATE_TEST_USDT");
+    const rates = getCoinWinRates().find((row) => row.symbol === "WRATEUSDT");
     expect(rates?.trades).toBe(1);
     expect(rates?.winRate).toBe(100);
   });

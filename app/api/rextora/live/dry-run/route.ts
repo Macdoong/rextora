@@ -7,6 +7,7 @@ import {
   submitDryRunOrder,
   type DryRunOrderSide,
 } from "@/src/lib/rextora/live/liveDryRunEngine";
+import { resolveLiveDryRunExecutionStrategy } from "@/src/lib/rextora/execution/paperStrategyResolver";
 
 /**
  * POST /api/rextora/live/dry-run
@@ -63,10 +64,18 @@ export async function POST(request: Request) {
     }
 
     if (action === "submit") {
+      const resolved = resolveLiveDryRunExecutionStrategy(body.strategyId);
+      if (body.strategyHash && body.strategyHash !== resolved.strategyHash) {
+        return apiErrorResponse(
+          "strategyHash does not match the stored canonical strategy",
+          Date.now() - start,
+          400,
+        );
+      }
       const record = submitDryRunOrder({
         executionKey: body.executionKey ?? "",
-        strategyId: body.strategyId ?? "",
-        strategyHash: body.strategyHash ?? "",
+        strategyId: resolved.strategyId,
+        strategyHash: resolved.strategyHash,
         symbol: body.symbol ?? "",
         side: (body.side ?? "BUY") as DryRunOrderSide,
         quantity: body.quantity ?? 0,
@@ -74,6 +83,13 @@ export async function POST(request: Request) {
       return apiJsonResponse(
         {
           record,
+          displayIdentity: {
+            strategyId: resolved.strategyId,
+            strategyHash: resolved.strategyHash,
+            displayName: resolved.name,
+            displayAlias: resolved.strategy.displayAlias ?? null,
+            configuredDisplayName: resolved.strategy.displayName ?? null,
+          },
           messageKo:
             record.state === "EMERGENCY_STOPPED"
               ? "긴급 중단 상태 — 드라이런 주문이 차단되었습니다. 실전 봇은 시작되지 않았습니다."

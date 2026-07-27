@@ -43,7 +43,7 @@ describe("recoverOrphanSearchJobs", () => {
     const startSpy = vi
       .spyOn(jobApi, "startStrategySearchJobApi")
       .mockImplementation(() => ({ ok: true } as never));
-    vi.spyOn(registry, "isSearchJobExecutionActive").mockReturnValue(true);
+    vi.spyOn(registry, "isSearchJobExecutionWorkerActive").mockReturnValue(true);
     vi.spyOn(jobStore, "listSearchJobs").mockReturnValue([
       {
         id: "search_orphan_test",
@@ -71,7 +71,7 @@ describe("recoverOrphanSearchJobs", () => {
     const startSpy = vi
       .spyOn(jobApi, "startStrategySearchJobApi")
       .mockImplementation(() => ({ ok: true } as never));
-    vi.spyOn(registry, "isSearchJobExecutionActive").mockReturnValue(false);
+    vi.spyOn(registry, "isSearchJobExecutionWorkerActive").mockReturnValue(false);
     vi.spyOn(jobStore, "listSearchJobs").mockReturnValue([
       {
         id: "search_resume_me",

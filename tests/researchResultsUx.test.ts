@@ -131,13 +131,16 @@ describe("research display helpers", () => {
   it("classifies cost statuses without bare dash semantics", () => {
     expect(
       resolveCostStatus({ totalCost: 12.5, stressPassed: true }),
-    ).toBe("비용 계산 완료");
+    ).toBe("비용 스트레스 통과");
     expect(
       resolveCostStatus({ totalCost: null, stressPassed: true }),
     ).toBe("비용 스트레스 통과");
     expect(
       resolveCostStatus({ totalCost: null, stressPassed: false }),
-    ).toBe("비용 검증 대기");
+    ).toBe("비용 스트레스 미통과");
+    expect(
+      resolveCostStatus({ totalCost: 12.5, stressPassed: null }),
+    ).toBe("비용 계산 완료");
     expect(
       resolveCostStatus({ totalCost: null, stressPassed: null }),
     ).toBe("비용 데이터 없음");
@@ -525,7 +528,7 @@ describe("summary enrichment + SAFE isolation", () => {
     const withCost = summary.representatives.find(
       (r) => r.paramsHash === "dd44ee55ff66",
     );
-    expect(withCost?.costStatus).toBe("비용 계산 완료");
+    expect(withCost?.costStatus).toBe("비용 스트레스 통과");
     expect(withCost?.totalCost).toBe(9.5);
     expect(withCost?.finalRecommendable).toBe(true);
 

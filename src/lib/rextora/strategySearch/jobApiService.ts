@@ -33,6 +33,7 @@ import {
 } from "./jobStore";
 import {
   activeElapsedMs,
+  computeExpectedCompletionAtMs,
   createEmptySearchPlan,
   getSearchPlan,
   markPlanPaused,
@@ -85,6 +86,7 @@ import {
   rankChangeLabelShort,
 } from "./researchTop10";
 import { buildPersistedSearchSummary } from "./persistedSearchSummary";
+import { combinationLabelKo } from "./patternCombination";
 import type {
   StrategySearchBestCandidateReference,
   StrategySearchJob,
@@ -184,6 +186,12 @@ export interface StrategySearchJobSummary {
   promotionWarnings?: number | null;
   /** Current search family label (operator-facing). */
   currentSearchFamily?: string | null;
+  /** Full combination label when multi-pattern plan is active. */
+  currentCombinationLabel?: string | null;
+  /** Selected combination families for running header honesty. */
+  patternCombinationFamilies?: string[] | null;
+  /** Combination operator when multi-pattern. */
+  patternCombinationOperator?: string | null;
   /** 1-based stage index / total for progression UI. */
   searchStageIndex?: number | null;
   searchStageTotal?: number | null;
@@ -291,6 +299,12 @@ export interface StrategySearchJobSummary {
       maxDrawdown: number | null;
       tradeCount: number | null;
       profitFactor: number | null;
+      winRate: number | null;
+      sharpe: number | null;
+      patternStack: string;
+      confidence: string;
+      risk: string;
+      miniSeries: number[] | null;
       costStatus: string;
       robustnessStatus: string;
       sampleConfidence: string;
@@ -379,7 +393,7 @@ function mapCaught(err: unknown): never {
     );
   }
   if (err instanceof StrategySearchExecutionRegistryError) {
-    if (err.code === "ALREADY_RUNNING") {
+    if (err.code === "ALREADY_RUNNING" || err.code === "ALREADY_OWNED") {
       throw new StrategySearchApiError(
         "JOB_ALREADY_RUNNING",
         err.message,
@@ -473,10 +487,29 @@ function requireJob(
   }
 }
 
-function progressRatio(job: StrategySearchJob): number | null {
-  const max = job.config.maxIterations;
-  if (max == null || max <= 0) return null;
-  return Math.min(1, job.checkpoint.completedIterations / max);
+/**
+ * Primary research progress is deadline/time based:
+ * activeElapsedMs / requestedActiveDurationMs (paused time excluded).
+ * Candidate budget must never drive this ratio.
+ */
+function progressRatio(
+  job: StrategySearchJob,
+  options?: StrategySearchStoreOptions,
+): number | null {
+  const plan = getSearchPlan(job.id, options);
+  if (plan?.maxRuntimeMs != null && plan.maxRuntimeMs > 0) {
+    if (job.status === "completed") return 1;
+    const terminal =
+      job.status === "cancelled" ||
+      job.status === "failed";
+    const elapsed = terminal
+      ? Math.max(0, plan.elapsedMs ?? 0)
+      : plan.campaignStartedAtMs != null
+        ? activeElapsedMs(plan)
+        : Math.max(0, plan.elapsedMs ?? 0);
+    return Math.min(1, Math.max(0, elapsed / plan.maxRuntimeMs));
+  }
+  return null;
 }
 
 function summarizeJob(
@@ -531,7 +564,12 @@ function summarizeJob(
         currentBestSummary = buildReadableStrategyIdentity(
           trial.params,
           trial.paramsHash,
-          { includeSuffix: false },
+          {
+            includeSuffix: false,
+            comboAware: true,
+            symbol: job.config.symbols[0] ?? "BTCUSDT",
+            timeframe: job.config.timeframe,
+          },
         ).readableName;
       }
     } catch {
@@ -539,17 +577,27 @@ function summarizeJob(
     }
   }
 
+  const terminal =
+    job.status === "completed" ||
+    job.status === "cancelled" ||
+    job.status === "failed";
   const planActiveElapsed =
     plan?.campaignStartedAtMs != null ? activeElapsedMs(plan) : null;
-  const elapsedMs =
-    statistics?.elapsedMs ??
-    plan?.elapsedMs ??
-    planActiveElapsed ??
-    null;
-  const remainingMs =
-    plan?.maxRuntimeMs != null && elapsedMs != null
+  // Terminal jobs freeze on persisted plan.elapsedMs (same clock as progressRatio).
+  const elapsedMs = terminal
+    ? (plan?.elapsedMs ?? statistics?.elapsedMs ?? null)
+    : plan?.campaignStartedAtMs != null
+      ? planActiveElapsed
+      : (plan?.elapsedMs ?? statistics?.elapsedMs ?? null);
+  const remainingMs = terminal
+    ? 0
+    : plan?.maxRuntimeMs != null && elapsedMs != null
       ? Math.max(0, plan.maxRuntimeMs - elapsedMs)
       : (statistics?.remainingEstimateMs ?? null);
+  const expectedCompletionAtMs = terminal
+    ? null
+    : (plan?.expectedCompletionAtMs ??
+      (plan != null ? computeExpectedCompletionAtMs(plan) : null));
 
   return {
     id: job.id,
@@ -566,11 +614,11 @@ function summarizeJob(
     pausedAtMs: plan?.pausedAtMs ?? null,
     accumulatedPauseMs: plan?.accumulatedPauseMs ?? null,
     resumedAtMs: plan?.resumedAtMs ?? null,
-    expectedCompletionAtMs: plan?.expectedCompletionAtMs ?? null,
+    expectedCompletionAtMs: expectedCompletionAtMs ?? null,
     maxIterations: job.config.maxIterations,
     completedIterations: job.checkpoint.completedIterations,
     nextIteration: job.checkpoint.nextIteration,
-    progressRatio: progressRatio(job),
+    progressRatio: progressRatio(job, options),
     statistics,
     bestScore: job.checkpoint.bestCandidate?.score ?? null,
     bestCandidateHash: job.checkpoint.bestCandidate?.paramsHash ?? null,
@@ -603,7 +651,76 @@ function summarizeJob(
     candidateBudget: plan?.candidateBudget ?? job.config.maxIterations,
     promotionWarnings:
       plan?.promotions.filter((p) => p.status === "failed").length ?? null,
-    currentSearchFamily: activeSpace?.labelKo ?? null,
+    currentSearchFamily: (() => {
+      const comboFamilies =
+        plan?.patternCombinationSpec?.blocks.map((b) => b.family) ??
+        plan?.patternCombinationFamilies ??
+        null;
+      if (comboFamilies && comboFamilies.length > 1) {
+        const spec =
+          plan?.patternCombinationSpec ??
+          (plan
+            ? {
+                version: 1 as const,
+                templateId: "confluence" as const,
+                operator: (plan.patternCombinationOperator ?? "and") as
+                  | "and"
+                  | "or"
+                  | "sequence"
+                  | "weighted_score"
+                  | "priority",
+                failurePolicy: "any" as const,
+                invalidationMode: "any" as const,
+                blocks: comboFamilies.map((family, order) => ({
+                  id: `${family}_${order}`,
+                  family: family as
+                    | "order_block"
+                    | "fvg"
+                    | "trendline"
+                    | "support_resistance"
+                    | "supply_demand",
+                  role: (order === 0 ? "entry_zone" : "trend_filter") as
+                    | "entry_zone"
+                    | "trend_filter",
+                  order,
+                  required: true,
+                  weight: 1,
+                  priority: order,
+                  params: {},
+                })),
+              }
+            : null);
+        if (spec) {
+          try {
+            return combinationLabelKo(spec);
+          } catch {
+            return comboFamilies.join(" + ");
+          }
+        }
+        return comboFamilies.join(" + ");
+      }
+      return activeSpace?.labelKo ?? null;
+    })(),
+    currentCombinationLabel: (() => {
+      const comboFamilies =
+        plan?.patternCombinationSpec?.blocks.map((b) => b.family) ??
+        plan?.patternCombinationFamilies ??
+        null;
+      if (!comboFamilies || comboFamilies.length < 2) return null;
+      if (plan?.patternCombinationSpec) {
+        try {
+          return combinationLabelKo(plan.patternCombinationSpec);
+        } catch {
+          return comboFamilies.join(" + ");
+        }
+      }
+      return comboFamilies.join(" + ");
+    })(),
+    patternCombinationFamilies:
+      plan?.patternCombinationSpec?.blocks.map((b) => b.family) ??
+      plan?.patternCombinationFamilies ??
+      null,
+    patternCombinationOperator: plan?.patternCombinationOperator ?? null,
     searchStageIndex: plan ? plan.currentSpaceIndex + 1 : null,
     searchStageTotal: plan?.spaces.length ?? null,
     searchProgression: plan
@@ -624,6 +741,7 @@ function summarizeJob(
     candidateBudgetUsed: plan?.candidateBudgetUsed ?? null,
     // Time-based progress for deadline jobs; never present budget as completion %.
     overallProgressPct: (() => {
+      if (job.status === "completed") return 100;
       if (plan?.maxRuntimeMs != null && plan.maxRuntimeMs > 0) {
         const elapsed = elapsedMs ?? 0;
         return Math.min(
@@ -800,7 +918,15 @@ function summarizeJob(
     liveTop10: (() => {
       const snap = getResearchTop10(job.id, options);
       if (!snap) return null;
+      // Hard jobId boundary: never surface another Research Job's shortlist.
+      if (snap.jobId && snap.jobId !== job.id) return null;
       const mapEntry = (e: (typeof snap.entries)[number]) => {
+        if (
+          e.sourceResearchJobId &&
+          e.sourceResearchJobId !== job.id
+        ) {
+          return null;
+        }
         const changeRow = snap.rankChanges.find(
           (c) => c.strategyHash === e.strategyHash,
         );
@@ -819,6 +945,14 @@ function summarizeJob(
           maxDrawdown: e.maxDrawdown,
           tradeCount: e.tradeCount,
           profitFactor: e.profitFactor,
+          winRate: e.winRate ?? null,
+          sharpe: e.sharpe ?? null,
+          patternStack: e.patternStack ?? e.strategyFamily ?? "—",
+          confidence: e.confidence ?? e.sampleConfidence,
+          risk: e.risk ?? e.overfittingRisk,
+          miniSeries: Array.isArray(e.miniSeries)
+            ? e.miniSeries.slice(0, 30)
+            : null,
           score: e.score ?? null,
           previousNetReturn: prev?.netReturn ?? null,
           previousMaxDrawdown: prev?.maxDrawdown ?? null,
@@ -842,12 +976,18 @@ function summarizeJob(
           overfittingRisk: e.overfittingRisk,
         };
       };
+      const entries = snap.entries
+        .map(mapEntry)
+        .filter((e): e is NonNullable<typeof e> => e != null);
+      const finalEntries = (snap.finalEntries ?? [])
+        .map(mapEntry)
+        .filter((e): e is NonNullable<typeof e> => e != null);
       return {
         updatedAt: snap.updatedAt,
         finalizedAt: snap.finalizedAt ?? null,
         phase: snap.phase ?? (snap.finalizedAt ? "final" : "live"),
-        entries: snap.entries.map(mapEntry),
-        finalEntries: (snap.finalEntries ?? []).map(mapEntry),
+        entries,
+        finalEntries,
         finalVsLive: (snap.finalVsLive ?? []).map((d) => ({
           strategyHash: d.strategyHash,
           liveRank: d.liveRank,
@@ -910,10 +1050,26 @@ export function createStrategySearchJobApi(
     let config = validated.config;
     if (validated.operatorPlan) {
       const depthSpaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
-      const effectiveSpaces = resolveSelectedSearchSpaces(
+      let effectiveSpaces = resolveSelectedSearchSpaces(
         validated.operatorPlan.selectedSpaceIds,
         depthSpaces.map((s) => s.id),
       );
+      // Combined-pattern jobs search the entry-zone family once; combination
+      // identity is injected into every candidate via the plan.
+      const comboFamilies =
+        (validated.operatorPlan.patternCombinationSpec?.blocks.map(
+          (block) => block.family,
+        ) ??
+          validated.operatorPlan.patternCombinationFamilies)?.filter(
+          (f): f is string => typeof f === "string" && f.length > 0,
+        ) ?? [];
+      if (comboFamilies.length > 1) {
+        const entryId = comboFamilies[0]!;
+        const entrySpace = getSearchSpaceById(entryId);
+        if (entrySpace) {
+          effectiveSpaces = [entrySpace];
+        }
+      }
       const first = effectiveSpaces[0];
       if (first) {
         const spaceDef = getSearchSpaceById(first.id);
@@ -930,13 +1086,37 @@ export function createStrategySearchJobApi(
       }
     }
     const job = createSearchJob(config, store);
-    saveJobExecutionProfile(job.id, validated.execution, store);
+    // Jitter ranges must match the search space. The UI/API create body uses a
+    // SafeV44 placeholder (ema_fast); leaving it causes every pattern candidate
+    // to fail jitter with UNKNOWN_PARAMETER and zero qualification.
+    const execution = {
+      ...validated.execution,
+      jitterConfig: {
+        ...validated.execution.jitterConfig,
+        parameterRanges: config.parameterRanges.map((r) => ({ ...r })),
+      },
+    };
+    saveJobExecutionProfile(job.id, execution, store);
     if (validated.operatorPlan) {
       const depthSpaces = resolveSpacesForDepth(validated.operatorPlan.depthProfile);
-      const effectiveSpaces = resolveSelectedSearchSpaces(
+      let effectiveSpaces = resolveSelectedSearchSpaces(
         validated.operatorPlan.selectedSpaceIds,
         depthSpaces.map((s) => s.id),
       );
+      const comboFamilies =
+        (validated.operatorPlan.patternCombinationSpec?.blocks.map(
+          (block) => block.family,
+        ) ??
+          validated.operatorPlan.patternCombinationFamilies)?.filter(
+          (f): f is string => typeof f === "string" && f.length > 0,
+        ) ?? [];
+      if (comboFamilies.length > 1) {
+        const entryId = comboFamilies[0]!;
+        const entrySpace = getSearchSpaceById(entryId);
+        if (entrySpace) {
+          effectiveSpaces = [entrySpace];
+        }
+      }
       const selectedSymbol = config.symbols[0] ?? "BTCUSDT";
       const marketMode =
         (body as { marketMode?: string } | null)?.marketMode === "manual"
@@ -975,10 +1155,26 @@ export function createStrategySearchJobApi(
           patternRetestMode: validated.operatorPlan.patternRetestMode,
           patternConfirmStrength: validated.operatorPlan.patternConfirmStrength,
           patternConfirmClose: validated.operatorPlan.patternConfirmClose,
+          patternConfirmationMode:
+            validated.operatorPlan.patternConfirmationMode,
+          patternConfirmationCandleCount:
+            validated.operatorPlan.patternConfirmationCandleCount,
+          patternConfirmationWindow:
+            validated.operatorPlan.patternConfirmationWindow,
           patternExpiryBars: validated.operatorPlan.patternExpiryBars,
           patternRiskStyle: validated.operatorPlan.patternRiskStyle,
           patternStrength: validated.operatorPlan.patternStrength,
           patternSrSensitivity: validated.operatorPlan.patternSrSensitivity,
+          patternCombinationTemplate:
+            validated.operatorPlan.patternCombinationTemplate,
+          patternCombinationOperator:
+            validated.operatorPlan.patternCombinationOperator,
+          patternCombinationInvalidationMode:
+            validated.operatorPlan.patternCombinationInvalidationMode,
+          patternCombinationFamilies:
+            validated.operatorPlan.patternCombinationFamilies,
+          patternCombinationSpec:
+            validated.operatorPlan.patternCombinationSpec,
         }),
         store,
       );

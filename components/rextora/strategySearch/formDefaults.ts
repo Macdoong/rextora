@@ -5,9 +5,12 @@
  */
 
 import type {
+  PatternCombinationBlockConfig,
+  PatternFamilyId,
   StrategySearchCreateJobBody,
   StrategySearchOperatorPlan,
 } from "./types";
+import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
 import {
   maxDrawdownPercentToPolicy,
   percentInputToRatio,
@@ -61,6 +64,7 @@ export const SEARCHABLE_PATTERN_SPACE_OPTIONS = [
   { id: "fvg", labelKo: "Fair Value Gap" },
   { id: "trendline", labelKo: "Trendline" },
   { id: "support_resistance", labelKo: "Support / Resistance" },
+  { id: "supply_demand", labelKo: "Supply / Demand" },
 ] as const;
 
 export const BEGINNER_PRESET_MAP: Record<
@@ -352,11 +356,39 @@ export interface StrategySearchOperatorFormState {
   patternDirection: "both" | "long" | "short";
   patternRetestMode: "required" | "optional" | "disabled";
   patternConfirmStrength: "standard" | "strict";
+  /** @deprecated prefer patternConfirmationMode */
   patternConfirmClose: "required" | "disabled";
+  patternConfirmationMode:
+    | "none"
+    | "single_close"
+    | "consecutive_closes"
+    | "threshold_count";
+  patternConfirmationCandleCount: string;
+  patternConfirmationWindow: string;
   patternExpiryBars: string;
   patternRiskStyle: "conservative" | "balanced" | "aggressive";
   patternStrength: "loose" | "standard" | "strict";
   patternSrSensitivity: "tight" | "standard" | "loose";
+  /** Multi-pattern combination template (persisted into Search plan). */
+  patternCombinationTemplate:
+    | "single"
+    | "confluence"
+    | "entry_confirmation"
+    | "ordered_sequence"
+    | "breakout_retest"
+    | "zone_confluence"
+    | "invalidation_composite";
+  patternCombinationOperator:
+    | "and"
+    | "or"
+    | "sequence"
+    | "weighted_score"
+    | "priority";
+  patternCombinationFailurePolicy: "any" | "all" | "majority";
+  patternCombinationWeightedThreshold: string;
+  patternCombinationFamilies: string[];
+  /** Canonical block configs; omitted by legacy/single-family forms. */
+  patternCombinationBlocks?: PatternCombinationBlockConfig[];
   leverageMode: LeverageModeId;
   leverageFixed: string;
   leverageMin: string;
@@ -372,6 +404,71 @@ export interface StrategySearchOperatorFormState {
   maxSearchCount?: string;
   /** @deprecated client campaign flag — server operatorPlan always runs to target */
   runUntilQualified?: boolean;
+}
+
+const PATTERN_FAMILIES = new Set<PatternFamilyId>([
+  "order_block",
+  "fvg",
+  "trendline",
+  "support_resistance",
+  "supply_demand",
+]);
+
+export function isPatternFamilyId(value: string): value is PatternFamilyId {
+  return PATTERN_FAMILIES.has(value as PatternFamilyId);
+}
+
+type PatternRole = PatternCombinationBlockConfig["role"];
+
+function rolesForTemplate(
+  template: StrategySearchOperatorFormState["patternCombinationTemplate"],
+): PatternRole[] {
+  switch (template) {
+    case "entry_confirmation":
+    case "ordered_sequence":
+    case "breakout_retest":
+      return ["entry_zone", "confirmation"];
+    case "zone_confluence":
+      return ["entry_zone", "trend_filter", "confirmation"];
+    case "invalidation_composite":
+      return ["entry_zone", "invalidation"];
+    case "confluence":
+      return ["entry_zone", "trend_filter"];
+    default:
+      return ["entry_zone"];
+  }
+}
+
+/** Build a complete, server-valid persisted block snapshot from the catalog. */
+export function buildCatalogPatternBlocks(
+  families: readonly string[],
+  template: StrategySearchOperatorFormState["patternCombinationTemplate"],
+  previous: readonly PatternCombinationBlockConfig[] = [],
+): PatternCombinationBlockConfig[] {
+  const roles = rolesForTemplate(template);
+  return families
+    .filter(isPatternFamilyId)
+    .filter((family, index, all) => all.indexOf(family) === index)
+    .slice(0, 4)
+    .map((family, order) => {
+      const prior = previous.find((block) => block.family === family);
+      const defaults = Object.fromEntries(
+        PATTERN_PARAMETER_CATALOG[family].map((entry) => [
+          entry.key,
+          prior?.params[entry.key] ?? entry.default,
+        ]),
+      );
+      return {
+        id: prior?.id || `${family}_${order}`,
+        family,
+        role: order === 0 ? "entry_zone" : (prior?.role ?? roles[Math.min(order, roles.length - 1)] ?? "confirmation"),
+        order,
+        required: prior?.required ?? true,
+        weight: prior?.weight ?? 1,
+        priority: prior?.priority ?? order,
+        params: defaults,
+      };
+    });
 }
 
 function daysAgoMs(days: number): number {
@@ -608,10 +705,19 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     patternRetestMode: "required",
     patternConfirmStrength: "standard",
     patternConfirmClose: "required",
+    patternConfirmationMode: "single_close",
+    patternConfirmationCandleCount: "2",
+    patternConfirmationWindow: "4",
     patternExpiryBars: "48",
     patternRiskStyle: "balanced",
     patternStrength: "standard",
     patternSrSensitivity: "standard",
+    patternCombinationTemplate: "single",
+    patternCombinationOperator: "and",
+    patternCombinationFailurePolicy: "any",
+    patternCombinationWeightedThreshold: "1",
+    patternCombinationFamilies: [],
+    patternCombinationBlocks: [],
     leverageMode: "automatic",
     leverageFixed: "3",
     leverageMin: "1",
@@ -734,7 +840,17 @@ export function operatorFormToCreateBody(
     patternDirection: form.patternDirection,
     patternRetestMode: form.patternRetestMode,
     patternConfirmStrength: form.patternConfirmStrength,
-    patternConfirmClose: form.patternConfirmClose,
+    patternConfirmClose:
+      form.patternConfirmationMode === "none" ? "disabled" : "required",
+    patternConfirmationMode: form.patternConfirmationMode,
+    patternConfirmationCandleCount: Math.max(
+      1,
+      Math.min(8, Math.trunc(Number(form.patternConfirmationCandleCount) || 1)),
+    ),
+    patternConfirmationWindow: Math.max(
+      1,
+      Math.min(24, Math.trunc(Number(form.patternConfirmationWindow) || 1)),
+    ),
     patternExpiryBars: Math.max(
       12,
       Math.min(96, Math.trunc(Number(form.patternExpiryBars) || 48)),
@@ -742,6 +858,50 @@ export function operatorFormToCreateBody(
     patternRiskStyle: form.patternRiskStyle,
     patternStrength: form.patternStrength,
     patternSrSensitivity: form.patternSrSensitivity,
+    patternCombinationTemplate:
+      form.patternCombinationFamilies.length > 1
+        ? form.patternCombinationTemplate
+        : form.patternCombinationTemplate === "single"
+          ? "single"
+          : form.patternCombinationTemplate,
+    patternCombinationOperator: form.patternCombinationOperator,
+    patternCombinationInvalidationMode:
+      form.patternCombinationFailurePolicy === "all" ? "all" : "any",
+    patternCombinationFailurePolicy: form.patternCombinationFailurePolicy,
+    patternCombinationWeightedThreshold:
+      form.patternCombinationOperator === "weighted_score"
+        ? Number(form.patternCombinationWeightedThreshold)
+        : null,
+    patternCombinationFamilies:
+      form.patternCombinationFamilies.length > 0
+        ? [...form.patternCombinationFamilies].slice(0, 4)
+        : null,
+    patternCombinationSpec:
+      form.patternCombinationBlocks &&
+      form.patternCombinationBlocks.length > 0
+        ? {
+            version: 1,
+            templateId: form.patternCombinationTemplate,
+            operator: form.patternCombinationOperator,
+            failurePolicy: form.patternCombinationFailurePolicy,
+            invalidationMode:
+              form.patternCombinationFailurePolicy === "all" ? "all" : "any",
+            ...(form.patternCombinationOperator === "weighted_score"
+              ? {
+                  weightedThreshold: Number(
+                    form.patternCombinationWeightedThreshold,
+                  ),
+                }
+              : {}),
+            blocks: form.patternCombinationBlocks.map((block) => ({
+              ...block,
+              required: block.required ?? true,
+              weight: block.weight ?? 1,
+              priority: block.priority ?? block.order,
+              params: { ...block.params },
+            })),
+          }
+        : null,
   };
 
   return {

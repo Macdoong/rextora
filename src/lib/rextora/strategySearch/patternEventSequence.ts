@@ -6,16 +6,23 @@ import {
   buildFvgSequence,
   buildOrderBlockLongSequence,
   buildSupportResistanceSequence,
+  buildSupplyDemandSequence,
   buildTrendlineSequence,
   type StrategyEventSequence,
 } from "../strategy/definition/eventSequence";
 import { defaultDefinition } from "../strategy/definition/validator";
 import type { CanonicalStrategyDefinition } from "../strategy/definition/types";
 import {
+  buildCombinedEventSequence,
+  combinationLabelKo,
+  resolveCombinationFromParams,
+} from "./patternCombination";
+import {
   type PatternSearchFamilyId,
   readFvgParams,
   readOrderBlockParams,
   readSupportResistanceParams,
+  readSupplyDemandParams,
   readTrendlineParams,
   resolvePatternFamilyFromParams,
 } from "./patternSearchSpaces";
@@ -24,7 +31,14 @@ export function buildPatternEventSequence(
   params: Record<string, unknown>,
   family?: PatternSearchFamilyId | null,
 ): StrategyEventSequence | null {
-  const fam = family ?? resolvePatternFamilyFromParams(params);
+  const combo = resolveCombinationFromParams(params);
+  if (combo && combo.blocks.length > 1) {
+    return buildCombinedEventSequence(combo, params);
+  }
+  const fam =
+    family ??
+    combo?.blocks[0]?.family ??
+    resolvePatternFamilyFromParams(params);
   if (!fam) return null;
   switch (fam) {
     case "fvg":
@@ -33,6 +47,8 @@ export function buildPatternEventSequence(
       return buildTrendlineSequence(readTrendlineParams(params));
     case "support_resistance":
       return buildSupportResistanceSequence(readSupportResistanceParams(params));
+    case "supply_demand":
+      return buildSupplyDemandSequence(readSupplyDemandParams(params));
     default:
       return buildOrderBlockLongSequence(readOrderBlockParams(params));
   }
@@ -46,10 +62,15 @@ export function buildPatternSearchDefinition(input: {
   params: Record<string, unknown>;
   family?: PatternSearchFamilyId | null;
 }): CanonicalStrategyDefinition | null {
+  const combo = resolveCombinationFromParams(input.params);
   const fam =
-    input.family ?? resolvePatternFamilyFromParams(input.params);
+    input.family ??
+    combo?.blocks.find((b) => b.role === "entry_zone")?.family ??
+    combo?.blocks[0]?.family ??
+    resolvePatternFamilyFromParams(input.params);
   const seq = buildPatternEventSequence(input.params, fam);
   if (!seq || !fam) return null;
+  const comboLabel = combo ? combinationLabelKo(combo) : null;
   const stop =
     typeof input.params.stopAtrMult === "number"
       ? input.params.stopAtrMult
@@ -104,6 +125,16 @@ export function buildPatternSearchDefinition(input: {
     metadata: {
       searchFamily: fam,
       pattern: fam,
+      ...(comboLabel ? { patternCombination: comboLabel } : {}),
+      ...(combo
+        ? {
+            combinationTemplate: combo.templateId,
+            combinationOperator: combo.operator,
+            combinationFamilies: combo.blocks
+              .map((b) => b.family)
+              .join("+"),
+          }
+        : {}),
       ...(hasLev
         ? {
             lev_min: Number.isFinite(levMin) ? levMin : 1,

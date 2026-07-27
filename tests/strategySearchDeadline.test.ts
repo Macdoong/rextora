@@ -6,6 +6,7 @@ import {
   markPlanPaused,
   markPlanResumed,
   replenishDeadlineBudget,
+  syncPlanTimingFields,
   type StrategySearchPlan,
 } from "../src/lib/rextora/strategySearch/searchPlan";
 import { completionReasonLabelKo } from "../components/rextora/strategySearch/formatters";
@@ -132,5 +133,50 @@ describe("deadline-primary stopping helpers", () => {
     plan = markPlanResumed(plan, t0 + 300_000);
     expect(activeElapsedMs(plan, t0 + 300_000)).toBe(12_000);
     expect(plan.expectedCompletionAtMs).toBe(t0 + 300_000 + 48_000);
+  });
+
+  it("computeExpectedCompletionAtMs is set when campaign starts", () => {
+    const t0 = 3_000_000;
+    let plan = createEmptySearchPlan({
+      searchName: "start-timing",
+      depthProfile: "fast",
+      qualificationProfile: "balanced",
+      qualifiedTarget: 1,
+      candidateBudget: 100,
+      stageBatchSize: 10,
+      maxRuntimeMs: 60_000,
+      spaces: [{ id: "ema_core", labelKo: "EMA" }],
+    });
+    plan = syncPlanTimingFields(
+      { ...plan, campaignStartedAtMs: t0 },
+      t0 + 5_000,
+    );
+    expect(plan.elapsedMs).toBe(5_000);
+    expect(plan.expectedCompletionAtMs).toBe(t0 + 5_000 + 55_000);
+  });
+
+  it("syncPlanTimingFields keeps remaining stable while paused", () => {
+    const t0 = 4_000_000;
+    let plan = createEmptySearchPlan({
+      searchName: "pause-remaining",
+      depthProfile: "fast",
+      qualificationProfile: "balanced",
+      qualifiedTarget: 1,
+      candidateBudget: 100,
+      stageBatchSize: 10,
+      maxRuntimeMs: 60_000,
+      spaces: [{ id: "ema_core", labelKo: "EMA" }],
+    });
+    plan = { ...plan, campaignStartedAtMs: t0 };
+    plan = syncPlanTimingFields(plan, t0 + 10_000);
+    plan = markPlanPaused(plan, t0 + 10_000);
+    const remainingAtPause =
+      (plan.expectedCompletionAtMs ?? 0) - (t0 + 10_000);
+    plan = syncPlanTimingFields(plan, t0 + 40_000);
+    expect(plan.elapsedMs).toBe(10_000);
+    expect((plan.expectedCompletionAtMs ?? 0) - (t0 + 40_000)).toBe(
+      remainingAtPause,
+    );
+    expect(remainingAtPause).toBe(50_000);
   });
 });
