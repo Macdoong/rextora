@@ -131,7 +131,7 @@ describe("candlestick crosshair contracts", () => {
     expect(src).toContain("triangle-down");
   });
 
-  it("trade drawer includes mini chart and waterfall", () => {
+  it("selected trade inspector uses nine structured Korean evidence sections", () => {
     const src = fs.readFileSync(
       path.join(
         process.cwd(),
@@ -139,9 +139,31 @@ describe("candlestick crosshair contracts", () => {
       ),
       "utf8",
     );
-    expect(src).toContain("trade-mini-chart");
-    expect(src).toContain("trade-pnl-waterfall");
-    expect(src).toContain("trade-lifecycle");
+    expect(src).toContain("selected-trade-inspector");
+    expect(src).toContain("trade-inspector-result");
+    expect(src).toContain("trade-inspector-entry");
+    expect(src).toContain("trade-inspector-pattern");
+    expect(src).toContain("trade-inspector-timeline");
+    expect(src).toContain("trade-inspector-risk");
+    expect(src).toContain("trade-inspector-exit");
+    expect(src).toContain("trade-inspector-cost");
+    expect(src).toContain("trade-inspector-risk-management");
+    expect(src).toContain("9. 개발자 정보");
     expect(src).toContain("기록 없음");
+  });
+
+  it("provides a mobile trade card list and closable full-screen inspector", () => {
+    const view = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components/rextora/charts/BacktestAnalysisView.tsx",
+      ),
+      "utf8",
+    );
+    const css = fs.readFileSync(path.join(process.cwd(), "app/globals.css"), "utf8");
+    expect(view).toContain('data-testid="trade-mobile-list"');
+    expect(view).toContain('aria-label="거래 상세 닫기"');
+    expect(view).toContain("rextora-trade-inspector");
+    expect(css).toMatch(/\.rextora-trade-inspector\s*\{[\s\S]*position:\s*fixed/);
   });
 });

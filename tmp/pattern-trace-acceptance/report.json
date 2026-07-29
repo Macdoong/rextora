@@ -1,0 +1,76 @@
+{
+  "buildId": "c1YrEmWbO9DWlW9w5zZt7",
+  "viewports": {
+    "automatic-390": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\automatic-390.png",
+    "automatic-768": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\automatic-768.png",
+    "automatic-1024": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\automatic-1024.png",
+    "automatic-1440": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\automatic-1440.png",
+    "basic-390": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\basic-390.png",
+    "basic-768": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\basic-768.png",
+    "basic-1024": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\basic-1024.png",
+    "basic-1440": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\basic-1440.png",
+    "expert-390": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\expert-390.png",
+    "expert-768": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\expert-768.png",
+    "expert-1024": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\expert-1024.png",
+    "expert-1440": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\expert-1440.png"
+  },
+  "configs": [
+    {
+      "name": "ob_only_basic",
+      "payloadPath": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\ob_only_basic-payload.json",
+      "patternSelectionMode": "manual",
+      "selectedSpaceIds": [
+        "order_block"
+      ],
+      "operator": "and",
+      "failurePolicy": "any",
+      "invalidationMode": "any",
+      "families": [
+        "order_block"
+      ],
+      "majorityNotCollapsed": true
+    },
+    {
+      "name": "ob_fvg_and_expert",
+      "payloadPath": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\ob_fvg_and_expert-payload.json",
+      "patternSelectionMode": "manual",
+      "selectedSpaceIds": [
+        "order_block",
+        "fvg"
+      ],
+      "operator": "and",
+      "failurePolicy": "majority",
+      "invalidationMode": "majority",
+      "families": [
+        "order_block",
+        "fvg"
+      ],
+      "majorityNotCollapsed": true
+    },
+    {
+      "name": "fvg_tl_or",
+      "payloadPath": "C:\\Rextora\\tmp\\pattern-trace-acceptance\\fvg_tl_or-payload.json",
+      "patternSelectionMode": "manual",
+      "selectedSpaceIds": [
+        "fvg",
+        "trendline"
+      ],
+      "operator": "or",
+      "failurePolicy": "any",
+      "invalidationMode": "any",
+      "families": [
+        "fvg",
+        "trendline"
+      ],
+      "majorityNotCollapsed": true
+    }
+  ],
+  "consoleErrors": [],
+  "ok": true,
+  "systemManagedMarkers": 2,
+  "overflow": {
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "overflowX": false
+  }
+}

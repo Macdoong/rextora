@@ -90,7 +90,7 @@ describe("strategy search Korean localization polish", () => {
     expect(form).toContain("최대 허용 낙폭");
     expect(form).toContain("탐색 기준");
     expect(form).toContain("고급 탐색 설정");
-    expect(form).toContain("탐색 시작");
+    expect(form).toContain("연구 시작");
     expect(form).toContain("탐색 이름");
     expect(form).toContain("목표 합격 전략 수");
     expect(form).toContain("비용 검증");

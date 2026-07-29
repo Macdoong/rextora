@@ -1,16 +1,14 @@
 import { StrategySearchWorkbench } from "@/components/rextora/strategySearch/StrategySearchWorkbench";
+import { PageHeader } from "@/components/ui/primitives";
 
 export default function StrategySearchPage() {
   return (
     <div className="rextora-page ss-page" data-testid="strategy-search-page">
-      <div>
-        <h1 className="rextora-page-title ss-page-title">전략 탐색</h1>
-        <p className="rextora-helper ss-page-desc mt-2">
-          시장·시간봉·연구 시간만 정하면 AI가 탐색 전략을 만들고 검증·개선합니다.
-          설정한 시간이 끝날 때까지 계속하며, 첫 합격에서 멈추지 않습니다. 합격
-          전략은 검토 후 모의 매매에 직접 등록하세요.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="RESEARCH"
+        title="전략 탐색"
+        description="연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다. 완료 후 결과를 직접 검토하고 다음 단계로 이동합니다."
+      />
       <div id="results" className="scroll-mt-20">
         <StrategySearchWorkbench />
       </div>

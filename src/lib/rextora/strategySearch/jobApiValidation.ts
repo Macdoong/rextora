@@ -46,6 +46,7 @@ export interface ValidatedOperatorPlanInput {
   errorAutoPauseRate?: number | null;
   repeatedSignatureThreshold?: number | null;
   selectedSpaceIds?: string[] | null;
+  patternSelectionMode?: "automatic" | "manual" | null;
   leverageMode?: "automatic" | "fixed" | "range" | "disabled" | null;
   leverageFixed?: number | null;
   leverageMin?: number | null;
@@ -78,7 +79,7 @@ export interface ValidatedOperatorPlanInput {
     | null;
   patternCombinationFailurePolicy?: "any" | "all" | "majority" | null;
   patternCombinationWeightedThreshold?: number | null;
-  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationInvalidationMode?: "any" | "all" | "majority" | null;
   patternCombinationFamilies?: string[] | null;
   patternCombinationSpec?: PatternCombinationSpec | null;
 }
@@ -739,6 +740,96 @@ export function validateCreateSearchJobBody(
       if (op.patternCombinationSpec != null && patternCombinationSpec == null) {
         details.push("operatorPlan.patternCombinationSpec invalid");
       }
+      const failurePolicyRaw = op.patternCombinationFailurePolicy;
+      const patternCombinationFailurePolicy =
+        failurePolicyRaw === "any" ||
+        failurePolicyRaw === "all" ||
+        failurePolicyRaw === "majority"
+          ? failurePolicyRaw
+          : failurePolicyRaw == null
+            ? (patternCombinationSpec?.failurePolicy ?? null)
+            : null;
+      if (
+        failurePolicyRaw != null &&
+        patternCombinationFailurePolicy == null
+      ) {
+        details.push("operatorPlan.patternCombinationFailurePolicy invalid");
+      }
+      const invalidationModeRaw = op.patternCombinationInvalidationMode;
+      const patternCombinationInvalidationMode =
+        invalidationModeRaw === "any" ||
+        invalidationModeRaw === "all" ||
+        invalidationModeRaw === "majority"
+          ? invalidationModeRaw
+          : invalidationModeRaw == null
+            ? (patternCombinationFailurePolicy ??
+              patternCombinationSpec?.invalidationMode ??
+              null)
+            : null;
+      if (
+        invalidationModeRaw != null &&
+        patternCombinationInvalidationMode == null
+      ) {
+        details.push(
+          "operatorPlan.patternCombinationInvalidationMode invalid",
+        );
+      }
+      const weightedThresholdRaw = op.patternCombinationWeightedThreshold;
+      let patternCombinationWeightedThreshold: number | null = null;
+      if (weightedThresholdRaw != null) {
+        if (
+          typeof weightedThresholdRaw !== "number" ||
+          !Number.isFinite(weightedThresholdRaw) ||
+          weightedThresholdRaw <= 0
+        ) {
+          details.push(
+            "operatorPlan.patternCombinationWeightedThreshold invalid",
+          );
+        } else {
+          patternCombinationWeightedThreshold = weightedThresholdRaw;
+        }
+      } else if (
+        typeof patternCombinationSpec?.weightedThreshold === "number"
+      ) {
+        patternCombinationWeightedThreshold =
+          patternCombinationSpec.weightedThreshold;
+      }
+      const selectionModeRaw = op.patternSelectionMode;
+      const patternSelectionMode =
+        selectionModeRaw === "automatic" || selectionModeRaw === "manual"
+          ? selectionModeRaw
+          : selectionModeRaw == null
+            ? patternConfigLevel === "automatic" || selectedSpaceIds == null
+              ? "automatic"
+              : "manual"
+            : null;
+      if (selectionModeRaw != null && patternSelectionMode == null) {
+        details.push("operatorPlan.patternSelectionMode invalid");
+      }
+      // Manual mode must not silently drop spaces; require at least one space id.
+      if (
+        patternSelectionMode === "manual" &&
+        (selectedSpaceIds == null || selectedSpaceIds.length === 0) &&
+        !(
+          Array.isArray(op.patternCombinationFamilies) &&
+          op.patternCombinationFamilies.length > 0
+        ) &&
+        !(patternCombinationSpec && patternCombinationSpec.blocks.length > 0)
+      ) {
+        details.push(
+          "operatorPlan.selectedSpaceIds required when patternSelectionMode is manual",
+        );
+      }
+      if (
+        op.patternCombinationOperator != null &&
+        op.patternCombinationOperator !== "and" &&
+        op.patternCombinationOperator !== "or" &&
+        op.patternCombinationOperator !== "sequence" &&
+        op.patternCombinationOperator !== "weighted_score" &&
+        op.patternCombinationOperator !== "priority"
+      ) {
+        details.push("operatorPlan.patternCombinationOperator invalid");
+      }
       operatorPlan = {
         depthProfile: depth,
         qualificationProfile: qual,
@@ -755,7 +846,9 @@ export function validateCreateSearchJobBody(
         errorWarningRate,
         errorAutoPauseRate,
         repeatedSignatureThreshold,
-        selectedSpaceIds,
+        selectedSpaceIds:
+          patternSelectionMode === "automatic" ? null : selectedSpaceIds,
+        patternSelectionMode,
         leverageMode,
         leverageFixed:
           typeof op.leverageFixed === "number" && Number.isFinite(op.leverageFixed)
@@ -797,11 +890,9 @@ export function validateCreateSearchJobBody(
           op.patternCombinationOperator === "priority"
             ? op.patternCombinationOperator
             : null,
-        patternCombinationInvalidationMode:
-          op.patternCombinationInvalidationMode === "any" ||
-          op.patternCombinationInvalidationMode === "all"
-            ? op.patternCombinationInvalidationMode
-            : null,
+        patternCombinationInvalidationMode,
+        patternCombinationFailurePolicy,
+        patternCombinationWeightedThreshold,
         patternCombinationFamilies: Array.isArray(
           op.patternCombinationFamilies,
         )

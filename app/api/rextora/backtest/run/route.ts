@@ -5,6 +5,7 @@ import {
   runConfiguredBacktest,
 } from "@/src/lib/rextora/backtest/backtestRunner";
 import {
+  deleteSavedBacktest,
   getSavedBacktest,
   listSavedBacktests,
   listSavedBacktestsForStrategy,
@@ -440,4 +441,41 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+}
+
+/** Delete a saved Backtest Run. Never touches SAFE or live order endpoints. */
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const runId = searchParams.get("runId") ?? searchParams.get("id");
+  if (!runId) {
+    return NextResponse.json(
+      { ok: false, error: "runId가 필요합니다.", code: "MISSING_RUN_ID" },
+      { status: 400 },
+    );
+  }
+  const existing = getSavedBacktest(runId);
+  if (!existing) {
+    return NextResponse.json(
+      { ok: false, error: "저장된 백테스트 실행을 찾을 수 없습니다.", code: "NOT_FOUND" },
+      { status: 404 },
+    );
+  }
+  const result = deleteSavedBacktest(runId);
+  if (!result.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "백테스트 실행을 삭제하지 못했습니다.",
+        code: result.reason ?? "DELETE_FAILED",
+      },
+      { status: 500 },
+    );
+  }
+  return NextResponse.json({
+    ok: true,
+    data: {
+      deletedRunId: runId,
+      strategyId: existing.strategyId ?? existing.report.strategyId ?? null,
+    },
+  });
 }

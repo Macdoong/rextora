@@ -4,8 +4,9 @@ import crypto from "node:crypto";
 import type { SavedBacktestResult } from "./backtestTypes";
 import { hasChartEvidence } from "./chartEvidenceStore";
 
-const DIR = () =>
-  path.join(/* turbopackIgnore: true */ process.cwd(), "data", "rextora", "backtests");
+import { backtestsRoot } from "../storage/runtimePaths";
+
+const DIR = () => backtestsRoot();
 
 function ensure(): void {
   fs.mkdirSync(DIR(), { recursive: true });
@@ -189,6 +190,38 @@ export function getSavedBacktest(id: string): SavedBacktestResult | null {
   const full = path.join(DIR(), `${id}.json`);
   if (!fs.existsSync(full)) return null;
   return JSON.parse(fs.readFileSync(full, "utf8")) as SavedBacktestResult;
+}
+
+/**
+ * Delete a saved Backtest Run artifact.
+ * Does not touch strategies, Paper, Live, or SAFE. Chart sidecar removed when unreferenced.
+ */
+export function deleteSavedBacktest(id: string): {
+  ok: boolean;
+  reason?: string;
+} {
+  ensure();
+  if (!id || id.includes("..") || id.includes("/") || id.includes("\\")) {
+    return { ok: false, reason: "invalid_id" };
+  }
+  const full = path.join(DIR(), `${id}.json`);
+  if (!fs.existsSync(full)) return { ok: false, reason: "not_found" };
+  try {
+    fs.unlinkSync(full);
+  } catch {
+    return { ok: false, reason: "unlink_failed" };
+  }
+  const index = readIndex().filter((row) => row.id !== id);
+  writeIndex(index);
+  const chartPath = path.join(DIR(), `${id}.chart.json`);
+  if (fs.existsSync(chartPath)) {
+    try {
+      fs.unlinkSync(chartPath);
+    } catch {
+      /* non-fatal */
+    }
+  }
+  return { ok: true };
 }
 
 /** Latest user Backtest Runs for a strategy (newest first). */

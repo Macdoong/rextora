@@ -116,6 +116,8 @@ describe("UI workflow wiring", () => {
       path.join(process.cwd(), "app/strategy-search/page.tsx"),
       "utf8",
     );
-    expect(search).toContain("첫 합격에서 멈추지 않습니다");
+    expect(search).toContain(
+      "연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다",
+    );
   });
 });

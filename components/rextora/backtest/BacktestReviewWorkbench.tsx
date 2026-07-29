@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import { Badge, Button, Card, Metric, Skeleton, StatusBanner } from "@/components/ui/primitives";
+import type { StatusBannerStatus } from "@/components/ui/primitives";
 import type { StoredStrategy } from "@/src/lib/rextora/strategy/strategyTypes";
 import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
 import type {
@@ -20,6 +21,11 @@ import {
   formatShortHash,
 } from "@/src/lib/rextora/displayLabels";
 import { EmptyState } from "@/components/rextora/EmptyState";
+import { DemoDataBadge } from "@/components/rextora/DemoDataBadge";
+import {
+  isDemoBacktestRecord,
+  isDemoStrategyRecord,
+} from "@/src/lib/rextora/firstRun/demoIdentity";
 import {
   BACKTEST_PERIOD_PRESETS,
   computeDayPresetRange,
@@ -43,6 +49,7 @@ import {
 import type { StoredStrategyV1 } from "@/src/lib/rextora/strategy/definition/bridge";
 import type { AvailableCandleDateRange } from "@/src/lib/rextora/backtest/backtestDateRange";
 import { resolveEventSequenceFamilyFromStrategy } from "@/src/lib/rextora/backtest/patternOverlayAvailability";
+import { fetchJsonCached } from "@/src/lib/rextora/client/requestCache";
 
 function sourceTypeLabelKo(source: string | null | undefined): string {
   if (source === "user_backtest_run") return "사용자 실행";
@@ -69,10 +76,69 @@ function metricOrUnavailable(
   return format(value);
 }
 
+type PersistedBacktestViewState = {
+  strategyId?: string | null;
+  symbol?: string | null;
+  runId?: string | null;
+  tradeId?: string | null;
+  fromDate?: string | null;
+  toDate?: string | null;
+  activeResultTab?: string | null;
+  savedAt?: number;
+};
+
+type BacktestSettingsResponse = {
+  data?: {
+    settings?: {
+      ui?: { expertMode?: boolean };
+      expertMode?: boolean;
+      cost?: {
+        feeRate?: number;
+        takerFee?: number;
+        slippageRate?: number;
+      };
+      market?: { allowedSymbols?: string[] };
+      allowedSymbols?: string[];
+    };
+  };
+};
+
+type ActivePaperSessionResponse = {
+  data?: {
+    active?: {
+      status?: string;
+      strategyId?: string;
+    } | null;
+  };
+};
+
+const BACKTEST_VIEW_STATE_KEY = "rextora.backtest.viewState";
+
+function readPersistedBacktestViewState(): PersistedBacktestViewState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(BACKTEST_VIEW_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedBacktestViewState;
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 function syncBacktestStrategyUrl(
   nextStrategyId: string,
   nextSymbol?: string | null,
-  options?: { clearRunId?: boolean; runId?: string | null },
+  options?: {
+    clearRunId?: boolean;
+    runId?: string | null;
+    tradeId?: string | null;
+    clearTradeId?: boolean;
+    fromDate?: string | null;
+    toDate?: string | null;
+    activeResultTab?: string | null;
+  },
 ) {
   if (typeof window === "undefined") return;
   const url = new URL(window.location.href);
@@ -91,8 +157,75 @@ function syncBacktestStrategyUrl(
   } else if (options?.runId) {
     url.searchParams.set("runId", options.runId);
   }
+  if (options?.clearTradeId) {
+    url.searchParams.delete("tradeId");
+  } else if (options?.tradeId) {
+    url.searchParams.set("tradeId", options.tradeId);
+  }
   const next = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState(window.history.state, "", next);
+  try {
+    const prev = readPersistedBacktestViewState() ?? {};
+    const nextRunId = options?.clearRunId
+      ? null
+      : (options?.runId ??
+        url.searchParams.get("runId") ??
+        prev.runId ??
+        null);
+    const nextTradeId = options?.clearTradeId
+      ? null
+      : (options?.tradeId ??
+        url.searchParams.get("tradeId") ??
+        prev.tradeId ??
+        null);
+    window.sessionStorage.setItem(
+      BACKTEST_VIEW_STATE_KEY,
+      JSON.stringify({
+        strategyId: nextStrategyId || null,
+        symbol: nextSymbol ?? null,
+        runId: nextRunId,
+        tradeId: nextTradeId,
+        fromDate: options?.fromDate ?? prev.fromDate ?? null,
+        toDate: options?.toDate ?? prev.toDate ?? null,
+        activeResultTab:
+          options?.activeResultTab ?? prev.activeResultTab ?? null,
+        savedAt: Date.now(),
+      } satisfies PersistedBacktestViewState),
+    );
+    invalidatePersistedBacktestViewCache();
+  } catch {
+    /* ignore */
+  }
+}
+
+function subscribeNoop() {
+  return () => undefined;
+}
+
+/** Stable snapshot cache — useSyncExternalStore requires referential stability. */
+let persistedViewCacheRaw: string | null | undefined;
+let persistedViewCacheValue: PersistedBacktestViewState | null = null;
+
+function getPersistedBacktestViewSnapshot(): PersistedBacktestViewState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(BACKTEST_VIEW_STATE_KEY);
+    if (raw === persistedViewCacheRaw) return persistedViewCacheValue;
+    persistedViewCacheRaw = raw;
+    persistedViewCacheValue = raw
+      ? (JSON.parse(raw) as PersistedBacktestViewState)
+      : null;
+    return persistedViewCacheValue;
+  } catch {
+    persistedViewCacheRaw = undefined;
+    persistedViewCacheValue = null;
+    return null;
+  }
+}
+
+function invalidatePersistedBacktestViewCache() {
+  persistedViewCacheRaw = undefined;
+  persistedViewCacheValue = null;
 }
 
 /**
@@ -102,10 +235,22 @@ function syncBacktestStrategyUrl(
  */
 export function BacktestReviewWorkbench() {
   const searchParams = useSearchParams();
-  const initialStrategyId = searchParams.get("strategyId");
+  const urlStrategyId = searchParams.get("strategyId");
   const expertQuery = searchParams.get("expert") === "1";
-  const initialRunId = searchParams.get("runId");
-  const initialSymbol = (searchParams.get("symbol") ?? "").toUpperCase();
+  const urlRunId = searchParams.get("runId");
+  const urlSymbol = (searchParams.get("symbol") ?? "").toUpperCase();
+  const urlTradeId = searchParams.get("tradeId");
+  const sessionBoot = useSyncExternalStore(
+    subscribeNoop,
+    getPersistedBacktestViewSnapshot,
+    () => null,
+  );
+
+  const initialStrategyId = urlStrategyId || sessionBoot?.strategyId || null;
+  const initialRunId = urlRunId || sessionBoot?.runId || null;
+  const initialSymbol =
+    urlSymbol || (sessionBoot?.symbol ?? "").toUpperCase() || "";
+  const initialTradeId = urlTradeId || sessionBoot?.tradeId || null;
 
   const today = useMemo(() => new Date(), []);
   const defaultFrom = useMemo(() => {
@@ -115,12 +260,16 @@ export function BacktestReviewWorkbench() {
   const defaultTo = useMemo(() => toDateInput(today), [today]);
 
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
-  const [strategyId, setStrategyId] = useState(initialStrategyId ?? "");
+  const [strategyId, setStrategyId] = useState(
+    () => urlStrategyId || sessionBoot?.strategyId || "",
+  );
   const [strategyPickerQuery, setStrategyPickerQuery] = useState("");
   const [strategyPickerFamily, setStrategyPickerFamily] = useState<
     "all" | "combo" | "pattern" | "general" | "safe" | "research" | "registered"
   >("all");
-  const [symbol, setSymbol] = useState(initialSymbol || "BTCUSDT");
+  const [symbol, setSymbol] = useState(
+    () => urlSymbol || (sessionBoot?.symbol ?? "").toUpperCase() || "BTCUSDT",
+  );
   const [symbolQuery, setSymbolQuery] = useState("");
   const [providerSymbols, setProviderSymbols] = useState<string[]>(() =>
     configuredBacktestSymbols(),
@@ -130,13 +279,17 @@ export function BacktestReviewWorkbench() {
   const [savedRunSymbolFilter, setSavedRunSymbolFilter] = useState<
     "current" | "all"
   >("current");
-  const [fromDate, setFromDate] = useState(defaultFrom);
-  const [toDate, setToDate] = useState(defaultTo);
+  const [fromDate, setFromDate] = useState(
+    () => sessionBoot?.fromDate || defaultFrom,
+  );
+  const [toDate, setToDate] = useState(() => sessionBoot?.toDate || defaultTo);
   const [loading, setLoading] = useState(false);
   /** Run-card feedback (validation / loading / success / error). */
   const [runFeedback, setRunFeedback] = useState("");
+  const [runStatus, setRunStatus] = useState<StatusBannerStatus>("idle");
   /** Paper / Live action feedback (separate from Run card). */
   const [actionMessage, setActionMessage] = useState("");
+  const [actionStatus, setActionStatus] = useState<StatusBannerStatus>("idle");
   const [report, setReport] = useState<BacktestReport | null>(null);
   const [presetBusy, setPresetBusy] = useState(false);
   const [trades, setTrades] = useState<BacktestTrade[]>([]);
@@ -157,7 +310,9 @@ export function BacktestReviewWorkbench() {
     string | null
   >(null);
   const [savedRuns, setSavedRuns] = useState<SavedBacktestResult[]>([]);
-  const [selectedRunId, setSelectedRunId] = useState(initialRunId ?? "");
+  const [selectedRunId, setSelectedRunId] = useState(
+    () => urlRunId || sessionBoot?.runId || "",
+  );
   const chartHydrateRunIdRef = useRef<string | null>(null);
   const appliedInitialRunRef = useRef(false);
   const [costSummary, setCostSummary] = useState<string>(
@@ -165,7 +320,7 @@ export function BacktestReviewWorkbench() {
   );
   const [runInFlight, setRunInFlight] = useState(false);
   const runLock = useRef(false);
-  const [activeNavSection, setActiveNavSection] = useState("run");
+  const [activeNavSection, setActiveNavSection] = useState("price");
   const [runErrorDetail, setRunErrorDetail] = useState<string | null>(null);
   const [lastDeduped, setLastDeduped] = useState(false);
   const [hydrationState, setHydrationState] = useState<SavedRunHydrationState>(
@@ -175,6 +330,29 @@ export function BacktestReviewWorkbench() {
   const hydratedRunIdRef = useRef<string | null>(null);
   const hydrationSeqRef = useRef(0);
   const runsLoadSeqRef = useRef(0);
+  const sessionUrlSyncedRef = useRef(false);
+
+  // When URL lacks identity, project session snapshot back into the address bar
+  // (does not re-execute Backtest).
+  useEffect(() => {
+    if (sessionUrlSyncedRef.current) return;
+    if (urlStrategyId || urlRunId) {
+      sessionUrlSyncedRef.current = true;
+      return;
+    }
+    if (!sessionBoot?.strategyId && !sessionBoot?.runId) {
+      sessionUrlSyncedRef.current = true;
+      return;
+    }
+    sessionUrlSyncedRef.current = true;
+    syncBacktestStrategyUrl(sessionBoot.strategyId ?? "", sessionBoot.symbol ?? null, {
+      runId: sessionBoot.runId ?? null,
+      tradeId: sessionBoot.tradeId ?? null,
+      fromDate: sessionBoot.fromDate ?? null,
+      toDate: sessionBoot.toDate ?? null,
+      activeResultTab: sessionBoot.activeResultTab ?? null,
+    });
+  }, [urlStrategyId, urlRunId, sessionBoot]);
 
   const strategy = useMemo(
     () => strategies.find((s) => s.id === strategyId) ?? null,
@@ -298,11 +476,16 @@ export function BacktestReviewWorkbench() {
   useEffect(() => {
     const timer = setTimeout(() => {
       void Promise.all([
-        fetch("/api/rextora/strategies").then((r) => r.json()),
-        fetch("/api/rextora/settings").then((r) => r.json()).catch(() => null),
-        fetch("/api/rextora/paper/session?active=1")
-          .then((r) => r.json())
-          .catch(() => null),
+        fetchJsonCached<{ data?: StoredStrategy[] }>("/api/rextora/strategies", {
+          ttlMs: 1_000,
+        }),
+        fetchJsonCached<BacktestSettingsResponse>("/api/rextora/settings", {
+          ttlMs: 1_000,
+        }).catch(() => null),
+        fetchJsonCached<ActivePaperSessionResponse>(
+          "/api/rextora/paper/session?active=1",
+          { ttlMs: 1_000 },
+        ).catch(() => null),
       ])
         .then(([j, settingsJson, sessionJson]) => {
           const list = (j.data ?? []) as StoredStrategy[];
@@ -384,6 +567,7 @@ export function BacktestReviewWorkbench() {
         })
         .catch(() => {
           setRunFeedback("전략 목록을 불러오지 못했습니다.");
+          setRunStatus("error");
           setHydrationState("error");
           setHydrationError("전략 목록을 불러오지 못했습니다.");
         });
@@ -426,6 +610,7 @@ export function BacktestReviewWorkbench() {
     clearResultState();
     setSafeFallbackNotice(false);
     setRunFeedback("");
+    setRunStatus("idle");
     setSymbolQuery("");
     const compat = resolveStrategySymbolCompatibility(
       (strategies.find((s) => s.id === nextId) as StoredStrategyV1) ?? null,
@@ -444,12 +629,14 @@ export function BacktestReviewWorkbench() {
         symbolCompat.reasonKo ??
           `${next}은(는) 이 전략에서 사용할 수 없습니다.`,
       );
+      setRunStatus("error");
       return;
     }
     setSymbol(next);
     setSymbolQuery("");
     clearResultState();
     setRunFeedback(`심볼 변경: ${next}`);
+    setRunStatus("info");
     syncBacktestStrategyUrl(strategyId, next, { clearRunId: true });
   }
 
@@ -469,16 +656,19 @@ export function BacktestReviewWorkbench() {
       setRunFeedback(
         `기간 프리셋 적용 (${symbol}): ${range.fromDate} → ${range.toDate}`,
       );
+      setRunStatus("info");
       return;
     }
     setPresetBusy(true);
     setRunFeedback("전체 기간 조회 중…");
+    setRunStatus("loading");
     try {
       const range =
         bounds ??
         (await loadSymbolDataRange(symbol, tf));
       if (!range?.fromDate || !range?.toDate) {
         setRunFeedback("전체 기간을 불러오지 못했습니다.");
+        setRunStatus("error");
         return;
       }
       setFromDate(String(range.fromDate));
@@ -486,12 +676,14 @@ export function BacktestReviewWorkbench() {
       setRunFeedback(
         `전체 기간 적용 (${symbol}): ${range.fromDate} → ${range.toDate}`,
       );
+      setRunStatus("info");
     } catch (error) {
       setRunFeedback(
         error instanceof Error
           ? error.message
           : "전체 기간을 불러오지 못했습니다.",
       );
+      setRunStatus("error");
     } finally {
       setPresetBusy(false);
     }
@@ -524,6 +716,7 @@ export function BacktestReviewWorkbench() {
     setRunFeedback(
       `저장된 실행 로드: ${run.id} · ${runSymbol} · ${run.report.fromDate ?? "?"} → ${run.report.toDate ?? "?"} · 실행 방식 ${sourceTypeLabelKo(run.sourceType)}`,
     );
+    setRunStatus("info");
     syncBacktestStrategyUrl(strategyId, runSymbol, { runId: run.id });
     hydratedRunIdRef.current = run.id;
     setHydrationState("loaded");
@@ -644,19 +837,23 @@ export function BacktestReviewWorkbench() {
 
   async function runUserBacktest() {
     setRunFeedback("백테스트를 준비하고 있습니다.");
+    setRunStatus("loading");
     setRunErrorDetail(null);
     setLastDeduped(false);
     if (!strategyId || !strategy) {
       setRunFeedback("전략을 선택하세요.");
+      setRunStatus("error");
       return;
     }
     if (runLock.current || runInFlight) {
       setRunFeedback("이미 백테스트가 실행 중입니다.");
+      setRunStatus("error");
       return;
     }
     const validated = validateBacktestCalendarRange(fromDate, toDate);
     if (!validated.ok) {
       setRunFeedback("백테스트 실행에 실패했습니다.");
+      setRunStatus("error");
       setRunErrorDetail(validated.error);
       return;
     }
@@ -665,6 +862,7 @@ export function BacktestReviewWorkbench() {
     setRunInFlight(true);
     setLoading(true);
     setRunFeedback("백테스트 실행 중입니다.");
+    setRunStatus("loading");
     setReport(null);
     setTrades([]);
     setEquityCurve([]);
@@ -691,6 +889,7 @@ export function BacktestReviewWorkbench() {
       const payload = json.data;
       if (!json.ok || !payload?.report) {
         setRunFeedback("백테스트 실행에 실패했습니다.");
+        setRunStatus("error");
         setRunErrorDetail(json.error ?? json.code ?? null);
         return;
       }
@@ -725,13 +924,16 @@ export function BacktestReviewWorkbench() {
         setSelectedRunId(saved.id);
         setLastDeduped(Boolean(saved.deduplicatedResult));
         setRunFeedback("백테스트가 완료되고 저장되었습니다.");
+        setRunStatus("success");
       } else {
         setRunFeedback("백테스트가 완료되고 저장되었습니다.");
+        setRunStatus("success");
         setLastDeduped(false);
       }
       await loadRuns(strategyId, symbol, savedRunSymbolFilter);
     } catch (error) {
       setRunFeedback("백테스트 실행에 실패했습니다.");
+      setRunStatus("error");
       setRunErrorDetail(
         error instanceof Error ? error.message : "알 수 없는 오류",
       );
@@ -747,6 +949,7 @@ export function BacktestReviewWorkbench() {
       setActionMessage(
         "SAFE는 모의 활성으로 덮어쓰지 않습니다. 다른 전략을 선택하세요.",
       );
+      setActionStatus("error");
       return;
     }
     if (report) {
@@ -770,36 +973,34 @@ export function BacktestReviewWorkbench() {
       });
       if (eligibilityBlocksPaperLive(gate)) {
         setActionMessage(gate.verdictLabel);
+        setActionStatus("error");
         return;
       }
     }
     setActionBusy(true);
-    setActionMessage("모의매매 등록 중…");
+    setActionMessage("모의매매 준비 중…");
+    setActionStatus("loading");
     try {
       const res = await fetch("/api/rextora/strategies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "apply_paper", id: strategyId }),
+        body: JSON.stringify({
+          action: "apply_paper",
+          id: strategyId,
+          backtestRunId: selectedRunId,
+          backtestResultId: selectedRunId,
+          symbol:
+            report?.symbol ??
+            selectedRun?.report.symbol ??
+            symbol,
+        }),
       });
       const json = await res.json();
-      if (json.ok && selectedRunId) {
-        const sessionRes = await fetch("/api/rextora/paper/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            strategyId,
-            backtestResultId: selectedRunId,
-            symbol:
-              report?.symbol ??
-              selectedRun?.report.symbol ??
-              symbol,
-          }),
-        }).catch(() => null);
-        const sessionJson = sessionRes ? await sessionRes.json() : null;
-        const active = sessionJson?.data?.session ?? sessionJson?.data?.active;
+      if (json.ok) {
+        const active = json.data?.session;
         if (active?.strategyId) {
           setPaperSessionStrategyId(String(active.strategyId));
-        } else if (json.ok) {
+        } else {
           setPaperSessionStrategyId(strategyId);
         }
       }
@@ -813,9 +1014,10 @@ export function BacktestReviewWorkbench() {
       }
       setActionMessage(
         json.ok
-          ? `모의매매 등록 · 전략 ${strategyId} · 심볼 ${report?.symbol ?? symbol} · 실행 ${selectedRunId || "없음"}`
-          : (json.error ?? "모의매매 등록 실패"),
+          ? `모의매매 승인 대기 · 전략 ${strategyId} · 심볼 ${report?.symbol ?? symbol} · 실행 ${selectedRunId || "없음"}`
+          : (json.error ?? "모의매매 준비 실패"),
       );
+      setActionStatus(json.ok ? "success" : "error");
     } finally {
       setActionBusy(false);
     }
@@ -844,11 +1046,13 @@ export function BacktestReviewWorkbench() {
       });
       if (eligibilityBlocksPaperLive(gate)) {
         setActionMessage(gate.verdictLabel);
+        setActionStatus("error");
         return;
       }
     }
     setActionBusy(true);
     setActionMessage("실전 후보 등록 중…");
+    setActionStatus("loading");
     try {
       const res = await fetch("/api/rextora/strategies", {
         method: "POST",
@@ -861,6 +1065,7 @@ export function BacktestReviewWorkbench() {
           ? `실전 후보 등록 · 전략 ${strategyId} · 심볼 ${report?.symbol ?? symbol} · 실행 ${selectedRunId || "없음"}`
           : (json.error ?? "실전 후보 등록 실패"),
       );
+      setActionStatus(json.ok ? "success" : "error");
     } finally {
       setActionBusy(false);
     }
@@ -951,10 +1156,8 @@ export function BacktestReviewWorkbench() {
       : paperBlockedReason;
 
   const workbenchSections = [
-    { id: "run", label: "실행" },
-    { id: "verdict", label: "판정" },
     { id: "price", label: "차트" },
-    { id: "trades", label: "거래 목록" },
+    { id: "trades", label: "거래" },
     { id: "monthly", label: "월별" },
     { id: "cost", label: "비용" },
     { id: "equity", label: "자산·낙폭" },
@@ -966,16 +1169,18 @@ export function BacktestReviewWorkbench() {
   const navClickLocked = useRef(false);
 
   const scrollWorkbenchSection = (id: string) => {
-    const el = document.getElementById(`bt-${id}`);
-    if (!el) return;
-    el.setAttribute("data-force-expand", "1");
-    el.dispatchEvent(new CustomEvent("bt-force-expand", { bubbles: true }));
     navClickLocked.current = true;
     window.setTimeout(() => {
       navClickLocked.current = false;
     }, 700);
     setActiveNavSection(id);
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.requestAnimationFrame(() => {
+      const el = document.getElementById(`bt-${id}`);
+      if (!el) return;
+      el.setAttribute("data-force-expand", "1");
+      el.dispatchEvent(new CustomEvent("bt-force-expand", { bubbles: true }));
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   useEffect(() => {
@@ -1054,9 +1259,37 @@ export function BacktestReviewWorkbench() {
     costRatios?.totalCostPctOfGrossProfit != null
       ? (costRatios.totalCostPctOfGrossProfit * 100).toFixed(1)
       : null;
+  const analysisSectionIds = [
+    "price",
+    "trades",
+    "monthly",
+    "cost",
+    "equity",
+    "timeline",
+    "advanced",
+    "validation",
+  ] as const;
+  const analysisSection = analysisSectionIds.includes(
+    activeNavSection as (typeof analysisSectionIds)[number],
+  )
+    ? (activeNavSection as (typeof analysisSectionIds)[number])
+    : "price";
 
   return (
     <div className="space-y-4" data-testid="backtest-review-workbench">
+      {(searchParams.get("demo") === "1" ||
+        (strategy && isDemoStrategyRecord(strategy)) ||
+        (selectedRun && isDemoBacktestRecord(selectedRun))) ? (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2"
+          data-testid="backtest-demo-banner"
+        >
+          <DemoDataBadge />
+          <p className="text-sm text-amber-50">
+            데모 백테스트입니다. 예시 수치이며 실전 시장 성과가 아닙니다.
+          </p>
+        </div>
+      ) : null}
       <section id="bt-run" className="scroll-mt-20 space-y-4">
       <Card
         title="백테스트 실행"
@@ -1069,7 +1302,7 @@ export function BacktestReviewWorkbench() {
             <div className="mt-1 flex flex-wrap gap-2">
               <input
                 type="search"
-                className="min-w-[180px] flex-1 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                className="rextora-input min-w-[180px] flex-1"
                 placeholder="별칭 · 이름 · 해시 · Research 검색"
                 value={strategyPickerQuery}
                 onChange={(e) => setStrategyPickerQuery(e.target.value)}
@@ -1095,7 +1328,7 @@ export function BacktestReviewWorkbench() {
               </select>
             </div>
             <select
-              className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-2 rextora-input"
               value={strategyId}
               onChange={(e) => selectStrategy(e.target.value)}
               data-testid="backtest-strategy-select"
@@ -1283,7 +1516,7 @@ export function BacktestReviewWorkbench() {
               심볼/시장
               {symbolCompat.selectorDisabled ? (
                 <select
-                  className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 opacity-70"
+                  className="mt-1 rextora-input opacity-70"
                   value={symbol}
                   disabled
                   data-testid="backtest-symbol-select"
@@ -1295,7 +1528,7 @@ export function BacktestReviewWorkbench() {
                 <>
                   <input
                     type="search"
-                    className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    className="mt-1 rextora-input"
                     placeholder="심볼 검색"
                     value={symbolQuery}
                     onChange={(e) => setSymbolQuery(e.target.value)}
@@ -1303,7 +1536,7 @@ export function BacktestReviewWorkbench() {
                     aria-label="심볼 검색"
                   />
                   <select
-                    className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    className="mt-1 rextora-input"
                     value={symbol}
                     onChange={(e) => selectSymbol(e.target.value)}
                     data-testid="backtest-symbol-select"
@@ -1327,7 +1560,7 @@ export function BacktestReviewWorkbench() {
             시작일
             <input
               type="date"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-1 rextora-input"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
               data-testid="backtest-from"
@@ -1337,7 +1570,7 @@ export function BacktestReviewWorkbench() {
             종료일
             <input
               type="date"
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-1 rextora-input"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
               data-testid="backtest-to"
@@ -1392,34 +1625,29 @@ export function BacktestReviewWorkbench() {
             </Link>
           )}
         </div>
-        <div
-          className="mt-2 min-h-[1.25rem] space-y-1 text-sm text-slate-300"
-          data-testid="backtest-run-status"
-          aria-live="polite"
-        >
-          <p>
-            {runFeedback ||
-              (loading || runInFlight ? "백테스트 실행 중입니다." : "")}
-          </p>
-          {runFeedback.includes("완료되고 저장") && selectedRunId ? (
-            <p className="text-xs rx-text-muted" data-testid="backtest-run-id-detail">
-              실행 ID: {selectedRunId}
-            </p>
-          ) : null}
-          {lastDeduped && runFeedback.includes("완료되고 저장") ? (
-            <p
-              className="text-xs text-sky-200/90"
-              data-testid="backtest-result-reuse-note"
-            >
-              동일한 조건의 기존 계산 결과를 사용했습니다. 이번 실행 기록은 새로 저장되었습니다.
-            </p>
-          ) : null}
-          {runErrorDetail ? (
-            <details className="text-xs text-rose-200/90" data-testid="backtest-run-error-detail">
-              <summary className="cursor-pointer">기술 상세</summary>
-              <pre className="mt-1 whitespace-pre-wrap break-all">{runErrorDetail}</pre>
-            </details>
-          ) : null}
+        <div className="mt-2 min-h-[1.25rem]" data-testid="backtest-run-status">
+          <StatusBanner
+            status={runStatus === "idle" && (loading || runInFlight) ? "loading" : runStatus}
+            message={runFeedback || (loading || runInFlight ? "백테스트 실행 중입니다." : "")}
+            aria-live="polite"
+          >
+            {runFeedback.includes("완료되고 저장") && selectedRunId ? (
+              <p className="text-xs opacity-75" data-testid="backtest-run-id-detail">
+                실행 ID: {selectedRunId}
+              </p>
+            ) : null}
+            {lastDeduped && runFeedback.includes("완료되고 저장") ? (
+              <p className="text-xs opacity-75" data-testid="backtest-result-reuse-note">
+                동일한 조건의 기존 계산 결과를 사용했습니다. 이번 실행 기록은 새로 저장되었습니다.
+              </p>
+            ) : null}
+            {runErrorDetail ? (
+              <details className="text-xs" data-testid="backtest-run-error-detail">
+                <summary className="cursor-pointer opacity-75">기술 상세</summary>
+                <pre className="mt-1 whitespace-pre-wrap break-all opacity-80">{runErrorDetail}</pre>
+              </details>
+            ) : null}
+          </StatusBanner>
         </div>
         {/* Compatibility alias used by older tests/selectors */}
         <p className="sr-only" data-testid="backtest-message">
@@ -1464,9 +1692,10 @@ export function BacktestReviewWorkbench() {
             }
           />
         ) : hydrationState === "loading_run" || hydrationState === "loading_runs" ? (
-          <p className="text-sm text-slate-400" data-testid="backtest-run-loading">
-            저장된 실행을 불러오는 중입니다…
-          </p>
+          <div className="space-y-2" data-testid="backtest-run-loading">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
         ) : savedRuns.length === 0 ? (
           <EmptyState
             message="저장된 사용자 백테스트가 없습니다."
@@ -1476,7 +1705,7 @@ export function BacktestReviewWorkbench() {
           <label className="block text-sm text-slate-300">
             실행 선택
             <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-1 rextora-input"
               value={selectedRunId}
               onChange={(e) => {
                 const run = savedRuns.find((r) => r.id === e.target.value);
@@ -1612,7 +1841,11 @@ export function BacktestReviewWorkbench() {
         />
       ) : loading && !report ? (
         <Card title="실행 중">
-          <p className="text-sm text-slate-400">백테스트를 실행합니다…</p>
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-32 w-full" />
+          </div>
         </Card>
       ) : report && eligibility ? (
         <>
@@ -1846,12 +2079,13 @@ export function BacktestReviewWorkbench() {
               </Button>
             </div>
             {actionMessage ? (
-              <p
-                className="mt-3 text-sm text-slate-300"
-                data-testid="backtest-action-message"
-              >
-                {actionMessage}
-              </p>
+              <div className="mt-3">
+                <StatusBanner
+                  status={actionStatus}
+                  message={actionMessage}
+                  data-testid="backtest-action-message"
+                />
+              </div>
             ) : null}
           </Card>
 
@@ -1864,6 +2098,16 @@ export function BacktestReviewWorkbench() {
             chartSamplingApplied={chartSamplingApplied}
             processedCandleCount={processedCandleCount}
             backtestRunId={selectedRunId || null}
+            initialSelectedTradeId={initialTradeId}
+            activeSection={analysisSection}
+            onSectionChange={(section) => setActiveNavSection(section)}
+            onSelectedTradeChange={(tradeId) => {
+              syncBacktestStrategyUrl(strategyId, symbol, {
+                runId: selectedRunId || undefined,
+                tradeId: tradeId || undefined,
+                clearTradeId: !tradeId,
+              });
+            }}
             strategyType={
               (strategy as StoredStrategyV1 | null)?.strategyType ??
               (strategy as StoredStrategyV1 | null)?.definition?.strategyType ??

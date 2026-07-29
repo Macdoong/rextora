@@ -116,9 +116,43 @@ describe("multi-pattern block persistence", () => {
     const rejected = result.rejectedSetups.find(
       (r) => r.patternBlocks?.some((b) => b.status === "missing"),
     );
-    if (!rejected) return;
-    expect(rejected.reasonCode).toBeTruthy();
-    expect(rejected.patternBlocks?.length).toBeGreaterThan(0);
+    expect(rejected).toBeTruthy();
+    expect(rejected?.reasonCode).toBeTruthy();
+    expect(rejected?.patternBlocks?.length).toBeGreaterThan(0);
+    expect(rejected?.combinationOperator).toBe("and");
+    expect(typeof rejected?.combinationResult).toBe("boolean");
+    expect(
+      rejected?.patternBlocks?.some((block) => typeof block.operatorPassed === "boolean"),
+    ).toBe(true);
+  });
+
+  it("multi-pattern pattern_creation rejects persist combination evaluation evidence", () => {
+    const def = comboDefinition("and", ["order_block", "fvg"]);
+    if (def.eventSequence?.combination) {
+      def.eventSequence.combination.failurePolicy = "majority";
+      def.eventSequence.combination.invalidationMode = "majority";
+    }
+    const candles = syntheticCandles(400);
+    const result = runEventSequenceBacktest({
+      def,
+      candles,
+      symbol: "BTCUSDT",
+      balance: 10_000,
+      feeRate: 0.0004,
+      slippageRate: 0.0002,
+    });
+    const rejected = result.rejectedSetups.find(
+      (r) =>
+        (r.patternBlocks?.length ?? 0) >= 2 &&
+        r.combinationOperator === "and" &&
+        typeof r.combinationResult === "boolean",
+    );
+    expect(rejected).toBeTruthy();
+    expect(rejected?.combinationFailurePolicy).toBe("majority");
+    expect(rejected?.combinationInvalidationMode).toBe("majority");
+    expect(
+      rejected?.patternBlocks?.some((block) => typeof block.operatorPassed === "boolean"),
+    ).toBe(true);
   });
 
   it("trade drawer sections built from persisted blocks only", async () => {

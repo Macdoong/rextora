@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/primitives";
+import {
+  Button,
+  SegmentedControl,
+  StickyActionBar,
+} from "@/components/ui/primitives";
 import type { StrategySearchOperatorFormState } from "./formDefaults";
 import {
   BEGINNER_PRESET_MAP,
@@ -33,6 +37,12 @@ import type {
   PatternFamilyId,
 } from "./types";
 import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
+import {
+  ORDER_BLOCK_ZONE_BASIS_LABEL_KO,
+  ORDER_BLOCK_ZONE_BASIS_VALUES,
+  resolveOrderBlockZoneBasis,
+  type OrderBlockZoneBasis,
+} from "@/src/lib/rextora/strategy/conditions/orderBlockZoneBasis";
 import type { FormFieldError } from "./formValidation";
 import { buildAppliedSettingsPreview, formatRuntimeKo } from "./formValidation";
 import { SearchConfigManager } from "./SearchConfigManager";
@@ -455,6 +465,26 @@ export function JobCreateForm(props: {
     });
   }
 
+  function movePatternBlock(blockId: string, direction: -1 | 1) {
+    const sorted = [...(form.patternCombinationBlocks ?? [])].sort(
+      (a, b) => a.order - b.order,
+    );
+    const index = sorted.findIndex((block) => block.id === blockId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= sorted.length) return;
+    const currentOrder = sorted[index].order;
+    sorted[index] = { ...sorted[index], order: sorted[target].order };
+    sorted[target] = { ...sorted[target], order: currentOrder };
+    onChange({
+      ...form,
+      patternCombinationBlocks: sorted,
+      patternCombinationFamilies: sorted
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((block) => block.family),
+    });
+  }
+
   function applySymbol(symbol: string) {
     const nextName = isGeneratedName(form.searchName, form.symbol, form.timeframe)
       ? generateDefaultSearchName(symbol, form.timeframe)
@@ -573,11 +603,29 @@ export function JobCreateForm(props: {
   const depthProfile = SEARCH_DEPTH_PROFILES[form.depthProfile];
   const preview = buildAppliedSettingsPreview(form);
   const inputDisabled = locked;
+  const familyLabel = (family: string) =>
+    PATTERN_FAMILY_OPTIONS.find((option) => option.id === family)?.label ?? family;
+  const combinationJoiner =
+    form.patternCombinationOperator === "and"
+      ? " + "
+      : form.patternCombinationOperator === "or"
+        ? " 또는 "
+        : " → ";
+  const combinationSentence =
+    (form.patternCombinationBlocks ?? []).length > 0
+      ? [...(form.patternCombinationBlocks ?? [])]
+          .sort((a, b) => a.order - b.order)
+          .map((block) => `${familyLabel(block.family)} ${PATTERN_ROLE_OPTIONS.find((role) => role.id === block.role)?.label ?? block.role}`)
+          .join(combinationJoiner)
+      : form.autoStrategyCombo
+        ? "추천 패턴을 자동으로 조합"
+        : form.selectedSpaceIds.map(familyLabel).join(combinationJoiner);
 
   return (
     <section
       className="rextora-card space-y-6 p-5"
       data-testid="strategy-search-create"
+      data-config-level={form.patternConfigLevel}
       aria-labelledby="strategy-search-create-title"
     >
       <div>
@@ -590,6 +638,17 @@ export function JobCreateForm(props: {
         <p className="mt-2">
           <Link
             href="#ss-section-engine"
+            onClick={(event) => {
+              event.preventDefault();
+              set("patternConfigLevel", "expert");
+              window.history.replaceState(null, "", "#ss-section-engine");
+              window.dispatchEvent(new HashChangeEvent("hashchange"));
+              window.requestAnimationFrame(() => {
+                document
+                  .getElementById("ss-section-engine")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
+              });
+            }}
             className="text-sm font-medium text-sky-300 underline-offset-2 hover:underline"
             data-testid="ss-advanced-settings-link"
           >
@@ -597,6 +656,37 @@ export function JobCreateForm(props: {
           </Link>
         </p>
       </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700/70 bg-slate-950/45 p-3">
+        <div>
+          <p className="ss-subsection-title">설정 수준</p>
+          <p className="ss-helper mt-1">
+            자동은 권장값만, 기본은 핵심 조정값, 전문가는 엔진이 소비하는 전체 설정을 표시합니다.
+          </p>
+        </div>
+        <SegmentedControl
+          label="전략 탐색 설정 수준"
+          value={form.patternConfigLevel}
+          options={[
+            { value: "automatic", label: "자동" },
+            { value: "basic", label: "기본" },
+            { value: "expert", label: "전문가" },
+          ]}
+          onChange={(value) => set("patternConfigLevel", value)}
+          data-testid="ss-config-level-control"
+        />
+      </div>
+
+      {form.patternConfigLevel === "automatic" ? (
+        <section className="ss-section-card space-y-2" data-testid="ss-automatic-summary">
+          <h3 className="ss-subsection-title">추천 전략 구성</h3>
+          <p className="text-sm text-slate-200">{combinationSentence}</p>
+          <p className="ss-helper">
+            선택한 프리셋에 맞춰 패턴 조합·위험 기준·비용 검증을 자동 적용합니다.
+            세부값은 기본 또는 전문가 수준에서 확인할 수 있습니다.
+          </p>
+        </section>
+      ) : null}
 
       <SettingsSection
         id="ss-section-core"
@@ -834,6 +924,15 @@ export function JobCreateForm(props: {
           />
           자동 조합 (깊이 프로필 기본 공간)
         </label>
+        {form.autoStrategyCombo ? (
+          <p
+            className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"
+            data-testid="ss-auto-selection-notice"
+          >
+            시스템 관리 모드입니다. 수동 패밀리·패턴 포함 선택은 적용되지
+            않으며, 깊이 프로필이 탐색 공간을 결정합니다.
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -880,6 +979,9 @@ export function JobCreateForm(props: {
                 data-testid={`ss-space-${space.id}`}
               />
               {space.labelKo}
+              {form.autoStrategyCombo ? (
+                <span className="text-[10px] text-slate-500">시스템 관리</span>
+              ) : null}
             </label>
           ))}
         </div>
@@ -895,6 +997,16 @@ export function JobCreateForm(props: {
           패턴 · 탐색 · 백테스트 · 모의매매 · 실전 검증 지원 현황입니다. 지원되는
           패턴을 탐색에 포함할 수 있습니다.
         </p>
+        {form.autoStrategyCombo || form.patternConfigLevel === "automatic" ? (
+          <p
+            className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-300"
+            data-testid="ss-pattern-matrix-system-managed"
+          >
+            패턴 포함 선택은 시스템 관리입니다. 자동 조합이 켜져 있거나 설정
+            수준이 자동일 때 수동 포함 토글은 비활성화되며 요청에 포함되지
+            않습니다.
+          </p>
+        ) : null}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[36rem] text-left text-xs">
             <thead>
@@ -937,8 +1049,24 @@ export function JobCreateForm(props: {
                       <label className="flex items-center gap-2 text-slate-200">
                         <input
                           type="checkbox"
-                          checked={form.selectedSpaceIds.includes(p.id)}
+                          disabled={
+                            inputDisabled ||
+                            form.autoStrategyCombo ||
+                            form.patternConfigLevel === "automatic"
+                          }
+                          checked={
+                            form.autoStrategyCombo ||
+                            form.patternConfigLevel === "automatic"
+                              ? false
+                              : form.selectedSpaceIds.includes(p.id)
+                          }
                           onChange={(e) => {
+                            if (
+                              form.autoStrategyCombo ||
+                              form.patternConfigLevel === "automatic"
+                            ) {
+                              return;
+                            }
                             const next = e.target.checked
                               ? [
                                   ...new Set([
@@ -953,7 +1081,10 @@ export function JobCreateForm(props: {
                           }}
                           data-testid={`ss-pattern-toggle-${p.id}`}
                         />
-                        포함
+                        {form.autoStrategyCombo ||
+                        form.patternConfigLevel === "automatic"
+                          ? "시스템 관리"
+                          : "포함"}
                       </label>
                     ) : (
                       <label className="flex items-center gap-2 text-slate-500">
@@ -1368,10 +1499,10 @@ export function JobCreateForm(props: {
                 data-testid="ss-combo-failure-policy-help"
               >
                 {form.patternCombinationFailurePolicy === "all"
-                  ? "ALL: 모든 실패 조건이 발생해야 탈락"
+                  ? "ALL: 모든 실패 조건이 발생해야 탈락 (canonical failurePolicy=all)"
                   : form.patternCombinationFailurePolicy === "majority"
-                    ? "MAJORITY: 과반수 블록이 실패하면 탈락"
-                    : "ANY: 하나라도 실패하면 전체 조건 탈락"}
+                    ? "MAJORITY: 과반수 블록이 실패하면 탈락 (canonical failurePolicy=majority — any로 축소되지 않음)"
+                    : "ANY: 하나라도 실패하면 전체 조건 탈락 (canonical failurePolicy=any)"}
               </p>
             </Field>
             {form.patternCombinationOperator === "weighted_score" ? (
@@ -1441,29 +1572,25 @@ export function JobCreateForm(props: {
               })}
             </div>
             {form.patternCombinationFamilies.length > 0 ? (
-              <p
-                className="mt-2 text-xs text-slate-400"
+              <div
+                className="mt-3 rounded-lg border border-sky-500/20 bg-sky-950/20 p-3"
                 data-testid="ss-combo-summary"
               >
-                조합:{" "}
-                {form.patternCombinationFamilies
-                  .map((f) =>
-                    f === "order_block"
-                      ? "OB"
-                      : f === "fvg"
-                        ? "FVG"
-                        : f === "trendline"
-                          ? "TL"
-                          : "SR",
-                  )
-                  .join(
-                    form.patternCombinationOperator === "and"
-                      ? " AND "
-                      : form.patternCombinationOperator === "or"
-                        ? " OR "
-                        : " → ",
-                  )}
-              </p>
+                <p className="text-sm font-semibold text-sky-100">
+                  {combinationSentence}
+                </p>
+                <p className="ss-helper mt-1">
+                  {form.patternCombinationOperator === "and"
+                    ? "AND: 선택한 모든 패턴이 충족되어야 합니다."
+                    : form.patternCombinationOperator === "or"
+                      ? "OR: 선택한 패턴 중 하나 이상이 충족되면 됩니다."
+                      : form.patternCombinationOperator === "sequence"
+                        ? "SEQUENCE: 표시된 순서와 허용 시간 안에서 패턴이 이어져야 합니다."
+                        : form.patternCombinationOperator === "weighted_score"
+                          ? "가중 점수: 각 패턴의 점수 합이 기준을 넘어야 합니다."
+                          : "우선순위: 높은 우선순위 패턴부터 평가합니다."}
+                </p>
+              </div>
             ) : null}
           </div>
           {(form.patternCombinationBlocks ?? []).length > 0 ? (
@@ -1477,14 +1604,47 @@ export function JobCreateForm(props: {
                 .map((block) => (
                   <details
                     key={block.id}
-                    open={form.patternConfigLevel !== "automatic"}
+                    open={form.patternConfigLevel === "expert"}
                     className="rounded-lg border border-slate-700 bg-slate-950/40 p-3"
                     data-testid={`ss-pattern-block-${block.id}`}
                   >
-                    <summary className="cursor-pointer text-sm font-medium text-slate-100">
-                      블록 {block.order + 1} ·{" "}
-                      {PATTERN_FAMILY_OPTIONS.find((f) => f.id === block.family)
-                        ?.label ?? block.family}
+                    <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-medium text-slate-100">
+                      <span>
+                        {block.order + 1}.{" "}
+                        {PATTERN_FAMILY_OPTIONS.find((f) => f.id === block.family)
+                          ?.label ?? block.family}{" "}
+                        · {PATTERN_ROLE_OPTIONS.find((role) => role.id === block.role)?.label}
+                        · {block.required ? "필수" : "선택"}
+                      </span>
+                      <span className="flex shrink-0 gap-1">
+                        <button
+                          type="button"
+                          className="min-h-9 rounded-md border border-slate-700 px-2 text-xs text-slate-300 disabled:opacity-30"
+                          disabled={inputDisabled || block.order === 0}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            movePatternBlock(block.id, -1);
+                          }}
+                          aria-label={`${familyLabel(block.family)} 앞으로 이동`}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          className="min-h-9 rounded-md border border-slate-700 px-2 text-xs text-slate-300 disabled:opacity-30"
+                          disabled={
+                            inputDisabled ||
+                            block.order === (form.patternCombinationBlocks?.length ?? 1) - 1
+                          }
+                          onClick={(event) => {
+                            event.preventDefault();
+                            movePatternBlock(block.id, 1);
+                          }}
+                          aria-label={`${familyLabel(block.family)} 뒤로 이동`}
+                        >
+                          ↓
+                        </button>
+                      </span>
                     </summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       <Field id={`${block.id}-family`} label="패턴 패밀리">
@@ -1537,23 +1697,12 @@ export function JobCreateForm(props: {
                           ))}
                         </select>
                       </Field>
-                      <Field id={`${block.id}-order`} label="실행 순서">
-                        <input
-                          id={`${block.id}-order`}
-                          className={inputClass}
-                          type="number"
-                          min={0}
-                          step={1}
-                          value={block.order}
-                          disabled={inputDisabled}
-                          data-testid={`ss-pattern-block-order-${block.order}`}
-                          onChange={(e) =>
-                            updatePatternBlock(block.id, {
-                              order: Math.trunc(Number(e.target.value)),
-                            })
-                          }
-                        />
-                      </Field>
+                      <div data-testid={`ss-pattern-block-order-${block.order}`}>
+                        <span className="ss-field-label mb-1 block">실행 순서</span>
+                        <div className="ss-input flex items-center">
+                          {block.order + 1}번째 · 카드의 ↑ ↓ 버튼으로 변경
+                        </div>
+                      </div>
                       <Field id={`${block.id}-weight`} label="가중치">
                         <input
                           id={`${block.id}-weight`}
@@ -1604,15 +1753,27 @@ export function JobCreateForm(props: {
                         필수 블록
                       </label>
                     </div>
-                    {form.patternConfigLevel !== "automatic" ? (
+                    {form.patternConfigLevel === "expert" ? (
                       <div
                         className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
                         data-testid={`ss-pattern-block-params-${block.order}`}
                       >
                         {PATTERN_PARAMETER_CATALOG[block.family].map((entry) => {
+                          const resolvedZoneBasis =
+                            block.family === "order_block"
+                              ? resolveOrderBlockZoneBasis(block.params)
+                              : null;
+                          if (
+                            entry.key === "wickExtensionPct" &&
+                            resolvedZoneBasis !== "BODY_PLUS_WICK_PERCENT"
+                          ) {
+                            return null;
+                          }
                           const id = `${block.id}-${entry.key}`;
                           const value =
-                            block.params[entry.key] ?? entry.default;
+                            entry.key === "zoneBasis" && block.family === "order_block"
+                              ? resolvedZoneBasis ?? entry.default
+                              : (block.params[entry.key] ?? entry.default);
                           const hint =
                             form.patternConfigLevel === "expert"
                               ? `min ${String(entry.min)} · default ${String(entry.default)} · max ${String(entry.max)}${entry.step != null ? ` · step ${entry.step}` : ""}`
@@ -1627,7 +1788,37 @@ export function JobCreateForm(props: {
                                 `patternBlock.${block.id}.${entry.key}`,
                               )}
                             >
-                              {entry.type === "enum" ? (
+                              {entry.key === "zoneBasis" &&
+                              form.patternConfigLevel === "expert" &&
+                              block.family === "order_block" ? (
+                                <div
+                                  className="space-y-1"
+                                  data-testid={`ss-pattern-param-${block.order}-${entry.key}`}
+                                >
+                                  {ORDER_BLOCK_ZONE_BASIS_VALUES.map((option) => (
+                                    <label
+                                      key={option}
+                                      className="flex items-center gap-2 text-sm text-slate-200"
+                                    >
+                                      <input
+                                        type="radio"
+                                        name={id}
+                                        value={option}
+                                        checked={String(value) === option}
+                                        disabled={inputDisabled}
+                                        onChange={() =>
+                                          updatePatternParam(
+                                            block.id,
+                                            entry.key,
+                                            option as OrderBlockZoneBasis,
+                                          )
+                                        }
+                                      />
+                                      {ORDER_BLOCK_ZONE_BASIS_LABEL_KO[option]}
+                                    </label>
+                                  ))}
+                                </div>
+                              ) : entry.type === "enum" ? (
                                 <select
                                   id={id}
                                   className={inputClass}
@@ -2364,17 +2555,25 @@ export function JobCreateForm(props: {
         </div>
       ) : null}
 
-      <div className="flex justify-end pt-1">
+      <StickyActionBar>
+        <div className="mr-auto min-w-0">
+          <p className="text-sm font-semibold text-slate-100">검토 완료 후 연구를 시작합니다.</p>
+          <p className="rextora-helper">
+            예상 최대 시간 {formatRuntimeKo(Number(form.maxRuntimeMinutesOverride) * 60_000)}
+            {" · "}{combinationSentence || "자동 전략 조합"}
+          </p>
+        </div>
         <Button
           type="button"
+          size="lg"
           className="ss-btn-primary"
           data-testid="ss-create-submit"
           disabled={submitting || inputDisabled}
           onClick={onSubmit}
         >
-          {submitting ? "시작 중…" : "탐색 시작"}
+          {submitting ? "시작 중…" : "연구 시작"}
         </Button>
-      </div>
+      </StickyActionBar>
     </section>
   );
 }

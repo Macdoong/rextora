@@ -528,6 +528,13 @@ export type {
 } from "./patternCombination";
 
 export {
+  resolvePatternSelectionMode,
+  selectedSpaceIdsForSelectionMode,
+  patternSelectionModeLabelKo,
+} from "./patternSelectionMode";
+export type { PatternSelectionMode } from "./patternSelectionMode";
+
+export {
   PATTERN_PARAMETER_CATALOG,
   catalogDefaultsForPatternFamily,
   catalogForPatternFamily,

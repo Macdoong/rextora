@@ -2,9 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import {
+  Badge,
+  Button,
+  Card,
+  Metric,
+  SectionHeader,
+  Skeleton,
+  StatusBanner,
+} from "@/components/ui/primitives";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { isTestResearchJob } from "@/src/lib/rextora/strategySearch/testJobFilter";
+import { fetchJsonCached } from "@/src/lib/rextora/client/requestCache";
 
 type ResearchJob = {
   id: string;
@@ -65,31 +74,70 @@ function formatUsdt(v: number | null | undefined): string {
   return `${v.toFixed(2)} USDT`;
 }
 
+function historyStatusLabel(status: string): string {
+  if (status === "completed") return "완료";
+  if (status === "cancelled") return "취소";
+  if (status === "failed") return "실패";
+  return status;
+}
+
 export function LifecycleDashboard() {
   const [jobs, setJobs] = useState<ResearchJob[]>([]);
   const [status, setStatus] = useState<DashStatus | null>(null);
   const [paperName, setPaperName] = useState<string | null>(null);
+  const [paperSessionStatus, setPaperSessionStatus] = useState<string | null>(
+    null,
+  );
   const [generationHint, setGenerationHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
-      const [jRes, dRes, sRes] = await Promise.all([
-        fetch("/api/rextora/strategy-search").then((r) => r.json()),
-        fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
-        fetch("/api/rextora/strategies").then((r) => r.json()),
+      const [jRes, dRes, sRes, pRes] = await Promise.all([
+        fetchJsonCached<{ data?: { jobs?: ResearchJob[] } | ResearchJob[] }>(
+          "/api/rextora/strategy-search",
+          { ttlMs: 2_000 },
+        ),
+        fetchJsonCached<{ data?: { status?: DashStatus }; status?: DashStatus }>(
+          "/api/rextora/trading/dashboard",
+          { ttlMs: 5_000 },
+        ),
+        fetchJsonCached<{ data?: Array<{ paperActive?: boolean; name?: string }> }>(
+          "/api/rextora/strategies",
+          { ttlMs: 2_000 },
+        ),
+        fetchJsonCached<{
+          data?: {
+            active?: {
+              strategyName?: string;
+              strategyId?: string;
+              status?: string;
+              exchangeCalled?: boolean;
+            } | null;
+          };
+        }>("/api/rextora/paper/session?active=1", { ttlMs: 2_000 }),
       ]);
-      const list: ResearchJob[] = jRes.data?.jobs ?? jRes.data ?? [];
+      const list: ResearchJob[] = Array.isArray(jRes.data)
+        ? jRes.data
+        : (jRes.data?.jobs ?? []);
       setJobs(
         Array.isArray(list)
           ? list.filter((j) => !isTestResearchJob(j))
           : [],
       );
       setStatus(dRes.data?.status ?? dRes.status ?? null);
-      const active = (sRes.data ?? []).find(
-        (s: { paperActive?: boolean; name?: string }) => s.paperActive,
-      );
-      setPaperName(active?.name ?? null);
+      const session = pRes.data?.active ?? null;
+      if (session?.status) {
+        setPaperName(session.strategyName ?? session.strategyId ?? null);
+        setPaperSessionStatus(session.status);
+      } else {
+        const active = (sRes.data ?? []).find(
+          (s: { paperActive?: boolean; name?: string }) => s.paperActive,
+        );
+        setPaperName(active?.name ?? null);
+        setPaperSessionStatus(null);
+      }
 
       const activeJob = (Array.isArray(list) ? list : []).find((j) =>
         ["running", "queued", "pause_requested", "paused"].includes(j.status),
@@ -118,6 +166,8 @@ export function LifecycleDashboard() {
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "대시보드 로드 실패");
+    } finally {
+      setInitialLoading(false);
     }
   }, []);
 
@@ -171,43 +221,52 @@ export function LifecycleDashboard() {
     });
   }
 
+  const primaryAction = activeResearch
+    ? {
+        href: `/strategy-search?jobId=${encodeURIComponent(activeResearch.id)}`,
+        label: "진행 중인 탐색 보기",
+      }
+    : completedRecent?.status === "completed"
+      ? {
+          href: `/results?jobId=${encodeURIComponent(completedRecent.id)}`,
+          label: "완료된 결과 검토",
+        }
+      : { href: "/strategy-search", label: "새 탐색 시작" };
+
   return (
     <div className="space-y-5" data-testid="lifecycle-dashboard">
-      {error ? (
-        <p className="text-sm text-red-300" role="alert">
-          {error}
-        </p>
-      ) : null}
+      <SectionHeader
+        title="운영 현황"
+        description="현재 연구와 승인이 필요한 항목을 먼저 확인하세요."
+        action={
+          <Link href={primaryAction.href}>
+            <Button data-testid="dash-start-research">{primaryAction.label}</Button>
+          </Link>
+        }
+      />
+      <StatusBanner
+        status={error ? "error" : initialLoading ? "loading" : "info"}
+        message={
+          error
+            ? "최신 운영 상태를 불러오지 못했습니다. 기존 화면은 유지됩니다."
+            : initialLoading
+              ? "운영 상태를 확인하고 있습니다."
+              : status?.liveAllowed
+                ? "실전 거래 권한이 설정되어 있습니다. 주문은 별도 승인 전까지 실행되지 않습니다."
+                : "모의 거래 모드이며 실전 주문은 승인 게이트에서 차단됩니다."
+        }
+        data-testid="dashboard-operational-status"
+      />
 
-      <div className="flex flex-wrap gap-2" data-testid="dashboard-primary-actions">
-        <Link href="/strategy-search">
-          <Button data-testid="dash-start-research">새 탐색 시작</Button>
-        </Link>
-        <Link href="/results">
-          <Button variant="outline" data-testid="dash-open-results">
-            탐색 결과 확인
-          </Button>
-        </Link>
-        <Link href="/backtest">
-          <Button variant="outline" data-testid="dash-open-backtest">
-            백테스트 확인
-          </Button>
-        </Link>
-        <Link href="/paper-trading">
-          <Button variant="outline" data-testid="dash-open-paper">
-            모의매매 확인
-          </Button>
-        </Link>
-        <Link href="/live-trading">
-          <Button variant="outline" data-testid="dash-open-live">
-            실전매매 확인
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]">
         <Card title="현재 연구" data-testid="dash-current-research">
-          {!activeResearch ? (
+          {initialLoading ? (
+            <div className="grid gap-3 sm:grid-cols-3" aria-label="현재 연구 불러오는 중">
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+            </div>
+          ) : !activeResearch ? (
             <EmptyState
               message="진행 중인 탐색이 없습니다."
               hint="새 탐색을 시작하세요."
@@ -267,9 +326,15 @@ export function LifecycleDashboard() {
 
         <Card
           title="확인이 필요한 항목"
+          className={reviewItems.length ? "border-amber-500/30" : ""}
           data-testid="dash-review-required"
         >
-          {reviewItems.length === 0 ? (
+          {initialLoading ? (
+            <div className="space-y-3" aria-label="확인 항목 불러오는 중">
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+            </div>
+          ) : reviewItems.length === 0 ? (
             <EmptyState
               message="지금 확인할 항목이 없습니다."
               hint="탐색이 끝나면 여기에 다음 단계가 표시됩니다."
@@ -295,10 +360,49 @@ export function LifecycleDashboard() {
           )}
         </Card>
 
-        <Card title="모의 매매 요약" data-testid="dash-paper-summary">
+      </div>
+
+      <SectionHeader
+        title="현재 단계 요약"
+        description="연구·모의·실전 단계를 서로 섞지 않고 확인합니다."
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card title="연구" data-testid="dash-research-summary">
+          <div className="grid grid-cols-2 gap-3">
+            <Metric label="상태" value={activeResearch ? "진행 중" : "대기"} />
+            <Metric label="최근 완료" value={completedRecent ? historyStatusLabel(completedRecent.status) : "없음"} />
+          </div>
+          <Link
+            href={activeResearch ? `/strategy-search?jobId=${encodeURIComponent(activeResearch.id)}` : "/strategy-search"}
+            className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-sky-300 hover:text-sky-200"
+          >
+            연구 화면 열기 →
+          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/results"
+              className="inline-flex min-h-11 items-center text-sm text-slate-300 hover:text-white"
+              data-testid="dash-open-results"
+            >
+              탐색 결과
+            </Link>
+            <Link
+              href="/backtest"
+              className="inline-flex min-h-11 items-center text-sm text-slate-300 hover:text-white"
+              data-testid="dash-open-backtest"
+            >
+              백테스트
+            </Link>
+          </div>
+        </Card>
+
+        <Card title="모의 매매" data-testid="dash-paper-summary">
           <div className="grid grid-cols-2 gap-2">
-            <Metric label="활성 전략" value={paperName ?? "없음"} />
-            <Metric label="봇 상태" value={status?.botStatusLabel ?? "—"} />
+            <Metric label="세션 전략" value={paperName ?? "없음"} />
+            <Metric
+              label="세션 상태"
+              value={paperSessionStatus ?? status?.botStatusLabel ?? "없음"}
+            />
             <Metric
               label="실현 손익"
               value={formatUsdt(
@@ -315,12 +419,19 @@ export function LifecycleDashboard() {
             />
           </div>
           <p className="mt-2 text-xs rx-text-muted">
-            모의 매매는 실제 주문 없이 등록한 전략만 실행합니다. 보호 전략(SAFE)은
-            직접 선택한 경우에만 사용됩니다.
+            모의 매매는 실제 주문 없이 세션 기록만 따릅니다. 시뮬레이션 전용이며
+            거래소 주문은 전송되지 않습니다.
           </p>
+          <Link
+            href="/paper-trading"
+            className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-sky-300 hover:text-sky-200"
+            data-testid="dash-open-paper"
+          >
+            모의 매매 확인 →
+          </Link>
         </Card>
 
-        <Card title="실전 매매 요약" data-testid="dash-live-summary">
+        <Card title="실전 매매" data-testid="dash-live-summary">
           <div className="grid grid-cols-2 gap-2">
             <Metric
               label="실전 허용"
@@ -349,6 +460,13 @@ export function LifecycleDashboard() {
               뒤에만 시작할 수 있습니다.
             </p>
           )}
+          <Link
+            href="/live-trading"
+            className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-sky-300 hover:text-sky-200"
+            data-testid="dash-open-live"
+          >
+            승인 게이트 확인 →
+          </Link>
         </Card>
       </div>
     </div>

@@ -219,7 +219,7 @@ describe("FINAL_READY_VERIFY operator and leverage mapping", () => {
 });
 
 describe("S/R main-chart overlay contract", () => {
-  it("drawer close must not clear selected trade (source contract)", () => {
+  it("trade selection stays linked without clearing on inspector focus", () => {
     const src = fs.readFileSync(
       path.join(
         process.cwd(),
@@ -227,11 +227,12 @@ describe("S/R main-chart overlay contract", () => {
       ),
       "utf8",
     );
-    expect(src).toContain("Close the drawer only");
-    expect(src).toContain("setDrawerTrade(null)");
-    // Must not clear selection on drawer close anymore.
+    expect(src).toContain("selected-trade-inspector");
+    expect(src).toContain("onSelectedTradeChange");
+    expect(src).toContain("backtest-trade-workspace");
+    // Must not clear selection when focusing chart from inspector.
     expect(src).not.toMatch(
-      /onClose=\{\(\)\s*=>\s*\{\s*setDrawerTrade\(null\);\s*setSelectedTradeId\(null\)/,
+      /onFocusChart=\{\(\)\s*=>\s*\{\s*selectTrade\(null/,
     );
     const chartSrc = fs.readFileSync(
       path.join(process.cwd(), "components/rextora/charts/CandlestickChart.tsx"),

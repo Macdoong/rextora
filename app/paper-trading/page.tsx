@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 import { EmptyState } from "@/components/rextora/EmptyState";
+import { DemoDataBadge } from "@/components/rextora/DemoDataBadge";
 import {
   displayParamsHashLabel,
   formatDataSourceMeta,
 } from "@/src/lib/rextora/displayLabels";
+import { isDemoStrategyRecord } from "@/src/lib/rextora/firstRun/demoIdentity";
 
 type Metrics = UnifiedMetricsSnapshot;
 
@@ -25,24 +28,41 @@ type PaperStrategy = {
 
 type PaperSession = {
   id: string;
+  sessionId?: string;
   strategyId: string;
   strategyHash: string;
+  paramsHash?: string;
   strategyName: string;
   displayAliasSnapshot?: string | null;
   displayNameSnapshot?: string | null;
   sourceParamsHash?: string | null;
-  status: "active" | "paused" | "stopped";
+  sourceResearchJobId?: string | null;
+  sourceTrialIteration?: number | null;
+  backtestRunId?: string | null;
+  backtestResultId?: string | null;
+  status:
+    | "pending_approval"
+    | "ready"
+    | "active"
+    | "paused"
+    | "stopped"
+    | "failed";
+  mode?: "paper";
+  exchangeCalled?: false;
   virtualBalance: number;
   realizedPnl: number;
   unrealizedPnl: number;
   tradeCount: number;
   signalCount: number;
-  backtestResultId?: string | null;
+  heartbeatAt?: string | null;
+  updatedAt?: string;
 };
 
 type CanonicalPaperStatus =
   | "idle"
   | "starting"
+  | "pending_approval"
+  | "ready"
   | "active"
   | "paused"
   | "stopping"
@@ -52,6 +72,8 @@ type CanonicalPaperStatus =
 const PAPER_STATUS_LABEL: Record<CanonicalPaperStatus, string> = {
   idle: "대기",
   starting: "시작 중",
+  pending_approval: "승인 대기",
+  ready: "준비됨",
   active: "활성",
   paused: "일시정지",
   stopping: "종료 중",
@@ -60,6 +82,23 @@ const PAPER_STATUS_LABEL: Record<CanonicalPaperStatus, string> = {
 };
 
 export default function PaperTradingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-4 p-4 text-sm text-slate-400" data-testid="paper-trading-suspense">
+          모의 매매 화면을 준비합니다…
+        </div>
+      }
+    >
+      <PaperTradingPageInner />
+    </Suspense>
+  );
+}
+
+function PaperTradingPageInner() {
+  const searchParams = useSearchParams();
+  const deepLinkStrategyId = searchParams.get("strategyId");
+  const isDemoDeepLink = searchParams.get("demo") === "1";
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
   const [strategy, setStrategy] = useState<PaperStrategy | null>(null);
@@ -74,7 +113,7 @@ export default function PaperTradingPage() {
   >(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     try {
       const [dash, strategies, bot, sessionRes] = await Promise.all([
         fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
@@ -108,8 +147,11 @@ export default function PaperTradingPage() {
       const fromSession = activeSession?.strategyId
         ? list.find((s) => s.id === activeSession.strategyId)
         : null;
+      const fromDeepLink = deepLinkStrategyId
+        ? list.find((s) => s.id === deepLinkStrategyId)
+        : null;
       const paperRegistered = list.find((s) => s.paperActive);
-      const canonical = fromSession ?? paperRegistered ?? null;
+      const canonical = fromSession ?? fromDeepLink ?? paperRegistered ?? null;
       if (canonical || activeSession) {
         setStrategy({
           id: activeSession?.strategyId ?? canonical!.id,
@@ -146,7 +188,7 @@ export default function PaperTradingPage() {
       setIdentityLoading(false);
       setPendingPhase(null);
     }
-  }
+  }, [deepLinkStrategyId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -157,16 +199,19 @@ export default function PaperTradingPage() {
       clearTimeout(timer);
       clearInterval(t);
     };
-  }, []);
+  }, [refresh]);
 
   const canonicalStatus: CanonicalPaperStatus = (() => {
     if (loadError && !session) return "error";
     if (pendingPhase === "starting") return "starting";
     if (pendingPhase === "stopping") return "stopping";
     if (!session) return "idle";
+    if (session.status === "pending_approval") return "pending_approval";
+    if (session.status === "ready") return "ready";
     if (session.status === "active") return "active";
     if (session.status === "paused") return "paused";
     if (session.status === "stopped") return "stopped";
+    if (session.status === "failed") return "error";
     return "error";
   })();
 
@@ -178,26 +223,26 @@ export default function PaperTradingPage() {
     setSessionBusy(true);
     setPendingPhase("starting");
     try {
+      // Explicit approve+start via canonical service (never URL auto-start).
       const res = await fetch("/api/rextora/paper/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ strategyId: strategy.id }),
+        body: JSON.stringify({
+          strategyId: strategy.id,
+          approve: true,
+          idempotencyKey: `paper-start-${strategy.id}-${Date.now()}`,
+        }),
       });
       const json = await res.json();
       if (!json.ok) {
-        setMessage(json.error ?? "세션 생성 실패");
+        setMessage(json.error ?? "세션 시작 실패");
         return;
       }
-      const botRes = await fetch("/api/bot/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "PAPER" }),
-      });
-      const botJson = await botRes.json();
+      const started = json.data?.session;
       setMessage(
-        botJson.ok
-          ? `모의매매 시작 · 전략 ${strategy.id} · ${strategy.paramsHash.slice(0, 12)}`
-          : (botJson.error ?? botJson.message ?? "봇 시작 실패"),
+        started
+          ? `모의매매 시작 · 세션 ${started.id} · 전략 ${started.strategyId} · 시뮬레이션 전용`
+          : "모의매매가 시작되었습니다.",
       );
       await refresh();
     } finally {
@@ -219,17 +264,13 @@ export default function PaperTradingPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action }),
+          body: JSON.stringify({
+            action,
+            strategyId: session.strategyId,
+          }),
         },
       );
       const json = await res.json();
-      if (action === "stop" && json.ok) {
-        await fetch("/api/bot/stop", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "PAPER" }),
-        });
-      }
       setMessage(
         json.ok
           ? `세션 ${action}: ${json.data?.session?.status ?? ""}`
@@ -265,8 +306,19 @@ export default function PaperTradingPage() {
 
   const m = s?.metrics;
   const ts = s?.todayStats;
-  const paperSessionActive =
+  const hasPaperSession = Boolean(session);
+  const paperExecutorActive =
     canonicalStatus === "active" || canonicalStatus === "paused";
+  const sessionMetricsAvailable =
+    canonicalStatus === "active" || canonicalStatus === "paused";
+  const formatSessionMetric = (
+    value: number | null | undefined,
+    suffix = "",
+  ): string => {
+    if (!sessionMetricsAvailable) return "수집 대기";
+    if (value == null || !Number.isFinite(value)) return "—";
+    return `${value}${suffix}`;
+  };
 
   return (
     <div className="space-y-4" data-testid="paper-trading-page">
@@ -277,6 +329,25 @@ export default function PaperTradingPage() {
           확인한 뒤 실전 검토로 넘어갈 수 있습니다.
         </p>
       </div>
+
+      {isDemoDeepLink ||
+      (strategy && isDemoStrategyRecord(strategy)) ? (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2"
+          data-testid="paper-demo-deep-link"
+        >
+          <DemoDataBadge />
+          <p className="text-sm text-amber-50">
+            데모 딥링크입니다. 세션은 자동 시작되지 않으며, 시작하려면 아래
+            「모의매매 시작」을 직접 승인해야 합니다.
+          </p>
+          {!session ? (
+            <Badge tone="info" data-testid="paper-demo-no-session">
+              세션 대기 · 자동 시작 없음
+            </Badge>
+          ) : null}
+        </div>
+      ) : null}
 
       <Card title="활성 모의 전략">
         {identityLoading ? (
@@ -339,41 +410,74 @@ export default function PaperTradingPage() {
             ) : null}
           </div>
         )}
-        {paperSessionActive ? (
-          <>
+        {hasPaperSession && session ? (
+          <div data-testid="paper-session-metrics">
+            <p className="mb-2 text-xs text-slate-400">
+              현재 Paper 세션 성과 · 상태{" "}
+              {PAPER_STATUS_LABEL[canonicalStatus]} · exchangeCalled=false
+            </p>
             <div className="grid gap-3 md:grid-cols-4">
               <Metric
-                label="감시 코인"
-                value={String(s?.operations?.watchedSymbolCount ?? 0)}
+                label="가상 잔고 (세션)"
+                value={
+                  sessionMetricsAvailable
+                    ? `${session.virtualBalance.toFixed(2)} USDT`
+                    : "수집 대기"
+                }
               />
               <Metric
-                label="오늘 실현 손익"
-                value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT (${ts?.realizedPnlPct ?? 0}%)`}
+                label="세션 실현 손익"
+                value={formatSessionMetric(session.realizedPnl, " USDT")}
               />
               <Metric
-                label="오늘 미실현"
-                value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
+                label="세션 미실현"
+                value={formatSessionMetric(session.unrealizedPnl, " USDT")}
               />
               <Metric
-                label="오늘 거래"
-                value={String(ts?.trades ?? m?.todayTradeCount ?? 0)}
+                label="세션 거래 수"
+                value={
+                  sessionMetricsAvailable
+                    ? String(session.tradeCount)
+                    : "수집 대기"
+                }
               />
             </div>
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
-              <Metric
-                label="현재 자본"
-                value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`}
-              />
-              <Metric
-                label="수수료"
-                value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`}
-              />
-              <Metric
-                label="슬리피지"
-                value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`}
-              />
-            </div>
-          </>
+            {!sessionMetricsAvailable ? (
+              <p
+                className="mt-2 text-xs text-amber-200/90"
+                data-testid="paper-session-metrics-unavailable"
+              >
+                승인·시작 전에는 세션 성과가 수집되지 않습니다. 아래 제어
+                패널에서 시작을 승인하세요.
+              </p>
+            ) : null}
+            <details
+              className="mt-3 text-xs text-slate-500"
+              data-testid="paper-global-reference-metrics"
+            >
+              <summary className="cursor-pointer select-none">
+                전체 운영 참고 (현재 Paper 세션 성과 아님)
+              </summary>
+              <div className="mt-2 grid gap-3 md:grid-cols-4">
+                <Metric
+                  label="감시 코인 (전체)"
+                  value={String(s?.operations?.watchedSymbolCount ?? 0)}
+                />
+                <Metric
+                  label="오늘 실현 (전체)"
+                  value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}
+                />
+                <Metric
+                  label="오늘 미실현 (전체)"
+                  value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
+                />
+                <Metric
+                  label="오늘 거래 (전체)"
+                  value={String(ts?.trades ?? m?.todayTradeCount ?? 0)}
+                />
+              </div>
+            </details>
+          </div>
         ) : (
           <div
             className="rounded-xl border border-dashed border-slate-700/80 bg-slate-950/40 px-4 py-6 text-center"
@@ -402,7 +506,7 @@ export default function PaperTradingPage() {
       )}
 
       <Card title="모의매매 제어" data-testid="paper-control-bar">
-        {paperSessionActive ? (
+        {hasPaperSession ? (
           <div className="grid gap-3 md:grid-cols-4">
             <div data-testid="paper-canonical-status">
               <Metric
@@ -624,7 +728,7 @@ export default function PaperTradingPage() {
 
       <TradingChartsPanel
         mode="PAPER"
-        sessionActive={paperSessionActive}
+        sessionActive={paperExecutorActive}
         metrics={(s?.metrics as Metrics) ?? null}
         riskView={riskView}
         symbol={
@@ -634,8 +738,15 @@ export default function PaperTradingPage() {
         }
       />
 
-      {paperSessionActive ? (
+      {paperExecutorActive ? (
         <>
+          <p
+            className="text-xs text-slate-500"
+            data-testid="paper-positions-source"
+          >
+            아래 포지션·차트는 전체 운영 참고 데이터입니다. Paper 세션 전용
+            포지션이 아닐 수 있습니다.
+          </p>
           <Card title="현재 모의 포지션">
             {(s?.positions?.length ?? 0) > 0 ? (
               <div className="overflow-x-auto">

@@ -1,0 +1,695 @@
+{
+  "buildId": "14AqH2W3ycA_YWYWDsuCS",
+  "runtime": "C:\\Users\\user\\AppData\\Local\\Temp\\rextora-paper-ssot-rt-ybPlmo",
+  "steps": [
+    {
+      "step": "results_apply_paper",
+      "applyJson": {
+        "ok": true,
+        "data": {
+          "strategy": {
+            "id": "copy_ms62m1wj_792b2c",
+            "name": "paper_ssot_primary_copy",
+            "description": "SAFE_v44_i4060 복사본. 편집 가능합니다.",
+            "type": "안정형",
+            "timeframe": "15m",
+            "paramsHash": "fb49a5ed8baf",
+            "params": {
+              "ema_fast": 20,
+              "ema_mid": 60,
+              "ema_slow": 200,
+              "rsi_period": 14,
+              "atr_period": 14,
+              "vol_lookback": 5,
+              "res_lookback": 24,
+              "slope_lookback": 29,
+              "slope_min": 0.0002183157527055703,
+              "pullback_max_dist": 0.05045575483968,
+              "vol_ratio_min": 1.25,
+              "max_atr_pct": 0.026490862793435842,
+              "min_room_to_resist": 0.012,
+              "confirm_bull": false,
+              "rsi_max_long": 75.19573150544439,
+              "break_lookback": 9,
+              "break_margin": 0.0009567973462357032,
+              "vol_ratio_min_break": 0.8432557589560703,
+              "max_atr_pct_break": 0.03613740954587826,
+              "confirm_bear": true,
+              "rsi_min_short": 19.5417882210621,
+              "sl_atr_mult": 1.8814680172969072,
+              "tp_atr_mult": 4.475374424448608,
+              "cooldown_bars": 2,
+              "allow_in_range": true,
+              "range_vol_ratio_min": 1.027255983428468,
+              "max_hold_bars": 5,
+              "use_trailing": true,
+              "trail_atr_mult": 4.185748185920124,
+              "use_vol_target": true,
+              "target_atr_pct": 0.017030312850789035,
+              "size_min": 0.8722924038040076,
+              "size_max": 1.327452679393273,
+              "use_dynamic_leverage": true,
+              "lev_min": 1.2,
+              "lev_base": 1.667409360218415,
+              "lev_max": 2.5,
+              "lev_atr_ok_max": 0.01001954461683031,
+              "lev_atr_too_high": 0.026965485866541215,
+              "lev_down_on_dd": -0.09446141586552376,
+              "lev_up_on_dd": -0.04698651466730082,
+              "risk_mult_cap": 2.5353685094966254,
+              "range_risk_mult": 0.6571670263493049,
+              "mark_to_market": true,
+              "base_bal_pct": 0.02,
+              "cost_guard": true,
+              "cost_guard_k": 3
+            },
+            "locked": false,
+            "sourceFile": null,
+            "sourceStatus": "user_copy",
+            "paperActive": true,
+            "liveActive": false,
+            "liveEligible": false,
+            "createdAt": "2026-07-29T12:38:20.706Z",
+            "updatedAt": "2026-07-29T12:38:20.706Z",
+            "lastBacktest": {
+              "totalReturn": 0.2228,
+              "mdd": -0.17,
+              "trades": 201,
+              "winRate": 0.6189,
+              "at": "2026-07-29T12:38:20.687Z"
+            },
+            "schemaVersion": 1,
+            "strategyType": "safe_params",
+            "sourceStrategyId": "SAFE_v44_i4060",
+            "version": "1.0.0",
+            "symbols": [
+              "BTCUSDT"
+            ],
+            "longEnabled": true,
+            "shortEnabled": true,
+            "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+            "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+            "stopLossSummary": "ATR × 1.881",
+            "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99"
+          },
+          "session": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "pending_approval",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": null,
+            "pausedAt": null,
+            "resumedAt": null,
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:20.745Z",
+            "heartbeatAt": null,
+            "stopReason": null,
+            "lastError": null,
+            "version": 1,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          },
+          "paperApprovalDeepLink": "/paper-trading?strategyId=copy_ms62m1wj_792b2c&sessionId=paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9"
+        }
+      }
+    },
+    {
+      "step": "active_before_approve",
+      "activeBefore": {
+        "ok": true,
+        "data": {
+          "active": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "pending_approval",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": null,
+            "pausedAt": null,
+            "resumedAt": null,
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:20.745Z",
+            "heartbeatAt": null,
+            "stopReason": null,
+            "lastError": null,
+            "version": 1,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          }
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 1,
+          "updatedAt": "2026-07-29T12:38:22.483Z"
+        }
+      }
+    },
+    {
+      "step": "agent_before_approve",
+      "agent": {
+        "error": true,
+        "messageKo": "질문을 입력해 주세요."
+      }
+    },
+    {
+      "step": "legacy_restart_pending",
+      "restartPending": {
+        "ok": false,
+        "mode": "PAPER",
+        "message": "Paper 세션이 pending_approval 상태입니다. 재시작하려면 active 세션이 필요합니다.",
+        "serviceState": "paper",
+        "blockedReasons": [
+          "SESSION_PENDING_APPROVAL"
+        ],
+        "errorCode": "SESSION_PENDING_APPROVAL",
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "sessionStatus": "pending_approval",
+        "expectedStrategyId": "copy_ms62m1wj_792b2c"
+      }
+    },
+    {
+      "step": "approve",
+      "approveJson": {
+        "ok": true,
+        "data": {
+          "session": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "active",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": "2026-07-29T12:38:23.272Z",
+            "pausedAt": null,
+            "resumedAt": null,
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:23.418Z",
+            "heartbeatAt": "2026-07-29T12:38:23.418Z",
+            "stopReason": null,
+            "lastError": null,
+            "version": 4,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          },
+          "action": "approve"
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 1263,
+          "updatedAt": "2026-07-29T12:38:24.521Z"
+        }
+      }
+    },
+    {
+      "step": "legacy_restart_active_match",
+      "restartActive": {
+        "ok": true,
+        "mode": "PAPER",
+        "message": "Paper executor restarted for session paper_fa487c… (simulated only)",
+        "serviceState": "paper",
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "sessionStatus": "active",
+        "expectedStrategyId": "copy_ms62m1wj_792b2c"
+      }
+    },
+    {
+      "step": "legacy_restart_conflict",
+      "restartConflict": {
+        "ok": false,
+        "mode": "PAPER",
+        "message": "요청 strategyId(copy_ms62m1x0_4e2fe1)가 활성 Paper 세션(copy_ms62m1wj_792b2c)과 일치하지 않습니다.",
+        "serviceState": "paper",
+        "blockedReasons": [
+          "STRATEGY_MISMATCH"
+        ],
+        "errorCode": "STRATEGY_MISMATCH",
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "sessionStatus": "active",
+        "expectedStrategyId": "copy_ms62m1wj_792b2c"
+      }
+    },
+    {
+      "step": "pause",
+      "pauseJson": {
+        "ok": true,
+        "data": {
+          "session": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "paused",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": "2026-07-29T12:38:23.272Z",
+            "pausedAt": "2026-07-29T12:38:25.459Z",
+            "resumedAt": null,
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:25.459Z",
+            "heartbeatAt": "2026-07-29T12:38:23.418Z",
+            "stopReason": null,
+            "lastError": null,
+            "version": 5,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          },
+          "action": "pause"
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 5,
+          "updatedAt": "2026-07-29T12:38:25.463Z"
+        }
+      }
+    },
+    {
+      "step": "legacy_restart_paused",
+      "restartPaused": {
+        "ok": false,
+        "mode": "PAPER",
+        "message": "Paper 세션이 paused 상태입니다. 재시작하려면 active 세션이 필요합니다.",
+        "serviceState": "paper",
+        "blockedReasons": [
+          "SESSION_PAUSED"
+        ],
+        "errorCode": "SESSION_PAUSED",
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "sessionStatus": "paused",
+        "expectedStrategyId": "copy_ms62m1wj_792b2c"
+      }
+    },
+    {
+      "step": "persisted_paused",
+      "persisted": {
+        "schemaVersion": 2,
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "strategyId": "copy_ms62m1wj_792b2c",
+        "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+        "paramsHash": "fb49a5ed8baf",
+        "sourceParamsHash": "fb49a5ed8baf",
+        "sourceResearchJobId": null,
+        "sourceTrialIteration": null,
+        "backtestRunId": null,
+        "backtestResultId": null,
+        "linkedJobId": null,
+        "strategyName": "paper_ssot_primary_copy",
+        "displayAliasSnapshot": null,
+        "displayNameSnapshot": null,
+        "status": "paused",
+        "mode": "paper",
+        "exchangeCalled": false,
+        "symbol": "BTCUSDT",
+        "timeframe": null,
+        "createdAt": "2026-07-29T12:38:20.745Z",
+        "startedAt": "2026-07-29T12:38:23.272Z",
+        "pausedAt": "2026-07-29T12:38:25.459Z",
+        "resumedAt": null,
+        "stoppedAt": null,
+        "updatedAt": "2026-07-29T12:38:25.459Z",
+        "heartbeatAt": "2026-07-29T12:38:23.418Z",
+        "stopReason": null,
+        "lastError": null,
+        "version": 5,
+        "virtualBalance": 10000,
+        "realizedPnl": 0,
+        "unrealizedPnl": 0,
+        "tradeCount": 0,
+        "signalCount": 0,
+        "drawdown": 0
+      }
+    },
+    {
+      "step": "recover",
+      "recoverRes": {
+        "ok": true,
+        "data": {
+          "recovery": {
+            "recovered": [
+              {
+                "schemaVersion": 2,
+                "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+                "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+                "strategyId": "copy_ms62m1wj_792b2c",
+                "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+                "paramsHash": "fb49a5ed8baf",
+                "sourceParamsHash": "fb49a5ed8baf",
+                "sourceResearchJobId": null,
+                "sourceTrialIteration": null,
+                "backtestRunId": null,
+                "backtestResultId": null,
+                "linkedJobId": null,
+                "strategyName": "paper_ssot_primary_copy",
+                "displayAliasSnapshot": null,
+                "displayNameSnapshot": null,
+                "status": "paused",
+                "mode": "paper",
+                "exchangeCalled": false,
+                "symbol": "BTCUSDT",
+                "timeframe": null,
+                "createdAt": "2026-07-29T12:38:20.745Z",
+                "startedAt": "2026-07-29T12:38:23.272Z",
+                "pausedAt": "2026-07-29T12:38:25.459Z",
+                "resumedAt": null,
+                "stoppedAt": null,
+                "updatedAt": "2026-07-29T12:38:25.459Z",
+                "heartbeatAt": "2026-07-29T12:38:23.418Z",
+                "stopReason": null,
+                "lastError": null,
+                "version": 5,
+                "virtualBalance": 10000,
+                "realizedPnl": 0,
+                "unrealizedPnl": 0,
+                "tradeCount": 0,
+                "signalCount": 0,
+                "drawdown": 0
+              }
+            ],
+            "safePaused": [],
+            "notes": [
+              "session paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9 remains paused"
+            ]
+          },
+          "active": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "paused",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": "2026-07-29T12:38:23.272Z",
+            "pausedAt": "2026-07-29T12:38:25.459Z",
+            "resumedAt": null,
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:25.459Z",
+            "heartbeatAt": "2026-07-29T12:38:23.418Z",
+            "stopReason": null,
+            "lastError": null,
+            "version": 5,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          }
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 2,
+          "updatedAt": "2026-07-29T12:38:25.470Z"
+        }
+      }
+    },
+    {
+      "step": "resume",
+      "resumeJson": {
+        "ok": true,
+        "data": {
+          "session": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "active",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": "2026-07-29T12:38:23.272Z",
+            "pausedAt": "2026-07-29T12:38:25.459Z",
+            "resumedAt": "2026-07-29T12:38:25.482Z",
+            "stoppedAt": null,
+            "updatedAt": "2026-07-29T12:38:25.482Z",
+            "heartbeatAt": "2026-07-29T12:38:25.482Z",
+            "stopReason": null,
+            "lastError": null,
+            "version": 6,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          },
+          "action": "resume"
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 17,
+          "updatedAt": "2026-07-29T12:38:25.490Z"
+        }
+      }
+    },
+    {
+      "step": "stop",
+      "stopJson": {
+        "ok": true,
+        "data": {
+          "session": {
+            "schemaVersion": 2,
+            "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+            "strategyId": "copy_ms62m1wj_792b2c",
+            "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+            "paramsHash": "fb49a5ed8baf",
+            "sourceParamsHash": "fb49a5ed8baf",
+            "sourceResearchJobId": null,
+            "sourceTrialIteration": null,
+            "backtestRunId": null,
+            "backtestResultId": null,
+            "linkedJobId": null,
+            "strategyName": "paper_ssot_primary_copy",
+            "displayAliasSnapshot": null,
+            "displayNameSnapshot": null,
+            "status": "stopped",
+            "mode": "paper",
+            "exchangeCalled": false,
+            "symbol": "BTCUSDT",
+            "timeframe": null,
+            "createdAt": "2026-07-29T12:38:20.745Z",
+            "startedAt": "2026-07-29T12:38:23.272Z",
+            "pausedAt": "2026-07-29T12:38:25.459Z",
+            "resumedAt": "2026-07-29T12:38:25.482Z",
+            "stoppedAt": "2026-07-29T12:38:26.326Z",
+            "updatedAt": "2026-07-29T12:38:26.326Z",
+            "heartbeatAt": "2026-07-29T12:38:25.528Z",
+            "stopReason": "user_stop",
+            "lastError": null,
+            "version": 9,
+            "virtualBalance": 10000,
+            "realizedPnl": 0,
+            "unrealizedPnl": 0,
+            "tradeCount": 0,
+            "signalCount": 0,
+            "drawdown": 0
+          },
+          "action": "stop"
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 5,
+          "updatedAt": "2026-07-29T12:38:26.329Z"
+        }
+      }
+    },
+    {
+      "step": "legacy_restart_stopped",
+      "restartStopped": {
+        "ok": false,
+        "mode": "PAPER",
+        "message": "Paper 세션이 종료되었습니다. Results 또는 Paper 화면에서 새 세션을 준비하세요.",
+        "serviceState": "paper",
+        "blockedReasons": [
+          "SESSION_STOPPED"
+        ],
+        "errorCode": "SESSION_STOPPED",
+        "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+        "sessionStatus": "stopped",
+        "expectedStrategyId": "copy_ms62m1wj_792b2c"
+      }
+    },
+    {
+      "step": "recover_final",
+      "recoverFinal": {
+        "ok": true,
+        "data": {
+          "recovery": {
+            "recovered": [
+              {
+                "schemaVersion": 2,
+                "sessionId": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+                "id": "paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9",
+                "strategyId": "copy_ms62m1wj_792b2c",
+                "strategyHash": "f8148ef9e739a3f4f1017e69a478359f90d472b1bdb2151df1025c892be31e99",
+                "paramsHash": "fb49a5ed8baf",
+                "sourceParamsHash": "fb49a5ed8baf",
+                "sourceResearchJobId": null,
+                "sourceTrialIteration": null,
+                "backtestRunId": null,
+                "backtestResultId": null,
+                "linkedJobId": null,
+                "strategyName": "paper_ssot_primary_copy",
+                "displayAliasSnapshot": null,
+                "displayNameSnapshot": null,
+                "status": "stopped",
+                "mode": "paper",
+                "exchangeCalled": false,
+                "symbol": "BTCUSDT",
+                "timeframe": null,
+                "createdAt": "2026-07-29T12:38:20.745Z",
+                "startedAt": "2026-07-29T12:38:23.272Z",
+                "pausedAt": "2026-07-29T12:38:25.459Z",
+                "resumedAt": "2026-07-29T12:38:25.482Z",
+                "stoppedAt": "2026-07-29T12:38:26.326Z",
+                "updatedAt": "2026-07-29T12:38:26.326Z",
+                "heartbeatAt": "2026-07-29T12:38:25.528Z",
+                "stopReason": "user_stop",
+                "lastError": null,
+                "version": 9,
+                "virtualBalance": 10000,
+                "realizedPnl": 0,
+                "unrealizedPnl": 0,
+                "tradeCount": 0,
+                "signalCount": 0,
+                "drawdown": 0
+              }
+            ],
+            "safePaused": [],
+            "notes": [
+              "session paper_fa487c4e-aeea-4b85-a8f2-5a23ed5eb0f9 remains stopped"
+            ]
+          },
+          "active": null
+        },
+        "meta": {
+          "source": "paper-session",
+          "cached": false,
+          "durationMs": 1,
+          "updatedAt": "2026-07-29T12:38:26.336Z"
+        }
+      }
+    },
+    {
+      "step": "agent_final",
+      "agent": {
+        "error": true,
+        "messageKo": "질문을 입력해 주세요."
+      }
+    }
+  ],
+  "ok": true,
+  "consoleErrors": []
+}

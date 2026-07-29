@@ -373,6 +373,28 @@ export function buildPersistedSearchSummary(
   ];
 
   if (patternLevel === "basic" || patternLevel === "expert") {
+    const comboSpec = plan?.patternCombinationSpec ?? null;
+    const failurePolicy =
+      plan?.patternCombinationFailurePolicy ??
+      comboSpec?.failurePolicy ??
+      plan?.patternCombinationInvalidationMode ??
+      null;
+    const operator =
+      plan?.patternCombinationOperator ?? comboSpec?.operator ?? null;
+    const families =
+      comboSpec?.blocks.map((b) => b.family).join(" → ") ??
+      plan?.patternCombinationFamilies?.join(", ") ??
+      null;
+    const blocksSummary = comboSpec
+      ? comboSpec.blocks
+          .slice()
+          .sort((a, b) => a.order - b.order)
+          .map(
+            (b) =>
+              `${b.family}(${b.role}${b.required ? ",필수" : ",선택"}·w${b.weight}·p${b.priority})`,
+          )
+          .join(" · ")
+      : "—";
     sections.push({
       id: "pattern_config",
       titleKo: "패턴 탐색 설정",
@@ -380,6 +402,15 @@ export function buildPersistedSearchSummary(
         {
           labelKo: "설정 수준",
           valueKo: patternLevelLabel(patternLevel),
+        },
+        {
+          labelKo: "선택 모드",
+          valueKo:
+            plan?.patternSelectionMode === "manual"
+              ? "수동 선택"
+              : plan?.patternSelectionMode === "automatic"
+                ? "자동 (시스템 관리)"
+                : "—",
         },
         {
           labelKo: "방향",
@@ -416,6 +447,29 @@ export function buildPersistedSearchSummary(
           labelKo: "지지/저항·추세선 민감도",
           valueKo: patternSrSensLabel(plan?.patternSrSensitivity),
         },
+        {
+          labelKo: "조합 연산자",
+          valueKo: operator ? String(operator).toUpperCase() : "—",
+        },
+        {
+          labelKo: "실패 정책",
+          valueKo:
+            failurePolicy === "majority"
+              ? "MAJORITY (과반 실패)"
+              : failurePolicy === "all"
+                ? "ALL (전부 실패)"
+                : failurePolicy === "any"
+                  ? "ANY (하나라도 실패)"
+                  : "—",
+        },
+        {
+          labelKo: "적용 패턴 패밀리",
+          valueKo: families || "—",
+        },
+        {
+          labelKo: "블록 (역할·필수·가중·우선)",
+          valueKo: blocksSummary,
+        },
       ],
     });
   }
@@ -442,6 +496,7 @@ export function buildPersistedSearchSummary(
       maxRuntimeMs: plan?.maxRuntimeMs ?? null,
       candidateBudget: plan?.candidateBudget ?? null,
       qualifiedTarget: plan?.qualifiedTarget ?? null,
+      patternSelectionMode: plan?.patternSelectionMode ?? null,
       patternConfigLevel: plan?.patternConfigLevel ?? null,
       patternDirection: plan?.patternDirection ?? null,
       patternRetestMode: plan?.patternRetestMode ?? null,
@@ -451,6 +506,13 @@ export function buildPersistedSearchSummary(
       patternRiskStyle: plan?.patternRiskStyle ?? null,
       patternStrength: plan?.patternStrength ?? null,
       patternSrSensitivity: plan?.patternSrSensitivity ?? null,
+      patternCombinationOperator: plan?.patternCombinationOperator ?? null,
+      patternCombinationFailurePolicy:
+        plan?.patternCombinationFailurePolicy ?? null,
+      patternCombinationInvalidationMode:
+        plan?.patternCombinationInvalidationMode ?? null,
+      patternCombinationFamilies: plan?.patternCombinationFamilies ?? null,
+      patternCombinationSpec: plan?.patternCombinationSpec ?? null,
     },
   };
 }

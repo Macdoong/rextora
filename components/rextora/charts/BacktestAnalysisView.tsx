@@ -34,7 +34,15 @@ import { formatPenetrationKo } from "@/src/lib/rextora/backtest/tradeEventTrace"
 import { displayParamsHashLabel, displaySignalReason, displayStrategyHashLabel, displayTimeframeLabel, formatShortHash } from "@/src/lib/rextora/displayLabels";
 import {
   buildPatternBlockSections,
+  buildPatternSummaryGroups,
+  buildRejectionTooltipLines,
   combinationOperatorKo,
+  formatPatternZoneChartLabel,
+  formatRejectionReasonForDisplay,
+  LIFECYCLE_LABEL_KO,
+  patternBlockRoleKo,
+  patternFamilyKo,
+  patternBlockStatusKo,
 } from "@/src/lib/rextora/backtest/patternExplainability";
 import { computeCostRatios } from "@/src/lib/rextora/backtest/costRatios";
 import {
@@ -90,9 +98,104 @@ const SECTIONS = [
 ] as const;
 const TRADE_PREVIEW_SIZE = 5;
 const TRADE_HEADERS = [
-  "거래번호", "코인", "방향", "진입 시간", "진입가", "청산 시간", "청산가", "보유", "수량", "레버리지",
-  "순익 USDT", "수익률", "수수료", "슬리피지", "스프레드", "청산 사유",
+  "번호", "방향", "진입 시각", "청산 시각", "진입가", "청산가", "레버리지", "순손익", "수익률", "청산 사유",
 ] as const;
+
+type TimelineStageStatus = "통과" | "미도달" | "기록 없음";
+
+interface TradeTimelineStage {
+  key: string;
+  label: string;
+  time: string | null;
+  price: number | null;
+  status: TimelineStageStatus;
+  explanation: string;
+}
+
+function findTraceEvent(trace: TradeEventTrace | null, labelKo: string): TradeEventTrace["events"][number] | null {
+  if (!trace) return null;
+  return trace.events.find((e) => e.labelKo === labelKo) ?? null;
+}
+
+function buildTradeTimelineStages(trade: EnrichedTrade, trace: TradeEventTrace | null): TradeTimelineStage[] {
+  const patternEvent = findTraceEvent(trace, "패턴 감지");
+  const revisitEvent = findTraceEvent(trace, "리테스트");
+  const confirmEvent = findTraceEvent(trace, "확인");
+  const creationTime = trace?.creationCandleTime ?? patternEvent?.at ?? null;
+  const revisitTime = trace?.revisitCandleTime ?? revisitEvent?.at ?? null;
+  const confirmTime = trace?.confirmationCandleTime ?? confirmEvent?.at ?? null;
+  const exitReason = trade.exitReason ?? trace?.exitReason ?? "";
+  const exitIsStop = exitReason.includes("stop") || exitReason.includes("trailing");
+  const exitIsTarget = exitReason.includes("tp") || exitReason.includes("target") || exitReason.includes("take_profit");
+  const exitLabel = exitIsStop ? "손절" : exitIsTarget ? "익절" : "청산";
+  const hasStop = (trade.stopLoss != null && trade.stopLoss > 0) || trace?.stopPrice != null;
+  const hasTarget = (trade.takeProfit != null && trade.takeProfit > 0) || trace?.targetPrice != null;
+
+  return [
+    {
+      key: "creation",
+      label: "패턴 생성",
+      time: creationTime,
+      price: patternEvent?.price ?? trace?.zoneHigh ?? trace?.zoneLow ?? null,
+      status: (creationTime ? "통과" : "기록 없음") as TimelineStageStatus,
+      explanation: creationTime
+        ? trace?.patternType
+          ? `${patternFamilyKo(trace.patternType) ?? trace.patternType} 패턴이 감지되었습니다.`
+          : "패턴 생성 시각이 기록되었습니다."
+        : "패턴 생성 시각이 기록되지 않았습니다.",
+    },
+    {
+      key: "revisit",
+      label: "되돌림",
+      time: revisitTime,
+      price: revisitEvent?.price ?? null,
+      status: (revisitTime ? "통과" : "기록 없음") as TimelineStageStatus,
+      explanation: revisitTime
+        ? revisitEvent?.detailKo ?? "되돌림(리테스트) 구간이 기록되었습니다."
+        : "되돌림 시각이 기록되지 않았습니다.",
+    },
+    {
+      key: "confirmation",
+      label: "확인",
+      time: confirmTime,
+      price: confirmEvent?.price ?? null,
+      status: (confirmTime ? "통과" : "기록 없음") as TimelineStageStatus,
+      explanation: confirmTime
+        ? confirmEvent?.detailKo ?? "확인 조건을 통과했습니다."
+        : "확인 시각이 기록되지 않았습니다.",
+    },
+    {
+      key: "entry",
+      label: "진입",
+      time: trade.entryTime != null ? String(trade.entryTime) : trace?.entry.at ?? null,
+      price: trade.entryPrice ?? trace?.entry.price ?? null,
+      status: (trade.entryTime != null ? "통과" : "기록 없음") as TimelineStageStatus,
+      explanation: trace?.whyEnteredKo ?? (trade.signalType ? `신호: ${trade.signalType}` : "진입 기록"),
+    },
+    {
+      key: "exit",
+      label: exitLabel,
+      time: trade.exitTime != null ? String(trade.exitTime) : trace?.exit.at ?? null,
+      price: trade.exitPrice ?? trace?.exit.price ?? null,
+      status: (trade.exitTime != null ? "통과" : "기록 없음") as TimelineStageStatus,
+      explanation: trace?.whyExitedKo ?? displaySignalReason(trade.exitReason),
+    },
+  ].map((stage) => {
+    if (stage.key === "exit" && stage.status === "통과" && exitIsTarget && hasStop) {
+      return { ...stage, explanation: `${stage.explanation} · 손절가는 미도달` };
+    }
+    if (stage.key === "exit" && stage.status === "통과" && exitIsStop && hasTarget) {
+      return { ...stage, explanation: `${stage.explanation} · 익절가는 미도달` };
+    }
+    return stage;
+  });
+}
+
+function timelineStatusTone(status: TimelineStageStatus): Tone {
+  if (status === "통과") return "success";
+  if (status === "미도달") return "warning";
+  return "default";
+}
 
 function CompactEmpty({ message, hint }: { message: string; hint?: string }) {
   return <EmptyState message={message} hint={hint} className="!py-6" />;
@@ -155,6 +258,10 @@ export function BacktestAnalysisView({
   liveBlockReason = null,
   chartReproWarning = null,
   chartSource = null,
+  initialSelectedTradeId = null,
+  activeSection = "price",
+  onSectionChange,
+  onSelectedTradeChange,
 }: {
   report: BacktestReport; trades: BacktestTrade[]; equityCurve: number[]; candles: OhlcvCandle[];
   chartSamplingApplied?: boolean; processedCandleCount?: number;
@@ -168,6 +275,10 @@ export function BacktestAnalysisView({
   liveBlockReason?: string | null;
   chartReproWarning?: string | null;
   chartSource?: "persisted" | "legacy_remote_hydrate" | "live_run" | null;
+  initialSelectedTradeId?: string | null;
+  activeSection?: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation";
+  onSectionChange?: (section: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation") => void;
+  onSelectedTradeChange?: (tradeId: string | null) => void;
 }) {
   const model = useMemo(() => buildVisualAnalysisModel({ report, trades, equityCurve, candles }), [report, trades, equityCurve, candles]);
   const processed = processedCandleCount ?? report.processedCandleCount ?? report.candleCount;
@@ -175,7 +286,10 @@ export function BacktestAnalysisView({
   const hasTrades = model.trades.length > 0;
   const [tradeFilter, setTradeFilter] = useState<TradeFilter>("all");
   const [tradeSort, setTradeSort] = useState<TradeSort>("entry_desc");
-  const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
+  /** undefined = auto first trade; null = user cleared; string = explicit selection */
+  const [selectedTradeOverride, setSelectedTradeOverride] = useState<
+    string | null | undefined
+  >(() => initialSelectedTradeId ?? undefined);
   const [linkStatus, setLinkStatus] = useState<string | null>(null);
   const [tradeListExpanded, setTradeListExpanded] = useState(false);
   const [equityExpanded, setEquityExpanded] = useState(false);
@@ -187,9 +301,10 @@ export function BacktestAnalysisView({
   const [page, setPage] = useState(0);
   const [costToggles, setCostToggles] = useState({ fees: true, slippage: true, spread: true, funding: true, total: false });
   const [syncX, setSyncX] = useState<number | null>(null);
-  const [drawerTrade, setDrawerTrade] = useState<EnrichedTrade | null>(null);
-  const [techOpen, setTechOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("summary");
+  const [developerMode, setDeveloperMode] = useState(false);
+  const [patternSummaryExpanded, setPatternSummaryExpanded] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [timelineRange, setTimelineRange] = useState<"all" | "7d" | "30d">("all");
   const [timelineSide, setTimelineSide] = useState<"all" | "long" | "short">("all");
   const [timelineResult, setTimelineResult] = useState<"all" | "win" | "loss">("all");
@@ -219,10 +334,10 @@ export function BacktestAnalysisView({
     stop: true,
     target: true,
     sequence: true,
-    revisit: true,
-    confirmation: true,
-    invalidation: true,
-    rejected: true,
+    revisit: false,
+    confirmation: false,
+    invalidation: false,
+    rejected: false,
   });
   const [patternToggleOverride, setPatternToggleOverride] = useState<
     Partial<Record<PatternOverlayKind, boolean>>
@@ -246,6 +361,11 @@ export function BacktestAnalysisView({
     });
     return map;
   }, [report.tradeEventTraces, model.trades]);
+  // Auto-select first trade so accepted pattern zones are visible on load.
+  const selectedTradeId =
+    selectedTradeOverride === undefined
+      ? (model.trades[0]?.id ?? null)
+      : selectedTradeOverride;
   const selectedTrace = selectedTradeId
     ? tracesById.get(selectedTradeId) ?? null
     : null;
@@ -316,8 +436,9 @@ export function BacktestAnalysisView({
       creationTime?: string | null;
       revisitTime?: string | null;
       exitTime?: string | null;
+      invalidationTime?: string | null;
       touchCount?: number | null;
-      blockId?: string;
+      opacity?: number;
     }) => {
       if (
         input.zoneHigh == null ||
@@ -339,23 +460,27 @@ export function BacktestAnalysisView({
         return;
       }
       const fromMs = input.creationTime ? Date.parse(input.creationTime) : null;
-      const toMs = input.exitTime
-        ? Date.parse(input.exitTime)
-        : input.revisitTime
-          ? Date.parse(input.revisitTime)
-          : null;
+      const endCandidates = [
+        input.exitTime,
+        input.invalidationTime,
+        input.revisitTime,
+      ]
+        .map((v) => (v ? Date.parse(v) : Number.NaN))
+        .filter((v) => Number.isFinite(v));
+      const toMs = endCandidates.length ? Math.max(...endCandidates) : null;
       zones.push({
         high: input.zoneHigh,
         low: input.zoneLow,
         color: colorFor(kind),
-        label: `${input.patternType ?? "영역"}${input.touchCount != null ? ` · touches ${input.touchCount}` : ""}${input.blockId ? ` · ${input.blockId}` : ""}`,
+        label: formatPatternZoneChartLabel(input.patternType, input.touchCount),
         fromTime: fromMs != null && Number.isFinite(fromMs) ? fromMs : null,
-        toTime: toMs != null && Number.isFinite(toMs) ? toMs : null,
-        opacity: 0.35,
+        toTime: toMs,
+        opacity: input.opacity ?? 0.42,
       });
     };
     if (selectedTrace) {
       const blocks = selectedTrace.patternBlocks ?? [];
+      let pushed = 0;
       for (const block of blocks) {
         if (block.status !== "detected" || block.family === "trendline") continue;
         pushZone({
@@ -365,11 +490,19 @@ export function BacktestAnalysisView({
           creationTime: block.creationTime,
           revisitTime: block.revisitTime,
           exitTime: block.exitTime ?? selectedTrace.exit?.at,
+          invalidationTime: block.invalidationTime,
           touchCount: block.touchCount,
-          blockId: block.blockId,
+          opacity: block.family === "order_block" ? 0.48 : 0.42,
         });
+        pushed += 1;
       }
-      if (blocks.length === 0 && selectedTrace.patternType !== "trendline") {
+      // Fallback: blocks present but none drawable, or legacy traces.
+      if (
+        pushed === 0 &&
+        selectedTrace.patternType !== "trendline" &&
+        selectedTrace.zoneHigh != null &&
+        selectedTrace.zoneLow != null
+      ) {
         pushZone({
           patternType: selectedTrace.patternType,
           zoneHigh: selectedTrace.zoneHigh,
@@ -377,23 +510,13 @@ export function BacktestAnalysisView({
           creationTime: selectedTrace.creationCandleTime,
           revisitTime: selectedTrace.revisitCandleTime,
           exitTime: selectedTrace.exit?.at,
-        });
-      }
-    }
-    if (overlayOpts.rejected) {
-      for (const rejection of report.rejectedSetups ?? []) {
-        pushZone({
-          patternType: rejection.patternType,
-          zoneHigh: rejection.zoneHigh,
-          zoneLow: rejection.zoneLow,
-          creationTime: rejection.creationTime,
-          exitTime: rejection.at,
-          blockId: `rejected:${rejection.reasonCode}`,
+          invalidationTime: selectedTrace.invalidationCandleTime,
+          opacity: 0.48,
         });
       }
     }
     return zones;
-  }, [selectedTrace, patternToggleOn, overlayOpts.rejected, report.rejectedSetups]);
+  }, [selectedTrace, patternToggleOn]);
 
   const patternLevels = useMemo((): LevelLine[] => {
     if (!selectedTrace) return [];
@@ -440,7 +563,7 @@ export function BacktestAnalysisView({
       for (const rejection of report.rejectedSetups ?? []) {
         if (rejection.patternType === "trendline" && rejection.lineAnchors?.length) {
           sources.push({
-            blockId: `rejected:${rejection.reasonCode}`,
+            blockId: "rejected-trendline",
             lineAnchors: rejection.lineAnchors,
           });
         }
@@ -461,7 +584,7 @@ export function BacktestAnalysisView({
         toTime,
         toPrice: to.price,
         color: "#fbbf24",
-        label: `추세선 ${source.blockId}`,
+        label: `추세선 · ${patternFamilyKo("trendline")}`,
         tooltipLines: [
           `시작 #${from.bar} @ ${from.price}`,
           `종료 #${to.bar} @ ${to.price}`,
@@ -499,57 +622,107 @@ export function BacktestAnalysisView({
             ? (block.zoneHigh + block.zoneLow) / 2
             : block.lineAnchors?.[0]?.price ?? null;
         const evidence = [
-          block.reasonCode ? `reason ${block.reasonCode}` : null,
-          block.stage ? `stage ${block.stage}` : null,
-          `required ${String(block.required)}`,
-          `weight ${block.weight}`,
-          `priority ${block.priority}`,
+          block.reasonCode
+            ? `사유 ${formatRejectionReasonForDisplay(block.reasonCode, { developerMode }) ?? block.reasonCode}`
+            : null,
+          block.stage ? `단계 ${block.stage}` : null,
+          `필수 ${String(block.required)}`,
+          `가중치 ${block.weight}`,
+          `우선순위 ${block.priority}`,
         ].filter((v): v is string => Boolean(v));
         if (overlayOpts.sequence) {
-          add("creation", block.creationTime, midpoint, "생성", evidence, block.blockId);
+          add(
+            "creation",
+            block.creationTime,
+            midpoint,
+            LIFECYCLE_LABEL_KO.creation,
+            evidence,
+            block.blockId,
+          );
         }
         if (overlayOpts.revisit) {
-          add("revisit", block.revisitTime, midpoint, "재접촉", evidence, block.blockId);
+          add(
+            "revisit",
+            block.revisitTime,
+            midpoint,
+            LIFECYCLE_LABEL_KO.revisit,
+            evidence,
+            block.blockId,
+          );
         }
         if (overlayOpts.confirmation) {
-          add("confirmation", block.confirmationTime, midpoint, "확인", evidence, block.blockId);
+          add(
+            "confirmation",
+            block.confirmationTime,
+            midpoint,
+            LIFECYCLE_LABEL_KO.confirmation,
+            evidence,
+            block.blockId,
+          );
         }
         if (overlayOpts.invalidation) {
-          add("break", block.breakTime, midpoint, "돌파", evidence, block.blockId);
-          add("invalidation", block.invalidationTime, midpoint, "무효화", evidence, block.blockId);
+          add("break", block.breakTime, midpoint, LIFECYCLE_LABEL_KO.break, evidence, block.blockId);
+          add(
+            "invalidation",
+            block.invalidationTime,
+            midpoint,
+            LIFECYCLE_LABEL_KO.invalidation,
+            evidence,
+            block.blockId,
+          );
         }
       }
     }
     if (overlayOpts.rejected) {
-      for (const rejection of report.rejectedSetups ?? []) {
+      // Cluster nearby rejections (same ~bucket) to reduce dense marker clutter.
+      const CLUSTER_MS = 15 * 60_000;
+      const sorted = [...(report.rejectedSetups ?? [])].sort(
+        (a, b) => Date.parse(String(a.at ?? 0)) - Date.parse(String(b.at ?? 0)),
+      );
+      let cluster: typeof sorted = [];
+      const flush = () => {
+        if (!cluster.length) return;
+        const head = cluster[0]!;
+        const reason =
+          cluster.length === 1
+            ? formatRejectionReasonForDisplay(head.reasonCode, { developerMode })
+            : `${cluster.length}건 설정 거절`;
         add(
           "rejected",
-          rejection.at,
-          rejection.eventPrice,
-          "거부",
-          [
-            `reason ${rejection.reasonCode}`,
-            `stage ${rejection.stage ?? "unknown"}`,
-            rejection.measured != null ? `measured ${rejection.measured}` : null,
-            rejection.required != null ? `required ${rejection.required}` : null,
-          ].filter((v): v is string => Boolean(v)),
+          head.at,
+          head.eventPrice,
+          "",
+          buildRejectionTooltipLines(
+            head.reasonCode,
+            [
+              reason && cluster.length > 1 ? reason : null,
+              head.stage ? `단계 ${head.stage}` : null,
+              head.measured != null ? `측정 ${head.measured}` : null,
+              head.required != null ? `기준 ${head.required}` : null,
+            ],
+            { developerMode },
+          ),
         );
+        cluster = [];
+      };
+      for (const rejection of sorted) {
+        if (!cluster.length) {
+          cluster = [rejection];
+          continue;
+        }
+        const prev = Date.parse(String(cluster[0]!.at ?? 0));
+        const cur = Date.parse(String(rejection.at ?? 0));
+        if (Number.isFinite(prev) && Number.isFinite(cur) && cur - prev <= CLUSTER_MS) {
+          cluster.push(rejection);
+        } else {
+          flush();
+          cluster = [rejection];
+        }
       }
+      flush();
     }
     return out;
-  }, [selectedTrace, overlayOpts, report.rejectedSetups]);
-
-  useEffect(() => {
-    const nodes = rootRef.current?.querySelectorAll("[data-section]");
-    if (!nodes?.length) return;
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      const id = (visible[0]?.target as HTMLElement | undefined)?.dataset.section;
-      if (id) setActiveSection(id);
-    }, { rootMargin: "-20% 0px -55% 0px", threshold: [0.1, 0.25, 0.5] });
-    nodes.forEach((n) => observer.observe(n));
-    return () => observer.disconnect();
-  }, [hasTrades, hasProcessedCandles, report.symbol]);
+  }, [selectedTrace, overlayOpts, report.rejectedSetups, developerMode]);
 
   const filtered = useMemo(() => {
     let list = filterTrades(model.trades, tradeFilter);
@@ -604,30 +777,27 @@ export function BacktestAnalysisView({
   }, [model.tradeMarkers, filtered, overlayOpts]);
 
   const selectTrade = useCallback((id: string | null, source: "chart" | "list" | "clear" = "list") => {
-    setSelectedTradeId(id);
+    setSelectedTradeOverride(id);
+    onSelectedTradeChange?.(id);
     if (!id) {
-      setDrawerTrade(null);
       setLinkStatus(null);
       return;
     }
-    const trade = model.trades.find((x) => x.id === id) ?? null;
-    setDrawerTrade(trade);
-    setTechOpen(false);
     if (source === "chart") {
       setLinkStatus(`차트에서 선택한 거래 ${id}을 표시했습니다.`);
-      setActiveSection("trades");
+      onSectionChange?.("trades");
       requestAnimationFrame(() => {
         document.getElementById("bt-trades")?.scrollIntoView({ behavior: "smooth", block: "start" });
         rowRefs.current.get(id)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       });
     } else {
       setLinkStatus(`거래 ${id} 구간을 차트에 표시했습니다.`);
-      setActiveSection("price");
+      onSectionChange?.("price");
       requestAnimationFrame(() => {
         document.getElementById("bt-price")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [model.trades]);
+  }, [onSectionChange, onSelectedTradeChange]);
 
   useEffect(() => {
     const onForce = (ev: Event) => {
@@ -644,19 +814,21 @@ export function BacktestAnalysisView({
     return () => root?.removeEventListener("bt-force-expand", onForce);
   }, []);
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation") => {
     if (id === "equity") setEquityExpanded(true);
     if (id === "timeline") setTimelineExpanded(true);
     if (id === "advanced") setAdvancedExpanded(true);
     if (id === "validation") setValidationDetailsOpen(true);
     if (id === "trades") setTradeListExpanded(true);
-    document.getElementById(`bt-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setActiveSection(id);
+    onSectionChange?.(id);
+    requestAnimationFrame(() => {
+      document.getElementById(`bt-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const navigateTrade = (dir: -1 | 1) => {
-    if (!drawerTrade) return;
-    const idx = model.trades.findIndex((t) => t.id === drawerTrade.id);
+    if (!selectedTradeId) return;
+    const idx = model.trades.findIndex((t) => t.id === selectedTradeId);
     const next = model.trades[idx + dir];
     if (next) selectTrade(next.id, "list");
   };
@@ -719,7 +891,12 @@ export function BacktestAnalysisView({
       : null;
 
   return (
-    <div className="space-y-4 overflow-x-hidden" data-testid="backtest-analysis" ref={rootRef}>
+    <div
+      className="space-y-4 overflow-x-hidden"
+      data-testid="backtest-analysis"
+      data-active-section={activeSection}
+      ref={rootRef}
+    >
       {report.zeroTradeDiagnostics && report.tradeCount === 0 && (
         <Card title="진단" data-testid="backtest-zero-trade">
           <p className="text-sm text-slate-300">{report.zeroTradeDiagnostics.explanationKo}</p>
@@ -892,10 +1069,19 @@ export function BacktestAnalysisView({
       <SectionAnchor id="price">
         <div data-testid="backtest-price-chart">
           <h2 className="mb-2 text-sm font-semibold text-slate-100">가격 차트</h2>
-          <div
-            className="mb-3 space-y-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3 sm:p-4"
+          <details
+            className="rextora-collapsible mb-3"
             data-testid="trade-overlay-toggles"
           >
+            <summary>
+              <span>
+                <span className="rextora-card-title block">차트 표시 설정</span>
+                <span className="rextora-helper mt-0.5 block">
+                  진입·청산, 패턴 영역, 거부 셋업 표시를 조정합니다.
+                </span>
+              </span>
+            </summary>
+            <div className="rextora-collapsible-body space-y-4">
             <div className="space-y-2">
               <p className="text-sm font-semibold text-slate-200">기본 표시</p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -997,9 +1183,21 @@ export function BacktestAnalysisView({
               </div>
             </div>
             <div className="space-y-2 border-t border-slate-800/80 pt-3">
-              <p className="text-sm font-semibold text-slate-200">이벤트</p>
+              <p className="text-sm font-semibold text-slate-200">분석</p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300" title="재접촉">
+                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300" title="패턴 감지(생성)">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={overlayOpts.sequence}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({ ...s, sequence: !s.sequence }))
+                    }
+                    data-testid="overlay-toggle-creation"
+                  />
+                  패턴 감지
+                </label>
+                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300" title="되돌림 확인">
                   <input
                     type="checkbox"
                     className="h-4 w-4"
@@ -1007,8 +1205,9 @@ export function BacktestAnalysisView({
                     onChange={() =>
                       setOverlayOpts((s) => ({ ...s, revisit: !s.revisit }))
                     }
+                    data-testid="overlay-toggle-revisit"
                   />
-                  재접촉
+                  되돌림
                 </label>
                 <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300">
                   <input
@@ -1021,22 +1220,9 @@ export function BacktestAnalysisView({
                         confirmation: !s.confirmation,
                       }))
                     }
+                    data-testid="overlay-toggle-confirmation"
                   />
                   확인
-                </label>
-                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4"
-                    checked={overlayOpts.invalidation}
-                    onChange={() =>
-                      setOverlayOpts((s) => ({
-                        ...s,
-                        invalidation: !s.invalidation,
-                      }))
-                    }
-                  />
-                  무효화
                 </label>
                 <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300">
                   <input
@@ -1048,11 +1234,42 @@ export function BacktestAnalysisView({
                     }
                     data-testid="overlay-toggle-rejected"
                   />
-                  거부 셋업
+                  설정 거절
                 </label>
               </div>
             </div>
-          </div>
+            <div className="space-y-2 border-t border-slate-800/80 pt-3">
+              <p className="text-sm font-semibold text-slate-200">기술</p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={overlayOpts.invalidation}
+                    onChange={() =>
+                      setOverlayOpts((s) => ({
+                        ...s,
+                        invalidation: !s.invalidation,
+                      }))
+                    }
+                    data-testid="overlay-toggle-invalidation"
+                  />
+                  실제 무효화
+                </label>
+                <label className="flex min-h-11 min-w-[7rem] items-center gap-2 text-sm text-slate-300">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={developerMode}
+                    onChange={() => setDeveloperMode((v) => !v)}
+                    data-testid="overlay-toggle-developer"
+                  />
+                  원본 코드
+                </label>
+              </div>
+            </div>
+            </div>
+          </details>
           <div className="mb-2">
             <Button size="sm" variant="outline" onClick={() => selectTrade(null, "clear")}>
               선택 해제
@@ -1102,83 +1319,133 @@ export function BacktestAnalysisView({
               이 실행에는 표시할 가격 캔들이 없습니다.
             </p>
           )}
-          <Card title="Pattern Summary" data-testid="pattern-summary">
+          <Card title="패턴 요약" data-testid="pattern-summary">
             {!selectedTrace ? (
               <p className="text-sm rx-text-muted">
                 거래를 선택하면 저장된 패턴 증거를 표시합니다.
               </p>
             ) : selectedTrace.patternBlocks?.length ? (
-              <div className="space-y-3">
+              <div className="space-y-2" data-testid="pattern-summary-compact">
                 {selectedTrace.patternBlocks.map((block, index) => {
-                  const params = Object.entries(block.detectorParams ?? {});
-                  const measured = Object.entries(block.measuredValues ?? {});
-                  const thresholds = Object.entries(block.thresholds ?? {});
+                  const blockKey = `${block.blockId}-${block.stage ?? index}`;
+                  const expanded = patternSummaryExpanded.has(blockKey);
+                  const groups = expanded ? buildPatternSummaryGroups(block) : [];
                   const hasGeometry =
                     (block.zoneHigh != null && block.zoneLow != null) ||
                     (block.lineAnchors?.length ?? 0) >= 2;
+                  const pen =
+                    typeof block.measuredValues?.penetrationPct === "number"
+                      ? block.measuredValues.penetrationPct
+                      : typeof block.measured === "number"
+                        ? block.measured
+                        : null;
+                  const coreHint = [
+                    pen != null && Number.isFinite(pen)
+                      ? formatPenetrationKo(pen)
+                      : null,
+                    block.confirmationTime ? "확인 완료" : null,
+                    block.entryTime ? "진입 완료" : "대기/거절",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ");
+                  const sideKo =
+                    selectedTrade?.side === "LONG"
+                      ? "롱"
+                      : selectedTrade?.side === "SHORT"
+                        ? "숏"
+                        : "—";
                   return (
                     <div
-                      key={`${block.blockId}-${block.stage ?? index}`}
-                      className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-xs text-slate-300"
+                      key={blockKey}
+                      className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 text-sm text-slate-200"
                       data-testid="pattern-summary-block"
+                      data-expanded={expanded ? "1" : "0"}
                     >
-                      <p className="font-semibold text-slate-100">
-                        {block.blockId} · {block.family} · {block.role} · {block.status}
-                      </p>
-                      <p className="mt-1">
-                        required {String(block.required)} · weight {block.weight} ·
-                        priority {block.priority}
-                        {block.selectedPriority != null
-                          ? ` · selected ${block.selectedPriority}`
-                          : ""}
-                      </p>
-                      {block.operator ? (
-                        <p>
-                          operator {block.operator}
-                          {block.scoreTotal != null ? ` · score ${block.scoreTotal}` : ""}
-                          {block.scoreThreshold != null
-                            ? ` / ${block.scoreThreshold}`
-                            : ""}
-                        </p>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-slate-100">
+                            {patternFamilyKo(block.family)} · {sideKo} ·{" "}
+                            {patternBlockRoleKo(block.role)} ·{" "}
+                            {block.entryTime
+                              ? "진입 완료"
+                              : patternBlockStatusKo(block.status)}
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-400">{coreHint || "핵심 조건 기록 없음"}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          data-testid="pattern-summary-toggle"
+                          onClick={() => {
+                            setPatternSummaryExpanded((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(blockKey)) next.delete(blockKey);
+                              else next.add(blockKey);
+                              try {
+                                window.localStorage.setItem(
+                                  "rextora.backtest.patternSummaryExpanded",
+                                  next.size > 0 ? "1" : "0",
+                                );
+                              } catch {
+                                /* ignore */
+                              }
+                              return next;
+                            });
+                          }}
+                        >
+                          {expanded ? "접기" : "자세히 보기"}
+                        </Button>
+                      </div>
+                      {expanded ? (
+                        <div className="mt-3 space-y-3" data-testid="pattern-summary-expanded">
+                          {groups.map((group) => (
+                            <div key={group.id}>
+                              <p className="mb-1 text-xs font-semibold text-sky-300/90">
+                                {group.title}
+                              </p>
+                              <dl className="grid gap-1 sm:grid-cols-2">
+                                {group.rows.map((row) => (
+                                  <div
+                                    key={`${group.id}-${row.label}`}
+                                    className="flex justify-between gap-3 border-b border-slate-800/60 py-1"
+                                  >
+                                    <dt className="text-slate-400">{row.label}</dt>
+                                    <dd className="text-right text-slate-100">{row.value}</dd>
+                                  </div>
+                                ))}
+                              </dl>
+                            </div>
+                          ))}
+                          <p data-testid="pattern-summary-geometry" className="text-xs text-slate-500">
+                            {hasGeometry
+                              ? block.lineAnchors?.length
+                                ? `추세선 앵커 ${block.lineAnchors.length}개 확인`
+                                : `영역 ${block.zoneLow}–${block.zoneHigh}`
+                              : "저장된 도형 없음"}
+                          </p>
+                          {developerMode ? (
+                            <details className="text-xs text-slate-500">
+                              <summary className="cursor-pointer">개발자 정보</summary>
+                              <pre className="mt-1 overflow-x-auto whitespace-pre-wrap font-mono">
+                                {JSON.stringify(
+                                  {
+                                    blockId: block.blockId,
+                                    family: block.family,
+                                    role: block.role,
+                                    status: block.status,
+                                    reasonCode: block.reasonCode,
+                                    detectorParams: block.detectorParams,
+                                    measuredValues: block.measuredValues,
+                                    thresholds: block.thresholds,
+                                  },
+                                  null,
+                                  2,
+                                )}
+                              </pre>
+                            </details>
+                          ) : null}
+                        </div>
                       ) : null}
-                      {block.stage || block.reasonCode ? (
-                        <p>
-                          {block.stage ? `stage ${block.stage}` : ""}
-                          {block.reasonCode ? ` · reason ${block.reasonCode}` : ""}
-                        </p>
-                      ) : null}
-                      {params.length ? (
-                        <p>params {params.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}</p>
-                      ) : null}
-                      {measured.length ? (
-                        <p>
-                          measured {measured.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}
-                        </p>
-                      ) : null}
-                      {thresholds.length ? (
-                        <p>
-                          thresholds{" "}
-                          {thresholds.map(([k, v]) => `${k}=${String(v)}`).join(" · ")}
-                        </p>
-                      ) : null}
-                      <p data-testid="pattern-summary-geometry">
-                        {hasGeometry
-                          ? block.lineAnchors?.length
-                            ? `verified line anchors ${block.lineAnchors.length}`
-                            : `verified zone ${block.zoneLow}–${block.zoneHigh}`
-                          : "missing persisted geometry"}
-                      </p>
-                      {(block.stopPrice != null ||
-                        block.targetPrice != null ||
-                        block.exitPrice != null) && (
-                        <p>
-                          risk
-                          {block.stopPrice != null ? ` · SL ${block.stopPrice}` : ""}
-                          {block.targetPrice != null ? ` · TP ${block.targetPrice}` : ""}
-                          {block.exitPrice != null ? ` · exit ${block.exitPrice}` : ""}
-                          {block.exitReason ? ` (${block.exitReason})` : ""}
-                        </p>
-                      )}
                     </div>
                   );
                 })}
@@ -1198,115 +1465,171 @@ export function BacktestAnalysisView({
       <SectionAnchor id="trades">
         {hasTrades ? (
           <Card title="거래 목록" data-testid="backtest-trade-list">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <input
-                className="min-h-11 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-                placeholder="거래번호 또는 심볼 검색"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(0);
-                }}
-                data-testid="trade-search"
-              />
-              <select
-                className="min-h-11 rounded border border-slate-700 bg-slate-950 px-2 py-2 text-sm"
-                value={tradeSort}
-                onChange={(e) => setTradeSort(e.target.value as TradeSort)}
-                data-testid="trade-sort"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              <div className="flex flex-wrap gap-1">
-                {FILTERS.map((f) => (
-                  <Button
-                    key={f.id}
-                    size="sm"
-                    variant={tradeFilter === f.id ? "primary" : "outline"}
-                    onClick={() => {
-                      setTradeFilter(f.id);
+            <div
+              className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] gap-4"
+              data-testid="backtest-trade-workspace"
+            >
+              <div className="min-w-0">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <input
+                    className="min-h-11 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                    placeholder="거래번호 또는 심볼 검색"
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
                       setPage(0);
                     }}
+                    data-testid="trade-search"
+                  />
+                  <select
+                    className="min-h-11 rounded border border-slate-700 bg-slate-950 px-2 py-2 text-sm"
+                    value={tradeSort}
+                    onChange={(e) => setTradeSort(e.target.value as TradeSort)}
+                    data-testid="trade-sort"
                   >
-                    {f.label}
-                  </Button>
-                ))}
-              </div>
-              <span className="text-xs rx-text-muted">
-                {filtered.length}건
-                {tradeListExpanded
-                  ? ` · ${safePage + 1}/${pageCount} 페이지`
-                  : " · 미리보기"}
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px] text-left text-sm">
-                <thead className="sticky top-0 bg-slate-950 rx-text-muted">
-                  <tr>
-                    {TRADE_HEADERS.map((h) => (
-                      <th key={h} className="whitespace-nowrap px-2 py-2 font-medium">
-                        {h}
-                      </th>
+                    {SORTS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.label}
+                      </option>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {previewTradeRows.map((t) => (
-                    <TradeTableRow
-                      key={t.id}
-                      t={t}
-                      selected={selectedTradeId === t.id}
-                      onSelect={() => selectTrade(t.id, "list")}
-                      rowRef={(el) => {
-                        if (el) rowRefs.current.set(t.id, el);
-                      }}
-                    />
+                  </select>
+                  <div className="flex flex-wrap gap-1">
+                    {FILTERS.map((f) => (
+                      <Button
+                        key={f.id}
+                        size="sm"
+                        variant={tradeFilter === f.id ? "primary" : "outline"}
+                        onClick={() => {
+                          setTradeFilter(f.id);
+                          setPage(0);
+                        }}
+                      >
+                        {f.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <span className="text-xs rx-text-muted">
+                    {filtered.length}건
+                    {tradeListExpanded
+                      ? ` · ${safePage + 1}/${pageCount} 페이지`
+                      : " · 미리보기"}
+                  </span>
+                </div>
+                <div className="hidden overflow-x-auto md:block">
+                  <table className="w-full min-w-[880px] text-left text-sm">
+                    <thead className="sticky top-0 bg-slate-950 rx-text-muted">
+                      <tr>
+                        {TRADE_HEADERS.map((h) => (
+                          <th key={h} className="whitespace-nowrap px-2 py-2 font-medium">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewTradeRows.map((t) => (
+                        <TradeTableRow
+                          key={t.id}
+                          t={t}
+                          selected={selectedTradeId === t.id}
+                          onSelect={() => selectTrade(t.id, "list")}
+                          rowRef={(el) => {
+                            if (el) rowRefs.current.set(t.id, el);
+                          }}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="grid gap-2 md:hidden" data-testid="trade-mobile-list">
+                  {previewTradeRows.map((trade) => (
+                    <button
+                      key={`mobile-${trade.id}`}
+                      type="button"
+                      className={`rounded-xl border p-3 text-left ${
+                        selectedTradeId === trade.id
+                          ? "border-sky-500 bg-sky-950/30"
+                          : "border-slate-700 bg-slate-950/40"
+                      }`}
+                      onClick={() => selectTrade(trade.id, "list")}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <Badge tone={trade.side === "LONG" ? "success" : "danger"}>
+                          {trade.side === "LONG" ? "롱" : "숏"}
+                        </Badge>
+                        <span className={trade.netPnlUsdt >= 0 ? "text-emerald-300" : "text-rose-300"}>
+                          {formatUsdt(trade.netPnlUsdt)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-slate-300">
+                        {formatKoreanDateTime(trade.entryTime)} · 진입 {trade.entryPrice.toLocaleString("ko-KR")}
+                      </p>
+                    </button>
                   ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {!tradeListExpanded ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  data-testid="trade-list-expand"
-                  onClick={() => setTradeListExpanded(true)}
-                >
-                  전체 {filtered.length}개 거래 보기
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    data-testid="trade-list-collapse"
-                    onClick={() => setTradeListExpanded(false)}
-                  >
-                    미리보기로 접기
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={safePage === 0}
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  >
-                    이전
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={safePage >= pageCount - 1}
-                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-                  >
-                    다음
-                  </Button>
-                </>
-              )}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {!tradeListExpanded ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      data-testid="trade-list-expand"
+                      onClick={() => setTradeListExpanded(true)}
+                    >
+                      전체 {filtered.length}개 거래 보기
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        data-testid="trade-list-collapse"
+                        onClick={() => setTradeListExpanded(false)}
+                      >
+                        미리보기로 접기
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={safePage === 0}
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      >
+                        이전
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={safePage >= pageCount - 1}
+                        onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                      >
+                        다음
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
+                {selectedTrade ? (
+                  <SelectedTradeInspector
+                    trade={selectedTrade}
+                    trace={selectedTrace}
+                    developerMode={developerMode}
+                    onClose={() => selectTrade(null, "clear")}
+                    onPrev={() => navigateTrade(-1)}
+                    onNext={() => navigateTrade(1)}
+                    onFocusChart={() => {
+                      onSectionChange?.("price");
+                      window.requestAnimationFrame(() => scrollToSection("price"));
+                    }}
+                    onCopyId={() => {
+                      void navigator.clipboard?.writeText(selectedTrade.id);
+                    }}
+                  />
+                ) : (
+                  <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-dashed border-slate-800 bg-slate-950/40 p-6">
+                    <p className="text-sm rx-text-muted">거래를 선택하세요</p>
+                  </div>
+                )}
+              </div>
             </div>
           </Card>
         ) : (
@@ -1701,29 +2024,6 @@ export function BacktestAnalysisView({
         </Card>
       </SectionAnchor>
 
-      {drawerTrade && (
-        <TradeDetailDrawer
-          trade={drawerTrade}
-          trace={tracesById.get(drawerTrade.id) ?? null}
-          candles={model.sampledPriceCandles}
-          techOpen={techOpen}
-          setTechOpen={setTechOpen}
-          onPrev={() => navigateTrade(-1)}
-          onNext={() => navigateTrade(1)}
-          onFocusChart={() => {
-            // Keep trade selection so pattern zones stay on the main chart.
-            setDrawerTrade(null);
-            scrollToSection("price");
-          }}
-          onClose={() => {
-            // Close the drawer only — keep selectedTradeId so overlays remain.
-            setDrawerTrade(null);
-          }}
-          onCopyId={() => {
-            void navigator.clipboard?.writeText(drawerTrade.id);
-          }}
-        />
-      )}
 
       <SectionAnchor id="validation">
         <Card title="검증 결과" data-testid="backtest-validation">
@@ -1792,216 +2092,236 @@ function TradeTableRow({ t, selected, onSelect, rowRef }: { t: EnrichedTrade; se
   return (
     <tr ref={rowRef} className={`cursor-pointer border-t border-slate-900 ${selected ? "bg-sky-950/40" : "hover:bg-slate-900/50"}`} data-testid="trade-row" data-trade-id={t.id} onClick={onSelect}>
       <td className="px-2 py-2 font-mono text-xs">{t.id}</td>
-      <td className="px-2 py-2">{t.symbol}</td>
       <td className="px-2 py-2"><Badge tone={t.side === "LONG" ? "success" : "danger"}>{t.side === "LONG" ? "롱" : "숏"}</Badge></td>
       <td className="whitespace-nowrap px-2 py-2 text-xs">{formatKoreanDateTime(t.entryTime)}</td>
-      <td className="px-2 py-2">{t.entryPrice.toLocaleString("ko-KR")}</td>
       <td className="whitespace-nowrap px-2 py-2 text-xs">{formatKoreanDateTime(t.exitTime)}</td>
+      <td className="px-2 py-2">{t.entryPrice.toLocaleString("ko-KR")}</td>
       <td className="px-2 py-2">{t.exitPrice.toLocaleString("ko-KR")}</td>
-      <td className="px-2 py-2 text-xs">{formatDurationMs(t.holdMs)}</td>
-      <td className="px-2 py-2 text-xs">{t.quantity.toFixed(4)}</td>
       <td className="px-2 py-2">{t.leverage.toFixed(2)}</td>
       <td className={`px-2 py-2 ${pnlCls}`}>{formatUsdt(t.netPnlUsdt)}</td>
       <td className={`px-2 py-2 ${t.pnlPct >= 0 ? "text-emerald-300" : "text-rose-300"}`}>{formatPct(t.pnlPct)}</td>
-      <td className="px-2 py-2 text-xs">{formatUsdt(t.feeCostUsdt)}</td>
-      <td className="px-2 py-2 text-xs">{formatUsdt(t.slippageCostUsdt)}</td>
-      <td className="px-2 py-2 text-xs">{formatUsdt(t.spreadCostUsdt)}</td>
       <td className="px-2 py-2 text-xs">{displaySignalReason(t.exitReason)}</td>
     </tr>
   );
 }
 
-function TradeEventTracePanel({ trace }: { trace: TradeEventTrace }) {
-  const blockSections = trace.patternBlocks?.length
-    ? buildPatternBlockSections(trace.patternBlocks)
-    : [];
-  const operator = trace.combinationOperator ?? null;
-
-  return (
-    <div
-      className="mt-3 rounded-xl border border-sky-700/40 bg-sky-950/20 p-4"
-      data-testid="trade-event-trace"
-    >
-      <h4 className="mb-2 text-sm font-semibold text-sky-100">거래 이벤트 추적</h4>
-      {blockSections.length > 0 ? (
-        <div className="mb-3 space-y-3" data-testid="trade-pattern-stack">
-          <p className="text-xs font-medium text-sky-200/90">
-            전략 조합 · {combinationOperatorKo(operator)}
-          </p>
-          {blockSections.map((section) => (
-            <div
-              key={section.id}
-              className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
-              data-testid={`trade-block-${section.role}`}
-            >
-              <p className="text-sm font-medium text-slate-100">{section.title}</p>
-              <ul className="mt-1 list-inside list-disc text-xs text-slate-300">
-                {section.items.map((line) => (
-                  <li key={`${section.id}-${line}`}>{line}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      ) : trace.patternType ? (
-        <p className="mb-2 text-xs text-sky-200/90">
-          패턴 {trace.patternType}
-          {trace.zoneHigh != null && trace.zoneLow != null
-            ? ` · 존 ${trace.zoneLow}–${trace.zoneHigh}`
-            : ""}
-          {trace.penetrationPct != null
-            ? ` · ${formatPenetrationKo(trace.penetrationPct)}`
-            : ""}
-        </p>
-      ) : null}
-      {trace.zoneHigh == null || trace.zoneLow == null ? (
-        blockSections.length === 0 ? (
-          <p
-            className="mb-2 text-xs text-amber-200/90"
-            data-testid="trade-geometry-missing"
-          >
-            이 거래 기록에는 영역 좌표가 저장되지 않았습니다.
-          </p>
-        ) : null
-      ) : (
-        <p className="mb-2 text-xs text-sky-200/80" data-testid="trade-geometry-present">
-          영역 좌표가 저장되어 차트에 사각형 존으로 표시됩니다.
-        </p>
-      )}
-      <ol className="mb-3 space-y-1.5 border-l border-sky-800 pl-3 text-sm text-slate-200" data-testid="trade-event-timeline">
-        {trace.events.map((e, i) => (
-          <li key={`${e.kind}-${i}`}>
-            <span className="font-medium text-slate-100">{e.labelKo}</span>
-            {e.price != null ? ` @ ${e.price}` : ""}
-            {e.at ? ` · ${formatKoreanDateTime(Date.parse(e.at))}` : ""}
-            {e.detailKo ? (
-              <span className="block text-xs rx-text-muted">{e.detailKo}</span>
-            ) : null}
-          </li>
-        ))}
-      </ol>
-      <div className="space-y-1 text-xs text-slate-300">
-        <p>진입 사유: {trace.whyEnteredKo}</p>
-        <p>청산 사유: {trace.whyExitedKo}</p>
-        <p>비용: {trace.feeSlippageImpactKo}</p>
-        {trace.assumptionsKo.map((a) => (
-          <p key={a} className="rx-text-muted">
-            {a}
-          </p>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TradeDetailDrawer({ trade, trace, candles, techOpen, setTechOpen, onPrev, onNext, onFocusChart, onClose, onCopyId }: {
+function SelectedTradeInspector({
+  trade,
+  trace,
+  developerMode,
+  onPrev,
+  onNext,
+  onFocusChart,
+  onCopyId,
+  onClose,
+}: {
   trade: EnrichedTrade;
   trace: TradeEventTrace | null;
-  candles: Array<{ time: number; open: number; high: number; low: number; close: number }>;
-  techOpen: boolean; setTechOpen: (v: boolean | ((p: boolean) => boolean)) => void;
-  onPrev: () => void; onNext: () => void; onFocusChart: () => void; onClose: () => void; onCopyId: () => void;
+  developerMode: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  onFocusChart: () => void;
+  onCopyId: () => void;
+  onClose: () => void;
 }) {
   const hasSl = trade.stopLoss != null && trade.stopLoss > 0;
   const hasTp = trade.takeProfit != null && trade.takeProfit > 0;
-  const waterfall = [
-    { label: "총손익", v: trade.grossPnlUsdt }, { label: "수수료", v: -trade.feeCostUsdt }, { label: "슬리피지", v: -trade.slippageCostUsdt },
-    { label: "스프레드", v: -trade.spreadCostUsdt }, { label: "펀딩비", v: -trade.fundingCostUsdt }, { label: "순손익", v: trade.netPnlUsdt },
-  ];
-  const recon = trade.grossPnlUsdt - trade.feeCostUsdt - trade.slippageCostUsdt - trade.spreadCostUsdt - trade.fundingCostUsdt;
-  const reconOk = Math.abs(recon - trade.netPnlUsdt) < 0.05;
-  const mini = useMemo(() => {
-    if (!trade.entryTime || !trade.exitTime || !candles.length) return [];
-    const padMs = Math.max(trade.holdMs * 0.5, 60 * 60_000);
-    return candles.filter((c) => c.time >= trade.entryTime! - padMs && c.time <= trade.exitTime! + padMs).slice(0, 120);
-  }, [candles, trade]);
+  const stopPrice = hasSl ? trade.stopLoss : trace?.stopPrice ?? null;
+  const targetPrice = hasTp ? trade.takeProfit : trace?.targetPrice ?? null;
+  const blockSections = trace?.patternBlocks?.length
+    ? buildPatternBlockSections(trace.patternBlocks, { developerMode })
+    : [];
+  const timelineStages = buildTradeTimelineStages(trade, trace);
+  const invalidationTime = trace?.invalidationCandleTime ?? null;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto border-l border-slate-800 bg-slate-950 p-4 shadow-xl sm:max-w-lg md:max-w-xl" data-testid="trade-drawer" role="dialog" aria-label="거래 상세">
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h3 className="text-lg font-semibold rx-text-primary">{trade.id}</h3>
-        <Badge>{trade.symbol}</Badge>
+    <div
+      className="rextora-trade-inspector space-y-4 rounded-xl border border-slate-800 bg-slate-950/95 p-4"
+      data-testid="selected-trade-inspector"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 className="text-base font-semibold rx-text-primary">선택 거래</h3>
         <Badge tone={trade.side === "LONG" ? "success" : "danger"}>{trade.side === "LONG" ? "롱" : "숏"}</Badge>
         <Badge tone={trade.profitable ? "success" : "danger"}>{trade.profitable ? "이익" : "손실"}</Badge>
-        <Badge>{displaySignalReason(trade.exitReason)}</Badge>
+        <button
+          type="button"
+          className="rextora-icon-button ml-auto lg:hidden"
+          onClick={onClose}
+          aria-label="거래 상세 닫기"
+        >
+          ×
+        </button>
       </div>
-      <MetricsGrid cols="grid-cols-3" items={[
-        { label: "순손익", value: formatUsdt(trade.netPnlUsdt), tone: trade.netPnlUsdt >= 0 ? "success" : "danger" },
-        { label: "수익률", value: formatPct(trade.pnlPct) }, { label: "보유", value: formatDurationMs(trade.holdMs) },
-      ]} />
-      <div className="mb-4" data-testid="trade-mini-chart">
-        <h4 className="mb-2 text-sm font-medium rx-text-primary">미니 차트</h4>
-        {mini.length ? <MiniTradeChart candles={mini} trade={trade} hasSl={hasSl} hasTp={hasTp} /> : <p className="rx-text-muted text-xs">표시할 캔들 구간이 없습니다.</p>}
-        <div className="mt-1 text-[11px] rx-text-muted">손절: {hasSl ? trade.stopLoss.toLocaleString("ko-KR") : "기록 없음"} · 익절: {hasTp ? trade.takeProfit.toLocaleString("ko-KR") : "기록 없음"}</div>
+
+      <div data-testid="trade-inspector-result">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">1. 거래 결과</h4>
+        <MetricsGrid
+          cols="grid-cols-2"
+          items={[
+            { label: "순손익", value: formatUsdt(trade.netPnlUsdt), tone: trade.netPnlUsdt >= 0 ? "success" : "danger" },
+            { label: "수익률", value: formatPct(trade.pnlPct), tone: trade.pnlPct >= 0 ? "success" : "danger" },
+            { label: "보유", value: formatDurationMs(trade.holdMs) },
+            { label: "레버리지", value: trade.leverage.toFixed(2) },
+          ]}
+        />
       </div>
-      <div className="mb-4" data-testid="trade-pnl-waterfall">
-        <h4 className="mb-2 text-sm font-medium rx-text-primary">손익 분해</h4>
-        <div className="space-y-1">{waterfall.map((row) => (
-          <div key={row.label} className="flex items-center justify-between text-sm"><span className="rx-text-secondary">{row.label}</span><span className={row.v >= 0 ? "rx-text-positive" : "rx-text-negative"}>{formatUsdt(row.v)}</span></div>
-        ))}</div>
-        <p className="mt-1 text-[11px] rx-text-muted">장부 합산: {reconOk ? "일치" : "확인 필요"} (Δ {formatUsdt(Math.abs(recon - trade.netPnlUsdt))})</p>
+
+      <div data-testid="trade-inspector-entry">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">2. 진입 근거</h4>
+        <dl className="grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">진입 시각</dt>
+            <dd className="mt-1 text-slate-100">{formatKoreanDateTime(trade.entryTime)}</dd>
+          </div>
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">진입 가격</dt>
+            <dd className="mt-1 text-slate-100">{trade.entryPrice.toLocaleString("ko-KR")}</dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-sm text-slate-300">
+          저장된 패턴 조합과 확인 이벤트가 충족된 시점의 엔진 진입 기록입니다.
+        </p>
       </div>
-      <div className="mb-4 grid grid-cols-2 gap-2" data-testid="trade-position-cards">
-        <Metric label="진입가" value={trade.entryPrice.toLocaleString("ko-KR")} />
-        <Metric label="청산가" value={trade.exitPrice.toLocaleString("ko-KR")} />
-        <Metric label="수량" value={trade.quantity.toFixed(6)} />
-        <Metric label="명목가치" value={formatUsdt(trade.entryPrice * trade.quantity)} />
-        <Metric label="레버리지" value={String(trade.leverage)} />
-        <Metric label="증거금" value={formatUsdt(trade.marginUsdt)} />
-      </div>
-      <div className="mb-4" data-testid="trade-lifecycle">
-        <h4 className="mb-2 text-sm font-medium rx-text-primary">거래 생명주기</h4>
-        {trace ? (
-          <TradeEventTracePanel trace={trace} />
+
+      <div data-testid="trade-inspector-pattern">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">3. 패턴 조합</h4>
+        {blockSections.length > 0 ? (
+          <div className="space-y-2" data-testid="trade-pattern-stack">
+            <p className="text-xs rx-text-muted">
+              전략 조합 · {combinationOperatorKo(trace?.combinationOperator ?? null)}
+            </p>
+            {blockSections.map((section) => (
+              <div
+                key={section.id}
+                className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
+                data-testid={`trade-block-${section.role}`}
+              >
+                <p className="text-sm font-medium text-slate-100">{section.title}</p>
+                <ul className="mt-1 list-inside list-disc text-xs text-slate-300">
+                  {section.items.map((line) => (
+                    <li key={`${section.id}-${line}`}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : trace?.patternType ? (
+          <p className="text-xs text-slate-300">
+            패턴 {patternFamilyKo(trace.patternType)}
+            {trace.zoneHigh != null && trace.zoneLow != null
+              ? ` · 존 ${trace.zoneLow}–${trace.zoneHigh}`
+              : ""}
+            {trace.penetrationPct != null
+              ? ` · ${formatPenetrationKo(trace.penetrationPct)}`
+              : ""}
+          </p>
         ) : (
-          <ol className="space-y-2 border-l border-slate-700 pl-3 text-sm rx-text-secondary">
-            <li>신호 · {trade.signalType}</li>
-            <li>진입 · {formatKoreanDateTime(trade.entryTime)}</li>
-            <li>보유 · {formatDurationMs(trade.holdMs)}</li>
-            <li>청산 · {displaySignalReason(trade.exitReason)} · {formatKoreanDateTime(trade.exitTime)}</li>
-            <li>최종 · {formatUsdt(trade.netPnlUsdt)} ({formatPct(trade.pnlPct)})</li>
-          </ol>
+          <p className="text-xs rx-text-muted">저장된 패턴 근거가 없습니다.</p>
         )}
       </div>
-      <div className="mb-4 text-sm rx-text-secondary">
-        <h4 className="mb-1 font-medium rx-text-primary">전략 설명</h4>
-        <div>진입 신호: {trade.signalType}</div>
-        <div>청산 사유: {displaySignalReason(trade.exitReason)}</div>
+
+      <div data-testid="trade-inspector-timeline">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">
+          4. 감지 → 리테스트 → 확인 → 진입
+        </h4>
+        <ol className="space-y-3 border-l-2 border-slate-700 pl-4">
+          {timelineStages.map((stage) => (
+            <li key={stage.key} className="relative">
+              <span className="absolute -left-[1.35rem] top-1 h-2.5 w-2.5 rounded-full bg-slate-600 ring-2 ring-slate-950" />
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium text-slate-100">{stage.label}</span>
+                <Badge tone={timelineStatusTone(stage.status)}>{stage.status}</Badge>
+              </div>
+              <div className="mt-0.5 text-xs rx-text-muted">
+                {stage.time
+                  ? /^\d+$/.test(stage.time)
+                    ? formatKoreanDateTime(Number(stage.time))
+                    : formatKoreanDateTime(Date.parse(stage.time))
+                  : "시각 기록 없음"}
+                {stage.price != null ? ` · ${stage.price.toLocaleString("ko-KR")}` : ""}
+              </div>
+              <p className="mt-0.5 text-xs text-slate-300">{stage.explanation}</p>
+            </li>
+          ))}
+        </ol>
       </div>
-      <div className="mb-4">
-        <button type="button" className="text-sky-300 underline" onClick={() => setTechOpen((v) => !v)}>기술 세부정보 {techOpen ? "접기" : "펼치기"}</button>
-        {techOpen && <div className="mt-1 text-xs rx-text-muted">진입봉 #{trade.entryBar} · 청산봉 #{trade.exitBar} · 보유봉 {trade.holdBars ?? "-"} · ID {trade.id}</div>}
+
+      <div data-testid="trade-inspector-risk">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">5. 손절·익절</h4>
+        <dl className="grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">손절</dt>
+            <dd className="font-medium text-slate-100">
+              {stopPrice != null ? stopPrice.toLocaleString("ko-KR") : "기록 없음"}
+            </dd>
+          </div>
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">익절</dt>
+            <dd className="font-medium text-slate-100">
+              {targetPrice != null ? targetPrice.toLocaleString("ko-KR") : "기록 없음"}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div className="flex flex-wrap gap-2">
+
+      <div data-testid="trade-inspector-exit">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">6. 청산 사유</h4>
+        <p className="text-sm text-slate-100">{displaySignalReason(trade.exitReason)}</p>
+        <p className="mt-1 text-xs rx-text-muted">
+          {formatKoreanDateTime(trade.exitTime)} · {trade.exitPrice.toLocaleString("ko-KR")}
+        </p>
+      </div>
+
+      <div data-testid="trade-inspector-cost">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">7. 비용</h4>
+        <dl className="grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">수수료</dt>
+            <dd className="font-medium text-slate-100">{formatUsdt(trade.feeCostUsdt)}</dd>
+          </div>
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">슬리피지</dt>
+            <dd className="font-medium text-slate-100">{formatUsdt(trade.slippageCostUsdt)}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div data-testid="trade-inspector-risk-management">
+        <h4 className="mb-2 text-sm font-semibold text-slate-200">8. 위험 관리</h4>
+        <dl className="grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">레버리지</dt>
+            <dd className="font-medium text-slate-100">{trade.leverage.toFixed(2)}x</dd>
+          </div>
+          <div className="rounded border border-slate-800 p-2">
+            <dt className="text-xs rx-text-muted">무효화</dt>
+            <dd className="font-medium text-slate-100">
+              {invalidationTime
+                ? formatKoreanDateTime(Date.parse(invalidationTime))
+                : "기록 없음"}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <details className="rounded-lg border border-slate-800 p-3 text-xs text-slate-400">
+        <summary className="cursor-pointer text-sm font-semibold text-slate-200">
+          9. 개발자 정보
+        </summary>
+        <div className="mt-2 space-y-1 break-all font-mono">
+          <p>tradeId: {trade.id}</p>
+          {trace ? <p>traceId: {trace.tradeId}</p> : null}
+          <p>developerMode: {developerMode ? "on" : "off"}</p>
+        </div>
+      </details>
+
+      <div className="flex flex-wrap gap-2 border-t border-slate-800 pt-3">
         <Button size="sm" variant="outline" onClick={onPrev}>이전 거래</Button>
         <Button size="sm" variant="outline" onClick={onNext}>다음 거래</Button>
         <Button size="sm" variant="outline" onClick={onFocusChart}>차트 포커스</Button>
         <Button size="sm" variant="outline" onClick={onCopyId}>ID 복사</Button>
-        <Button size="sm" variant="outline" onClick={onClose}>닫기</Button>
       </div>
     </div>
-  );
-}
-
-function MiniTradeChart({ candles, trade, hasSl, hasTp }: { candles: Array<{ time: number; open: number; high: number; low: number; close: number }>; trade: EnrichedTrade; hasSl: boolean; hasTp: boolean }) {
-  const w = 420; const h = 160; const pad = { t: 8, r: 8, b: 20, l: 40 };
-  const lows = candles.map((c) => c.low); const highs = candles.map((c) => c.high);
-  if (hasSl) lows.push(trade.stopLoss); if (hasTp) highs.push(trade.takeProfit);
-  const min = Math.min(...lows); const max = Math.max(...highs);
-  const x = (i: number) => pad.l + (i / Math.max(1, candles.length - 1)) * (w - pad.l - pad.r);
-  const y = (p: number) => pad.t + (1 - (p - min) / (max - min || 1)) * (h - pad.t - pad.b);
-  const entryI = candles.findIndex((c) => trade.entryTime != null && c.time >= trade.entryTime);
-  const exitI = candles.findIndex((c) => trade.exitTime != null && c.time >= trade.exitTime);
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="h-40 w-full">
-      {candles.map((c, i) => {
-        const up = c.close >= c.open; const cx = x(i);
-        return (<g key={c.time}><line x1={cx} x2={cx} y1={y(c.high)} y2={y(c.low)} stroke={up ? CHART_THEME.up : CHART_THEME.down} /><rect x={cx - 2} y={Math.min(y(c.open), y(c.close))} width={4} height={Math.max(1, Math.abs(y(c.close) - y(c.open)))} fill={up ? CHART_THEME.up : CHART_THEME.down} /></g>);
-      })}
-      {entryI >= 0 && <circle cx={x(entryI)} cy={y(trade.entryPrice)} r={5} fill={CHART_THEME.entryLong} data-testid="mini-entry-marker" />}
-      {exitI >= 0 && <circle cx={x(Math.max(exitI, 0))} cy={y(trade.exitPrice)} r={5} fill={CHART_THEME.exit} data-testid="mini-exit-marker" />}
-      {hasSl && <line x1={pad.l} x2={w - pad.r} y1={y(trade.stopLoss)} y2={y(trade.stopLoss)} stroke={CHART_THEME.stopLoss} strokeDasharray="4 3" />}
-      {hasTp && <line x1={pad.l} x2={w - pad.r} y1={y(trade.takeProfit)} y2={y(trade.takeProfit)} stroke={CHART_THEME.takeProfit} strokeDasharray="4 3" />}
-    </svg>
   );
 }
 

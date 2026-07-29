@@ -76,13 +76,15 @@ describe("backtest UX final completion", () => {
     expect(ACCOUNT_EQUITY_IMPACT_LABEL_KO).toBe("계좌 자산 영향");
   });
 
-  it("overlay controls are grouped Basic / Pattern / Event", () => {
+  it("overlay controls are grouped Core / Pattern / Analysis / Technical", () => {
     const src = av();
     expect(src).toContain("기본 표시");
     expect(src).toContain("기술 패턴");
-    expect(src).toContain("이벤트");
-    expect(src).toContain("재접촉");
-    expect(src).toContain("무효화");
+    expect(src).toContain("분석");
+    expect(src).toContain("되돌림");
+    expect(src).toContain("설정 거절");
+    expect(src).toContain("실제 무효화");
+    expect(src).toMatch(/rejected:\s*false/);
   });
 
   it("unsupported overlays stay disabled without fake geometry", () => {
@@ -185,10 +187,8 @@ describe("backtest UX final completion", () => {
   it("sticky section navigation order matches hierarchy", () => {
     const src = wb();
     const order = [
-      "실행",
-      "판정",
       "차트",
-      "거래 목록",
+      "거래",
       "월별",
       "비용",
       "자산·낙폭",

@@ -38,13 +38,10 @@ export interface BacktestChartEvidence {
   equityBasis?: EquityBasis;
 }
 
+import { backtestsRoot } from "../storage/runtimePaths";
+
 function dir(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "backtests",
-  );
+  return backtestsRoot();
 }
 
 export function chartEvidencePath(runId: string): string {

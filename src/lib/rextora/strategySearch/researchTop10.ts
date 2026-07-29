@@ -9,6 +9,7 @@ import path from "node:path";
 import type { StrategySearchStoreOptions } from "./jobStore";
 import type { StrategyRoleBadge } from "../results/researchDisplay";
 import type { ResearchResultCard } from "./researchResultsSummary";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export const RESEARCH_TOP10_VERSION = 1 as const;
 export const RESEARCH_TOP10_LIMIT = 10;
@@ -222,12 +223,7 @@ export function buildResearchScopeKey(input: ResearchScopeKeyInput): string {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

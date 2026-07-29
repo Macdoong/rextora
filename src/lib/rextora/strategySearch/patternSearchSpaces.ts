@@ -10,6 +10,11 @@ import {
   catalogForPatternFamily,
   catalogRangesForPatternFamily,
 } from "./patternParameterCatalog";
+import {
+  bodyOnlyFromZoneBasis,
+  resolveOrderBlockZoneBasis,
+  type OrderBlockZoneBasis,
+} from "../strategy/conditions/orderBlockZoneBasis";
 
 export type PatternSearchFamilyId =
   | "order_block"
@@ -77,6 +82,9 @@ export type OrderBlockSearchParams = {
   confirmationCandleCount?: number;
   confirmationWindow?: number;
   invalidationMode?: "close_beyond_zone" | "none";
+  zoneBasis: OrderBlockZoneBasis;
+  wickExtensionPct: number;
+  /** Legacy mirror — derived from zoneBasis for older persisted strategies. */
   bodyOnly: boolean;
   minImpulseAtrMult: number;
   minImpulsePct: number;
@@ -86,6 +94,33 @@ export type OrderBlockSearchParams = {
   retestAllowed: boolean;
   entryInsideBlock: boolean;
   invalidateOnCloseBeyond: boolean;
+  /** Flat entry-trigger fields (catalog / search identity). */
+  touchBasis?: "WICK" | "BODY" | "CLOSE" | "ANY";
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?:
+    | "CONFIRMATION_CLOSE"
+    | "NEXT_BAR_OPEN"
+    | "TOUCH_PRICE"
+    | "LIMIT_AT_ZONE_LEVEL";
+  entryPriceTolerancePct?: number;
+  /** Institutional quality — catalog defaults true for new strategies. */
+  institutionalQuality?: boolean;
+  requireBodyEngulf?: boolean;
+  minBodyEngulfPct?: number;
+  minDisplacementBodyMult?: number;
+  minSourceBodyPct?: number;
+  minSourceBodyAtrMult?: number;
+  minSourceBodyRangeRatio?: number;
+  maxSourceUpperWickPct?: number;
+  maxSourceLowerWickPct?: number;
+  minImpulseBodyRangeRatio?: number;
+  minZoneHeightPct?: number;
+  minZoneHeightAtrMult?: number;
+  maxZoneHeightAtrMult?: number;
+  requireStructureBreak?: boolean;
+  structureBreakLookback?: number;
 };
 
 export type FvgSearchParams = OrderBlockSearchParams & {
@@ -501,7 +536,11 @@ export function readOrderBlockParams(
       ? Math.max(1, Math.min(24, Math.trunc(windowRaw)))
       : undefined,
     invalidationMode: readInvalidationMode(params),
-    bodyOnly: readOptionalBool(params, "bodyOnly") ?? true,
+    zoneBasis: resolveOrderBlockZoneBasis(params),
+    wickExtensionPct: Number.isFinite(Number(params.wickExtensionPct))
+      ? Number(params.wickExtensionPct)
+      : 25,
+    bodyOnly: bodyOnlyFromZoneBasis(resolveOrderBlockZoneBasis(params)),
     minImpulseAtrMult: Number(params.minImpulseAtrMult),
     minImpulsePct: Number(params.minImpulsePct),
     minVolumeMult: Number(params.minVolumeMult),
@@ -511,6 +550,82 @@ export function readOrderBlockParams(
     entryInsideBlock: readOptionalBool(params, "entryInsideBlock") ?? false,
     invalidateOnCloseBeyond:
       readOptionalBool(params, "invalidateOnCloseBeyond") ?? true,
+    touchBasis:
+      params.touchBasis === "BODY" ||
+      params.touchBasis === "CLOSE" ||
+      params.touchBasis === "ANY" ||
+      params.touchBasis === "WICK"
+        ? params.touchBasis
+        : "WICK",
+    revalidateAtEntry: readOptionalBool(params, "revalidateAtEntry") ?? true,
+    maxBarsAfterTouch: Number.isFinite(Number(params.maxBarsAfterTouch))
+      ? Math.trunc(Number(params.maxBarsAfterTouch))
+      : 8,
+    maxBarsAfterConfirmation: Number.isFinite(
+      Number(params.maxBarsAfterConfirmation),
+    )
+      ? Math.trunc(Number(params.maxBarsAfterConfirmation))
+      : 1,
+    entryExecution:
+      params.entryExecution === "NEXT_BAR_OPEN" ||
+      params.entryExecution === "TOUCH_PRICE" ||
+      params.entryExecution === "LIMIT_AT_ZONE_LEVEL" ||
+      params.entryExecution === "CONFIRMATION_CLOSE"
+        ? params.entryExecution
+        : "CONFIRMATION_CLOSE",
+    entryPriceTolerancePct: Number.isFinite(
+      Number(params.entryPriceTolerancePct),
+    )
+      ? Number(params.entryPriceTolerancePct)
+      : 0.5,
+    institutionalQuality: readOptionalBool(params, "institutionalQuality") ?? true,
+    requireBodyEngulf: readOptionalBool(params, "requireBodyEngulf") ?? true,
+    minBodyEngulfPct: Number.isFinite(Number(params.minBodyEngulfPct))
+      ? Number(params.minBodyEngulfPct)
+      : 0,
+    minDisplacementBodyMult: Number.isFinite(
+      Number(params.minDisplacementBodyMult),
+    )
+      ? Number(params.minDisplacementBodyMult)
+      : 2,
+    minSourceBodyPct: Number.isFinite(Number(params.minSourceBodyPct))
+      ? Number(params.minSourceBodyPct)
+      : 0.05,
+    minSourceBodyAtrMult: Number.isFinite(Number(params.minSourceBodyAtrMult))
+      ? Number(params.minSourceBodyAtrMult)
+      : 0.15,
+    minSourceBodyRangeRatio: Number.isFinite(
+      Number(params.minSourceBodyRangeRatio),
+    )
+      ? Number(params.minSourceBodyRangeRatio)
+      : 0.35,
+    maxSourceUpperWickPct: Number.isFinite(Number(params.maxSourceUpperWickPct))
+      ? Number(params.maxSourceUpperWickPct)
+      : 60,
+    maxSourceLowerWickPct: Number.isFinite(Number(params.maxSourceLowerWickPct))
+      ? Number(params.maxSourceLowerWickPct)
+      : 60,
+    minImpulseBodyRangeRatio: Number.isFinite(
+      Number(params.minImpulseBodyRangeRatio),
+    )
+      ? Number(params.minImpulseBodyRangeRatio)
+      : 0.45,
+    minZoneHeightPct: Number.isFinite(Number(params.minZoneHeightPct))
+      ? Number(params.minZoneHeightPct)
+      : 0.08,
+    minZoneHeightAtrMult: Number.isFinite(Number(params.minZoneHeightAtrMult))
+      ? Number(params.minZoneHeightAtrMult)
+      : 0.2,
+    maxZoneHeightAtrMult: Number.isFinite(Number(params.maxZoneHeightAtrMult))
+      ? Number(params.maxZoneHeightAtrMult)
+      : 8,
+    requireStructureBreak:
+      readOptionalBool(params, "requireStructureBreak") ?? false,
+    structureBreakLookback: Number.isFinite(
+      Number(params.structureBreakLookback),
+    )
+      ? Math.trunc(Number(params.structureBreakLookback))
+      : 20,
   };
 }
 

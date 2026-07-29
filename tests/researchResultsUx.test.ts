@@ -578,7 +578,8 @@ describe("UI source contracts", () => {
     expect(src).toContain("results-section-nav");
     expect(src).toContain("results-section-outcome");
     expect(src).toContain("results-section-top10");
-    expect(src).toContain("results-section-rank-history");
+    expect(src).toContain("results-section-final-recommendation");
+    expect(src).toContain("results-section-top3");
     expect(src).toContain("results-raw-candidates");
     expect(src).toContain("results-storage-summary");
     expect(src).toContain("deletion-impact");

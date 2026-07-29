@@ -1150,6 +1150,7 @@ export function createStrategySearchJobApi(
           leverageMax: validated.operatorPlan.leverageMax,
           adaptiveLeverageEnabled:
             validated.operatorPlan.adaptiveLeverageEnabled,
+          patternSelectionMode: validated.operatorPlan.patternSelectionMode,
           patternConfigLevel: validated.operatorPlan.patternConfigLevel,
           patternDirection: validated.operatorPlan.patternDirection,
           patternRetestMode: validated.operatorPlan.patternRetestMode,
@@ -1171,6 +1172,10 @@ export function createStrategySearchJobApi(
             validated.operatorPlan.patternCombinationOperator,
           patternCombinationInvalidationMode:
             validated.operatorPlan.patternCombinationInvalidationMode,
+          patternCombinationFailurePolicy:
+            validated.operatorPlan.patternCombinationFailurePolicy,
+          patternCombinationWeightedThreshold:
+            validated.operatorPlan.patternCombinationWeightedThreshold,
           patternCombinationFamilies:
             validated.operatorPlan.patternCombinationFamilies,
           patternCombinationSpec:

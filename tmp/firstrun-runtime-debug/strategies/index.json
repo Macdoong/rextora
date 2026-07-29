@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-28T16:04:26.099Z",
+  "strategies": [
+    {
+      "id": "SAFE_v44_i4060",
+      "name": "SAFE_v44_i4060",
+      "paramsHash": "7893ca3f0e30",
+      "locked": true,
+      "paperActive": true,
+      "liveActive": false,
+      "file": "SAFE_v44_i4060.json"
+    }
+  ]
+}

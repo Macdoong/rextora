@@ -18,6 +18,8 @@ import { assertSafeStrategyId, StrategyValidationError, validateCanonicalDefinit
 import { definitionToStoredPatch, storedToDefinition, type StoredStrategyV1 } from "./definition/bridge";
 import type { CanonicalStrategyDefinition } from "./definition/types";
 import { isTestStrategyRecord } from "./strategyTestFilter";
+import { strategiesRootDefault, productionStrategiesRootCanonical } from "../storage/runtimePaths";
+import { isDemoLiveBlocked } from "../firstRun/demoIdentity";
 
 export const UNSAFE_TEST_STRATEGY_STORE =
   "UNSAFE_TEST_STRATEGY_STORE: Test strategy storage must use an isolated REXTORA_STRATEGIES_DIR.";
@@ -33,12 +35,7 @@ export function isStrategyStoreTestRuntime(): boolean {
 }
 
 export function productionStrategiesRoot(): string {
-  return path.resolve(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategies"
-  );
+  return path.resolve(productionStrategiesRootCanonical());
 }
 
 export function canonicalSafeSourceDir(): string {
@@ -116,17 +113,13 @@ function assertDestructiveTargetAllowed(targetFile: string): void {
   if (resolved === path.resolve(canonicalSafeFile)) {
     throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
   }
-  if (isStrategyStoreTestRuntime()) {
-    const root = ROOT();
-    if (!isPathInside(resolved, root)) {
+  const root = ROOT();
+  if (!isPathInside(resolved, root)) {
+    if (isStrategyStoreTestRuntime()) {
       throw new StrategyValidationError(
-        `${UNSAFE_TEST_STRATEGY_STORE} Destructive path is outside the isolated test root.`
+        `${UNSAFE_TEST_STRATEGY_STORE} Destructive path is outside the isolated test root.`,
       );
     }
-    return;
-  }
-  const prod = productionStrategiesRoot();
-  if (!isPathInside(resolved, prod)) {
     throw new StrategyValidationError("잘못된 전략 경로입니다.");
   }
 }
@@ -551,11 +544,31 @@ export function createStrategy(input: {
   definition?: CanonicalStrategyDefinition;
   sourceParamsHash?: string;
   strategyHash?: string;
+  /**
+   * Optional fixed id. Only reserved demo_strategy_* ids are accepted —
+   * never SAFE, never path traversal.
+   */
+  id?: string;
 }): StoredStrategyV1 {
   const now = new Date().toISOString();
   const params = mergeSafeParams(input.params ?? {});
   const paramsHash = computeParamsHash(params);
-  const id = `custom_${Date.now().toString(36)}`;
+  const requestedId = input.id?.trim();
+  if (requestedId) {
+    assertSafeStrategyId(requestedId);
+    if (requestedId === SAFE_STRATEGY_ID || requestedId.includes("SAFE")) {
+      throw new StrategyValidationError("보호 전략 ID는 생성할 수 없습니다.");
+    }
+    if (!requestedId.startsWith("demo_strategy_")) {
+      throw new StrategyValidationError(
+        "사용자 지정 전략 ID는 demo_strategy_ 예약 네임스페이스만 허용됩니다.",
+      );
+    }
+    if (getStrategyById(requestedId)) {
+      throw new StrategyValidationError("이미 존재하는 전략 ID입니다.");
+    }
+  }
+  const id = requestedId ?? `custom_${Date.now().toString(36)}`;
   assertSafeStrategyId(id);
   const summary = summariesFromParams(params);
   const strategyType = input.strategyType ?? "condition_builder";
@@ -789,6 +802,11 @@ export function setLiveActiveStrategy(id: string): StoredStrategy {
   assertSafeStrategyId(id);
   const target = getStrategyById(id);
   if (!target) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
+  if (isDemoLiveBlocked(target)) {
+    throw new StrategyValidationError(
+      "데모 전략은 실전 거래 후보로 지정할 수 없습니다.",
+    );
+  }
   if (isTestStrategyRecord(target as StoredStrategyV1 & { testData?: boolean })) {
     throw new StrategyValidationError("테스트 전략은 실전 후보로 지정할 수 없습니다.");
   }

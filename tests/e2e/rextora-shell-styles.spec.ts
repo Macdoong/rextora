@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Response } from "@playwright/test";
 
 const ROUTES = [
   "/dashboard",
@@ -10,32 +10,84 @@ const ROUTES = [
   "/settings",
 ] as const;
 
-async function assertStyledShell(page: Page, route: string) {
-  const response = await page.goto(route, { waitUntil: "networkidle" });
-  expect(response?.ok() ?? false).toBe(true);
+type StylesheetLoadRecord = {
+  url: string;
+  status: number;
+};
 
-  const stylesheets = page.locator('link[rel="stylesheet"]');
-  await expect(stylesheets.first()).toHaveCount(1);
-  const href = await stylesheets.first().getAttribute("href");
-  expect(href).toBeTruthy();
-  const cssRes = await page.request.get(href!);
-  expect(cssRes.status()).toBe(200);
-
-  await expect(page.locator(".dashboard-shell")).toBeVisible();
-  await expect(page.locator("main.dashboard-main")).toBeVisible();
-  await expect(page.getByTestId("main-nav")).toBeVisible();
-
-  const body = await page.evaluate(() => {
-    const style = getComputedStyle(document.body);
-    return {
-      fontFamily: style.fontFamily,
-      backgroundImage: style.backgroundImage,
-      color: style.color,
-    };
+async function readBuildId(page: Page): Promise<string | null> {
+  return page.evaluate(() => {
+    const nextData = (window as unknown as { __NEXT_DATA__?: { buildId?: string } })
+      .__NEXT_DATA__;
+    return nextData?.buildId ?? null;
   });
-  expect(body.fontFamily.toLowerCase()).toContain("jakarta");
-  expect(body.backgroundImage).not.toBe("none");
-  expect(body.color).not.toBe("rgb(0, 0, 0)");
+}
+
+function stylesheetResponses(responses: StylesheetLoadRecord[]): StylesheetLoadRecord[] {
+  return responses.filter(
+    (item) => item.url.includes(".css") || item.url.includes("/_next/static/css/"),
+  );
+}
+
+async function assertStyledShell(page: Page, route: string) {
+  const cssResponses: StylesheetLoadRecord[] = [];
+  const onResponse = (response: Response) => {
+    const request = response.request();
+    if (request.resourceType() === "stylesheet" || response.url().includes(".css")) {
+      cssResponses.push({ url: response.url(), status: response.status() });
+    }
+  };
+  page.on("response", onResponse);
+
+  try {
+    const response = await page.goto(route, { waitUntil: "networkidle" });
+    expect(response?.ok() ?? false).toBe(true);
+
+    const stylesheets = page.locator('link[rel="stylesheet"]');
+    await expect(stylesheets.first()).toHaveCount(1);
+    const href = await stylesheets.first().getAttribute("href");
+    expect(href).toBeTruthy();
+
+    const loadedStylesheets = stylesheetResponses(cssResponses);
+    const hrefTail = href!.split("/").pop()?.split("?")[0] ?? href!;
+    const matchedStylesheet = loadedStylesheets.find(
+      (item) => item.url.includes(hrefTail) || item.url.endsWith(href!),
+    );
+
+    expect(
+      matchedStylesheet?.status,
+      JSON.stringify(
+        {
+          route,
+          pageUrl: page.url(),
+          buildId: await readBuildId(page),
+          stylesheetHref: href,
+          browserStylesheetResponses: loadedStylesheets,
+          note: "Stylesheet must load via browser navigation, not a redundant apiRequestContext fetch",
+        },
+        null,
+        2,
+      ),
+    ).toBe(200);
+
+    await expect(page.locator(".dashboard-shell")).toBeVisible();
+    await expect(page.locator("main.dashboard-main")).toBeVisible();
+    await expect(page.getByTestId("main-nav")).toBeVisible();
+
+    const body = await page.evaluate(() => {
+      const style = getComputedStyle(document.body);
+      return {
+        fontFamily: style.fontFamily,
+        backgroundImage: style.backgroundImage,
+        color: style.color,
+      };
+    });
+    expect(body.fontFamily.toLowerCase()).toContain("jakarta");
+    expect(body.backgroundImage).not.toBe("none");
+    expect(body.color).not.toBe("rgb(0, 0, 0)");
+  } finally {
+    page.off("response", onResponse);
+  }
 }
 
 test.describe("Rextora shell styles (production)", () => {

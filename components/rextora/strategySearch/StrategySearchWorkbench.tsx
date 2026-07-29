@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Button, ConfirmDialog } from "@/components/ui/primitives";
 import {
@@ -53,6 +53,8 @@ void OPERATOR_RUN_UNTIL_QUALIFIED;
 
 const DETAIL_POLL_MS = 2000;
 const LIST_POLL_MS = 8000;
+/** When no operationally active jobs, list refresh is much less frequent. */
+const LIST_POLL_IDLE_MS = 30_000;
 const SELECTED_JOB_LS_KEY = "rextora.strategySearch.selectedJobId";
 
 function syncJobIdToUrl(jobId: string | null) {
@@ -386,20 +388,40 @@ export function StrategySearchWorkbench() {
     [handleJobNotFound, refreshTrials],
   );
 
+  const hasActiveJobs = useMemo(
+    () =>
+      jobs.some((j) =>
+        isOperationallyActiveStatus(j.status, j.executionActive),
+      ),
+    [jobs],
+  );
+
   useEffect(() => {
     let cancelled = false;
-    const tick = () => {
-      if (cancelled) return;
-      void refreshList();
+    let timer: number | undefined;
+    const schedule = (ms: number) => {
+      timer = window.setTimeout(async () => {
+        if (cancelled) return;
+        if (typeof document !== "undefined" && document.hidden) {
+          schedule(ms);
+          return;
+        }
+        await refreshList();
+        if (cancelled) return;
+        schedule(hasActiveJobs ? LIST_POLL_MS : LIST_POLL_IDLE_MS);
+      }, ms);
     };
-    const boot = window.setTimeout(tick, 0);
-    const timer = window.setInterval(tick, LIST_POLL_MS);
+    const boot = window.setTimeout(() => {
+      void refreshList().then(() => {
+        if (!cancelled) schedule(hasActiveJobs ? LIST_POLL_MS : LIST_POLL_IDLE_MS);
+      });
+    }, 0);
     return () => {
       cancelled = true;
       window.clearTimeout(boot);
-      window.clearInterval(timer);
+      if (timer != null) window.clearTimeout(timer);
     };
-  }, [refreshList]);
+  }, [refreshList, hasActiveJobs]);
 
   const pollActive =
     !!selectedId &&
@@ -411,6 +433,7 @@ export function StrategySearchWorkbench() {
     const jobId = selectedId;
     const tick = () => {
       void (async () => {
+        if (typeof document !== "undefined" && document.hidden) return;
         const data = await refreshDetail(jobId);
         if (!data) {
           await refreshList();
@@ -434,8 +457,11 @@ export function StrategySearchWorkbench() {
               tone: "info",
             });
           }
+          // Terminal: one final list sync, then detail polling stops via pollActive.
+          await refreshList();
+          return;
         }
-        await refreshList();
+        // While active, refresh list less often than detail (detail already ticks).
       })();
     };
     tick();
@@ -875,7 +901,7 @@ export function StrategySearchWorkbench() {
           data-testid="ss-job-detail"
           aria-labelledby="ss-job-detail-title"
         >
-          <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="sticky top-16 z-20 -mx-2 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-slate-700/60 bg-slate-950/95 px-3 py-3 shadow-lg backdrop-blur min-[1101px]:top-3" data-testid="ss-sticky-status-header">
             <div>
               <h2
                 id="ss-job-detail-title"
@@ -1064,7 +1090,7 @@ export function StrategySearchWorkbench() {
           <label className="block text-sm text-slate-300">
             최근 연구 선택
             <select
-              className="mt-1 w-full max-w-xl rounded border border-slate-700 bg-slate-950 px-3 py-2"
+              className="mt-1 rextora-input max-w-xl"
               value={selectedId ?? ""}
               onChange={(e) => {
                 const id = e.target.value || null;

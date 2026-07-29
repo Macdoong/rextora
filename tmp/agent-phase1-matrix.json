@@ -1,0 +1,62 @@
+[
+  {
+    "prompt": "BTC와 ETH 전략 비교해줘",
+    "intentType": "compare_strategies",
+    "safetyBlocked": false,
+    "actionCount": 1,
+    "actionHref": "/backtest",
+    "factsVisible": 1,
+    "interpretationVisible": 1,
+    "recommendedVisible": 1,
+    "actionCards": 1,
+    "scopeVisible": 1
+  },
+  {
+    "prompt": "Paper 시작해줘",
+    "intentType": "paper_start_request",
+    "safetyBlocked": false,
+    "actionCount": 1,
+    "actionHref": "/paper-trading?strategyId=custom_ms2h97mt",
+    "factsVisible": 1,
+    "interpretationVisible": 1,
+    "recommendedVisible": 1,
+    "actionCards": 1,
+    "scopeVisible": 1
+  },
+  {
+    "prompt": "실패한 탐색 원인을 설명해줘",
+    "intentType": "search_failure_explanation",
+    "safetyBlocked": false,
+    "actionCount": 1,
+    "actionHref": "/strategy-search",
+    "factsVisible": 1,
+    "interpretationVisible": 1,
+    "recommendedVisible": 1,
+    "actionCards": 1,
+    "scopeVisible": 1
+  },
+  {
+    "prompt": "다음에 뭘 해야 하지?",
+    "intentType": "recommend_next",
+    "safetyBlocked": false,
+    "actionCount": 1,
+    "actionHref": "/paper-trading",
+    "factsVisible": 1,
+    "interpretationVisible": 1,
+    "recommendedVisible": 1,
+    "actionCards": 1,
+    "scopeVisible": 1
+  },
+  {
+    "prompt": "지금 BTC 매수해줘",
+    "intentType": "execute_trade",
+    "safetyBlocked": true,
+    "actionCount": 0,
+    "actionHref": null,
+    "factsVisible": 0,
+    "interpretationVisible": 1,
+    "recommendedVisible": 1,
+    "actionCards": 0,
+    "scopeVisible": 1
+  }
+]

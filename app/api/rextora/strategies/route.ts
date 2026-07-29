@@ -8,7 +8,6 @@ import {
   restoreCloneFromSource,
   saveStrategy,
   setLiveActiveStrategy,
-  setPaperActiveStrategy,
   updateStrategyDisplayMeta,
   validateStrategyById
 } from "@/src/lib/rextora/strategy/strategyStore";
@@ -24,9 +23,13 @@ import { getSafeParamCatalog } from "@/src/lib/rextora/strategy/definition/safeP
 import { StrategyValidationError } from "@/src/lib/rextora/strategy/definition/validator";
 import { defaultDefinition } from "@/src/lib/rextora/strategy/definition/validator";
 import { buildComboAwareStrategyName } from "@/src/lib/rextora/strategySearch/readableStrategyName";
+import { applyLibraryArchiveTag } from "@/src/lib/rextora/strategy/libraryArchive";
+import { PaperSessionError } from "@/src/lib/rextora/paper/paperSessionStore";
+import { preparePaperFromResults } from "@/src/lib/rextora/paper/paperSessionService";
 
 function koreanError(error: unknown): string {
   if (error instanceof StrategyValidationError) return error.message;
+  if (error instanceof PaperSessionError) return error.message;
   if (error instanceof Error) {
     if (error.message.includes("잠긴") || error.message.includes("원본")) return error.message;
     if (error.message.includes("id required")) return "전략 고유번호가 필요합니다.";
@@ -82,6 +85,11 @@ export async function POST(request: Request) {
     timeframe?: StrategyTimeframe;
     detachRefsFirst?: boolean;
     includeRelatedRecords?: boolean;
+    backtestRunId?: string | null;
+    backtestResultId?: string | null;
+    symbol?: string | null;
+    sourceResearchJobId?: string | null;
+    sourceTrialIteration?: number | null;
   };
 
   try {
@@ -119,6 +127,23 @@ export async function POST(request: Request) {
           ok: true,
           data: saveStrategy(body.id, body.patch ?? { params: body.params, definition: body.definition })
         });
+      case "library_archive":
+      case "library_restore": {
+        if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const current = getStrategyById(body.id);
+        if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
+        const archived = body.action === "library_archive";
+        const nextDescription = applyLibraryArchiveTag(
+          current.description,
+          archived,
+        );
+        return NextResponse.json({
+          ok: true,
+          data: updateStrategyDisplayMeta(body.id, {
+            description: nextDescription,
+          }),
+        });
+      }
       case "rename_display": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
         return NextResponse.json({
@@ -195,7 +220,18 @@ export async function POST(request: Request) {
         });
       case "apply_paper":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
-        return NextResponse.json({ ok: true, data: setPaperActiveStrategy(body.id) });
+        return NextResponse.json({
+          ok: true,
+          data: preparePaperFromResults({
+            strategyId: body.id,
+            backtestRunId: body.backtestRunId ?? body.backtestResultId ?? null,
+            backtestResultId: body.backtestResultId ?? body.backtestRunId ?? null,
+            symbol: body.symbol ?? null,
+            timeframe: body.timeframe ?? null,
+            sourceResearchJobId: body.sourceResearchJobId ?? null,
+            sourceTrialIteration: body.sourceTrialIteration ?? null,
+          }),
+        });
       case "apply_live":
       case "mark_live_candidate":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");

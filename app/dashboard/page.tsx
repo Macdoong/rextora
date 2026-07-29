@@ -1,14 +1,23 @@
-import { PageHeader } from "@/components/rextora/StatusCards";
+import { Badge, PageHeader } from "@/components/ui/primitives";
 import { LifecycleDashboard } from "@/components/rextora/dashboard/LifecycleDashboard";
+import { AgentPanel } from "@/components/rextora/agent/AgentPanel";
+import { FirstRunOnboarding } from "@/components/rextora/firstRun/FirstRunOnboarding";
+import { Suspense } from "react";
 
 export default function DashboardPage() {
   return (
     <div className="rextora-page">
       <PageHeader
         compact
+        eyebrow="AI TRADING EMPLOYEE"
         title="대시보드"
-        description="지금 진행 중인 연구와 다음으로 확인할 단계를 한눈에 봅니다. 실전 주문은 승인 전까지 차단됩니다."
+        description="AI 연구원에게 질문하고, 현재 연구와 승인이 필요한 다음 단계를 한눈에 확인합니다."
+        actions={<Badge tone="success">모의 거래 · 실전 주문 차단</Badge>}
       />
+      <Suspense fallback={null}>
+        <FirstRunOnboarding />
+      </Suspense>
+      <AgentPanel />
       <LifecycleDashboard />
     </div>
   );

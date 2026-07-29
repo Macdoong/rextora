@@ -153,7 +153,7 @@ a {
 }
 
 .rextora-table {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
@@ -167,7 +167,7 @@ a {
 }
 
 .rextora-badge {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   line-height: 1.3;
   font-weight: 650;
   letter-spacing: 0.01em;
@@ -183,7 +183,7 @@ a {
 }
 
 .rextora-helper {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.5;
   letter-spacing: 0;
   font-weight: 400;
@@ -191,7 +191,7 @@ a {
 }
 
 .rextora-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   line-height: 1.35;
   font-weight: 550;
   letter-spacing: 0.01em;
@@ -239,6 +239,14 @@ a {
   gap: var(--space-section);
   animation: rx-fade-in var(--duration) var(--ease-out);
   max-width: 1600px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.rextora-responsive-container {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
 }
 
 .data-grid {
@@ -279,7 +287,7 @@ a {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.45;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
@@ -292,7 +300,7 @@ a {
   background: rgba(8, 14, 26, 0.97);
   backdrop-filter: blur(8px);
   color: var(--text-muted);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -339,7 +347,7 @@ a {
 /* Form controls */
 .rextora-input {
   width: 100%;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: rgba(2, 6, 16, 0.8);
@@ -351,6 +359,146 @@ a {
   transition:
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.rextora-segmented {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-x: auto;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 16, 0.58);
+}
+
+.rextora-segmented button {
+  min-height: 2.25rem;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 0.2rem);
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.45rem 0.8rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rextora-segmented button:hover:not(:disabled) {
+  color: var(--text);
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.rextora-segmented button.is-active {
+  color: #eff6ff;
+  background: rgba(37, 99, 235, 0.82);
+  box-shadow: var(--shadow-sm);
+}
+
+.rextora-segmented button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rextora-collapsible {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(10, 16, 28, 0.72);
+}
+
+.rextora-collapsible > summary {
+  display: flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.rextora-collapsible > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rextora-collapsible > summary svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.rextora-collapsible[open] > summary svg {
+  transform: rotate(180deg);
+}
+
+.rextora-collapsible-body {
+  border-top: 1px solid var(--border-subtle);
+  padding: 1rem;
+}
+
+.rextora-state {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 16, 0.28);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.rextora-sticky-actions {
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(8, 14, 26, 0.94);
+  padding: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+}
+
+.rextora-mobile-card-list {
+  display: none;
+}
+
+.rextora-icon-button {
+  display: inline-grid;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.rextora-icon-button:hover {
+  color: var(--text);
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.rextora-drawer {
+  display: flex;
+  width: min(34rem, 100%);
+  height: 100%;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-lg);
+}
+
+.rextora-drawer-bottom {
+  align-self: end;
+  width: 100%;
+  height: min(80vh, 46rem);
+  border-top: 1px solid var(--border);
+  border-left: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .rextora-input:hover {
@@ -473,6 +621,57 @@ a {
   }
 }
 
+@media (max-width: 767px) {
+  .dashboard-main {
+    padding: 1rem 1rem 6rem;
+  }
+
+  .rextora-page {
+    gap: 1.25rem;
+  }
+
+  .rextora-card {
+    border-radius: var(--radius-md);
+  }
+
+  .rextora-btn-text,
+  .rextora-input,
+  .rextora-segmented button,
+  summary,
+  button,
+  a {
+    min-height: 2.75rem;
+  }
+
+  .rextora-sticky-actions {
+    bottom: 0.5rem;
+  }
+
+  .rextora-mobile-card-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .rextora-table-desktop-only {
+    display: none;
+  }
+
+  .rextora-dialog {
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+  }
+
+  .rextora-trade-inspector {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow-y: auto;
+    border-radius: 0;
+    padding: 1rem;
+    overscroll-behavior: contain;
+  }
+}
+
 @media (min-width: 1600px) {
   .dashboard-main {
     padding: 1.75rem 2.25rem 3.5rem;
@@ -533,9 +732,9 @@ a {
 }
 
 [data-testid="strategy-search-page"] .ss-helper {
-  font-size: 0.75rem; /* 12px */
-  line-height: 1.45;
-  color: var(--text-muted);
+  font-size: 0.8125rem; /* 13px — readable helper, not microcopy */
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text-muted) 70%, var(--text-secondary));
 }
 
 [data-testid="strategy-search-page"] .ss-input {
@@ -595,3 +794,132 @@ a {
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+[data-testid="strategy-search-create"] [data-testid="ss-pattern-config-levels"] > h4,
+[data-testid="strategy-search-create"] [data-testid="ss-pattern-config-levels"] > .flex {
+  display: none;
+}
+
+[data-testid="strategy-search-create"][data-config-level="automatic"]
+  :is(
+    #ss-section-strategy-scope,
+    #ss-section-patterns,
+    #ss-section-data,
+    #ss-section-risk,
+    #ss-section-validation,
+    #ss-section-execution,
+    #ss-section-engine,
+    #ss-section-expert,
+    #ss-section-config
+  ) {
+  display: none;
+}
+
+[data-testid="strategy-search-create"][data-config-level="basic"]
+  :is(
+    #ss-section-data,
+    #ss-section-execution,
+    #ss-section-engine,
+    #ss-section-expert,
+    #ss-section-config
+  ) {
+  display: none;
+}
+
+[data-testid="strategy-search-create"][data-config-level="basic"]
+  [data-testid="ss-pattern-search"]
+  > .overflow-x-auto {
+  display: none;
+}
+
+.ss-top10-table :is(th, td):nth-child(n + 8):nth-child(-n + 15),
+.ss-top10-table :is(th, td):nth-child(17),
+.ss-top10-table :is(th, td):nth-child(18) {
+  display: none;
+}
+
+/* ── Results / Backtest readability (scoped, dark theme preserved) ── */
+[data-testid="results-page"] {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+[data-testid="results-page"] .rextora-card,
+[data-testid="results-page"] [class*="Card"] {
+  --results-card-pad: 1rem;
+}
+
+[data-testid="results-page"] p,
+[data-testid="results-page"] .text-xs {
+  line-height: 1.5;
+}
+
+[data-testid="results-page"] .text-slate-400,
+[data-testid="results-page"] .text-slate-500 {
+  color: color-mix(in srgb, var(--text-muted) 55%, var(--text-secondary));
+}
+
+.results-top10-table :is(th, td):nth-child(n + 9) {
+  display: none;
+}
+
+[data-testid="results-final-recommendation"] .rextora-card-title {
+  font-size: 1.125rem;
+}
+
+[data-testid="results-final-recommendation"] .rextora-metric-secondary {
+  font-size: 1.25rem;
+}
+
+[data-testid="backtest-analysis"] {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+[data-testid="backtest-analysis"][data-active-section="price"]
+  [data-section]:not([data-section="summary"]):not([data-section="price"]),
+[data-testid="backtest-analysis"][data-active-section="trades"]
+  [data-section]:not([data-section="summary"]):not([data-section="trades"]),
+[data-testid="backtest-analysis"][data-active-section="monthly"]
+  [data-section]:not([data-section="summary"]):not([data-section="monthly"]),
+[data-testid="backtest-analysis"][data-active-section="cost"]
+  [data-section]:not([data-section="summary"]):not([data-section="cost"]),
+[data-testid="backtest-analysis"][data-active-section="equity"]
+  [data-section]:not([data-section="summary"]):not([data-section="equity"]),
+[data-testid="backtest-analysis"][data-active-section="timeline"]
+  [data-section]:not([data-section="summary"]):not([data-section="timeline"]),
+[data-testid="backtest-analysis"][data-active-section="advanced"]
+  [data-section]:not([data-section="summary"]):not([data-section="advanced"]),
+[data-testid="backtest-analysis"][data-active-section="validation"]
+  [data-section]:not([data-section="summary"]):not([data-section="validation"]) {
+  display: none;
+}
+
+[data-testid="backtest-trade-workspace"] table {
+  font-size: 0.875rem;
+}
+
+[data-testid="selected-trade-inspector"] {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+[data-testid="pattern-summary"] {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

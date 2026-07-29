@@ -1,6 +1,14 @@
 /**
- * Paper trading session persistence.
+ * Paper trading session persistence — AUTHORITATIVE commercial session ledger.
  * Writes only under data/rextora/paper-sessions/ — never touches SAFE strategy files.
+ *
+ * Schema version 2 expands identity + lifecycle fields. On read, v1 records migrate
+ * deterministically via migratePaperSessionRecord (idempotent).
+ *
+ * @deprecated Direct createPaperSession({…}) that jumps to "active" is replaced by
+ * preparePaperSession → approveAndStartPaperSession in paperSessionService.
+ * Legacy createPaperSession remains as prepare+approve without executor start for
+ * store-level tests; commercial API/UI must use paperSessionService.
  */
 
 import fs from "node:fs";
@@ -16,37 +24,73 @@ import {
   type StoredStrategyV1,
 } from "../strategy/definition/bridge";
 import { computeStrategyHash } from "../strategy/strategyHash";
+import { paperSessionsRootDefault } from "../storage/runtimePaths";
 
-export type PaperSessionStatus = "active" | "paused" | "stopped";
+/** Canonical commercial Paper session status. */
+export type PaperSessionStatus =
+  | "pending_approval"
+  | "ready"
+  | "active"
+  | "paused"
+  | "stopped"
+  | "failed";
+
+export const PAPER_SESSION_SCHEMA_VERSION = 2 as const;
+
+export type PaperExecutionMode = "paper";
 
 export interface PaperSession {
+  schemaVersion: typeof PAPER_SESSION_SCHEMA_VERSION;
+  /** Alias of id for commercial contract. */
+  sessionId: string;
   id: string;
   strategyId: string;
   strategyHash: string;
+  /** Strategy params hash captured at session creation (never substitutes strategyHash). */
+  paramsHash: string;
   /** Search candidate identity captured at promotion, when applicable. */
-  sourceParamsHash?: string | null;
+  sourceParamsHash: string | null;
+  sourceResearchJobId: string | null;
+  sourceTrialIteration: number | null;
+  backtestRunId: string | null;
+  /** @deprecated Prefer backtestRunId — kept for v1 read compatibility. */
+  backtestResultId: string | null;
+  /** @deprecated Prefer sourceResearchJobId. */
+  linkedJobId: string | null;
   strategyName: string;
-  /** Immutable display identity captured when this historical session starts. */
-  displayAliasSnapshot?: string | null;
-  displayNameSnapshot?: string | null;
+  displayAliasSnapshot: string | null;
+  displayNameSnapshot: string | null;
   status: PaperSessionStatus;
-  startedAt: string;
-  updatedAt: string;
+  mode: PaperExecutionMode;
+  /** Always false for Paper — no real exchange client calls. */
+  exchangeCalled: false;
+  symbol: string | null;
+  timeframe: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  pausedAt: string | null;
+  resumedAt: string | null;
   stoppedAt: string | null;
+  updatedAt: string;
+  heartbeatAt: string | null;
+  stopReason: string | null;
+  lastError: string | null;
+  version: number;
   virtualBalance: number;
   realizedPnl: number;
   unrealizedPnl: number;
   tradeCount: number;
   signalCount: number;
   drawdown: number;
-  backtestResultId: string | null;
-  linkedJobId: string | null;
-  /** Optional symbol preserved from the Backtest Run handoff. */
-  symbol?: string | null;
+  /** Set when a v1 record was migrated. */
+  migrationAudit?: {
+    fromSchemaVersion: number;
+    migratedAt: string;
+    notes: string[];
+  };
 }
 
 export interface PaperSessionStoreOptions {
-  /** Injectable root for tests. Default: data/rextora/paper-sessions */
   rootDir?: string;
 }
 
@@ -62,16 +106,21 @@ export class PaperSessionError extends Error {
 
 const DEFAULT_VIRTUAL_BALANCE = 10_000;
 
+const TERMINAL: ReadonlySet<PaperSessionStatus> = new Set(["stopped", "failed"]);
+
+/** Non-terminal sessions that own the commercial "current" slot. */
+const CURRENT: ReadonlySet<PaperSessionStatus> = new Set([
+  "pending_approval",
+  "ready",
+  "active",
+  "paused",
+]);
+
 function defaultRoot(): string {
   if (process.env.REXTORA_PAPER_SESSIONS_DIR) {
     return path.resolve(process.env.REXTORA_PAPER_SESSIONS_DIR);
   }
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "paper-sessions",
-  );
+  return paperSessionsRootDefault();
 }
 
 function resolveRoot(options?: PaperSessionStoreOptions): string {
@@ -116,7 +165,12 @@ function readJson<T>(filePath: string, fallback: T): T {
 type SessionIndex = {
   version: 1;
   updatedAt: string;
-  sessions: Array<{ id: string; strategyId: string; status: PaperSessionStatus; updatedAt: string }>;
+  sessions: Array<{
+    id: string;
+    strategyId: string;
+    status: PaperSessionStatus;
+    updatedAt: string;
+  }>;
 };
 
 function loadIndex(root: string): SessionIndex {
@@ -158,23 +212,505 @@ function assertNotSafeFileWrite(filePath: string): void {
   }
 }
 
-function persistSession(root: string, session: PaperSession): PaperSession {
-  const fp = sessionPath(root, session.id);
-  assertNotSafeFileWrite(fp);
-  writeJson(fp, session);
-  upsertIndexRow(root, session);
-  return session;
-}
-
-function readSession(root: string, id: string): PaperSession | null {
-  const fp = sessionPath(root, id);
-  if (!fs.existsSync(fp)) return null;
-  return readJson<PaperSession | null>(fp, null);
+function asStatus(raw: unknown): PaperSessionStatus | null {
+  if (
+    raw === "pending_approval" ||
+    raw === "ready" ||
+    raw === "active" ||
+    raw === "paused" ||
+    raw === "stopped" ||
+    raw === "failed"
+  ) {
+    return raw;
+  }
+  return null;
 }
 
 /**
- * Create a new active paper session for an existing strategy.
- * Never writes strategy files (including SAFE).
+ * Deterministic idempotent migration from legacy v1 (or partial) records to schema v2.
+ * Never starts a migrated session. Preserves stopped/paused/active states.
+ */
+export function migratePaperSessionRecord(
+  raw: Record<string, unknown>,
+): PaperSession {
+  const notes: string[] = [];
+  const fromVersion =
+    typeof raw.schemaVersion === "number" && Number.isFinite(raw.schemaVersion)
+      ? Math.trunc(raw.schemaVersion)
+      : 1;
+
+  const id =
+    typeof raw.id === "string" && raw.id.startsWith("paper_")
+      ? raw.id
+      : typeof raw.sessionId === "string" && raw.sessionId.startsWith("paper_")
+        ? raw.sessionId
+        : null;
+  if (!id) {
+    throw new PaperSessionError("corrupted session: missing id", "CORRUPT_SESSION");
+  }
+
+  const status = asStatus(raw.status);
+  if (!status) {
+    throw new PaperSessionError(
+      `corrupted session: invalid status ${String(raw.status)}`,
+      "CORRUPT_SESSION",
+    );
+  }
+
+  const strategyId =
+    typeof raw.strategyId === "string" && raw.strategyId.trim()
+      ? raw.strategyId.trim()
+      : null;
+  if (!strategyId) {
+    throw new PaperSessionError(
+      "corrupted session: missing strategyId",
+      "CORRUPT_SESSION",
+    );
+  }
+
+  const strategyHash =
+    typeof raw.strategyHash === "string" && raw.strategyHash.trim()
+      ? raw.strategyHash
+      : null;
+  if (!strategyHash) {
+    throw new PaperSessionError(
+      "corrupted session: missing strategyHash",
+      "CORRUPT_SESSION",
+    );
+  }
+
+  const backtestRunId =
+    (typeof raw.backtestRunId === "string" ? raw.backtestRunId : null) ??
+    (typeof raw.backtestResultId === "string" ? raw.backtestResultId : null);
+
+  const sourceResearchJobId =
+    (typeof raw.sourceResearchJobId === "string"
+      ? raw.sourceResearchJobId
+      : null) ??
+    (typeof raw.linkedJobId === "string" ? raw.linkedJobId : null);
+
+  if (raw.backtestResultId && !raw.backtestRunId) {
+    notes.push("mapped backtestResultId → backtestRunId");
+  }
+  if (raw.linkedJobId && !raw.sourceResearchJobId) {
+    notes.push("mapped linkedJobId → sourceResearchJobId");
+  }
+  if (fromVersion < PAPER_SESSION_SCHEMA_VERSION) {
+    notes.push(`migrated schema ${fromVersion} → ${PAPER_SESSION_SCHEMA_VERSION}`);
+  }
+
+  const createdAt =
+    typeof raw.createdAt === "string"
+      ? raw.createdAt
+      : typeof raw.startedAt === "string"
+        ? raw.startedAt
+        : typeof raw.updatedAt === "string"
+          ? raw.updatedAt
+          : nowIso();
+
+  const startedAt =
+    typeof raw.startedAt === "string"
+      ? raw.startedAt
+      : status === "active" || status === "paused" || status === "stopped"
+        ? createdAt
+        : null;
+
+  const paramsHash =
+    typeof raw.paramsHash === "string" && raw.paramsHash.trim()
+      ? raw.paramsHash
+      : typeof raw.sourceParamsHash === "string"
+        ? raw.sourceParamsHash
+        : "";
+
+  if (!raw.paramsHash) notes.push("paramsHash derived from sourceParamsHash or empty");
+
+  const session: PaperSession = {
+    schemaVersion: PAPER_SESSION_SCHEMA_VERSION,
+    sessionId: id,
+    id,
+    strategyId,
+    strategyHash,
+    paramsHash,
+    sourceParamsHash:
+      typeof raw.sourceParamsHash === "string" || raw.sourceParamsHash === null
+        ? (raw.sourceParamsHash as string | null)
+        : null,
+    sourceResearchJobId,
+    sourceTrialIteration:
+      typeof raw.sourceTrialIteration === "number" &&
+      Number.isFinite(raw.sourceTrialIteration)
+        ? Math.trunc(raw.sourceTrialIteration)
+        : null,
+    backtestRunId,
+    backtestResultId: backtestRunId,
+    linkedJobId: sourceResearchJobId,
+    strategyName:
+      typeof raw.strategyName === "string" ? raw.strategyName : strategyId,
+    displayAliasSnapshot:
+      typeof raw.displayAliasSnapshot === "string" ||
+      raw.displayAliasSnapshot === null
+        ? (raw.displayAliasSnapshot as string | null)
+        : null,
+    displayNameSnapshot:
+      typeof raw.displayNameSnapshot === "string" ||
+      raw.displayNameSnapshot === null
+        ? (raw.displayNameSnapshot as string | null)
+        : null,
+    status,
+    mode: "paper",
+    exchangeCalled: false,
+    symbol:
+      typeof raw.symbol === "string"
+        ? raw.symbol.toUpperCase()
+        : raw.symbol === null
+          ? null
+          : null,
+    timeframe:
+      typeof raw.timeframe === "string"
+        ? raw.timeframe
+        : raw.timeframe === null
+          ? null
+          : null,
+    createdAt,
+    startedAt,
+    pausedAt: typeof raw.pausedAt === "string" ? raw.pausedAt : null,
+    resumedAt: typeof raw.resumedAt === "string" ? raw.resumedAt : null,
+    stoppedAt: typeof raw.stoppedAt === "string" ? raw.stoppedAt : null,
+    updatedAt:
+      typeof raw.updatedAt === "string" ? raw.updatedAt : createdAt,
+    heartbeatAt:
+      typeof raw.heartbeatAt === "string" ? raw.heartbeatAt : null,
+    stopReason:
+      typeof raw.stopReason === "string" ? raw.stopReason : null,
+    lastError: typeof raw.lastError === "string" ? raw.lastError : null,
+    version:
+      typeof raw.version === "number" && Number.isFinite(raw.version)
+        ? Math.max(1, Math.trunc(raw.version))
+        : 1,
+    virtualBalance:
+      typeof raw.virtualBalance === "number" && Number.isFinite(raw.virtualBalance)
+        ? raw.virtualBalance
+        : DEFAULT_VIRTUAL_BALANCE,
+    realizedPnl:
+      typeof raw.realizedPnl === "number" && Number.isFinite(raw.realizedPnl)
+        ? raw.realizedPnl
+        : 0,
+    unrealizedPnl:
+      typeof raw.unrealizedPnl === "number" && Number.isFinite(raw.unrealizedPnl)
+        ? raw.unrealizedPnl
+        : 0,
+    tradeCount:
+      typeof raw.tradeCount === "number" && Number.isFinite(raw.tradeCount)
+        ? Math.trunc(raw.tradeCount)
+        : 0,
+    signalCount:
+      typeof raw.signalCount === "number" && Number.isFinite(raw.signalCount)
+        ? Math.trunc(raw.signalCount)
+        : 0,
+    drawdown:
+      typeof raw.drawdown === "number" && Number.isFinite(raw.drawdown)
+        ? raw.drawdown
+        : 0,
+  };
+
+  if (notes.length > 0 && fromVersion < PAPER_SESSION_SCHEMA_VERSION) {
+    session.migrationAudit = {
+      fromSchemaVersion: fromVersion,
+      migratedAt: nowIso(),
+      notes,
+    };
+  } else if (
+    raw.migrationAudit &&
+    typeof raw.migrationAudit === "object" &&
+    raw.migrationAudit !== null
+  ) {
+    session.migrationAudit = raw.migrationAudit as PaperSession["migrationAudit"];
+  }
+
+  return session;
+}
+
+function persistSession(root: string, session: PaperSession): PaperSession {
+  const fp = sessionPath(root, session.id);
+  assertNotSafeFileWrite(fp);
+  const normalized: PaperSession = {
+    ...session,
+    schemaVersion: PAPER_SESSION_SCHEMA_VERSION,
+    sessionId: session.id,
+    mode: "paper",
+    exchangeCalled: false,
+    backtestResultId: session.backtestRunId,
+    linkedJobId: session.sourceResearchJobId,
+  };
+  writeJson(fp, normalized);
+  upsertIndexRow(root, normalized);
+  return normalized;
+}
+
+function readSessionRaw(root: string, id: string): PaperSession | null {
+  const fp = sessionPath(root, id);
+  if (!fs.existsSync(fp)) return null;
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as Record<string, unknown>;
+  } catch {
+    throw new PaperSessionError(
+      `corrupted session JSON: ${id}`,
+      "CORRUPT_SESSION",
+    );
+  }
+  const migrated = migratePaperSessionRecord(parsed);
+  // Persist migration when schema advanced (idempotent rewrite).
+  if (
+    parsed.schemaVersion !== PAPER_SESSION_SCHEMA_VERSION ||
+    !parsed.sessionId ||
+    !parsed.paramsHash
+  ) {
+    persistSession(root, migrated);
+  }
+  return migrated;
+}
+
+function bump(session: PaperSession, patch: Partial<PaperSession>): PaperSession {
+  return {
+    ...session,
+    ...patch,
+    version: session.version + 1,
+    updatedAt: nowIso(),
+    sessionId: session.id,
+    mode: "paper",
+    exchangeCalled: false,
+  };
+}
+
+function resolveIdentityFromStrategy(strategyId: string): {
+  strategy: StoredStrategyV1;
+  strategyHash: string;
+  paramsHash: string;
+  sourceParamsHash: string | null;
+  sourceResearchJobId: string | null;
+  sourceTrialIteration: number | null;
+  strategyName: string;
+  displayAliasSnapshot: string | null;
+  displayNameSnapshot: string | null;
+  timeframe: string | null;
+} {
+  const strategy = getStrategyById(strategyId);
+  if (!strategy) {
+    throw new PaperSessionError(
+      `strategy not found: ${strategyId}`,
+      "STRATEGY_NOT_FOUND",
+    );
+  }
+  const hydrated = getStrategyById(strategy.id) ?? strategy;
+  const strategyHash =
+    hydrated.strategyHash ??
+    computeStrategyHash(storedToDefinition(hydrated as StoredStrategyV1));
+  const meta = (hydrated.definition?.metadata ?? {}) as Record<string, unknown>;
+  const trial =
+    typeof meta.sourceTrialIteration === "number"
+      ? Math.trunc(meta.sourceTrialIteration)
+      : typeof meta.trialIteration === "number"
+        ? Math.trunc(meta.trialIteration)
+        : null;
+  const jobId =
+    typeof meta.sourceResearchJobId === "string"
+      ? meta.sourceResearchJobId
+      : typeof meta.linkedJobId === "string"
+        ? meta.linkedJobId
+        : null;
+
+  return {
+    strategy: hydrated as StoredStrategyV1,
+    strategyHash,
+    paramsHash: hydrated.paramsHash ?? "",
+    sourceParamsHash: hydrated.sourceParamsHash ?? hydrated.paramsHash ?? null,
+    sourceResearchJobId: jobId,
+    sourceTrialIteration: trial,
+    strategyName:
+      hydrated.displayAlias ?? hydrated.displayName ?? hydrated.name,
+    displayAliasSnapshot: hydrated.displayAlias ?? null,
+    displayNameSnapshot: hydrated.displayName ?? null,
+    timeframe:
+      typeof hydrated.definition?.timeframe === "string"
+        ? hydrated.definition.timeframe
+        : null,
+  };
+}
+
+function stopCurrentNonTerminal(
+  options?: PaperSessionStoreOptions,
+  exceptId?: string,
+): void {
+  const current = getCurrentPaperSession(options);
+  if (current && current.id !== exceptId && CURRENT.has(current.status)) {
+    stopPaperSession(current.id, options, "replaced_by_new_session");
+  }
+}
+
+export type PreparePaperSessionInput = {
+  strategyId: string;
+  virtualBalance?: number;
+  backtestRunId?: string | null;
+  /** @deprecated use backtestRunId */
+  backtestResultId?: string | null;
+  sourceResearchJobId?: string | null;
+  linkedJobId?: string | null;
+  sourceTrialIteration?: number | null;
+  symbol?: string | null;
+  timeframe?: string | null;
+  /** When true, status is pending_approval; otherwise ready. */
+  requireApproval?: boolean;
+};
+
+/**
+ * Prepare a Paper session without starting execution.
+ * Status: pending_approval | ready.
+ */
+export function preparePaperSession(
+  input: PreparePaperSessionInput,
+  options?: PaperSessionStoreOptions,
+): PaperSession {
+  const strategyId = input.strategyId?.trim();
+  if (!strategyId) {
+    throw new PaperSessionError("strategyId required", "STRATEGY_REQUIRED");
+  }
+
+  const identity = resolveIdentityFromStrategy(strategyId);
+  const root = resolveRoot(options);
+  ensureDir(root);
+  stopCurrentNonTerminal(options);
+
+  // Registry flag is policy/eligibility only — sync to this strategy for UX.
+  setPaperActiveStrategy(identity.strategy.id);
+
+  const now = nowIso();
+  const backtestRunId =
+    input.backtestRunId ?? input.backtestResultId ?? null;
+  const sourceResearchJobId =
+    input.sourceResearchJobId ??
+    input.linkedJobId ??
+    identity.sourceResearchJobId;
+  const status: PaperSessionStatus = input.requireApproval
+    ? "pending_approval"
+    : "ready";
+
+  const session: PaperSession = {
+    schemaVersion: PAPER_SESSION_SCHEMA_VERSION,
+    sessionId: "",
+    id: `paper_${crypto.randomUUID()}`,
+    strategyId: identity.strategy.id,
+    strategyHash: identity.strategyHash,
+    paramsHash: identity.paramsHash,
+    sourceParamsHash: identity.sourceParamsHash,
+    sourceResearchJobId,
+    sourceTrialIteration:
+      input.sourceTrialIteration ?? identity.sourceTrialIteration,
+    backtestRunId,
+    backtestResultId: backtestRunId,
+    linkedJobId: sourceResearchJobId,
+    strategyName: identity.strategyName,
+    displayAliasSnapshot: identity.displayAliasSnapshot,
+    displayNameSnapshot: identity.displayNameSnapshot,
+    status,
+    mode: "paper",
+    exchangeCalled: false,
+    symbol: input.symbol ? String(input.symbol).toUpperCase() : null,
+    timeframe: input.timeframe ?? identity.timeframe,
+    createdAt: now,
+    startedAt: null,
+    pausedAt: null,
+    resumedAt: null,
+    stoppedAt: null,
+    updatedAt: now,
+    heartbeatAt: null,
+    stopReason: null,
+    lastError: null,
+    version: 1,
+    virtualBalance:
+      typeof input.virtualBalance === "number" &&
+      Number.isFinite(input.virtualBalance)
+        ? input.virtualBalance
+        : DEFAULT_VIRTUAL_BALANCE,
+    realizedPnl: 0,
+    unrealizedPnl: 0,
+    tradeCount: 0,
+    signalCount: 0,
+    drawdown: 0,
+  };
+  session.sessionId = session.id;
+  return persistSession(root, session);
+}
+
+/**
+ * Move pending_approval → ready (human reviewed, still not executing).
+ */
+export function markPaperSessionReady(
+  id: string,
+  options?: PaperSessionStoreOptions,
+): PaperSession {
+  const root = resolveRoot(options);
+  const session = readSessionRaw(root, id);
+  if (!session) {
+    throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
+  }
+  if (session.status === "ready") return session;
+  if (session.status !== "pending_approval") {
+    throw new PaperSessionError(
+      `cannot mark ready from status ${session.status}`,
+      "INVALID_STATE",
+    );
+  }
+  return persistSession(
+    root,
+    bump(session, { status: "ready", lastError: null }),
+  );
+}
+
+/**
+ * Approve and activate a prepared session (ready|pending_approval → active).
+ * Does not start the bot executor — paperSessionService owns that boundary.
+ */
+export function activatePaperSession(
+  id: string,
+  options?: PaperSessionStoreOptions,
+): PaperSession {
+  const root = resolveRoot(options);
+  const session = readSessionRaw(root, id);
+  if (!session) {
+    throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
+  }
+  if (session.status === "active") {
+    throw new PaperSessionError(
+      "session already active",
+      "DUPLICATE_START",
+    );
+  }
+  if (session.status !== "ready" && session.status !== "pending_approval") {
+    throw new PaperSessionError(
+      `cannot activate from status ${session.status}`,
+      "INVALID_STATE",
+    );
+  }
+  // Ensure no other current session remains.
+  stopCurrentNonTerminal(options, session.id);
+  setPaperActiveStrategy(session.strategyId);
+  const now = nowIso();
+  return persistSession(
+    root,
+    bump(session, {
+      status: "active",
+      startedAt: session.startedAt ?? now,
+      heartbeatAt: now,
+      lastError: null,
+      stopReason: null,
+    }),
+  );
+}
+
+/**
+ * @deprecated Prefer preparePaperSession + activatePaperSession via paperSessionService.
+ * Legacy atomic create → active (no executor). Kept for store tests and migration.
  */
 export function createPaperSession(
   input: {
@@ -186,83 +722,65 @@ export function createPaperSession(
   },
   options?: PaperSessionStoreOptions,
 ): PaperSession {
-  const strategyId = input.strategyId?.trim();
-  if (!strategyId) {
-    throw new PaperSessionError("strategyId required", "STRATEGY_REQUIRED");
-  }
-
-  const strategy = getStrategyById(strategyId);
-  if (!strategy) {
-    throw new PaperSessionError(
-      `strategy not found: ${strategyId}`,
-      "STRATEGY_NOT_FOUND",
-    );
-  }
-
-  const root = resolveRoot(options);
-  ensureDir(root);
-
-  // Finalize any currently active session so getActivePaperSession stays singular.
-  const existingActive = getActivePaperSession(options);
-  if (existingActive) {
-    stopPaperSession(existingActive.id, options);
-  }
-
-  // Always re-assert singular paperActive so stale flags cannot diverge
-  // from the session that will execute.
-  setPaperActiveStrategy(strategy.id);
-
-  const hydrated = getStrategyById(strategy.id) ?? strategy;
-  const strategyHash =
-    hydrated.strategyHash ??
-    computeStrategyHash(storedToDefinition(hydrated as StoredStrategyV1));
-
-  const now = nowIso();
-  const session: PaperSession = {
-    id: `paper_${crypto.randomUUID()}`,
-    strategyId: hydrated.id,
-    strategyHash,
-    sourceParamsHash:
-      hydrated.sourceParamsHash ?? hydrated.paramsHash ?? null,
-    strategyName:
-      hydrated.displayAlias ?? hydrated.displayName ?? hydrated.name,
-    displayAliasSnapshot: hydrated.displayAlias ?? null,
-    displayNameSnapshot: hydrated.displayName ?? null,
-    status: "active",
-    startedAt: now,
-    updatedAt: now,
-    stoppedAt: null,
-    virtualBalance:
-      typeof input.virtualBalance === "number" &&
-      Number.isFinite(input.virtualBalance)
-        ? input.virtualBalance
-        : DEFAULT_VIRTUAL_BALANCE,
-    realizedPnl: 0,
-    unrealizedPnl: 0,
-    tradeCount: 0,
-    signalCount: 0,
-    drawdown: 0,
-    backtestResultId: input.backtestResultId ?? null,
-    linkedJobId: input.linkedJobId ?? null,
-    symbol: input.symbol ? String(input.symbol).toUpperCase() : null,
-  };
-
-  return persistSession(root, session);
+  const prepared = preparePaperSession(
+    {
+      strategyId: input.strategyId,
+      virtualBalance: input.virtualBalance,
+      backtestResultId: input.backtestResultId,
+      linkedJobId: input.linkedJobId,
+      symbol: input.symbol,
+      requireApproval: false,
+    },
+    options,
+  );
+  return activatePaperSession(prepared.id, options);
 }
 
-export function getActivePaperSession(
+/** Current commercial session: pending_approval|ready|active|paused. */
+export function getCurrentPaperSession(
   options?: PaperSessionStoreOptions,
 ): PaperSession | null {
   const root = resolveRoot(options);
   const index = loadIndex(root);
   for (const row of index.sessions) {
-    if (row.status !== "active" && row.status !== "paused") continue;
-    const session = readSession(root, row.id);
-    if (session && (session.status === "active" || session.status === "paused")) {
-      return session;
+    if (!CURRENT.has(row.status as PaperSessionStatus)) continue;
+    try {
+      const session = readSessionRaw(root, row.id);
+      if (session && CURRENT.has(session.status)) return session;
+    } catch (err) {
+      if (err instanceof PaperSessionError && err.code === "CORRUPT_SESSION") {
+        continue;
+      }
+      throw err;
     }
   }
   return null;
+}
+
+/**
+ * Execution-eligible session only (status === active).
+ * Paused/ready/pending never execute.
+ */
+export function getExecutablePaperSession(
+  options?: PaperSessionStoreOptions,
+): PaperSession | null {
+  const current = getCurrentPaperSession(options);
+  return current?.status === "active" ? current : null;
+}
+
+/**
+ * Commercial "active slot": active or paused (authoritative after restart).
+ * @deprecated Name kept for callers; prefer getCurrentPaperSession / getExecutablePaperSession.
+ */
+export function getActivePaperSession(
+  options?: PaperSessionStoreOptions,
+): PaperSession | null {
+  const current = getCurrentPaperSession(options);
+  if (!current) return null;
+  if (current.status === "active" || current.status === "paused") return current;
+  // Include ready/pending for UI consumers that previously used "active=1"
+  // to mean "current session" — they should migrate to getCurrentPaperSession.
+  return current;
 }
 
 export function listPaperSessions(
@@ -272,8 +790,15 @@ export function listPaperSessions(
   const index = loadIndex(root);
   const out: PaperSession[] = [];
   for (const row of index.sessions) {
-    const session = readSession(root, row.id);
-    if (session) out.push(session);
+    try {
+      const session = readSessionRaw(root, row.id);
+      if (session) out.push(session);
+    } catch (err) {
+      if (err instanceof PaperSessionError && err.code === "CORRUPT_SESSION") {
+        continue;
+      }
+      throw err;
+    }
   }
   return out.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 }
@@ -283,7 +808,14 @@ export function getPaperSession(
   options?: PaperSessionStoreOptions,
 ): PaperSession | null {
   const root = resolveRoot(options);
-  return readSession(root, id);
+  try {
+    return readSessionRaw(root, id);
+  } catch (err) {
+    if (err instanceof PaperSessionError && err.code === "CORRUPT_SESSION") {
+      throw err;
+    }
+    return null;
+  }
 }
 
 export function pausePaperSession(
@@ -291,20 +823,30 @@ export function pausePaperSession(
   options?: PaperSessionStoreOptions,
 ): PaperSession {
   const root = resolveRoot(options);
-  const session = readSession(root, id);
+  const session = readSessionRaw(root, id);
   if (!session) {
     throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
   }
-  if (session.status === "stopped") {
-    throw new PaperSessionError("stopped session cannot be paused", "INVALID_STATE");
+  if (TERMINAL.has(session.status)) {
+    throw new PaperSessionError(
+      "terminal session cannot be paused",
+      "INVALID_STATE",
+    );
   }
-  if (session.status === "paused") return session;
-  const next: PaperSession = {
-    ...session,
-    status: "paused",
-    updatedAt: nowIso(),
-  };
-  return persistSession(root, next);
+  if (session.status === "paused") {
+    throw new PaperSessionError("session already paused", "DUPLICATE_PAUSE");
+  }
+  if (session.status !== "active") {
+    throw new PaperSessionError(
+      `cannot pause from status ${session.status}`,
+      "INVALID_STATE",
+    );
+  }
+  const now = nowIso();
+  return persistSession(
+    root,
+    bump(session, { status: "paused", pausedAt: now }),
+  );
 }
 
 export function resumePaperSession(
@@ -312,38 +854,126 @@ export function resumePaperSession(
   options?: PaperSessionStoreOptions,
 ): PaperSession {
   const root = resolveRoot(options);
-  const session = readSession(root, id);
+  const session = readSessionRaw(root, id);
   if (!session) {
     throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
   }
-  if (session.status === "stopped") {
-    throw new PaperSessionError("stopped session cannot be resumed", "INVALID_STATE");
+  if (TERMINAL.has(session.status)) {
+    throw new PaperSessionError(
+      "terminal session cannot be resumed",
+      "INVALID_STATE",
+    );
   }
-  if (session.status === "active") return session;
-  const next: PaperSession = {
-    ...session,
-    status: "active",
-    updatedAt: nowIso(),
-  };
-  return persistSession(root, next);
+  if (session.status === "active") {
+    throw new PaperSessionError("session already active", "DUPLICATE_START");
+  }
+  if (session.status !== "paused") {
+    throw new PaperSessionError(
+      `cannot resume from status ${session.status}`,
+      "INVALID_STATE",
+    );
+  }
+  setPaperActiveStrategy(session.strategyId);
+  const now = nowIso();
+  return persistSession(
+    root,
+    bump(session, {
+      status: "active",
+      resumedAt: now,
+      heartbeatAt: now,
+    }),
+  );
 }
 
 export function stopPaperSession(
   id: string,
   options?: PaperSessionStoreOptions,
+  stopReason?: string | null,
 ): PaperSession {
   const root = resolveRoot(options);
-  const session = readSession(root, id);
+  const session = readSessionRaw(root, id);
   if (!session) {
     throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
   }
   if (session.status === "stopped") return session;
+  if (session.status === "failed") {
+    throw new PaperSessionError(
+      "failed session cannot transition to stopped",
+      "INVALID_STATE",
+    );
+  }
   const now = nowIso();
-  const next: PaperSession = {
-    ...session,
-    status: "stopped",
-    updatedAt: now,
-    stoppedAt: now,
-  };
-  return persistSession(root, next);
+  return persistSession(
+    root,
+    bump(session, {
+      status: "stopped",
+      stoppedAt: now,
+      stopReason: stopReason ?? session.stopReason ?? "user_stop",
+    }),
+  );
+}
+
+export function failPaperSession(
+  id: string,
+  lastError: string,
+  options?: PaperSessionStoreOptions,
+): PaperSession {
+  const root = resolveRoot(options);
+  const session = readSessionRaw(root, id);
+  if (!session) {
+    throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
+  }
+  if (TERMINAL.has(session.status)) {
+    throw new PaperSessionError(
+      "terminal session cannot fail again",
+      "INVALID_STATE",
+    );
+  }
+  const now = nowIso();
+  return persistSession(
+    root,
+    bump(session, {
+      status: "failed",
+      stoppedAt: now,
+      lastError,
+      stopReason: "failed",
+    }),
+  );
+}
+
+export function touchPaperSessionHeartbeat(
+  id: string,
+  options?: PaperSessionStoreOptions,
+): PaperSession | null {
+  const root = resolveRoot(options);
+  const session = readSessionRaw(root, id);
+  if (!session || session.status !== "active") return session;
+  return persistSession(
+    root,
+    bump(session, { heartbeatAt: nowIso() }),
+  );
+}
+
+export function assertSessionStrategyMatch(
+  session: PaperSession,
+  strategyId: string,
+): void {
+  if (session.strategyId !== strategyId.trim()) {
+    throw new PaperSessionError(
+      "strategyId does not match session identity",
+      "WRONG_STRATEGY",
+    );
+  }
+}
+
+export function assertSessionIdMatch(
+  session: PaperSession,
+  sessionId: string,
+): void {
+  if (session.id !== sessionId && session.sessionId !== sessionId) {
+    throw new PaperSessionError(
+      "sessionId does not match",
+      "WRONG_SESSION",
+    );
+  }
 }

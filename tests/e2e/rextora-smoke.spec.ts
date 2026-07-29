@@ -82,7 +82,18 @@ test.describe("Rextora lifecycle smoke", () => {
     await expect(expert).toBeAttached();
     await expect(page.getByTestId("ss-min-winrate")).not.toBeVisible();
     await expect(page.getByTestId("ss-section-engine")).toBeAttached();
+    await expect(page.getByTestId("ss-pattern-order_block")).not.toBeVisible();
+    // Switch to expert so pattern matrix is visible, then prove automatic
+    // selection disables manual family toggles until auto combo is turned off.
+    await page
+      .getByTestId("ss-config-level-control")
+      .getByRole("button", { name: "전문가" })
+      .click();
     await expect(page.getByTestId("ss-pattern-order_block")).toBeVisible();
+    await expect(page.getByTestId("ss-auto-strategy-combo")).toBeChecked();
+    await expect(page.getByTestId("ss-pattern-toggle-order_block")).toBeDisabled();
+    await expect(page.getByTestId("ss-pattern-matrix-system-managed")).toBeVisible();
+    await page.getByTestId("ss-auto-strategy-combo").uncheck();
     await expect(page.getByTestId("ss-pattern-toggle-order_block")).toBeEnabled();
     await expect(page.getByTestId("ss-pattern-toggle-fvg")).toBeEnabled();
     await expect(page.getByTestId("ss-pattern-toggle-trendline")).toBeEnabled();

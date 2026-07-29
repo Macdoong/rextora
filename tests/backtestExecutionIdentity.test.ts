@@ -328,20 +328,17 @@ describe("backtest polish UI source contracts", () => {
     expect(src).toContain("summary-cost-warning");
   });
 
-  it("sticky nav order and viewport observer are present", () => {
+  it("tab navigation order and active state wiring are present", () => {
     const src = wb();
     const nav = src.slice(
       src.indexOf("workbenchSections"),
       src.indexOf("scrollWorkbenchSection"),
     );
-    expect(nav.indexOf('"실행"')).toBeLessThan(nav.indexOf('"판정"'));
-    expect(nav.indexOf('"판정"')).toBeLessThan(nav.indexOf('"차트"'));
-    expect(nav.indexOf('"차트"')).toBeLessThan(nav.indexOf('"거래 목록"'));
+    expect(nav.indexOf('"차트"')).toBeLessThan(nav.indexOf('"거래"'));
+    expect(nav.indexOf('"거래"')).toBeLessThan(nav.indexOf('"월별"'));
     expect(nav.indexOf('"월별"')).toBeGreaterThan(0);
-    expect(src).toContain("IntersectionObserver");
     expect(src).toContain("activeNavSection");
     expect(src).toContain("bt-force-expand");
-    expect(src).toContain("backtest-nav-scroll-spacer");
     expect(src).toContain("navClickLocked");
     expect(src).toContain("scrollBottomGap");
   });

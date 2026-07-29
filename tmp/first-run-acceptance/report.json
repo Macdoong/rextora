@@ -1,0 +1,116 @@
+{
+  "BUILD_ID": "8X9stLmO705dlK1_br3FI",
+  "runtimeRoot": "C:\\Users\\user\\AppData\\Local\\Temp\\rextora-firstrun-browser-EgrbJc",
+  "strategiesDir": "C:\\Users\\user\\AppData\\Local\\Temp\\rextora-firstrun-browser-EgrbJc\\strategies",
+  "safeBefore": {
+    "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475",
+    "size": 1228
+  },
+  "steps": [
+    {
+      "ok": true,
+      "step": "server_up",
+      "BUILD_ID": "8X9stLmO705dlK1_br3FI"
+    },
+    {
+      "ok": true,
+      "step": "empty_onboarding_visible"
+    },
+    {
+      "ok": true,
+      "step": "confirm_required"
+    },
+    {
+      "ok": true,
+      "step": "demo_results_marked"
+    },
+    {
+      "ok": true,
+      "step": "demo_backtest_marked"
+    },
+    {
+      "ok": true,
+      "step": "paper_deeplink_no_auto_session"
+    },
+    {
+      "ok": true,
+      "step": "live_page_opened"
+    },
+    {
+      "ok": true,
+      "step": "demo_reset",
+      "mode": "EMPTY"
+    },
+    {
+      "ok": true,
+      "step": "idempotent_reinit"
+    },
+    {
+      "ok": true,
+      "step": "viewport_390",
+      "overflow": false
+    },
+    {
+      "ok": true,
+      "step": "viewport_768",
+      "overflow": false
+    },
+    {
+      "ok": true,
+      "step": "viewport_1024",
+      "overflow": false
+    },
+    {
+      "ok": true,
+      "step": "viewport_1440",
+      "overflow": false
+    },
+    {
+      "ok": true,
+      "step": "page_/strategy-search"
+    },
+    {
+      "ok": true,
+      "step": "page_/results"
+    },
+    {
+      "ok": true,
+      "step": "page_/backtest"
+    },
+    {
+      "ok": true,
+      "step": "page_/paper-trading"
+    },
+    {
+      "ok": true,
+      "step": "page_/live-trading"
+    }
+  ],
+  "screenshots": [
+    "C:\\Rextora\\tmp\\first-run-acceptance\\empty-first-run-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\demo-confirm-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\demo-results-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\demo-backtest-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\paper-deeplink-no-session-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\live-blocked-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\demo-reset-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\dashboard-390.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\dashboard-768.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\dashboard-1024.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\dashboard-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\page-strategy-search-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\page-results-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\page-backtest-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\page-paper-trading-1440.png",
+    "C:\\Rextora\\tmp\\first-run-acceptance\\page-live-trading-1440.png"
+  ],
+  "consoleErrors": [],
+  "verdictHints": [],
+  "safeAfter": {
+    "sha256": "53a3ab25bb41dda2bae13fe87cdd8f14abfd0b224bca3879becd71667eff7475",
+    "size": 1228
+  },
+  "safeUnchanged": true,
+  "consoleErrorCount": 0,
+  "ok": true
+}

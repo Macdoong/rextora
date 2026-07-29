@@ -599,6 +599,7 @@ function CandlePlot({
               opacity={z.opacity ?? 0.18}
               data-testid="chart-zone-rect"
             />
+            {z.label ? (
             <text
               x={left + 4}
               y={Math.min(y1, y2) + 12}
@@ -608,6 +609,7 @@ function CandlePlot({
             >
               {z.label}
             </text>
+          ) : null}
           </g>
         );
       })}
@@ -1088,12 +1090,17 @@ function CandlePlot({
                 setTooltip({
                   x,
                   y,
-                  header: marker.label,
-                  rows: (marker.tooltipLines ?? []).map((line) => ({
-                    label: "",
-                    value: line,
-                    tone: "muted",
-                  })),
+                  header:
+                    marker.label?.trim() ||
+                    marker.tooltipLines?.[0] ||
+                    (marker.kind === "rejected" ? "설정 거절" : marker.kind),
+                  rows: (marker.tooltipLines ?? [])
+                    .slice(marker.label?.trim() ? 0 : 1)
+                    .map((line) => ({
+                      label: "",
+                      value: line,
+                      tone: "muted",
+                    })),
                   footer: formatKoreanDateTime(marker.time),
                 })
               }

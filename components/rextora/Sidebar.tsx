@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { ModeBadge } from "@/components/rextora/ModeBadge";
 
 /** Primary lifecycle navigation — seven items only. */
@@ -48,7 +49,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden h-screen border-r border-slate-800/80 bg-slate-950/80 p-4 lg:block">
+      <aside className="rextora-desktop-sidebar sticky top-0 hidden h-screen border-r border-slate-800/80 bg-slate-950/80 p-4 min-[1101px]:block">
         <div className="mb-6 flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-violet-600 text-xl font-black shadow-glow">
             R
@@ -75,7 +76,7 @@ export function Sidebar() {
           {navItems.map(([label, href]) => {
             const active = navActive(pathname, href);
             return (
-              <a
+              <Link
                 key={href}
                 href={href}
                 data-testid={`nav-${href.slice(1).replace(/\//g, "-")}`}
@@ -86,7 +87,7 @@ export function Sidebar() {
                 }`}
               >
                 {label}
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -95,11 +96,14 @@ export function Sidebar() {
           Rextora Quant · SAFE_v44 보호
         </div>
       </aside>
-      <div className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 px-3 py-2 backdrop-blur lg:hidden">
+      <div
+        className="rextora-mobile-header sticky top-0 z-40 h-[61px] border-b border-slate-800 bg-slate-950/95 px-3 py-2 backdrop-blur min-[1101px]:hidden"
+        style={{ height: 61, minHeight: 61 }}
+      >
         <div className="flex items-center justify-between gap-3">
-          <a href="/dashboard" className="font-black text-white">
+          <Link href="/dashboard" className="flex min-h-11 items-center font-black text-white">
             Rextora
-          </a>
+          </Link>
           <ModeBadge />
           <details className="relative">
             <summary className="cursor-pointer list-none rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200">
@@ -107,20 +111,21 @@ export function Sidebar() {
             </summary>
             <nav
               className="absolute right-0 mt-2 grid w-52 gap-1 rounded-xl border border-slate-700 bg-slate-950 p-2 shadow-2xl"
+              style={{ position: "absolute", right: 0 }}
               data-testid="mobile-nav"
             >
               {navItems.map(([label, href]) => (
-                <a
+                <Link
                   key={href}
                   href={href}
-                  className={`rounded-lg px-3 py-2 text-sm ${
+                  className={`flex min-h-11 items-center rounded-lg px-3 py-2 text-sm ${
                     navActive(pathname, href)
                       ? "bg-violet-600 text-white"
                       : "text-slate-300"
                   }`}
                 >
                   {label}
-                </a>
+                </Link>
               ))}
             </nav>
           </details>

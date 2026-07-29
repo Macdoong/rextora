@@ -90,7 +90,7 @@ export interface PatternCombinationSpecInput {
     | "invalidation_composite";
   operator: "and" | "or" | "sequence" | "weighted_score" | "priority";
   failurePolicy: "any" | "all" | "majority";
-  invalidationMode: "any" | "all";
+  invalidationMode: "any" | "all" | "majority";
   weightedThreshold?: number;
   blocks: PatternCombinationBlockConfig[];
 }
@@ -115,6 +115,12 @@ export interface StrategySearchOperatorPlan {
   repeatedSignatureThreshold?: number | null;
   /** Optional override of SafeV44 search space ids (null = depth default). */
   selectedSpaceIds?: string[] | null;
+  /**
+   * Canonical pattern-family selection mode.
+   * automatic → selectedSpaceIds ignored (null); system picks spaces.
+   * manual → selectedSpaceIds persisted and applied.
+   */
+  patternSelectionMode?: "automatic" | "manual" | null;
   leverageMode?: "automatic" | "fixed" | "range" | "disabled" | null;
   leverageFixed?: number | null;
   leverageMin?: number | null;
@@ -153,7 +159,7 @@ export interface StrategySearchOperatorPlan {
     | "weighted_score"
     | "priority"
     | null;
-  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationInvalidationMode?: "any" | "all" | "majority" | null;
   patternCombinationFailurePolicy?: "any" | "all" | "majority" | null;
   patternCombinationWeightedThreshold?: number | null;
   patternCombinationFamilies?: string[] | null;

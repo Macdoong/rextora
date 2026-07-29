@@ -39,6 +39,7 @@ async function postAction(path: string, body: ActionBody = paperBody): Promise<E
   return response.json() as Promise<EngineResult>;
 }
 
+/** @deprecated Dev-only panel — commercial Paper UI uses /api/rextora/paper/session */
 export function PaperBotActionPanel() {
   const [status, setStatus] = useState("PAPER 모의 거래 대기");
   const [logs, setLogs] = useState<ActionLog[]>([]);

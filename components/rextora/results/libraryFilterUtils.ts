@@ -1,4 +1,6 @@
 import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
+import { descriptionHasLibraryArchive } from "@/src/lib/rextora/strategy/libraryArchive";
+import { isDemoStrategyRecord } from "@/src/lib/rextora/firstRun/demoIdentity";
 
 export type LibraryCategory =
   | "all"
@@ -55,10 +57,22 @@ export const LIBRARY_FILTER_BUTTONS: Array<{
   { id: "all", label: LIBRARY_CATEGORY_LABELS.all },
 ];
 
-function isExplicitlyArchived(s: LibraryStrategyRow): boolean {
+export {
+  applyLibraryArchiveTag,
+  descriptionHasLibraryArchive,
+} from "@/src/lib/rextora/strategy/libraryArchive";
+
+function isExplicitlyArchived(
+  s: Pick<LibraryStrategyRow, "archived" | "description">,
+): boolean {
   if (s.archived === true) return true;
-  const desc = s.description ?? "";
-  return desc.includes("libraryCategory=archive");
+  return descriptionHasLibraryArchive(s.description);
+}
+
+export function isLibraryArchived(
+  s: Pick<LibraryStrategyRow, "archived" | "description">,
+): boolean {
+  return isExplicitlyArchived(s);
 }
 
 export function parseLibraryProvenance(description: string | null | undefined): {
@@ -94,6 +108,7 @@ export function libraryCategoryOf(s: LibraryStrategyRow): Exclude<
 
 function isRecommendedRow(s: LibraryStrategyRow): boolean {
   if (s.id === SAFE_STRATEGY_ID) return false;
+  if (isDemoStrategyRecord(s)) return false;
   if (isExplicitlyArchived(s)) return false;
   if (!s.lastBacktest || typeof s.lastBacktest !== "object") return false;
   const bt = s.lastBacktest as {
@@ -182,6 +197,12 @@ export function filterLibraryStrategies<T extends LibraryStrategyRow>(
 
   if (category === "recommended") {
     return library.filter(isRecommendedRow);
+  }
+
+  if (category === "live") {
+    return library.filter(
+      (s) => libraryCategoryOf(s) === "live" && !isDemoStrategyRecord(s),
+    );
   }
 
   if (category === "newest" || category === "all") {

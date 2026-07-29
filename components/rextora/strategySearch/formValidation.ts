@@ -481,10 +481,17 @@ export function buildAppliedSettingsPreview(
     {
       labelKo: "전략 패밀리",
       valueKo: form.autoStrategyCombo
-        ? "자동 조합"
+        ? "자동 조합 (시스템 관리)"
         : form.selectedSpaceIds.length > 0
           ? form.selectedSpaceIds.join(", ")
           : "깊이 프로필 기본",
+    },
+    {
+      labelKo: "선택 모드",
+      valueKo:
+        form.patternConfigLevel === "automatic" || form.autoStrategyCombo
+          ? "automatic — 수동 포함 선택 미적용"
+          : "manual — 선택 패밀리 유지",
     },
     {
       labelKo: "레버리지",

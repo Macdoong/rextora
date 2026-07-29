@@ -120,6 +120,6 @@ describe("commercial lifecycle fixes", () => {
       "utf8",
     );
     expect(results).toContain("libraryLoadState");
-    expect(results).toContain("전략 라이브러리를 불러오는 중입니다");
+    expect(results).toContain("전략 라이브러리 불러오는 중");
   });
 });

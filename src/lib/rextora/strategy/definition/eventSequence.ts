@@ -3,6 +3,14 @@
  * v1 definitions remain readable; this extends without destructive rewrite.
  */
 
+import type { OrderBlockZoneBasis } from "../conditions/orderBlockZoneBasis";
+import {
+  NEW_STRATEGY_ENTRY_TRIGGER_DEFAULTS,
+  entryTriggerToStepParams,
+  validateEntryTriggerParams,
+  type PatternEntryTrigger,
+} from "./entryTrigger";
+
 export const STRATEGY_EVENT_SEQUENCE_VERSION = 2 as const;
 
 export type StrategyEventStepKind =
@@ -77,8 +85,11 @@ export interface EventSequenceCombination {
   operator: PatternCombinationOperator;
   /** Canonical failure policy. */
   failurePolicy: PatternFailurePolicy;
-  /** Backward-compatible alias retained in serialized definitions. */
-  invalidationMode: "any" | "all";
+  /**
+   * Compat alias — must mirror failurePolicy. Includes majority so UI MAJORITY
+   * is never silently rewritten to any.
+   */
+  invalidationMode: PatternFailurePolicy;
   weightedThreshold?: number;
   blocks: EventSequenceCombinationBlock[];
 }
@@ -132,6 +143,62 @@ const REQUIRED_ORDER: StrategyEventStepKind[] = [
   "stop_loss",
   "take_profit",
 ];
+
+function buildEntryStepParams(opts?: {
+  legacyEntry?: boolean;
+  penetrationPct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+}): Record<string, number | string | boolean | null> {
+  if (opts?.legacyEntry) {
+    return { rule: "confirmation_close" };
+  }
+  // Only spread defined values — undefined entries must not overwrite defaults.
+  const entryOverrides: Partial<PatternEntryTrigger> = opts?.entryTrigger
+    ? (Object.fromEntries(
+        Object.entries(opts.entryTrigger).filter(([, v]) => v !== undefined),
+      ) as Partial<PatternEntryTrigger>)
+    : {};
+  return entryTriggerToStepParams({
+    ...NEW_STRATEGY_ENTRY_TRIGGER_DEFAULTS,
+    penetrationValue:
+      entryOverrides.penetrationValue ??
+      opts?.penetrationPct ??
+      NEW_STRATEGY_ENTRY_TRIGGER_DEFAULTS.penetrationValue,
+    ...entryOverrides,
+  });
+}
+
+/** Shared commercial entry-trigger knobs accepted by every family builder. */
+export type SharedEntryTriggerBuilderParams = {
+  penetrationPct: number;
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
+};
+
+function entryTriggerParamsFromShared(
+  params: SharedEntryTriggerBuilderParams,
+): Record<string, number | string | boolean | null> {
+  return buildEntryStepParams({
+    legacyEntry: params.legacyEntry,
+    penetrationPct: params.penetrationPct,
+    entryTrigger: {
+      touchBasis: params.touchBasis,
+      revalidateAtEntry: params.revalidateAtEntry,
+      maxBarsAfterTouch: params.maxBarsAfterTouch,
+      maxBarsAfterConfirmation: params.maxBarsAfterConfirmation,
+      entryExecution: params.entryExecution,
+      entryPriceTolerancePct: params.entryPriceTolerancePct,
+      penetrationValue: params.penetrationPct,
+      ...params.entryTrigger,
+    },
+  });
+}
 
 export function validateEventSequence(
   seq: StrategyEventSequence,
@@ -243,6 +310,17 @@ export function validateEventSequence(
       errors.push("weighted_score requires a threshold within total block weight");
     }
   }
+  const entryStep = seq.steps.find((step) => step.kind === "entry");
+  if (entryStep?.params && typeof entryStep.params === "object") {
+    const triggerValidation = validateEntryTriggerParams(
+      entryStep.params as Record<string, unknown>,
+    );
+    if (!triggerValidation.ok) {
+      errors.push(
+        `entry triggerMode unsupported: ${triggerValidation.triggerMode} (only PENETRATION is executable)`,
+      );
+    }
+  }
   return { ok: errors.length === 0, errors };
 }
 
@@ -316,12 +394,43 @@ export function buildOrderBlockLongSequence(params: {
   retestAllowed?: boolean;
   entryInsideBlock?: boolean;
   invalidateOnCloseBeyond?: boolean;
+  zoneBasis?: OrderBlockZoneBasis;
+  wickExtensionPct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  /** Institutional quality gates — must reach detectOrderBlocks. */
+  institutionalQuality?: boolean;
+  requireBodyEngulf?: boolean;
+  minBodyEngulfPct?: number;
+  minDisplacementBodyMult?: number;
+  minSourceBodyPct?: number;
+  minSourceBodyAtrMult?: number;
+  minSourceBodyRangeRatio?: number;
+  maxSourceUpperWickPct?: number;
+  maxSourceLowerWickPct?: number;
+  minImpulseBodyRangeRatio?: number;
+  minZoneHeightPct?: number;
+  minZoneHeightAtrMult?: number;
+  maxZoneHeightAtrMult?: number;
+  requireStructureBreak?: boolean;
+  structureBreakLookback?: number;
 }): StrategyEventSequence {
   const direction = params.direction ?? "long";
   const bullish =
     direction === "short" ? "bearish" : "bullish";
   const requireTouch = params.requireTouch !== false;
   const confirmationParams = buildConfirmationStepParams(params);
+  const zoneBasis =
+    params.zoneBasis ??
+    (params.bodyOnly === false ? "FULL_CANDLE" : "BODY");
+  const wickExtensionPct = params.wickExtensionPct ?? 25;
+  const entryTriggerParams = entryTriggerParamsFromShared(params);
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
     direction,
@@ -334,7 +443,9 @@ export function buildOrderBlockLongSequence(params: {
           lookback: params.zoneLookback,
           maxAgeBars: params.zoneLookback,
           direction: bullish,
-          bodyOnly: params.bodyOnly ?? true,
+          bodyOnly: zoneBasis === "BODY",
+          zoneBasis,
+          wickExtensionPct,
           minImpulseAtrMult: params.minImpulseAtrMult ?? 0.8,
           minImpulsePct: params.minImpulsePct ?? 0.25,
           minVolumeMult: params.minVolumeMult ?? 0.5,
@@ -345,6 +456,21 @@ export function buildOrderBlockLongSequence(params: {
           invalidateOnCloseBeyond:
             params.invalidationMode !== "none" &&
             (params.invalidateOnCloseBeyond ?? true),
+          institutionalQuality: params.institutionalQuality ?? true,
+          requireBodyEngulf: params.requireBodyEngulf ?? true,
+          minBodyEngulfPct: params.minBodyEngulfPct ?? 0,
+          minDisplacementBodyMult: params.minDisplacementBodyMult ?? 2,
+          minSourceBodyPct: params.minSourceBodyPct ?? 0.05,
+          minSourceBodyAtrMult: params.minSourceBodyAtrMult ?? 0.15,
+          minSourceBodyRangeRatio: params.minSourceBodyRangeRatio ?? 0.35,
+          maxSourceUpperWickPct: params.maxSourceUpperWickPct ?? 60,
+          maxSourceLowerWickPct: params.maxSourceLowerWickPct ?? 60,
+          minImpulseBodyRangeRatio: params.minImpulseBodyRangeRatio ?? 0.45,
+          minZoneHeightPct: params.minZoneHeightPct ?? 0.08,
+          minZoneHeightAtrMult: params.minZoneHeightAtrMult ?? 0.2,
+          maxZoneHeightAtrMult: params.maxZoneHeightAtrMult ?? 8,
+          requireStructureBreak: params.requireStructureBreak ?? false,
+          structureBreakLookback: params.structureBreakLookback ?? 20,
         },
       },
       {
@@ -380,7 +506,7 @@ export function buildOrderBlockLongSequence(params: {
       {
         kind: "entry",
         labelKo: "진입",
-        params: { rule: "confirmation_close" },
+        params: entryTriggerParams,
       },
       {
         kind: "stop_loss",
@@ -437,11 +563,20 @@ export function buildFvgSequence(params: {
   firstTouchOnly?: boolean;
   entryInsideGap?: boolean;
   invalidateOnCloseThrough?: boolean;
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
 }): StrategyEventSequence {
   const direction = params.direction ?? "long";
   const bullish = direction === "short" ? "bearish" : "bullish";
   const requireTouch = params.requireTouch !== false;
   const confirmationParams = buildConfirmationStepParams(params);
+  const entryTriggerParams = entryTriggerParamsFromShared(params);
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
     direction,
@@ -499,7 +634,7 @@ export function buildFvgSequence(params: {
       {
         kind: "entry",
         labelKo: "진입",
-        params: { rule: "confirmation_close" },
+        params: entryTriggerParams,
       },
       {
         kind: "stop_loss",
@@ -557,10 +692,19 @@ export function buildTrendlineSequence(params: {
   breakoutByWick?: boolean;
   retestRequired?: boolean;
   detectorConfirmationCandles?: number;
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
 }): StrategyEventSequence {
   const direction = params.direction ?? "long";
   const requireTouch = params.requireTouch !== false;
   const confirmationParams = buildConfirmationStepParams(params);
+  const entryTriggerParams = entryTriggerParamsFromShared(params);
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
     direction,
@@ -613,7 +757,7 @@ export function buildTrendlineSequence(params: {
       {
         kind: "entry",
         labelKo: "진입",
-        params: { rule: "confirmation_close" },
+        params: entryTriggerParams,
       },
       {
         kind: "stop_loss",
@@ -664,10 +808,19 @@ export function buildSupportResistanceSequence(params: {
   invalidationMode?: "close_beyond_zone" | "none";
   volumeConfirmation?: boolean;
   breakoutConfirmation?: boolean;
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
 }): StrategyEventSequence {
   const direction = params.direction ?? "long";
   const requireTouch = params.requireTouch !== false;
   const confirmationParams = buildConfirmationStepParams(params);
+  const entryTriggerParams = entryTriggerParamsFromShared(params);
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
     direction,
@@ -716,7 +869,7 @@ export function buildSupportResistanceSequence(params: {
       {
         kind: "entry",
         labelKo: "진입",
-        params: { rule: "confirmation_close" },
+        params: entryTriggerParams,
       },
       {
         kind: "stop_loss",
@@ -770,10 +923,19 @@ export function buildSupplyDemandSequence(params: {
   confirmationCandleCount?: number;
   confirmationWindow?: number;
   invalidationMode?: "close_beyond_zone" | "none";
+  touchBasis?: PatternEntryTrigger["touchBasis"];
+  revalidateAtEntry?: boolean;
+  maxBarsAfterTouch?: number;
+  maxBarsAfterConfirmation?: number;
+  entryExecution?: PatternEntryTrigger["entryExecution"];
+  entryPriceTolerancePct?: number;
+  entryTrigger?: Partial<PatternEntryTrigger> | null;
+  legacyEntry?: boolean;
 }): StrategyEventSequence {
   const direction = params.direction ?? "long";
   const requireTouch = params.requireTouch !== false;
   const confirmationParams = buildConfirmationStepParams(params);
+  const entryTriggerParams = entryTriggerParamsFromShared(params);
   return {
     version: STRATEGY_EVENT_SEQUENCE_VERSION,
     direction,
@@ -813,7 +975,7 @@ export function buildSupplyDemandSequence(params: {
       { kind: "revisit", labelKo: "존 재방문", patternFamily: "supply_demand", params: { requireTouch } },
       { kind: "penetration", labelKo: "침투 깊이", patternFamily: "supply_demand", params: { penetrationPct: params.penetrationPct } },
       { kind: "confirmation", labelKo: "확인 봉", patternFamily: "indicator", params: confirmationParams },
-      { kind: "entry", labelKo: "진입", params: { rule: "confirmation_close" } },
+      { kind: "entry", labelKo: "진입", params: entryTriggerParams },
       { kind: "stop_loss", labelKo: "손절", params: { atrMult: params.stopAtrMult, anchor: direction === "short" ? "zone_high" : "zone_low" } },
       { kind: "take_profit", labelKo: "익절", params: { atrMult: params.tpAtrMult } },
       { kind: "invalidation", labelKo: "무효화", params: { rule: params.invalidationMode !== "none" && params.invalidateOnCloseBeyond ? "close_beyond_zone" : "none" } },

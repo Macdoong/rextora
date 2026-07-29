@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import { Badge, Button, Card, ConfirmDialog, Metric, RenameDialog, Skeleton, StatusBanner } from "@/components/ui/primitives";
+import type { StatusBannerStatus } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { CurrentResearchResultsPanel } from "@/components/rextora/results/CurrentResearchResultsPanel";
 import { historyStatusLabelKo } from "@/components/rextora/strategySearch/formatters";
@@ -32,9 +33,16 @@ import {
   filterLibraryStrategies,
   libraryCategoryOf,
   parseLibraryProvenance,
+  isLibraryArchived,
   LIBRARY_FILTER_BUTTONS,
   type LibraryCategory,
 } from "@/components/rextora/results/libraryFilterUtils";
+import type { SavedBacktestResult } from "@/src/lib/rextora/backtest/backtestTypes";
+import { DemoDataBadge } from "@/components/rextora/DemoDataBadge";
+import {
+  isDemoJobId,
+  isDemoSearchName,
+} from "@/src/lib/rextora/firstRun/demoIdentity";
 
 function parseSourceResearchJobId(
   description: string | null | undefined,
@@ -63,6 +71,21 @@ type StrategyRow = {
   } | null;
   sourceStatus?: string;
   description?: string;
+  symbols?: string[];
+  timeframe?: string;
+  strategyHash?: string;
+};
+
+type PaperSessionSummary = {
+  id: string;
+  strategyId: string;
+  status:
+    | "pending_approval"
+    | "ready"
+    | "active"
+    | "paused"
+    | "stopped"
+    | "failed";
 };
 
 type JobSummary = {
@@ -127,16 +150,11 @@ type Category = Exclude<
 
 const RESULTS_NAV_ITEMS = [
   { id: "results-section-outcome", label: "탐색 결과" },
-  { id: "results-section-summary", label: "요약" },
+  { id: "results-section-final-recommendation", label: "최종 추천" },
   { id: "results-section-top3", label: "TOP 3" },
   { id: "results-section-top10", label: "TOP 10" },
-  { id: "results-section-backtest-rec", label: "백테스트" },
-  { id: "results-section-rank-history", label: "순위 변동" },
   { id: "results-section-library", label: "라이브러리" },
-  { id: "results-section-history", label: "연구 이력" },
-  { id: "results-section-raw-mgmt", label: "원본 후보 관리" },
-  { id: "results-raw-candidates", label: "원본 trial" },
-  { id: "results-section-safe", label: "SAFE" },
+  { id: "results-section-history", label: "연구·저장소 관리" },
 ] as const;
 
 function formatBytes(n: number): string {
@@ -187,6 +205,91 @@ type LibraryLoadState =
   | "partial"
   | "error";
 
+function deriveMessageStatus(msg: string | null): StatusBannerStatus {
+  if (!msg) return "idle";
+  const m = msg.toLowerCase();
+  if (
+    m.includes("실패") ||
+    m.includes("오류") ||
+    m.includes("못했습니다") ||
+    m.includes("할 수 없습니다") ||
+    m.includes("않습니다") ||
+    m.includes("없습니다")
+  )
+    return "error";
+  if (
+    m.includes("등록했습니다") ||
+    m.includes("저장했습니다") ||
+    m.includes("삭제했습니다") ||
+    m.includes("보관했습니다") ||
+    m.includes("복원했습니다") ||
+    m.includes("처리했습니다") ||
+    m.includes("적용했습니다")
+  )
+    return "success";
+  return "info";
+}
+
+function paperSessionForStrategy(
+  session: PaperSessionSummary | null,
+  strategyId: string,
+): PaperSessionSummary | null {
+  if (!session || session.strategyId !== strategyId) return null;
+  return session;
+}
+
+function paperActionForStrategy(
+  session: PaperSessionSummary | null,
+  strategyId: string,
+): {
+  label: string;
+  href?: string;
+  kind: "link" | "prepare";
+} {
+  const match = paperSessionForStrategy(session, strategyId);
+  if (match?.status === "pending_approval" || match?.status === "ready") {
+    return {
+      label: "승인 대기 · 모의매매",
+      href: `/paper-trading?strategyId=${encodeURIComponent(strategyId)}&sessionId=${encodeURIComponent(match.id)}`,
+      kind: "link",
+    };
+  }
+  if (match?.status === "active" || match?.status === "paused") {
+    return {
+      label: "모의매매 보기",
+      href: `/paper-trading?strategyId=${encodeURIComponent(strategyId)}`,
+      kind: "link",
+    };
+  }
+  if (match?.status === "stopped" || match?.status === "failed") {
+    return {
+      label: "모의매매 재준비",
+      kind: "prepare",
+    };
+  }
+  return {
+    label: "모의매매 준비",
+    kind: "prepare",
+  };
+}
+
+function paperStatusLabel(
+  session: PaperSessionSummary | null,
+  strategy: StrategyRow,
+): string {
+  const match = paperSessionForStrategy(session, strategy.id);
+  if (match?.status === "pending_approval") return "모의 승인 대기";
+  if (match?.status === "ready") return "모의 준비됨";
+  if (match?.status === "active") return "모의 활성";
+  if (match?.status === "paused") return "모의 일시정지";
+  if (match?.status === "stopped") return "모의 종료";
+  if (match?.status === "failed") return "모의 오류";
+  if (strategy.paperActive) return "모의 등록(세션 없음)";
+  if (strategy.liveActive) return "실전 후보";
+  if (strategy.lastBacktest) return "백테스트";
+  return "등록";
+}
+
 export function ResultsWorkbench() {
   const searchParams = useSearchParams();
   const jobIdFromUrl = searchParams.get("jobId");
@@ -194,8 +297,12 @@ export function ResultsWorkbench() {
     string | null | undefined
   >(undefined);
   const [strategies, setStrategies] = useState<StrategyRow[]>([]);
+  const [paperSession, setPaperSession] = useState<PaperSessionSummary | null>(
+    null,
+  );
   const [jobs, setJobs] = useState<JobSummary[]>([]);
   const [category, setCategory] = useState<LibraryCategory>("newest");
+  const [librarySearch, setLibrarySearch] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
@@ -225,6 +332,68 @@ export function ResultsWorkbench() {
   const impactsFetchedRef = useRef(new Set<string>());
   const [rawPreview, setRawPreview] = useState<RawTrialPreview | null>(null);
   const [rawBusy, setRawBusy] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(true);
+  const [libraryShowAll, setLibraryShowAll] = useState(false);
+  const [runsPanelStrategyId, setRunsPanelStrategyId] = useState<string | null>(
+    null,
+  );
+  const [relatedRuns, setRelatedRuns] = useState<SavedBacktestResult[]>([]);
+  const [relatedRunsBusy, setRelatedRunsBusy] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [safeOpen, setSafeOpen] = useState(false);
+  const [storageOpen, setStorageOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("results-section-outcome");
+  const LIBRARY_PREVIEW_LIMIT = 5;
+
+  // ── Confirm dialog state ──────────────────────────────────────────────────
+  type ConfirmState = {
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    onConfirm: () => Promise<void>;
+  };
+  const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
+
+  async function runConfirmedAction(state: ConfirmState) {
+    setConfirmBusy(true);
+    try {
+      await state.onConfirm();
+    } finally {
+      setConfirmBusy(false);
+      setConfirmState(null);
+    }
+  }
+
+  // ── Rename dialog state ───────────────────────────────────────────────────
+  type RenameState = {
+    id: string;
+    currentValue: string;
+    onConfirm: (next: string) => Promise<void>;
+  };
+  const [renameState, setRenameState] = useState<RenameState | null>(null);
+  const [renameBusy, setRenameBusy] = useState(false);
+
+  async function runRenameAction(state: RenameState, next: string) {
+    setRenameBusy(true);
+    try {
+      await state.onConfirm(next);
+    } finally {
+      setRenameBusy(false);
+      setRenameState(null);
+    }
+  }
+
+  // ── Strategy-delete 3-way choice dialog ──────────────────────────────────
+  type DeleteChoiceState = {
+    strategyId: string;
+    reasonKo: string;
+    backtestCount: number;
+    paperCount: number;
+  };
+  const [deleteChoiceState, setDeleteChoiceState] = useState<DeleteChoiceState | null>(null);
+  const [deleteChoiceBusy, setDeleteChoiceBusy] = useState(false);
 
   const selectedJobId =
     selectedJobIdOverride !== undefined
@@ -234,7 +403,7 @@ export function ResultsWorkbench() {
   const refreshSeqRef = useRef(0);
   const refreshAbortRef = useRef<AbortController | null>(null);
 
-  const refresh = useCallback(async (viewOverride?: "default" | "archived") => {
+  const refreshPrimary = useCallback(async (viewOverride?: "default" | "archived") => {
     const view = viewOverride ?? historyView;
     refreshAbortRef.current?.abort();
     const controller = new AbortController();
@@ -243,16 +412,17 @@ export function ResultsWorkbench() {
     try {
       const historyQuery =
         view === "archived"
-          ? "?limit=100&archivedOnly=true"
-          : "?limit=100";
-      const [sRes, jRes, storageRes] = await Promise.all([
+          ? "?limit=40&archivedOnly=true"
+          : "?limit=40";
+      // Primary shell: jobs + strategies only (storage-summary is deferred).
+      const [sRes, jRes, pRes] = await Promise.all([
         fetch("/api/rextora/strategies", { signal: controller.signal }).then(
           (r) => r.json(),
         ),
         fetch(`/api/rextora/strategy-search${historyQuery}`, {
           signal: controller.signal,
         }).then((r) => r.json()),
-        fetch("/api/rextora/strategy-search/storage-summary", {
+        fetch("/api/rextora/paper/session?active=1", {
           signal: controller.signal,
         }).then((r) => r.json()),
       ]);
@@ -274,8 +444,22 @@ export function ResultsWorkbench() {
         const jobList: JobSummary[] = Array.isArray(list) ? list : [];
         setJobs(jobList);
       }
-      if (storageRes?.ok && storageRes.data) {
-        setStorageSummary(storageRes.data as StorageSummaryView);
+      if (pRes?.ok) {
+        const active = pRes.data?.active ?? null;
+        if (
+          active &&
+          typeof active.id === "string" &&
+          typeof active.strategyId === "string" &&
+          typeof active.status === "string"
+        ) {
+          setPaperSession({
+            id: active.id,
+            strategyId: active.strategyId,
+            status: active.status,
+          });
+        } else {
+          setPaperSession(null);
+        }
       }
       if (sRes?.ok || jRes?.ok) setError(null);
     } catch (e) {
@@ -290,17 +474,35 @@ export function ResultsWorkbench() {
     }
   }, [historyView]);
 
+  const refreshStorageSummary = useCallback(async () => {
+    try {
+      const storageRes = await fetch(
+        "/api/rextora/strategy-search/storage-summary",
+      ).then((r) => r.json());
+      if (storageRes?.ok && storageRes.data) {
+        setStorageSummary(storageRes.data as StorageSummaryView);
+      }
+    } catch {
+      /* non-blocking */
+    }
+  }, []);
+
+  const refresh = refreshPrimary;
+
   useEffect(() => {
     const boot = window.setTimeout(() => {
-      void refresh();
+      void refreshPrimary();
     }, 0);
-    const t = setInterval(() => void refresh(), 12_000);
+    const t = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      void refreshPrimary();
+    }, 30_000);
     return () => {
       window.clearTimeout(boot);
       clearInterval(t);
       refreshAbortRef.current?.abort();
     };
-  }, [refresh]);
+  }, [refreshPrimary]);
 
   useEffect(() => {
     if (!loading) return;
@@ -312,8 +514,17 @@ export function ResultsWorkbench() {
     return () => window.clearTimeout(failsafe);
   }, [loading]);
 
+  // Close "더보기" dropdown when clicking outside any open card menu.
   useEffect(() => {
-    if (jobs.length === 0) return;
+    if (!openMenuId) return;
+    const close = () => setOpenMenuId(null);
+    document.addEventListener("click", close, { capture: true });
+    return () => document.removeEventListener("click", close, { capture: true });
+  }, [openMenuId]);
+
+  // Deletion-impact is expensive — only hydrate when research history is opened.
+  useEffect(() => {
+    if (!historyOpen || jobs.length === 0) return;
     const pending = jobs
       .map((j) => j.id)
       .filter((id) => !impactsFetchedRef.current.has(id));
@@ -344,7 +555,7 @@ export function ResultsWorkbench() {
         return next;
       });
     })();
-  }, [jobs]);
+  }, [jobs, historyOpen]);
 
   function switchHistoryView(view: "default" | "archived") {
     if (view === historyView) return;
@@ -478,33 +689,68 @@ export function ResultsWorkbench() {
   );
 
   const filtered = useMemo(() => {
-    return filterLibraryStrategies(libraryStrategies, category, {
+    const categoryFiltered = filterLibraryStrategies(libraryStrategies, category, {
       selectedJobId,
       parseSourceResearchJobId,
     });
-  }, [libraryStrategies, category, selectedJobId]);
+    const query = librarySearch.trim().toLocaleLowerCase("ko-KR");
+    if (!query) return categoryFiltered;
+    return categoryFiltered.filter((strategy) => {
+      const display =
+        (strategy as { displayAlias?: string | null; displayName?: string | null })
+          .displayAlias ||
+        (strategy as { displayName?: string | null }).displayName ||
+        strategy.name;
+      return `${display} ${strategy.name}`.toLocaleLowerCase("ko-KR").includes(query);
+    });
+  }, [libraryStrategies, category, selectedJobId, librarySearch]);
 
   async function setPaper(id: string) {
     if (id === SAFE_STRATEGY_ID) {
       setMessage("SAFE는 모의 활성으로 덮어쓰지 않습니다. 복사본을 사용하세요.");
       return;
     }
+    const row = strategies.find((s) => s.id === id);
+    const provenance = parseLibraryProvenance(row?.description);
     setBusyId(id);
     try {
       const res = await fetch("/api/rextora/strategies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "apply_paper", id }),
+        body: JSON.stringify({
+          action: "apply_paper",
+          id,
+          symbol: row?.symbols?.[0] ?? "BTCUSDT",
+          timeframe: row?.timeframe ?? "15m",
+          sourceResearchJobId: provenance.sourceResearchJobId,
+        }),
       });
       const json = await res.json();
-      setMessage(json.ok ? "모의매매에 등록했습니다." : (json.error ?? "실패"));
+      if (json.ok) {
+        const session = json.data?.session as PaperSessionSummary | undefined;
+        if (session?.id && session.strategyId) {
+          setPaperSession({
+            id: session.id,
+            strategyId: session.strategyId,
+            status: session.status,
+          });
+        }
+        const link = json.data?.paperApprovalDeepLink as string | undefined;
+        setMessage(
+          link
+            ? `모의매매 승인 대기 세션을 준비했습니다. Paper 화면에서 시작을 승인하세요.`
+            : "모의매매 승인 대기 세션을 준비했습니다.",
+        );
+      } else {
+        setMessage(json.error ?? "실패");
+      }
       await refresh();
     } finally {
       setBusyId(null);
     }
   }
 
-  async function renameDisplay(id: string) {
+  function renameDisplay(id: string) {
     if (id === SAFE_STRATEGY_ID) {
       setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
       return;
@@ -514,43 +760,39 @@ export function ResultsWorkbench() {
       (s as { displayAlias?: string | null } | undefined)?.displayAlias ||
       s?.name ||
       "";
-    const next = window.prompt(
-      "표시 이름(별칭)을 입력하세요. 전략 ID·해시는 변경되지 않습니다.",
-      current,
-    );
-    if (next == null) return;
-    const trimmed = next.trim().slice(0, 120);
-    if (!trimmed) {
-      setMessage("표시 이름이 비어 있습니다.");
-      return;
-    }
-    setBusyId(id);
-    try {
-      const beforeHash = s?.paramsHash;
-      const res = await fetch("/api/rextora/strategies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "rename_display",
-          id,
-          displayAlias: trimmed,
-          displayName: trimmed,
-        }),
-      });
-      const json = await res.json();
-      if (!json.ok) {
-        setMessage(json.error ?? "이름 변경 실패");
-        return;
-      }
-      if (beforeHash && json.data?.paramsHash !== beforeHash) {
-        setMessage("오류: 이름 변경이 해시를 바꿨습니다.");
-        return;
-      }
-      setMessage(`별칭을 "${trimmed}"(으)로 저장했습니다.`);
-      await refresh();
-    } finally {
-      setBusyId(null);
-    }
+    setRenameState({
+      id,
+      currentValue: current,
+      onConfirm: async (trimmed) => {
+        setBusyId(id);
+        try {
+          const beforeHash = s?.paramsHash;
+          const res = await fetch("/api/rextora/strategies", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "rename_display",
+              id,
+              displayAlias: trimmed,
+              displayName: trimmed,
+            }),
+          });
+          const json = await res.json();
+          if (!json.ok) {
+            setMessage(json.error ?? "이름 변경 실패");
+            return;
+          }
+          if (beforeHash && json.data?.paramsHash !== beforeHash) {
+            setMessage("오류: 이름 변경이 해시를 바꿨습니다.");
+            return;
+          }
+          setMessage(`별칭을 "${trimmed}"(으)로 저장했습니다.`);
+          await refresh();
+        } finally {
+          setBusyId(null);
+        }
+      },
+    });
   }
 
   async function updateAutomaticAlias(
@@ -580,6 +822,88 @@ export function ResultsWorkbench() {
     } finally {
       setBusyId(null);
     }
+  }
+
+  async function setLibraryArchive(id: string, archived: boolean) {
+    if (id === SAFE_STRATEGY_ID) {
+      setMessage("SAFE 전략은 보관할 수 없습니다.");
+      return;
+    }
+    setBusyId(id);
+    try {
+      const res = await fetch("/api/rextora/strategies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: archived ? "library_archive" : "library_restore",
+          id,
+        }),
+      });
+      const json = await res.json();
+      setMessage(
+        json.ok
+          ? archived
+            ? "전략을 보관함으로 옮겼습니다."
+            : "전략을 보관함에서 복원했습니다."
+          : (json.error ?? "보관 처리 실패"),
+      );
+      if (json.ok) await refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function loadRelatedRuns(strategyId: string) {
+    if (runsPanelStrategyId === strategyId) {
+      setRunsPanelStrategyId(null);
+      setRelatedRuns([]);
+      return;
+    }
+    setRunsPanelStrategyId(strategyId);
+    setRelatedRunsBusy(true);
+    try {
+      const res = await fetch(
+        `/api/rextora/backtest/run?strategyId=${encodeURIComponent(strategyId)}&allSymbols=1`,
+        { cache: "no-store" },
+      );
+      const json = await res.json();
+      setRelatedRuns(Array.isArray(json.data) ? json.data : []);
+    } catch {
+      setRelatedRuns([]);
+      setMessage("관련 백테스트 실행을 불러오지 못했습니다.");
+    } finally {
+      setRelatedRunsBusy(false);
+    }
+  }
+
+  function deleteRelatedRun(runId: string, strategyId: string) {
+    void strategyId;
+    setConfirmState({
+      title: "백테스트 실행 삭제",
+      description: `실행 ${runId}을(를) 삭제할까요? 전략·모의·실전 기록은 유지됩니다.`,
+      confirmLabel: "삭제",
+      onConfirm: async () => {
+        setRelatedRunsBusy(true);
+        try {
+          const res = await fetch(
+            `/api/rextora/backtest/run?runId=${encodeURIComponent(runId)}`,
+            { method: "DELETE" },
+          );
+          const json = await res.json();
+          setMessage(
+            json.ok
+              ? `실행 ${runId}을(를) 삭제했습니다.`
+              : (json.error ?? "실행 삭제 실패"),
+          );
+          if (json.ok) {
+            setRelatedRuns((prev) => prev.filter((r) => r.id !== runId));
+            await refresh();
+          }
+        } finally {
+          setRelatedRunsBusy(false);
+        }
+      },
+    });
   }
 
   async function deleteStrategy(id: string) {
@@ -621,59 +945,35 @@ export function ResultsWorkbench() {
       (impact?.paperRefs?.length ?? 0) > 0 ||
       Boolean(s?.paperActive);
     if (needsDetach) {
-      const choice = window.prompt(
-        `${impact?.reasonsKo?.[0] ?? "참조가 있습니다."}\n` +
-          `다음 중 입력: 보관 | 해제후삭제 | 취소\n` +
-          `(Backtest ${impact?.backtestRefs?.length ?? 0} · Paper ${impact?.paperRefs?.length ?? 0})`,
-        "해제후삭제",
-      );
-      if (!choice || choice.trim() === "취소") return;
-      if (choice.trim() === "보관") {
-        setMessage("전략 보관은 삭제하지 않고 목록 필터(보관)에서 관리하세요.");
-        return;
-      }
-      if (choice.trim() !== "해제후삭제") {
-        setMessage("지원하지 않는 선택입니다.");
-        return;
-      }
-      setBusyId(id);
-      try {
-        await fetch("/api/rextora/strategies", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "detach_research_provenance", id }),
-        });
-        const res = await fetch("/api/rextora/strategies", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "delete", id, detachRefsFirst: true }),
-        });
-        const json = await res.json();
-        setMessage(
-          json.ok ? "연결 해제 후 삭제했습니다." : (json.error ?? "삭제 실패"),
-        );
-        await refresh();
-      } finally {
-        setBusyId(null);
-      }
-      return;
-    }
-    if (!window.confirm("이 전략을 삭제할까요?")) {
-      return;
-    }
-    setBusyId(id);
-    try {
-      const res = await fetch("/api/rextora/strategies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete", id }),
+      // Show 3-way choice dialog: archive | detach-then-delete | cancel
+      setDeleteChoiceState({
+        strategyId: id,
+        reasonKo: impact?.reasonsKo?.[0] ?? "참조가 있어 단순 삭제가 불가합니다.",
+        backtestCount: impact?.backtestRefs?.length ?? 0,
+        paperCount: impact?.paperRefs?.length ?? 0,
       });
-      const json = await res.json();
-      setMessage(json.ok ? "삭제했습니다." : (json.error ?? "삭제 실패"));
-      await refresh();
-    } finally {
-      setBusyId(null);
+      return;
     }
+    setConfirmState({
+      title: "전략 삭제",
+      description: "이 전략을 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+      confirmLabel: "삭제",
+      onConfirm: async () => {
+        setBusyId(id);
+        try {
+          const res = await fetch("/api/rextora/strategies", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete", id }),
+          });
+          const json = await res.json();
+          setMessage(json.ok ? "삭제했습니다." : (json.error ?? "삭제 실패"));
+          await refresh();
+        } finally {
+          setBusyId(null);
+        }
+      },
+    });
   }
 
   function renderHighlight(
@@ -720,7 +1020,7 @@ export function ResultsWorkbench() {
     });
     const isDuplicateRole =
       ranked.duplicateId != null && s.id === ranked.duplicateId;
-    const paperLabel = s.paperActive ? "모의매매 보기" : "모의매매 등록";
+    const paperAction = paperActionForStrategy(paperSession, s.id);
     const liveGate = evaluateLiveCandidateRegistration({
       strategyId: s.id,
       isSafe: s.id === SAFE_STRATEGY_ID,
@@ -803,10 +1103,10 @@ export function ResultsWorkbench() {
             >
               <Button size="sm">새 기간으로 백테스트</Button>
             </Link>
-            {s.paperActive ? (
-              <Link href="/paper-trading">
+            {paperAction.kind === "link" && paperAction.href ? (
+              <Link href={paperAction.href}>
                 <Button size="sm" tone="success">
-                  {paperLabel}
+                  {paperAction.label}
                 </Button>
               </Link>
             ) : (
@@ -816,7 +1116,7 @@ export function ResultsWorkbench() {
                 disabled={busyId === s.id || s.id === SAFE_STRATEGY_ID}
                 onClick={() => void setPaper(s.id)}
               >
-                {paperLabel}
+                {paperAction.label}
               </Button>
             )}
             {s.liveActive || liveGate.allowed ? (
@@ -914,35 +1214,35 @@ export function ResultsWorkbench() {
     }
   }
 
-  async function archiveJob(jobId: string) {
-    if (
-      !window.confirm(
-        "이 탐색 작업을 보관할까요? 데이터는 유지되며 기본 이력 목록에서 숨겨집니다.",
-      )
-    ) {
-      return;
-    }
-    setHistoryBusyJobId(jobId);
-    try {
-      const res = await fetch(
-        `/api/rextora/strategy-search/${encodeURIComponent(jobId)}/archive`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reason: "results_history_archive" }),
-        },
-      );
-      const json = await res.json();
-      setMessage(json.ok ? "탐색 작업을 보관했습니다." : (json.error ?? "보관 실패"));
-      setSelectedHistoryIds((prev) => {
-        const next = new Set(prev);
-        next.delete(jobId);
-        return next;
-      });
-      await refresh();
-    } finally {
-      setHistoryBusyJobId(null);
-    }
+  function archiveJob(jobId: string) {
+    setConfirmState({
+      title: "탐색 작업 보관",
+      description: "이 탐색 작업을 보관할까요? 데이터는 유지되며 기본 이력 목록에서 숨겨집니다.",
+      confirmLabel: "보관",
+      onConfirm: async () => {
+        setHistoryBusyJobId(jobId);
+        try {
+          const res = await fetch(
+            `/api/rextora/strategy-search/${encodeURIComponent(jobId)}/archive`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ reason: "results_history_archive" }),
+            },
+          );
+          const json = await res.json();
+          setMessage(json.ok ? "탐색 작업을 보관했습니다." : (json.error ?? "보관 실패"));
+          setSelectedHistoryIds((prev) => {
+            const next = new Set(prev);
+            next.delete(jobId);
+            return next;
+          });
+          await refresh();
+        } finally {
+          setHistoryBusyJobId(null);
+        }
+      },
+    });
   }
 
   async function restoreJob(jobId: string) {
@@ -984,15 +1284,22 @@ export function ResultsWorkbench() {
     }
   }
 
-  async function cleanupRawTrials(jobId: string, dryRun: boolean) {
-    if (
-      !dryRun &&
-      !window.confirm(
-        "보호되지 않은 원본 trial만 삭제합니다. TOP 10·등록·참조 trial은 유지됩니다. 계속할까요?",
-      )
-    ) {
+  function cleanupRawTrials(jobId: string, dryRun: boolean) {
+    if (dryRun) {
+      void _doCleanupRawTrials(jobId, true);
       return;
     }
+    setConfirmState({
+      title: "원본 후보 정리",
+      description: "보호되지 않은 원본 trial만 삭제합니다. TOP 10·등록·참조 trial은 유지됩니다. 계속할까요?",
+      confirmLabel: "정리 실행",
+      onConfirm: async () => {
+        await _doCleanupRawTrials(jobId, false);
+      },
+    });
+  }
+
+  async function _doCleanupRawTrials(jobId: string, dryRun: boolean) {
     setRawBusy(true);
     try {
       const res = await fetch(
@@ -1035,58 +1342,58 @@ export function ResultsWorkbench() {
       setMessage("참조가 있어 삭제 대신 보관만 가능합니다.");
       return;
     }
-    if (
-      !window.confirm(
-        `trial ${impact.trialCount}개 · TOP 10 ${impact.top10Count}개 · ${formatBytes(impact.bytesToRemove)}를 삭제할까요?`,
-      )
-    ) {
-      return;
-    }
-    setHistoryBusyJobId(jobId);
-    try {
-      const res = await fetch(
-        `/api/rextora/strategy-search/${encodeURIComponent(jobId)}`,
-        { method: "DELETE" },
-      );
-      const json = await res.json();
-      setMessage(json.ok ? "탐색 작업을 삭제했습니다." : (json.error ?? "삭제 실패"));
-      if (json.ok) {
-        setHistoryImpact((prev) => {
-          const next = { ...prev };
-          delete next[jobId];
-          return next;
-        });
-        impactsFetchedRef.current.delete(jobId);
-        setSelectedHistoryIds((prev) => {
-          const next = new Set(prev);
-          next.delete(jobId);
-          return next;
-        });
-        if (typeof window !== "undefined") {
-          try {
-            const url = new URL(window.location.href);
-            if (url.searchParams.get("jobId") === jobId) {
-              url.searchParams.delete("jobId");
-              window.history.replaceState({}, "", url.pathname + url.search);
+    setConfirmState({
+      title: "탐색 작업 삭제",
+      description: `trial ${impact.trialCount}개 · TOP 10 ${impact.top10Count}개 · ${formatBytes(impact.bytesToRemove)}를 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+      confirmLabel: "삭제",
+      onConfirm: async () => {
+        setHistoryBusyJobId(jobId);
+        try {
+          const res = await fetch(
+            `/api/rextora/strategy-search/${encodeURIComponent(jobId)}`,
+            { method: "DELETE" },
+          );
+          const json = await res.json();
+          setMessage(json.ok ? "탐색 작업을 삭제했습니다." : (json.error ?? "삭제 실패"));
+          if (json.ok) {
+            setHistoryImpact((prev) => {
+              const next = { ...prev };
+              delete next[jobId];
+              return next;
+            });
+            impactsFetchedRef.current.delete(jobId);
+            setSelectedHistoryIds((prev) => {
+              const next = new Set(prev);
+              next.delete(jobId);
+              return next;
+            });
+            if (typeof window !== "undefined") {
+              try {
+                const url = new URL(window.location.href);
+                if (url.searchParams.get("jobId") === jobId) {
+                  url.searchParams.delete("jobId");
+                  window.history.replaceState({}, "", url.pathname + url.search);
+                }
+                for (const key of Object.keys(window.sessionStorage)) {
+                  if (key.includes(jobId)) window.sessionStorage.removeItem(key);
+                }
+                for (const key of Object.keys(window.localStorage)) {
+                  if (key.includes(jobId)) window.localStorage.removeItem(key);
+                }
+              } catch {
+                /* ignore */
+              }
             }
-            for (const key of Object.keys(window.sessionStorage)) {
-              if (key.includes(jobId)) window.sessionStorage.removeItem(key);
-            }
-            for (const key of Object.keys(window.localStorage)) {
-              if (key.includes(jobId)) window.localStorage.removeItem(key);
-            }
-          } catch {
-            /* ignore */
           }
+          if (json.ok && selectedJobId === jobId) {
+            setSelectedJobIdOverride(null);
+          }
+          await refresh();
+        } finally {
+          setHistoryBusyJobId(null);
         }
-      }
-      if (json.ok && selectedJobId === jobId) {
-        setSelectedJobIdOverride(null);
-      }
-      await refresh();
-    } finally {
-      setHistoryBusyJobId(null);
-    }
+      },
+    });
   }
 
   const jobsById = useMemo(
@@ -1103,7 +1410,7 @@ export function ResultsWorkbench() {
     });
   }
 
-  async function bulkArchiveSelected() {
+  function bulkArchiveSelected() {
     const ids = filterBulkArchiveCandidates(
       [...selectedHistoryIds],
       jobsById,
@@ -1113,37 +1420,37 @@ export function ResultsWorkbench() {
       setMessage("보관 가능한 선택 작업이 없습니다.");
       return;
     }
-    if (
-      !window.confirm(
-        `선택한 ${ids.length}개 탐색 작업을 보관할까요? 기본 이력에서 숨겨집니다.`,
-      )
-    ) {
-      return;
-    }
-    setBulkBusy(true);
-    let ok = 0;
-    try {
-      for (const jobId of ids) {
-        const res = await fetch(
-          `/api/rextora/strategy-search/${encodeURIComponent(jobId)}/archive`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reason: "results_history_bulk_archive" }),
-          },
-        );
-        const json = await res.json();
-        if (json.ok) ok += 1;
-      }
-      setMessage(`${ok}/${ids.length}개 작업을 보관했습니다.`);
-      setSelectedHistoryIds(new Set());
-      await refresh();
-    } finally {
-      setBulkBusy(false);
-    }
+    setConfirmState({
+      title: "선택 작업 보관",
+      description: `선택한 ${ids.length}개 탐색 작업을 보관합니다. 데이터는 유지되며 기본 이력에서 숨겨집니다.`,
+      confirmLabel: "보관",
+      onConfirm: async () => {
+        setBulkBusy(true);
+        let ok = 0;
+        try {
+          for (const jobId of ids) {
+            const res = await fetch(
+              `/api/rextora/strategy-search/${encodeURIComponent(jobId)}/archive`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reason: "results_history_bulk_archive" }),
+              },
+            );
+            const json = await res.json();
+            if (json.ok) ok += 1;
+          }
+          setMessage(`${ok}/${ids.length}개 작업을 보관했습니다.`);
+          setSelectedHistoryIds(new Set());
+          await refresh();
+        } finally {
+          setBulkBusy(false);
+        }
+      },
+    });
   }
 
-  async function bulkDeleteSelected() {
+  function bulkDeleteSelected() {
     const ids = filterBulkDeleteCandidates(
       [...selectedHistoryIds],
       jobsById,
@@ -1157,30 +1464,30 @@ export function ResultsWorkbench() {
       (sum, id) => sum + (historyImpact[id]?.bytesToRemove ?? 0),
       0,
     );
-    if (
-      !window.confirm(
-        `삭제 가능 ${ids.length}개 · ${formatBytes(totalBytes)} — 영구 삭제할까요? 등록 전략·Backtest·Paper·Live 기록은 유지됩니다.`,
-      )
-    ) {
-      return;
-    }
-    setBulkBusy(true);
-    let ok = 0;
-    try {
-      for (const jobId of ids) {
-        const res = await fetch(
-          `/api/rextora/strategy-search/${encodeURIComponent(jobId)}`,
-          { method: "DELETE" },
-        );
-        const json = await res.json();
-        if (json.ok) ok += 1;
-      }
-      setMessage(`${ok}/${ids.length}개 탐색 작업을 삭제했습니다.`);
-      setSelectedHistoryIds(new Set());
-      await refresh();
-    } finally {
-      setBulkBusy(false);
-    }
+    setConfirmState({
+      title: "선택 작업 삭제",
+      description: `삭제 가능 ${ids.length}개 · ${formatBytes(totalBytes)} — 영구 삭제합니다. 등록 전략·Backtest·Paper·Live 기록은 유지됩니다.`,
+      confirmLabel: "삭제",
+      onConfirm: async () => {
+        setBulkBusy(true);
+        let ok = 0;
+        try {
+          for (const jobId of ids) {
+            const res = await fetch(
+              `/api/rextora/strategy-search/${encodeURIComponent(jobId)}`,
+              { method: "DELETE" },
+            );
+            const json = await res.json();
+            if (json.ok) ok += 1;
+          }
+          setMessage(`${ok}/${ids.length}개 탐색 작업을 삭제했습니다.`);
+          setSelectedHistoryIds(new Set());
+          await refresh();
+        } finally {
+          setBulkBusy(false);
+        }
+      },
+    });
   }
 
   function selectHistoryPreset(
@@ -1194,10 +1501,16 @@ export function ResultsWorkbench() {
     setMessage(`${ids.length}개 작업을 선택했습니다.`);
   }
 
-  const [libraryOpen, setLibraryOpen] = useState(true);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [safeOpen, setSafeOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("results-section-outcome");
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "rextora.results.libraryShowAll",
+        libraryShowAll ? "1" : "0",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [libraryShowAll]);
 
   useEffect(() => {
     const ids = RESULTS_NAV_ITEMS.map((n) => n.id);
@@ -1245,14 +1558,25 @@ export function ResultsWorkbench() {
   return (
     <div className="space-y-5" data-testid="results-workbench">
       {message ? (
-        <p className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200">
-          {message}
-        </p>
+        <StatusBanner status={deriveMessageStatus(message)} message={message} aria-live="polite" />
       ) : null}
       {error ? (
-        <p className="text-sm text-red-300" role="alert">
-          {error}
-        </p>
+        <StatusBanner status="error" message={error} aria-live="assertive" />
+      ) : null}
+
+      {selectedJobId &&
+      (isDemoJobId(selectedJobId) ||
+        isDemoSearchName(jobs.find((j) => j.id === selectedJobId)?.searchName) ||
+        searchParams.get("demo") === "1") ? (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2"
+          data-testid="results-demo-banner"
+        >
+          <DemoDataBadge />
+          <p className="text-sm text-amber-50">
+            이 결과는 데모 데이터입니다. 실전 시장 성과나 실전 주문이 아닙니다.
+          </p>
+        </div>
       ) : null}
 
       <nav
@@ -1275,51 +1599,88 @@ export function ResultsWorkbench() {
         </div>
       </nav>
 
-      {storageSummary ? (
-        <Card title="저장소 요약" data-testid="results-storage-summary">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Metric label="탐색 작업" value={storageSummary.activeJobs} />
-            <Metric label="보관됨" value={storageSummary.archivedJobs} />
-            <Metric label="trial 파일" value={storageSummary.totalTrialFiles} />
-            <Metric
-              label="디스크 사용"
-              value={formatBytes(storageSummary.totalBytes)}
-            />
-          </div>
-          <p className="mt-2 text-xs text-slate-500">
-            TOP 10 {storageSummary.top10Files}개 · 원본 trial 보존 정책{" "}
-            {storageSummary.rawTrialRetentionPolicy}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => goToSection("results-section-history")}
-              data-testid="storage-link-history"
-            >
-              연구 이력 관리
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => goToSection("results-section-raw-mgmt")}
-              data-testid="storage-link-raw"
-            >
-              원본 후보 관리
-            </Button>
-            <Link href="/strategy-search#ss-section-config">
-              <Button size="sm" variant="outline" data-testid="storage-link-config">
-                설정 관리
+      <details
+        className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3"
+        data-testid="results-storage-summary"
+        open={storageOpen}
+        onToggle={(e) => {
+          const open = (e.target as HTMLDetailsElement).open;
+          setStorageOpen(open);
+          if (open) void refreshStorageSummary();
+        }}
+      >
+        <summary className="cursor-pointer text-sm font-medium text-slate-200">
+          저장소·기술 요약
+          <span className="ml-2 text-xs font-normal text-slate-500">
+            (연구 결과와 별도 · 펼치면 로드)
+          </span>
+        </summary>
+        {storageSummary ? (
+          <div className="mt-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Metric label="탐색 작업" value={storageSummary.activeJobs} />
+              <Metric label="보관됨" value={storageSummary.archivedJobs} />
+              <Metric label="trial 파일" value={storageSummary.totalTrialFiles} />
+              <Metric
+                label="디스크 사용"
+                value={formatBytes(storageSummary.totalBytes)}
+              />
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              TOP 10 {storageSummary.top10Files}개 · 원본 trial 보존 정책{" "}
+              {storageSummary.rawTrialRetentionPolicy}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => goToSection("results-section-history")}
+                data-testid="storage-link-history"
+              >
+                연구 이력 관리
               </Button>
-            </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => goToSection("results-section-raw-mgmt")}
+                data-testid="storage-link-raw"
+              >
+                원본 후보 관리
+              </Button>
+              <Link href="/strategy-search#ss-section-config">
+                <Button size="sm" variant="outline" data-testid="storage-link-config">
+                  설정 관리
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-slate-500">저장소 요약을 불러오는 중…</p>
+        )}
+      </details>
+
+      {loading ? (
+        <Card title="이번 탐색 요약" data-testid="current-research-parent-loading">
+          <div
+            className="min-h-[calc(100vh-16rem)] space-y-4"
+            aria-busy="true"
+            aria-label="탐색 결과 불러오는 중"
+          >
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((item) => (
+                <Skeleton key={item} className="h-20 w-full rounded-xl" />
+              ))}
+            </div>
+            <Skeleton className="h-52 w-full rounded-xl" />
           </div>
         </Card>
-      ) : null}
-
-      <CurrentResearchResultsPanel
-        jobId={selectedJobId}
-        onMessage={setMessage}
-      />
+      ) : (
+        <CurrentResearchResultsPanel
+          jobId={selectedJobId}
+          onMessage={setMessage}
+        />
+      )}
 
       {!selectedJobId ? (
         <div className="grid gap-4 lg:grid-cols-3" id="results-section-top3-fallback">
@@ -1370,7 +1731,22 @@ export function ResultsWorkbench() {
             <>
               <p className="mb-3 mt-2 text-xs text-slate-400">
                 이미 등록된 전략입니다. 이번 탐색의 합격 trial과는 별도입니다.
+                기본 {LIBRARY_PREVIEW_LIMIT}개만 미리보기합니다.
               </p>
+              <label className="mb-3 block">
+                <span className="rextora-label mb-1 block">전략 검색</span>
+                <input
+                  type="search"
+                  className="rextora-input"
+                  placeholder="표시 이름으로 검색"
+                  value={librarySearch}
+                  onChange={(event) => {
+                    setLibrarySearch(event.target.value);
+                    setLibraryShowAll(false);
+                  }}
+                  data-testid="library-search"
+                />
+              </label>
               <div className="mb-3 flex flex-wrap gap-2">
                 {LIBRARY_FILTER_BUTTONS.map(({ id, label }) => (
                   <Button
@@ -1385,15 +1761,19 @@ export function ResultsWorkbench() {
                 ))}
               </div>
               {libraryLoadState === "loading" ? (
-                <EmptyState
-                  message="전략 라이브러리를 불러오는 중입니다…"
-                  hint="잠시만 기다려 주세요."
-                />
+                <div className="space-y-2" aria-busy="true" aria-label="전략 라이브러리 불러오는 중">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                  ))}
+                </div>
               ) : filtered.length === 0 ? (
                 <EmptyState message="표시할 전략이 없습니다." />
               ) : (
                 <div className="space-y-2" data-testid="library-compact-list">
-                  {filtered.map((s) => {
+                  {(libraryShowAll
+                    ? filtered
+                    : filtered.slice(0, LIBRARY_PREVIEW_LIMIT)
+                  ).map((s) => {
                     const trades = tradeCountOf(s);
                     const provenance = parseLibraryProvenance(s.description);
                     const metricState = metricStatusKo({
@@ -1406,9 +1786,10 @@ export function ResultsWorkbench() {
                     return (
                       <div
                         key={s.id}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2"
+                        className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2"
                         data-testid={`result-card-${s.id}`}
                       >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="min-w-0">
                           <div className="text-sm font-medium text-slate-100">
                             {(s as {
@@ -1418,12 +1799,6 @@ export function ResultsWorkbench() {
                               (s as { displayName?: string | null }).displayName ||
                               s.name}
                           </div>
-                          {(s as { displayAlias?: string | null })
-                            .displayAlias &&
-                          (s as { displayAlias?: string | null }).displayAlias !==
-                            s.name ? (
-                            <div className="text-xs text-slate-500">{s.name}</div>
-                          ) : null}
                           <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-400">
                             <Badge tone="muted">{metricState}</Badge>
                             <span>
@@ -1439,11 +1814,6 @@ export function ResultsWorkbench() {
                                 {new Date(s.createdAt).toLocaleString("ko-KR")}
                               </span>
                             ) : null}
-                            {provenance.sourceResearchJobId ? (
-                              <span>
-                                연구 {provenance.sourceResearchJobId.slice(0, 12)}…
-                              </span>
-                            ) : null}
                             {provenance.searchFamily ? (
                               <span>패밀리 {provenance.searchFamily}</span>
                             ) : null}
@@ -1453,18 +1823,29 @@ export function ResultsWorkbench() {
                             {provenance.leverage ? (
                               <span>레버리지 {provenance.leverage}</span>
                             ) : null}
-                            <span>
-                              {s.paperActive
-                                ? "모의"
-                                : s.liveActive
-                                  ? "실전 후보"
-                                  : s.lastBacktest
-                                    ? "백테스트"
-                                    : "등록"}
-                            </span>
+                            <span>{paperStatusLabel(paperSession, s)}</span>
                           </div>
+                          <details className="mt-1 text-xs text-slate-500">
+                            <summary className="cursor-pointer">개발자 정보</summary>
+                            <p className="mt-1 break-all">전략 ID: {s.id}</p>
+                            <p className="break-all">저장 이름: {s.name}</p>
+                            {provenance.sourceResearchJobId ? (
+                              <p className="break-all">
+                                연구 ID: {provenance.sourceResearchJobId}
+                              </p>
+                            ) : null}
+                          </details>
                         </div>
                         <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(
+                              (s as StrategyRow & { strategyHash?: string })
+                                .strategyHash ?? s.paramsHash,
+                            )}`}
+                            data-testid="results-row-backtest-handoff"
+                          >
+                            <Button size="sm">백테스트</Button>
+                          </Link>
                           <Button
                             size="sm"
                             variant="outline"
@@ -1483,66 +1864,237 @@ export function ResultsWorkbench() {
                               busyId === s.id || s.id === SAFE_STRATEGY_ID
                             }
                             onClick={() =>
-                              void updateAutomaticAlias(s.id, "restore_alias")
-                            }
-                            data-testid={`library-restore-alias-${s.id}`}
-                          >
-                            별칭 복원
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              busyId === s.id || s.id === SAFE_STRATEGY_ID
-                            }
-                            onClick={() =>
-                              void updateAutomaticAlias(
+                              void setLibraryArchive(
                                 s.id,
-                                "regenerate_auto_name",
+                                !isLibraryArchived(s),
                               )
                             }
-                            data-testid={`library-regenerate-name-${s.id}`}
+                            data-testid={`library-archive-${s.id}`}
                           >
-                            자동 이름 재생성
+                            {isLibraryArchived(s) ? "복원" : "보관"}
                           </Button>
-                          <Link
-                            href={`/backtest?strategyId=${encodeURIComponent(s.id)}&strategyHash=${encodeURIComponent(
-                              (s as StrategyRow & { strategyHash?: string })
-                                .strategyHash ?? s.paramsHash,
-                            )}`}
-                            data-testid="results-row-backtest-handoff"
-                          >
-                            <Button size="sm">새 기간으로 백테스트</Button>
-                          </Link>
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={
-                              busyId === s.id ||
-                              s.id === SAFE_STRATEGY_ID ||
-                              Boolean(s.paperActive)
-                            }
-                            onClick={() => void setPaper(s.id)}
+                            disabled={busyId === s.id}
+                            onClick={() => void loadRelatedRuns(s.id)}
+                            data-testid={`library-related-runs-${s.id}`}
                           >
-                            {s.paperActive ? "모의매매 보기" : "모의매매 등록"}
+                            {runsPanelStrategyId === s.id
+                              ? "실행 닫기"
+                              : "관련 실행 보기"}
                           </Button>
-                          <Button
-                            size="sm"
-                            tone="muted"
-                            disabled={
-                              busyId === s.id ||
-                              s.id === SAFE_STRATEGY_ID ||
-                              Boolean(s.paperActive) ||
-                              Boolean(s.liveActive)
-                            }
-                            onClick={() => void deleteStrategy(s.id)}
-                          >
-                            삭제
-                          </Button>
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              type="button"
+                              aria-expanded={openMenuId === s.id}
+                              aria-haspopup="true"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === s.id ? null : s.id);
+                              }}
+                            >
+                              더보기
+                            </Button>
+                            {openMenuId === s.id ? (
+                              <div
+                                className="absolute right-0 top-full z-20 mt-1 min-w-[160px] rounded-lg border border-slate-700 bg-slate-900 p-1 shadow-xl"
+                                role="menu"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                  disabled={
+                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                  }
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void updateAutomaticAlias(s.id, "restore_alias");
+                                  }}
+                                  data-testid={`library-restore-alias-${s.id}`}
+                                >
+                                  별칭 복원
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                  disabled={
+                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                  }
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void updateAutomaticAlias(s.id, "regenerate_auto_name");
+                                  }}
+                                  data-testid={`library-regenerate-name-${s.id}`}
+                                >
+                                  자동 이름 재생성
+                                </button>
+                                {(() => {
+                                  const action = paperActionForStrategy(
+                                    paperSession,
+                                    s.id,
+                                  );
+                                  if (action.kind === "link" && action.href) {
+                                    return (
+                                      <Link
+                                        href={action.href}
+                                        className="block w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
+                                        onClick={() => setOpenMenuId(null)}
+                                      >
+                                        {action.label}
+                                      </Link>
+                                    );
+                                  }
+                                  return (
+                                    <button
+                                      type="button"
+                                      role="menuitem"
+                                      className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                      disabled={
+                                        busyId === s.id ||
+                                        s.id === SAFE_STRATEGY_ID
+                                      }
+                                      onClick={() => {
+                                        setOpenMenuId(null);
+                                        void setPaper(s.id);
+                                      }}
+                                    >
+                                      {action.label}
+                                    </button>
+                                  );
+                                })()}
+                                <div className="my-1 border-t border-slate-700/60" />
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-rose-300 hover:bg-rose-950/50 disabled:opacity-40"
+                                  disabled={
+                                    busyId === s.id ||
+                                    s.id === SAFE_STRATEGY_ID ||
+                                    Boolean(s.paperActive) ||
+                                    Boolean(s.liveActive)
+                                  }
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void deleteStrategy(s.id);
+                                  }}
+                                  data-testid={`library-delete-${s.id}`}
+                                >
+                                  전략 삭제
+                                </button>
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
+                      {runsPanelStrategyId === s.id ? (
+                        <div
+                          className="mt-3 rounded-lg border border-slate-800 bg-slate-950/40 p-3"
+                          data-testid={`library-runs-panel-${s.id}`}
+                        >
+                          <p className="mb-2 text-sm font-medium text-slate-200">
+                            관련 백테스트 실행
+                          </p>
+                          {relatedRunsBusy ? (
+                            <div className="space-y-2">
+                              <Skeleton className="h-8 w-full" />
+                              <Skeleton className="h-8 w-full" />
+                            </div>
+                          ) : relatedRuns.length === 0 ? (
+                            <p className="text-sm text-slate-400">
+                              저장된 실행이 없습니다.
+                            </p>
+                          ) : (
+                            <div className="overflow-x-auto">
+                              <table className="w-full min-w-[720px] text-left text-sm">
+                                <thead className="text-xs text-slate-400">
+                                  <tr>
+                                    <th className="px-2 py-1">실행</th>
+                                    <th className="px-2 py-1">기간</th>
+                                    <th className="px-2 py-1">수익</th>
+                                    <th className="px-2 py-1">MDD</th>
+                                    <th className="px-2 py-1">거래</th>
+                                    <th className="px-2 py-1">작업</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {relatedRuns.map((run) => (
+                                    <tr
+                                      key={run.id}
+                                      className="border-t border-slate-900"
+                                    >
+                                      <td className="px-2 py-1 font-mono text-xs">
+                                        {run.id}
+                                      </td>
+                                      <td className="px-2 py-1 text-xs">
+                                        {run.report?.fromDate ?? "?"} →{" "}
+                                        {run.report?.toDate ?? "?"}
+                                      </td>
+                                      <td className="px-2 py-1">
+                                        {run.report?.totalReturn == null
+                                          ? "—"
+                                          : formatPct(run.report.totalReturn)}
+                                      </td>
+                                      <td className="px-2 py-1">
+                                        {run.report?.mdd == null
+                                          ? "—"
+                                          : formatPct(run.report.mdd)}
+                                      </td>
+                                      <td className="px-2 py-1">
+                                        {run.report?.tradeCount ?? "—"}
+                                      </td>
+                                      <td className="px-2 py-1">
+                                        <div className="flex flex-wrap gap-1">
+                                          <Link
+                                            href={`/backtest?strategyId=${encodeURIComponent(s.id)}&runId=${encodeURIComponent(run.id)}`}
+                                          >
+                                            <Button size="sm" variant="outline">
+                                              열기
+                                            </Button>
+                                          </Link>
+                                          <Button
+                                            size="sm"
+                                            tone="muted"
+                                            disabled={relatedRunsBusy}
+                                            onClick={() =>
+                                              void deleteRelatedRun(run.id, s.id)
+                                            }
+                                          >
+                                            삭제
+                                          </Button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
                     );
                   })}
+                  {filtered.length > LIBRARY_PREVIEW_LIMIT ? (
+                    <div className="pt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setLibraryShowAll((v) => !v)}
+                        data-testid="library-show-all-toggle"
+                        aria-expanded={libraryShowAll}
+                      >
+                        {libraryShowAll
+                          ? "접기"
+                          : `전체 보기 (${filtered.length})`}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               )}
             </>
@@ -1993,6 +2545,110 @@ export function ResultsWorkbench() {
           ) : null}
         </Card>
       </section>
+
+      {/* ── Confirm dialog (generic) ───────────────────────────────────── */}
+      <ConfirmDialog
+        open={confirmState !== null}
+        title={confirmState?.title ?? ""}
+        description={confirmState?.description ?? ""}
+        confirmLabel={confirmState?.confirmLabel ?? "확인"}
+        loading={confirmBusy}
+        onConfirm={() => {
+          if (confirmState) void runConfirmedAction(confirmState);
+        }}
+        onCancel={() => setConfirmState(null)}
+      />
+
+      {/* ── Rename dialog ─────────────────────────────────────────────── */}
+      <RenameDialog
+        open={renameState !== null}
+        title="표시 이름 변경"
+        description="전략 ID·파라미터 해시는 변경되지 않습니다."
+        initialValue={renameState?.currentValue ?? ""}
+        placeholder="표시 이름(별칭) 입력"
+        loading={renameBusy}
+        onConfirm={(next) => {
+          if (renameState) void runRenameAction(renameState, next);
+        }}
+        onCancel={() => setRenameState(null)}
+      />
+
+      {/* ── Strategy delete 3-way choice dialog ───────────────────────── */}
+      {deleteChoiceState && (
+        <div
+          className="rextora-dialog-backdrop"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !deleteChoiceBusy)
+              setDeleteChoiceState(null);
+          }}
+        >
+          <div
+            className="rextora-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="rx-delete-choice-title"
+          >
+            <h3 id="rx-delete-choice-title" className="rextora-section-title mb-2 text-slate-100">
+              전략 삭제 — 참조 있음
+            </h3>
+            <p className="rextora-body mb-1 text-slate-300">{deleteChoiceState.reasonKo}</p>
+            <p className="rextora-helper mb-4 text-slate-400">
+              백테스트 참조 {deleteChoiceState.backtestCount}개 · 모의매매 참조{" "}
+              {deleteChoiceState.paperCount}개
+            </p>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                disabled={deleteChoiceBusy}
+                onClick={() => {
+                  setDeleteChoiceState(null);
+                  void setLibraryArchive(deleteChoiceState.strategyId, true);
+                }}
+              >
+                보관 (참조 유지, 이력에서 숨김)
+              </Button>
+              <Button
+                tone="danger"
+                loading={deleteChoiceBusy}
+                onClick={async () => {
+                  const id = deleteChoiceState.strategyId;
+                  setDeleteChoiceBusy(true);
+                  try {
+                    await fetch("/api/rextora/strategies", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "detach_research_provenance", id }),
+                    });
+                    const res = await fetch("/api/rextora/strategies", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "delete", id, detachRefsFirst: true }),
+                    });
+                    const json = await res.json();
+                    setMessage(
+                      json.ok ? "연결 해제 후 삭제했습니다." : (json.error ?? "삭제 실패"),
+                    );
+                    setDeleteChoiceState(null);
+                    await refresh();
+                  } finally {
+                    setDeleteChoiceBusy(false);
+                  }
+                }}
+              >
+                연결 해제 후 삭제
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={deleteChoiceBusy}
+                onClick={() => setDeleteChoiceState(null)}
+              >
+                취소
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

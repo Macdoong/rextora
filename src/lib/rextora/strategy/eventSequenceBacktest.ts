@@ -15,6 +15,7 @@ import {
   detectOrderBlocks,
   type OrderBlockParams,
 } from "./conditions/orderBlock";
+import { resolveOrderBlockZoneBasis } from "./conditions/orderBlockZoneBasis";
 import { detectFvg, type FvgParams } from "./conditions/fvg";
 import {
   detectTrendLine,
@@ -36,6 +37,12 @@ import {
   type StrategyEventSequence,
   type StrategyEventStep,
 } from "./definition/eventSequence";
+import {
+  EntryTriggerValidationError,
+  resolveEntryTrigger,
+  validateEntryTriggerParams,
+  validateEntryZoneAtExecution,
+} from "./definition/entryTrigger";
 import { resolveEventSequenceLeverage } from "../strategySearch/leverageMode";
 
 export type EvidenceScalar = number | string | boolean | null;
@@ -72,6 +79,12 @@ export interface RejectedSetup {
   invalidationBar?: number | null;
   invalidationTime?: string | null;
   patternBlocks?: PatternBlockEvidence[];
+  combinationOperator?: string;
+  combinationFailurePolicy?: string;
+  combinationInvalidationMode?: string;
+  combinationResult?: boolean;
+  combinationScore?: number;
+  combinationPriority?: number | null;
 }
 
 export interface PatternBlockEvidence {
@@ -161,6 +174,7 @@ type Phase =
   | "revisited"
   | "penetrated"
   | "confirmed"
+  | "entry_ready"
   | "in_position";
 
 interface PatternGeometry {
@@ -377,6 +391,25 @@ interface DetectedPattern {
   touchCount?: number | null;
 }
 
+interface PatternDetectionReject {
+  rejected: true;
+  reasonCode: string;
+  patternType: string;
+  detectorParams: Record<string, EvidenceScalar>;
+  measuredValues: Record<string, EvidenceScalar>;
+  thresholds: Record<string, EvidenceScalar>;
+  zoneHigh: number | null;
+  zoneLow: number | null;
+  creationBar: number | null;
+  impulseBar: number | null;
+}
+
+function isPatternReject(
+  v: DetectedPattern | PatternDetectionReject | null,
+): v is PatternDetectionReject {
+  return Boolean(v && "rejected" in v && v.rejected);
+}
+
 /**
  * Detect a pattern using only candles[0..bar] (caller must slice).
  * @param requireFresh when true (primary creation), zone must form on/near bar.
@@ -390,7 +423,7 @@ function detectPatternAt(
   side: "LONG" | "SHORT",
   creationStep: StrategyEventStep | undefined,
   requireFresh = true,
-): DetectedPattern | null {
+): DetectedPattern | PatternDetectionReject | null {
   const lookback = numParam(creationStep, "lookback", 40);
   const maxAge = Math.max(
     2,
@@ -405,9 +438,22 @@ function detectPatternAt(
   const fam = family ?? "order_block";
 
   if (fam === "order_block") {
+    const zoneBasis = resolveOrderBlockZoneBasis({
+      zoneBasis: creationStep?.params?.zoneBasis,
+      bodyOnly: boolParam(creationStep, "bodyOnly", true),
+    });
+    const wickExtensionPct = numParam(creationStep, "wickExtensionPct", 25);
+    const institutionalQuality = boolParam(
+      creationStep,
+      "institutionalQuality",
+      false,
+    );
     const detectorParams: Record<string, EvidenceScalar> = {
       ...defaultObParams(maxAge),
-      bodyOnly: boolParam(creationStep, "bodyOnly", true),
+      zoneBasis,
+      wickExtensionPct,
+      bodyOnly: zoneBasis === "BODY",
+      institutionalQuality,
       minImpulseAtrMult: numParam(creationStep, "minImpulseAtrMult", 0.8),
       minImpulsePct: numParam(creationStep, "minImpulsePct", 0.25),
       minVolumeMult: numParam(creationStep, "minVolumeMult", 0.5),
@@ -420,29 +466,95 @@ function detectPatternAt(
         "invalidateOnCloseBeyond",
         true,
       ),
+      requireBodyEngulf: boolParam(creationStep, "requireBodyEngulf", true),
+      minBodyEngulfPct: numParam(creationStep, "minBodyEngulfPct", 0),
+      minDisplacementBodyMult: numParam(
+        creationStep,
+        "minDisplacementBodyMult",
+        2,
+      ),
+      minSourceBodyPct: numParam(creationStep, "minSourceBodyPct", 0.05),
+      minSourceBodyAtrMult: numParam(creationStep, "minSourceBodyAtrMult", 0.15),
+      minSourceBodyRangeRatio: numParam(
+        creationStep,
+        "minSourceBodyRangeRatio",
+        0.35,
+      ),
+      maxSourceUpperWickPct: numParam(creationStep, "maxSourceUpperWickPct", 60),
+      maxSourceLowerWickPct: numParam(creationStep, "maxSourceLowerWickPct", 60),
+      minImpulseBodyRangeRatio: numParam(
+        creationStep,
+        "minImpulseBodyRangeRatio",
+        0.45,
+      ),
+      minZoneHeightPct: numParam(creationStep, "minZoneHeightPct", 0.08),
+      minZoneHeightAtrMult: numParam(creationStep, "minZoneHeightAtrMult", 0.2),
+      maxZoneHeightAtrMult: numParam(creationStep, "maxZoneHeightAtrMult", 8),
+      requireStructureBreak: boolParam(
+        creationStep,
+        "requireStructureBreak",
+        false,
+      ),
+      structureBreakLookback: Math.trunc(
+        numParam(creationStep, "structureBreakLookback", 20),
+      ),
     };
-    const { zone } = detectOrderBlocks(
+    // Legacy strategies: omit institutionalQuality → no new gates applied.
+    if (!institutionalQuality) {
+      delete detectorParams.requireBodyEngulf;
+      delete detectorParams.minBodyEngulfPct;
+      delete detectorParams.minDisplacementBodyMult;
+      delete detectorParams.minSourceBodyPct;
+      delete detectorParams.minSourceBodyAtrMult;
+      delete detectorParams.minSourceBodyRangeRatio;
+      delete detectorParams.maxSourceUpperWickPct;
+      delete detectorParams.maxSourceLowerWickPct;
+      delete detectorParams.minImpulseBodyRangeRatio;
+      delete detectorParams.minZoneHeightPct;
+      delete detectorParams.minZoneHeightAtrMult;
+      delete detectorParams.maxZoneHeightAtrMult;
+      delete detectorParams.requireStructureBreak;
+      delete detectorParams.structureBreakLookback;
+    }
+    const det = detectOrderBlocks(
       candles,
       bar,
       atr,
       obSide,
       detectorParams as unknown as OrderBlockParams,
     );
-    if (!zone) return null;
+    if (!det.zone) {
+      if (det.rejectReason && requireFresh) {
+        return {
+          rejected: true,
+          reasonCode: det.rejectReason,
+          patternType: "order_block",
+          detectorParams: { ...detectorParams },
+          measuredValues: { ...det.measuredValues },
+          thresholds: { ...det.thresholds },
+          zoneHigh: null,
+          zoneLow: null,
+          creationBar: det.sourceBar,
+          impulseBar: det.impulseBar,
+        };
+      }
+      return null;
+    }
     // Fresh creation: zone formed on/near this bar (impulse just completed)
-    if (requireFresh && bar - zone.createdAt > 2) return null;
-    if (!requireFresh && bar - zone.createdAt > maxAge) return null;
+    if (requireFresh && bar - det.zone.createdAt > 2) return null;
+    if (!requireFresh && bar - det.zone.createdAt > maxAge) return null;
     return {
       patternType: "order_block",
-      zoneHigh: zone.high,
-      zoneLow: zone.low,
-      creationBar: zone.createdAt,
+      zoneHigh: det.zone.high,
+      zoneLow: det.zone.low,
+      creationBar: det.zone.createdAt,
       detectorParams: { ...detectorParams },
-      measuredValues: { detected: 1 },
+      measuredValues: { detected: 1, ...det.measuredValues },
       thresholds: {
         minImpulseAtrMult: detectorParams.minImpulseAtrMult,
         minImpulsePct: detectorParams.minImpulsePct,
         minVolumeMult: detectorParams.minVolumeMult,
+        ...det.thresholds,
       },
     };
   }
@@ -783,7 +895,7 @@ function evaluateCombinationBlocks(input: {
         : syntheticCreation,
       false,
     );
-    if (detected) {
+    if (detected && !isPatternReject(detected)) {
       const creationTime = candleTimeIso(input.window[detected.creationBar]) ?? null;
       const stageBar =
         input.stage === "entry_retest" ||
@@ -1059,6 +1171,84 @@ function aggregateCombinationEvidence(
   };
 }
 
+type CombinationRejectContext = {
+  blocks: PatternBlockEvidence[];
+  operatorOk: boolean;
+  score?: number;
+  priority?: number | null;
+};
+
+function enrichCombinationReject(
+  setup: RejectedSetup,
+  combination: NonNullable<StrategyEventSequence["combination"]>,
+  context: CombinationRejectContext,
+): RejectedSetup {
+  const failurePolicy =
+    combination.failurePolicy ?? combination.invalidationMode ?? "any";
+  const invalidationMode =
+    combination.invalidationMode ?? combination.failurePolicy ?? "any";
+  return {
+    ...setup,
+    patternBlocks: context.blocks,
+    combinationOperator: combination.operator,
+    combinationFailurePolicy: failurePolicy,
+    combinationInvalidationMode: invalidationMode,
+    combinationResult: context.operatorOk,
+    combinationScore: context.score ?? setup.combinationScore,
+    combinationPriority:
+      context.priority ?? setup.combinationPriority ?? null,
+  };
+}
+
+function pushRejectedSetup(
+  rejectedSetups: RejectedSetup[],
+  seq: StrategyEventSequence | undefined,
+  setup: RejectedSetup,
+  combo?: CombinationRejectContext,
+): void {
+  if (seq?.combination && combo) {
+    rejectedSetups.push(enrichCombinationReject(setup, seq.combination, combo));
+    return;
+  }
+  if (seq?.combination && setup.patternBlocks && setup.patternBlocks.length > 0) {
+    const operatorOk =
+      typeof setup.combinationResult === "boolean"
+        ? setup.combinationResult
+        : setup.patternBlocks.some((block) => block.operatorPassed === true);
+    rejectedSetups.push(
+      enrichCombinationReject(setup, seq.combination, {
+        blocks: setup.patternBlocks,
+        operatorOk,
+        score: setup.combinationScore,
+        priority: setup.combinationPriority ?? null,
+      }),
+    );
+    return;
+  }
+  rejectedSetups.push(setup);
+}
+
+function comboContextFromEvidence(
+  seq: StrategyEventSequence | undefined,
+  evidence: PatternBlockEvidence[] | undefined,
+  roles: string[] = [
+    "trend_filter",
+    "entry_zone",
+    "confirmation",
+    "invalidation",
+    "exit_filter",
+  ],
+): CombinationRejectContext | undefined {
+  if (!seq?.combination || !evidence) return undefined;
+  const aggregate = aggregateCombinationEvidence(seq.combination, evidence, roles);
+  return {
+    blocks: evidence,
+    operatorOk: aggregate.ok,
+    score: aggregate.score,
+    priority: aggregate.selectedPriority,
+  };
+}
+
 export function runEventSequenceBacktest(input: {
   def: CanonicalStrategyDefinition;
   symbol: string;
@@ -1070,6 +1260,29 @@ export function runEventSequenceBacktest(input: {
   params?: Record<string, unknown> | null;
 }): EventSequenceBacktestResult {
   const seq = input.def.eventSequence;
+  const entryStepEarly = seq?.steps.find((step) => step.kind === "entry");
+  const triggerParamsValidation = validateEntryTriggerParams(
+    entryStepEarly?.params as Record<string, unknown> | undefined,
+  );
+  if (!triggerParamsValidation.ok) {
+    return {
+      trades: [],
+      equityCurve: [input.balance],
+      endingBalance: input.balance,
+      rejectedSetups: [
+        {
+          bar: -1,
+          stage: "definition_validation",
+          reasonCode: "unsupported_trigger_mode",
+          patternType: "none",
+          measured: null,
+          required: null,
+          measuredValues: { triggerMode: triggerParamsValidation.triggerMode },
+        },
+      ],
+      assumptionsKo: ASSUMPTIONS_KO,
+    };
+  }
   if (!seq || !validateEventSequence(seq).ok) {
     return {
       trades: [],
@@ -1095,10 +1308,39 @@ export function runEventSequenceBacktest(input: {
   const revisitStep = stepByKind(seq, "revisit");
   const penetrationStep = stepByKind(seq, "penetration");
   const confirmationStep = stepByKind(seq, "confirmation");
+  const entryStep = stepByKind(seq, "entry");
   const stopStep = stepByKind(seq, "stop_loss");
   const tpStep = stepByKind(seq, "take_profit");
   const invalidationStep = stepByKind(seq, "invalidation");
   const maxHoldStep = stepByKind(seq, "max_hold_exit");
+  let entryTrigger;
+  let legacyEntryTrigger;
+  try {
+    ({ trigger: entryTrigger, legacy: legacyEntryTrigger } = resolveEntryTrigger(
+      entryStep?.params as Record<string, unknown> | undefined,
+    ));
+  } catch (err) {
+    if (err instanceof EntryTriggerValidationError) {
+      return {
+        trades: [],
+        equityCurve: [input.balance],
+        endingBalance: input.balance,
+        rejectedSetups: [
+          {
+            bar: -1,
+            stage: "definition_validation",
+            reasonCode: "unsupported_trigger_mode",
+            patternType: "none",
+            measured: null,
+            required: null,
+            measuredValues: { triggerMode: err.triggerMode },
+          },
+        ],
+        assumptionsKo: ASSUMPTIONS_KO,
+      };
+    }
+    throw err;
+  }
 
   const penetrationRequired = numParam(penetrationStep, "penetrationPct", 0.3);
   const stopAtrMult = numParam(stopStep, "atrMult", def.risk.stopLossAtrMult);
@@ -1467,7 +1709,10 @@ export function runEventSequenceBacktest(input: {
             (seq.combination.operator === "and" ||
               seq.combination.operator === "sequence")
           ) {
-            rejectedSetups.push({
+            pushRejectedSetup(
+              rejectedSetups,
+              seq,
+              {
               bar: i,
               at: candleTimeIso(c) ?? null,
               eventPrice: c.close,
@@ -1479,7 +1724,14 @@ export function runEventSequenceBacktest(input: {
               ).length,
               required: filters.blocks.length,
               patternBlocks: filters.blocks,
-            });
+            },
+              {
+                blocks: filters.blocks,
+                operatorOk: filters.ok,
+                score: filters.score,
+                priority: filters.selectedPriority,
+              },
+            );
             continue;
           }
           m.blockEvidence = filters.blocks;
@@ -1494,6 +1746,52 @@ export function runEventSequenceBacktest(input: {
           m.side,
           creationStep,
         );
+        if (isPatternReject(detected)) {
+          const comboEval = seq.combination
+            ? evaluateCombinationBlocks({
+                combination: seq.combination,
+                window,
+                bar: i,
+                atr,
+                side: m.side,
+                creationStep,
+                stage: "pattern_creation",
+              })
+            : null;
+          pushRejectedSetup(
+            rejectedSetups,
+            seq,
+            {
+            bar: i,
+            at: candleTimeIso(c) ?? null,
+            eventPrice: c.close,
+            stage: "pattern_creation",
+            reasonCode: detected.reasonCode,
+            patternType: detected.patternType,
+            measured: null,
+            required: null,
+            detectorParams: detected.detectorParams,
+            measuredValues: detected.measuredValues,
+            thresholds: detected.thresholds,
+            zoneHigh: detected.zoneHigh,
+            zoneLow: detected.zoneLow,
+            creationBar: detected.creationBar,
+            creationTime:
+              detected.creationBar != null
+                ? candleTimeIso(candles[detected.creationBar]) ?? null
+                : null,
+          },
+            comboEval
+              ? {
+                  blocks: comboEval.blocks,
+                  operatorOk: comboEval.ok,
+                  score: comboEval.score,
+                  priority: comboEval.selectedPriority,
+                }
+              : undefined,
+          );
+          continue;
+        }
         if (detected) {
           m.phase = "pattern_created";
           m.geo = {
@@ -1548,7 +1846,10 @@ export function runEventSequenceBacktest(input: {
       }
 
       if (isInvalidated(c, m.geo, m.side, invalidateRule)) {
-        rejectedSetups.push({
+        pushRejectedSetup(
+          rejectedSetups,
+          seq,
+          {
           bar: i,
           at: candleTimeIso(c) ?? null,
           eventPrice: c.close,
@@ -1581,7 +1882,9 @@ export function runEventSequenceBacktest(input: {
           invalidationBar: i,
           invalidationTime: candleTimeIso(c) ?? null,
           patternBlocks: m.blockEvidence,
-        });
+        },
+          comboContextFromEvidence(seq, m.blockEvidence),
+        );
         m.phase = "idle";
         m.geo = null;
         continue;
@@ -1635,7 +1938,10 @@ export function runEventSequenceBacktest(input: {
         if (measured + 1e-12 < penetrationRequired) {
           // Still in zone but not deep enough — keep waiting unless left without enough depth
           if (!touchesZone(c, m.geo.zoneHigh, m.geo.zoneLow)) {
-            rejectedSetups.push({
+            pushRejectedSetup(
+              rejectedSetups,
+              seq,
+              {
               bar: i,
               at: candleTimeIso(c) ?? null,
               eventPrice: c.close,
@@ -1658,7 +1964,9 @@ export function runEventSequenceBacktest(input: {
                   ? candleTimeIso(candles[m.geo.revisitBar]) ?? null
                   : null,
               patternBlocks: m.blockEvidence,
-            });
+            },
+              comboContextFromEvidence(seq, m.blockEvidence),
+            );
             m.phase = "idle";
             m.geo = null;
           }
@@ -1713,7 +2021,10 @@ export function runEventSequenceBacktest(input: {
           }
           const elapsed = i - (m.confirmWindowStart ?? i);
           if (elapsed >= confirmWindow) {
-            rejectedSetups.push({
+            pushRejectedSetup(
+              rejectedSetups,
+              seq,
+              {
               bar: i,
               at: candleTimeIso(c) ?? null,
               eventPrice: c.close,
@@ -1739,7 +2050,9 @@ export function runEventSequenceBacktest(input: {
                   ? candleTimeIso(candles[m.geo.revisitBar]) ?? null
                   : null,
               patternBlocks: m.blockEvidence,
-            });
+            },
+              comboContextFromEvidence(seq, m.blockEvidence),
+            );
             m.phase = "idle";
             m.geo = null;
             m.confirmHits = 0;
@@ -1768,6 +2081,191 @@ export function runEventSequenceBacktest(input: {
         }
       }
 
+      // Touch / confirmation validity windows (new entryTrigger only).
+      const phaseForExpiry = m.phase as Phase;
+      if (
+        !legacyEntryTrigger &&
+        m.geo &&
+        (phaseForExpiry === "revisited" ||
+          phaseForExpiry === "penetrated" ||
+          phaseForExpiry === "confirmed" ||
+          phaseForExpiry === "entry_ready")
+      ) {
+        if (
+          entryTrigger.maxBarsAfterTouch != null &&
+          m.geo.revisitBar != null &&
+          i - m.geo.revisitBar > entryTrigger.maxBarsAfterTouch
+        ) {
+          pushRejectedSetup(
+            rejectedSetups,
+            seq,
+            {
+            bar: i,
+            at: candleTimeIso(c) ?? null,
+            eventPrice: c.close,
+            stage: "entry",
+            reasonCode: "touch_expired",
+            patternType: m.geo.patternType,
+            measured: i - m.geo.revisitBar,
+            required: entryTrigger.maxBarsAfterTouch,
+            measuredValues: {
+              barsAfterTouch: i - m.geo.revisitBar,
+              maxBarsAfterTouch: entryTrigger.maxBarsAfterTouch,
+            },
+            thresholds: { maxBarsAfterTouch: entryTrigger.maxBarsAfterTouch },
+            zoneHigh: m.geo.zoneHigh,
+            zoneLow: m.geo.zoneLow,
+            creationBar: m.geo.creationBar,
+            creationTime: candleTimeIso(candles[m.geo.creationBar]) ?? null,
+            revisitBar: m.geo.revisitBar,
+            revisitTime:
+              candleTimeIso(candles[m.geo.revisitBar]) ?? null,
+            patternBlocks: m.blockEvidence,
+          },
+            comboContextFromEvidence(seq, m.blockEvidence),
+          );
+          m.phase = "idle";
+          m.geo = null;
+          continue;
+        }
+        if (
+          entryTrigger.maxBarsAfterConfirmation != null &&
+          m.geo.confirmationBar != null &&
+          i - m.geo.confirmationBar > entryTrigger.maxBarsAfterConfirmation
+        ) {
+          pushRejectedSetup(
+            rejectedSetups,
+            seq,
+            {
+            bar: i,
+            at: candleTimeIso(c) ?? null,
+            eventPrice: c.close,
+            stage: "entry",
+            reasonCode: "confirmation_expired",
+            patternType: m.geo.patternType,
+            measured: i - m.geo.confirmationBar,
+            required: entryTrigger.maxBarsAfterConfirmation,
+            measuredValues: {
+              barsAfterConfirmation: i - m.geo.confirmationBar,
+              maxBarsAfterConfirmation: entryTrigger.maxBarsAfterConfirmation,
+            },
+            thresholds: {
+              maxBarsAfterConfirmation: entryTrigger.maxBarsAfterConfirmation,
+            },
+            zoneHigh: m.geo.zoneHigh,
+            zoneLow: m.geo.zoneLow,
+            creationBar: m.geo.creationBar,
+            creationTime: candleTimeIso(candles[m.geo.creationBar]) ?? null,
+            revisitBar: m.geo.revisitBar ?? null,
+            confirmationBar: m.geo.confirmationBar,
+            confirmationTime:
+              candleTimeIso(candles[m.geo.confirmationBar]) ?? null,
+            patternBlocks: m.blockEvidence,
+          },
+            comboContextFromEvidence(seq, m.blockEvidence),
+          );
+          m.phase = "idle";
+          m.geo = null;
+          continue;
+        }
+      }
+
+      if (m.phase === "entry_ready" && m.geo) {
+        const entryPrice =
+          entryTrigger.entryExecution === "NEXT_BAR_OPEN" ? c.open : c.close;
+        const spatial = validateEntryZoneAtExecution({
+          side: m.side,
+          candle: c,
+          zoneHigh: m.geo.zoneHigh,
+          zoneLow: m.geo.zoneLow,
+          entryPrice,
+          trigger: entryTrigger,
+        });
+        if (!spatial.ok) {
+          pushRejectedSetup(
+            rejectedSetups,
+            seq,
+            {
+            bar: i,
+            at: candleTimeIso(c) ?? null,
+            eventPrice: entryPrice,
+            stage: "entry",
+            reasonCode: spatial.reasonCode ?? "entry_zone_not_valid_at_execution",
+            patternType: m.geo.patternType,
+            measured: spatial.distanceZoneMult,
+            required: spatial.toleranceMult,
+            measuredValues: {
+              entryPrice,
+              distanceOutside: spatial.distanceOutside,
+              distanceZoneMult: spatial.distanceZoneMult,
+              penetrationPct: spatial.penetrationPct,
+              touchOk: spatial.touchOk,
+              revalidateAtEntry: true,
+            },
+            thresholds: {
+              entryPriceTolerancePct: entryTrigger.entryPriceTolerancePct,
+            },
+            zoneHigh: m.geo.zoneHigh,
+            zoneLow: m.geo.zoneLow,
+            creationBar: m.geo.creationBar,
+            creationTime: candleTimeIso(candles[m.geo.creationBar]) ?? null,
+            revisitBar: m.geo.revisitBar ?? null,
+            confirmationBar: m.geo.confirmationBar ?? null,
+            patternBlocks: m.blockEvidence,
+          },
+            comboContextFromEvidence(seq, m.blockEvidence),
+          );
+          m.phase = "idle";
+          m.geo = null;
+          continue;
+        }
+        // Fall through by setting confirmed path vars via synthetic jump:
+        // reuse confirmed entry block by assigning phase and entryPrice below.
+        const stopAtrLocal = stopAtrMult;
+        const tpAtrLocal = tpAtrMult;
+        let stop: number;
+        if (stopAnchor === "zone_low" && m.side === "LONG") {
+          stop = m.geo.zoneLow - atr * stopAtrLocal;
+        } else if (stopAnchor === "zone_high" && m.side === "SHORT") {
+          stop = m.geo.zoneHigh + atr * stopAtrLocal;
+        } else if (m.side === "LONG") {
+          stop = entryPrice - atr * stopAtrLocal;
+        } else {
+          stop = entryPrice + atr * stopAtrLocal;
+        }
+        const tp =
+          m.side === "LONG"
+            ? entryPrice + atr * tpAtrLocal
+            : entryPrice - atr * tpAtrLocal;
+        m.phase = "in_position";
+        m.entryBar = i;
+        m.entryPrice = entryPrice;
+        m.stop = stop;
+        m.tp = tp;
+        m.blockEvidence = m.blockEvidence?.map((block) => ({
+          ...block,
+          entryBar: i,
+          entryTime: candleTimeIso(c) ?? null,
+          stopPrice: stop,
+          targetPrice: tp,
+          measuredValues: {
+            ...block.measuredValues,
+            entryRevalidated: true,
+            distanceZoneMult: spatial.distanceZoneMult,
+            entryExecution: entryTrigger.entryExecution,
+            legacyEntryTrigger: false,
+          },
+        }));
+        m.leverage = resolveEventSequenceLeverage({
+          params: levParams,
+          atr,
+          price: entryPrice,
+          peakEquity,
+          equity,
+        });
+        continue;
+      }
+
       if (m.phase === "confirmed" && m.geo) {
         // Confirmation-role blocks are evaluated only at confirmation.
         if (seq.combination && seq.combination.blocks.length > 0) {
@@ -1793,7 +2291,10 @@ export function runEventSequenceBacktest(input: {
           m.combinationScore = aggregate.score;
           m.combinationPriority = aggregate.selectedPriority;
           if (!aggregate.ok) {
-            rejectedSetups.push({
+            pushRejectedSetup(
+              rejectedSetups,
+              seq,
+              {
               bar: i,
               at: candleTimeIso(c) ?? null,
               eventPrice: c.close,
@@ -1829,7 +2330,14 @@ export function runEventSequenceBacktest(input: {
               confirmationBar: m.geo.confirmationBar ?? i,
               confirmationTime: candleTimeIso(c) ?? null,
               patternBlocks: m.blockEvidence,
-            });
+            },
+              {
+                blocks: m.blockEvidence ?? combo.blocks,
+                operatorOk: aggregate.ok,
+                score: aggregate.score,
+                priority: aggregate.selectedPriority,
+              },
+            );
             m.phase = "idle";
             m.geo = null;
             m.confirmHits = 0;
@@ -1838,7 +2346,78 @@ export function runEventSequenceBacktest(input: {
           }
         }
 
+        if (
+          !legacyEntryTrigger &&
+          entryTrigger.entryExecution === "NEXT_BAR_OPEN"
+        ) {
+          m.phase = "entry_ready";
+          continue;
+        }
+
         const entryPrice = c.close;
+        if (!legacyEntryTrigger && entryTrigger.revalidateAtEntry) {
+          const spatial = validateEntryZoneAtExecution({
+            side: m.side,
+            candle: c,
+            zoneHigh: m.geo.zoneHigh,
+            zoneLow: m.geo.zoneLow,
+            entryPrice,
+            trigger: entryTrigger,
+          });
+          if (!spatial.ok) {
+            pushRejectedSetup(
+              rejectedSetups,
+              seq,
+              {
+              bar: i,
+              at: candleTimeIso(c) ?? null,
+              eventPrice: entryPrice,
+              stage: "entry",
+              reasonCode:
+                spatial.reasonCode ?? "entry_zone_not_valid_at_execution",
+              patternType: m.geo.patternType,
+              measured: spatial.distanceZoneMult,
+              required: spatial.toleranceMult,
+              measuredValues: {
+                entryPrice,
+                distanceOutside: spatial.distanceOutside,
+                distanceZoneMult: spatial.distanceZoneMult,
+                penetrationPct: spatial.penetrationPct,
+                touchOk: spatial.touchOk,
+                revalidateAtEntry: true,
+                legacyEntryTrigger: false,
+              },
+              thresholds: {
+                entryPriceTolerancePct: entryTrigger.entryPriceTolerancePct,
+              },
+              zoneHigh: m.geo.zoneHigh,
+              zoneLow: m.geo.zoneLow,
+              creationBar: m.geo.creationBar,
+              creationTime: candleTimeIso(candles[m.geo.creationBar]) ?? null,
+              revisitBar: m.geo.revisitBar ?? null,
+              confirmationBar: m.geo.confirmationBar ?? i,
+              confirmationTime: candleTimeIso(c) ?? null,
+              patternBlocks: m.blockEvidence,
+            },
+              comboContextFromEvidence(seq, m.blockEvidence),
+            );
+            m.phase = "idle";
+            m.geo = null;
+            m.confirmHits = 0;
+            m.confirmWindowStart = null;
+            continue;
+          }
+          m.blockEvidence = m.blockEvidence?.map((block) => ({
+            ...block,
+            measuredValues: {
+              ...block.measuredValues,
+              entryRevalidated: true,
+              distanceZoneMult: spatial.distanceZoneMult,
+              entryExecution: entryTrigger.entryExecution,
+            },
+          }));
+        }
+
         const lifecycleEntry = seq.combination
           ? evaluateCombinationBlocks({
               combination: seq.combination,

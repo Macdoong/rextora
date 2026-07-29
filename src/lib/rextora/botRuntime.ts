@@ -279,6 +279,32 @@ export async function startBotRuntime(): Promise<EngineResult> {
   } catch {
     // Non-fatal: paper bot can start even if search recovery fails.
   }
+
+  // Executor must not create an independent Paper session. An active session
+  // is required — approveAndStartPaperSession creates it before calling here.
+  try {
+    const { getExecutablePaperSession } = await import("./paper/paperSessionStore");
+    if (!getExecutablePaperSession()) {
+      return {
+        ok: false,
+        mode: "PAPER",
+        message:
+          "활성 Paper 세션이 없습니다. Paper 화면에서 승인 후 시작하세요.",
+        serviceState: "paper",
+        blockedReasons: ["NO_EXECUTABLE_PAPER_SESSION"],
+      };
+    }
+  } catch {
+    // If store cannot load, fail closed.
+    return {
+      ok: false,
+      mode: "PAPER",
+      message: "Paper 세션을 확인할 수 없습니다.",
+      serviceState: "paper",
+      blockedReasons: ["PAPER_SESSION_UNAVAILABLE"],
+    };
+  }
+
   const result = await startPaperBot();
   if (!result.ok) return result;
 

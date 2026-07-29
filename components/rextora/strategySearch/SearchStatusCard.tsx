@@ -569,6 +569,41 @@ export function SearchStatusCard(props: {
         />
       </div>
 
+      {job.appliedSearchSummary?.sections?.length ? (
+        <details
+          className="rounded-xl border border-[var(--border)] bg-[var(--panel-strong)] px-4 py-3"
+          data-testid="ss-applied-settings-summary"
+        >
+          <summary className="cursor-pointer text-sm font-medium text-slate-100">
+            적용된 전략 설정 (엔진 기준)
+          </summary>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
+            {job.appliedSearchSummary.subtitleKo ??
+              "저장된 탐색 설정에서 파생된 값입니다. 폼 상태가 아닙니다."}
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {job.appliedSearchSummary.sections.map((section) => (
+              <div key={section.id} className="space-y-1.5">
+                <div className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                  {section.titleKo}
+                </div>
+                <dl className="space-y-1 text-sm">
+                  {section.rows.map((row) => (
+                    <div
+                      key={`${section.id}-${row.labelKo}`}
+                      className="flex flex-wrap justify-between gap-2 border-b border-slate-800/80 py-1"
+                    >
+                      <dt className="text-slate-400">{row.labelKo}</dt>
+                      <dd className="text-right text-slate-100">{row.valueKo}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
+
       <div
         className="rounded-xl border border-[var(--border)] bg-[var(--panel-strong)] px-4 py-3"
         data-testid="ss-live-top10"
@@ -596,10 +631,10 @@ export function SearchStatusCard(props: {
         ) : (
           <>
             <div
-              className="mt-3 overflow-x-auto"
+              className="mt-3 hidden overflow-x-auto md:block"
               data-testid="ss-live-top10-list"
             >
-              <table className="w-full min-w-[1180px] border-collapse text-left text-xs">
+              <table className="ss-top10-table w-full min-w-[48rem] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-700 text-[var(--text-muted)]">
                     <th scope="col" className="px-2 py-1.5 font-medium">순위</th>
@@ -720,6 +755,34 @@ export function SearchStatusCard(props: {
                   })}
                 </tbody>
               </table>
+            </div>
+            <div className="mt-3 grid gap-2 md:hidden" data-testid="ss-live-top10-cards">
+              {(top10Expanded
+                ? job.liveTop10.entries
+                : job.liveTop10.entries.slice(0, 3)
+              ).map((row) => (
+                <article
+                  key={`mobile-${row.rank}-${row.strategyHash}`}
+                  className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold text-slate-100">
+                      {row.rank}위 · {cleanStrategyDisplayName(row.displayAlias) || row.readableName}
+                    </p>
+                    <span className={`rounded px-2 py-1 text-xs ${movementTone(row.rankChangeShort)}`}>
+                      {movementLabelKo(row.rankChangeShort)}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {row.patternStack || row.strategyFamily || "패턴 정보 없음"}
+                  </p>
+                  <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
+                    <div><dt className="text-xs text-slate-400">수익률</dt><dd>{formatPct(row.netReturn)}</dd></div>
+                    <div><dt className="text-xs text-slate-400">MDD</dt><dd>{formatPct(row.maxDrawdown)}</dd></div>
+                    <div><dt className="text-xs text-slate-400">거래</dt><dd>{formatCount(row.tradeCount ?? 0)}</dd></div>
+                  </dl>
+                </article>
+              ))}
             </div>
             <details
               className="mt-2 rounded-lg border border-slate-800/80 px-3 py-2 text-xs text-[var(--text-muted)]"

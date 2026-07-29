@@ -455,7 +455,7 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "전략 탐색" })).toBeVisible();
     await expect(
-      page.getByText(/시장·시간봉·연구 시간만 정하면 AI가 탐색 전략을 만들고/),
+      page.getByText(/연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다/),
     ).toBeVisible();
   });
 
@@ -478,13 +478,14 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await page.goto("/strategy-search/advanced");
     await expect(page).toHaveURL(/\/strategy-search#ss-section-engine$/);
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
+    await page.getByTestId("ss-advanced-settings-link").click();
     await expect(page.getByTestId("ss-max-search")).toBeVisible();
     // Seed invalid advanced override AFTER navigation settle so the deferred
     // session autosave from the previous form cannot overwrite it.
     await page.goto("/strategy-search");
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
-    // Expand developer engine section so the budget field is visible.
-    await page.locator("details").filter({ hasText: "엔진 임계값" }).locator("summary").click();
+    await page.getByTestId("ss-advanced-settings-link").click();
+    await expect(page.getByTestId("ss-max-search")).toBeVisible();
     await page.getByTestId("ss-max-search").fill("0", { force: true });
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-form-errors")).toBeVisible();
@@ -646,8 +647,8 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     });
     await installSearchMocks(page, state);
     await page.goto("/strategy-search");
+    await page.getByTestId("ss-advanced-settings-link").click();
     await page.getByTestId("ss-combo-preset-confluence").click();
-    await page.getByTestId("ss-pattern-level-expert").check();
     await page.getByTestId("ss-combo-operator").selectOption("weighted_score");
     await page.getByTestId("ss-combo-failure-policy").selectOption("majority");
     await page.getByTestId("ss-combo-weighted-threshold").fill("1.5");

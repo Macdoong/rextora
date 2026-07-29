@@ -15,6 +15,7 @@ import type {
   StrategySearchJobStatus,
   StrategySearchTrial,
 } from "./types";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export interface StrategySearchStoreOptions {
   /** Injectable root for tests. Default: data/rextora/strategy-search */
@@ -69,12 +70,7 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
 ];
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

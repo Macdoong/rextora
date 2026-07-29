@@ -12,6 +12,11 @@ import type {
 } from "./types";
 import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
 import {
+  resolvePatternSelectionMode,
+  selectedSpaceIdsForSelectionMode,
+  type PatternSelectionMode,
+} from "@/src/lib/rextora/patternSelectionMode";
+import {
   maxDrawdownPercentToPolicy,
   percentInputToRatio,
   ratioToPercentInput,
@@ -348,7 +353,11 @@ export interface StrategySearchOperatorFormState {
   showAdvanced: boolean;
   /** Strategy family spaces (SafeV44 only). Empty = depth profile default. */
   selectedSpaceIds: string[];
-  /** When true, use depth-profile space list automatically. */
+  /**
+   * When true, use depth-profile space list automatically.
+   * Canonical selection mode is derived via resolvePatternSelectionMode —
+   * autoStrategyCombo and patternConfigLevel="automatic" both imply automatic.
+   */
   autoStrategyCombo: boolean;
   /** Pattern Search configuration depth (UI → applied ranges). */
   patternConfigLevel: "automatic" | "basic" | "expert";
@@ -811,11 +820,17 @@ export function operatorFormToCreateBody(
       repeatedSig != null && Number.isFinite(repeatedSig)
         ? Math.max(1, Math.trunc(repeatedSig))
         : 25,
-    selectedSpaceIds: form.autoStrategyCombo
-      ? null
-      : form.selectedSpaceIds.length > 0
-        ? [...form.selectedSpaceIds]
-        : null,
+    patternSelectionMode: resolvePatternSelectionMode({
+      patternConfigLevel: form.patternConfigLevel,
+      autoStrategyCombo: form.autoStrategyCombo,
+    }) satisfies PatternSelectionMode,
+    selectedSpaceIds: selectedSpaceIdsForSelectionMode(
+      resolvePatternSelectionMode({
+        patternConfigLevel: form.patternConfigLevel,
+        autoStrategyCombo: form.autoStrategyCombo,
+      }),
+      form.selectedSpaceIds,
+    ),
     leverageMode: form.leverageMode,
     leverageFixed:
       form.leverageMode === "fixed"
@@ -865,8 +880,8 @@ export function operatorFormToCreateBody(
           ? "single"
           : form.patternCombinationTemplate,
     patternCombinationOperator: form.patternCombinationOperator,
-    patternCombinationInvalidationMode:
-      form.patternCombinationFailurePolicy === "all" ? "all" : "any",
+    // Canonical failure policy; invalidationMode mirrors it (no silent collapse).
+    patternCombinationInvalidationMode: form.patternCombinationFailurePolicy,
     patternCombinationFailurePolicy: form.patternCombinationFailurePolicy,
     patternCombinationWeightedThreshold:
       form.patternCombinationOperator === "weighted_score"
@@ -884,8 +899,7 @@ export function operatorFormToCreateBody(
             templateId: form.patternCombinationTemplate,
             operator: form.patternCombinationOperator,
             failurePolicy: form.patternCombinationFailurePolicy,
-            invalidationMode:
-              form.patternCombinationFailurePolicy === "all" ? "all" : "any",
+            invalidationMode: form.patternCombinationFailurePolicy,
             ...(form.patternCombinationOperator === "weighted_score"
               ? {
                   weightedThreshold: Number(

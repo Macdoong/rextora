@@ -10,6 +10,7 @@ import {
   type StrategySearchStoreOptions,
 } from "./jobStore";
 import { assertStrategySearchJobId } from "./searchId";
+import { strategySearchRoot } from "../storage/runtimePaths";
 import type { SearchDepthProfileId, QualificationProfileId } from "./operatorProfiles";
 import type { SearchSpaceMutationRecord } from "./searchSpaceMutation";
 import type { StrategySearchParameterRange } from "./types";
@@ -149,6 +150,8 @@ export interface StrategySearchPlan {
   leverageMax?: number | null;
   leverageFixed?: number | null;
   adaptiveLeverageEnabled?: boolean | null;
+  /** Pattern family selection mode snapshot. */
+  patternSelectionMode?: "automatic" | "manual" | null;
   /** Pattern Search operator configuration snapshot (immutable at create). */
   patternConfigLevel?: "automatic" | "basic" | "expert" | null;
   patternDirection?: "both" | "long" | "short" | null;
@@ -176,19 +179,16 @@ export interface StrategySearchPlan {
     | "weighted_score"
     | "priority"
     | null;
-  patternCombinationInvalidationMode?: "any" | "all" | null;
+  patternCombinationInvalidationMode?: "any" | "all" | "majority" | null;
+  patternCombinationFailurePolicy?: "any" | "all" | "majority" | null;
+  patternCombinationWeightedThreshold?: number | null;
   patternCombinationFamilies?: string[] | null;
   /** Canonical immutable block-level configuration snapshot. */
   patternCombinationSpec?: PatternCombinationSpec | null;
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {
@@ -236,6 +236,7 @@ export function createEmptySearchPlan(input: {
   leverageMax?: number | null;
   leverageFixed?: number | null;
   adaptiveLeverageEnabled?: boolean | null;
+  patternSelectionMode?: StrategySearchPlan["patternSelectionMode"];
   patternConfigLevel?: StrategySearchPlan["patternConfigLevel"];
   patternDirection?: StrategySearchPlan["patternDirection"];
   patternRetestMode?: StrategySearchPlan["patternRetestMode"];
@@ -251,6 +252,8 @@ export function createEmptySearchPlan(input: {
   patternCombinationTemplate?: StrategySearchPlan["patternCombinationTemplate"];
   patternCombinationOperator?: StrategySearchPlan["patternCombinationOperator"];
   patternCombinationInvalidationMode?: StrategySearchPlan["patternCombinationInvalidationMode"];
+  patternCombinationFailurePolicy?: StrategySearchPlan["patternCombinationFailurePolicy"];
+  patternCombinationWeightedThreshold?: StrategySearchPlan["patternCombinationWeightedThreshold"];
   patternCombinationFamilies?: StrategySearchPlan["patternCombinationFamilies"];
   patternCombinationSpec?: PatternCombinationSpec | null;
 }): StrategySearchPlan {
@@ -277,6 +280,7 @@ export function createEmptySearchPlan(input: {
     leverageMax: input.leverageMax ?? null,
     leverageFixed: input.leverageFixed ?? null,
     adaptiveLeverageEnabled: input.adaptiveLeverageEnabled ?? null,
+    patternSelectionMode: input.patternSelectionMode ?? null,
     patternConfigLevel: input.patternConfigLevel ?? "automatic",
     patternDirection: input.patternDirection ?? null,
     patternRetestMode: input.patternRetestMode ?? null,
@@ -294,6 +298,14 @@ export function createEmptySearchPlan(input: {
     patternCombinationOperator: input.patternCombinationOperator ?? null,
     patternCombinationInvalidationMode:
       input.patternCombinationInvalidationMode ?? null,
+    patternCombinationFailurePolicy:
+      input.patternCombinationFailurePolicy ??
+      combinationSpec?.failurePolicy ??
+      null,
+    patternCombinationWeightedThreshold:
+      input.patternCombinationWeightedThreshold ??
+      combinationSpec?.weightedThreshold ??
+      null,
     patternCombinationFamilies: input.patternCombinationFamilies
       ? [...input.patternCombinationFamilies]
       : null,

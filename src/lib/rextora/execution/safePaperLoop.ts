@@ -62,8 +62,9 @@ function noneSignal(
 }
 
 /**
- * Deterministic paper scan for the currently paperActive strategy.
- * Does not hard-code SAFE unless SAFE is the active selection.
+ * Deterministic paper scan for the executable Paper session strategy.
+ * Blocked when session is paused/ready/pending. Registry paperActive is
+ * fallback only when no current session exists.
  */
 export async function runSafePaperScanLoop(options?: {
   maxSymbols?: number;
@@ -76,8 +77,39 @@ export async function runSafePaperScanLoop(options?: {
   paramsHash: string;
   strategyHash: string;
 }> {
-  const resolved = resolvePaperExecutionStrategy();
+  let resolved;
+  try {
+    resolved = resolvePaperExecutionStrategy();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "paper execution blocked";
+    lastSignals = [];
+    return {
+      scanned: 0,
+      entries: 0,
+      signals: [],
+      strategyId: "",
+      paramsHash: "",
+      strategyHash: "",
+      // callers ignore extra fields
+      ...( { blocked: true, blockReason: message } as object ),
+    } as {
+      scanned: number;
+      entries: number;
+      signals: SafeScanSnapshot[];
+      strategyId: string;
+      paramsHash: string;
+      strategyHash: string;
+    };
+  }
   assertPaperStrategyIntegrity(resolved);
+  if (resolved.sessionId) {
+    try {
+      const { recordPaperHeartbeat } = await import("../paper/paperSessionService");
+      recordPaperHeartbeat(resolved.sessionId);
+    } catch {
+      // Heartbeat is best-effort.
+    }
+  }
   const {
     strategy,
     paramsHash,

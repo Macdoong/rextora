@@ -47,7 +47,11 @@ export type PatternCombinationOperator =
   | "weighted_score"
   | "priority";
 
-export type PatternInvalidationMode = "any" | "all";
+/**
+ * Compat alias for failurePolicy. Historically only any|all; majority is now
+ * first-class so UI MAJORITY no longer silently collapses to any.
+ */
+export type PatternInvalidationMode = PatternFailurePolicy;
 export type PatternCombinationFailurePolicy = PatternFailurePolicy;
 
 export type PatternCombinationTemplateId =
@@ -218,7 +222,8 @@ export function normalizePatternCombinationSpec(
       source.failurePolicy !== "majority") ||
     (source.invalidationMode !== undefined &&
       source.invalidationMode !== "any" &&
-      source.invalidationMode !== "all")
+      source.invalidationMode !== "all" &&
+      source.invalidationMode !== "majority")
   ) {
     return null;
   }
@@ -305,8 +310,20 @@ export function normalizePatternCombinationSpec(
         ? source.failurePolicy
         : source.invalidationMode === "all"
           ? "all"
-          : "any",
-    invalidationMode: source.invalidationMode === "all" ? "all" : "any",
+          : source.invalidationMode === "majority"
+            ? "majority"
+            : "any",
+    // Mirror failurePolicy — never silently collapse majority → any.
+    invalidationMode:
+      source.failurePolicy === "any" ||
+      source.failurePolicy === "all" ||
+      source.failurePolicy === "majority"
+        ? source.failurePolicy
+        : source.invalidationMode === "all"
+          ? "all"
+          : source.invalidationMode === "majority"
+            ? "majority"
+            : "any",
     ...(typeof source.weightedThreshold === "number"
       ? { weightedThreshold: source.weightedThreshold }
       : {}),
@@ -392,7 +409,11 @@ export function validatePatternCombination(
   if (!isPatternCombinationOperator(spec.operator)) {
     errors.push("invalid combination operator");
   }
-  if (spec.invalidationMode !== "any" && spec.invalidationMode !== "all") {
+  if (
+    spec.invalidationMode !== "any" &&
+    spec.invalidationMode !== "all" &&
+    spec.invalidationMode !== "majority"
+  ) {
     errors.push("invalid invalidation mode");
   }
   if (

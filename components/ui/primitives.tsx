@@ -10,7 +10,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { HelpCircle, Loader2, X } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  HelpCircle,
+  Loader2,
+  X,
+} from "lucide-react";
 
 type Tone = "default" | "success" | "danger" | "warning" | "purple" | "muted" | "info";
 
@@ -107,6 +115,197 @@ export function Card({
       {children}
     </section>
   );
+}
+
+export function PageHeader({
+  title,
+  description,
+  eyebrow,
+  actions,
+  compact = false,
+}: {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  actions?: ReactNode;
+  compact?: boolean;
+}) {
+  return (
+    <header
+      className={`flex flex-wrap items-start justify-between gap-4 ${compact ? "mb-1" : "mb-2"}`}
+    >
+      <div className="min-w-0 max-w-3xl">
+        {eyebrow ? <p className="rextora-label mb-1.5 text-sky-300">{eyebrow}</p> : null}
+        <h1 className="rextora-page-title">{title}</h1>
+        {description ? (
+          <p className="rextora-body mt-2 max-w-2xl">{description}</p>
+        ) : null}
+      </div>
+      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+    </header>
+  );
+}
+
+export function SectionHeader({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0">
+        <h2 className="rextora-section-title">{title}</h2>
+        {description ? <p className="rextora-helper mt-1">{description}</p> : null}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+export function ResponsiveContainer({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`rextora-responsive-container ${className}`}>{children}</div>;
+}
+
+export function SegmentedControl<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+  className = "",
+  "data-testid": dataTestId,
+}: {
+  value: T;
+  options: ReadonlyArray<{ value: T; label: string; disabled?: boolean }>;
+  onChange: (value: T) => void;
+  label: string;
+  className?: string;
+  "data-testid"?: string;
+}) {
+  return (
+    <div
+      className={`rextora-segmented ${className}`}
+      role="group"
+      aria-label={label}
+      data-testid={dataTestId}
+    >
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          aria-pressed={value === option.value}
+          disabled={option.disabled}
+          onClick={() => onChange(option.value)}
+          className={value === option.value ? "is-active" : ""}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function CollapsiblePanel({
+  title,
+  description,
+  children,
+  defaultOpen = false,
+  testId,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  testId?: string;
+}) {
+  return (
+    <details
+      className="rextora-collapsible"
+      open={defaultOpen || undefined}
+      data-testid={testId}
+    >
+      <summary>
+        <span className="min-w-0">
+          <span className="rextora-card-title block">{title}</span>
+          {description ? (
+            <span className="rextora-helper mt-0.5 block">{description}</span>
+          ) : null}
+        </span>
+        <ChevronDown className="size-4 shrink-0" aria-hidden />
+      </summary>
+      <div className="rextora-collapsible-body">{children}</div>
+    </details>
+  );
+}
+
+export function EmptyState({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="rextora-state" role="status">
+      <p className="rextora-card-title">{title}</p>
+      {description ? <p className="rextora-helper mt-1">{description}</p> : null}
+      {action ? <div className="mt-4">{action}</div> : null}
+    </div>
+  );
+}
+
+export function ErrorState({
+  title = "정보를 불러오지 못했습니다.",
+  description,
+  onRetry,
+}: {
+  title?: string;
+  description?: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div className="rextora-state border-rose-500/30 bg-rose-950/20" role="alert">
+      <AlertTriangle className="mx-auto mb-2 size-5 text-rose-300" aria-hidden />
+      <p className="rextora-card-title text-rose-100">{title}</p>
+      {description ? <p className="rextora-helper mt-1 text-rose-200">{description}</p> : null}
+      {onRetry ? (
+        <Button variant="outline" size="sm" className="mt-4" onClick={onRetry}>
+          다시 시도
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+export function StickyActionBar({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`rextora-sticky-actions ${className}`}>{children}</div>;
+}
+
+export function MobileCardList({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`rextora-mobile-card-list ${className}`}>{children}</div>;
 }
 
 export function Badge({
@@ -385,11 +584,31 @@ export function ConfirmDialog({
 
   useEffect(() => {
     if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    const focusables = panel?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+    );
+    focusables?.[0]?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onCancel();
+      if (e.key === "Tab" && focusables?.length) {
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previous?.focus();
+    };
   }, [open, onCancel]);
 
   if (!open) return null;
@@ -444,6 +663,179 @@ export function ConfirmDialog({
   );
 }
 
+export function RenameDialog({
+  open,
+  title,
+  description,
+  initialValue = "",
+  placeholder = "",
+  maxLength = 120,
+  confirmLabel = "저장",
+  cancelLabel = "취소",
+  loading = false,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  title: string;
+  description?: string;
+  initialValue?: string;
+  placeholder?: string;
+  maxLength?: number;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  loading?: boolean;
+  onConfirm: (value: string) => void;
+  onCancel: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Select all on open so the user can immediately type a replacement.
+  useEffect(() => {
+    if (open) window.setTimeout(() => inputRef.current?.select(), 0);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onCancel]);
+
+  if (!open) return null;
+
+  function submit() {
+    const v = inputRef.current?.value.trim() ?? "";
+    if (v) onConfirm(v);
+  }
+
+  return (
+    <div
+      className="rextora-dialog-backdrop"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
+      <div
+        className="rextora-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rx-rename-title"
+      >
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h3 id="rx-rename-title" className="rextora-section-title text-slate-100">
+            {title}
+          </h3>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-md p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+            aria-label="닫기"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        {description && (
+          <p className="rextora-helper mb-3 text-slate-400">{description}</p>
+        )}
+        {/* Uncontrolled input: key resets the DOM element when initialValue changes. */}
+        <input
+          key={initialValue}
+          ref={inputRef}
+          type="text"
+          className="rextora-input"
+          defaultValue={initialValue}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+          }}
+          data-testid="rename-dialog-input"
+          autoFocus
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="ghost" onClick={onCancel} disabled={loading}>
+            {cancelLabel}
+          </Button>
+          <Button
+            variant="primary"
+            loading={loading}
+            onClick={submit}
+            data-testid="rename-dialog-confirm"
+          >
+            {confirmLabel}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export type StatusBannerStatus = "idle" | "loading" | "success" | "error" | "info";
+
+const bannerConfig: Record<
+  StatusBannerStatus,
+  { containerClass: string; Icon: typeof Loader2 | null; iconClass: string }
+> = {
+  idle: { containerClass: "text-slate-300", Icon: null, iconClass: "" },
+  loading: {
+    containerClass: "border border-sky-500/30 bg-sky-950/25 text-sky-100",
+    Icon: Loader2,
+    iconClass: "animate-spin text-sky-300",
+  },
+  success: {
+    containerClass: "border border-emerald-500/30 bg-emerald-950/25 text-emerald-100",
+    Icon: CheckCircle2,
+    iconClass: "text-emerald-400",
+  },
+  error: {
+    containerClass: "border border-rose-500/40 bg-rose-950/25 text-rose-100",
+    Icon: AlertCircle,
+    iconClass: "text-rose-400",
+  },
+  info: {
+    containerClass: "border border-slate-600/50 bg-slate-900/40 text-slate-200",
+    Icon: null,
+    iconClass: "",
+  },
+};
+
+export function StatusBanner({
+  status,
+  message,
+  children,
+  "data-testid": dataTestId,
+  "aria-live": ariaLive = "polite",
+}: {
+  status: StatusBannerStatus;
+  message: string;
+  children?: ReactNode;
+  "data-testid"?: string;
+  "aria-live"?: "polite" | "assertive" | "off";
+}) {
+  const cfg = bannerConfig[status];
+  const Icon = cfg.Icon;
+  if (!message && !children) return null;
+  return (
+    <div
+      className={`rounded-lg px-3 py-2 text-sm ${cfg.containerClass}`}
+      data-testid={dataTestId}
+      aria-live={ariaLive}
+    >
+      <div className="flex items-start gap-2">
+        {Icon ? (
+          <Icon className={`mt-0.5 size-4 shrink-0 ${cfg.iconClass}`} />
+        ) : null}
+        <p className="flex-1">{message}</p>
+      </div>
+      {children ? <div className="mt-1 space-y-1 pl-6">{children}</div> : null}
+    </div>
+  );
+}
+
 export function DataTable({
   children,
   className = "",
@@ -464,6 +856,58 @@ export function DataTable({
       >
         {children}
       </table>
+    </div>
+  );
+}
+
+export function Drawer({
+  open,
+  title,
+  children,
+  onClose,
+  side = "right",
+  testId,
+}: {
+  open: boolean;
+  title: string;
+  children: ReactNode;
+  onClose: () => void;
+  side?: "right" | "bottom";
+  testId?: string;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div
+      className="rextora-dialog-backdrop justify-items-end"
+      role="presentation"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <aside
+        className={`rextora-drawer rextora-drawer-${side}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        data-testid={testId}
+      >
+        <div className="flex items-center justify-between border-b border-slate-700/60 px-5 py-4">
+          <h2 className="rextora-section-title">{title}</h2>
+          <button type="button" className="rextora-icon-button" onClick={onClose} aria-label="닫기">
+            <X className="size-4" />
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
+      </aside>
     </div>
   );
 }
