@@ -1,0 +1,34 @@
+
+Running 4 tests using 1 worker
+
+(node:52899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:52899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (720ms)
+  ✓  2 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (1.3s)
+  ✓  3 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (1.2m)
+  ✘  4 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (2.0m)
+
+
+  1) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+  3 passed (3.3m)

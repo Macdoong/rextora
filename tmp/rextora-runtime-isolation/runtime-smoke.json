@@ -1,0 +1,22 @@
+{
+  "label": "deployment_smoke",
+  "baseURL": "http://127.0.0.1:3000",
+  "BUILD_ID": "2-RjvN6kLmSfKLidxHUzi",
+  "command": "playwright settings-browser.spec.ts @ prod-1440 against next start :3000",
+  "cwd": "/Users/macdoong/Documents/Rextora",
+  "providerSettingsStorePath": "/Users/macdoong/Documents/Rextora/data/rextora/ai-provider-settings.json",
+  "providerCredentialStorePath": "/Users/macdoong/Documents/Rextora/data/rextora/secrets/ai-provider-credentials.enc.json",
+  "sameStoresAsProduction": true,
+  "contradiction": {
+    "directApiGeminiStored": true,
+    "browserAssertGeminiStored": false,
+    "evidence": "tmp/rextora-deployment-release/final-validation/deployment-smoke.stdout.txt",
+    "hypothesisCategories": [
+      "race between Settings GET and concurrent orphan/search load",
+      "settings-browser save path when stored was transiently false",
+      "jsonStore 5s cache across concurrent writers (unlikely for credential file — credentials bypass jsonStore)",
+      "UI assertion after incomplete saveOnSuccess"
+    ]
+  },
+  "modelSwitchingAtSameSmokeRun": "PASS"
+}

@@ -1,0 +1,6 @@
+{
+  "scenarioId": "07",
+  "classification": "HARNESS_DEFECT",
+  "rootCause": "scanPageRawLeaks used locator.innerText() which auto-waits until test timeout (300s) when agent answer nodes exist but are not Playwright-visible at 390px. API/UI path succeeded in ~11s.",
+  "fixes": ["commitAgentQueryInput for React controlled send", "sendAgentQueryAwaitResponse query-scoped response wait", "scanPageRawLeaks/readLatestAgentAnswer via page.evaluate"]
+}

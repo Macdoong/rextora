@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T11:58:57.715278+00:00",
+  "verdict": "REXTORA AI TRADING EMPLOYEE EXTERNAL TESTER RELEASE VERIFIED",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "gates": {
+    "focusedB": true,
+    "lint": true,
+    "unit": true,
+    "build": true,
+    "trace": true,
+    "e2e": true,
+    "canary": true,
+    "matrix": true,
+    "b_all": true,
+    "safe": true,
+    "head_unchanged": true,
+    "no_live_tool": true
+  },
+  "b1440RootCause": {
+    "primary": "approval-state defect + fallback-state defect + harness assertion defect",
+    "secondaryRaceObservedInMatrix": "asynchronous evidence race on oldJobStillActive under parallel load",
+    "detail": "Repeated approve_pending with cleared/stale pending entered provider path; no terminal approval receipt ledger. Harness rejected any executionResult on repeat. Under parallel matrix, jobs could complete during planning before oldJobStillActive check."
+  },
+  "correction": {
+    "product": [
+      "approvalExecutionStore terminal ledger",
+      "empty approve short-circuit without provider",
+      "approve_pending always skipProvider",
+      "atomic claim before execute"
+    ],
+    "harness": [
+      "repeatApprovalCreatedNothing product-state assertion allows alreadyExecuted",
+      "oldJobStillActive tolerates completed-but-not-cancelled during planning"
+    ]
+  },
+  "filesModified": [
+    "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+    "app/api/rextora/agent/route.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+    "tmp/codex-master-run/phase3-isolated-acceptance.mjs",
+    "tests/AgentV2TerminalApprovalIdempotency.test.ts"
+  ],
+  "focusedTests": "tests/AgentV2TerminalApprovalIdempotency.test.ts",
+  "conversationB": [
+    {
+      "width": 390,
+      "passed": true,
+      "repeatApprovalCreatedNothing": true,
+      "providerCallCount": 0,
+      "duplicateExecutionCount": 0,
+      "persistedStateMatch": true,
+      "oldJobStillActive": true,
+      "consoleErrorCount": 0,
+      "rawLeakCount": 0
+    },
+    {
+      "width": 768,
+      "passed": true,
+      "repeatApprovalCreatedNothing": true,
+      "providerCallCount": 0,
+      "duplicateExecutionCount": 0,
+      "persistedStateMatch": true,
+      "oldJobStillActive": true,
+      "consoleErrorCount": 0,
+      "rawLeakCount": 0
+    },
+    {
+      "width": 1024,
+      "passed": true,
+      "repeatApprovalCreatedNothing": true,
+      "providerCallCount": 0,
+      "duplicateExecutionCount": 0,
+      "persistedStateMatch": true,
+      "oldJobStillActive": true,
+      "consoleErrorCount": 0,
+      "rawLeakCount": 0
+    },
+    {
+      "width": 1440,
+      "passed": true,
+      "repeatApprovalCreatedNothing": true,
+      "providerCallCount": 0,
+      "duplicateExecutionCount": 0,
+      "persistedStateMatch": true,
+      "oldJobStillActive": true,
+      "consoleErrorCount": 0,
+      "rawLeakCount": 0
+    }
+  ],
+  "lint": {
+    "exitCode": 0
+  },
+  "unitTest": {
+    "exitCode": 0,
+    "summary": "191 files / 1372 tests passed"
+  },
+  "build": {
+    "exitCode": 0,
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "durationMs": 93913
+  },
+  "trace": {
+    "inspectedAt": "2026-08-05T11:00:19.729Z",
+    "nextDir": "/Users/macdoong/Documents/Rextora/.next",
+    "totalSizeBytes": 687791530,
+    "totalSizeHuman": "655.9MB",
+    "nftManifestCount": 115,
+    "traced": {
+      "tmp": 0,
+      "screenshots": 0,
+      "gitEvidence": 0,
+      "envFiles": 0,
+      "acceptanceArtifacts": 0
+    },
+    "samples": {
+      "tmp": [],
+      "screenshots": [],
+      "envFiles": [],
+      "gitEvidence": []
+    },
+    "largestTracedPaths": [
+      {
+        "file": "./route_client-reference-manifest.js",
+        "count": 80
+      },
+      {
+        "file": "./page/react-loadable-manifest.json",
+        "count": 32
+      },
+      {
+        "file": "./page_client-reference-manifest.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/@swc/helpers/cjs/_interop_require_default.cjs",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/@swc/helpers/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/build/adapter/setup-node-env.external.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/app-router-headers.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/hooks-server-context.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/static-generation-bailout.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/lib/console.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/@opentelemetry/api/index.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/@opentelemetry/api/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/jsonwebtoken/index.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/jsonwebtoken/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.prod.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/source-map/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/source-map/source-map.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/stacktrace-parser/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/stacktrace-parser/stack-trace-parser.cjs.js",
+        "count": 32
+      }
+    ],
+    "runtimeRequired": {
+      "safeStrategyPresent": true
+    },
+    "secretTraceFailure": false,
+    "pass": true
+  },
+  "e2e": [
+    {
+      "run": 1,
+      "exitCode": 0
+    },
+    {
+      "run": 2,
+      "exitCode": 0
+    },
+    {
+      "run": 3,
+      "exitCode": 0
+    }
+  ],
+  "providerCanary": {
+    "requestedProviders": [
+      "gemini"
+    ],
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "structuredOutputValid": true,
+    "canaryPassed": true,
+    "checksNonEmpty": true,
+    "checksCount": 2,
+    "fallbackUsed": false,
+    "writeToolAuditCount": 0,
+    "attempts": [
+      {
+        "requestedProvider": "gemini",
+        "providerSucceeded": true,
+        "canaryPassed": true,
+        "fallbackUsed": false,
+        "fallbackReason": null,
+        "writeToolAuditCount": 0
+      }
+    ]
+  },
+  "browserMatrix": {
+    "passed": 52,
+    "total": 52,
+    "failures": []
+  },
+  "leakage": {
+    "rawLeakTotal": 0
+  },
+  "runtimeConsole": {
+    "consoleErrorTotal": 0,
+    "cleanupOk": true
+  },
+  "safety": {
+    "static": {
+      "writeLikeTools": [
+        "backtest.detail",
+        "backtest.list",
+        "backtest.run",
+        "paper.pause",
+        "paper.prepare",
+        "paper.resume",
+        "paper.session",
+        "paper.status",
+        "paper.stop",
+        "results.detail",
+        "results.list",
+        "results.promote",
+        "search.cancel",
+        "search.create",
+        "search.list",
+        "search.pause",
+        "search.result",
+        "search.start",
+        "search.status",
+        "strategy.archive",
+        "strategy.delete",
+        "strategy.detail",
+        "strategy.list",
+        "strategy.rename",
+        "strategy.restore"
+      ],
+      "liveOrOrderToolHitsInRegistry": [
+        "live.",
+        "start_live",
+        "safe_v44",
+        "start_live"
+      ],
+      "noLiveTool": true,
+      "policyMentionsApproval": true,
+      "paperExchangeCalledFalsePresent": true,
+      "SAFE": {
+        "params_hash": "7893ca3f0e30",
+        "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+        "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+        "diffEmpty": true
+      },
+      "git": {
+        "branch": "main",
+        "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+        "statusLines": 154
+      },
+      "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq"
+    },
+    "tools": {
+      "writeToolsRequireApproval": [
+        "memory.reset",
+        "search.create",
+        "search.start",
+        "search.pause",
+        "search.cancel",
+        "backtest.run",
+        "paper.prepare",
+        "paper.approve_start",
+        "paper.pause",
+        "paper.resume",
+        "paper.stop",
+        "results.promote",
+        "strategy.rename",
+        "strategy.archive",
+        "strategy.restore",
+        "strategy.delete"
+      ],
+      "readTools": [
+        "search.list",
+        "search.status",
+        "search.result",
+        "results.list",
+        "results.detail",
+        "strategy.list",
+        "strategy.detail",
+        "backtest.list",
+        "backtest.detail",
+        "paper.status",
+        "paper.session",
+        "workspace.current",
+        "workspace.get",
+        "lifecycle.current",
+        "lifecycle.get",
+        "settings.current",
+        "settings.get",
+        "research.summary",
+        "memory.recall",
+        "memory.export"
+      ],
+      "allRegisteredWritesRequireApproval": true,
+      "noLiveTool": true,
+      "noBinanceOrderTool": true,
+      "noSafeMutationTool": true,
+      "unknownDenied": true,
+      "paperExchangeCalledFalse": true
+    }
+  },
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "diffEmpty": true
+  },
+  "git": {
+    "branch": "main",
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "statusLineCount": 154,
+    "diffStat": "+---\n components/rextora/agent/AgentPanel.tsx            |  259 ++++-\n components/rextora/agent/AgentSuggestions.tsx      |   22 +-\n components/rextora/agent/useAgentSession.ts        |  473 ++++++++-\n .../rextora/backtest/BacktestReviewWorkbench.tsx   |  117 +-\n components/rextora/charts/BacktestAnalysisView.tsx |   87 +-\n instrumentation.ts                                 |   21 +-\n next.config.ts                                     |   16 +\n src/lib/rextora/agent/agentDataFetcher.ts          |   78 ++\n src/lib/rextora/agent/agentResponseBuilder.ts      |  450 +++++++-\n src/lib/rextora/agent/intentParser.ts              |  237 ++++-\n src/lib/rextora/agent/llmTypes.ts                  |   21 +\n src/lib/rextora/agent/providerConfig.ts            |   28 +-\n src/lib/rextora/agent/providers/promptBuilder.ts   |   47 +-\n src/lib/rextora/agent/safetyGuard.ts               |   23 +\n src/lib/rextora/agent/types.ts                     |  157 ++-\n src/lib/rextora/liveSafetyGate.ts                  |    6 +-\n src/lib/rextora/report/aiTradeReport.ts            |    2 +-\n src/lib/rextora/storage/jsonStore.ts               |    6 +-\n src/lib/rextora/strategySearch/deletionSafety.ts   |    2 +-\n .../strategySearch/strategyDeletionSafety.ts       |    2 +-\n tests/agentCommercialUx.test.ts                    |   19 +-\n tests/agentIntentParser.test.ts                    |   45 +-\n tests/agentProvider.test.ts                        |   22 +-\n tests/backtestExecutionIdentity.test.ts            |   18 +-\n tests/backtestSymbolSelector.test.ts               |   11 +-\n tests/commercialOverlayHydration.test.ts           |   20 +-\n tests/e2e/rextora-smoke.spec.ts                    |    4 +-\n tests/firstRunEmptyRuntime.test.ts                 |   10 +-\n tests/liveReadinessChecklist.test.ts               |   85 +-\n tsconfig.json                                      |    3 +-\n tsconfig.tsbuildinfo                               |    2 +-\n 42 files changed, 3523 insertions(+), 587 deletions(-)\n"
+  },
+  "firstMatrixFailurePreserved": {
+    "passed": false,
+    "failedOn": "oldJobStillActive",
+    "repeatApprovalCreatedNothing": true
+  },
+  "remainingWarnings": [
+    "First aborted matrix preserved B-1440 failure on oldJobStillActive race (repeatApproval already true); harness corrected; final matrix 52/52.",
+    "Dirty working tree preserved (no commit/push)."
+  ]
+}

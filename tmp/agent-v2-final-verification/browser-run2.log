@@ -1,0 +1,4 @@
+viewport 390
+Error: browserSend_timeout:이전에 했던 설정과 다른 패턴으로 새 탐색해줘.
+    at browserSend (file:///Users/macdoong/Documents/Rextora/tmp/agent-v2-browser-only.mjs:38:9)
+    at async main (file:///Users/macdoong/Documents/Rextora/tmp/agent-v2-browser-only.mjs:81:5)

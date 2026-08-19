@@ -1,0 +1,51 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:3000
+- Network:       http://172.30.1.38:3000
+✓ Ready in 119ms
+[rextora] orphan search recovery {
+  ok: true,
+  scanned: 2,
+  resumed: [ 'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb' ],
+  skipped: [ 'search_92b7caa7-e2a5-4327-800d-05e5cd0fda71' ],
+  recordRecovered: [],
+  cancelFinalized: [],
+  ownershipRecovered: [
+    'search_7e4e10f2-3f92-4d19-8ad4-96d67ebdd911',
+    'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb'
+  ],
+  errors: [],
+  audits: [
+    {
+      jobId: 'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb',
+      previousState: 'running',
+      recoveredState: 'running',
+      reason: 'process_restart_orphan_resume'
+    }
+  ]
+}
+▲ Next.js 16.2.6
+- Local:         http://localhost:3000
+- Network:       http://172.30.1.38:3000
+✓ Ready in 94ms
+[rextora] orphan search recovery {
+  ok: true,
+  scanned: 2,
+  resumed: [ 'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb' ],
+  skipped: [ 'search_92b7caa7-e2a5-4327-800d-05e5cd0fda71' ],
+  recordRecovered: [],
+  cancelFinalized: [],
+  ownershipRecovered: [ 'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb' ],
+  errors: [],
+  audits: [
+    {
+      jobId: 'search_8c3e3a10-224c-42e1-9d82-1a454c8058bb',
+      previousState: 'running',
+      recoveredState: 'running',
+      reason: 'process_restart_orphan_resume'
+    }
+  ]
+}
+▲ Next.js 16.2.6
+- Local:         http://localhost:3000
+- Network:       http://172.30.1.38:3000
+✓ Ready in 184ms

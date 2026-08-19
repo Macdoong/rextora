@@ -1,0 +1,32 @@
+{
+  "t1": {
+    "httpStatus": 200,
+    "latencyMs": 18726,
+    "interpretationSource": "llm",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "errorKo": null,
+    "conclusionPreview": "백테스트는 정해진 전략을 과거 시장 데이터에 적용해 어떤 거래가 발생했는지를 재현하고 성과와 위험을 평가하는 검증 과정입니다. 결과는 단순 수익률뿐 아니라 거래 수, 최대 낙폭, 수수료·슬리피지 반영 여부, 여러 기간에서의 일관성 등을 함께 살펴야 하며, 과거 결과가 미래 수익을 보장하지는 않습니다.",
+    "topic": "feature_backtest",
+    "routeMode": "DIRECT_ANSWER",
+    "providerExpected": true,
+    "safetyBlocked": false,
+    "proposedAction": false,
+    "rawLeak": false
+  },
+  "t2": {
+    "httpStatus": 200,
+    "latencyMs": 3363,
+    "interpretationSource": "llm",
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "errorKo": null,
+    "conclusionPreview": "백테스트는 과거 데이터로 전략을 시험해서 수익성과 위험을 미리 알아보는 과정입니다.",
+    "topic": "feature_backtest",
+    "routeMode": "DIRECT_ANSWER",
+    "providerExpected": true,
+    "safetyBlocked": false,
+    "proposedAction": false,
+    "rawLeak": false
+  }
+}

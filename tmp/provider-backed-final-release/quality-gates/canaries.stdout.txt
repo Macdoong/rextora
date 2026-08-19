@@ -1,0 +1,10 @@
+{
+  "openai": {
+    "passed": true,
+    "stored": "openai"
+  },
+  "gemini": {
+    "passed": true,
+    "stored": "gemini"
+  }
+}

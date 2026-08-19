@@ -1,0 +1,62 @@
+[
+  {
+    "t": "2026-08-11T02:30:30.662Z",
+    "k": "T0_directApi",
+    "v": {
+      "status": 200,
+      "openaiStored": true,
+      "geminiStored": true,
+      "envO": false,
+      "envG": false
+    }
+  },
+  {
+    "t": "2026-08-11T02:30:30.726Z",
+    "k": "T0_pageLoad",
+    "v": "http://127.0.0.1:3101/settings"
+  },
+  {
+    "t": "2026-08-11T02:30:31.105Z",
+    "k": "T2_settingsResponse",
+    "v": {
+      "status": 200,
+      "openaiStored": true,
+      "geminiStored": true
+    }
+  },
+  {
+    "t": "2026-08-11T02:30:31.111Z",
+    "k": "T4_uiConfiguredBadges",
+    "v": {
+      "openai": false,
+      "gemini": true
+    }
+  },
+  {
+    "t": "2026-08-11T02:30:31.135Z",
+    "k": "T5_browserFetch",
+    "v": {
+      "status": 200,
+      "openaiStored": true,
+      "geminiStored": true,
+      "envO": false,
+      "envG": false
+    }
+  },
+  {
+    "t": "2026-08-11T02:30:31.140Z",
+    "k": "T6_finalDirectApi",
+    "v": {
+      "status": 200,
+      "openaiStored": true,
+      "geminiStored": true,
+      "envO": false,
+      "envG": false
+    }
+  },
+  {
+    "t": "2026-08-11T02:30:31.140Z",
+    "k": "geminiStoredMismatch",
+    "v": false
+  }
+]

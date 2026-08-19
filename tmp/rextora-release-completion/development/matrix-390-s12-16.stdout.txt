@@ -1,0 +1,30 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 85962
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 906
+    }
+  ]
+}
+
+Running 5 tests using 1 worker
+
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.1m)
+  ✓  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (16.2s)
+  ✓  3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.6m)
+  ✓  4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (39.2s)
+  ✓  5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.0m)
+
+  5 passed (8.3m)

@@ -1,0 +1,77 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-06T09:18:31.444Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mshazw9g_wifmye",
+      "turnId": "turn-1786007911426",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T09:18:37.405Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mshazw9g_wifmye",
+      "turnId": "turn-1786007911426",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 5954,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-06T09:18:38.565Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mshb01r9_vwl5vr",
+      "turnId": "turn-1786007918560",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T09:18:44.948Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mshb01r9_vwl5vr",
+      "turnId": "turn-1786007918560",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 6381,
+      "errorCategory": "provider_or_validation"
+    }
+  ],
+  "backtestFiles": [
+    "bt_mshazvaw_29b4ad.chart.json",
+    "bt_mshazvaw_29b4ad.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_cf59637f103f4bd6"
+  ]
+}

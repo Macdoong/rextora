@@ -1,0 +1,71 @@
+{
+  "BUILD_ID": "Bt9hwUM42EQX4tnRiIVUW",
+  "pageLoads": {
+    "/dashboard": {
+      "status": 200,
+      "ok": true
+    },
+    "/strategy-search": {
+      "status": 200,
+      "ok": true
+    },
+    "/results": {
+      "status": 200,
+      "ok": true
+    },
+    "/backtest": {
+      "status": 200,
+      "ok": true
+    },
+    "/paper-trading": {
+      "status": 200,
+      "ok": true
+    },
+    "/settings": {
+      "status": 200,
+      "ok": true
+    },
+    "/live-trading": {
+      "status": 200,
+      "ok": true
+    }
+  },
+  "agentVisible": false,
+  "openaiStored": true,
+  "geminiStored": true,
+  "envFallback": false,
+  "credentialNotPrefilled": true,
+  "openaiConversation": {
+    "ok": true,
+    "provider": "openai"
+  },
+  "geminiSwitch": {
+    "ok": true,
+    "provider": "gemini"
+  },
+  "workspaceRead": {
+    "ok": true
+  },
+  "actionPlanning": {
+    "ok": true
+  },
+  "approvalExactlyOnce": {
+    "ok": true
+  },
+  "liveRefused": {
+    "ok": true
+  },
+  "safeMutationRefused": {
+    "ok": true
+  },
+  "counters": {
+    "malformedJsonCount": 0,
+    "ChunkLoadErrorCount": 0,
+    "hydrationErrorCount": 0,
+    "HTTP5xxCount": 0,
+    "unexpectedConsoleErrorCount": 0,
+    "horizontalOverflow": false,
+    "missingStaticAssets": 0
+  },
+  "testerSmokePassed": true
+}

@@ -1,0 +1,27 @@
+{
+  "pendingInBody": true,
+  "actionId": "pa_df45fc82bbfb64c4",
+  "query": "진행해",
+  "createKeys": [
+    "searchVersion",
+    "strategyTemplateId",
+    "symbols",
+    "timeframe",
+    "dataVersion",
+    "seed",
+    "generatorType",
+    "maxIterations",
+    "parameterRanges",
+    "evaluationWindows",
+    "balance",
+    "baseCostConfig",
+    "passPolicy",
+    "scoreWeights",
+    "costStressScenarios",
+    "jitterConfig",
+    "dataRef",
+    "operatorPlan",
+    "marketMode"
+  ],
+  "createBodyBytes": 2527
+}

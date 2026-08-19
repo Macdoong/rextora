@@ -1,0 +1,22 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/liveReadinessChecklist.test.ts > liveReadinessChecklist > includes expected LIVE block reasons when setting is off
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/liveReadinessChecklist.test.ts:44:59
+     42|     const gate = evaluateLiveSafetyGate({ readinessOnly: true, diagnos…
+     43|     const remaining = getExpectedRemainingLiveBlocks(gate);
+     44|     expect(remaining.some((r) => r.includes("실전 거래 허용"))).toBe(true);
+       |                                                           ^
+     45|     expect(remaining.some((r) => r.includes("실전 거래 승인 환경변수"))).toBe(fa…
+     46|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

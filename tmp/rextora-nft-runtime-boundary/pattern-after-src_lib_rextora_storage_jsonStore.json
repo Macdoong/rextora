@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/storage/jsonStore.ts",
+  "elapsedMs": 62.544666,
+  "tracedFileCount": 5,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

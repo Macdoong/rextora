@@ -1,0 +1,39 @@
+
+Running 1 test using 1 worker
+
+(node:75212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [dev-390] › tests/e2e/release/dev-timeout-diagnostic.spec.ts:8:7 › Experiment C — matrix semantics 01 then 02 › scenario 01 then 02 @390 with 60s cap on 02 (1.0m)
+
+
+  1) [dev-390] › tests/e2e/release/dev-timeout-diagnostic.spec.ts:8:7 › Experiment C — matrix semantics 01 then 02 › scenario 01 then 02 @390 with 60s cap on 02 
+
+    Error: scenario02_60s_diagnostic_cap
+
+      43 |
+      44 |     if (!passed) {
+    > 45 |       throw new Error(failure ?? "scenario02_failed");
+         |             ^
+      46 |     }
+      47 |   });
+      48 | });
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/dev-timeout-diagnostic.spec.ts:45:13
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dev-timeout-diagnostic-Exp-dbdcf-n-02-390-with-60s-cap-on-02-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dev-timeout-diagnostic-Exp-dbdcf-n-02-390-with-60s-cap-on-02-dev-390/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/dev-timeout-diagnostic-Exp-dbdcf-n-02-390-with-60s-cap-on-02-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/dev-timeout-diagnostic-Exp-dbdcf-n-02-390-with-60s-cap-on-02-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/dev-timeout-diagnostic.spec.ts:8:7 › Experiment C — matrix semantics 01 then 02 › scenario 01 then 02 @390 with 60s cap on 02 

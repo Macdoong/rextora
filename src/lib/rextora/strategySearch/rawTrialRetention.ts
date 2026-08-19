@@ -15,6 +15,7 @@ import { getSearchPlan } from "./searchPlan";
 import { listStrategies } from "../strategy/strategyStore";
 import { parseSourceResearchJobId, parseSourceTrialIteration } from "./researchResultsSummary";
 import { writeDeletionAudit } from "./deletionSafety";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export type RawTrialRetentionPolicy =
   | "keep_indefinitely"
@@ -37,12 +38,7 @@ export interface RawTrialCleanupPreview {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

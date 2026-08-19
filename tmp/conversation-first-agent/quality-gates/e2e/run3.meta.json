@@ -1,0 +1,12 @@
+{
+  "command": "npm run test:e2e",
+  "run": 3,
+  "startedAt": "2026-08-06T00:28:57Z",
+  "finishedAt": "2026-08-06T00:29:13Z",
+  "durationMs": 16555,
+  "exitCode": 0,
+  "BUILD_ID": "k57qjoN01VLHGzzhrlQpN",
+  "passedCount": 31,
+  "stdout": "tmp/conversation-first-agent/quality-gates/e2e/run3.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/e2e/run3.stderr.log"
+}

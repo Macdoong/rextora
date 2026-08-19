@@ -1,0 +1,257 @@
+{
+  "startedAt": "2026-08-01T12:16:31.496Z",
+  "buildId": "h4nnXEhF-eCEChR7NrXQd",
+  "stages": {
+    "dashboard": {
+      "ok": true,
+      "hasAgent": true,
+      "hasSuggestions": true,
+      "screenshot": "tmp/step6-audit/01-dashboard-1440.png"
+    },
+    "dashboardMobile": {
+      "screenshot": "tmp/step6-audit/01-dashboard-390.png"
+    },
+    "mobileConversation": {
+      "screenshot": "tmp/step6-audit/06-convo-mobile-390.png"
+    },
+    "strategySearch": {
+      "path": "/strategy-search",
+      "title": "Rextora — Quant Futures Platform",
+      "loaded": true,
+      "screenshot": "tmp/step6-audit/stage-strategySearch-1440.png",
+      "hasPrimaryAction": true
+    },
+    "results": {
+      "path": "/results",
+      "title": "Rextora — Quant Futures Platform",
+      "loaded": true,
+      "screenshot": "tmp/step6-audit/stage-results-1440.png",
+      "hasPrimaryAction": true
+    },
+    "backtest": {
+      "path": "/backtest",
+      "title": "Rextora — Quant Futures Platform",
+      "loaded": true,
+      "screenshot": "tmp/step6-audit/stage-backtest-1440.png",
+      "hasPrimaryAction": true
+    },
+    "paper": {
+      "path": "/paper-trading",
+      "title": "Rextora — Quant Futures Platform",
+      "loaded": true,
+      "screenshot": "tmp/step6-audit/stage-paper-1440.png",
+      "hasPrimaryAction": true
+    },
+    "live": {
+      "path": "/live-trading",
+      "title": "Rextora — Quant Futures Platform",
+      "loaded": true,
+      "screenshot": "tmp/step6-audit/stage-live-1440.png",
+      "hasPrimaryAction": true
+    },
+    "agentDeepLink": {
+      "href": "/strategy-search",
+      "screenshot": "tmp/step6-audit/07-agent-deeplink-1440.png"
+    }
+  },
+  "conversations": [
+    {
+      "query": "오늘 무엇을 해야 하지?",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 0,
+      "actionLabel": "",
+      "evidenceToggle": 1,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 1,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": true,
+      "noAutoExecuteLanguage": true
+    },
+    {
+      "query": "좋은 전략을 찾아줘.",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 0,
+      "actionLabel": "",
+      "evidenceToggle": 2,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 2,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": true,
+      "noAutoExecuteLanguage": true
+    },
+    {
+      "query": "왜 이 전략이 좋은 거야?",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 0,
+      "actionLabel": "",
+      "evidenceToggle": 3,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 3,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": true,
+      "noAutoExecuteLanguage": true
+    },
+    {
+      "query": "백테스트 해볼까?",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 0,
+      "actionLabel": "",
+      "evidenceToggle": 4,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 4,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": true,
+      "noAutoExecuteLanguage": true
+    },
+    {
+      "query": "Paper로 돌려볼까?",
+      "conclusion": "\"SAFE_v44_i4060\"를 Paper로 검토할 준비가 되었습니다. 에이전트는 자동 시작하지 않습니다.\n\n화면만 열리며, 세션 시작은 사용자가 승인해야 합니다. 자동 시작하지 않습니다.\n\n모의매매 화면을 열고 승인하세요.",
+      "actionCount": 1,
+      "actionLabel": "모의매매 열기",
+      "evidenceToggle": 5,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 5,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": true,
+      "noAutoExecuteLanguage": true
+    },
+    {
+      "query": "현재 가장 위험한 부분은?",
+      "conclusion": "저장된 백테스트 증거를 먼저 상세 검토하세요.\n\n상세 지표는 백테스트 화면에서 확인하세요.\n\n백테스트 페이지에서 증거를 상세 검토하세요.",
+      "actionCount": 2,
+      "actionLabel": "백테스트 열기",
+      "evidenceToggle": 6,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 6,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": false,
+      "noAutoExecuteLanguage": false
+    },
+    {
+      "query": "다음 단계는?",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 2,
+      "actionLabel": "백테스트 열기",
+      "evidenceToggle": 7,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 0,
+      "timestamp": 7,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": false,
+      "noAutoExecuteLanguage": false
+    },
+    {
+      "query": "이 전략을 왜 추천했어?",
+      "conclusion": "이어서 리스크 검토 열기를 진행하는 것이 좋습니다.\n\n검증된 사실만 반영했습니다.\n\n실패 탐색 원인 확인.",
+      "actionCount": 3,
+      "actionLabel": "전략 탐색 열기",
+      "evidenceToggle": 8,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 1,
+      "timestamp": 8,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": false,
+      "noAutoExecuteLanguage": false
+    },
+    {
+      "query": "지금 승인하면 어떤 일이 일어나?",
+      "conclusion": "대시보드에서 상태를 확인하세요.\n\n검증된 사실만 반영했습니다.\n\n대시보드에서 상태를 확인하세요.",
+      "actionCount": 3,
+      "actionLabel": "전략 탐색 열기",
+      "evidenceToggle": 9,
+      "approvalTrio": 0,
+      "safety": 0,
+      "followups": [
+        "지금 뭘 해야 해?",
+        "왜?",
+        "그럼 진행해"
+      ],
+      "pinned": 1,
+      "workspace": 1,
+      "timestamp": 9,
+      "hasDecisionEvidence": 0,
+      "hasConclusion": true,
+      "hasOneAction": false,
+      "noAutoExecuteLanguage": false
+    }
+  ],
+  "ux": {
+    "agentDeepLink": "/strategy-search"
+  },
+  "quality": {},
+  "summary": {
+    "conversationSuccess": "5/9",
+    "stagesLoaded": 9,
+    "avgActionsPerTurn": 1.2222222222222223
+  }
+}

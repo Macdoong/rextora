@@ -1,0 +1,140 @@
+
+> rextora@0.1.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 89s
+  Running TypeScript ...
+  Finished TypeScript in 8.5s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/98) ...
+  Generating static pages using 9 workers (24/98) 
+  Generating static pages using 9 workers (48/98) 
+  Generating static pages using 9 workers (73/98) 
+✓ Generating static pages using 9 workers (98/98) in 282ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /ai-candidates
+├ ○ /ai-reports
+├ ○ /alerts
+├ ○ /alerts/history
+├ ○ /alerts/rules
+├ ƒ /api/alerts/history
+├ ƒ /api/alerts/rules
+├ ƒ /api/backtests/run
+├ ƒ /api/backtests/validation
+├ ƒ /api/binance/balance
+├ ƒ /api/binance/klines
+├ ƒ /api/binance/market
+├ ƒ /api/binance/status
+├ ƒ /api/bot/restart
+├ ƒ /api/bot/start
+├ ƒ /api/bot/status
+├ ƒ /api/bot/stop
+├ ƒ /api/dashboard
+├ ƒ /api/emergency/stop-all
+├ ƒ /api/orders/cancel-all
+├ ƒ /api/orders/close-position
+├ ƒ /api/orders/partial-close
+├ ƒ /api/rextora/agent
+├ ƒ /api/rextora/agent/health
+├ ƒ /api/rextora/agent/session
+├ ƒ /api/rextora/agent/session/reset
+├ ƒ /api/rextora/backtest/run
+├ ƒ /api/rextora/binance/diagnostics
+├ ƒ /api/rextora/bot/start
+├ ƒ /api/rextora/bot/status
+├ ƒ /api/rextora/bot/stop
+├ ƒ /api/rextora/candidates
+├ ƒ /api/rextora/charts/candles
+├ ƒ /api/rextora/cost
+├ ƒ /api/rextora/emergency
+├ ƒ /api/rextora/first-run
+├ ƒ /api/rextora/first-run/demo
+├ ƒ /api/rextora/first-run/demo/reset
+├ ƒ /api/rextora/first-run/dismiss
+├ ƒ /api/rextora/internal/orphan-recovery
+├ ƒ /api/rextora/learning
+├ ƒ /api/rextora/live/dry-run
+├ ƒ /api/rextora/live/preflight
+├ ƒ /api/rextora/live/readiness
+├ ƒ /api/rextora/market
+├ ƒ /api/rextora/paper/session
+├ ƒ /api/rextora/paper/session/[id]
+├ ƒ /api/rextora/risk
+├ ƒ /api/rextora/settings
+├ ƒ /api/rextora/settings/ai-providers
+├ ƒ /api/rextora/settings/ai-providers/credential
+├ ƒ /api/rextora/settings/ai-providers/models
+├ ƒ /api/rextora/settings/ai-providers/test
+├ ƒ /api/rextora/strategies
+├ ƒ /api/rextora/strategies/compare
+├ ƒ /api/rextora/strategies/preview
+├ ƒ /api/rextora/strategy-search
+├ ƒ /api/rextora/strategy-search/[jobId]
+├ ƒ /api/rextora/strategy-search/[jobId]/archive
+├ ƒ /api/rextora/strategy-search/[jobId]/best
+├ ƒ /api/rextora/strategy-search/[jobId]/cancel
+├ ƒ /api/rextora/strategy-search/[jobId]/deletion-impact
+├ ƒ /api/rextora/strategy-search/[jobId]/generations
+├ ƒ /api/rextora/strategy-search/[jobId]/pause
+├ ƒ /api/rextora/strategy-search/[jobId]/promote
+├ ƒ /api/rextora/strategy-search/[jobId]/raw-trials
+├ ƒ /api/rextora/strategy-search/[jobId]/restore
+├ ƒ /api/rextora/strategy-search/[jobId]/results-summary
+├ ƒ /api/rextora/strategy-search/[jobId]/resume
+├ ƒ /api/rextora/strategy-search/[jobId]/start
+├ ƒ /api/rextora/strategy-search/[jobId]/trials
+├ ƒ /api/rextora/strategy-search/configs
+├ ƒ /api/rextora/strategy-search/configs/[name]
+├ ƒ /api/rextora/strategy-search/follow-up
+├ ƒ /api/rextora/strategy-search/recover
+├ ƒ /api/rextora/strategy-search/storage-summary
+├ ƒ /api/rextora/strategy/approve
+├ ƒ /api/rextora/system
+├ ƒ /api/rextora/telegram/test
+├ ƒ /api/rextora/trading/cancel-all
+├ ƒ /api/rextora/trading/close-all
+├ ƒ /api/rextora/trading/dashboard
+├ ƒ /api/rextora/trading/emergency-stop
+├ ƒ /api/risk
+├ ƒ /api/strategies
+├ ƒ /api/strategies/[id]
+├ ƒ /api/strategies/discover
+├ ƒ /api/system/api-status
+├ ƒ /api/telegram/test
+├ ƒ /backtest
+├ ○ /backtests
+├ ○ /cost-analysis
+├ ○ /dashboard
+├ ○ /learning-log
+├ ○ /live-trading
+├ ○ /market-watch
+├ ○ /paper-trading
+├ ○ /results
+├ ○ /risk
+├ ○ /settings
+├ ƒ /strategies
+├ ƒ /strategies/[id]
+├ ○ /strategies/discovery
+├ ○ /strategies/ranking
+├ ○ /strategy-performance
+├ ○ /strategy-search
+├ ○ /strategy-search/advanced
+├ ○ /system-status
+├ ○ /system/api-status
+├ ○ /trades
+├ ○ /trading
+├ ○ /trading/bot
+└ ○ /trading/orders
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,34 @@
+{
+  "buildId": "AKGGYNTPCkYoh0VM3fvnU",
+  "expectedRows": 88,
+  "executedRows": 8,
+  "passedRows": 7,
+  "failedRows": 1,
+  "skippedRows": 0,
+  "retries": 0,
+  "workers": 1,
+  "stoppedAt": "prod-390 scenario 08",
+  "failure": {
+    "viewport": 390,
+    "scenario": 1,
+    "name": "OpenAI settings configured state",
+    "classification": "external OpenAI billing/credit blocker",
+    "expectedStored": true,
+    "observedStored": false,
+    "observedEnvFallback": true,
+    "providerSucceeded": false,
+    "fallbackUsed": true,
+    "writeToolCount": 0
+  },
+  "passingRows": [
+    "prod-390 scenario 02",
+    "prod-390 scenario 03",
+    "prod-390 scenario 04",
+    "prod-390 scenario 05",
+    "prod-390 scenario 06",
+    "prod-390 scenario 07",
+    "prod-390 scenario 08"
+  ],
+  "authoritativeComplete": false,
+  "passed": false
+}

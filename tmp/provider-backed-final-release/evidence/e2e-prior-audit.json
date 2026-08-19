@@ -1,0 +1,147 @@
+{
+  "priorReports": {
+    "agent-final": {
+      "verdict": "REXTORA PROVIDER-BACKED AI EMPLOYEE FINAL PARTIAL",
+      "generatedAt": "2026-08-06T13:00:00.000Z",
+      "BUILD_ID": "_8-AcvZPxbV93M8SHTuAg",
+      "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+      "openaiMandatoryReproduction": {
+        "total": 9,
+        "providerSucceeded": 9,
+        "fallbackUsed": 0,
+        "passed": true
+      },
+      "openaiLiveConversation": {
+        "providerBackedTurns": 8,
+        "fallbackTurns": 2,
+        "rawLeakCount": 0
+      },
+      "geminiLiveConversation": {
+        "providerBackedTurns": 8,
+        "fallbackTurns": 2,
+        "rawLeakCount": 0
+      },
+      "canaries": {
+        "openai": {
+          "canaryPassed": true,
+          "model": "gpt-5-mini",
+          "fallbackUsed": false
+        },
+        "gemini": {
+          "canaryPassed": true,
+          "model": "gemini-2.5-flash",
+          "fallbackUsed": false
+        }
+      },
+      "qualityGates": {
+        "lintExitCode": 0,
+        "unitTests": "1538/1538",
+        "e2e1": 0,
+        "e2e2": 0,
+        "e2e3": 0
+      },
+      "credentialState": {
+        "openaiConfigured": true,
+        "openaiStored": false,
+        "openaiEnvFallback": true,
+        "geminiConfigured": true,
+        "geminiStored": false,
+        "geminiEnvFallback": true
+      },
+      "secretLeakCount": 0,
+      "safe": {
+        "params_hash": "7893ca3f0e30",
+        "unchanged": true
+      },
+      "blockersRemaining": [
+        "Full Settings UI browser matrix at 390/768/1024/1440 not executed",
+        "Production 22-scenario browser matrix not executed",
+        "Development browser matrix not executed",
+        "OpenAI credential not persisted in encrypted store (env fallback only)",
+        "24+ turn per-provider conversation matrix not fully executed"
+      ]
+    },
+    "agent-prior": {
+      "title": "REXTORA PROVIDER-BACKED AI EMPLOYEE COMPLETION",
+      "verdict": "REXTORA PROVIDER-BACKED AI EMPLOYEE PARTIAL",
+      "BUILD_ID": "O5MqlOEKs8liifj_TKUBu",
+      "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+      "SAFE": {
+        "params_hash": "7893ca3f0e30",
+        "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+        "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+        "unchanged": true
+      },
+      "openaiCanary": {
+        "ok": true,
+        "provider": "openai",
+        "model": "gpt-5-mini",
+        "latencyMs": 1858,
+        "structuredOutputValid": true,
+        "writeToolAuditCount": 0,
+        "errorKo": null,
+        "responseFingerprint": "openai:chatcmpl-E9qiiT7mILTIg9zWfbtagxf2t7VSg"
+      },
+      "geminiCanary": {
+        "ok": true,
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "latencyMs": 965,
+        "structuredOutputValid": true,
+        "writeToolAuditCount": 0,
+        "errorKo": null,
+        "responseFingerprint": "gemini:gemini-2.5-flash:965"
+      },
+      "modelSwitch": {
+        "t1": {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "source": "llm"
+        },
+        "t2": {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "source": "llm"
+        }
+      },
+      "secretGet": {
+        "reasoningActive": true,
+        "openaiConfigured": true,
+        "geminiConfigured": true,
+        "hasSk": false,
+        "hasAiza": false,
+        "hasApiKeyField": false
+      },
+      "gates": {
+        "lint": 0,
+        "unit": 0,
+        "build": 0,
+        "e2e": [
+          0,
+          0,
+          0
+        ]
+      },
+      "remaining": [
+        "Full Playwright browser matrix for Settings AI provider UI and multi-viewport model switching not executed end-to-end in this cycle",
+        ".env.local OPENAI_API_KEY contains non-ASCII lookalikes; shell/process OpenAI key is valid and used by next start; re-paste via Settings recommended",
+        "Some READ_AND_ANSWER OpenAI turns still fall back locally on JSON parse/timeout under load"
+      ]
+    }
+  },
+  "rawE2E": {
+    "run1": {
+      "exitFile": "E2E1:0",
+      "passedLine": "31 passed"
+    },
+    "run2": {
+      "exitFile": "E2E2:0",
+      "passedLine": "31 passed"
+    },
+    "run3": {
+      "exitFile": "E2E3:0",
+      "passedLine": "31 passed"
+    }
+  },
+  "resolution": "Prior final-report.json e2e1/e2e2/e2e3 values are shell EXIT CODES (0=success), not test counts. Raw stdout confirms 31 passed per run."
+}

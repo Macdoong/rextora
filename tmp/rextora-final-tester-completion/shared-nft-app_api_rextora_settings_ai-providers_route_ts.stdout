@@ -1,0 +1,8 @@
+{
+  "entrypoint": "app/api/rextora/settings/ai-providers/route.ts",
+  "elapsedMs": 126.673833,
+  "tracedFileCount": 15,
+  "esmFileCount": 0,
+  "warningCount": 0,
+  "warnings": []
+}

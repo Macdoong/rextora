@@ -1,0 +1,1424 @@
+{
+  "source": "tmp/external-tester-release/logs/final-build.stderr.log",
+  "warningRows": 80,
+  "totalAggregateMatchedFiles": 9238706,
+  "thresholdPercent": 80,
+  "minimumFileCountForThreshold": 11,
+  "thresholdFiles": [
+    "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+    "src/lib/rextora/strategySearch/deletionSafety.ts",
+    "src/lib/rextora/backtest/backtestStore.ts",
+    "src/lib/rextora/strategySearch/jobStore.ts",
+    "src/lib/rextora/strategy/strategyStore.ts",
+    "src/lib/rextora/storage/jsonStore.ts",
+    "src/lib/rextora/strategySearch/searchConfigStore.ts",
+    "src/lib/rextora/strategySearch/storageSummary.ts",
+    "src/lib/rextora/agent/commandStore.ts",
+    "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+    "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+  ],
+  "ranked": [
+    {
+      "file": "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+      "aggregateMatchedFiles": 1463075,
+      "maxMatchedFiles": 582346,
+      "warningRows": 6,
+      "patterns": [
+        "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json'",
+        "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 193,
+          "column": 10,
+          "matchedFiles": 291218,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json'"
+        },
+        {
+          "line": 187,
+          "column": 16,
+          "matchedFiles": 582346,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json'"
+        },
+        {
+          "line": 108,
+          "column": 14,
+          "matchedFiles": 145654,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'"
+        },
+        {
+          "line": 115,
+          "column": 12,
+          "matchedFiles": 145654,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'"
+        },
+        {
+          "line": 115,
+          "column": 32,
+          "matchedFiles": 145654,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'"
+        },
+        {
+          "line": 49,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 1463075,
+      "cumulativePercent": 15.8364,
+      "symbols": "retainedTrialPath, get/set policy, preview/execute cleanup",
+      "importChain": [
+        "app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts",
+        "rawTrialRetention.ts"
+      ],
+      "runtimePurpose": "Raw strategy-trial retention policy, sizing, and protected cleanup",
+      "filesystemExpressions": [
+        {
+          "line": 193,
+          "column": 10,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json'",
+          "matchedFiles": 291218
+        },
+        {
+          "line": 187,
+          "column": 16,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json'",
+          "matchedFiles": 582346
+        },
+        {
+          "line": 108,
+          "column": 14,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+          "matchedFiles": 145654
+        },
+        {
+          "line": 115,
+          "column": 12,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+          "matchedFiles": 145654
+        },
+        {
+          "line": 115,
+          "column": 32,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+          "matchedFiles": 145654
+        },
+        {
+          "line": 49,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "aggregateMatchedFiles": 887424,
+      "maxMatchedFiles": 582350,
+      "warningRows": 3,
+      "patterns": [
+        "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> | <dynamic> '/jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.json' | <dynamic> 'jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.json' | <dynamic> '/jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.json' | <dynamic> 'jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.json' | <dynamic> '/jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.plan.json' | <dynamic> 'jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.plan.json' | <dynamic> '/jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.plan.json' | <dynamic> 'jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.plan.json' | <dynamic> '/jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.execution.json' | <dynamic> 'jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.execution.json' | <dynamic> '/jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.execution.json' | <dynamic> 'jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.execution.json' | <dynamic> '/jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.generations.json' | <dynamic> 'jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.generations.json' | <dynamic> '/jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.generations.json' | <dynamic> 'jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.generations.json' | <dynamic> '/jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.top10.json' | <dynamic> 'jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.top10.json' | <dynamic> '/jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.top10.json' | <dynamic> 'jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.top10.json' | <dynamic>",
+        "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic>",
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 229,
+          "column": 11,
+          "matchedFiles": 152525,
+          "pattern": "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> | <dynamic> '/jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.json' | <dynamic> 'jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.json' | <dynamic> '/jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.json' | <dynamic> 'jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.json' | <dynamic> '/jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.plan.json' | <dynamic> 'jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.plan.json' | <dynamic> '/jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.plan.json' | <dynamic> 'jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.plan.json' | <dynamic> '/jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.execution.json' | <dynamic> 'jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.execution.json' | <dynamic> '/jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.execution.json' | <dynamic> 'jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.execution.json' | <dynamic> '/jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.generations.json' | <dynamic> 'jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.generations.json' | <dynamic> '/jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.generations.json' | <dynamic> 'jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.generations.json' | <dynamic> '/jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.top10.json' | <dynamic> 'jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.top10.json' | <dynamic> '/jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.top10.json' | <dynamic> 'jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.top10.json' | <dynamic>"
+        },
+        {
+          "line": 165,
+          "column": 21,
+          "matchedFiles": 582350,
+          "pattern": "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic>"
+        },
+        {
+          "line": 57,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 2350499,
+      "cumulativePercent": 25.4419,
+      "symbols": "directorySizeBytes, buildDeletionImpactPreview, writeDeletionAudit",
+      "importChain": [
+        "app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts",
+        "deletionSafety.ts"
+      ],
+      "runtimePurpose": "Deletion reference graph, size preview, and audit persistence",
+      "filesystemExpressions": [
+        {
+          "line": 229,
+          "column": 11,
+          "pattern": "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> | <dynamic> '/jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.json' | <dynamic> 'jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.json' | <dynamic> '/jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.json' | <dynamic> 'jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.json' | <dynamic> '/jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.plan.json' | <dynamic> 'jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.plan.json' | <dynamic> '/jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.plan.json' | <dynamic> 'jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.plan.json' | <dynamic> '/jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.execution.json' | <dynamic> 'jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.execution.json' | <dynamic> '/jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.execution.json' | <dynamic> 'jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.execution.json' | <dynamic> '/jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.generations.json' | <dynamic> 'jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.generations.json' | <dynamic> '/jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.generations.json' | <dynamic> 'jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.generations.json' | <dynamic> '/jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.top10.json' | <dynamic> 'jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.top10.json' | <dynamic> '/jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.top10.json' | <dynamic> 'jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.top10.json' | <dynamic>",
+          "matchedFiles": 152525
+        },
+        {
+          "line": 165,
+          "column": 21,
+          "pattern": "<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic>",
+          "matchedFiles": 582350
+        },
+        {
+          "line": 57,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "aggregateMatchedFiles": 834009,
+      "maxMatchedFiles": 75819,
+      "warningRows": 11,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 78,
+          "column": 18,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 79,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 81,
+          "column": 25,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 177,
+          "column": 18,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 178,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 180,
+          "column": 27,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 190,
+          "column": 16,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 191,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 192,
+          "column": 21,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 207,
+          "column": 16,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 208,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 3184508,
+      "cumulativePercent": 34.4692,
+      "symbols": "load/list/save/delete saved backtests",
+      "importChain": [
+        "app/api/rextora/backtest/run/route.ts",
+        "backtestStore.ts"
+      ],
+      "runtimePurpose": "Saved backtest JSON/index persistence",
+      "filesystemExpressions": [
+        {
+          "line": 78,
+          "column": 18,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 79,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 81,
+          "column": 25,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 177,
+          "column": 18,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 178,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 180,
+          "column": 27,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 190,
+          "column": 16,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 191,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 192,
+          "column": 21,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 207,
+          "column": 16,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 208,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "aggregateMatchedFiles": 728284,
+      "maxMatchedFiles": 291314,
+      "warningRows": 5,
+      "patterns": [
+        "<dynamic> '/trials' | <dynamic> 'trials'",
+        "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+        "<dynamic> '/trials/' <dynamic> '/' <dynamic> | <dynamic> 'trials/' <dynamic> '/' <dynamic> | <dynamic> '/trials' <dynamic> '/' <dynamic> | <dynamic> 'trials' <dynamic> '/' <dynamic> | <dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+        "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+      ],
+      "locations": [
+        {
+          "line": 93,
+          "column": 10,
+          "matchedFiles": 72829,
+          "pattern": "<dynamic> '/trials' | <dynamic> 'trials'"
+        },
+        {
+          "line": 130,
+          "column": 16,
+          "matchedFiles": 145654,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'"
+        },
+        {
+          "line": 752,
+          "column": 56,
+          "matchedFiles": 291314,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> | <dynamic> 'trials/' <dynamic> '/' <dynamic> | <dynamic> '/trials' <dynamic> '/' <dynamic> | <dynamic> 'trials' <dynamic> '/' <dynamic> | <dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+        },
+        {
+          "line": 124,
+          "column": 15,
+          "matchedFiles": 145658,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+        },
+        {
+          "line": 745,
+          "column": 8,
+          "matchedFiles": 72829,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+        }
+      ],
+      "cumulativeMatchedFiles": 3912792,
+      "cumulativePercent": 42.3522,
+      "symbols": "atomicWriteJson, listSearchTrials, deleteSearchJobArtifacts",
+      "importChain": [
+        "strategy-search API routes",
+        "jobStore.ts"
+      ],
+      "runtimePurpose": "Atomic strategy-search job, checkpoint, and trial persistence",
+      "filesystemExpressions": [
+        {
+          "line": 93,
+          "column": 10,
+          "pattern": "<dynamic> '/trials' | <dynamic> 'trials'",
+          "matchedFiles": 72829
+        },
+        {
+          "line": 130,
+          "column": 16,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json'",
+          "matchedFiles": 145654
+        },
+        {
+          "line": 752,
+          "column": 56,
+          "pattern": "<dynamic> '/trials/' <dynamic> '/' <dynamic> | <dynamic> 'trials/' <dynamic> '/' <dynamic> | <dynamic> '/trials' <dynamic> '/' <dynamic> | <dynamic> 'trials' <dynamic> '/' <dynamic> | <dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+          "matchedFiles": 291314
+        },
+        {
+          "line": 124,
+          "column": 15,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+          "matchedFiles": 145658
+        },
+        {
+          "line": 745,
+          "column": 8,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+          "matchedFiles": 72829
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyStore.ts",
+      "aggregateMatchedFiles": 682371,
+      "maxMatchedFiles": 75819,
+      "warningRows": 9,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 260,
+          "column": 43,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 337,
+          "column": 12,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 344,
+          "column": 24,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 374,
+          "column": 22,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 390,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 442,
+          "column": 35,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 766,
+          "column": 7,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 844,
+          "column": 11,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 852,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 4595163,
+      "cumulativePercent": 49.7382,
+      "symbols": "load/list/save/delete/repair strategies",
+      "importChain": [
+        "app/api/rextora/strategies/route.ts",
+        "strategyStore.ts"
+      ],
+      "runtimePurpose": "Strategy JSON/index persistence with SAFE protection",
+      "filesystemExpressions": [
+        {
+          "line": 260,
+          "column": 43,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 337,
+          "column": 12,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 344,
+          "column": 24,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 374,
+          "column": 22,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 390,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 442,
+          "column": 35,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 766,
+          "column": 7,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 844,
+          "column": 11,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 852,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "aggregateMatchedFiles": 617576,
+      "maxMatchedFiles": 308788,
+      "warningRows": 5,
+      "patterns": [
+        "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+      ],
+      "locations": [
+        {
+          "line": 24,
+          "column": 10,
+          "matchedFiles": 308788,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+        },
+        {
+          "line": 29,
+          "column": 8,
+          "matchedFiles": 77197,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+        },
+        {
+          "line": 30,
+          "column": 10,
+          "matchedFiles": 77197,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+        },
+        {
+          "line": 52,
+          "column": 8,
+          "matchedFiles": 77197,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+        },
+        {
+          "line": 59,
+          "column": 30,
+          "matchedFiles": 77197,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>"
+        }
+      ],
+      "cumulativeMatchedFiles": 5212739,
+      "cumulativePercent": 56.4228,
+      "symbols": "readJsonStore, writeJsonStore, getFileMtimeMs",
+      "importChain": [
+        "settings/system/agent server modules",
+        "jsonStore.ts"
+      ],
+      "runtimePurpose": "Shared runtime JSON settings/state store",
+      "filesystemExpressions": [
+        {
+          "line": 24,
+          "column": 10,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>",
+          "matchedFiles": 308788
+        },
+        {
+          "line": 29,
+          "column": 8,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>",
+          "matchedFiles": 77197
+        },
+        {
+          "line": 30,
+          "column": 10,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>",
+          "matchedFiles": 77197
+        },
+        {
+          "line": 52,
+          "column": 8,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>",
+          "matchedFiles": 77197
+        },
+        {
+          "line": 59,
+          "column": 30,
+          "pattern": "'/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>",
+          "matchedFiles": 77197
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchConfigStore.ts",
+      "aggregateMatchedFiles": 616161,
+      "maxMatchedFiles": 158030,
+      "warningRows": 7,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+        "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>"
+      ],
+      "locations": [
+        {
+          "line": 87,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'"
+        },
+        {
+          "line": 178,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'"
+        },
+        {
+          "line": 181,
+          "column": 7,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'"
+        },
+        {
+          "line": 200,
+          "column": 20,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'"
+        },
+        {
+          "line": 322,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'"
+        },
+        {
+          "line": 142,
+          "column": 35,
+          "matchedFiles": 158030,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>"
+        },
+        {
+          "line": 142,
+          "column": 19,
+          "matchedFiles": 79036,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>"
+        }
+      ],
+      "cumulativeMatchedFiles": 5828900,
+      "cumulativePercent": 63.0922,
+      "symbols": "load/list/save/rename/delete search configs",
+      "importChain": [
+        "app/api/rextora/strategy-search/configs/route.ts",
+        "searchConfigStore.ts"
+      ],
+      "runtimePurpose": "Named operator search-configuration persistence",
+      "filesystemExpressions": [
+        {
+          "line": 87,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 178,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 181,
+          "column": 7,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 200,
+          "column": 20,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 322,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 142,
+          "column": 35,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>",
+          "matchedFiles": 158030
+        },
+        {
+          "line": 142,
+          "column": 19,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>",
+          "matchedFiles": 79036
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/storageSummary.ts",
+      "aggregateMatchedFiles": 589476,
+      "maxMatchedFiles": 152549,
+      "warningRows": 5,
+      "patterns": [
+        "<dynamic> '/trials' | '/ROOT/data/rextora/strategy-search/trials' | <dynamic> 'trials' | '/ROOT/data/rextora/strategy-searchtrials'",
+        "<dynamic> '/trials' | <dynamic> 'trials'",
+        "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 87,
+          "column": 16,
+          "matchedFiles": 145611,
+          "pattern": "<dynamic> '/trials' | '/ROOT/data/rextora/strategy-search/trials' | <dynamic> 'trials' | '/ROOT/data/rextora/strategy-searchtrials'"
+        },
+        {
+          "line": 52,
+          "column": 21,
+          "matchedFiles": 72829,
+          "pattern": "<dynamic> '/trials' | <dynamic> 'trials'"
+        },
+        {
+          "line": 56,
+          "column": 16,
+          "matchedFiles": 145658,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+        },
+        {
+          "line": 57,
+          "column": 10,
+          "matchedFiles": 72829,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>"
+        },
+        {
+          "line": 31,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 6418376,
+      "cumulativePercent": 69.4727,
+      "symbols": "dirBytes, trialCount, top10Count",
+      "importChain": [
+        "app/api/rextora/strategy-search/storage-summary/route.ts",
+        "storageSummary.ts"
+      ],
+      "runtimePurpose": "Runtime strategy-search storage accounting",
+      "filesystemExpressions": [
+        {
+          "line": 87,
+          "column": 16,
+          "pattern": "<dynamic> '/trials' | '/ROOT/data/rextora/strategy-search/trials' | <dynamic> 'trials' | '/ROOT/data/rextora/strategy-searchtrials'",
+          "matchedFiles": 145611
+        },
+        {
+          "line": 52,
+          "column": 21,
+          "pattern": "<dynamic> '/trials' | <dynamic> 'trials'",
+          "matchedFiles": 72829
+        },
+        {
+          "line": 56,
+          "column": 16,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+          "matchedFiles": 145658
+        },
+        {
+          "line": 57,
+          "column": 10,
+          "pattern": "<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>",
+          "matchedFiles": 72829
+        },
+        {
+          "line": 31,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "aggregateMatchedFiles": 388856,
+      "maxMatchedFiles": 158106,
+      "warningRows": 4,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json'",
+        "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>"
+      ],
+      "locations": [
+        {
+          "line": 37,
+          "column": 17,
+          "matchedFiles": 75838,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json'"
+        },
+        {
+          "line": 26,
+          "column": 10,
+          "matchedFiles": 75857,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json'"
+        },
+        {
+          "line": 54,
+          "column": 25,
+          "matchedFiles": 158106,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>"
+        },
+        {
+          "line": 54,
+          "column": 9,
+          "matchedFiles": 79055,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>"
+        }
+      ],
+      "cumulativeMatchedFiles": 6807232,
+      "cumulativePercent": 73.6817,
+      "symbols": "saveCommand, getCommand, findByIdempotencyKey",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "commandExecutor.ts",
+        "commandStore.ts"
+      ],
+      "runtimePurpose": "Typed agent command audit/idempotency persistence",
+      "filesystemExpressions": [
+        {
+          "line": 37,
+          "column": 17,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json'",
+          "matchedFiles": 75838
+        },
+        {
+          "line": 26,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json'",
+          "matchedFiles": 75857
+        },
+        {
+          "line": 54,
+          "column": 25,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>",
+          "matchedFiles": 158106
+        },
+        {
+          "line": 54,
+          "column": 9,
+          "pattern": "<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>",
+          "matchedFiles": 79055
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "aggregateMatchedFiles": 379095,
+      "maxMatchedFiles": 75819,
+      "warningRows": 5,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 37,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 47,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 48,
+          "column": 30,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 64,
+          "column": 7,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 78,
+          "column": 9,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 7186327,
+      "cumulativePercent": 77.785,
+      "symbols": "readToolIdempotency, writeToolIdempotency",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "toolExecutor.ts",
+        "toolIdempotency.ts"
+      ],
+      "runtimePurpose": "Atomic Agent V2 tool idempotency receipts",
+      "filesystemExpressions": [
+        {
+          "line": 37,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 47,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 48,
+          "column": 30,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 64,
+          "column": 7,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 78,
+          "column": 9,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "aggregateMatchedFiles": 227457,
+      "maxMatchedFiles": 75819,
+      "warningRows": 3,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 37,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 45,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 47,
+          "column": 23,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 7413784,
+      "cumulativePercent": 80.247,
+      "symbols": "read/claim/finalize approval execution receipt",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "approvalExecutionStore.ts"
+      ],
+      "runtimePurpose": "Terminal approval execution deduplication receipts",
+      "filesystemExpressions": [
+        {
+          "line": 37,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 45,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 47,
+          "column": 23,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "aggregateMatchedFiles": 227457,
+      "maxMatchedFiles": 75819,
+      "warningRows": 3,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 146,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 452,
+          "column": 8,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 455,
+          "column": 25,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 7641241,
+      "cumulativePercent": 82.709,
+      "filesystemExpressions": [
+        {
+          "line": 146,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 452,
+          "column": 8,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 455,
+          "column": 25,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 33,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 7793790,
+      "cumulativePercent": 84.3602,
+      "filesystemExpressions": [
+        {
+          "line": 33,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 77,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 7946339,
+      "cumulativePercent": 86.0114,
+      "filesystemExpressions": [
+        {
+          "line": 77,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 61,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8098888,
+      "cumulativePercent": 87.6626,
+      "filesystemExpressions": [
+        {
+          "line": 61,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 49,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8251437,
+      "cumulativePercent": 89.3138,
+      "filesystemExpressions": [
+        {
+          "line": 49,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 32,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8403986,
+      "cumulativePercent": 90.965,
+      "filesystemExpressions": [
+        {
+          "line": 32,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "aggregateMatchedFiles": 152549,
+      "maxMatchedFiles": 152549,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 72,
+          "column": 10,
+          "matchedFiles": 152549,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8556535,
+      "cumulativePercent": 92.6162,
+      "filesystemExpressions": [
+        {
+          "line": 72,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/strategy-search'",
+          "matchedFiles": 152549
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/planner/planStore.ts",
+      "aggregateMatchedFiles": 151638,
+      "maxMatchedFiles": 75819,
+      "warningRows": 2,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 17,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 22,
+          "column": 31,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8708173,
+      "cumulativePercent": 94.2575,
+      "filesystemExpressions": [
+        {
+          "line": 17,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 22,
+          "column": 31,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tasks/taskStore.ts",
+      "aggregateMatchedFiles": 151638,
+      "maxMatchedFiles": 75819,
+      "warningRows": 2,
+      "patterns": [
+        "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+      ],
+      "locations": [
+        {
+          "line": 13,
+          "column": 10,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        },
+        {
+          "line": 19,
+          "column": 31,
+          "matchedFiles": 75819,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'"
+        }
+      ],
+      "cumulativeMatchedFiles": 8859811,
+      "cumulativePercent": 95.8988,
+      "filesystemExpressions": [
+        {
+          "line": 13,
+          "column": 10,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        },
+        {
+          "line": 19,
+          "column": 31,
+          "pattern": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+          "matchedFiles": 75819
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/runtimePaths.ts",
+      "aggregateMatchedFiles": 147168,
+      "maxMatchedFiles": 147168,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> '/strategy-search' | '/ROOT/data/rextora/strategy-search' | <dynamic> 'strategy-search' | '/ROOT/data/rextorastrategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 40,
+          "column": 10,
+          "matchedFiles": 147168,
+          "pattern": "<dynamic> '/strategy-search' | '/ROOT/data/rextora/strategy-search' | <dynamic> 'strategy-search' | '/ROOT/data/rextorastrategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 9006979,
+      "cumulativePercent": 97.4918,
+      "filesystemExpressions": [
+        {
+          "line": 40,
+          "column": 10,
+          "pattern": "<dynamic> '/strategy-search' | '/ROOT/data/rextora/strategy-search' | <dynamic> 'strategy-search' | '/ROOT/data/rextorastrategy-search'",
+          "matchedFiles": 147168
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/live/liveDryRunEngine.ts",
+      "aggregateMatchedFiles": 79036,
+      "maxMatchedFiles": 79036,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/live-dry-run'"
+      ],
+      "locations": [
+        {
+          "line": 111,
+          "column": 10,
+          "matchedFiles": 79036,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/live-dry-run'"
+        }
+      ],
+      "cumulativeMatchedFiles": 9086015,
+      "cumulativePercent": 98.3473,
+      "filesystemExpressions": [
+        {
+          "line": 111,
+          "column": 10,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/live-dry-run'",
+          "matchedFiles": 79036
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts",
+      "aggregateMatchedFiles": 79036,
+      "maxMatchedFiles": 79036,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> | '/ROOT/data/rextora/reasoning-shadow'"
+      ],
+      "locations": [
+        {
+          "line": 24,
+          "column": 8,
+          "matchedFiles": 79036,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/reasoning-shadow'"
+        }
+      ],
+      "cumulativeMatchedFiles": 9165051,
+      "cumulativePercent": 99.2028,
+      "filesystemExpressions": [
+        {
+          "line": 24,
+          "column": 8,
+          "pattern": "<dynamic> | '/ROOT/data/rextora/reasoning-shadow'",
+          "matchedFiles": 79036
+        }
+      ]
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStatus.ts",
+      "aggregateMatchedFiles": 73655,
+      "maxMatchedFiles": 73655,
+      "warningRows": 1,
+      "patterns": [
+        "<dynamic> '/strategy-search' | <dynamic> 'strategy-search'"
+      ],
+      "locations": [
+        {
+          "line": 85,
+          "column": 15,
+          "matchedFiles": 73655,
+          "pattern": "<dynamic> '/strategy-search' | <dynamic> 'strategy-search'"
+        }
+      ],
+      "cumulativeMatchedFiles": 9238706,
+      "cumulativePercent": 100,
+      "filesystemExpressions": [
+        {
+          "line": 85,
+          "column": 15,
+          "pattern": "<dynamic> '/strategy-search' | <dynamic> 'strategy-search'",
+          "matchedFiles": 73655
+        }
+      ]
+    }
+  ],
+  "thresholdAggregateMatchedFiles": 7413784,
+  "thresholdAggregatePercent": 80.247
+}

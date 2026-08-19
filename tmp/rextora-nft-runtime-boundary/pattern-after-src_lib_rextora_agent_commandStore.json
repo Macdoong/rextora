@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/agent/commandStore.ts",
+  "elapsedMs": 51.286166,
+  "tracedFileCount": 2,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/agent-commands/**/*"
+  ]
+}

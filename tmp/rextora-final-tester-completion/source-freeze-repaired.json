@@ -1,0 +1,16 @@
+{
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "fileCount": 937,
+  "sourceTreeSha256": "25edc3c17daced6497136d6479156c9569f5fc1851de4f214119102315bb3d6c",
+  "algorithm": "sha256(sorted(path + NUL + content + NUL))",
+  "excluded": [
+    ".git",
+    ".next",
+    "node_modules",
+    "data",
+    "tmp",
+    "test-results",
+    "playwright-report"
+  ],
+  "capturedAt": "2026-08-13T17:05:42.956Z"
+}

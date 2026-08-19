@@ -1,0 +1,15 @@
+{
+  "command": "npm run lint",
+  "startedAt": "2026-08-04T10:50:38.919Z",
+  "finishedAt": "2026-08-04T10:50:55.979Z",
+  "durationMs": 17059,
+  "exitCode": 0,
+  "stdoutLogPath": "tmp/final-tester-ready-revalidation/logs/lint.stdout.log",
+  "stderrLogPath": "tmp/final-tester-ready-revalidation/logs/lint.stderr.log",
+  "parsedResult": null,
+  "BUILD_ID": "mwEjoK4ic1cyT-pd5_Omz",
+  "evidenceComplete": true,
+  "signal": null,
+  "error": null,
+  "pass": true
+}

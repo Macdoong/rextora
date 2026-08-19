@@ -32,6 +32,10 @@ export interface LiveGateResult {
   status: LiveExecutionStatus;
 }
 
+/** Operator-visible block when LIVE permission is disabled in settings. */
+export const LIVE_BLOCK_REASON_ALLOW_LIVE_OFF =
+  "설정에서 실전 거래 허용을 켜야 합니다.";
+
 function findDiagnosticItem(report: BinanceDiagnosticsReport | undefined, id: string) {
   return report?.items.find((item) => item.id === id);
 }
@@ -150,7 +154,7 @@ export function evaluateLiveSafetyGate(options: LiveGateOptions = {}): LiveGateR
   }
 
   if (!isLiveTradingAllowed()) {
-    reasons.push("설정에서 실전 거래 허용을 켜야 합니다.");
+    reasons.push(LIVE_BLOCK_REASON_ALLOW_LIVE_OFF);
   }
 
   if (

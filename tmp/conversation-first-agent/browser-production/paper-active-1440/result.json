@@ -1,0 +1,61 @@
+{
+  "profile": "paper-active",
+  "width": 1440,
+  "port": 53273,
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "startedAt": "2026-08-06T07:49:26.287Z",
+  "finishedAt": "2026-08-06T07:49:30.758Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-paper-active-1440-jHYZ2x",
+  "turnResults": [
+    {
+      "query": "백테스트가 뭐야?",
+      "expectedMode": "DIRECT_ANSWER",
+      "expectedTopic": "feature_backtest",
+      "mode": "DIRECT_ANSWER",
+      "topic": "feature_backtest",
+      "provider": "local",
+      "fallbackUsed": false,
+      "readTools": [],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    },
+    {
+      "query": "그럼 모의매매랑 차이는?",
+      "expectedMode": "DIRECT_ANSWER",
+      "expectedTopic": "feature_paper",
+      "mode": "DIRECT_ANSWER",
+      "topic": "feature_paper",
+      "provider": "local",
+      "fallbackUsed": false,
+      "readTools": [],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "백테스트는 과거 데이터를 재생해 전략을 검증하고, 모의매매는 실제 주문 없이 앞으로 들어오는 흐름에서 전략을 관찰합니다.\n\n백테스트는 ",
+    "primaryText": "백테스트는 과거 데이터를 재생해 전략을 검증하고, 모의매매는 실제 주문 없이 앞으로 들어오는 흐름에서 전략을 관찰합니다.\n\n백테스트는 \n오후 04:49 · 모의매매 진행 중",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": true,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": null,
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 0,
+  "passed": true
+}

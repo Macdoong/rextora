@@ -1,0 +1,15 @@
+{
+  "previousBuildId": "1XWJaOd-qF4VMUWBKK157",
+  "invalidated": true,
+  "reason": "Application source modified after BUILD_ID timestamp",
+  "evidence": {
+    "routeTsMtime": "2026-08-10T12:48:52",
+    "approvalStoreMtime": "2026-08-10T12:48:52",
+    "buildIdMtime": "2026-08-09T19:56:34",
+    "files": [
+      "app/api/rextora/agent/route.ts",
+      "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+    ]
+  },
+  "action": "Fresh production build required before final release validation"
+}

@@ -1,0 +1,565 @@
+{
+  "config": {
+    "configFile": "/Users/macdoong/Documents/Rextora/playwright.deployment-dev.config.mjs",
+    "rootDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/macdoong/Documents/Rextora/tests/e2e/release/global-setup.dev.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-390",
+        "name": "dev-390",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-768",
+        "name": "dev-768",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1024",
+        "name": "dev-1024",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1440",
+        "name": "dev-1440",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tmp/rextora-release-completion/development/matrix-result.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "REXTORA_ORPHAN_AUTO_RESUME_LIMIT=0 npm run dev -- --port 3101 --hostname 127.0.0.1 --webpack",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "reuseExistingServer": true,
+      "timeout": 300000
+    }
+  },
+  "suites": [
+    {
+      "title": "deployment-matrix.spec.ts",
+      "file": "deployment-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Deployment scenario registry",
+          "file": "deployment-matrix.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:47.020Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-71bac925c524a0425e67",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Deployment provider-backed matrix",
+          "file": "deployment-matrix.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2447,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:47.043Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-56e3e5f335896972bf62",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2055,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:49.815Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9ad03a7ae54367cc4121",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1632,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:51.878Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a4c9bd74caebb4e8e369",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 94,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:53.518Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a7063895061378446416",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1554,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:53.620Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0280623c414f5828f011",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3728,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:55.181Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-497657d2e3c50e1ddfb8",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15466,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:31:58.917Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-67bc8572d6a9714b1cfc",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 74759,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:32:14.391Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-fa90a1eb542c2eddda8e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 27381,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:33:29.156Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-71c4ca710dfeabdd4542",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 77022,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:33:56.544Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4f5b87bfb3f4aba3af0a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 162652,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T19:35:13.572Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a42ef7da2b2a30f771ad",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-11T19:28:03.686Z",
+    "duration": 592690.88,
+    "expected": 12,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

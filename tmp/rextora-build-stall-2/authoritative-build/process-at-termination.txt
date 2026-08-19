@@ -1,0 +1,2 @@
+69071 69059 R+         01:00 694.2 12161008 node /Users/macdoong/Documents/Rextora/node_modules/.bin/next build
+69106 69071 S+         00:53   0.0  45120 node /Users/macdoong/Documents/Rextora/.next/build/postcss.js 57496

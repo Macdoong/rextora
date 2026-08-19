@@ -1,0 +1,2593 @@
+{
+  "entryCount": 117,
+  "reachableLocalFileCount": 569,
+  "reachableLocalBytes": 4091010,
+  "reachableFiles": [
+    {
+      "file": "components/rextora/charts/BacktestAnalysisView.tsx",
+      "bytes": 125599
+    },
+    {
+      "file": "components/rextora/results/ResultsWorkbench.tsx",
+      "bytes": 102934
+    },
+    {
+      "file": "components/rextora/strategySearch/JobCreateForm.tsx",
+      "bytes": 98714
+    },
+    {
+      "file": "src/lib/rextora/strategy/eventSequenceBacktest.ts",
+      "bytes": 89181
+    },
+    {
+      "file": "components/rextora/backtest/BacktestReviewWorkbench.tsx",
+      "bytes": 79007
+    },
+    {
+      "file": "components/rextora/results/CurrentResearchResultsPanel.tsx",
+      "bytes": 63747
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "bytes": 58357
+    },
+    {
+      "file": "app/api/rextora/agent/route.ts",
+      "bytes": 56109
+    },
+    {
+      "file": "components/rextora/strategy/builder/StrategyBuilderPanel.tsx",
+      "bytes": 44508
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchResultsSummary.ts",
+      "bytes": 43213
+    },
+    {
+      "file": "components/rextora/strategySearch/SearchStatusCard.tsx",
+      "bytes": 41822
+    },
+    {
+      "file": "components/rextora/charts/CandlestickChart.tsx",
+      "bytes": 40187
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "bytes": 39576
+    },
+    {
+      "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+      "bytes": 38995
+    },
+    {
+      "file": "src/lib/rextora/agent/agentResponseBuilder.ts",
+      "bytes": 38397
+    },
+    {
+      "file": "src/lib/rextora/agent/decisionContext.ts",
+      "bytes": 33847
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "bytes": 33626
+    },
+    {
+      "file": "components/rextora/strategySearch/formDefaults.ts",
+      "bytes": 32755
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRunner.ts",
+      "bytes": 32557
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/eventSequence.ts",
+      "bytes": 32229
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternCombination.ts",
+      "bytes": 31909
+    },
+    {
+      "file": "app/paper-trading/page.tsx",
+      "bytes": 31869
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "bytes": 31864
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyStore.ts",
+      "bytes": 31781
+    },
+    {
+      "file": "components/rextora/strategySearch/QualifiedResultsPanel.tsx",
+      "bytes": 29731
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "bytes": 28681
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "bytes": 28599
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+      "bytes": 27792
+    },
+    {
+      "file": "src/lib/rextora/backtest/visualAnalysis.ts",
+      "bytes": 26638
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/backtestAdapter.ts",
+      "bytes": 26212
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestRunner.ts",
+      "bytes": 25917
+    },
+    {
+      "file": "components/rextora/agent/useAgentSession.ts",
+      "bytes": 25384
+    },
+    {
+      "file": "src/lib/rextora/displayLabels.ts",
+      "bytes": 25351
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "bytes": 24665
+    },
+    {
+      "file": "components/rextora/charts/ChartShell.tsx",
+      "bytes": 24619
+    },
+    {
+      "file": "components/ui/primitives.tsx",
+      "bytes": 23994
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "bytes": 23978
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "bytes": 21978
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternSearchSpaces.ts",
+      "bytes": 21773
+    },
+    {
+      "file": "src/lib/rextora/tradingDashboardStatus.ts",
+      "bytes": 21563
+    },
+    {
+      "file": "components/rextora/strategySearch/types.ts",
+      "bytes": 20989
+    },
+    {
+      "file": "app/globals.css",
+      "bytes": 20661
+    },
+    {
+      "file": "src/lib/rextora/seedData.ts",
+      "bytes": 20660
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+      "bytes": 20419
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternParameterCatalog.ts",
+      "bytes": 19444
+    },
+    {
+      "file": "components/rextora/backtest/SafeBacktestPanel.tsx",
+      "bytes": 19280
+    },
+    {
+      "file": "components/rextora/strategySearch/formValidation.ts",
+      "bytes": 19106
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "bytes": 19101
+    },
+    {
+      "file": "src/lib/rextora/telegram/telegramMessages.ts",
+      "bytes": 18630
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "bytes": 17952
+    },
+    {
+      "file": "src/lib/rextora/agent/goalDetector.ts",
+      "bytes": 17752
+    },
+    {
+      "file": "components/rextora/agent/AgentMessage.tsx",
+      "bytes": 17657
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/evaluationPolicy.ts",
+      "bytes": 17444
+    },
+    {
+      "file": "src/lib/rextora/charts/adapters.ts",
+      "bytes": 17346
+    },
+    {
+      "file": "components/rextora/dashboard/LifecycleDashboard.tsx",
+      "bytes": 16997
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningFallback.ts",
+      "bytes": 16865
+    },
+    {
+      "file": "components/rextora/backtest/MultiSymbolWorkspace.tsx",
+      "bytes": 16623
+    },
+    {
+      "file": "components/rextora/settings/AiProviderSettingsPanel.tsx",
+      "bytes": 16540
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "bytes": 16439
+    },
+    {
+      "file": "src/lib/rextora/agent/planDrafts.ts",
+      "bytes": 16413
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/index.ts",
+      "bytes": 16027
+    },
+    {
+      "file": "src/lib/rextora/firstRun/demoFixture.ts",
+      "bytes": 15872
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/promoteFromSearch.ts",
+      "bytes": 15679
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/persistedSearchSummary.ts",
+      "bytes": 15630
+    },
+    {
+      "file": "src/lib/rextora/agent/intentParser.ts",
+      "bytes": 15591
+    },
+    {
+      "file": "app/api/rextora/backtest/run/route.ts",
+      "bytes": 15410
+    },
+    {
+      "file": "components/rextora/strategySearch/ResearchCompletionPanel.tsx",
+      "bytes": 15408
+    },
+    {
+      "file": "components/rextora/strategySearch/SearchConfigManager.tsx",
+      "bytes": 15358
+    },
+    {
+      "file": "src/lib/rextora/botRuntime.ts",
+      "bytes": 14922
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternSearchConfig.ts",
+      "bytes": 14737
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/orderBlock.ts",
+      "bytes": 14635
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceDiagnosticsService.ts",
+      "bytes": 14413
+    },
+    {
+      "file": "components/rextora/learning/LearningLogPanel.tsx",
+      "bytes": 14123
+    },
+    {
+      "file": "src/lib/rextora/backtest/patternExplainability.ts",
+      "bytes": 13988
+    },
+    {
+      "file": "src/lib/rextora/backtest/tradeEventTrace.ts",
+      "bytes": 13900
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/historyRetention.ts",
+      "bytes": 13861
+    },
+    {
+      "file": "components/rextora/live/LiveActivationGates.tsx",
+      "bytes": 13833
+    },
+    {
+      "file": "components/rextora/strategySearch/JobList.tsx",
+      "bytes": 13736
+    },
+    {
+      "file": "components/rextora/strategySearch/formatters.ts",
+      "bytes": 13606
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+      "bytes": 13453
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/types.ts",
+      "bytes": 13333
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/entryTrigger.ts",
+      "bytes": 13056
+    },
+    {
+      "file": "components/rextora/RiskPanelEditable.tsx",
+      "bytes": 13038
+    },
+    {
+      "file": "src/lib/rextora/learningLogger.ts",
+      "bytes": 12953
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestEngine.ts",
+      "bytes": 12903
+    },
+    {
+      "file": "components/rextora/charts/TradingChartsPanel.tsx",
+      "bytes": 12442
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jitterEvaluator.ts",
+      "bytes": 12393
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchSpaceMutation.ts",
+      "bytes": 12361
+    },
+    {
+      "file": "src/lib/rextora/live/liveDryRunEngine.ts",
+      "bytes": 12221
+    },
+    {
+      "file": "src/lib/rextora/telegramOperation.ts",
+      "bytes": 12012
+    },
+    {
+      "file": "src/lib/rextora/liveExecutionEngine.ts",
+      "bytes": 11860
+    },
+    {
+      "file": "components/rextora/firstRun/FirstRunOnboarding.tsx",
+      "bytes": 11795
+    },
+    {
+      "file": "src/lib/rextora/agent/types.ts",
+      "bytes": 11570
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/candidateGenerator.ts",
+      "bytes": 11441
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "bytes": 11440
+    },
+    {
+      "file": "components/rextora/backtest/BacktestStrategyManageDrawer.tsx",
+      "bytes": 11438
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/weaknessAnalysis.ts",
+      "bytes": 11405
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/userVisibleSanitizer.ts",
+      "bytes": 11393
+    },
+    {
+      "file": "src/lib/rextora/systemStatusSyncService.ts",
+      "bytes": 11341
+    },
+    {
+      "file": "src/lib/rextora/executionQueue.ts",
+      "bytes": 11276
+    },
+    {
+      "file": "src/lib/rextora/liveSafetyGate.ts",
+      "bytes": 11086
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+      "bytes": 11081
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceReadOnlyService.ts",
+      "bytes": 11075
+    },
+    {
+      "file": "src/lib/rextora/types.ts",
+      "bytes": 10852
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "bytes": 10670
+    },
+    {
+      "file": "app/api/rextora/strategies/route.ts",
+      "bytes": 10585
+    },
+    {
+      "file": "components/rextora/charts/BarChart.tsx",
+      "bytes": 10534
+    },
+    {
+      "file": "app/live-trading/page.tsx",
+      "bytes": 10523
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/evaluator.ts",
+      "bytes": 10476
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/cancellationLifecycle.ts",
+      "bytes": 10332
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/costStress.ts",
+      "bytes": 10216
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/followUpResearch.ts",
+      "bytes": 10208
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchConfigStore.ts",
+      "bytes": 10177
+    },
+    {
+      "file": "src/lib/rextora/learningEngine.ts",
+      "bytes": 10040
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+      "bytes": 10006
+    },
+    {
+      "file": "components/rextora/agent/AgentPanel.tsx",
+      "bytes": 9945
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "bytes": 9737
+    },
+    {
+      "file": "components/rextora/SystemStatusPanel.tsx",
+      "bytes": 9728
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "bytes": 9387
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningProvider.ts",
+      "bytes": 9379
+    },
+    {
+      "file": "components/rextora/agent/AgentModelSelector.tsx",
+      "bytes": 9280
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobCheckpoint.ts",
+      "bytes": 9265
+    },
+    {
+      "file": "components/rextora/settings/LifecycleSettingsShell.tsx",
+      "bytes": 9208
+    },
+    {
+      "file": "src/lib/rextora/execution/safePaperLoop.ts",
+      "bytes": 9191
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestReport.ts",
+      "bytes": 9111
+    },
+    {
+      "file": "src/lib/rextora/agent/commandExecutor.ts",
+      "bytes": 8936
+    },
+    {
+      "file": "components/rextora/settings/SettingsTabs.tsx",
+      "bytes": 8740
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/readableStrategyName.ts",
+      "bytes": 8529
+    },
+    {
+      "file": "src/lib/rextora/agent/missionTimeline.ts",
+      "bytes": 8384
+    },
+    {
+      "file": "components/rextora/strategySearch/LifecycleNextActionsPanel.tsx",
+      "bytes": 8063
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/windowPlanner.ts",
+      "bytes": 8019
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerSettingsService.ts",
+      "bytes": 7995
+    },
+    {
+      "file": "src/lib/rextora/data/historicalCandleLoader.ts",
+      "bytes": 7986
+    },
+    {
+      "file": "src/lib/rextora/agent/searchPlanDraft.ts",
+      "bytes": 7975
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "bytes": 7917
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/conversationalProse.ts",
+      "bytes": 7798
+    },
+    {
+      "file": "src/lib/rextora/report/aiTradeReport.ts",
+      "bytes": 7791
+    },
+    {
+      "file": "components/rextora/strategySearch/apiClient.ts",
+      "bytes": 7762
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestEligibility.ts",
+      "bytes": 7628
+    },
+    {
+      "file": "components/rextora/backtest/ReturnDrawdownScatter.tsx",
+      "bytes": 7559
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "bytes": 7512
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/operatorProfiles.ts",
+      "bytes": 7491
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/validator.ts",
+      "bytes": 7314
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/candidateEvaluator.ts",
+      "bytes": 7308
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/paperFeedback.ts",
+      "bytes": 7307
+    },
+    {
+      "file": "src/lib/rextora/agent/agentLLM.ts",
+      "bytes": 7177
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/leverageMode.ts",
+      "bytes": 7171
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/domainAssistant.ts",
+      "bytes": 7167
+    },
+    {
+      "file": "components/rextora/agent/agentSessionSync.ts",
+      "bytes": 7101
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobState.ts",
+      "bytes": 7072
+    },
+    {
+      "file": "src/lib/rextora/paperExecutionEngine.ts",
+      "bytes": 7044
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "bytes": 6952
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "bytes": 6948
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/toolPlanBuilder.ts",
+      "bytes": 6889
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+      "bytes": 6788
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "bytes": 6689
+    },
+    {
+      "file": "src/lib/rextora/tradeLifecycle.ts",
+      "bytes": 6678
+    },
+    {
+      "file": "src/lib/rextora/signal/safeV44SignalEngine.ts",
+      "bytes": 6632
+    },
+    {
+      "file": "src/lib/rextora/liveReadinessChecklist.ts",
+      "bytes": 6627
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStatus.ts",
+      "bytes": 6593
+    },
+    {
+      "file": "components/rextora/strategy/StrategyPanels.tsx",
+      "bytes": 6588
+    },
+    {
+      "file": "src/lib/rextora/metrics/metricsEngine.ts",
+      "bytes": 6575
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestDateRange.ts",
+      "bytes": 6513
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+      "bytes": 6482
+    },
+    {
+      "file": "src/lib/rextora/backtest/patternOverlayAvailability.ts",
+      "bytes": 6482
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationContext.ts",
+      "bytes": 6380
+    },
+    {
+      "file": "src/lib/rextora/backtest/candleGeometry.ts",
+      "bytes": 6353
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerConnectionTest.ts",
+      "bytes": 6337
+    },
+    {
+      "file": "src/lib/rextora/indicator/indicatorEngine.ts",
+      "bytes": 6326
+    },
+    {
+      "file": "app/api/rextora/strategies/preview/route.ts",
+      "bytes": 6321
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/calculationErrorBreakdown.ts",
+      "bytes": 6313
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceTradeService.ts",
+      "bytes": 6309
+    },
+    {
+      "file": "components/rextora/agent/ActionCard.tsx",
+      "bytes": 6282
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "bytes": 6239
+    },
+    {
+      "file": "components/rextora/results/libraryFilterUtils.ts",
+      "bytes": 6235
+    },
+    {
+      "file": "components/rextora/charts/EquityCurveChart.tsx",
+      "bytes": 6215
+    },
+    {
+      "file": "src/lib/rextora/agent/conversationContext.ts",
+      "bytes": 6210
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningSchema.ts",
+      "bytes": 6133
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/workspaceMerge.ts",
+      "bytes": 6061
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningPolicy.ts",
+      "bytes": 5994
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternSupportMatrix.ts",
+      "bytes": 5969
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionTypes.ts",
+      "bytes": 5936
+    },
+    {
+      "file": "src/lib/rextora/agent/providers/geminiAdapter.ts",
+      "bytes": 5933
+    },
+    {
+      "file": "components/rextora/agent/ApprovalCenter.tsx",
+      "bytes": 5925
+    },
+    {
+      "file": "components/rextora/agent/GlobalAgentAssistant.tsx",
+      "bytes": 5882
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/productKnowledge.ts",
+      "bytes": 5855
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestTypes.ts",
+      "bytes": 5844
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/orchestration/reasoningTaskBridge.ts",
+      "bytes": 5811
+    },
+    {
+      "file": "src/lib/rextora/metrics/unifiedCost.ts",
+      "bytes": 5803
+    },
+    {
+      "file": "src/lib/rextora/agent/typedCommand.ts",
+      "bytes": 5720
+    },
+    {
+      "file": "src/lib/rextora/aiExecutionBridge.ts",
+      "bytes": 5698
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStatistics.ts",
+      "bytes": 5687
+    },
+    {
+      "file": "components/rextora/results/researchExplorerUtils.ts",
+      "bytes": 5681
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCatalog.ts",
+      "bytes": 5654
+    },
+    {
+      "file": "src/lib/rextora/backtest/monthlyCoverage.ts",
+      "bytes": 5582
+    },
+    {
+      "file": "components/rextora/settings/SystemStatusSection.tsx",
+      "bytes": 5461
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/bridge.ts",
+      "bytes": 5422
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningResponseBuilder.ts",
+      "bytes": 5361
+    },
+    {
+      "file": "src/lib/rextora/agent/providers/openaiAdapter.ts",
+      "bytes": 5305
+    },
+    {
+      "file": "src/lib/rextora/agent/conversationState.ts",
+      "bytes": 5294
+    },
+    {
+      "file": "src/lib/rextora/backtest/strategySymbolCompatibility.ts",
+      "bytes": 5276
+    },
+    {
+      "file": "src/lib/rextora/telegramNotifier.ts",
+      "bytes": 5241
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/engineErrorClassification.ts",
+      "bytes": 5223
+    },
+    {
+      "file": "src/lib/rextora/results/researchDisplay.ts",
+      "bytes": 5220
+    },
+    {
+      "file": "src/lib/rextora/tpSlPlacement.ts",
+      "bytes": 5200
+    },
+    {
+      "file": "src/lib/rextora/paper/paperBacktestComparison.ts",
+      "bytes": 5198
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceHttpClient.ts",
+      "bytes": 5183
+    },
+    {
+      "file": "components/rextora/StatusCards.tsx",
+      "bytes": 5091
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyHash.ts",
+      "bytes": 5068
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/planner/planService.ts",
+      "bytes": 5002
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceUserStreamManager.ts",
+      "bytes": 4998
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts",
+      "bytes": 4990
+    },
+    {
+      "file": "src/lib/rextora/settings/settingsTypes.ts",
+      "bytes": 4939
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "bytes": 4923
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/trendLine.ts",
+      "bytes": 4912
+    },
+    {
+      "file": "components/rextora/Sidebar.tsx",
+      "bytes": 4897
+    },
+    {
+      "file": "components/rextora/agent/agentPersistence.ts",
+      "bytes": 4889
+    },
+    {
+      "file": "src/lib/rextora/agent/proposedAction.ts",
+      "bytes": 4866
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/overfittingEvidence.ts",
+      "bytes": 4823
+    },
+    {
+      "file": "src/lib/rextora/results/eligibility.ts",
+      "bytes": 4775
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternEventSequence.ts",
+      "bytes": 4726
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/types.ts",
+      "bytes": 4717
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchOutcome.ts",
+      "bytes": 4712
+    },
+    {
+      "file": "src/lib/rextora/serverTpSlManager.ts",
+      "bytes": 4711
+    },
+    {
+      "file": "src/lib/rextora/riskStateStore.ts",
+      "bytes": 4676
+    },
+    {
+      "file": "src/lib/rextora/settings/settingsValidation.ts",
+      "bytes": 4564
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerRuntimeConfig.ts",
+      "bytes": 4555
+    },
+    {
+      "file": "src/lib/rextora/marketDataStore.ts",
+      "bytes": 4553
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/orchestration/taskOrchestrator.ts",
+      "bytes": 4532
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditionBacktest.ts",
+      "bytes": 4512
+    },
+    {
+      "file": "src/lib/rextora/serverTpSlReadiness.ts",
+      "bytes": 4505
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "bytes": 4500
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "bytes": 4496
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningPrompt.ts",
+      "bytes": 4496
+    },
+    {
+      "file": "components/rextora/AiCandidateDetailPanel.tsx",
+      "bytes": 4473
+    },
+    {
+      "file": "components/rextora/agent/AgentContextStrip.tsx",
+      "bytes": 4449
+    },
+    {
+      "file": "src/lib/rextora/agent/executionRequestClassifier.ts",
+      "bytes": 4382
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/terminationReason.ts",
+      "bytes": 4359
+    },
+    {
+      "file": "src/lib/rextora/leverageEngine.ts",
+      "bytes": 4322
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts",
+      "bytes": 4259
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/structure.ts",
+      "bytes": 4239
+    },
+    {
+      "file": "src/lib/rextora/settings/defaultSettings.ts",
+      "bytes": 4236
+    },
+    {
+      "file": "src/lib/rextora/execution/paperStrategyResolver.ts",
+      "bytes": 4227
+    },
+    {
+      "file": "components/rextora/charts/DashboardCharts.tsx",
+      "bytes": 4206
+    },
+    {
+      "file": "src/lib/rextora/agent/safetyGuard.ts",
+      "bytes": 4195
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "bytes": 4195
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/supportResistance.ts",
+      "bytes": 4162
+    },
+    {
+      "file": "src/lib/rextora/agent/canonicalCommandPayload.ts",
+      "bytes": 4161
+    },
+    {
+      "file": "components/rextora/backtest/BacktestPanels.tsx",
+      "bytes": 4160
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningValidator.ts",
+      "bytes": 4160
+    },
+    {
+      "file": "src/lib/rextora/env.ts",
+      "bytes": 4147
+    },
+    {
+      "file": "src/lib/rextora/metrics/tradeResult.ts",
+      "bytes": 4139
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/responseComposer.ts",
+      "bytes": 4121
+    },
+    {
+      "file": "src/lib/rextora/backtest/scatterDomain.ts",
+      "bytes": 4065
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternConfirmation.ts",
+      "bytes": 4043
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/referenceResolver.ts",
+      "bytes": 4033
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "bytes": 3992
+    },
+    {
+      "file": "app/api/rextora/live/dry-run/route.ts",
+      "bytes": 3987
+    },
+    {
+      "file": "components/rextora/agent/AgentWorkspacePanel.tsx",
+      "bytes": 3984
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolSchemas.ts",
+      "bytes": 3972
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "bytes": 3967
+    },
+    {
+      "file": "src/lib/rextora/agent/researchWorkspace.ts",
+      "bytes": 3933
+    },
+    {
+      "file": "app/api/rextora/paper/session/route.ts",
+      "bytes": 3898
+    },
+    {
+      "file": "src/lib/rextora/accountStateStore.ts",
+      "bytes": 3838
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningTypes.ts",
+      "bytes": 3828
+    },
+    {
+      "file": "src/lib/rextora/emergencyControls.ts",
+      "bytes": 3820
+    },
+    {
+      "file": "src/lib/rextora/backtest/strategyVerdict.ts",
+      "bytes": 3813
+    },
+    {
+      "file": "src/lib/rextora/strategyLiveApproval.ts",
+      "bytes": 3772
+    },
+    {
+      "file": "src/lib/rextora/risk/safeV44RiskEngine.ts",
+      "bytes": 3765
+    },
+    {
+      "file": "src/lib/rextora/metrics/riskService.ts",
+      "bytes": 3644
+    },
+    {
+      "file": "src/lib/rextora/telegramAssistant.ts",
+      "bytes": 3638
+    },
+    {
+      "file": "src/lib/rextora/orderManager.ts",
+      "bytes": 3638
+    },
+    {
+      "file": "src/lib/rextora/telegramService.ts",
+      "bytes": 3590
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/supplyDemand.ts",
+      "bytes": 3582
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/fvg.ts",
+      "bytes": 3578
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/random.ts",
+      "bytes": 3570
+    },
+    {
+      "file": "components/rextora/strategySearch/ExecutionControls.tsx",
+      "bytes": 3560
+    },
+    {
+      "file": "components/rextora/agent/AgentInput.tsx",
+      "bytes": 3537
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyTypes.ts",
+      "bytes": 3522
+    },
+    {
+      "file": "app/api/rextora/market/route.ts",
+      "bytes": 3507
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/indicators.ts",
+      "bytes": 3506
+    },
+    {
+      "file": "app/api/rextora/paper/session/[id]/route.ts",
+      "bytes": 3481
+    },
+    {
+      "file": "app/ai-candidates/page.tsx",
+      "bytes": 3430
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolValidator.ts",
+      "bytes": 3402
+    },
+    {
+      "file": "components/rextora/strategySearch/ruleSummary.ts",
+      "bytes": 3397
+    },
+    {
+      "file": "src/lib/rextora/agent/lifecycleStage.ts",
+      "bytes": 3383
+    },
+    {
+      "file": "src/lib/rextora/costEngine.ts",
+      "bytes": 3366
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/promote/route.ts",
+      "bytes": 3275
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchSpaces.ts",
+      "bytes": 3273
+    },
+    {
+      "file": "components/rextora/strategySearch/displayNames.ts",
+      "bytes": 3272
+    },
+    {
+      "file": "src/lib/rextora/tpSlManager.ts",
+      "bytes": 3231
+    },
+    {
+      "file": "src/lib/rextora/riskManager.ts",
+      "bytes": 3202
+    },
+    {
+      "file": "components/rextora/AlertPanel.tsx",
+      "bytes": 3197
+    },
+    {
+      "file": "src/lib/rextora/security.ts",
+      "bytes": 3174
+    },
+    {
+      "file": "components/rextora/agent/MissionTimeline.tsx",
+      "bytes": 3147
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/planner/planStore.ts",
+      "bytes": 3146
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationTypes.ts",
+      "bytes": 3126
+    },
+    {
+      "file": "src/lib/rextora/signalRules.ts",
+      "bytes": 3119
+    },
+    {
+      "file": "src/lib/rextora/backtest/statusThresholds.ts",
+      "bytes": 3082
+    },
+    {
+      "file": "components/rextora/AiCandidateTopTable.tsx",
+      "bytes": 3074
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "bytes": 3060
+    },
+    {
+      "file": "app/api/rextora/strategy-search/configs/route.ts",
+      "bytes": 3039
+    },
+    {
+      "file": "src/lib/rextora/apiStatusService.ts",
+      "bytes": 3037
+    },
+    {
+      "file": "src/lib/rextora/agent/providers/promptBuilder.ts",
+      "bytes": 3037
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "bytes": 2962
+    },
+    {
+      "file": "src/lib/rextora/backtest/savedRunLabels.ts",
+      "bytes": 2941
+    },
+    {
+      "file": "src/lib/rextora/metrics/types.ts",
+      "bytes": 2930
+    },
+    {
+      "file": "src/lib/rextora/signalEngine.ts",
+      "bytes": 2925
+    },
+    {
+      "file": "src/lib/rextora/settings/settingsService.ts",
+      "bytes": 2924
+    },
+    {
+      "file": "src/lib/rextora/positionSyncService.ts",
+      "bytes": 2907
+    },
+    {
+      "file": "src/lib/rextora/riskRules.ts",
+      "bytes": 2867
+    },
+    {
+      "file": "src/lib/rextora/config.ts",
+      "bytes": 2866
+    },
+    {
+      "file": "src/lib/rextora/charts/types.ts",
+      "bytes": 2853
+    },
+    {
+      "file": "app/api/rextora/agent/session/route.ts",
+      "bytes": 2852
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/storageSummary.ts",
+      "bytes": 2818
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "bytes": 2794
+    },
+    {
+      "file": "components/rextora/results/researchHistoryBulk.ts",
+      "bytes": 2742
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerSettingsStore.ts",
+      "bytes": 2742
+    },
+    {
+      "file": "src/lib/rextora/learningStore.ts",
+      "bytes": 2740
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/decisionMemory.ts",
+      "bytes": 2701
+    },
+    {
+      "file": "app/api/rextora/settings/ai-providers/route.ts",
+      "bytes": 2678
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceTypes.ts",
+      "bytes": 2609
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts",
+      "bytes": 2604
+    },
+    {
+      "file": "src/lib/rextora/agent/llmTypes.ts",
+      "bytes": 2599
+    },
+    {
+      "file": "src/lib/rextora/runtimeState.ts",
+      "bytes": 2576
+    },
+    {
+      "file": "src/lib/rextora/firstRun/demoIdentity.ts",
+      "bytes": 2549
+    },
+    {
+      "file": "src/lib/rextora/results/recommendation.ts",
+      "bytes": 2542
+    },
+    {
+      "file": "app/api/rextora/strategies/compare/route.ts",
+      "bytes": 2538
+    },
+    {
+      "file": "src/lib/rextora/data/timeframes.ts",
+      "bytes": 2533
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolPolicy.ts",
+      "bytes": 2527
+    },
+    {
+      "file": "components/rextora/agent/agentAnalytics.ts",
+      "bytes": 2514
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningTaskProfile.ts",
+      "bytes": 2493
+    },
+    {
+      "file": "src/lib/rextora/data/ohlcvTypes.ts",
+      "bytes": 2477
+    },
+    {
+      "file": "src/lib/rextora/strategyDiscoveryEngine.ts",
+      "bytes": 2473
+    },
+    {
+      "file": "src/lib/rextora/backtest/candleSpacing.ts",
+      "bytes": 2473
+    },
+    {
+      "file": "components/rextora/settings/ExpertModeCard.tsx",
+      "bytes": 2452
+    },
+    {
+      "file": "src/lib/rextora/rankingModel.ts",
+      "bytes": 2425
+    },
+    {
+      "file": "src/lib/rextora/aiRanker.ts",
+      "bytes": 2414
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionStore.ts",
+      "bytes": 2408
+    },
+    {
+      "file": "app/api/rextora/system/route.ts",
+      "bytes": 2395
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerTypes.ts",
+      "bytes": 2351
+    },
+    {
+      "file": "app/backtest/page.tsx",
+      "bytes": 2328
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/performanceSummary.ts",
+      "bytes": 2313
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyMetadata.ts",
+      "bytes": 2272
+    },
+    {
+      "file": "app/settings/page.tsx",
+      "bytes": 2257
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "bytes": 2234
+    },
+    {
+      "file": "components/rextora/CostAnalysisPanel.tsx",
+      "bytes": 2213
+    },
+    {
+      "file": "src/lib/rextora/marketMetrics.ts",
+      "bytes": 2213
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/boundedLifecycleWatcher.ts",
+      "bytes": 2190
+    },
+    {
+      "file": "src/lib/rextora/executionCandidateTypes.ts",
+      "bytes": 2154
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceExchangeFilters.ts",
+      "bytes": 2147
+    },
+    {
+      "file": "src/lib/rextora/strategyRepository.ts",
+      "bytes": 2131
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolTypes.ts",
+      "bytes": 2129
+    },
+    {
+      "file": "src/lib/rextora/localStore.ts",
+      "bytes": 2122
+    },
+    {
+      "file": "app/api/rextora/bot/status/route.ts",
+      "bytes": 2120
+    },
+    {
+      "file": "src/lib/rextora/positionManager.ts",
+      "bytes": 2120
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/reflection.ts",
+      "bytes": 2120
+    },
+    {
+      "file": "src/lib/rextora/backtest/tradeLossSemantics.ts",
+      "bytes": 2119
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningConfig.ts",
+      "bytes": 2112
+    },
+    {
+      "file": "src/lib/rextora/settings/settingsStore.ts",
+      "bytes": 2096
+    },
+    {
+      "file": "src/lib/rextora/indicators.ts",
+      "bytes": 2084
+    },
+    {
+      "file": "src/lib/rextora/learningTypes.ts",
+      "bytes": 2083
+    },
+    {
+      "file": "components/rextora/PanelShell.tsx",
+      "bytes": 2068
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "bytes": 2064
+    },
+    {
+      "file": "components/rextora/strategy/builder/saveAndNext.ts",
+      "bytes": 2058
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Params.ts",
+      "bytes": 2057
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "bytes": 2054
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "bytes": 2040
+    },
+    {
+      "file": "components/rextora/ModeBadge.tsx",
+      "bytes": 2010
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolResult.ts",
+      "bytes": 1997
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleReducer.ts",
+      "bytes": 1997
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/symbolSelection.ts",
+      "bytes": 1975
+    },
+    {
+      "file": "src/lib/rextora/patternSelectionMode.ts",
+      "bytes": 1961
+    },
+    {
+      "file": "src/lib/rextora/storage/runtimePaths.ts",
+      "bytes": 1952
+    },
+    {
+      "file": "src/lib/rextora/storage/auditStore.ts",
+      "bytes": 1951
+    },
+    {
+      "file": "src/lib/rextora/results/liveCandidateEligibility.ts",
+      "bytes": 1950
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryIndex.ts",
+      "bytes": 1948
+    },
+    {
+      "file": "src/lib/rextora/backtest/costRatios.ts",
+      "bytes": 1947
+    },
+    {
+      "file": "app/api/rextora/settings/route.ts",
+      "bytes": 1924
+    },
+    {
+      "file": "src/lib/rextora/marketWatcherService.ts",
+      "bytes": 1915
+    },
+    {
+      "file": "app/api/rextora/settings/ai-providers/test/route.ts",
+      "bytes": 1890
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tasks/taskStore.ts",
+      "bytes": 1879
+    },
+    {
+      "file": "src/lib/rextora/client/safeFetchJson.ts",
+      "bytes": 1879
+    },
+    {
+      "file": "next.config.ts",
+      "bytes": 1862
+    },
+    {
+      "file": "src/lib/rextora/strategy/conditions/orderBlockZoneBasis.ts",
+      "bytes": 1856
+    },
+    {
+      "file": "app/api/rextora/strategy-search/follow-up/route.ts",
+      "bytes": 1852
+    },
+    {
+      "file": "src/lib/rextora/safety.ts",
+      "bytes": 1841
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchEvidence.ts",
+      "bytes": 1828
+    },
+    {
+      "file": "src/lib/rextora/marketWatcherUtils.ts",
+      "bytes": 1823
+    },
+    {
+      "file": "src/lib/rextora/cost/costGuard.ts",
+      "bytes": 1818
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/index.ts",
+      "bytes": 1746
+    },
+    {
+      "file": "app/cost-analysis/page.tsx",
+      "bytes": 1737
+    },
+    {
+      "file": "src/lib/rextora/orderSyncService.ts",
+      "bytes": 1730
+    },
+    {
+      "file": "src/lib/rextora/agent/providerConfig.ts",
+      "bytes": 1718
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchPlanGenerator.ts",
+      "bytes": 1717
+    },
+    {
+      "file": "src/lib/rextora/displayFormat.ts",
+      "bytes": 1716
+    },
+    {
+      "file": "src/lib/rextora/apiResponse.ts",
+      "bytes": 1710
+    },
+    {
+      "file": "src/lib/rextora/client/requestCache.ts",
+      "bytes": 1666
+    },
+    {
+      "file": "app/api/rextora/live/readiness/route.ts",
+      "bytes": 1665
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchId.ts",
+      "bytes": 1661
+    },
+    {
+      "file": "src/lib/rextora/charts/scales.ts",
+      "bytes": 1653
+    },
+    {
+      "file": "instrumentation.ts",
+      "bytes": 1634
+    },
+    {
+      "file": "components/rextora/settings/ExpertRouteGuard.tsx",
+      "bytes": 1610
+    },
+    {
+      "file": "app/api/rextora/strategy-search/route.ts",
+      "bytes": 1594
+    },
+    {
+      "file": "components/rextora/strategySearch/errorMessages.ts",
+      "bytes": 1587
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiHttp.ts",
+      "bytes": 1586
+    },
+    {
+      "file": "lib/mock-data.ts",
+      "bytes": 1583
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningRequestRegistry.ts",
+      "bytes": 1559
+    },
+    {
+      "file": "src/lib/rextora/executionEngine.ts",
+      "bytes": 1550
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceSigner.ts",
+      "bytes": 1521
+    },
+    {
+      "file": "components/rextora/ErrorState.tsx",
+      "bytes": 1500
+    },
+    {
+      "file": "src/lib/rextora/execution/safePaperExecution.ts",
+      "bytes": 1496
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+      "bytes": 1491
+    },
+    {
+      "file": "app/api/rextora/first-run/demo/route.ts",
+      "bytes": 1484
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/openaiRequestParams.ts",
+      "bytes": 1482
+    },
+    {
+      "file": "app/api/rextora/strategy/approve/route.ts",
+      "bytes": 1457
+    },
+    {
+      "file": "src/lib/rextora/backtest/availableCandleRange.ts",
+      "bytes": 1452
+    },
+    {
+      "file": "app/api/rextora/strategy-search/configs/[name]/route.ts",
+      "bytes": 1446
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchComparison.ts",
+      "bytes": 1436
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerRequestGuard.ts",
+      "bytes": 1421
+    },
+    {
+      "file": "components/rextora/strategySearch/operatorFormSession.ts",
+      "bytes": 1410
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/archive/route.ts",
+      "bytes": 1400
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchTypes.ts",
+      "bytes": 1390
+    },
+    {
+      "file": "src/lib/rextora/alertRuleEngine.ts",
+      "bytes": 1376
+    },
+    {
+      "file": "src/lib/rextora/backtestEngine.ts",
+      "bytes": 1376
+    },
+    {
+      "file": "src/lib/rextora/charts/theme.ts",
+      "bytes": 1373
+    },
+    {
+      "file": "app/api/rextora/first-run/demo/reset/route.ts",
+      "bytes": 1346
+    },
+    {
+      "file": "components/rextora/strategySearch/unitMapping.ts",
+      "bytes": 1346
+    },
+    {
+      "file": "components/rextora/charts/MeterChart.tsx",
+      "bytes": 1322
+    },
+    {
+      "file": "src/lib/rextora/metrics/tradeResultStore.ts",
+      "bytes": 1308
+    },
+    {
+      "file": "app/layout.tsx",
+      "bytes": 1305
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchGapAnalyzer.ts",
+      "bytes": 1301
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/generations/route.ts",
+      "bytes": 1296
+    },
+    {
+      "file": "app/strategies/[id]/page.tsx",
+      "bytes": 1255
+    },
+    {
+      "file": "src/lib/rextora/metrics/riskFormulas.ts",
+      "bytes": 1250
+    },
+    {
+      "file": "src/lib/rextora/data/candleLoader.ts",
+      "bytes": 1248
+    },
+    {
+      "file": "app/dashboard/page.tsx",
+      "bytes": 1239
+    },
+    {
+      "file": "src/lib/rextora/riskEngine.ts",
+      "bytes": 1238
+    },
+    {
+      "file": "components/rextora/EmptyState.tsx",
+      "bytes": 1237
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationPolicy.ts",
+      "bytes": 1233
+    },
+    {
+      "file": "components/rextora/LoadingState.tsx",
+      "bytes": 1224
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchRecommendation.ts",
+      "bytes": 1220
+    },
+    {
+      "file": "app/api/rextora/settings/ai-providers/credential/route.ts",
+      "bytes": 1219
+    },
+    {
+      "file": "components/rextora/strategy/ExpertStrategiesPage.tsx",
+      "bytes": 1215
+    },
+    {
+      "file": "app/api/rextora/trading/dashboard/route.ts",
+      "bytes": 1212
+    },
+    {
+      "file": "app/api/rextora/risk/route.ts",
+      "bytes": 1205
+    },
+    {
+      "file": "app/api/rextora/learning/route.ts",
+      "bytes": 1201
+    },
+    {
+      "file": "app/api/rextora/settings/ai-providers/models/route.ts",
+      "bytes": 1197
+    },
+    {
+      "file": "src/lib/rextora/storage/tradeStore.ts",
+      "bytes": 1193
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceUserStreamService.ts",
+      "bytes": 1189
+    },
+    {
+      "file": "data/strategies/SAFE_v44_i4060.json",
+      "bytes": 1175
+    },
+    {
+      "file": "app/strategy-search/page.tsx",
+      "bytes": 1140
+    },
+    {
+      "file": "components/rextora/agent/AgentSuggestions.tsx",
+      "bytes": 1140
+    },
+    {
+      "file": "app/api/rextora/candidates/route.ts",
+      "bytes": 1128
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/route.ts",
+      "bytes": 1080
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/planner/planTypes.ts",
+      "bytes": 1047
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/results-summary/route.ts",
+      "bytes": 1046
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tasks/taskTypes.ts",
+      "bytes": 1028
+    },
+    {
+      "file": "app/api/rextora/first-run/dismiss/route.ts",
+      "bytes": 1026
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyTestFilter.ts",
+      "bytes": 1024
+    },
+    {
+      "file": "app/api/rextora/first-run/route.ts",
+      "bytes": 1008
+    },
+    {
+      "file": "src/lib/rextora/binanceDiagnosticsTypes.ts",
+      "bytes": 1007
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryTypes.ts",
+      "bytes": 1003
+    },
+    {
+      "file": "app/api/rextora/agent/session/reset/route.ts",
+      "bytes": 985
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/trials/route.ts",
+      "bytes": 961
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/index.ts",
+      "bytes": 955
+    },
+    {
+      "file": "components/rextora/agent/AgentSessionProvider.tsx",
+      "bytes": 946
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolContext.ts",
+      "bytes": 945
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchFailureAnalyzer.ts",
+      "bytes": 936
+    },
+    {
+      "file": "src/lib/rextora/backtest/equityBasis.ts",
+      "bytes": 928
+    },
+    {
+      "file": "src/lib/rextora/backtest/tradeTime.ts",
+      "bytes": 900
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventTypes.ts",
+      "bytes": 896
+    },
+    {
+      "file": "app/api/rextora/cost/route.ts",
+      "bytes": 887
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolEvents.ts",
+      "bytes": 886
+    },
+    {
+      "file": "app/learning-log/page.tsx",
+      "bytes": 880
+    },
+    {
+      "file": "app/results/page.tsx",
+      "bytes": 867
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchAudit.ts",
+      "bytes": 839
+    },
+    {
+      "file": "src/lib/rextora/dataFilters.ts",
+      "bytes": 831
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchValidator.ts",
+      "bytes": 827
+    },
+    {
+      "file": "src/lib/rextora/scheduler.ts",
+      "bytes": 820
+    },
+    {
+      "file": "app/api/rextora/binance/diagnostics/route.ts",
+      "bytes": 813
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/index.ts",
+      "bytes": 797
+    },
+    {
+      "file": "app/api/rextora/charts/candles/route.ts",
+      "bytes": 790
+    },
+    {
+      "file": "app/api/rextora/internal/orphan-recovery/route.ts",
+      "bytes": 745
+    },
+    {
+      "file": "app/api/rextora/trading/emergency-stop/route.ts",
+      "bytes": 745
+    },
+    {
+      "file": "app/api/rextora/bot/start/route.ts",
+      "bytes": 732
+    },
+    {
+      "file": "src/lib/rextora/aiBriefingService.ts",
+      "bytes": 731
+    },
+    {
+      "file": "src/lib/rextora/strategy/libraryArchive.ts",
+      "bytes": 729
+    },
+    {
+      "file": "app/api/rextora/emergency/route.ts",
+      "bytes": 722
+    },
+    {
+      "file": "app/alerts/page.tsx",
+      "bytes": 709
+    },
+    {
+      "file": "app/api/rextora/trading/close-all/route.ts",
+      "bytes": 699
+    },
+    {
+      "file": "app/api/rextora/strategy-search/recover/route.ts",
+      "bytes": 698
+    },
+    {
+      "file": "app/api/rextora/trading/cancel-all/route.ts",
+      "bytes": 697
+    },
+    {
+      "file": "src/lib/rextora/tpSlTypes.ts",
+      "bytes": 691
+    },
+    {
+      "file": "app/api/strategies/discover/route.ts",
+      "bytes": 689
+    },
+    {
+      "file": "app/api/rextora/live/preflight/route.ts",
+      "bytes": 682
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/restore/route.ts",
+      "bytes": 681
+    },
+    {
+      "file": "app/api/strategies/[id]/route.ts",
+      "bytes": 679
+    },
+    {
+      "file": "app/api/dashboard/route.ts",
+      "bytes": 654
+    },
+    {
+      "file": "app/api/bot/start/route.ts",
+      "bytes": 652
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts",
+      "bytes": 650
+    },
+    {
+      "file": "components/rextora/ClientHydrated.tsx",
+      "bytes": 645
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/cancel/route.ts",
+      "bytes": 642
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/resume/route.ts",
+      "bytes": 642
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/pause/route.ts",
+      "bytes": 639
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/start/route.ts",
+      "bytes": 639
+    },
+    {
+      "file": "app/api/rextora/agent/health/route.ts",
+      "bytes": 634
+    },
+    {
+      "file": "app/api/rextora/strategy-search/[jobId]/best/route.ts",
+      "bytes": 634
+    },
+    {
+      "file": "components/rextora/charts/MarketChartPanel.tsx",
+      "bytes": 629
+    },
+    {
+      "file": "app/api/bot/restart/route.ts",
+      "bytes": 618
+    },
+    {
+      "file": "components/rextora/agent/AppShell.tsx",
+      "bytes": 578
+    },
+    {
+      "file": "app/api/rextora/telegram/test/route.ts",
+      "bytes": 573
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/testJobFilter.ts",
+      "bytes": 566
+    },
+    {
+      "file": "components/rextora/DemoDataBadge.tsx",
+      "bytes": 563
+    },
+    {
+      "file": "components/rextora/charts/index.ts",
+      "bytes": 561
+    },
+    {
+      "file": "src/lib/rextora/patternParameterCatalog.ts",
+      "bytes": 545
+    },
+    {
+      "file": "app/api/rextora/bot/stop/route.ts",
+      "bytes": 544
+    },
+    {
+      "file": "src/lib/rextora/learningLogCategories.ts",
+      "bytes": 540
+    },
+    {
+      "file": "src/lib/rextora/leverageTypes.ts",
+      "bytes": 505
+    },
+    {
+      "file": "app/api/rextora/strategy-search/storage-summary/route.ts",
+      "bytes": 496
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchProvenance.ts",
+      "bytes": 475
+    },
+    {
+      "file": "app/api/alerts/history/route.ts",
+      "bytes": 433
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/safeUpstreamJson.ts",
+      "bytes": 418
+    },
+    {
+      "file": "app/api/binance/klines/route.ts",
+      "bytes": 394
+    },
+    {
+      "file": "app/api/risk/route.ts",
+      "bytes": 394
+    },
+    {
+      "file": "app/strategies/page.tsx",
+      "bytes": 390
+    },
+    {
+      "file": "app/api/bot/stop/route.ts",
+      "bytes": 373
+    },
+    {
+      "file": "app/api/orders/partial-close/route.ts",
+      "bytes": 368
+    },
+    {
+      "file": "app/api/alerts/rules/route.ts",
+      "bytes": 360
+    },
+    {
+      "file": "app/api/emergency/stop-all/route.ts",
+      "bytes": 355
+    },
+    {
+      "file": "app/api/orders/cancel-all/route.ts",
+      "bytes": 353
+    },
+    {
+      "file": "app/api/orders/close-position/route.ts",
+      "bytes": 349
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/index.ts",
+      "bytes": 343
+    },
+    {
+      "file": "app/api/binance/market/route.ts",
+      "bytes": 310
+    },
+    {
+      "file": "app/api/backtests/run/route.ts",
+      "bytes": 303
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternSelectionMode.ts",
+      "bytes": 275
+    },
+    {
+      "file": "app/api/backtests/validation/route.ts",
+      "bytes": 261
+    },
+    {
+      "file": "app/api/strategies/route.ts",
+      "bytes": 248
+    },
+    {
+      "file": "app/api/binance/balance/route.ts",
+      "bytes": 240
+    },
+    {
+      "file": "app/strategy-search/advanced/page.tsx",
+      "bytes": 240
+    },
+    {
+      "file": "app/api/bot/status/route.ts",
+      "bytes": 225
+    },
+    {
+      "file": "app/api/binance/status/route.ts",
+      "bytes": 210
+    },
+    {
+      "file": "app/api/telegram/test/route.ts",
+      "bytes": 200
+    },
+    {
+      "file": "app/api/system/api-status/route.ts",
+      "bytes": 197
+    },
+    {
+      "file": "app/trading/page.tsx",
+      "bytes": 190
+    },
+    {
+      "file": "app/strategy-performance/page.tsx",
+      "bytes": 183
+    },
+    {
+      "file": "app/market-watch/page.tsx",
+      "bytes": 177
+    },
+    {
+      "file": "app/system-status/page.tsx",
+      "bytes": 177
+    },
+    {
+      "file": "app/trades/page.tsx",
+      "bytes": 176
+    },
+    {
+      "file": "app/risk/page.tsx",
+      "bytes": 167
+    },
+    {
+      "file": "app/ai-reports/page.tsx",
+      "bytes": 160
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/index.ts",
+      "bytes": 157
+    },
+    {
+      "file": "src/lib/rextora/binanceReadOnlyService.ts",
+      "bytes": 146
+    },
+    {
+      "file": "app/strategies/discovery/page.tsx",
+      "bytes": 130
+    },
+    {
+      "file": "app/strategies/ranking/page.tsx",
+      "bytes": 129
+    },
+    {
+      "file": "app/system/api-status/page.tsx",
+      "bytes": 129
+    },
+    {
+      "file": "app/trading/orders/page.tsx",
+      "bytes": 121
+    },
+    {
+      "file": "app/alerts/history/page.tsx",
+      "bytes": 120
+    },
+    {
+      "file": "src/lib/rextora/paperTradingEngine.ts",
+      "bytes": 120
+    },
+    {
+      "file": "app/backtests/page.tsx",
+      "bytes": 119
+    },
+    {
+      "file": "app/alerts/rules/page.tsx",
+      "bytes": 118
+    },
+    {
+      "file": "app/trading/bot/page.tsx",
+      "bytes": 118
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/index.ts",
+      "bytes": 115
+    },
+    {
+      "file": "app/page.tsx",
+      "bytes": 110
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/planner/index.ts",
+      "bytes": 89
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/orchestration/index.ts",
+      "bytes": 75
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tasks/index.ts",
+      "bytes": 59
+    },
+    {
+      "file": "components/rextora/dashboard/DashboardCards.tsx",
+      "bytes": 45
+    },
+    {
+      "file": "lib/types.ts",
+      "bytes": 41
+    }
+  ],
+  "largestReachableFiles": [
+    {
+      "file": "components/rextora/charts/BacktestAnalysisView.tsx",
+      "bytes": 125599
+    },
+    {
+      "file": "components/rextora/results/ResultsWorkbench.tsx",
+      "bytes": 102934
+    },
+    {
+      "file": "components/rextora/strategySearch/JobCreateForm.tsx",
+      "bytes": 98714
+    },
+    {
+      "file": "src/lib/rextora/strategy/eventSequenceBacktest.ts",
+      "bytes": 89181
+    },
+    {
+      "file": "components/rextora/backtest/BacktestReviewWorkbench.tsx",
+      "bytes": 79007
+    },
+    {
+      "file": "components/rextora/results/CurrentResearchResultsPanel.tsx",
+      "bytes": 63747
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "bytes": 58357
+    },
+    {
+      "file": "app/api/rextora/agent/route.ts",
+      "bytes": 56109
+    },
+    {
+      "file": "components/rextora/strategy/builder/StrategyBuilderPanel.tsx",
+      "bytes": 44508
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchResultsSummary.ts",
+      "bytes": 43213
+    },
+    {
+      "file": "components/rextora/strategySearch/SearchStatusCard.tsx",
+      "bytes": 41822
+    },
+    {
+      "file": "components/rextora/charts/CandlestickChart.tsx",
+      "bytes": 40187
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "bytes": 39576
+    },
+    {
+      "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+      "bytes": 38995
+    },
+    {
+      "file": "src/lib/rextora/agent/agentResponseBuilder.ts",
+      "bytes": 38397
+    },
+    {
+      "file": "src/lib/rextora/agent/decisionContext.ts",
+      "bytes": 33847
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "bytes": 33626
+    },
+    {
+      "file": "components/rextora/strategySearch/formDefaults.ts",
+      "bytes": 32755
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRunner.ts",
+      "bytes": 32557
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/eventSequence.ts",
+      "bytes": 32229
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternCombination.ts",
+      "bytes": 31909
+    },
+    {
+      "file": "app/paper-trading/page.tsx",
+      "bytes": 31869
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "bytes": 31864
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyStore.ts",
+      "bytes": 31781
+    },
+    {
+      "file": "components/rextora/strategySearch/QualifiedResultsPanel.tsx",
+      "bytes": 29731
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "bytes": 28681
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "bytes": 28599
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+      "bytes": 27792
+    },
+    {
+      "file": "src/lib/rextora/backtest/visualAnalysis.ts",
+      "bytes": 26638
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/backtestAdapter.ts",
+      "bytes": 26212
+    }
+  ],
+  "edgeCount": 2156,
+  "dataOrEvidenceImportEdges": [
+    {
+      "from": "src/lib/rextora/strategyRepository.ts",
+      "specifier": "@/data/strategies/SAFE_v44_i4060.json",
+      "to": "data/strategies/SAFE_v44_i4060.json"
+    },
+    {
+      "from": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "specifier": "@/data/strategies/SAFE_v44_i4060.json",
+      "to": "data/strategies/SAFE_v44_i4060.json"
+    }
+  ],
+  "moduleScopeRisks": [
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 69,
+      "call": "tool({\n    id: \"search.list\",\n    name: \"List search jobs\",\n    description: \"List strategy search jobs from the existing job store\",\n    category: \"search\",\n    inputSchema: listLimitSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"search_status\", \"research_workspace\"],\n    handler: handleSearchList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 110,
+      "call": "tool({\n    id: \"results.list\",\n    name: \"Results list\",\n    description: \"List research results summary for a job\",\n    category: \"results\",\n    inputSchema: jobIdInputSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"recommend_next\", \"research_workspace\"],\n    handler: handleResultsList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 138,
+      "call": "tool({\n    id: \"strategy.list\",\n    name: \"List strategies\",\n    description: \"List strategies from the strategy store\",\n    category: \"strategy\",\n    inputSchema: listLimitSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"compare_strategies\", \"explain_strategy\"],\n    handler: handleStrategyList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 166,
+      "call": "tool({\n    id: \"backtest.list\",\n    name: \"List backtests\",\n    description: \"List saved backtest runs\",\n    category: \"backtest\",\n    inputSchema: {\n      type: \"object\",\n      properties: {\n        limit: { type: \"number\" },\n        strategyId: { type: \"string\" },\n      },\n      additionalProperties: false,\n    },\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"backtest_summary\"],\n    handler: handleBackt"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 500,
+      "call": "tool({\n    id: \"results.promote\",\n    name: \"Promote research result\",\n    description: \"Register/promote research trials via existing promote APIs\",\n    category: \"results\",\n    inputSchema: resultsPromoteInputSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: true,\n    executionMode: \"write\",\n    capabilities: [\"promote\"],\n    intents: [\"results_promote_request\", \"approve_pending\"],\n    handler: handleResultsPromote,\n  })"
+    }
+  ],
+  "dynamicImports": [
+    {
+      "file": "app/api/rextora/paper/session/route.ts",
+      "expression": "import(\n        \"@/src/lib/rextora/paper/paperSessionService\"\n      )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategySearch/jobStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/jobStore\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/researchResultsSummary\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/agent/v2/research\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategySearch/jobStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/paper/paperSessionService\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"../firstRun/firstRunStatus\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"../firstRun/demoFixture\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/botRuntime.ts",
+      "expression": "import(\n      \"./strategySearch/orphanJobRecovery\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/botRuntime.ts",
+      "expression": "import(\"./paper/paperSessionStore\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/execution/safePaperLoop.ts",
+      "expression": "import(\"../paper/paperSessionService\")",
+      "literal": true
+    },
+    {
+      "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+      "expression": "import(\n                      \"./apiClient\"\n                    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceTradeService.ts",
+      "expression": "import(\"./binanceHttpClient\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+      "expression": "import(\"./boundedLifecycleWatcher\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/jobApiService\")",
+      "literal": true
+    }
+  ],
+  "unresolvedLocal": [],
+  "externalPackages": [
+    "@next/bundle-analyzer",
+    "lucide-react",
+    "next",
+    "next/font/google",
+    "next/link",
+    "next/navigation",
+    "next/server",
+    "node:crypto",
+    "node:fs",
+    "node:os",
+    "node:path",
+    "react",
+    "tailwindcss"
+  ]
+}

@@ -1,0 +1,17 @@
+F-390: PASS
+F-1024: PASS
+F-768: PASS
+F-1440: PASS
+G-1440: PASS
+G-390: PASS
+G-768: PASS
+G-1024: PASS
+H-1440: PASS
+H-390: PASS
+H-768: PASS
+H-1024: PASS
+{
+  "passed": true,
+  "failures": [],
+  "provider": "gemini"
+}

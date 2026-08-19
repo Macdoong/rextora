@@ -1,0 +1,128 @@
+
+> rextora@0.1.0 dev
+> next dev --port 3101 --hostname 127.0.0.1 --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://127.0.0.1:3101
+- Network:       http://127.0.0.1:3101
+- Environments: .env.local
+✓ Ready in 406ms
+
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 537ms (next.js: 326ms, application-code: 211ms)
+ GET /dashboard 200 in 1038ms (next.js: 328ms, application-code: 710ms)
+ GET /settings 200 in 1523ms (next.js: 1393ms, application-code: 130ms)
+ GET /api/rextora/settings/ai-providers 200 in 293ms (next.js: 253ms, application-code: 40ms)
+ GET /api/rextora/settings/ai-providers 200 in 5ms (next.js: 1082µs, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 798µs, application-code: 3ms)
+[?25h
+
+> rextora@0.1.0 dev
+> next dev --port 3101 --hostname 127.0.0.1 --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://127.0.0.1:3101
+- Network:       http://127.0.0.1:3101
+- Environments: .env.local
+✓ Ready in 370ms
+
+ GET /api/rextora/settings/ai-providers 200 in 571ms (next.js: 554ms, application-code: 17ms)
+○ Compiling /dashboard ...
+ GET /settings 200 in 2.2s (next.js: 1990ms, application-code: 191ms)
+ GET /api/rextora/settings/ai-providers 200 in 19ms (next.js: 9ms, application-code: 10ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 906µs, application-code: 3ms)
+ GET /dashboard 200 in 26ms (next.js: 1133µs, application-code: 25ms)
+ GET /settings 200 in 27ms (next.js: 962µs, application-code: 27ms)
+ GET /api/rextora/settings/ai-providers 200 in 5ms (next.js: 1030µs, application-code: 4ms)
+ GET /settings 200 in 23ms (next.js: 1137µs, application-code: 22ms)
+ GET /api/rextora/first-run 200 in 861ms (next.js: 628ms, application-code: 233ms)
+ GET /api/rextora/settings 200 in 855ms (next.js: 623ms, application-code: 233ms)
+ GET /api/rextora/trading/dashboard 200 in 862ms (next.js: 629ms, application-code: 232ms)
+ GET /api/rextora/agent/session?sessionId=agent_cb9264bae2584752 200 in 853ms (next.js: 621ms, application-code: 232ms)
+ GET /api/rextora/settings/ai-providers 200 in 843ms (next.js: 611ms, application-code: 232ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 843µs, application-code: 3ms)
+ GET /settings 200 in 72ms (next.js: 19ms, application-code: 53ms)
+ GET /api/rextora/settings/ai-providers 200 in 182ms (next.js: 156ms, application-code: 26ms)
+ GET /settings 200 in 87ms (next.js: 18ms, application-code: 69ms)
+ GET /api/rextora/trading/dashboard 200 in 21ms (next.js: 7ms, application-code: 15ms)
+ GET /api/rextora/first-run 200 in 172ms (next.js: 6ms, application-code: 165ms)
+ GET /api/rextora/settings 200 in 3ms (next.js: 1662µs, application-code: 1409µs)
+ GET /api/rextora/agent/session?sessionId=agent_3b546769efb146bb 200 in 4ms (next.js: 1825µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 451µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 500µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 496µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 2ms (next.js: 888µs, application-code: 1192µs)
+ GET /api/rextora/settings/ai-providers/models?provider=gemini 200 in 3ms (next.js: 1040µs, application-code: 1987µs)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 813µs, application-code: 3ms)
+ GET /dashboard 200 in 29ms (next.js: 4ms, application-code: 25ms)
+ GET /settings 200 in 29ms (next.js: 774µs, application-code: 28ms)
+ GET /dashboard 200 in 23ms (next.js: 936µs, application-code: 22ms)
+ GET /dashboard 200 in 19ms (next.js: 756µs, application-code: 18ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 908µs, application-code: 3ms)
+ GET /settings 200 in 28ms (next.js: 886µs, application-code: 27ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 859µs, application-code: 14ms)
+ GET /api/rextora/first-run 200 in 166ms (next.js: 765µs, application-code: 165ms)
+ GET /api/rextora/settings 200 in 2ms (next.js: 792µs, application-code: 1417µs)
+ GET /api/rextora/agent/session?sessionId=agent_3638300024ef4dae 200 in 3ms (next.js: 896µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 540µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 539µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 2ms (next.js: 741µs, application-code: 1697µs)
+ GET /api/rextora/settings/ai-providers/models?provider=gemini 200 in 1781µs (next.js: 578µs, application-code: 1203µs)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 725µs, application-code: 3ms)
+⨯ SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>) {
+  page: '/settings'
+}
+ PATCH /api/rextora/agent/session 200 in 974ms (next.js: 878ms, application-code: 95ms)
+ GET /settings 200 in 584ms (next.js: 437ms, application-code: 147ms)
+ GET /settings 200 in 49ms (next.js: 1051µs, application-code: 48ms)
+ GET /settings 200 in 37ms (next.js: 1043µs, application-code: 36ms)
+ GET /settings 500 in 1589ms (next.js: 1482ms, application-code: 107ms)
+ GET /settings 200 in 15ms (next.js: 1145µs, application-code: 14ms)
+[browser] Uncaught SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+ GET /dashboard 200 in 211ms (next.js: 81ms, application-code: 130ms)
+ GET /dashboard 200 in 28ms (next.js: 977µs, application-code: 27ms)
+ GET /dashboard 200 in 32ms (next.js: 773µs, application-code: 31ms)
+ GET /dashboard 200 in 27ms (next.js: 895µs, application-code: 26ms)
+ GET /dashboard 200 in 25ms (next.js: 1001µs, application-code: 24ms)
+ GET /dashboard 200 in 24ms (next.js: 906µs, application-code: 23ms)
+ GET /dashboard 200 in 24ms (next.js: 800µs, application-code: 23ms)
+ GET /dashboard 200 in 42ms (next.js: 724µs, application-code: 41ms)
+ GET /api/rextora/settings/ai-providers 200 in 22ms (next.js: 15ms, application-code: 7ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 1339µs, application-code: 3ms)
+ GET /settings 200 in 143ms (next.js: 27ms, application-code: 116ms)
+ GET /settings 200 in 50ms (next.js: 931µs, application-code: 49ms)
+ GET /api/rextora/trading/dashboard 200 in 48ms (next.js: 22ms, application-code: 26ms)
+ GET /api/rextora/first-run 200 in 199ms (next.js: 24ms, application-code: 176ms)
+ GET /api/rextora/settings 200 in 6ms (next.js: 4ms, application-code: 1829µs)
+ GET /api/rextora/agent/session?sessionId=agent_465ba13dfa8d4424 200 in 9ms (next.js: 5ms, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 11ms (next.js: 833µs, application-code: 10ms)
+ GET /api/rextora/first-run 200 in 163ms (next.js: 728µs, application-code: 163ms)
+ GET /api/rextora/settings 200 in 3ms (next.js: 994µs, application-code: 2ms)
+ GET /api/rextora/agent/session?sessionId=agent_bf4e051fb4af499d 200 in 3ms (next.js: 913µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 853µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 740µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 587µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 1017µs, application-code: 3ms)
+ PATCH /api/rextora/agent/session 200 in 6ms (next.js: 1665µs, application-code: 4ms)
+ GET /settings 200 in 44ms (next.js: 1118µs, application-code: 42ms)
+ GET /settings 200 in 31ms (next.js: 909µs, application-code: 31ms)
+ PATCH /api/rextora/agent/session 200 in 4ms (next.js: 778µs, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers/models?provider=gemini 200 in 423ms (next.js: 536µs, application-code: 422ms)
+ GET /api/rextora/settings/ai-providers/models?provider=gemini 200 in 443ms (next.js: 588µs, application-code: 443ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 486ms (next.js: 3ms, application-code: 483ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 474ms (next.js: 498µs, application-code: 474ms)
+ GET /settings 200 in 16ms (next.js: 900µs, application-code: 16ms)
+ GET /settings 200 in 33ms (next.js: 916µs, application-code: 32ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 830µs, application-code: 3ms)
+ GET /settings 200 in 30ms (next.js: 861µs, application-code: 29ms)
+ GET /api/rextora/trading/dashboard 200 in 17ms (next.js: 932µs, application-code: 16ms)
+ GET /api/rextora/first-run 200 in 171ms (next.js: 783µs, application-code: 170ms)
+ GET /api/rextora/settings 200 in 2ms (next.js: 774µs, application-code: 1372µs)
+ GET /api/rextora/agent/session?sessionId=agent_722ae47beb5940f2 200 in 3ms (next.js: 548µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 710µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 772µs, application-code: 2ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 2ms (next.js: 603µs, application-code: 1512µs)
+ GET /api/rextora/settings/ai-providers/models?provider=gemini 200 in 2ms (next.js: 712µs, application-code: 1373µs)
+[?25h

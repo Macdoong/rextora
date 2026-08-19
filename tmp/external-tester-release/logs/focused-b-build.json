@@ -1,0 +1,10 @@
+{
+  "command": "rm -rf .next && npm run build",
+  "startedAt": "2026-08-05T10:52:30Z",
+  "finishedAt": "2026-08-05T10:54:00Z",
+  "durationMs": 89839,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/focused-b-build.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/focused-b-build.stderr.log",
+  "BUILD_ID": "D7FqIx7bs6mgike-bJ6nQ"
+}

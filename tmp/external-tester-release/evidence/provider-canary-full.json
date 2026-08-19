@@ -1,0 +1,90 @@
+{
+  "requestedProvider": "gemini",
+  "selectedProvider": "gemini",
+  "providerAttempted": true,
+  "providerSucceeded": true,
+  "structuredOutputValid": true,
+  "canaryPassed": true,
+  "checks": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "configured": false
+    },
+    {
+      "ok": false,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latencyMs": 815,
+      "errorKo": "Gemini 응답 오류 (200)",
+      "configured": true
+    }
+  ],
+  "fallbackUsed": false,
+  "fallbackReason": null,
+  "writeToolAuditCount": 0,
+  "canary": {
+    "status": 200,
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "fallbackUsed": false,
+    "validationOk": true,
+    "toolIds": [
+      "lifecycle.current",
+      "paper.status",
+      "workspace.current",
+      "search.list"
+    ],
+    "writeToolExecuted": false,
+    "structuredOutputValid": true,
+    "conclusionKo": "현재 시스템 상태를 파악하기 위한 정보 수집 계획이 수립되었습니다.",
+    "latencyMs": 8817,
+    "errorKo": null
+  },
+  "verification": {
+    "requestedProvider": "gemini",
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "fallbackReason": null,
+    "canaryPassed": true,
+    "healthyMarked": true,
+    "checksEmpty": false,
+    "canaryNull": false,
+    "writeToolsBlocked": true,
+    "plannedWriteTools": []
+  },
+  "attempts": [
+    {
+      "requestedProvider": "gemini",
+      "providerSucceeded": true,
+      "canaryPassed": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "writeToolAuditCount": 0
+    }
+  ],
+  "provider": "gemini",
+  "health": {
+    "activeProvider": "gemini",
+    "openaiConfigured": false,
+    "geminiConfigured": true,
+    "checks": [
+      {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "configured": false
+      },
+      {
+        "ok": false,
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "latencyMs": 815,
+        "errorKo": "Gemini 응답 오류 (200)",
+        "configured": true
+      }
+    ],
+    "checkedAt": "2026-08-05T11:03:35.661Z"
+  }
+}

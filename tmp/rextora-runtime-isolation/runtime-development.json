@@ -1,0 +1,35 @@
+{
+  "label": "development",
+  "observedStates": [
+    {
+      "phase": "hung_pre_restart",
+      "pid": 23258,
+      "port": 3101,
+      "command": "next-server (next dev)",
+      "uptimeHours": 10.3,
+      "settingsApi": { "error": "timed out", "latencyMs": 30001 },
+      "dashboardApi": { "error": "timed out_or_000" }
+    },
+    {
+      "phase": "clean_restart_then_crash",
+      "command": "npm run dev -- --port 3101",
+      "bootEvents": [
+        "Ready in 339ms",
+        "POST /api/rextora/internal/orphan-recovery 200",
+        "orphan search recovery resumed=13 jobs from shared data/rextora/strategy-search",
+        "Compiling /dashboard ... (multi-minute)",
+        "GET /dashboard 200 twice",
+        "process exit — port 3101 no longer listening"
+      ],
+      "settingsApiAfterCrash": { "http_code": 0, "latencyMs": 6, "meaning": "connection refused" }
+    }
+  ],
+  "cwd": "/Users/macdoong/Documents/Rextora",
+  "applicationDataRoot": "/Users/macdoong/Documents/Rextora/data/rextora",
+  "providerSettingsStorePath": "/Users/macdoong/Documents/Rextora/data/rextora/ai-provider-settings.json",
+  "providerCredentialStorePath": "/Users/macdoong/Documents/Rextora/data/rextora/secrets/ai-provider-credentials.enc.json",
+  "masterKeySourceType": "file:.master.key",
+  "sameCredentialInodeAsProduction": true,
+  "sameSettingsInodeAsProduction": true,
+  "rootObservation": "Development failures are not a different credential store. next-dev shares the production strategy-search job directory; boot orphan-recovery auto-resumes many jobs and saturates/kills Turbopack before Settings AI tab can mount."
+}

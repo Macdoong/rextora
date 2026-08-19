@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "dataDir": "/tmp/rextora-e2e-fixed-K2bpMG",
+  "strategiesDir": "/tmp/rextora-e2e-fixed-K2bpMG/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msrrmufr_e888e7",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msrrmufr_e888e7&demo=1"
+  }
+}

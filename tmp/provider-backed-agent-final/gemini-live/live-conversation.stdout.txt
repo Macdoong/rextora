@@ -1,0 +1,17 @@
+{"i":1,"mode":"DIRECT_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":2,"mode":"DIRECT_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":3,"mode":"DIRECT_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":4,"mode":"DIRECT_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":5,"mode":"DIRECT_ANSWER","source":"llm","provider":"gemini","model":"gemini-2.5-flash","fallback":false,"ok":true}
+{"i":6,"mode":"READ_AND_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":7,"mode":"READ_AND_ANSWER","source":"local","provider":"local","model":"v1_fallback","fallback":true,"ok":true}
+{"i":8,"mode":"READ_AND_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":9,"mode":"READ_AND_ANSWER","source":"llm","provider":"openai","model":"gpt-5-mini","fallback":false,"ok":true}
+{"i":10,"mode":"SAFE_REFUSAL","source":"local","provider":null,"model":null,"fallback":true,"ok":true}
+{
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "providerBackedTurns": 8,
+  "fallbackTurns": 2,
+  "rawLeakCount": 0
+}

@@ -1,0 +1,38 @@
+NODE
+v25.8.0
+NPM
+11.11.0
+NEXT
+Next.js v16.2.6
+NODE_OPTIONS
+<unset>
+PROCESSES
+SWAP
+vm.swapusage: total = 4096.00M  used = 3234.44M  free = 861.56M  (encrypted)
+MEMORY
+Mach Virtual Memory Statistics: (page size of 16384 bytes)
+Pages free:                                   645154.
+Pages active:                                 552040.
+Pages inactive:                               455116.
+Pages speculative:                             96643.
+Pages throttled:                                   0.
+Pages wired down:                             196724.
+Pages purgeable:                               22117.
+"Translation faults":                    17066264548.
+Pages copy-on-write:                       113411766.
+Pages zero filled:                       14037814037.
+Pages reactivated:                         630260960.
+Pages purged:                               16527382.
+File-backed pages:                            437432.
+Anonymous pages:                              666367.
+Pages stored in compressor:                   613678.
+Pages occupied by compressor:                 110116.
+Decompressions:                           1461933292.
+Compressions:                             1556837062.
+Pageins:                                    53653767.
+Pageouts:                                     329433.
+Swapins:                                   151652419.
+Swapouts:                                  167172250.
+DISK
+Filesystem      Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s5   460Gi   147Gi   288Gi    34%    4.2M  3.0G    0%   /System/Volumes/Data

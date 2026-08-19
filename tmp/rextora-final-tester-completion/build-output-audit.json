@@ -1,0 +1,38 @@
+{
+  "buildId": "AKGGYNTPCkYoh0VM3fvnU",
+  "fileCount": 952,
+  "forbiddenPathFileCount": 0,
+  "forbiddenPathFiles": [],
+  "contentMarkerCounts": {
+    "runtimeTrialPath": 2,
+    "runtimeJobPath": 2,
+    "agentSessionPath": 0,
+    "evidencePath": 0,
+    "privateKeyHeader": 0,
+    "openAiKeyShape": 0,
+    "googleKeyShape": 1
+  },
+  "contentMarkerFiles": {
+    "runtimeTrialPath": [
+      "required-server-files.js",
+      "required-server-files.json"
+    ],
+    "runtimeJobPath": [
+      "required-server-files.js",
+      "required-server-files.json"
+    ],
+    "agentSessionPath": [],
+    "evidencePath": [],
+    "privateKeyHeader": [],
+    "openAiKeyShape": [],
+    "googleKeyShape": [
+      "server/app/api/rextora/agent/route.js"
+    ]
+  },
+  "runtimeUserFilesBundled": false,
+  "credentialShapeHits": 0,
+  "classification": {
+    "runtimePathMarkers": "Configuration-only outputFileTracingExcludes entries in required-server-files; no runtime data files are present.",
+    "googlePrefixMarker": "Four-character literal prefix only; candidate length 4, not a credential."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "branch": "main",
+  "commit": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "committed": false,
+  "pushed": false,
+  "modifiedHarnessFiles": [
+    "tests/e2e/release/helpers.ts",
+    "tests/e2e/release/deployment-matrix.spec.ts",
+    "playwright.deployment-dev.config.mjs",
+    "scripts/warmDevRoutes.mjs",
+    "scripts/runDevelopment88.mjs",
+    "scripts/runDevelopment88ByViewport.mjs"
+  ]
+}

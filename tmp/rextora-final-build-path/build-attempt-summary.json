@@ -1,0 +1,34 @@
+{
+  "heavyBuildAttemptsUsed": 2,
+  "heavyBuildAttemptLimit": 2,
+  "attempts": [
+    {
+      "mode": "webpack",
+      "command": "npm run build (script temporarily set to next build --webpack)",
+      "candidate": "build-mode-only change",
+      "exitCode": 134,
+      "durationSeconds": 28.77,
+      "peakRssBytes": 5007245312,
+      "swapMiBBefore": 3416.12,
+      "swapMiBAfter": 3416.12,
+      "failure": "V8 heap out of memory; node::fs::AfterScanDir",
+      "buildIdPresent": false
+    },
+    {
+      "mode": "webpack",
+      "command": "npm run build (script temporarily set to next build --webpack)",
+      "candidate": "11-store runtime-fs server-external boundary covering 80.247% of preserved historical matches",
+      "exitCode": 134,
+      "durationSeconds": 27.39,
+      "peakRssBytes": 5007376384,
+      "swapMiBBefore": 3392.12,
+      "swapMiBAfter": 3392.12,
+      "failure": "V8 heap out of memory; node::fs::AfterScanDir",
+      "buildIdPresent": false
+    }
+  ],
+  "thirdBuildRun": false,
+  "sourceRepairsReverted": true,
+  "finalSourceFingerprintRestored": "50a99389ab615d5234321ab06d1eeec62635e9f367a104cbb8aed652a45e9c07",
+  "finalResult": "FAILED_NO_PRODUCTION_BUILD"
+}

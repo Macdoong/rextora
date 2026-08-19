@@ -9,24 +9,25 @@ const readAgent = (name: string) =>
   );
 
 describe("Dashboard AI Agent commercial UX", () => {
-  it("separates verified facts, interpretation, evidence links, and retry", () => {
+  it("uses conversational-first hierarchy with collapsed evidence", () => {
     const message = readAgent("AgentMessage.tsx");
-    expect(message).toContain("검증된 사실");
-    expect(message).toContain("AI 해석");
-    expect(message).toContain("권장 다음 작업");
-    expect(message).toContain("분석 범위");
-    expect(message).toContain("SOURCE_LINKS");
+    expect(message).toContain("agent-conversational-answer");
+    expect(message).toContain("근거 자세히 보기");
+    expect(message).toContain("agent-evidence-toggle");
     expect(message).toContain("다시 시도");
-    expect(message).toContain('aria-label="개발자 상세"');
+    expect(message).toContain("SOURCE_LINKS");
+    expect(message).toContain("agent-safety-banner");
   });
 
   it("supports send, stop, disabled reasons, and empty-session suggestions", () => {
     const panel = readAgent("AgentPanel.tsx");
     const input = readAgent("AgentInput.tsx");
-    expect(panel).toContain("AI 트레이딩 연구원");
-    expect(panel).toContain("읽기 전용");
+    expect(panel).toContain("AI 트레이딩 직원");
+    expect(panel).toContain("ApprovalCenter");
+    expect(panel).toContain("agent-details-toggle");
     expect(panel).toContain("stopResponse");
     expect(panel).toContain("turns.length === 0");
+    expect(panel).toContain('sendQuery("진행해")');
     expect(input).toContain('e.key === "Enter" && !e.shiftKey');
     expect(input).toContain('aria-label={disabled ? "응답 중지" : "전송"}');
     expect(input).toContain("agent-input-disabled-reason");

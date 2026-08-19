@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "before": {
+    "exitCode": 134,
+    "durationSeconds": 24.85,
+    "peakRssBytes": 5022842880,
+    "terminalFrame": "node::fs::AfterScanDir",
+    "strategyStorePattern": "**/*.json",
+    "trialTreeReachable": true
+  },
+  "after": {
+    "exitCode": 134,
+    "durationSeconds": 55.47,
+    "timePeakRssBytes": 5040537600,
+    "tracerPeakRssBytes": 822640640,
+    "tracerPeakHeapUsedBytes": 426866688,
+    "terminalResult": "V8 heap out of memory",
+    "terminalFrame": "node::fs::AfterScanDir",
+    "strategyStorePattern": null,
+    "strategyStoreGenericPatternCount": 0,
+    "completedFilesystemCalls": 4289,
+    "returnedEntries": 30496,
+    "recordedDirectories": 4285,
+    "trialRootCompletedCalls": 1,
+    "trialRootReturnedEntries": 255,
+    "trialRelatedCallsInFlightAtFinalFlush": 256,
+    "trialLeafEnumerationInitiated": true,
+    "trialLeafEnumerationCompleted": false,
+    "trialTreeReachable": true,
+    "normalSuccess": false
+  },
+  "patternsAfter": [
+    "data/rextora/**/*",
+    "data/rextora/agent-commands/**/*",
+    "data/rextora/reasoning-shadow/**/*",
+    "data/rextora/strategy-search/**/*"
+  ],
+  "nextExactTrigger": {
+    "file": "src/lib/rextora/storage/runtimePaths.ts",
+    "symbol": "rextoraDataRoot",
+    "expression": "path.join(process.cwd(), 'data', 'rextora')",
+    "generatedPattern": "data/rextora/**/*",
+    "isolatedProbePatternCount": 1,
+    "reasonTrialTreeRemainsReachable": "strategy-search/trials is a descendant of data/rextora"
+  },
+  "secondaryObservedTrigger": {
+    "family": "direct strategy-search roots",
+    "generatedPattern": "data/rextora/strategy-search/**/*",
+    "exampleSource": "src/lib/rextora/strategySearch/deletionSafety.ts"
+  },
+  "verdict": "STRATEGYSTORE_PATTERN_FIXED_BUT_AGENT_GATE_FAILED"
+}

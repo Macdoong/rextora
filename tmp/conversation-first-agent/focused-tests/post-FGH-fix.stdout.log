@@ -1,0 +1,15 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationApprovalValidation.test.ts tests/AgentConversationRandomized.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (95 tests | 1 failed) 35ms
+     × keeps the research-brain conversation grounded while separating reads and plans 5ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 108 passed (109)
+   Start at  01:37:29
+   Duration  1.31s (transform 659ms, setup 33ms, import 814ms, tests 65ms, environment 0ms)
+

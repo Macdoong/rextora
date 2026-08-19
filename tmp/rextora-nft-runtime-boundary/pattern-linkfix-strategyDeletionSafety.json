@@ -1,0 +1,10 @@
+{
+  "entrypoint": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+  "elapsedMs": 834.850083,
+  "tracedFileCount": 100,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/strategies/**/*"
+  ]
+}

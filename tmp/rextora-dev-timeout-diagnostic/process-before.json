@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-08-11T07:48:19.632791Z",
+  "cwd": "/Users/macdoong/Documents/Rextora",
+  "ports": {
+    "3000": [],
+    "3101": []
+  },
+  "processes": {
+    "next_dev": [],
+    "next_start": [],
+    "playwright": [],
+    "chromium_test": []
+  }
+}

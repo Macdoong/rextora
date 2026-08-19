@@ -1,0 +1,465 @@
+{
+  "count": 92,
+  "rows": [
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "line": 1706,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 205,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 208,
+      "method": "openSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 210,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 211,
+      "method": "fsyncSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 213,
+      "method": "closeSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 215,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 394,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 396,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 500,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 502,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 516,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 519,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 520,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 523,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 552,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 554,
+      "method": "readdirSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 670,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 672,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 481,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 482,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 496,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 534,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+      "line": 75,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+      "line": 76,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/report/aiTradeReport.ts",
+      "line": 65,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/report/aiTradeReport.ts",
+      "line": 67,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/report/aiTradeReport.ts",
+      "line": 76,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/report/aiTradeReport.ts",
+      "line": 77,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 63,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 64,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 69,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 71,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 72,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 77,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 85,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 93,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 94,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 118,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 119,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 127,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 142,
+      "method": "unlinkSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 213,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 214,
+      "method": "rmSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 28,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 29,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 32,
+      "method": "chmodSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 45,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 46,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 53,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 55,
+      "method": "chmodSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 78,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 80,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 90,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "line": 95,
+      "method": "chmodSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "line": 33,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "line": 35,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 27,
+      "method": "readdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 38,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 61,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 63,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 66,
+      "method": "unlinkSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 87,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 88,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+      "line": 105,
+      "method": "unlinkSync"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 65,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 83,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 93,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 95,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 122,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 21,
+      "method": "readdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 29,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 47,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 48,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 50,
+      "method": "unlinkSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 58,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+      "line": 59,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "line": 40,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "line": 42,
+      "method": "readFileSync"
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "line": 56,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "line": 66,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+      "line": 67,
+      "method": "renameSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 52,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 59,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 65,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryIndex.ts",
+      "line": 30,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/memory/memoryIndex.ts",
+      "line": 31,
+      "method": "writeFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+      "line": 34,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+      "line": 35,
+      "method": "appendFileSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+      "line": 46,
+      "method": "existsSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchAudit.ts",
+      "line": 17,
+      "method": "mkdirSync"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/research/researchAudit.ts",
+      "line": 18,
+      "method": "appendFileSync"
+    }
+  ]
+}

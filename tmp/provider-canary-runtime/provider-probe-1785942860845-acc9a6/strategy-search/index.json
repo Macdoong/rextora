@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-05T15:14:21.559Z",
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "strategyTemplateId": "Demo BTC Research",
+      "generatorType": "random",
+      "createdAt": "2026-08-05T15:14:21.485Z",
+      "updatedAt": "2026-08-05T15:14:21.551Z",
+      "completedIterations": 0,
+      "finishedAt": "2026-08-05T15:14:21.551Z"
+    }
+  ]
+}

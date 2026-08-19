@@ -1,0 +1,1393 @@
+{
+  "startedAt": "2026-08-02T05:22:56.789Z",
+  "isolated": {
+    "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C",
+    "port": 3105,
+    "pid": 50453,
+    "BUILD_ID": "nwTeYUmsRENxuyGPIC55a",
+    "envKeys": [
+      "REXTORA_DATA_DIR",
+      "REXTORA_STRATEGIES_DIR",
+      "REXTORA_PAPER_SESSIONS_DIR",
+      "REXTORA_AGENT_COMMANDS_DIR"
+    ]
+  },
+  "liveDependency": {
+    "strategyId": "custom_msbctkj1",
+    "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+    "paramsHash": "d957c0533076",
+    "liveActive": true,
+    "liveEligible": true,
+    "before": {
+      "filePath": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies/custom_msbctkj1.json",
+      "fileExists": true,
+      "fileJson": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": false,
+        "liveActive": true,
+        "liveEligible": true,
+        "createdAt": "2026-08-02T05:22:58.477Z",
+        "updatedAt": "2026-08-02T05:22:58.477Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctkj1",
+          "strategyName": "Verify Live Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:22:58.477Z",
+          "updatedAt": "2026-08-02T05:22:58.477Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_y21dj0lp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_w2oih78c",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_oingc9oo",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1970bbh7",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      },
+      "indexEntry": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "paramsHash": "d957c0533076",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+        "locked": false,
+        "paperActive": false,
+        "liveActive": true,
+        "file": "custom_msbctkj1.json"
+      }
+    },
+    "markLiveResponse": {
+      "status": 200,
+      "data": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": false,
+        "liveActive": true,
+        "liveEligible": true,
+        "createdAt": "2026-08-02T05:22:58.477Z",
+        "updatedAt": "2026-08-02T05:22:58.477Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctkj1",
+          "strategyName": "Verify Live Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:22:58.477Z",
+          "updatedAt": "2026-08-02T05:22:58.477Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_y21dj0lp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_w2oih78c",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_oingc9oo",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1970bbh7",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      }
+    },
+    "deletionImpact": {
+      "status": 200,
+      "data": {
+        "strategyId": "custom_msbctkj1",
+        "classification": "absolute_protect",
+        "reasonsKo": [
+          "실전 활성 전략은 먼저 비활성화해야 합니다."
+        ],
+        "nextActionKo": "실전 연결을 해제한 뒤 다시 시도하세요.",
+        "backtestRefs": [],
+        "paperRefs": [],
+        "liveRefs": [],
+        "sourceResearchJobId": null,
+        "provenanceDetached": false,
+        "protectedItems": [
+          "live_active"
+        ]
+      }
+    },
+    "deleteApi": {
+      "status": 400,
+      "json": {
+        "ok": false,
+        "error": "실전 활성 전략은 먼저 비활성화해야 합니다."
+      }
+    },
+    "after": {
+      "filePath": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies/custom_msbctkj1.json",
+      "fileExists": true,
+      "fileJson": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": false,
+        "liveActive": true,
+        "liveEligible": true,
+        "createdAt": "2026-08-02T05:22:58.477Z",
+        "updatedAt": "2026-08-02T05:22:58.477Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctkj1",
+          "strategyName": "Verify Live Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:22:58.477Z",
+          "updatedAt": "2026-08-02T05:22:58.477Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_y21dj0lp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_w2oih78c",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_oingc9oo",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1970bbh7",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      },
+      "indexEntry": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "paramsHash": "d957c0533076",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+        "locked": false,
+        "paperActive": false,
+        "liveActive": true,
+        "file": "custom_msbctkj1.json"
+      }
+    },
+    "afterUi": {
+      "filePath": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies/custom_msbctkj1.json",
+      "fileExists": true,
+      "fileJson": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": false,
+        "liveActive": true,
+        "liveEligible": true,
+        "createdAt": "2026-08-02T05:22:58.477Z",
+        "updatedAt": "2026-08-02T05:22:58.477Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctkj1",
+          "strategyName": "Verify Live Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:22:58.477Z",
+          "updatedAt": "2026-08-02T05:22:58.477Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_y21dj0lp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_w2oih78c",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_oingc9oo",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1970bbh7",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      },
+      "indexEntry": {
+        "id": "custom_msbctkj1",
+        "name": "Verify Live Block",
+        "paramsHash": "d957c0533076",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+        "locked": false,
+        "paperActive": false,
+        "liveActive": true,
+        "file": "custom_msbctkj1.json"
+      }
+    },
+    "uiImpactText": [
+      "삭제 확인 · custom_msbctkj1",
+      "실전 활성 전략은 먼저 비활성화해야 합니다. 실전 연결을 해제한 뒤 다시 시도하세요. 저장된 백테스트 이력은 기본적으로 유지됩니다."
+    ],
+    "uiMessageAfterDelete": "실전 활성 전략은 먼저 비활성화해야 합니다.",
+    "networkLog": [
+      {
+        "url": "http://127.0.0.1:3105/api/rextora/strategies",
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "url": "http://127.0.0.1:3105/api/rextora/strategies",
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "url": "http://127.0.0.1:3105/api/rextora/strategies",
+        "status": 200,
+        "method": "POST"
+      },
+      {
+        "url": "http://127.0.0.1:3105/api/rextora/strategies",
+        "status": 400,
+        "method": "POST"
+      }
+    ],
+    "ok": true
+  },
+  "paperDependency": {
+    "strategyId": "custom_msbctpx3",
+    "before": {
+      "filePath": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies/custom_msbctpx3.json",
+      "fileExists": true,
+      "fileJson": {
+        "id": "custom_msbctpx3",
+        "name": "Verify Paper Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": false,
+        "liveActive": false,
+        "liveEligible": false,
+        "createdAt": "2026-08-02T05:23:05.463Z",
+        "updatedAt": "2026-08-02T05:23:05.463Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctpx3",
+          "strategyName": "Verify Paper Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:23:05.463Z",
+          "updatedAt": "2026-08-02T05:23:05.463Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_i0nbkrw7",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1564ohwp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_09g245fl",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_mrvmkk1k",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      },
+      "indexEntry": {
+        "id": "custom_msbctpx3",
+        "name": "Verify Paper Block",
+        "paramsHash": "d957c0533076",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+        "locked": false,
+        "paperActive": false,
+        "liveActive": false,
+        "file": "custom_msbctpx3.json"
+      }
+    },
+    "paperPrep": {
+      "status": 200,
+      "sessionStatus": "pending_approval",
+      "sessionId": "paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26",
+      "exchangeCalled": false
+    },
+    "deletionImpact": {
+      "status": 200,
+      "data": {
+        "strategyId": "custom_msbctpx3",
+        "classification": "detach_then_delete",
+        "reasonsKo": [
+          "모의매매에 연결되어 있습니다."
+        ],
+        "nextActionKo": "모의매매 연결 해제 후 삭제하거나, 관련 기록 포함 삭제를 선택하세요.",
+        "backtestRefs": [],
+        "paperRefs": [
+          "paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26"
+        ],
+        "liveRefs": [],
+        "sourceResearchJobId": null,
+        "provenanceDetached": false,
+        "protectedItems": [
+          "paper:paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26"
+        ]
+      }
+    },
+    "deleteApi": {
+      "status": 400,
+      "json": {
+        "ok": false,
+        "error": "모의매매에 연결되어 있습니다. 모의매매 연결 해제 후 삭제하거나, 관련 기록 포함 삭제를 선택하세요."
+      }
+    },
+    "after": {
+      "filePath": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies/custom_msbctpx3.json",
+      "fileExists": true,
+      "fileJson": {
+        "id": "custom_msbctpx3",
+        "name": "Verify Paper Block",
+        "displayAlias": null,
+        "displayName": null,
+        "description": "사용자 생성 전략",
+        "type": "조건빌더",
+        "timeframe": "15m",
+        "paramsHash": "d957c0533076",
+        "params": {
+          "ema_fast": 20,
+          "ema_mid": 60,
+          "ema_slow": 200,
+          "rsi_period": 14,
+          "atr_period": 14,
+          "vol_lookback": 5,
+          "res_lookback": 24,
+          "slope_lookback": 29,
+          "slope_min": 0.0002183157527055703,
+          "pullback_max_dist": 0.05045575483968,
+          "vol_ratio_min": 1.25,
+          "max_atr_pct": 0.026490862793435842,
+          "min_room_to_resist": 0.012,
+          "confirm_bull": false,
+          "rsi_max_long": 75.19573150544439,
+          "break_lookback": 9,
+          "break_margin": 0.0009567973462357032,
+          "vol_ratio_min_break": 0.8432557589560703,
+          "max_atr_pct_break": 0.03613740954587826,
+          "confirm_bear": true,
+          "rsi_min_short": 19.5417882210621,
+          "sl_atr_mult": 1.8814680172969074,
+          "tp_atr_mult": 4.475374424448608,
+          "cooldown_bars": 2,
+          "allow_in_range": true,
+          "range_vol_ratio_min": 1.027255983428468,
+          "max_hold_bars": 5,
+          "use_trailing": true,
+          "trail_atr_mult": 4.185748185920124,
+          "use_vol_target": true,
+          "target_atr_pct": 0.017030312850789035,
+          "size_min": 0.8722924038040076,
+          "size_max": 1.327452679393273,
+          "use_dynamic_leverage": true,
+          "lev_min": 1.2,
+          "lev_base": 1.667409360218415,
+          "lev_max": 2.5,
+          "lev_atr_ok_max": 0.01001954461683031,
+          "lev_atr_too_high": 0.026965485866541215,
+          "lev_down_on_dd": -0.09446141586552376,
+          "lev_up_on_dd": -0.04698651466730082,
+          "risk_mult_cap": 2.5353685094966254,
+          "range_risk_mult": 0.6571670263493049,
+          "mark_to_market": true,
+          "base_bal_pct": 0.02,
+          "cost_guard": true,
+          "cost_guard_k": 3
+        },
+        "locked": false,
+        "sourceFile": null,
+        "sourceStatus": "user_created",
+        "paperActive": true,
+        "liveActive": false,
+        "liveEligible": false,
+        "createdAt": "2026-08-02T05:23:05.463Z",
+        "updatedAt": "2026-08-02T05:23:05.463Z",
+        "schemaVersion": 1,
+        "strategyType": "condition_builder",
+        "sourceStrategyId": null,
+        "version": "1.0.0",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "longEnabled": true,
+        "shortEnabled": true,
+        "definition": {
+          "schemaVersion": 1,
+          "strategyId": "custom_msbctpx3",
+          "strategyName": "Verify Paper Block",
+          "description": "",
+          "version": "1.0.0",
+          "strategyType": "condition_builder",
+          "sourceStrategyId": null,
+          "locked": false,
+          "createdAt": "2026-08-02T05:23:05.463Z",
+          "updatedAt": "2026-08-02T05:23:05.463Z",
+          "timeframe": "15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "longEnabled": true,
+          "shortEnabled": true,
+          "entryConditions": {
+            "long": {
+              "id": "grp_i0nbkrw7",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_1564ohwp",
+              "type": "group",
+              "category": "group",
+              "operator": "AND",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "exitConditions": {
+            "long": {
+              "id": "grp_09g245fl",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            },
+            "short": {
+              "id": "grp_mrvmkk1k",
+              "type": "group",
+              "category": "group",
+              "operator": "OR",
+              "enabled": true,
+              "children": [],
+              "validationStatus": "ok"
+            }
+          },
+          "filters": {},
+          "risk": {
+            "stopLossAtrMult": 1.5,
+            "takeProfitAtrMult": 3,
+            "useTrailing": false,
+            "trailAtrMult": 2,
+            "maxHoldBars": 48,
+            "oppositeSignalExit": true,
+            "structureInvalidationExit": false,
+            "partialExitEnabled": false
+          },
+          "positionSizing": {
+            "baseBalancePct": 0.02,
+            "sizeMin": 0.5,
+            "sizeMax": 1.5,
+            "useVolTarget": false,
+            "targetAtrPct": 0.02
+          },
+          "execution": {
+            "costGuardEnabled": true,
+            "costGuardK": 3,
+            "cooldownBars": 2,
+            "longEnabled": true,
+            "shortEnabled": true
+          },
+          "metadata": {},
+          "paramsHash": "d957c0533076"
+        },
+        "longConditionSummary": "EMA정배열·기울기≥0.000218·되돌림≤0.0505·RSI≤75.2·돌파/레인지 옵션",
+        "shortConditionSummary": "EMA역배열·확인숏·RSI≥19.5·돌파숏",
+        "stopLossSummary": "ATR × 1.881",
+        "takeProfitSummary": "ATR × 4.475 · 트레일 ATR×4.186",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6"
+      },
+      "indexEntry": {
+        "id": "custom_msbctpx3",
+        "name": "Verify Paper Block",
+        "paramsHash": "d957c0533076",
+        "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+        "locked": false,
+        "paperActive": true,
+        "liveActive": false,
+        "file": "custom_msbctpx3.json"
+      }
+    },
+    "paperSessionBefore": "paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26",
+    "paperSessionAfter": {
+      "schemaVersion": 2,
+      "sessionId": "paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26",
+      "id": "paper_855fa9df-2ad1-4cc2-9154-4aa553c60e26",
+      "strategyId": "custom_msbctpx3",
+      "strategyHash": "181be3c063a857007a6a00f33b6e4624197bc68c7ecb43943d4370df84cda0c6",
+      "paramsHash": "d957c0533076",
+      "sourceParamsHash": "d957c0533076",
+      "sourceResearchJobId": null,
+      "sourceTrialIteration": null,
+      "backtestRunId": null,
+      "backtestResultId": null,
+      "linkedJobId": null,
+      "strategyName": "Verify Paper Block",
+      "displayAliasSnapshot": null,
+      "displayNameSnapshot": null,
+      "status": "pending_approval",
+      "mode": "paper",
+      "exchangeCalled": false,
+      "symbol": "BTCUSDT",
+      "timeframe": "15m",
+      "createdAt": "2026-08-02T05:23:05.475Z",
+      "startedAt": null,
+      "pausedAt": null,
+      "resumedAt": null,
+      "stoppedAt": null,
+      "updatedAt": "2026-08-02T05:23:05.475Z",
+      "heartbeatAt": null,
+      "stopReason": null,
+      "lastError": null,
+      "version": 1,
+      "virtualBalance": 10000,
+      "realizedPnl": 0,
+      "unrealizedPnl": 0,
+      "tradeCount": 0,
+      "signalCount": 0,
+      "drawdown": 0
+    },
+    "paperFileCountBefore": 2,
+    "paperFileCountAfter": 2,
+    "uiConfirmText": "삭제 확인 · custom_msbctpx3모의매매에 연결되어 있습니다. 모의매매 연결 해제 후 삭제하거나, 관련 기록 포함 삭제를 선택하세요. 저장된 백테스트 이력은 기본적으로 유지됩니다.취소삭제 실행",
+    "uiMessage": "모의매매에 연결되어 있습니다. 모의매매 연결 해제 후 삭제하거나, 관련 기록 포함 삭제를 선택하세요.",
+    "ok": true
+  },
+  "agentContinuity": {
+    "beforeNavigation": {
+      "route": "/dashboard",
+      "label": "before-nav",
+      "storageTurnCount": 4,
+      "drawerTurnCount": 5,
+      "pendingSummary": "백테스트 계획 검토",
+      "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+      "symbol": "BTCUSDT",
+      "timeframe": "15m",
+      "strategyId": "demo_strategy_btc_v1",
+      "hasPendingPlan": true
+    },
+    "routeMatrix": [
+      {
+        "route": "/dashboard",
+        "label": "before-nav",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 5,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/strategy-search",
+        "label": "strategy-search",
+        "stripText": "AI 직원 · 전략 탐색 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 0,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/results",
+        "label": "results",
+        "stripText": "AI 직원 · 탐색 결과 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 0,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/backtest",
+        "label": "backtest",
+        "stripText": "AI 직원 · 백테스트 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 0,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/paper-trading",
+        "label": "paper-trading",
+        "stripText": "AI 직원 · 모의 매매 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 0,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/live-trading",
+        "label": "live-trading",
+        "stripText": "AI 직원 · 실전 매매 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 0,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      },
+      {
+        "route": "/dashboard",
+        "label": "dashboard-return",
+        "storageTurnCount": 4,
+        "drawerTurnCount": 4,
+        "pendingSummary": "백테스트 계획 검토",
+        "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "strategyId": "demo_strategy_btc_v1",
+        "hasPendingPlan": true
+      }
+    ],
+    "afterRefresh": {
+      "route": "/backtest",
+      "label": "after-refresh",
+      "stripText": "AI 직원 · 백테스트 · live_review현재 목표: 실전 승인 게이트 검토승인 대기: 백테스트 계획 검토 · 엔진 자동 실행 없음이어서 대화",
+      "storageTurnCount": 4,
+      "drawerTurnCount": 0,
+      "pendingSummary": "백테스트 계획 검토",
+      "pinnedObjective": "현재 목표: 실전 승인 게이트 검토",
+      "symbol": "BTCUSDT",
+      "timeframe": "15m",
+      "strategyId": "demo_strategy_btc_v1",
+      "hasPendingPlan": true,
+      "turnsAfterRefresh": 1
+    },
+    "tabRestore": {
+      "turns": 4,
+      "objective": "현재 목표: 실전 승인 게이트 검토"
+    },
+    "consoleErrors": [],
+    "ok": true
+  },
+  "qualityGates": {
+    "lint": {
+      "exitCode": 0
+    },
+    "unit": {
+      "exitCode": 0,
+      "passed": "1204"
+    },
+    "build": {
+      "exitCode": 0,
+      "BUILD_ID": "nwTeYUmsRENxuyGPIC55a"
+    },
+    "e2e": [
+      {
+        "run": 1,
+        "exitCode": 0
+      },
+      {
+        "run": 2,
+        "exitCode": 0
+      },
+      {
+        "run": 3,
+        "exitCode": 0
+      }
+    ]
+  },
+  "safeBefore": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": ""
+  },
+  "safeAfter": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": ""
+  },
+  "defects": [],
+  "verdict": "REXTORA INTERNAL TESTING COMPLETE",
+  "finishedAt": "2026-08-02T05:26:40.789Z"
+}

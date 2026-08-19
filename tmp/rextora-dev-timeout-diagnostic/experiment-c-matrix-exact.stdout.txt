@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:75467) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75467) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (1.9s)
+  ✓  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (1.2s)
+
+  2 passed (3.8s)

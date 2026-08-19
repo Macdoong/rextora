@@ -1,0 +1,42 @@
+{
+  "nextVersion": "16.2.6",
+  "localCliHelp": {
+    "buildDescription": "Creates an optimized production build of your application.",
+    "webpackOption": "--webpack: Builds using webpack.",
+    "supported": true,
+    "experimental": false
+  },
+  "installedSourceEvidence": {
+    "cli": "node_modules/next/dist/bin/next registers --webpack on the production build command",
+    "selection": "node_modules/next/dist/lib/bundler.js maps --webpack to Bundler.Webpack and maps no flag to Bundler.Turbopack",
+    "compiler": "node_modules/next/dist/build/index.js calls webpackBuild when the selected bundler is not Turbopack",
+    "buildId": "node_modules/next/dist/build/index.js calls writeBuildId after successful production compilation",
+    "start": "node_modules/next/dist/server/next-server.js reads the standard distDir/BUILD_ID and has no build-bundler selection"
+  },
+  "productionSemantics": {
+    "optimizedProductionBuild": true,
+    "disablesTurbopackForBuild": true,
+    "producesStandardNextDistDir": true,
+    "producesBuildIdOnSuccess": true,
+    "changesNextStartSemantics": false
+  },
+  "projectCompatibility": {
+    "decision": "WEBPACK_COMPATIBLE",
+    "turbopackOnlyLoaders": [],
+    "turbopackOnlyAliases": [],
+    "customWebpackConfig": "A compatible watchOptions.ignored extension; the installed config loaded and returned the same config object in a fast production-mode probe.",
+    "postcss": "Standard @tailwindcss/postcss plus autoprefixer.",
+    "tailwind": "source(none) with explicit app/components/src sources; not Turbopack-specific.",
+    "bundleAnalyzer": "Standard @next/bundle-analyzer wrapper, disabled unless ANALYZE=true.",
+    "packageLockChangeRequired": false
+  },
+  "decision": "Use next build --webpack as the first and preferred production-build candidate.",
+  "actualOutcome": {
+    "firstWebpackBuildExitCode": 134,
+    "firstWebpackBuildDurationSeconds": 28.77,
+    "firstWebpackBuildPeakRssBytes": 5007245312,
+    "failure": "V8 heap out of memory with node::fs::AfterScanDir in the terminal native stack",
+    "buildIdPresent": false,
+    "conclusion": "Officially supported and project-compatible, but not successful for the current repository/data footprint."
+  }
+}

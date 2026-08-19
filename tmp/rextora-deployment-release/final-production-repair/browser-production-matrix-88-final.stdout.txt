@@ -1,0 +1,225 @@
+
+Running 112 tests using 1 worker
+
+(node:51725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (4ms)
+  ✓    2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (20.3s)
+  ✓    3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (22.2s)
+  ✓    4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (22.6s)
+  ✓    5 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (1.5s)
+  ✓    6 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (20.7s)
+  ✓    7 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (22.5s)
+  ✓    8 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (50.0s)
+  ✓    9 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (56.3s)
+  ✓   10 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.3m)
+  ✓   11 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (58.3s)
+  ✓   12 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.9m)
+  ✓   13 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.5m)
+  ✓   14 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (45.0s)
+  ✓   15 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.3m)
+  ✓   16 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.3m)
+  ✓   17 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.3m)
+  ✓   18 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.7m)
+  ✓   19 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (2.7s)
+  ✓   20 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (843ms)
+  ✓   21 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (27.8s)
+  ✓   22 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (31.9s)
+  ✓   23 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.1m)
+  ✓   24 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:43:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+  ✓   25 [prod-390] › tests/e2e/release/model-switch-390.spec.ts:19:7 › 390px model-switch streaming regression › waits for streaming completion before asserting typo answer (54.7s)
+  ✓   26 [prod-390] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (4.7m)
+  ✓   27 [prod-390] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (28.3s)
+  ✓   28 [prod-390] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (29.6s)
+(node:53549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:53549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   29 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   30 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (28.6s)
+  ✓   31 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (26.0s)
+  ✓   32 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (22.1s)
+  ✓   33 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (4.2s)
+  ✓   34 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (23.8s)
+  ✓   35 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (29.4s)
+  ✓   36 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (44.8s)
+  ✓   37 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (46.6s)
+  ✓   38 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (56.9s)
+  ✓   39 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (47.9s)
+  ✓   40 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.4m)
+  ✓   41 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.6m)
+  ✓   42 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (50.1s)
+  ✓   43 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.2m)
+  ✓   44 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.3m)
+  ✓   45 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.4m)
+  ✓   46 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.8m)
+  ✓   47 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (1.4s)
+  ✓   48 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (678ms)
+  ✓   49 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (38.3s)
+  ✓   50 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (31.8s)
+  ✓   51 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.4m)
+  ✓   52 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:43:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+  ✓   53 [prod-768] › tests/e2e/release/model-switch-390.spec.ts:19:7 › 390px model-switch streaming regression › waits for streaming completion before asserting typo answer (1.0m)
+  ✓   54 [prod-768] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (4.6m)
+  ✓   55 [prod-768] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (40.1s)
+  ✓   56 [prod-768] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (37.1s)
+(node:55590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   57 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   58 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (31.9s)
+  ✓   59 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (35.6s)
+  ✓   60 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (34.9s)
+  ✓   61 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (3.3s)
+  ✓   62 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (30.3s)
+  ✓   63 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (29.6s)
+  ✓   64 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (56.6s)
+  ✓   65 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (58.6s)
+  ✓   66 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.4m)
+  ✓   67 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.0m)
+  ✓   68 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (2.7m)
+  ✓   69 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.9m)
+  ✓   70 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (1.1m)
+  ✓   71 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.4m)
+  ✓   72 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.5m)
+  ✓   73 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.4m)
+  ✓   74 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.5m)
+  ✓   75 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (3.1s)
+  ✓   76 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (748ms)
+  ✓   77 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (40.7s)
+  ✓   78 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (44.4s)
+  ✓   79 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.5m)
+  ✓   80 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:43:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+  ✓   81 [prod-1024] › tests/e2e/release/model-switch-390.spec.ts:19:7 › 390px model-switch streaming regression › waits for streaming completion before asserting typo answer (56.7s)
+  ✘   82 [prod-1024] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (5.0m)
+(node:57978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   83 [prod-1024] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (45.1s)
+  ✓   84 [prod-1024] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (45.2s)
+(node:58149) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58149) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   85 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   86 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (31.7s)
+  ✓   87 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (38.5s)
+  ✓   88 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (38.4s)
+  ✓   89 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (2.0s)
+  ✓   90 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (39.7s)
+  ✓   91 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (33.4s)
+  ✓   92 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (1.1m)
+  ✓   93 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.0m)
+  ✓   94 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.5m)
+  ✓   95 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.1m)
+  ✘   96 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (5.0m)
+(node:59576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   97 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (3.7m)
+  ✓   98 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (47.7s)
+  ✓   99 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.1m)
+  ✓  100 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.2m)
+  ✓  101 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.2m)
+  ✓  102 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.6m)
+  ✓  103 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (973ms)
+  ✓  104 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (478ms)
+  ✓  105 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (34.1s)
+  ✓  106 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (34.5s)
+  ✓  107 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.5m)
+  ✓  108 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:43:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+  ✓  109 [prod-1440] › tests/e2e/release/model-switch-390.spec.ts:19:7 › 390px model-switch streaming regression › waits for streaming completion before asserting typo answer (49.5s)
+  ✘  110 [prod-1440] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (5.0m)
+(node:61298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  111 [prod-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (35.6s)
+  ✓  112 [prod-1440] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (33.7s)
+
+
+  1) [prod-1024] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: page.evaluate: Target page, context or browser has been closed
+
+       at helpers.ts:424
+
+      422 |
+      423 | export async function readLatestAgentAnswer(page: Page): Promise<string> {
+    > 424 |   return page.evaluate(() => {
+          |               ^
+      425 |     const answers = document.querySelectorAll('[data-testid="agent-conversational-answer"]');
+      426 |     for (let i = answers.length - 1; i >= 0; i--) {
+      427 |       const text = (answers[i] as HTMLElement).innerText.trim();
+        at readLatestAgentAnswer (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:424:15)
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:338:26)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/model-switching.spec.ts:56:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [prod-1440] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Slow test file: [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts (21.6m)
+  Slow test file: [prod-390] › tests/e2e/release/deployment-matrix.spec.ts (17.9m)
+  Slow test file: [prod-768] › tests/e2e/release/deployment-matrix.spec.ts (17.6m)
+  Slow test file: [prod-1024] › tests/e2e/release/model-switching.spec.ts (5.0m)
+  Slow test file: [prod-1440] › tests/e2e/release/model-switching.spec.ts (5.0m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  3 failed
+    [prod-1024] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [prod-1440] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+  109 passed (1.8h)

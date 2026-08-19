@@ -1,0 +1,17 @@
+{
+  "lint": {
+    "command": "npm run lint",
+    "startedAt": "2026-08-04T10:30:43.417Z",
+    "finishedAt": "2026-08-04T10:30:59.383Z",
+    "durationMs": 15966,
+    "exitCode": 0,
+    "stdoutLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/lint.stdout.log",
+    "stderrLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/lint.stderr.log",
+    "parsedResult": null,
+    "BUILD_ID": "ssEKrey6MwlCk4vBIwfE0",
+    "evidenceComplete": true,
+    "signal": null,
+    "error": null,
+    "pass": true
+  }
+}

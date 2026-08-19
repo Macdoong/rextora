@@ -1,0 +1,16 @@
+{
+  "openai": {
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "canaryPassed": true,
+    "selectedProvider": "openai",
+    "writeToolAuditCount": 0
+  },
+  "gemini": {
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "canaryPassed": true,
+    "selectedProvider": "gemini",
+    "writeToolAuditCount": 0
+  }
+}

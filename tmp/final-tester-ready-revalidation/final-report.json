@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-04T11:40:00.000Z",
+  "revalidationType": "final-tester-ready-revalidation",
+  "constraintsObserved": {
+    "sourceModified": false,
+    "testsWeakened": false,
+    "committed": false,
+    "pushed": false,
+    "liveTradingEnabled": false,
+    "realOrdersExecuted": false,
+    "secretsModified": false,
+    "safeModified": false
+  },
+  "1_baselineGitState": {
+    "pwd": "/Users/macdoong/Documents/Rextora",
+    "branch": "main",
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "gitStatusShortLines": 141,
+    "preCleanBUILD_ID": "eZtUlBGDBVyiy8Lviw5SU",
+    "node": "v25.8.0",
+    "npm": "11.11.0",
+    "evidencePath": "tmp/final-tester-ready-revalidation/baseline/baseline.txt"
+  },
+  "2_freshBUILD_ID": "mwEjoK4ic1cyT-pd5_Omz",
+  "3_build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "durationMs": 87883,
+    "BUILD_ID": "mwEjoK4ic1cyT-pd5_Omz",
+    "pass": true,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/build.json"
+  },
+  "4_traceInspection": {
+    "tracedTmp": 0,
+    "tracedScreenshots": 0,
+    "tracedEnv": 0,
+    "secretsDetected": false,
+    "secretTraceFailure": false,
+    "totalSizeHuman": "639.2MB",
+    "runtimeRequiredSafeStrategyPresent": true,
+    "pass": true,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/trace-inspection.json"
+  },
+  "5_lint": {
+    "command": "npm run lint",
+    "exitCode": 0,
+    "durationMs": 17059,
+    "pass": true,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/lint.json"
+  },
+  "6_unitTests": {
+    "command": "npm test",
+    "exitCode": 1,
+    "durationMs": 83750,
+    "testFiles": 187,
+    "testFilesPassed": 186,
+    "testFilesFailed": 1,
+    "tests": 1351,
+    "testsPassed": 1350,
+    "testsFailed": 1,
+    "testsSkipped": 0,
+    "failedTest": "tests/liveReadinessChecklist.test.ts > liveReadinessChecklist > includes expected LIVE block reasons when setting is off",
+    "focusedOrSkippedCriticalPaths": false,
+    "pass": false,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/unit-tests.json"
+  },
+  "7_e2eRun1": {
+    "discoveredCount": 31,
+    "passed": 31,
+    "exitCode": 0,
+    "retries": 0,
+    "workers": 3,
+    "pass": true,
+    "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-1.log"
+  },
+  "8_e2eRun2": {
+    "discoveredCount": 31,
+    "passed": 31,
+    "exitCode": 0,
+    "retries": 0,
+    "workers": 3,
+    "pass": true,
+    "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-2.log"
+  },
+  "9_e2eRun3": {
+    "discoveredCount": 31,
+    "passed": 31,
+    "exitCode": 0,
+    "retries": 0,
+    "workers": 3,
+    "pass": true,
+    "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-3.log"
+  },
+  "10_providerCanary": {
+    "requestedProvider": "openai",
+    "selectedProvider": null,
+    "providerAttempted": true,
+    "providerSucceeded": false,
+    "structuredOutputValid": false,
+    "canaryPassed": false,
+    "checks": [
+      {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "configured": true,
+        "ok": true,
+        "latencyMs": 2226
+      },
+      {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "configured": true,
+        "ok": false,
+        "latencyMs": 1025,
+        "errorKo": "Gemini 응답 오류 (200)"
+      }
+    ],
+    "fallbackUsed": true,
+    "fallbackReason": "unusable_structured_output",
+    "writeToolAuditCount": 0,
+    "pass": false,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/provider-canary.json",
+    "matrixHarnessProviderNote": "Isolated matrix harness selected gemini successfully in demo runtime (see browser-matrix.json providerSelection); standalone Step-5 probe against default production data root did not pass structured canary."
+  },
+  "11_browserMatrix": {
+    "passed": 52,
+    "total": 52,
+    "buildId": "mwEjoK4ic1cyT-pd5_Omz",
+    "scenarios": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"],
+    "viewports": [390, 768, 1024, 1440],
+    "pass": true,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/browser-matrix.json",
+    "logPath": "tmp/final-tester-ready-revalidation/logs/browser-matrix.log",
+    "firstAttemptNote": "Initial harness launch failed with ERR_MODULE_NOT_FOUND for tmp/scripts/primaryLeakDetector.mjs; verification continued after tmp/scripts symlinks to ../../scripts (no source modification)."
+  },
+  "12_conversationBViewports": {
+    "B-390": { "passed": true, "rawLeakCountBefore": 0, "rawLeakCountAfter": 0, "exactOldJobIdentified": true, "noReplacementBeforeApproval": true, "oldJobCancelledAfterApproval": true, "exactlyOneReplacementStarted": true, "duplicateExecutionCount": 0, "approvalCleared": true, "monitoringVisible": true },
+    "B-768": { "passed": true, "rawLeakCountBefore": 0, "rawLeakCountAfter": 0, "exactOldJobIdentified": true, "noReplacementBeforeApproval": true, "oldJobCancelledAfterApproval": true, "exactlyOneReplacementStarted": true, "duplicateExecutionCount": 0, "approvalCleared": true, "monitoringVisible": true },
+    "B-1024": { "passed": true, "rawLeakCountBefore": 0, "rawLeakCountAfter": 0, "exactOldJobIdentified": true, "noReplacementBeforeApproval": true, "oldJobCancelledAfterApproval": true, "exactlyOneReplacementStarted": true, "duplicateExecutionCount": 0, "approvalCleared": true, "monitoringVisible": true },
+    "B-1440": { "passed": true, "rawLeakCountBefore": 0, "rawLeakCountAfter": 0, "exactOldJobIdentified": true, "noReplacementBeforeApproval": true, "oldJobCancelledAfterApproval": true, "exactlyOneReplacementStarted": true, "duplicateExecutionCount": 0, "approvalCleared": true, "monitoringVisible": true },
+    "pass": true
+  },
+  "13_visibleLeakage": {
+    "rawLeakCountTotal": 0,
+    "consoleErrorCountTotal": 0,
+    "horizontalOverflowRows": 0,
+    "thinkingNotClearedRows": 0,
+    "pass": true
+  },
+  "14_safetyAndExpandedTools": {
+    "writeToolsRequireApproval": true,
+    "persistentIdempotencyEnforced": true,
+    "strategyDeletionDependencyProtection": true,
+    "paperCanonicalSessionService": true,
+    "paperExchangeCalledFalse": true,
+    "noLiveTool": true,
+    "noRealOrderTool": true,
+    "noBinanceOrderTool": true,
+    "noSafeMutationTool": true,
+    "unknownToolsDenied": true,
+    "matrixRuntimeCleanupConfirmed": true,
+    "pass": true,
+    "evidencePath": "tmp/final-tester-ready-revalidation/evidence/safety-tools.json"
+  },
+  "15_safeBeforeAndAfter": {
+    "before": {
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+      "protectedDiffBytes": 0
+    },
+    "after": {
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+      "protectedDiffBytes": 0
+    },
+    "unchanged": true,
+    "pass": true
+  },
+  "16_gitDiffSummary": {
+    "branch": "main",
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "committed": false,
+    "pushed": false,
+    "gitStatusShortLines": 141,
+    "modifiedTrackedFiles": 40,
+    "insertionsDeletions": "3214 insertions, 574 deletions",
+    "finalBUILD_ID": "mwEjoK4ic1cyT-pd5_Omz"
+  },
+  "17_missingEvidenceOrContradictions": [
+    "Unit test gate failed: liveReadinessChecklist.test.ts expects remaining block reason containing '실전 거래 허용' but assertion received false.",
+    "Standalone Step-5 provider canary failed (fallbackUsed=true, providerSucceeded=false) while matrix harness provider probe succeeded with gemini in isolated demo runtime — contradictory provider verification depending on runtime context.",
+    "First browser-matrix launch failed immediately due to harness import path ../scripts resolving to tmp/scripts; required tmp/scripts symlinks to execute (operational workaround, not source change).",
+    "E2E webServer logs orphanJobRecovery module-not-found warning on each run (non-failing but present in logs)."
+  ],
+  "18_remainingRisks": [
+    "1350/1351 unit tests pass but live readiness checklist regression blocks full automated gate green.",
+    "External provider structured-output canary is environment-sensitive; default production data-root probe did not verify OpenAI/Gemini structured success.",
+    "Large uncommitted working tree (141 status lines) may confuse external testers about reproducible baseline.",
+    "Browser matrix harness import path remains fragile without tmp/scripts symlink workaround."
+  ],
+  "19_externalTesterUseCanBegin": false,
+  "20_finalVerdict": "REXTORA AI TRADING EMPLOYEE TESTER READY FAILED",
+  "gateSummary": {
+    "baseline": "PASS",
+    "build": "PASS",
+    "traceInspection": "PASS",
+    "lint": "PASS",
+    "unitTests": "FAIL",
+    "e2eRun1": "PASS",
+    "e2eRun2": "PASS",
+    "e2eRun3": "PASS",
+    "providerCanaryStandalone": "FAIL",
+    "browserMatrix52": "PASS",
+    "safeIntegrity": "PASS",
+    "safetyTools": "PASS"
+  }
+}

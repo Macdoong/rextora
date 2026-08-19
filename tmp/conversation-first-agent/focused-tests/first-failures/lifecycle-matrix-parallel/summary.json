@@ -1,0 +1,393 @@
+[
+  {
+    "row": "A-1024",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioA (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 1,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "A-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioA (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 1,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "A-390",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioA (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 1,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "A-768",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioA (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 1,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "B-1024",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "B-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "B-390",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "B-768",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "C-1024",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "C-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "C-390",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "C-768",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at createRunningSearch (/Users/macdoong/Docume",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "D-1024",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "D-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "D-390",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "D-768",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "E-1024",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioE (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "E-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioE (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "E-390",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioE (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "E-768",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioE (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "F-1024",
+    "error": "",
+    "consoleErrorCount": 8,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "전략 탐색은 여러 규칙과 설정을 실제 과거 데이터에 적용해 검토할 후보를 찾는 단계입니다.\n\n탐색 결과는 아직 채택된 전략이 아닙니다. 결과 등록과 백테스트 검토를 거쳐야 하며, 새 탐색이나 취소처럼 상태를 바꾸는 작업은 승인 후 실행됩니다.",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "F-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioF (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "F-390",
+    "error": "",
+    "consoleErrorCount": 6,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "전략 탐색은 여러 규칙과 설정을 실제 과거 데이터에 적용해 검토할 후보를 찾는 단계입니다.\n\n탐색 결과는 아직 채택된 전략이 아닙니다. 결과 등록과 백테스트 검토를 거쳐야 하며, 새 탐색이나 취소처럼 상태를 바꾸는 작업은 승인 후 실행됩니다.",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "F-768",
+    "error": "",
+    "consoleErrorCount": 8,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "전략 탐색은 여러 규칙과 설정을 실제 과거 데이터에 적용해 검토할 후보를 찾는 단계입니다.\n\n탐색 결과는 아직 채택된 전략이 아닙니다. 결과 등록과 백테스트 검토를 거쳐야 하며, 새 탐색이나 취소처럼 상태를 바꾸는 작업은 승인 후 실행됩니다.",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "G-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioG (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "I-1440",
+    "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:54743/dashboard\", waiting until \"domcontentloaded\"\n\n    at openDrawer (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "J-1024",
+    "error": "",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "결과 화면은 탐색에서 나온 후보를 비교하고, 실제 검증 대상으로 등록할지 판단하는 곳입니다.\n\n후보의 출처와 설정을 확인한 뒤 등록해야 백테스트와 후속 검토로 이어집니다. 탐색 점수만으로 우수하다고 단정하지 않습니다.",
+    "refreshRecallIntent": "unknown",
+    "responses": null
+  },
+  {
+    "row": "J-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "J-390",
+    "error": "",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "결과 화면은 탐색에서 나온 후보를 비교하고, 실제 검증 대상으로 등록할지 판단하는 곳입니다.\n\n후보의 출처와 설정을 확인한 뒤 등록해야 백테스트와 후속 검토로 이어집니다. 탐색 점수만으로 우수하다고 단정하지 않습니다.",
+    "refreshRecallIntent": "unknown",
+    "responses": null
+  },
+  {
+    "row": "J-768",
+    "error": "",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "결과 화면은 탐색에서 나온 후보를 비교하고, 실제 검증 대상으로 등록할지 판단하는 곳입니다.\n\n후보의 출처와 설정을 확인한 뒤 등록해야 백테스트와 후속 검토로 이어집니다. 탐색 점수만으로 우수하다고 단정하지 않습니다.",
+    "refreshRecallIntent": "unknown",
+    "responses": null
+  },
+  {
+    "row": "K-1024",
+    "error": "page.evaluate: Target page, context or browser has been closed\n    at uiMetrics (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:286:41)\n    at async scenarioE (/Users/macdoong/Documents/Rextora/tmp/cod",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "K-1440",
+    "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioE (/Users/macdoong/Documents/Rextor",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "K-390",
+    "error": "page.evaluate: Target page, context or browser has been closed\n    at uiMetrics (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:286:41)\n    at async scenarioE (/Users/macdoong/Documents/Rextora/tmp/cod",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "K-768",
+    "error": "page.evaluate: Target page, context or browser has been closed\n    at uiMetrics (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:286:41)\n    at async scenarioE (/Users/macdoong/Documents/Rextora/tmp/cod",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "L-1024",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "L-1440",
+    "error": "",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "보호된 SAFE 전략은 에이전트가 수정할 수 없습니다.\n\nSAFE는 비교와 복구를 위한 기준 전략이므로 별도의 명시적 변경 절차 없이는 그대로 유지됩니다.",
+    "refreshRecallIntent": null,
+    "responses": [
+      {
+        "query": "Live 시작해",
+        "intentType": "unknown",
+        "safetyBlocked": false,
+        "hasApproval": false,
+        "toolIds": []
+      },
+      {
+        "query": "BTC 실전 주문 넣어",
+        "intentType": "execute_trade",
+        "safetyBlocked": true,
+        "hasApproval": false,
+        "toolIds": []
+      },
+      {
+        "query": "SAFE 수정해",
+        "intentType": "modify_safe",
+        "safetyBlocked": true,
+        "hasApproval": false,
+        "toolIds": []
+      }
+    ]
+  },
+  {
+    "row": "L-390",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "L-768",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "M-1024",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "M-390",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  },
+  {
+    "row": "M-768",
+    "error": "browser.newContext: Target page, context or browser has been closed\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:897:15)\n    at async file:///Users/macdoong/Documents/Rextora/tmp",
+    "consoleErrorCount": 0,
+    "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+    "primaryText": "",
+    "refreshRecallIntent": null,
+    "responses": null
+  }
+]

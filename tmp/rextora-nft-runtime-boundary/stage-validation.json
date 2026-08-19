@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "candidate": "externalized server-only runtime-path provider",
+  "candidateValidationBeforeRevert": {
+    "runtimeModuleIdentityProbe": "PASS",
+    "focusedTests": {
+      "result": "PASS",
+      "testFiles": 7,
+      "passed": 54,
+      "failed": 0,
+      "files": [
+        "tests/runtimePathBoundary.test.ts",
+        "tests/providerRuntimePathIsolation.test.ts",
+        "tests/AgentSessionPersistence.test.ts",
+        "tests/agentTypedCommand.test.ts",
+        "tests/strategySearchJobStore.test.ts",
+        "tests/jobExecutionOwnership.test.ts",
+        "tests/researchHistoryManagement.test.ts"
+      ],
+      "rawLogPersisted": false
+    },
+    "focusedEslint": {
+      "result": "PASS",
+      "exitCode": 0,
+      "rawLogPersisted": false
+    },
+    "typescript": {
+      "result": "BLOCKED_BY_PREEXISTING_CONFIGURATION",
+      "diagnostic": "TS5101: baseUrl is deprecated in TypeScript 7",
+      "attributedToCandidate": false
+    }
+  },
+  "mandatoryNftGate": {
+    "result": "FAIL",
+    "normalTerminalSuccess": false,
+    "trialRootReached": true,
+    "remainingPattern": "**/*.json",
+    "remainingSource": "src/lib/rextora/strategy/strategyStore.ts"
+  },
+  "disposition": {
+    "candidateRetained": false,
+    "candidateFullyReverted": true,
+    "productionBuildRun": false,
+    "reason": "The mandatory isolated NFT gate failed."
+  }
+}

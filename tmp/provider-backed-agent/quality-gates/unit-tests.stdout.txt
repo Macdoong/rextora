@@ -1,0 +1,48 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationProviderFallback.test.ts (4 tests | 2 failed) 190ms
+     × answers stable direct topic without provider: 렉스토라는 뭐 하는 앱이야? 18ms
+     × answers stable direct topic without provider: MDD가 왜 중요해? 7ms
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (98 tests | 31 failed) 37ms
+     × A product · empty-product 8ms
+     × C concept · empty-concept 1ms
+     × A product · search-planned-product 0ms
+     × C concept · search-planned-concept 0ms
+     × A product · search-running-product 0ms
+     × C concept · search-running-concept 0ms
+     × A product · search-completed-product 0ms
+     × C concept · search-completed-concept 0ms
+     × A product · backtest-available-product 0ms
+     × C concept · backtest-available-concept 0ms
+     × A product · paper-pending-product 0ms
+     × C concept · paper-pending-concept 0ms
+     × A product · paper-active-product 0ms
+     × C concept · paper-active-concept 0ms
+     × A product · stale-expired-approval-product 0ms
+     × C concept · stale-expired-approval-concept 0ms
+     × A product · multiple-approvals-product 0ms
+     × C concept · multiple-approvals-concept 0ms
+     × A product · prior-different-strategy-product 0ms
+     × C concept · prior-different-strategy-concept 0ms
+     × J correction · empty-correction 0ms
+     × J correction · search-planned-correction 0ms
+     × J correction · search-running-correction 0ms
+     × J correction · search-completed-correction 0ms
+     × J correction · backtest-available-correction 0ms
+     × J correction · paper-pending-correction 0ms
+     × B feature · empty-feature 0ms
+     × B feature · search-planned-feature 0ms
+     × B feature · search-running-feature 0ms
+     × B feature · search-completed-feature 0ms
+     × B feature · backtest-available-feature 0ms
+
+ Test Files  2 failed | 200 passed (202)
+      Tests  33 failed | 1499 passed (1532)
+   Start at  20:47:16
+   Duration  173.43s (transform 2.29s, setup 1.15s, import 9.63s, tests 138.48s, environment 12ms)
+

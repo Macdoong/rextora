@@ -1,0 +1,76 @@
+
+> rextora@0.1.0 test:e2e
+> playwright test
+
+[2m[WebServer] [22m(node:23680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+[2m[WebServer] [22m(node:23699) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 31 tests using 3 workers
+
+(node:23707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /dashboard with pre-live safety state (240ms)
+  ✓   3 [chromium] › tests/e2e/strategy-search-flow.spec.ts:432:7 › Strategy Search operator UI (intercepted API) › renders simplified page and Korean nav (286ms)
+  ✓   4 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /strategy-search with pre-live safety state (279ms)
+  ✓   6 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /results with pre-live safety state (227ms)
+  ✓   7 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /backtest with pre-live safety state (189ms)
+  ✓   8 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /paper-trading with pre-live safety state (209ms)
+  ✓   9 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /live-trading with pre-live safety state (162ms)
+  ✓  10 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /settings with pre-live safety state (195ms)
+  ✓   1 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /dashboard loads styled shell on direct entry (1.7s)
+  ✓  11 [chromium] › tests/e2e/rextora-smoke.spec.ts:45:7 › Rextora lifecycle smoke › sidebar has exactly seven primary nav items (263ms)
+  ✓   5 [chromium] › tests/e2e/strategy-search-flow.spec.ts:462:7 › Strategy Search operator UI (intercepted API) › create starts search, controls, status, qualified panel, Korean errors (1.5s)
+  ✓  13 [chromium] › tests/e2e/rextora-smoke.spec.ts:56:7 › Rextora lifecycle smoke › dashboard shows lifecycle sections and primary actions (175ms)
+  ✓  12 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /strategy-search loads styled shell on direct entry (1.1s)
+  ✓  15 [chromium] › tests/e2e/rextora-smoke.spec.ts:69:7 › Rextora lifecycle smoke › research form keeps expert section collapsed by default (1.3s)
+  ✓  17 [chromium] › tests/e2e/rextora-smoke.spec.ts:105:7 › Rextora lifecycle smoke › results page shows SAFE baseline and highlights (143ms)
+  ✓  16 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /results loads styled shell on direct entry (1.1s)
+  ✓  18 [chromium] › tests/e2e/rextora-smoke.spec.ts:118:7 › Rextora lifecycle smoke › results research history management controls are visible (1.5s)
+  ✓  19 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /backtest loads styled shell on direct entry (1.1s)
+  ✓  20 [chromium] › tests/e2e/rextora-smoke.spec.ts:136:7 › Rextora lifecycle smoke › live activation gates never auto-start live (130ms)
+  ✓  22 [chromium] › tests/e2e/rextora-smoke.spec.ts:144:7 › Rextora lifecycle smoke › settings includes system and expert sections (460ms)
+  ✓  23 [chromium] › tests/e2e/rextora-smoke.spec.ts:158:7 › Rextora lifecycle smoke › expert wizard remains available via query gate (127ms)
+  ✓  24 [chromium] › tests/e2e/rextora-smoke.spec.ts:166:7 › Rextora lifecycle smoke › legacy strategy-performance redirects to results (130ms)
+  ✓  25 [chromium] › tests/e2e/rextora-smoke.spec.ts:171:7 › Rextora lifecycle smoke › backtest page still runs (143ms)
+  ✓  21 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /paper-trading loads styled shell on direct entry (1.1s)
+  ✓  26 [chromium] › tests/e2e/rextora-smoke.spec.ts:183:7 › Rextora lifecycle smoke › paper feedback actions visible (122ms)
+  ✓  27 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /live-trading loads styled shell on direct entry (1.1s)
+  ✓  28 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /settings loads styled shell on direct entry (1.1s)
+  ✓  29 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:108:7 › Rextora shell styles (production) › client navigation between lifecycle routes keeps shell (2.1s)
+  ✓  14 [chromium] › tests/e2e/strategy-search-flow.spec.ts:533:7 › Strategy Search operator UI (intercepted API) › polling stops after terminal and keeps last detail on transient failure (10.6s)
+  ✓  30 [chromium] › tests/e2e/strategy-search-flow.spec.ts:583:7 › Strategy Search operator UI (intercepted API) › failed job shows failureMessage; exhausted shows operator label (257ms)
+  ✓  31 [chromium] › tests/e2e/strategy-search-flow.spec.ts:618:7 › Strategy Search operator UI (intercepted API) › catalog builder controls persist through intercepted create (2.9s)
+
+  31 passed (17.1s)
+real 17.70
+user 27.80
+sys 4.65
+           404291584  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              882173  page reclaims
+                8849  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+               33778  messages sent
+               14076  messages received
+                   0  signals received
+                2478  voluntary context switches
+              210419  involuntary context switches
+          1172403935  instructions retired
+           439993264  cycles elapsed
+            26643240  peak memory footprint

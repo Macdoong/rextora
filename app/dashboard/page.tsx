@@ -3,6 +3,7 @@ import { LifecycleDashboard } from "@/components/rextora/dashboard/LifecycleDash
 import { AgentPanel } from "@/components/rextora/agent/AgentPanel";
 import { FirstRunOnboarding } from "@/components/rextora/firstRun/FirstRunOnboarding";
 import { Suspense } from "react";
+import { ClientHydrated } from "@/components/rextora/ClientHydrated";
 
 export default function DashboardPage() {
   return (
@@ -17,7 +18,16 @@ export default function DashboardPage() {
       <Suspense fallback={null}>
         <FirstRunOnboarding />
       </Suspense>
-      <AgentPanel />
+      <ClientHydrated
+        fallback={
+          <div
+            className="min-h-48 rounded-xl border border-slate-800 bg-slate-950/30"
+            aria-label="AI 직원 대화 준비 중"
+          />
+        }
+      >
+        <AgentPanel shared />
+      </ClientHydrated>
       <LifecycleDashboard />
     </div>
   );

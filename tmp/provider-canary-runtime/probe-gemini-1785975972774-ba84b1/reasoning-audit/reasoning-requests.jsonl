@@ -1,0 +1,2 @@
+{"at":"2026-08-06T00:26:14.701Z","phase":"started","reasoningRequestId":"rr_msgrzdpp_y8rhuz","turnId":"provider-canary-1785975974661-gemini","providerAttempt":1,"provider":null,"model":null,"fallbackUsed":null,"latencyMs":null,"errorCategory":null}
+{"at":"2026-08-06T00:26:19.776Z","phase":"completed","reasoningRequestId":"rr_msgrzdpp_y8rhuz","turnId":"provider-canary-1785975974661-gemini","providerAttempt":1,"provider":"gemini","model":"gemini-2.5-flash","fallbackUsed":false,"latencyMs":5066,"errorCategory":null}

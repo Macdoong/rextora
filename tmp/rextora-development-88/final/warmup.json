@@ -1,0 +1,20 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 116941
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 913
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 722
+    }
+  ]
+}

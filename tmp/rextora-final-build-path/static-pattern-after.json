@@ -1,0 +1,21 @@
+{
+  "before": {
+    "historicalWarningRows": 80,
+    "aggregateMatchedFiles": 9238706,
+    "thresholdFileCount": 11,
+    "thresholdAggregateMatchedFiles": 7413784,
+    "thresholdAggregatePercent": 80.247
+  },
+  "after": {
+    "targetFilesStillDirectlyImportingNodeFs": [],
+    "targetedDirectBuiltinFsSitesEliminated": true,
+    "serverExternalPackageConfigured": true,
+    "adapterContainsDynamicPathExpression": false,
+    "adapterExportsExactNodeFs": true,
+    "targetedHistoricalMatchesRemaining": 0,
+    "projectedAggregateMatchesRemainingFromHistoricalRows": 1824922,
+    "projectedReductionPercent": 80.247
+  },
+  "method": "Deterministic source-boundary check against the exact source files/rows in the preserved historical warning set; projected aggregate retains non-target warning rows and does not claim a fresh compiler warning count.",
+  "positiveForSecondBuild": true
+}

@@ -1,0 +1,130 @@
+
+Running 4 tests using 1 worker
+
+(node:41443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (3.0m)
+(node:41634) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41634) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (40.5s)
+(node:41684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (3.0m)
+(node:41913) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41913) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (3.0m)
+
+
+  1) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    Error: expected_idempotent_execution:{"mode":"CLARIFY_REFERENCE"}
+
+       at helpers.ts:229
+
+      227 |     er?.alreadyExecuted === true || er?.executionStatus === "skipped_idempotent";
+      228 |   if (!idempotent) {
+    > 229 |     throw new Error(
+          |           ^
+      230 |       `expected_idempotent_execution:${JSON.stringify({
+      231 |         mode: body.conversationRoute?.mode,
+      232 |         alreadyExecuted: er?.alreadyExecuted,
+        at expectIdempotentExecution (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:229:11)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:308:32)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    Error: page.evaluate: Target page, context or browser has been closed
+
+       at helpers.ts:257
+
+      255 |
+      256 | export async function assertNoHorizontalOverflow(page: Page): Promise<boolean> {
+    > 257 |   return page.evaluate(
+          |               ^
+      258 |     () => document.documentElement.scrollWidth <= window.innerWidth + 2,
+      259 |   );
+      260 | }
+        at assertNoHorizontalOverflow (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:257:15)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:378:46)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 

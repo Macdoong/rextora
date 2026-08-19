@@ -1,0 +1,78 @@
+{
+  "verifiedAt": "2026-08-19T10:25:46Z",
+  "authoritativeRun": "matrix-r2",
+  "invalidAttempt": {
+    "reason": "TEST_STATE_DEFECT",
+    "detail": "First matrix attempt failed dev_warm_gate_failed because production server was not persistent (port 3000 unreachable). Not counted toward final result.",
+    "evidence": "tmp/rextora-final-production-88/matrix.stdout.txt"
+  },
+  "branch": "main",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "sourceFingerprint": "4535d8559732c721cd895408c9f908bc2637363dbc73304d31ca118fe8a69423",
+  "BUILD_ID": "j4lAiIKoy4ofnQNdt2mFF",
+  "registry": {
+    "scenarioCount": 22,
+    "viewportCount": 4,
+    "expectedRows": 88,
+    "missingScenarioIds": [],
+    "duplicateScenarioIds": [],
+    "missingViewports": []
+  },
+  "matrix": {
+    "expectedRows": 88,
+    "executedRows": 88,
+    "passedRows": 88,
+    "failedRows": 0,
+    "skippedRows": 0,
+    "retryCount": 0,
+    "workers": 1,
+    "byViewport": {
+      "390": { "passed": 22, "failed": 0 },
+      "768": { "passed": 22, "failed": 0 },
+      "1024": { "passed": 22, "failed": 0 },
+      "1440": { "passed": 22, "failed": 0 }
+    },
+    "durationSeconds": 2405,
+    "durationHuman": "40.1m",
+    "exitCode": 0
+  },
+  "scenarioCoverage": {
+    "openAI": "PASS (scenarios 01,03,05-10,14-17,22 × 4 viewports)",
+    "gemini": "PASS (scenarios 02,04,11,12 × 4 viewports)",
+    "approvalExactlyOnce": "PASS (scenario 16 × 4 viewports)",
+    "approvalResurrectionProtection": "PASS (scenario 16 idempotent repeat × 4 viewports)",
+    "executionReporting": "PASS (scenario 17 × 4 viewports)",
+    "paperBehavior": "PASS indirect (scenarios 07-10 agent guidance references 모의/백테스트; no dedicated paper.prepare row in production-88)",
+    "liveRefusal": "PASS (scenario 20 × 4 viewports)",
+    "safeRefusal": "PASS (scenario 21 × 4 viewports)"
+  },
+  "aggregates": {
+    "secretLeakCount": 0,
+    "rawLeakCount": 0,
+    "duplicateExecutionCount": 0,
+    "unintendedWriteCount": 0,
+    "malformedJsonCount": 0,
+    "ChunkLoadErrorCount": 0,
+    "hydrationErrorCount": 0,
+    "HTTP5xxCount": 0,
+    "unexpectedCriticalConsoleErrorCount": 0,
+    "realOrderCount": 0,
+    "liveActivationCount": 0
+  },
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiffEmpty": true,
+    "safeMutationCount": 0
+  },
+  "evidence": {
+    "stdout": "tmp/rextora-final-production-88/matrix-r2.stdout.txt",
+    "summary": "tmp/rextora-final-production-88/summary.json",
+    "playwrightJson": "tmp/rextora-deployment-release/browser-production/results.json",
+    "serverLog": "tmp/rextora-final-production-88/server.log",
+    "runtimeDataDir": "tmp/rextora-final-production-88/runtime-data-dir.txt"
+  },
+  "verdict": "REXTORA FINAL PRODUCTION 88 VERIFIED",
+  "remainingBlocker": "Standard E2E (31 tests) not executed on BUILD_ID j4lAiIKoy4ofnQNdt2mFF"
+}

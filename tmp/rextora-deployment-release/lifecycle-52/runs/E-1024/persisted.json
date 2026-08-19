@@ -1,0 +1,136 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "paper.prepare",
+      "sessionId": "agent_c0d117ae296e4d5e",
+      "arguments": {
+        "strategyId": "SAFE_v44_i4060",
+        "symbol": null
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "pending_approval"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-14T07:46:17.009Z",
+      "approvalId": "pa_045fef3b0eaf299d"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T07:45:37.627Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssn78t7_jfaak2",
+      "turnId": "turn-1786693537612",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:46:16.062Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssn78t7_jfaak2",
+      "turnId": "turn-1786693537612",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 38428,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T07:46:17.013Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssn8379_7ndrxa",
+      "turnId": "turn-1786693576999",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:46:17.013Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssn8379_7ndrxa",
+      "turnId": "turn-1786693576999",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssn77wn_11d9bc.chart.json",
+    "bt_mssn77wn_11d9bc.json",
+    "index.json"
+  ],
+  "paperFiles": [
+    "index.json",
+    "paper_54be0ed0-74d1-459e-9614-788931d64a76.json"
+  ],
+  "memory": [
+    {
+      "sessionId": "agent_c0d117ae296e4d5e",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 모의매매 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_5ef57a960814429c9c61"
+        }
+      ],
+      "verifiedAt": "2026-08-14T07:46:17.011Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_045fef3b0eaf299d",
+        "meaningfulHash": "aa13cee3650d9ff236164dc8"
+      },
+      "memoryId": "memory_7b86cec0a823d7638768"
+    },
+    {
+      "sessionId": "agent_c0d117ae296e4d5e",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_5ef57a960814429c9c61"
+        }
+      ],
+      "verifiedAt": "2026-08-14T07:46:17.011Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_045fef3b0eaf299d",
+        "meaningfulHash": "aa13cee3650d9ff236164dc8"
+      },
+      "memoryId": "memory_0e1a87e2cbc41c098dba"
+    }
+  ],
+  "sessionFiles": [
+    "agent_c0d117ae296e4d5e"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "segments": [
+    {
+      "viewport": "390",
+      "batch": "s01-11",
+      "exitCode": 0,
+      "durationMs": 561978,
+      "stdoutPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s01-11.stdout.txt",
+      "stderrPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s01-11.stderr.txt",
+      "resultPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s01-11-result.json",
+      "modelsErrors": [
+        {
+          "viewport": "390",
+          "batch": "s01-11",
+          "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+          "timestamp": "2026-08-11T20:37:03.549Z"
+        },
+        {
+          "viewport": "390",
+          "batch": "s01-11",
+          "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+          "timestamp": "2026-08-11T20:37:03.550Z"
+        }
+      ]
+    },
+    {
+      "viewport": "390",
+      "batch": "s12-16",
+      "exitCode": 0,
+      "durationMs": 499861,
+      "stdoutPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s12-16.stdout.txt",
+      "stderrPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s12-16.stderr.txt",
+      "resultPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s12-16-result.json",
+      "modelsErrors": [
+        {
+          "viewport": "390",
+          "batch": "s12-16",
+          "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+          "timestamp": "2026-08-11T20:45:25.469Z"
+        }
+      ]
+    },
+    {
+      "viewport": "390",
+      "batch": "s17-22",
+      "exitCode": 1,
+      "durationMs": 591815,
+      "stdoutPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s17-22.stdout.txt",
+      "stderrPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s17-22.stderr.txt",
+      "resultPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-release-completion/development/matrix-390-s17-22-result.json",
+      "modelsErrors": []
+    }
+  ],
+  "allModelsErrors": [
+    {
+      "viewport": "390",
+      "batch": "s01-11",
+      "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+      "timestamp": "2026-08-11T20:37:03.549Z"
+    },
+    {
+      "viewport": "390",
+      "batch": "s01-11",
+      "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+      "timestamp": "2026-08-11T20:37:03.550Z"
+    },
+    {
+      "viewport": "390",
+      "batch": "s12-16",
+      "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+      "timestamp": "2026-08-11T20:45:25.469Z"
+    }
+  ],
+  "stoppedEarly": "390-s17-22"
+}

@@ -1,0 +1,16 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationFirstApi.test.ts tests/agentCommercialUx.test.ts tests/agentConversationalEmployee.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/agentConversationalEmployee.test.ts (17 tests | 2 failed) 27ms
+     × returns conclusion + explanation + one action, hides IDs in prose 12ms
+     × resolves multi-turn pending navigation without fabrication 3ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 28 passed (30)
+   Start at  23:04:13
+   Duration  1.59s (transform 809ms, setup 36ms, import 1.06s, tests 53ms, environment 0ms)
+

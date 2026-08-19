@@ -1,0 +1,57 @@
+{
+  "sessionId": "agent_f3588b9227034383",
+  "schemaVersion": 1,
+  "createdAt": "2026-08-13T12:17:07.075Z",
+  "updatedAt": "2026-08-13T12:17:07.489Z",
+  "pendingApproval": null,
+  "entityMemory": null,
+  "currentLifecycle": null,
+  "missionTimeline": {
+    "currentObjectiveKo": "현재 연구 상태를 확인하고 다음 단계를 준비합니다.",
+    "completed": [],
+    "pending": [
+      {
+        "id": "pending-orient",
+        "labelKo": "현재 연구 상태 확인",
+        "status": "pending",
+        "href": "/dashboard"
+      }
+    ],
+    "pendingApprovals": [],
+    "nextRecommendation": {
+      "id": "next-pending-orient",
+      "labelKo": "현재 연구 상태 확인",
+      "status": "next",
+      "href": "/dashboard"
+    },
+    "lifecycleStage": null,
+    "lifecycleLabelKo": "상태 확인 중",
+    "blockersKo": [
+      "실전 주문 · SAFE 수정 · 자동 실행"
+    ],
+    "whyRecommendedKo": null,
+    "whyRejectedKo": null,
+    "whyWaitingKo": null,
+    "progressPct": 5,
+    "updatedAt": "2026-08-13T12:17:07.085Z"
+  },
+  "taskQueueSummary": {
+    "pendingCommandCount": 0,
+    "activeJobId": null,
+    "lastCommandId": null,
+    "summaryKo": null
+  },
+  "reasoningContext": {
+    "lastIntentType": null,
+    "lastGoal": null,
+    "pinnedObjectiveKo": null,
+    "followUpKind": null,
+    "currentTopic": null,
+    "previousTopic": null,
+    "clarificationState": "none",
+    "conversationalConfidence": 0,
+    "updatedAt": "2026-08-13T12:17:07.487Z"
+  },
+  "lastExecution": null,
+  "lastRecommendation": null
+}

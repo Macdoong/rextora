@@ -16,9 +16,53 @@ import type {
 } from "./types";
 import { buildScopeFromContext } from "./agentDataFetcher";
 import { filterSafeActions } from "./safetyGuard";
+import {
+  buildDecisionContext,
+  type DecisionContext,
+} from "./decisionContext";
+import {
+  emptyEntityMemory,
+  mergeEntityMemory,
+  stripInternalIdsFromProse,
+  type ConversationEntityMemory,
+} from "./conversationContext";
+import {
+  proposedActionToCardAction,
+  proposedFromAgentAction,
+  type ProposedAction,
+} from "./proposedAction";
+import type { AgentPlanDraft } from "./planDrafts";
+import {
+  inferLifecycleStage,
+  lifecycleObjectiveKo,
+  type PipelineLifecycleStage,
+} from "./lifecycleStage";
+import type { ResearchWorkspaceSummary } from "./researchWorkspace";
+import {
+  advanceConversationState,
+  type ConversationWorkingState,
+} from "./conversationState";
+import type { AgentGoal } from "./goalDetector";
+import { buildMissionTimeline } from "./missionTimeline";
 
 function factValue(facts: FactItem[], label: string): string | undefined {
   return facts.find((f) => f.labelKo === label)?.value;
+}
+
+/** ID-like fact values must never persist Korean/English absence sentinels. */
+function factIdValue(facts: FactItem[], label: string): string | null {
+  const value = factValue(facts, label)?.trim();
+  if (!value) return null;
+  if (
+    value === "없음" ||
+    value === "null" ||
+    value === "undefined" ||
+    value === "None" ||
+    value === "-"
+  ) {
+    return null;
+  }
+  return value;
 }
 
 // ─── Interpretation generators ────────────────────────────────────────────────
@@ -351,16 +395,64 @@ function buildDemoOverviewInterpretation(facts: FactItem[]): string {
 function buildUnknownInterpretation(): string {
   return [
     "질문을 이해하지 못했습니다. 다음과 같은 방식으로 질문해 보세요:",
-    "• 탐색 상태 알려줘",
+    "• 지금 뭘 해야 해",
+    "• 새로운 전략 탐색해",
     "• 최근 백테스트 결과 보여줘",
     "• SAFE 전략 설명해줘",
-    "• BTC와 ETH 전략 비교",
+    "• BTC와 ETH 중 뭐가 더 좋아",
     "• Paper 시작해줘",
-    "• 실패한 탐색 원인 설명해줘",
-    "• 지금 뭘 해야 해",
-    "• 데모 보여줘",
-    "• 다음에 뭐 해야 해",
   ].join("\n");
+}
+
+function buildFollowUpWhyInterpretation(
+  facts: FactItem[],
+  entities?: ConversationEntityMemory | null,
+): string {
+  return buildDecisionContext("follow_up_why", facts, entities).explanationKo;
+}
+
+function buildApprovePendingInterpretation(
+  facts: FactItem[],
+  entities?: ConversationEntityMemory | null,
+): string {
+  return buildDecisionContext("approve_pending", facts, entities).explanationKo;
+}
+
+function buildPrepareSearchPlanInterpretation(facts: FactItem[]): string {
+  return buildDecisionContext("prepare_search_plan", facts).explanationKo;
+}
+
+function followUpsForIntent(intentType: string): string[] {
+  switch (intentType) {
+    case "first_run_help":
+    case "recommend_next":
+    case "workspace_status":
+    case "continue_session":
+      return ["왜 추천했어?", "왜 기다리는 거야?", "그럼 진행해"];
+    case "prepare_search_plan":
+    case "prepare_backtest_plan":
+    case "prepare_paper_plan":
+      return ["왜 추천했어?", "지금 승인하면?", "취소"];
+    case "compare_strategies":
+      return ["왜 추천했어?", "백테스트 열어줘", "그럼 진행해"];
+    case "paper_start_request":
+      return ["왜 추천했어?", "진행해", "왜 기다리는 거야?"];
+    case "paper_status":
+      return ["모의매매와 백테스트 차이는?", "현재 승인 대기는?", "위험은 뭐야?"];
+    case "approve_pending":
+      return ["이어서 하자", "다음 단계는?"];
+    case "explain_approval":
+    case "explain_waiting":
+      return ["그럼 진행해", "취소", "왜 추천했어?"];
+    case "explain_rejection":
+      return ["다음 단계는?", "다른 후보 보여줘", "왜?"];
+    case "cancel_pending":
+      return ["이어서 하자", "탐색 계획 준비해", "연구 현황 알려줘"];
+    case "research_workspace":
+      return ["이어서 하자", "왜 추천했어?", "왜 기다리는 거야?"];
+    default:
+      return ["이어서 하자", "왜 추천했어?", "그럼 진행해"];
+  }
 }
 
 export function buildRecommendedActionKo(
@@ -377,6 +469,8 @@ export function buildRecommendedActionKo(
       );
     case "paper_start_request":
       return "모의매매 화면을 열고 승인 후 시작하세요.";
+    case "paper_status":
+      return "모의매매 화면에서 저장된 상태를 확인하세요.";
     case "search_failure_explanation":
       return "전략 탐색 페이지에서 실패 작업을 확인하세요.";
     case "compare_strategies": {
@@ -393,6 +487,28 @@ export function buildRecommendedActionKo(
       return "백테스트 페이지에서 증거를 상세 검토하세요.";
     case "explain_strategy":
       return "전략 목록에서 대상 전략을 확인하세요.";
+    case "prepare_search_plan":
+      return "탐색 계획 검토";
+    case "prepare_backtest_plan":
+      return "백테스트 계획 검토";
+    case "prepare_paper_plan":
+      return "모의매매 계획 검토";
+    case "research_workspace":
+      return factValue(facts, "권장 다음 작업") ?? "연구 현황 다음 단계";
+    case "workspace_status":
+      return "대시보드에서 현재 상태를 확인하세요.";
+    case "follow_up_why":
+      return factValue(facts, "권장 다음 작업") ?? "직전 권장을 유지하세요.";
+    case "approve_pending":
+      return (
+        factValue(facts, "결과 참조") ??
+        factValue(facts, "실행 상태") ??
+        "승인된 명령을 처리했습니다."
+      );
+    case "explain_approval":
+      return factValue(facts, "권장 다음 작업") ?? "계획 검토";
+    case "cancel_pending":
+      return "원하는 다음 작업을 말씀해 주세요.";
     default:
       return "대시보드에서 현재 파이프라인 상태를 확인하세요.";
   }
@@ -457,7 +573,15 @@ function actionsForIntent(intentType: string, facts: FactItem[]): AgentAction[] 
         labelKo: "백테스트 열기",
         descriptionKo: "저장된 실행과 차트 증거를 확인합니다.",
         href: "/backtest",
-        requiresApproval: true,
+        requiresApproval: false,
+      });
+    case "paper_status":
+      return singleAction({
+        type: "open_paper",
+        labelKo: "모의매매 상태 보기",
+        descriptionKo: "저장된 모의매매 세션 상태를 확인합니다.",
+        href: "/paper-trading",
+        requiresApproval: false,
       });
     case "paper_start_request": {
       const strategyId = factValue(facts, "후보 전략 ID");
@@ -475,12 +599,13 @@ function actionsForIntent(intentType: string, facts: FactItem[]): AgentAction[] 
     }
     case "recommend_next":
     case "first_run_help":
-    case "demo_overview": {
+    case "demo_overview":
+    case "continue_session":
+    case "follow_up_why":
+    case "explain_waiting": {
       const href = factValue(facts, "권장 이동 경로") ?? "/dashboard";
       const label = factValue(facts, "권장 다음 작업") ?? "다음 단계 열기";
       const key = factValue(facts, "권장 작업 키") ?? "navigate";
-      const secondaryLabel = factValue(facts, "보조 작업");
-      const secondaryHref = factValue(facts, "보조 이동 경로");
       const type: AgentAction["type"] =
         key === "open_paper"
           ? "open_paper"
@@ -491,34 +616,66 @@ function actionsForIntent(intentType: string, facts: FactItem[]): AgentAction[] 
               : key === "view_recommendation" || key === "view_results"
                 ? "view_results"
                 : "navigate";
-      const primary: AgentAction = {
+      return singleAction({
         type,
         labelKo: label,
         descriptionKo: factValue(facts, "권장 사유"),
         href,
         requiresApproval:
           href.includes("/paper-trading") || href.includes("/backtest"),
-      };
-      if (
-        secondaryLabel &&
-        secondaryHref &&
-        (intentType === "first_run_help" ||
-          intentType === "demo_overview" ||
-          factValue(facts, "최초 실행 모드") === "EMPTY" ||
-          factValue(facts, "최초 실행 모드") === "DEMO_AVAILABLE")
-      ) {
-        return [
-          primary,
-          {
-            type: "open_search",
-            labelKo: secondaryLabel,
-            descriptionKo: "가짜 데이터 없이 Strategy Search로 이동합니다.",
-            href: secondaryHref,
-            requiresApproval: false,
-          },
-        ];
-      }
-      return singleAction(primary);
+      });
+    }
+    case "prepare_search_plan":
+      return singleAction({
+        type: "open_search",
+        labelKo: "계획 검토",
+        descriptionKo:
+          "탐색 계획 초안을 엽니다. 에이전트는 탐색을 자동 시작하지 않습니다.",
+        href: factValue(facts, "권장 이동 경로") ?? "/strategy-search",
+        requiresApproval: true,
+      });
+    case "prepare_backtest_plan":
+      return singleAction({
+        type: "open_backtest",
+        labelKo: "백테스트 계획 검토",
+        descriptionKo:
+          "백테스트 화면을 엽니다. 에이전트는 자동 실행하지 않습니다.",
+        href: factValue(facts, "권장 이동 경로") ?? "/backtest",
+        requiresApproval: true,
+      });
+    case "prepare_paper_plan":
+      return singleAction({
+        type: "open_paper",
+        labelKo: "모의매매 계획 검토",
+        descriptionKo:
+          "모의매매 화면을 엽니다. 세션 시작은 사용자가 승인합니다.",
+        href: factValue(facts, "권장 이동 경로") ?? "/paper-trading",
+        requiresApproval: true,
+      });
+    case "research_workspace": {
+      const href = factValue(facts, "권장 이동 경로") ?? "/dashboard";
+      return singleAction({
+        type: "navigate",
+        labelKo: factValue(facts, "권장 다음 작업") ?? "다음 단계 열기",
+        descriptionKo: factValue(facts, "권장 사유"),
+        href,
+        requiresApproval:
+          href.includes("/paper-trading") || href.includes("/backtest"),
+      });
+    }
+    case "cancel_pending":
+      return [];
+    case "explain_approval": {
+      const href = factValue(facts, "권장 이동 경로");
+      if (!href) return [];
+      return singleAction({
+        type: "navigate",
+        labelKo: factValue(facts, "권장 다음 작업") ?? "계획 검토",
+        descriptionKo:
+          "화면만 열립니다. 엔진은 자동 실행되지 않습니다.",
+        href,
+        requiresApproval: true,
+      });
     }
     default:
       return [];
@@ -532,22 +689,26 @@ function resolveScope(
 ): AgentScope {
   return buildScopeFromContext(context, {
     strategyId:
-      factValue(facts, "후보 전략 ID") ??
-      factValue(facts, "전략 ID") ??
-      factValue(facts, "SAFE 전략 ID") ??
+      factIdValue(facts, "후보 전략 ID") ??
+      factIdValue(facts, "전략 ID") ??
+      factIdValue(facts, "SAFE 전략 ID") ??
       null,
-    runId: factValue(facts, "최근 실행 ID") ?? factValue(facts, "관련 백테스트") ?? null,
+    runId:
+      factIdValue(facts, "최근 실행 ID") ??
+      factIdValue(facts, "관련 백테스트") ??
+      null,
     jobId:
-      factValue(facts, "탐색 작업 ID") ??
-      factValue(facts, "최근 작업 ID") ??
+      factIdValue(facts, "작업 ID") ??
+      factIdValue(facts, "탐색 작업 ID") ??
+      factIdValue(facts, "최근 작업 ID") ??
       null,
     symbol:
-      factValue(facts, "심볼") ??
-      factValue(facts, "비교 심볼 A") ??
-      factValue(facts, "최근 작업 심볼") ??
+      factIdValue(facts, "심볼") ??
+      factIdValue(facts, "비교 심볼 A") ??
+      factIdValue(facts, "최근 작업 심볼") ??
       null,
-    timeframe: factValue(facts, "타임프레임") ?? null,
-    paperSessionId: factValue(facts, "활성 Paper 세션") ?? null,
+    timeframe: factIdValue(facts, "타임프레임"),
+    paperSessionId: factIdValue(facts, "활성 Paper 세션"),
   });
 }
 
@@ -556,6 +717,7 @@ function resolveScope(
 export function buildLocalInterpretation(
   intent: AgentIntent,
   facts: FactItem[],
+  entities?: ConversationEntityMemory | null,
 ): string {
   switch (intent.type) {
     case "search_status":
@@ -572,19 +734,67 @@ export function buildLocalInterpretation(
       return buildRiskSummaryInterpretation(facts);
     case "market_status":
       return buildMarketStatusInterpretation();
+    case "paper_status":
     case "paper_start_request":
       return buildPaperStartInterpretation(facts);
     case "search_failure_explanation":
       return buildSearchFailureInterpretation(facts);
+    case "workspace_status":
     case "recommend_next":
       return buildRecommendNextInterpretation(facts);
     case "first_run_help":
       return buildFirstRunInterpretation(facts);
     case "demo_overview":
       return buildDemoOverviewInterpretation(facts);
+    case "follow_up_why":
+      return buildFollowUpWhyInterpretation(facts, entities);
+    case "explain_approval":
+      return buildDecisionContext("explain_approval", facts, entities)
+        .explanationKo;
+    case "explain_waiting":
+      return buildDecisionContext("explain_waiting", facts, entities)
+        .explanationKo;
+    case "continue_session":
+      return buildDecisionContext("continue_session", facts, entities)
+        .explanationKo;
+    case "approve_pending":
+      return buildApprovePendingInterpretation(facts, entities);
+    case "cancel_pending":
+      return entities?.pendingPlan || entities?.pendingProposedAction
+        ? "대기 중이던 계획을 취소했습니다. 엔진은 시작되지 않았습니다."
+        : "취소할 대기 계획이 없습니다.";
+    case "prepare_search_plan":
+      return buildPrepareSearchPlanInterpretation(facts);
+    case "prepare_backtest_plan":
+      return "백테스트 계획 초안을 준비했습니다. 자동 실행하지 않습니다.";
+    case "prepare_paper_plan":
+      return buildPaperStartInterpretation(facts);
+    case "research_workspace":
+      return buildRecommendNextInterpretation(facts);
     default:
       return buildUnknownInterpretation();
   }
+}
+
+function primaryActionOnly(actions: AgentAction[]): AgentAction[] {
+  return actions.slice(0, 1);
+}
+
+function resolveProposedAction(
+  intentType: string,
+  actions: AgentAction[],
+  scope: AgentScope,
+  decision: DecisionContext,
+  explicit?: ProposedAction | null,
+): ProposedAction | null {
+  if (explicit) return explicit;
+  if (intentType === "approve_pending") return null;
+  if (intentType === "explain_approval") return explicit ?? null;
+  const primary = actions[0];
+  if (!primary) return null;
+  return proposedFromAgentAction(primary, scope, {
+    recommendedActionKo: decision.recommendedActionKo,
+  });
 }
 
 // ─── Main builder ─────────────────────────────────────────────────────────────
@@ -598,24 +808,221 @@ export function buildAgentResponse(
     providerMeta?: ProviderMeta;
   },
   context?: AgentLifecycleContext | null,
+  options?: {
+    entities?: ConversationEntityMemory | null;
+    explicitProposedAction?: ProposedAction | null;
+    explicitPlan?: AgentPlanDraft | null;
+    workspace?: ResearchWorkspaceSummary | null;
+    safetyBlocked?: boolean;
+    safetyReasonKo?: string;
+    goal?: AgentGoal | null;
+    priorWorkingState?: ConversationWorkingState | null;
+    decisionOverride?: Partial<DecisionContext> | null;
+  },
 ): AgentResponse {
-  const interpretationKo =
-    llm?.interpretationKo ?? buildLocalInterpretation(intent, facts);
+  const entities = options?.entities ?? emptyEntityMemory();
+  const decision = {
+    ...buildDecisionContext(intent.type, facts, entities),
+    ...(options?.decisionOverride ?? {}),
+  };
+
   const interpretationSource: InterpretationSource = llm?.source ?? "local";
 
-  const rawActions = actionsForIntent(intent.type, facts);
-  const actions = filterSafeActions(rawActions);
+  const conclusionKo = stripInternalIdsFromProse(decision.conclusionKo);
+  const explanationKo = stripInternalIdsFromProse(decision.explanationKo);
+  const interpretationKo = stripInternalIdsFromProse(
+    `${conclusionKo}\n\n${explanationKo}`,
+  );
+
+  // Prefer decision prose; keep LLM text only when it doesn't inject IDs
+  // and local decision already carries the judgment structure.
+  const llmClean = llm?.interpretationKo
+    ? stripInternalIdsFromProse(llm.interpretationKo)
+    : null;
+  const finalInterpretation =
+    llmClean && llmClean.length > 20 && interpretationSource === "llm"
+      ? `${conclusionKo}\n\n${explanationKo}`
+      : interpretationKo;
+
+  const planIntent =
+    intent.type === "prepare_search_plan" ||
+    intent.type === "prepare_backtest_plan" ||
+    intent.type === "prepare_paper_plan" ||
+    intent.type === "research_workspace";
+
+  let rawActions =
+    (intent.type === "approve_pending" ||
+      intent.type === "follow_up_why" ||
+      intent.type === "explain_approval" ||
+      intent.type === "explain_waiting" ||
+      intent.type === "continue_session") &&
+    entities.pendingProposedAction
+      ? [proposedActionToCardAction(entities.pendingProposedAction)]
+      : planIntent && options?.explicitProposedAction
+        ? [proposedActionToCardAction(options.explicitProposedAction)]
+        : actionsForIntent(intent.type, facts);
+
+  if (options?.safetyBlocked || intent.type === "cancel_pending") {
+    rawActions = [];
+  }
+
+  const actions = primaryActionOnly(filterSafeActions(rawActions));
+  const scope = resolveScope(intent, facts, context);
+  const preserveConversationEntity = [
+    "continue_session",
+    "approve_pending",
+    "search_status",
+    "workspace_status",
+    "search_pause_request",
+    "search_resume_request",
+    "paper_start_request",
+    "paper_pause_request",
+    "paper_resume_request",
+    "paper_stop_request",
+  ].includes(intent.type);
+  const explicitProposed =
+    options && "explicitProposedAction" in options
+      ? (options.explicitProposedAction ?? null)
+      : intent.type === "approve_pending" ||
+          intent.type === "follow_up_why" ||
+          intent.type === "explain_approval" ||
+          intent.type === "explain_waiting" ||
+          intent.type === "continue_session"
+        ? entities.pendingProposedAction
+        : null;
+  const proposedAction =
+    options?.safetyBlocked || intent.type === "cancel_pending"
+      ? null
+      : resolveProposedAction(
+          intent.type,
+          actions,
+          scope,
+          decision,
+          explicitProposed,
+        );
+
+  // Prefer explicitPlan when provided (including null after typed-command execute).
+  const plan: AgentPlanDraft | null =
+    options?.safetyBlocked || intent.type === "cancel_pending"
+      ? null
+      : options && "explicitPlan" in options
+        ? (options.explicitPlan ?? null)
+        : (entities.pendingPlan ?? null);
+
+  const lifecycleStage: PipelineLifecycleStage =
+    options?.workspace?.stage ?? inferLifecycleStage(facts);
+  const pinnedObjectiveKo =
+    options?.workspace?.nextMilestoneKo ??
+    lifecycleObjectiveKo(lifecycleStage);
+
+  const nextPending =
+    intent.type === "cancel_pending" || intent.type === "approve_pending"
+      ? null
+      : proposedAction;
+  const nextPlan =
+    options?.safetyBlocked || intent.type === "cancel_pending"
+      ? null
+      : planIntent
+        ? plan
+        : intent.type === "approve_pending"
+          ? plan
+          : plan ?? entities.pendingPlan;
+
+  const entityMemory = mergeEntityMemory(entities, context, {
+    strategyId: preserveConversationEntity
+      ? entities.strategyId ?? scope.strategyId
+      : scope.strategyId ?? entities.strategyId,
+    strategyLabel: entities.strategyLabel,
+    jobId: preserveConversationEntity
+      ? entities.jobId ?? scope.jobId
+      : scope.jobId ?? entities.jobId,
+    runId: scope.runId ?? entities.runId,
+    symbol: scope.symbol ?? entities.symbol,
+    timeframe: scope.timeframe ?? entities.timeframe,
+    paperSessionId: preserveConversationEntity
+      ? entities.paperSessionId ?? scope.paperSessionId
+      : scope.paperSessionId ?? entities.paperSessionId,
+    lifecycleStage: lifecycleStage,
+    previousRecommendation: decision.recommendedActionKo,
+    previousConclusion: conclusionKo,
+    previousReason: explanationKo,
+    pendingProposedAction: nextPending,
+    pendingPlan: nextPlan,
+    pinnedObjectiveKo,
+    pipelineStage: lifecycleStage,
+  });
+
+  // Ensure empty evidence has an explicit operator-facing note
+  const factsOut =
+    facts.length === 0
+      ? [
+          {
+            labelKo: "검증된 증거",
+            value: "검증된 증거가 없습니다.",
+            source: "system_status" as const,
+            fetchedAt: new Date().toISOString(),
+          },
+        ]
+      : facts;
+
+  const goal = options?.goal ?? null;
+  const conversationState = advanceConversationState({
+    prior: options?.priorWorkingState,
+    goal: goal ?? "recommend_next",
+    lifecycleStage,
+    entities: entityMemory,
+    plan: nextPlan,
+    proposedAction: nextPending,
+    objectiveKo: pinnedObjectiveKo,
+    conclusionKo,
+    explanationKo,
+    recommendationKo: decision.recommendedActionKo,
+  });
+
+  const missionTimeline = buildMissionTimeline({
+    entities: entityMemory,
+    workspace: options?.workspace ?? null,
+    workingState: conversationState,
+    pendingAction: nextPending,
+    pendingPlan: nextPlan,
+  });
 
   return {
     intentType: intent.type,
-    facts,
-    interpretationKo,
-    recommendedActionKo: buildRecommendedActionKo(intent.type, facts),
+    conclusionKo,
+    explanationKo,
+    facts: factsOut,
+    interpretationKo: finalInterpretation,
+    recommendedActionKo: stripInternalIdsFromProse(decision.recommendedActionKo),
     interpretationSource,
     providerMeta: llm?.providerMeta,
     actions,
-    scope: resolveScope(intent, facts, context),
-    safetyBlocked: false,
+    proposedAction,
+    plan: nextPlan,
+    decision: {
+      situationKo: decision.situationKo,
+      meaningKo: decision.meaningKo,
+      whyMattersKo: decision.whyMattersKo,
+      recommendedActionKo: decision.recommendedActionKo,
+      whyBetterThanAlternativesKo: decision.whyBetterThanAlternativesKo,
+      uncertaintyKo: decision.uncertaintyKo,
+      conclusionKo: decision.conclusionKo,
+      explanationKo: decision.explanationKo,
+      evidenceKeys: decision.evidenceKeys,
+    },
+    lifecycleStage,
+    pinnedObjectiveKo,
+    workspace: options?.workspace ?? null,
+    entityMemory,
+    scope,
+    safetyBlocked: options?.safetyBlocked === true,
+    safetyReasonKo: options?.safetyReasonKo,
     respondedAt: new Date().toISOString(),
+    followUpSuggestions: followUpsForIntent(intent.type),
+    conversationState,
+    goal,
+    missionTimeline,
   };
 }
+
+export { buildDecisionContext };

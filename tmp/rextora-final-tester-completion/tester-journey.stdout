@@ -1,0 +1,30 @@
+
+Running 1 test using 1 worker
+
+(node:808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey (2.5m)
+
+
+  1) tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m1[39m
+    Received: [31m0[39m
+
+      88 |   const jobsAfterBody = await jobsAfterResponse.json();
+      89 |   const jobsAfter = Array.isArray(jobsAfterBody.jobs) ? jobsAfterBody.jobs.length : 0;
+    > 90 |   expect(jobsAfter).toBe(jobsBefore + 1);
+         |                     ^
+      91 |   const repeated = await sendAgentQueryAwaitResponse(page, "진행해");
+      92 |   expectIdempotentExecution(repeated.body);
+      93 |   const executionReport = await sendAgentQueryAwaitResponse(page, "방금 실제로 뭘 했어?");
+        at /Users/macdoong/Documents/Rextora/tmp/rextora-final-tester-completion/tester-journey.spec.ts:90:21
+
+    Error Context: test-results/tester-journey-concise-actual-production-tester-journey/error-context.md
+
+  1 failed
+    tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey 

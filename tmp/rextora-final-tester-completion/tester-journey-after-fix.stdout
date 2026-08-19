@@ -1,0 +1,27 @@
+
+Running 1 test using 1 worker
+
+(node:2026) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2026) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tmp/rextora-final-tester-completion/tester-journey.pw.ts:24:5 › concise actual production tester journey (2.1m)
+
+
+  1) tmp/rextora-final-tester-completion/tester-journey.pw.ts:24:5 › concise actual production tester journey 
+
+    TypeError: Cannot read properties of undefined (reading 'status')
+
+      127 |   const paperStartBody = await paperStartResponse.json();
+      128 |   const paperSession = paperStartBody.session;
+    > 129 |   expect(paperSession.status).toBe("active");
+          |                       ^
+      130 |   expect(paperSession.exchangeCalled).toBe(false);
+      131 |   const statuses = [paperSession.status];
+      132 |   for (const [action, expected] of [["pause", "paused"], ["resume", "active"], ["stop", "stopped"]] as const) {
+        at /Users/macdoong/Documents/Rextora/tmp/rextora-final-tester-completion/tester-journey.pw.ts:129:23
+
+    Error Context: test-results/tester-journey.pw.ts-conci-65331-l-production-tester-journey/error-context.md
+
+  1 failed
+    tmp/rextora-final-tester-completion/tester-journey.pw.ts:24:5 › concise actual production tester journey 

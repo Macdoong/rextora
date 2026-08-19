@@ -1,0 +1,798 @@
+{
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "consumerCount": 10,
+  "consumers": [
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "importedSymbols": [
+        "rextoraDataRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 46,
+          "symbol": "readApprovalExecutionReceipt",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 48,
+          "symbol": "readApprovalExecutionReceipt",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(file, \"utf8\")"
+        },
+        {
+          "line": 64,
+          "symbol": "claimApprovalExecution",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 80,
+          "symbol": "claimApprovalExecution",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(file, JSON.stringify(placeholder, null, 2), { flag: \"wx\" })"
+        },
+        {
+          "line": 94,
+          "symbol": "claimApprovalExecution",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(file, JSON.stringify(placeholder, null, 2))"
+        },
+        {
+          "line": 103,
+          "symbol": "writeApprovalExecutionReceipt",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 106,
+          "symbol": "writeApprovalExecutionReceipt",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(file, JSON.stringify(finalized, null, 2))"
+        },
+        {
+          "line": 115,
+          "symbol": "findLatestSessionApprovalReceipt",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(dir)"
+        },
+        {
+          "line": 118,
+          "symbol": "findLatestSessionApprovalReceipt",
+          "api": "fs.readdirSync",
+          "expression": "fs.readdirSync(dir)"
+        },
+        {
+          "line": 122,
+          "symbol": "findLatestSessionApprovalReceipt",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(path.join(dir, name), \"utf8\")"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "importedSymbols": [
+        "rextoraDataRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 64,
+          "symbol": "ensureSessionDir",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 65,
+          "symbol": "ensureSessionDir",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(plansDir(sessionId), { recursive: true })"
+        },
+        {
+          "line": 70,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 72,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(tmp, JSON.stringify(data, null, 2), \"utf8\")"
+        },
+        {
+          "line": 73,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, filePath)"
+        },
+        {
+          "line": 78,
+          "symbol": "readJsonFile",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(filePath, \"utf8\")"
+        },
+        {
+          "line": 86,
+          "symbol": "sessionExists",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(metadataPath(sessionId))"
+        },
+        {
+          "line": 94,
+          "symbol": "readTurnsJsonl",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 95,
+          "symbol": "readTurnsJsonl",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(file, \"utf8\")"
+        },
+        {
+          "line": 119,
+          "symbol": "writeTurnsJsonl",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(tmp, payload ? `${payload}\\n` : \"\", \"utf8\")"
+        },
+        {
+          "line": 120,
+          "symbol": "writeTurnsJsonl",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, file)"
+        },
+        {
+          "line": 128,
+          "symbol": "appendSessionEvent",
+          "api": "fs.appendFileSync",
+          "expression": "fs.appendFileSync(eventsPath(sessionId), `${JSON.stringify(event)}\\n`, \"utf8\")"
+        },
+        {
+          "line": 143,
+          "symbol": "writePendingPlan",
+          "api": "fs.unlinkSync",
+          "expression": "fs.unlinkSync(file)"
+        },
+        {
+          "line": 214,
+          "symbol": "deleteSessionRecord",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(dir)"
+        },
+        {
+          "line": 215,
+          "symbol": "deleteSessionRecord",
+          "api": "fs.rmSync",
+          "expression": "fs.rmSync(dir, { recursive: true, force: true })"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "importedSymbols": [
+        "rextoraDataRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 53,
+          "symbol": "writeToolAudit",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(root, { recursive: true })"
+        },
+        {
+          "line": 60,
+          "symbol": "writeToolAudit",
+          "api": "fs.appendFileSync",
+          "expression": "fs.appendFileSync(file, `${line}\\n`, \"utf8\")"
+        },
+        {
+          "line": 66,
+          "symbol": "readToolAuditLines",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 67,
+          "symbol": "readToolAuditLines",
+          "api": "fs.readFileSync",
+          "expression": "fs .readFileSync(file, \"utf8\")"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "importedSymbols": [
+        "rextoraDataRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 48,
+          "symbol": "readToolIdempotency",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 49,
+          "symbol": "readToolIdempotency",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(file, \"utf8\")"
+        },
+        {
+          "line": 63,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(directory, { recursive: true })"
+        },
+        {
+          "line": 65,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 75,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(temporary, JSON.stringify(receipt), { encoding: \"utf8\", mode: 0o600 })"
+        },
+        {
+          "line": 77,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(temporary, file)"
+        },
+        {
+          "line": 79,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(file)"
+        },
+        {
+          "line": 79,
+          "symbol": "writeToolIdempotency",
+          "api": "fs.unlinkSync",
+          "expression": "fs.unlinkSync(temporary)"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "importedSymbols": [
+        "backtestsRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 12,
+          "symbol": "ensure",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(DIR(), { recursive: true })"
+        },
+        {
+          "line": 56,
+          "symbol": "readIndex",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(indexPath)"
+        },
+        {
+          "line": 58,
+          "symbol": "readIndex",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(indexPath, \"utf8\")"
+        },
+        {
+          "line": 65,
+          "symbol": "writeIndex",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync( path.join(DIR(), \"index.json\"), JSON.stringify(index.slice(0, 200), null, 2), \"utf8\", )"
+        },
+        {
+          "line": 79,
+          "symbol": "findPriorByResultHash",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(full)"
+        },
+        {
+          "line": 81,
+          "symbol": "findPriorByResultHash",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(full, \"utf8\")"
+        },
+        {
+          "line": 154,
+          "symbol": "saveBacktestResult",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync( path.join(DIR(), `${saved.id}.json`), JSON.stringify(saved, null, 2), \"utf8\", )"
+        },
+        {
+          "line": 178,
+          "symbol": "listSavedBacktests",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(full)"
+        },
+        {
+          "line": 180,
+          "symbol": "listSavedBacktests",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(full, \"utf8\")"
+        },
+        {
+          "line": 191,
+          "symbol": "getSavedBacktest",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(full)"
+        },
+        {
+          "line": 192,
+          "symbol": "getSavedBacktest",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(full, \"utf8\")"
+        },
+        {
+          "line": 208,
+          "symbol": "deleteSavedBacktest",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(full)"
+        },
+        {
+          "line": 210,
+          "symbol": "deleteSavedBacktest",
+          "api": "fs.unlinkSync",
+          "expression": "fs.unlinkSync(full)"
+        },
+        {
+          "line": 217,
+          "symbol": "deleteSavedBacktest",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(chartPath)"
+        },
+        {
+          "line": 219,
+          "symbol": "deleteSavedBacktest",
+          "api": "fs.unlinkSync",
+          "expression": "fs.unlinkSync(chartPath)"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "importedSymbols": [
+        "backtestsRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 65,
+          "symbol": "saveChartEvidence",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir(), { recursive: true })"
+        },
+        {
+          "line": 83,
+          "symbol": "saveChartEvidence",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync( chartEvidencePath(input.runId), JSON.stringify(evidence), \"utf8\", )"
+        },
+        {
+          "line": 93,
+          "symbol": "loadChartEvidence",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(full)"
+        },
+        {
+          "line": 95,
+          "symbol": "loadChartEvidence",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(full, \"utf8\")"
+        },
+        {
+          "line": 122,
+          "symbol": "hasChartEvidence",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(chartEvidencePath(runId))"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "importedSymbols": [
+        "paperSessionsRootDefault"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 131,
+          "symbol": "ensureDir",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 152,
+          "symbol": "writeJson",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(tmp, JSON.stringify(value, null, 2), \"utf8\")"
+        },
+        {
+          "line": 153,
+          "symbol": "writeJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, filePath)"
+        },
+        {
+          "line": 157,
+          "symbol": "readJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(filePath)"
+        },
+        {
+          "line": 159,
+          "symbol": "readJson",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(filePath, \"utf8\")"
+        },
+        {
+          "line": 452,
+          "symbol": "readSessionRaw",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(fp)"
+        },
+        {
+          "line": 455,
+          "symbol": "readSessionRaw",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(fp, \"utf8\")"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "importedSymbols": [
+        "strategySearchRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 81,
+          "symbol": "ensureDir",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 147,
+          "symbol": "safeUnlink",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(filePath)"
+        },
+        {
+          "line": 147,
+          "symbol": "safeUnlink",
+          "api": "fs.unlinkSync",
+          "expression": "fs.unlinkSync(filePath)"
+        },
+        {
+          "line": 157,
+          "symbol": "tryParseJsonFile",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(filePath)"
+        },
+        {
+          "line": 158,
+          "symbol": "tryParseJsonFile",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(filePath, \"utf8\")"
+        },
+        {
+          "line": 166,
+          "symbol": "writeTmpFlushed",
+          "api": "fs.openSync",
+          "expression": "fs.openSync(tmpFile, \"w\")"
+        },
+        {
+          "line": 168,
+          "symbol": "writeTmpFlushed",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(fd, payload, \"utf8\")"
+        },
+        {
+          "line": 169,
+          "symbol": "writeTmpFlushed",
+          "api": "fs.fsyncSync",
+          "expression": "fs.fsyncSync(fd)"
+        },
+        {
+          "line": 171,
+          "symbol": "writeTmpFlushed",
+          "api": "fs.closeSync",
+          "expression": "fs.closeSync(fd)"
+        },
+        {
+          "line": 177,
+          "symbol": "tryFsyncDirectory",
+          "api": "fs.openSync",
+          "expression": "fs.openSync(dir, \"r\")"
+        },
+        {
+          "line": 179,
+          "symbol": "tryFsyncDirectory",
+          "api": "fs.fsyncSync",
+          "expression": "fs.fsyncSync(fd)"
+        },
+        {
+          "line": 181,
+          "symbol": "tryFsyncDirectory",
+          "api": "fs.closeSync",
+          "expression": "fs.closeSync(fd)"
+        },
+        {
+          "line": 202,
+          "symbol": "recoverableWriteJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(targetPath)"
+        },
+        {
+          "line": 204,
+          "symbol": "recoverableWriteJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(targetPath, bak)"
+        },
+        {
+          "line": 207,
+          "symbol": "recoverableWriteJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, targetPath)"
+        },
+        {
+          "line": 222,
+          "symbol": "recoverableWriteJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(targetPath)"
+        },
+        {
+          "line": 224,
+          "symbol": "recoverableWriteJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(bak, targetPath)"
+        },
+        {
+          "line": 255,
+          "symbol": "recoverReadJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(targetPath)"
+        },
+        {
+          "line": 256,
+          "symbol": "recoverReadJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(bak)"
+        },
+        {
+          "line": 257,
+          "symbol": "recoverReadJson",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(tmp)"
+        },
+        {
+          "line": 271,
+          "symbol": "recoverReadJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(bak, targetPath)"
+        },
+        {
+          "line": 295,
+          "symbol": "recoverReadJson",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, targetPath)"
+        },
+        {
+          "line": 745,
+          "symbol": "listSearchTrials",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(dir)"
+        },
+        {
+          "line": 746,
+          "symbol": "listSearchTrials",
+          "api": "fs.readdirSync",
+          "expression": "fs .readdirSync(dir)"
+        },
+        {
+          "line": 783,
+          "symbol": "safeRmDir",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(dirPath)"
+        },
+        {
+          "line": 784,
+          "symbol": "safeRmDir",
+          "api": "fs.rmSync",
+          "expression": "fs.rmSync(dirPath, { recursive: true, force: true })"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "importedSymbols": [
+        "strategySearchRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 500,
+          "symbol": "getResearchTop10",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(fp)"
+        },
+        {
+          "line": 502,
+          "symbol": "getResearchTop10",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(fp, \"utf8\")"
+        },
+        {
+          "line": 516,
+          "symbol": "saveResearchTop10",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(jobsDir, { recursive: true })"
+        },
+        {
+          "line": 519,
+          "symbol": "saveResearchTop10",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(tmp, JSON.stringify(snapshot, null, 2), \"utf8\")"
+        },
+        {
+          "line": 520,
+          "symbol": "saveResearchTop10",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, fp)"
+        },
+        {
+          "line": 523,
+          "symbol": "saveResearchTop10",
+          "api": "fs.appendFileSync",
+          "expression": "fs.appendFileSync( historyPath(root, snapshot.jobId), `${JSON.stringify({ at: snapshot.updatedAt, entries: snapshot.entries.map((e) => ({ rank: e.rank, strategyHash: e.strategyHash, })), rankChanges: snapshot.rankChanges, })}\\n`, \"utf8\", )"
+        },
+        {
+          "line": 552,
+          "symbol": "findLatestSameScopeTop10",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(jobsDir)"
+        },
+        {
+          "line": 554,
+          "symbol": "findLatestSameScopeTop10",
+          "api": "fs.readdirSync",
+          "expression": "fs.readdirSync(jobsDir)"
+        },
+        {
+          "line": 670,
+          "symbol": "listTop10History",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(fp)"
+        },
+        {
+          "line": 672,
+          "symbol": "listTop10History",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(fp, \"utf8\")"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "importedSymbols": [
+        "strategySearchRoot"
+      ],
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ],
+      "filesystemOperations": [
+        {
+          "line": 205,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.mkdirSync",
+          "expression": "fs.mkdirSync(dir, { recursive: true })"
+        },
+        {
+          "line": 208,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.openSync",
+          "expression": "fs.openSync(tmp, \"w\")"
+        },
+        {
+          "line": 210,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.writeFileSync",
+          "expression": "fs.writeFileSync(fd, payload, \"utf8\")"
+        },
+        {
+          "line": 211,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.fsyncSync",
+          "expression": "fs.fsyncSync(fd)"
+        },
+        {
+          "line": 213,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.closeSync",
+          "expression": "fs.closeSync(fd)"
+        },
+        {
+          "line": 215,
+          "symbol": "writeJsonAtomic",
+          "api": "fs.renameSync",
+          "expression": "fs.renameSync(tmp, targetPath)"
+        },
+        {
+          "line": 394,
+          "symbol": "getSearchPlan",
+          "api": "fs.existsSync",
+          "expression": "fs.existsSync(fp)"
+        },
+        {
+          "line": 396,
+          "symbol": "getSearchPlan",
+          "api": "fs.readFileSync",
+          "expression": "fs.readFileSync(fp, \"utf8\")"
+        }
+      ],
+      "runtimePurpose": "Derived from imported runtime root for persisted server state"
+    }
+  ]
+}

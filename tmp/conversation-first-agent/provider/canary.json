@@ -1,0 +1,23 @@
+{
+  "command": "node scripts/providerCanaryProbe.mjs --out=tmp/conversation-first-agent/provider/canary-full.json",
+  "startedAt": "2026-08-05T14:52:31Z",
+  "finishedAt": "2026-08-05T14:52:43Z",
+  "durationMs": 11706,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/provider/canary.stdout.log",
+  "stderr": "tmp/conversation-first-agent/provider/canary.stderr.log",
+  "BUILD_ID": "E0hf07WzbucpoXwZfA5R0",
+  "parsed": {
+    "requestedProviders": [
+      "gemini"
+    ],
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "structuredOutputValid": true,
+    "canaryPassed": true,
+    "checksNonEmpty": true,
+    "fallbackUsed": false,
+    "writeToolAuditCount": 0
+  }
+}

@@ -1,0 +1,5 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:61239
+- Network:       http://172.30.1.38:61239
+✓ Ready in 101ms
+[rextora] orphan search recovery skipped Cannot find package '@/src' imported from /Users/macdoong/Documents/Rextora/.next/server/chunks/instrumentation_ts_0zq9-xz._.js

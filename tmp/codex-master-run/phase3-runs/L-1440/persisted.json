@@ -1,0 +1,28 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [],
+  "reasoningAudit": [],
+  "backtestFiles": [
+    "bt_mshdzkat_147ca9.chart.json",
+    "bt_mshdzkat_147ca9.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_b026e1e077bb4cac"
+  ]
+}

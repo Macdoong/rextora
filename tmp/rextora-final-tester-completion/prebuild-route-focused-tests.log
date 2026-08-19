@@ -1,0 +1,19 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > applied settings terminology > uses initial batch label instead of total evaluation count 3ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > caps at 10 unique identities and includes role strategies without duplication 1ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > persists top10 and records rank changes on refresh 24ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > keeps Top-10 job-local and does not import peer-job entries 50ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > search config management > renames, duplicates, sets default, deletes without affecting jobs 11ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > raw trial retention > defaults to keep_30_days and never cleans Top-10 source trials 42ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > deletion safety and archive > archives paused job and restores; preview classifies missing refs 99ms
+ ✓ tests/strategySearchAdvancedSettings.test.ts > strategy search advanced settings helpers > default form includes error threshold fields 2ms
+ ✓ tests/strategySearchAdvancedSettings.test.ts > strategy search advanced settings helpers > applied settings preview shows operator labels 1ms
+ ✓ tests/strategySearchAdvancedSettings.test.ts > searchConfigStore > saves and loads named operator configs 4ms
+
+ Test Files  2 passed (2)
+      Tests  10 passed (10)
+   Start at  15:08:20
+   Duration  982ms (transform 414ms, setup 22ms, import 488ms, tests 239ms, environment 0ms)
+

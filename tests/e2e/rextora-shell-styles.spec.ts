@@ -40,8 +40,15 @@ async function assertStyledShell(page: Page, route: string) {
   page.on("response", onResponse);
 
   try {
-    const response = await page.goto(route, { waitUntil: "networkidle" });
+    const waitUntil = route === "/live-trading" ? "domcontentloaded" : "networkidle";
+    const response = await page.goto(route, { waitUntil });
     expect(response?.ok() ?? false).toBe(true);
+
+    if (route === "/live-trading") {
+      await expect(page.locator(".dashboard-shell")).toBeVisible();
+      await expect(page.locator("main.dashboard-main")).toBeVisible();
+      await expect(page.getByTestId("main-nav")).toBeVisible();
+    }
 
     const stylesheets = page.locator('link[rel="stylesheet"]');
     await expect(stylesheets.first()).toHaveCount(1);

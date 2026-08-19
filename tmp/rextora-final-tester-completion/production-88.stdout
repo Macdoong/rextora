@@ -1,0 +1,19 @@
+
+Running 88 tests using 1 worker
+
+(node:96266) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96266) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (3.2s)
+(node:96291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (3.2s)
+  ✓   3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (473ms)
+  ✓   4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (65ms)
+  ✓   5 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (464ms)
+  ✓   6 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (296ms)
+  ✓   7 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (3.1s)
+  ✓   8 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.0m)

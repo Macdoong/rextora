@@ -1,0 +1,469 @@
+{
+  "lint": {
+    "command": "npm run lint",
+    "startedAt": "2026-08-05T11:00:19Z",
+    "finishedAt": "2026-08-05T11:00:36Z",
+    "durationMs": 16534,
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/lint.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/lint.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "ok": true
+    }
+  },
+  "unitTest": {
+    "command": "npm test",
+    "startedAt": "2026-08-05T11:00:36Z",
+    "finishedAt": "2026-08-05T11:01:59Z",
+    "durationMs": 83020,
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/unit-test.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/unit-test.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "ok": true,
+      "tail": "\n> rextora@0.1.0 test\n> vitest run\n\n\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  191 passed (191)\n      Tests  1372 passed (1372)\n   Start at  20:00:36\n   Duration  82.42s (transform 2.22s, setup 1.17s, import 9.91s, tests 46.74s, environment 11ms)\n\n"
+    }
+  },
+  "build": {
+    "command": "rm -rf .next && npm run build",
+    "startedAt": "2026-08-05T10:58:35Z",
+    "finishedAt": "2026-08-05T11:00:09Z",
+    "durationMs": 93913,
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/final-build.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/final-build.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "traceForbiddenHits": [
+        {
+          "file": ".next/server/chunks/src_lib_rextora_134iyz9._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0bju-y6.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__06n7bwp._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0iw751_._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0eye2b_._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0y8vr~9._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_strategy_1245sfl._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0rl2xr4._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/instrumentation_ts_0zq9-xz._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0aj.h~x.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0vtgg-2._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0pvkq.2._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_05wgt7o.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0l5nw7x._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0k6qmvr._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__11xfncc._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0..qc~7._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__05gui~~._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_strategy_02eim93._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0pm36lv._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0l36kzu.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0lxqug-._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0oy.r9j._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0._6ohm._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0cy1jht._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0y8vr~9._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0xawmu2._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_11jyc56._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0dpxzlt._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0xeu3nh.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0dta4g3._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0i8hdua._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0j8-xkl._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__08~ot_t._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__08bj7gk._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0rl2xr4._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_134iyz9._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/_0~hxt91._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/_02fporv._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/_0kwwux1._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__08-qrxs._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/_04z.3s1._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_094gwc8._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_strategy_1245sfl._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_0cakguu._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0lojzkl._.js.map",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0msd~b~._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/[root-of-the-server]__0ivfnlo._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_11jyc56._.js",
+          "marker": ".env"
+        },
+        {
+          "file": ".next/server/chunks/src_lib_rextora_10wmz~i._.js.map",
+          "marker": ".env"
+        }
+      ],
+      "traceClean": false,
+      "buildWarnings": [
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+        "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts"
+      ]
+    }
+  },
+  "trace": {
+    "command": "node scripts/inspect-next-trace.mjs",
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/trace-inspect.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/trace-inspect.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "rawHead": "{\n  \"outPath\": \"/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/trace-inspection.json\",\n  \"totalSizeHuman\": \"655.9MB\",\n  \"tracedTmp\": 0,\n  \"tracedScreenshots\": 0,\n  \"tracedEnv\": 0,\n  \"secretTraceFailure\": false,\n  \"pass\": true\n}\n"
+    }
+  },
+  "e2e": [
+    {
+      "command": "npm run test:e2e",
+      "startedAt": "2026-08-05T11:02:03Z",
+      "finishedAt": "2026-08-05T11:02:22Z",
+      "durationMs": 19108,
+      "exitCode": 0,
+      "stdout": "tmp/external-tester-release/logs/e2e-run1.stdout.log",
+      "stderr": "tmp/external-tester-release/logs/e2e-run1.stderr.log",
+      "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+      "parsed": {
+        "ok": true,
+        "orphanJobRecoveryWarning": false,
+        "moduleNotFoundWarning": false,
+        "warningLines": [],
+        "tail": "ell (2.6s)\n  \u2713  30 [chromium] \u203a tests/e2e/strategy-search-flow.spec.ts:618:7 \u203a Strategy Search operator UI (intercepted API) \u203a catalog builder controls persist through intercepted create (3.1s)\n\n  31 passed (18.5s)\n\n(node:35225) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35227) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35226) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35227) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35226) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35225) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+      }
+    },
+    {
+      "command": "npm run test:e2e",
+      "startedAt": "2026-08-05T11:02:22Z",
+      "finishedAt": "2026-08-05T11:02:39Z",
+      "durationMs": 16891,
+      "exitCode": 0,
+      "stdout": "tmp/external-tester-release/logs/e2e-run2.stdout.log",
+      "stderr": "tmp/external-tester-release/logs/e2e-run2.stderr.log",
+      "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+      "parsed": {
+        "ok": true,
+        "orphanJobRecoveryWarning": false,
+        "moduleNotFoundWarning": false,
+        "warningLines": [],
+        "tail": "h intercepted create (1.1s)\n  \u2713  29 [chromium] \u203a tests/e2e/rextora-shell-styles.spec.ts:108:7 \u203a Rextora shell styles (production) \u203a client navigation between lifecycle routes keeps shell (2.6s)\n\n  31 passed (16.3s)\n\n(node:35361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+      }
+    },
+    {
+      "command": "npm run test:e2e",
+      "startedAt": "2026-08-05T11:02:39Z",
+      "finishedAt": "2026-08-05T11:02:59Z",
+      "durationMs": 19359,
+      "exitCode": 0,
+      "stdout": "tmp/external-tester-release/logs/e2e-run3.stdout.log",
+      "stderr": "tmp/external-tester-release/logs/e2e-run3.stderr.log",
+      "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+      "parsed": {
+        "ok": true,
+        "orphanJobRecoveryWarning": false,
+        "moduleNotFoundWarning": false,
+        "warningLines": [],
+        "tail": "ell (2.5s)\n  \u2713  31 [chromium] \u203a tests/e2e/strategy-search-flow.spec.ts:618:7 \u203a Strategy Search operator UI (intercepted API) \u203a catalog builder controls persist through intercepted create (3.1s)\n\n  31 passed (18.7s)\n\n(node:35491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+      }
+    }
+  ],
+  "providerCanary": {
+    "command": "node scripts/providerCanaryProbe.mjs --out=tmp/external-tester-release/evidence/provider-canary-full.json",
+    "startedAt": "2026-08-05T11:03:31Z",
+    "finishedAt": "2026-08-05T11:03:44Z",
+    "durationMs": 13457,
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/provider-canary-full.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/provider-canary-full.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "requestedProviders": [
+        "gemini"
+      ],
+      "selectedProvider": "gemini",
+      "providerAttempted": true,
+      "providerSucceeded": true,
+      "structuredOutputValid": true,
+      "canaryPassed": true,
+      "checksNonEmpty": true,
+      "checksCount": 2,
+      "fallbackUsed": false,
+      "writeToolAuditCount": 0,
+      "attempts": [
+        {
+          "requestedProvider": "gemini",
+          "providerSucceeded": true,
+          "canaryPassed": true,
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "writeToolAuditCount": 0
+        }
+      ]
+    }
+  },
+  "focusedB": {
+    "command": "PHASE3_SCENARIOS=B ...",
+    "startedAt": "2026-08-05T11:12:16Z",
+    "finishedAt": "2026-08-05T11:16:23Z",
+    "durationMs": 246697,
+    "exitCode": 0,
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "rows": [
+        {
+          "w": 390,
+          "passed": true,
+          "repeat": true,
+          "active": true,
+          "atCreate": "running",
+          "pre": "running",
+          "providerCalls": 0
+        },
+        {
+          "w": 768,
+          "passed": true,
+          "repeat": true,
+          "active": true,
+          "atCreate": "running",
+          "pre": "running",
+          "providerCalls": 0
+        },
+        {
+          "w": 1024,
+          "passed": true,
+          "repeat": true,
+          "active": true,
+          "atCreate": "running",
+          "pre": "completed",
+          "providerCalls": 0
+        },
+        {
+          "w": 1440,
+          "passed": true,
+          "repeat": true,
+          "active": true,
+          "atCreate": "running",
+          "pre": "running",
+          "providerCalls": 0
+        }
+      ],
+      "allPassed": true
+    }
+  },
+  "browserMatrix": {
+    "command": "PHASE3_SCENARIOS=A..M node tmp/codex-master-run/phase3-isolated-acceptance.mjs",
+    "startedAt": "2026-08-05T11:16:36Z",
+    "finishedAt": "2026-08-05T11:58:05Z",
+    "durationMs": 2488570,
+    "exitCode": 0,
+    "stdout": "tmp/external-tester-release/logs/browser-matrix.stdout.log",
+    "stderr": "tmp/external-tester-release/logs/browser-matrix.stderr.log",
+    "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+    "parsed": {
+      "passed": true,
+      "total": 52,
+      "passedCount": 52,
+      "failures": [],
+      "buildId": "-Cxu4VyOHFfrQb9h3COOq",
+      "provider": "gemini",
+      "conversationB": [
+        {
+          "width": 390,
+          "passed": true,
+          "repeatApprovalCreatedNothing": true,
+          "providerCallCount": 0,
+          "duplicateExecutionCount": 0,
+          "oldJobStillActive": true,
+          "oldJobStatusPreApproval": "running"
+        },
+        {
+          "width": 768,
+          "passed": true,
+          "repeatApprovalCreatedNothing": true,
+          "providerCallCount": 0,
+          "duplicateExecutionCount": 0,
+          "oldJobStillActive": true,
+          "oldJobStatusPreApproval": "running"
+        },
+        {
+          "width": 1024,
+          "passed": true,
+          "repeatApprovalCreatedNothing": true,
+          "providerCallCount": 0,
+          "duplicateExecutionCount": 0,
+          "oldJobStillActive": true,
+          "oldJobStatusPreApproval": "running"
+        },
+        {
+          "width": 1440,
+          "passed": true,
+          "repeatApprovalCreatedNothing": true,
+          "providerCallCount": 0,
+          "duplicateExecutionCount": 0,
+          "oldJobStillActive": true,
+          "oldJobStatusPreApproval": "queued"
+        }
+      ]
+    }
+  },
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq"
+}

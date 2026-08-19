@@ -1,0 +1,9 @@
+{
+  "credentialValueCandidatesChecked": 8,
+  "credentialValueMatches": 0,
+  "credentialLikeTokenMatches": 0,
+  "tmpEvidencePathMatches": 0,
+  "strategyJobTrialPathMatches": 0,
+  "envFilenameMentioned": true,
+  "note": "Counts only; no secret names or values emitted."
+}

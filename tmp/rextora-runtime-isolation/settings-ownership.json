@@ -1,0 +1,58 @@
+{
+  "ownershipMap": [
+    {
+      "step": "setting write",
+      "module": "components/rextora/settings/AiProviderSettingsPanel.tsx",
+      "via": "POST /api/rextora/settings/ai-providers/credential or test+save"
+    },
+    {
+      "step": "credential persistence",
+      "module": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+      "pathExpression": "rextoraDataRoot()/secrets/ai-provider-credentials.enc.json",
+      "respectsRextoraDataDir": true,
+      "masterKey": "REXTORA_SECRETS_MASTER_KEY env OR rextoraDataRoot()/secrets/.master.key"
+    },
+    {
+      "step": "settings persistence",
+      "module": "src/lib/rextora/agent/v2/providers/providerSettingsStore.ts",
+      "via": "src/lib/rextora/storage/jsonStore.ts",
+      "pathExpression": "rextoraDataRoot()/ai-provider-settings.json",
+      "respectsRextoraDataDir": true,
+      "inMemoryCacheTtlMs": 5000
+    },
+    {
+      "step": "runtime resolver",
+      "module": "src/lib/rextora/agent/v2/providers/providerRuntimeConfig.ts",
+      "symbol": "resolveProviderRuntime"
+    },
+    {
+      "step": "provider client / model catalog",
+      "module": "src/lib/rextora/agent/v2/providers/providerCatalog.ts",
+      "cache": "process-local Map TTL 10m"
+    },
+    {
+      "step": "Settings GET",
+      "module": "app/api/rextora/settings/ai-providers/route.ts",
+      "facade": "providerSettingsService.getAiProvidersPublic",
+      "guard": "providerRequestGuard.assertLocalOperatorRequest (localhost Host/Origin)"
+    },
+    {
+      "step": "Settings React state",
+      "module": "components/rextora/settings/AiProviderSettingsPanel.tsx",
+      "mountGate": "LifecycleSettingsShell tab===ai",
+      "testidAlwaysPresentWhenMounted": "ai-provider-settings"
+    },
+    {
+      "step": "Agent request",
+      "module": "app/api/rextora/agent/route.ts",
+      "uses": "resolveProviderRuntime + resolveProviderApiKey"
+    }
+  ],
+  "criticalFindings": [
+    "FIXED: providerCredentialStore and jsonStore now use rextoraDataRoot()/REXTORA_DATA_DIR",
+    "FIXED: orphan auto-resume capped at 2 (env override REXTORA_ORPHAN_AUTO_RESUME_LIMIT)",
+    "FIXED: lifecycle harness scenario extras now win over default AI_AGENT_PROVIDER",
+    "strategy-search/orphan recovery uses roots that respect REXTORA_DATA_DIR; default shared cwd store still used by prod/dev",
+    "AiProviderSettingsPanel always renders data-testid=ai-provider-settings when the AI tab mounts; missing testid means tab/page never mounted"
+  ]
+}

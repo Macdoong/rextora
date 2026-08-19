@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "processes": {
+    "83827": {
+      "pid": 83827,
+      "ppid": 83826,
+      "argv": [
+        "/opt/homebrew/Cellar/node/25.8.0/bin/node",
+        "<REPO>/tmp/rextora-webpack-scan-attribution/run-nft-repro.cjs",
+        "app/api/rextora/agent/route.ts"
+      ],
+      "startedAt": "2026-08-13T06:02:14.776Z",
+      "updatedAt": "2026-08-13T06:02:16.344Z",
+      "totalCalls": 2,
+      "totalReturnedEntries": 21,
+      "peakRssBytes": 294305792,
+      "peakHeapUsedBytes": 112071808,
+      "inFlight": [],
+      "directories": [
+        {
+          "api": "fs.readdir",
+          "path": "<REPO>/data/rextora/agent-commands",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 19,
+          "maxEntriesInOneScan": 19,
+          "totalElapsedMs": 168.84375,
+          "maxElapsedMs": 168.84375,
+          "firstCallerSample": "    at Glob._readdir (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:15901)\n    at Glob._processGlobStar (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:16883)\n    at Glob._process (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:13897)\n    at new Glob (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:11632)\n    at glob (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:10596)\n    at <REPO>/node_modules/next/dist/compiled/@vercel/nft/index.js:1:18979\n    at new Promise (<anonymous>)\n    at <REPO>/node_modules/next/dist/compiled/@vercel/nft/index.js:1:18946",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.readdir",
+          "path": "<REPO>/data/rextora/reasoning-shadow",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 37.055875,
+          "maxElapsedMs": 37.055875,
+          "firstCallerSample": "    at Glob._readdir (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:15901)\n    at Glob._processGlobStar (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:16883)\n    at Glob._process (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:13897)\n    at new Glob (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:11632)\n    at glob (<REPO>/node_modules/next/dist/compiled/glob/glob.js:1:10596)\n    at <REPO>/node_modules/next/dist/compiled/@vercel/nft/index.js:1:18979\n    at new Promise (<anonymous>)\n    at <REPO>/node_modules/next/dist/compiled/@vercel/nft/index.js:1:18946",
+          "firstErrorCode": null
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-08-13T06:02:16.344Z"
+}

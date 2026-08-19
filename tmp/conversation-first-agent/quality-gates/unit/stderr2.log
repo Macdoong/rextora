@@ -1,0 +1,37 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > D current state · search-planned-state
+AssertionError: expected 'search_status' to be 'workspace_status' // Object.is equality
+
+Expected: "workspace_status"
+Received: "search_status"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:422:27
+    420|
+    421|       expect(route.mode).toBe(item.mode);
+    422|       expect(route.topic).toBe(item.topic);
+       |                           ^
+    423|       expect(route.providerExpected).toBe(item.provider);
+    424|       expect(route.requiresApproval).toBe(item.approval);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > D current state · stale-expired-approval-state
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > D current state · multiple-approvals-state
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > D current state · prior-different-strategy-state
+AssertionError: expected 'paper_status' to be 'workspace_status' // Object.is equality
+
+Expected: "workspace_status"
+Received: "paper_status"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:422:27
+    420|
+    421|       expect(route.mode).toBe(item.mode);
+    422|       expect(route.topic).toBe(item.topic);
+       |                           ^
+    423|       expect(route.providerExpected).toBe(item.provider);
+    424|       expect(route.requiresApproval).toBe(item.approval);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+

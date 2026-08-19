@@ -1,0 +1,237 @@
+{
+  "command": "rm -rf .next && npm run build",
+  "startedAt": "2026-08-05T10:58:35Z",
+  "finishedAt": "2026-08-05T11:00:09Z",
+  "durationMs": 93913,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/final-build.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/final-build.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "traceForbiddenHits": [
+      {
+        "file": ".next/server/chunks/src_lib_rextora_134iyz9._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0bju-y6.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__06n7bwp._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0iw751_._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0eye2b_._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0y8vr~9._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_strategy_1245sfl._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0rl2xr4._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/instrumentation_ts_0zq9-xz._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0aj.h~x.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0vtgg-2._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0pvkq.2._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_05wgt7o.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0l5nw7x._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0k6qmvr._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__11xfncc._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0..qc~7._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__05gui~~._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_strategy_02eim93._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0pm36lv._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0l36kzu.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0lxqug-._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0oy.r9j._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0._6ohm._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0cy1jht._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0y8vr~9._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0xawmu2._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_11jyc56._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0dpxzlt._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/node_modules_next_dist_esm_build_templates_app-route_0xeu3nh.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0dta4g3._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0i8hdua._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0j8-xkl._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__08~ot_t._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__08bj7gk._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0rl2xr4._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_134iyz9._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/_0~hxt91._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/_02fporv._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/_0kwwux1._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__08-qrxs._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/_04z.3s1._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_094gwc8._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_strategy_1245sfl._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_0cakguu._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0lojzkl._.js.map",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0msd~b~._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/[root-of-the-server]__0ivfnlo._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_11jyc56._.js",
+        "marker": ".env"
+      },
+      {
+        "file": ".next/server/chunks/src_lib_rextora_10wmz~i._.js.map",
+        "marker": ".env"
+      }
+    ],
+    "traceClean": false,
+    "buildWarnings": [
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts"
+    ]
+  }
+}

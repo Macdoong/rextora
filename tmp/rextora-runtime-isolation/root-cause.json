@@ -1,0 +1,70 @@
+{
+  "answers": {
+    "1_same_credential_store_file": {
+      "answer": "Pre-fix YES across prod/dev/smoke and incorrectly lifecycle. Post-fix lifecycle uses rextoraDataRoot()/secrets under REXTORA_DATA_DIR (proven empty secrets dir on F run).",
+      "evidence": ["lifecycle F runtime secrets empty", "providerCredentialStore.ts"]
+    },
+    "2_same_provider_settings_file": {
+      "answer": "Pre-fix YES via cwd jsonStore. Post-fix jsonStore→rextoraDataRoot().",
+      "evidence": ["jsonStore.ts"]
+    },
+    "3_same_encryption_master_key_context": {
+      "answer": "Pre-fix lifecycle shared cwd .master.key. Post-fix master key follows isolated secretsDir.",
+      "evidence": ["providerCredentialStore.ts"]
+    },
+    "4_process_cwd_incorrectly_used": {
+      "answer": "YES — fixed for credentials + jsonStore to use rextoraDataRoot().",
+      "evidence": ["settings-ownership.json"]
+    },
+    "5_multiple_servers_mutating_shared_caches": {
+      "answer": "In-process caches are process-local. Shared disk jobs + unbounded orphan resume mutated whichever server booted.",
+      "evidence": ["orphanJobRecovery.ts", "instrumentation.ts"]
+    },
+    "6_settings_ui_stale_vs_api": {
+      "answer": "Dev missing testid was mount failure under hung/dead next-dev, not stored-flag parse. Smoke mismatch resolved under healthy server (API+browser stored=true).",
+      "evidence": ["s01-diagnostic2.json", "smoke-stored-timeline.json"]
+    },
+    "7_host_origin_guard_3101": {
+      "answer": "NO unique Host/Origin defect when server healthy.",
+      "evidence": ["api-comparison.json"]
+    },
+    "8_lifecycle_missing_provider_init": {
+      "answer": "Not missing init — inherited cwd credentials + harness overwrote AI_AGENT_PROVIDER. Fixed path isolation + harness extra-env precedence.",
+      "evidence": ["lifecycle F PASS after fix"]
+    },
+    "9_concurrent_execution_race": {
+      "answer": "YES contributes under load; isolation + orphan caps reduce it.",
+      "evidence": ["final-validation notes"]
+    },
+    "10_agent_provider_business_logic_defective": {
+      "answer": "NO primary agent conversation defect for this stage.",
+      "evidence": ["canaries PASS", "F fallback path works once credentials isolated"]
+    }
+  },
+  "environments": {
+    "development": {
+      "rootCause": "Shared strategy-search job/trial disk + boot orphan recovery starved Turbopack compile so Settings AI tab never mounted.",
+      "responsibleModule": "orphanJobRecovery.ts + instrumentation.ts + next.config tracing/watch excludes",
+      "classification": "SERVER_ISOLATION_DEFECT / DEV_COMPILATION_DEFECT",
+      "sharedWithOtherFailures": true
+    },
+    "lifecycle": {
+      "rootCause": "AI credential/settings ignored REXTORA_DATA_DIR; harness overwrote scenario F provider env; F console/loop assertions treated expected Gemini 400 as failure.",
+      "responsibleModule": "providerCredentialStore.ts + jsonStore.ts + deploymentLifecycle52.mjs",
+      "classification": "CREDENTIAL_STORE_DEFECT / RUNTIME_CONFIG_DEFECT / TEST_HARNESS_DEFECT",
+      "sharedWithOtherFailures": true
+    },
+    "smoke": {
+      "rootCause": "Same stores; stored=false UI assert under concurrent/orphan load. Resolved on healthy isolated server.",
+      "classification": "RACE_UNDER_LOAD / not distinct credential store",
+      "sharedWithOtherFailures": true
+    }
+  },
+  "fixesApplied": [
+    "orphan auto-resume capped; development default 0",
+    "instrumentation skips orphan recovery in development unless REXTORA_ORPHAN_RECOVERY=1",
+    "credential store + jsonStore use rextoraDataRoot()",
+    "next.config excludes jobs/trials from tracing; turbopack:{}",
+    "lifecycle harness: scenario extras win; F clears OpenAI/Google env; expected Gemini 400 ignored; noDuplicateProviderLoop per-request"
+  ]
+}

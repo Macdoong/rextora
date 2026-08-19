@@ -1,0 +1,49 @@
+{
+  "profile": "search-running",
+  "width": 1440,
+  "port": 53225,
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "startedAt": "2026-08-06T07:49:06.276Z",
+  "finishedAt": "2026-08-06T07:49:10.005Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-search-running-1440-O8E2Nd",
+  "turnResults": [
+    {
+      "query": "현재 진행 상황 알려줘.",
+      "expectedMode": "READ_AND_ANSWER",
+      "expectedTopic": "search_status",
+      "mode": "READ_AND_ANSWER",
+      "topic": "search_status",
+      "provider": "local",
+      "fallbackUsed": true,
+      "readTools": [
+        "search.status"
+      ],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "탐색 결과를 열어 현재 상태를 확인하는 것이 좋습니다.",
+    "primaryText": "탐색 결과를 열어 현재 상태를 확인하는 것이 좋습니다.\n오후 04:49 · 결과 검토\n탐색 결과 보기전략 탐색 결과와 추천을 확인합니다.화면만 엽니다.탐색 결과 열기",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": true,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": null,
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 1,
+  "passed": true
+}

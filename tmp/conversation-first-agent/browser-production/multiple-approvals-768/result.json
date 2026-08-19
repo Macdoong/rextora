@@ -1,0 +1,47 @@
+{
+  "profile": "multiple-approvals",
+  "width": 768,
+  "port": 53054,
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "startedAt": "2026-08-06T07:47:56.107Z",
+  "finishedAt": "2026-08-06T07:47:59.293Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-multiple-approvals-768-m8HjI7",
+  "turnResults": [
+    {
+      "query": "진행해.",
+      "expectedMode": "CLARIFY_REFERENCE",
+      "expectedTopic": "approval_control",
+      "mode": "CLARIFY_REFERENCE",
+      "topic": "approval_control",
+      "provider": "local",
+      "fallbackUsed": false,
+      "readTools": [],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "어떤 승인 계획을 진행할지 선택해 주세요.",
+    "primaryText": "어떤 승인 계획을 진행할지 선택해 주세요.\n첫 번째 계획\n승인 센터첫 번째 계획승인하면 관련 화면을 엽니다.왜 대기?계획 검토화면 열기취소\n오후 04:47 · 모의매매 준비",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": true,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": null,
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 0,
+  "passed": true
+}

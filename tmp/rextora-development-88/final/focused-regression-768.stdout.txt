@@ -1,0 +1,33 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 73858
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 20
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1106
+    }
+  ]
+}
+
+Running 4 tests using 1 worker
+
+(node:87640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:31:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.3s)
+  ✓  2 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:31:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (19.4s)
+  ✓  3 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:31:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.6m)
+  ✓  4 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:31:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (30.4s)
+
+  4 passed (6.0m)

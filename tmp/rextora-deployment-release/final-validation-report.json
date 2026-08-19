@@ -1,0 +1,28 @@
+{
+  "verdict": "REXTORA FINAL RELEASE FAILED",
+  "buildId": "2-RjvN6kLmSfKLidxHUzi",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "productionCountAudit": {
+    "scenarioRows": 88,
+    "registryTests": 4,
+    "metadataTests": 4,
+    "otherTests": 0,
+    "totalPlaywrightTests": 96,
+    "explanation": "88 required scenario rows + 4 registry validation tests (one per viewport) + 4 viewport metadata tests (one per viewport) = 96 total Playwright tests in deployment-matrix.spec.ts"
+  },
+  "gates": {
+    "production88": { "passed": true, "passedRows": 88, "failedRows": 0 },
+    "development88": { "passed": false, "passedRows": 20, "failedRows": 68 },
+    "lifecycle52": { "passed": false, "passedRows": 21, "failedRows": 31 },
+    "lint": { "passed": true, "exitCode": 0 },
+    "unit": { "passed": true, "count": "1541/1541" },
+    "e2e1": { "passed": true, "discovered": 31, "passedCount": 31, "failed": 0, "retries": 0 },
+    "e2e2": { "passed": true, "discovered": 31, "passedCount": 31, "failed": 0, "retries": 0 },
+    "e2e3": { "passed": true, "discovered": 31, "passedCount": 31, "failed": 0, "retries": 0 },
+    "providerSanity": { "passed": true },
+    "approvalE2e": { "passed": true },
+    "deploymentSmoke": { "passed": false, "note": "settings-browser gemini stored assertion failed; model-switching passed" },
+    "secretScan": { "secretLeakCount": 0, "rawLeakCount": 0 },
+    "safe": { "unchanged": true, "params_hash": "7893ca3f0e30" }
+  }
+}

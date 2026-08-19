@@ -1,0 +1,1053 @@
+{
+  "config": {
+    "configFile": "/Users/macdoong/Documents/Rextora/playwright.deployment-dev.config.mjs",
+    "rootDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/macdoong/Documents/Rextora/tests/e2e/release/global-setup.dev.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-390",
+        "name": "dev-390",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-768",
+        "name": "dev-768",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1024",
+        "name": "dev-1024",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1440",
+        "name": "dev-1440",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tmp/rextora-development-88/final/matrix-result.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "REXTORA_ORPHAN_AUTO_RESUME_LIMIT=0 npm run dev -- --port 3101 --hostname 127.0.0.1 --webpack",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "reuseExistingServer": true,
+      "timeout": 300000
+    }
+  },
+  "suites": [
+    {
+      "title": "deployment-matrix.spec.ts",
+      "file": "deployment-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Deployment scenario registry",
+          "file": "deployment-matrix.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:51.153Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dcc21d67ddbddc2f644a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Deployment provider-backed matrix",
+          "file": "deployment-matrix.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2388,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:51.174Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-807ed182086f113126eb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2151,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:53.873Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c418996dca440f623643",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1665,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:56.030Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ecfc2e57419de535f22b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 96,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:57.701Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-55603b403013e7b6e71c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1510,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:57.804Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d64551d1e85a054bc67c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301177,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 18,
+                            "line": 300
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\n\n   at helpers.ts:300\n\n  298 |   for (let attempt = 0; attempt < 3; attempt++) {\n  299 |     try {\n> 300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                  ^\n  301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n  302 |       await page.waitForFunction(\n  303 |         () =>\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:300:18)\n    at selectOpenAiMini (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:332:7)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:172:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:33:59.320Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-390/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-390/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-390/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c42f1932559b171da5e7",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 76314,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:39:01.772Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-073cdb8dfc745edfd828",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 77809,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:40:18.223Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0a5fcb345848a5bc4811",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 37405,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:41:36.040Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-81f6fa9cc1db9b6f97db",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16947,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:42:13.455Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-26438ed51f8e0c179218",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 26960,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:42:30.415Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-242dab2b80f2076490cd",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 123641,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:42:57.325Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a5e1a09e6505b7eff60f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11393,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:45:00.972Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a536c601a81b155a484c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 91446,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:45:12.373Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dccf81faf24403219496",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 38503,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:46:43.825Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ef5c87c0c164b3bf6e93",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 78886,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:47:22.334Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0fb10887e01223a9f589",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 100401,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:48:41.227Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a45d9322464556e002c1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 743,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:50:21.632Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f16f1b6f7506bb57499f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 645,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:50:22.383Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-39c339b6f07ebbb2015c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 79935,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:50:23.034Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8bf2f13c8cafbe01a3bb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 43559,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:51:42.974Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4207fd9d4250f8411193",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 90957,
+                      "error": {
+                        "message": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:155:16)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:442:30)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 16,
+                          "line": 155
+                        },
+                        "snippet": "   at helpers.ts:155\n\n  153 | export async function openAiProviderTab(page: Page) {\n  154 |   for (let attempt = 0; attempt < 3; attempt++) {\n> 155 |     await page.goto(\"/settings\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                ^\n  156 |     const broken = await page\n  157 |       .evaluate(() => {\n  158 |         const text = document.body?.innerText ?? \"\";"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 16,
+                            "line": 155
+                          },
+                          "message": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n   at helpers.ts:155\n\n  153 | export async function openAiProviderTab(page: Page) {\n  154 |   for (let attempt = 0; attempt < 3; attempt++) {\n> 155 |     await page.goto(\"/settings\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                ^\n  156 |     const broken = await page\n  157 |       .evaluate(() => {\n  158 |         const text = document.body?.innerText ?? \"\";\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:155:16)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:442:30)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:52:26.540Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 16,
+                        "line": 155
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-79e3c310b9edbe40e5a9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 30,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Deployment viewport coverage metadata",
+          "file": "deployment-matrix.spec.ts",
+          "line": 42,
+          "column": 6,
+          "specs": [
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:53:59.079Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-bcf8a04b73ad74ede65f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 43,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-11T12:30:13.809Z",
+    "duration": 1425445.777,
+    "expected": 22,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

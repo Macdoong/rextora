@@ -1,0 +1,430 @@
+{
+  "config": {
+    "configFile": "/Users/macdoong/Documents/Rextora/playwright.deployment-dev.config.mjs",
+    "rootDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/macdoong/Documents/Rextora/tests/e2e/release/global-setup.dev.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-390",
+        "name": "dev-390",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-768",
+        "name": "dev-768",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1024",
+        "name": "dev-1024",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1440",
+        "name": "dev-1440",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tmp/rextora-release-completion/development/matrix-result.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "REXTORA_ORPHAN_AUTO_RESUME_LIMIT=0 npm run dev -- --port 3101 --hostname 127.0.0.1 --webpack",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "reuseExistingServer": true,
+      "timeout": 300000
+    }
+  },
+  "suites": [
+    {
+      "title": "deployment-matrix.spec.ts",
+      "file": "deployment-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Deployment provider-backed matrix",
+          "file": "deployment-matrix.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 136902,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:49:11.955Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a45d9322464556e002c1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 56041,
+                      "error": {
+                        "message": "Error: dev_scenario_gate_failed",
+                        "stack": "Error: dev_scenario_gate_failed\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:54:11",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                          "column": 11,
+                          "line": 54
+                        },
+                        "snippet": "  52 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  53 |     }\n> 54 |     throw new Error(\"dev_scenario_gate_failed\");\n     |           ^\n  55 |   });\n  56 |\n  57 |   for (const scenario of DEPLOYMENT_SCENARIOS) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                            "column": 11,
+                            "line": 54
+                          },
+                          "message": "Error: dev_scenario_gate_failed\n\n  52 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  53 |     }\n> 54 |     throw new Error(\"dev_scenario_gate_failed\");\n     |           ^\n  55 |   });\n  56 |\n  57 |   for (const scenario of DEPLOYMENT_SCENARIOS) {\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:54:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:51:29.194Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                        "column": 11,
+                        "line": 54
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f16f1b6f7506bb57499f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 269,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:52:25.742Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-39c339b6f07ebbb2015c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14906,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:52:29.498Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8bf2f13c8cafbe01a3bb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 110414,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:52:44.411Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4207fd9d4250f8411193",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 44239,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:54:34.832Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-79e3c310b9edbe40e5a9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Deployment viewport coverage metadata",
+          "file": "deployment-matrix.spec.ts",
+          "line": 70,
+          "column": 6,
+          "specs": [
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T20:55:19.078Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-bcf8a04b73ad74ede65f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 71,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-11T20:45:28.429Z",
+    "duration": 590919.693,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,191 @@
+ M app/api/rextora/agent/route.ts
+ M app/backtest/page.tsx
+ M app/dashboard/page.tsx
+ M app/globals.css
+ M app/layout.tsx
+ M app/live-trading/page.tsx
+ M app/paper-trading/page.tsx
+ M app/results/page.tsx
+ M app/strategy-search/page.tsx
+ M components/rextora/agent/ActionCard.tsx
+ M components/rextora/agent/AgentInput.tsx
+ M components/rextora/agent/AgentMessage.tsx
+ M components/rextora/agent/AgentPanel.tsx
+ M components/rextora/agent/AgentSuggestions.tsx
+ M components/rextora/agent/useAgentSession.ts
+ M components/rextora/backtest/BacktestReviewWorkbench.tsx
+ M components/rextora/charts/BacktestAnalysisView.tsx
+ M components/rextora/settings/LifecycleSettingsShell.tsx
+ M instrumentation.ts
+ M next-env.d.ts
+ M next.config.ts
+ M playwright.config.ts
+ M src/lib/rextora/agent/agentDataFetcher.ts
+ M src/lib/rextora/agent/agentResponseBuilder.ts
+ M src/lib/rextora/agent/intentParser.ts
+ M src/lib/rextora/agent/llmTypes.ts
+ M src/lib/rextora/agent/providerConfig.ts
+ M src/lib/rextora/agent/providers/geminiAdapter.ts
+ M src/lib/rextora/agent/providers/openaiAdapter.ts
+ M src/lib/rextora/agent/providers/promptBuilder.ts
+ M src/lib/rextora/agent/safetyGuard.ts
+ M src/lib/rextora/agent/types.ts
+ M src/lib/rextora/liveSafetyGate.ts
+ M src/lib/rextora/report/aiTradeReport.ts
+ M src/lib/rextora/storage/jsonStore.ts
+ M src/lib/rextora/strategySearch/deletionSafety.ts
+ M src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+ M test-results/.last-run.json
+ M tests/agentCommercialUx.test.ts
+ M tests/agentIntentParser.test.ts
+ M tests/agentProvider.test.ts
+ M tests/backtestExecutionIdentity.test.ts
+ M tests/backtestSymbolSelector.test.ts
+ M tests/commercialOverlayHydration.test.ts
+ M tests/e2e/rextora-smoke.spec.ts
+ M tests/firstRunEmptyRuntime.test.ts
+ M tests/liveReadinessChecklist.test.ts
+ M tsconfig.json
+ M tsconfig.tsbuildinfo
+?? .DS_Store
+?? app/api/rextora/agent/session/
+?? app/api/rextora/internal/
+?? app/api/rextora/settings/ai-providers/
+?? components/rextora/ClientHydrated.tsx
+?? components/rextora/agent/AgentContextStrip.tsx
+?? components/rextora/agent/AgentModelSelector.tsx
+?? components/rextora/agent/AgentSessionProvider.tsx
+?? components/rextora/agent/AgentWorkspacePanel.tsx
+?? components/rextora/agent/AppShell.tsx
+?? components/rextora/agent/ApprovalCenter.tsx
+?? components/rextora/agent/GlobalAgentAssistant.tsx
+?? components/rextora/agent/MissionTimeline.tsx
+?? components/rextora/agent/agentPersistence.ts
+?? components/rextora/agent/agentSessionSync.ts
+?? components/rextora/backtest/BacktestStrategyManageDrawer.tsx
+?? components/rextora/settings/AiProviderSettingsPanel.tsx
+?? playwright.release.config.mjs
+?? scripts/commandEvidence.mjs
+?? scripts/finalGateOpenaiReproduction.mjs
+?? scripts/finalGateOrchestrator.mjs
+?? scripts/finalReleaseBaseline.mjs
+?? scripts/finalReleaseGeminiStability.mjs
+?? scripts/finalReleaseOpenaiStability.mjs
+?? scripts/finalReleaseSecretScan.mjs
+?? scripts/inspect-next-trace.mjs
+?? scripts/loadProjectEnv.mjs
+?? scripts/primaryLeakDetector.mjs
+?? scripts/providerBackedLiveConversation.mjs
+?? scripts/providerCanary.mjs
+?? scripts/providerCanaryProbe.mjs
+?? scripts/repoPaths.mjs
+?? src/lib/rextora/agent/canonicalCommandPayload.ts
+?? src/lib/rextora/agent/commandExecutor.ts
+?? src/lib/rextora/agent/commandStore.ts
+?? src/lib/rextora/agent/conversationContext.ts
+?? src/lib/rextora/agent/conversationState.ts
+?? src/lib/rextora/agent/decisionContext.ts
+?? src/lib/rextora/agent/executionRequestClassifier.ts
+?? src/lib/rextora/agent/goalDetector.ts
+?? src/lib/rextora/agent/lifecycleStage.ts
+?? src/lib/rextora/agent/missionTimeline.ts
+?? src/lib/rextora/agent/planDrafts.ts
+?? src/lib/rextora/agent/proposedAction.ts
+?? src/lib/rextora/agent/researchWorkspace.ts
+?? src/lib/rextora/agent/searchPlanDraft.ts
+?? src/lib/rextora/agent/typedCommand.ts
+?? src/lib/rextora/agent/v2/
+?? src/lib/rextora/backtest/workspaceTabState.ts
+?? src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts
+?? test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-390/
+?? tests/AgentConversationApprovalValidation.test.ts
+?? tests/AgentConversationFirstApi.test.ts
+?? tests/AgentConversationProviderFallback.test.ts
+?? tests/AgentConversationRandomized.test.ts
+?? tests/AgentConversationRoutingMatrix.test.ts
+?? tests/AgentGeminiResponse.test.ts
+?? tests/AgentSessionPersistence.test.ts
+?? tests/AgentV2ApprovalFastPath.test.ts
+?? tests/AgentV2CancelReplace.test.ts
+?? tests/AgentV2ConversationalProse.test.ts
+?? tests/AgentV2EventLifecycle.test.ts
+?? tests/AgentV2ExecutionFlow.test.ts
+?? tests/AgentV2ExpandedSafeTools.test.ts
+?? tests/AgentV2GateEvidence.test.ts
+?? tests/AgentV2LeakageDJK.test.ts
+?? tests/AgentV2LongTermMemory.test.ts
+?? tests/AgentV2NextTraceInspect.test.ts
+?? tests/AgentV2NoFabrication.test.ts
+?? tests/AgentV2PlanDiff.test.ts
+?? tests/AgentV2PlanModification.test.ts
+?? tests/AgentV2PlannerOrchestration.test.ts
+?? tests/AgentV2PostExecutionApprovalClear.test.ts
+?? tests/AgentV2ProviderBackedConversation.test.ts
+?? tests/AgentV2ProviderCanary.test.ts
+?? tests/AgentV2ProviderCredentials.test.ts
+?? tests/AgentV2ProviderFallback.test.ts
+?? tests/AgentV2ProviderRequestGuard.test.ts
+?? tests/AgentV2ReasoningPolicy.test.ts
+?? tests/AgentV2ReasoningRequestDedup.test.ts
+?? tests/AgentV2ReasoningSchema.test.ts
+?? tests/AgentV2ReasoningTaskProfile.test.ts
+?? tests/AgentV2ResearchBrain.test.ts
+?? tests/AgentV2ShadowMode.test.ts
+?? tests/AgentV2ShadowModeMatrix.test.ts
+?? tests/AgentV2SkippedWriteApproval.test.ts
+?? tests/AgentV2TerminalApprovalIdempotency.test.ts
+?? tests/AgentV2ToolSelection.test.ts
+?? tests/AgentV2UserVisibleSanitizer.test.ts
+?? tests/ConversationRefresh.test.ts
+?? tests/SessionRecovery.test.ts
+?? tests/ToolAudit.test.ts
+?? tests/ToolEvents.test.ts
+?? tests/ToolExecution.test.ts
+?? tests/ToolPolicy.test.ts
+?? tests/ToolRegistry.test.ts
+?? tests/ToolValidation.test.ts
+?? tests/WorkspaceMerge.test.ts
+?? tests/agentConversationalEmployee.test.ts
+?? tests/agentConversationalIntelligence.test.ts
+?? tests/agentExecutionSafety.test.ts
+?? tests/agentProductCompletion.test.ts
+?? tests/agentTradingEmployeeCommercial.test.ts
+?? tests/agentTypedCommand.test.ts
+?? tests/backtestWorkspaceTabStability.test.ts
+?? tests/e2e/release/
+?? tests/fixtures/
+?? tests/harnessDependencyResolution.test.ts
+?? tests/instrumentationBoot.test.ts
+?? tests/orphanRecoveryRoute.test.ts
+?? tmp/agent-conversational-screens/
+?? tmp/agent-employee-screens/
+?? tmp/agent-v2-browser-only.mjs
+?? tmp/agent-v2-final-verification.mjs
+?? tmp/agent-v2-final-verification/
+?? tmp/agent-v2-live-acceptance.mjs
+?? tmp/agent-v2-live-acceptance/
+?? tmp/agent-v2-phase1/
+?? tmp/codex-baseline/
+?? tmp/codex-master-run/
+?? tmp/conversation-first-agent/
+?? tmp/cursor-tester-ready-fix/
+?? tmp/external-tester-release/
+?? tmp/final-3point-verification.mjs
+?? tmp/final-3point-verification/
+?? tmp/final-blocker-closure/
+?? tmp/final-safety-api-verify.mjs
+?? tmp/final-safety-api-verify.ts
+?? tmp/final-tester-ready-revalidation/
+?? tmp/manual-test/
+?? tmp/operator-fix/
+?? tmp/provider-backed-agent-final/
+?? tmp/provider-backed-agent/
+?? tmp/provider-backed-final-release/
+?? tmp/provider-canary-runtime/
+?? tmp/reasoning-shadow/
+?? tmp/rextora-deployment-release/
+?? tmp/step6-audit/
+?? tmp/step7-audit/
+?? tmp/step8-audit/
+?? tmp/tester-readiness-verification.mjs
+?? tmp/tester-readiness/

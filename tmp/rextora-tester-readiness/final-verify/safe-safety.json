@@ -1,0 +1,54 @@
+{
+  "BUILD_ID": "-6CTCAJcZAMY02xezkvRO",
+  "safe": {
+    "BUILD_ID": "-6CTCAJcZAMY02xezkvRO",
+    "params_hash": "7893ca3f0e30",
+    "expected_params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "expected_sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "expected_gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiffBytes": 0,
+    "protectedDiffEmpty": true,
+    "safeUnchanged": true
+  },
+  "safety": {
+    "realOrderCount": 0,
+    "liveActivationCount": 0,
+    "exchangeCalledTrue": 0,
+    "flags": [],
+    "suspicious": [],
+    "scenarioE_exchangeCalledFalse": true,
+    "scenarioL_noLiveRuntime": true,
+    "realOrders": 0,
+    "liveActivations": 0,
+    "pass": true
+  },
+  "lifecycle": {
+    "executedRows": 52,
+    "passedRows": 49,
+    "failedRows": 3,
+    "failures": [
+      {
+        "id": "D-390",
+        "error": null,
+        "reasonHint": "잘못된 전략 고유번호입니다. 영문·숫자·_-만 사용할 수 있습니다."
+      },
+      {
+        "id": "I-390",
+        "error": null,
+        "reasonHint": {
+          "semanticToolEvents": false,
+          "watcherEventPersisted": false
+        }
+      },
+      {
+        "id": "B-1024",
+        "error": "Error: initial_search_not_started\n    at createRunningSearch (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:391:47)\n    at async scenarioB (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:396:20)\n    at async runOne (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:1009:28)\n    at async main (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:1147:23)",
+        "reasonHint": "Error: initial_search_not_started\n    at createRunningSearch (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:391:47)\n    at async scenarioB (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:396:20)\n    at async runOne (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:1009:28)\n    at async main (file:///Users/macdoong/Documents/Rextora/scripts/deploymentLifecycle52.mjs:1147:23)"
+      }
+    ],
+    "matrixPassed": false,
+    "matrixBuildId": "-6CTCAJcZAMY02xezkvRO"
+  }
+}

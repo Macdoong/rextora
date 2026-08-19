@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "method": "real installed Next-bundled nodeFileTrace with TypeScript transpilation and asset-glob interception before enumeration, correlated with the prior unfiltered Agent-route OOM trace",
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "routePatternProbe": {
+    "elapsedMs": 1650.804083,
+    "tracedFileCount": 294,
+    "observedAssetGlobInputs": [
+      "**/*.json",
+      "data/rextora/**/*",
+      "data/rextora/agent-commands/**/*",
+      "data/rextora/reasoning-shadow/**/*",
+      "data/rextora/strategy-search/**/*",
+      "data/strategies/**/*"
+    ]
+  },
+  "rankedTriggers": [
+    {
+      "rank": 1,
+      "sourceBoundary": "src/lib/rextora/storage/runtimePaths.ts:rextoraDataRoot and derived helpers",
+      "dynamicExpression": "filesystem calls whose path derives from path.join(process.cwd(), 'data', 'rextora')",
+      "generatedPattern": "data/rextora/**/*",
+      "directoriesReached": [
+        "data/rextora/strategy-search/trials",
+        "data/rextora/strategy-search/jobs",
+        "data/rextora/agent-sessions",
+        "data/rextora/agent-tasks",
+        "data/rextora/agent-plans-v2"
+      ],
+      "onDiskTrialFilesReached": 2088621,
+      "actualUnfilteredResult": "exit 134, 24.85 seconds, 5022842880-byte peak RSS, node::fs::AfterScanDir",
+      "representativeConsumers": [
+        "src/lib/rextora/strategySearch/jobStore.ts:listSearchTrials",
+        "src/lib/rextora/storage/jsonStore.ts:readJsonStore",
+        "src/lib/rextora/backtest/backtestStore.ts:store operations",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts:session operations"
+      ]
+    },
+    {
+      "rank": 2,
+      "sourceBoundary": "strategy-search helpers with direct process.cwd defaults",
+      "dynamicExpression": "path.join(process.cwd(), 'data', 'rextora', 'strategy-search', ...dynamic)",
+      "generatedPattern": "data/rextora/strategy-search/**/*",
+      "directoriesReached": [
+        "data/rextora/strategy-search/trials",
+        "data/rextora/strategy-search/jobs"
+      ],
+      "onDiskTrialFilesReached": 2088621,
+      "representativeSources": [
+        "src/lib/rextora/strategySearch/deletionSafety.ts:defaultRoot",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts:ownershipRoot",
+        "src/lib/rextora/strategySearch/jobArchive.ts:archive root",
+        "src/lib/rextora/strategySearch/recoveryAudit.ts:audit root"
+      ]
+    },
+    {
+      "rank": 3,
+      "sourceBoundary": "src/lib/rextora/agent/commandStore.ts:commandsRoot",
+      "dynamicExpression": "path.join(process.cwd(), 'data', 'rextora', 'agent-commands')",
+      "generatedPattern": "data/rextora/agent-commands/**/*",
+      "directoriesReached": ["data/rextora/agent-commands"],
+      "actualCompletedEntriesBeforeOom": 38,
+      "trialTreeReached": false
+    }
+  ]
+}

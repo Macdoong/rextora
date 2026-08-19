@@ -11,7 +11,31 @@ import { getRuntimeState } from "./runtimeState";
 import type { AlertItem, TelegramAlertSettings, TradingMode } from "./types";
 
 const ALERTS_FILE = "alerts.json";
-let lastRiskAlertAt = 0;
+const RISK_ALERT_STATE_FILE = "telegram-risk-alert-state.json";
+
+type RiskAlertTransitionState = {
+  blocked: boolean;
+  fingerprint: string | null;
+  updatedAt: string;
+};
+
+function getRiskAlertTransitionState(): RiskAlertTransitionState {
+  return readJsonStore<RiskAlertTransitionState>(RISK_ALERT_STATE_FILE, {
+    blocked: false,
+    fingerprint: null,
+    updatedAt: new Date(0).toISOString()
+  });
+}
+
+export function markRiskAlertStateNormal(): void {
+  const current = getRiskAlertTransitionState();
+  if (!current.blocked && current.fingerprint === null) return;
+  writeJsonStore<RiskAlertTransitionState>(RISK_ALERT_STATE_FILE, {
+    blocked: false,
+    fingerprint: null,
+    updatedAt: new Date().toISOString()
+  });
+}
 
 export function getAssistantStatus() {
   return getTelegramStatus();
@@ -49,10 +73,17 @@ export async function notifyCandidate(symbol: string, direction: string, score: 
   appendAlert({ id: `alert-${Date.now()}`, time: new Date().toLocaleString("ko-KR"), symbol, content: text, riskLevel: "낮음", status: "mock", serviceState: "mock" });
 }
 
-export async function sendRiskAlertIfNeeded(message: string): Promise<void> {
-  const now = Date.now();
-  if (now - lastRiskAlertAt < 60_000) return;
-  lastRiskAlertAt = now;
+export async function sendRiskAlertIfNeeded(message: string, fingerprint = message): Promise<void> {
+  const current = getRiskAlertTransitionState();
+  if (current.blocked && current.fingerprint === fingerprint) return;
+
+  // Persist the transition before network I/O so a retry/restart cannot spam
+  // the same risk state. A materially different fingerprint remains alertable.
+  writeJsonStore<RiskAlertTransitionState>(RISK_ALERT_STATE_FILE, {
+    blocked: true,
+    fingerprint,
+    updatedAt: new Date().toISOString()
+  });
   const text = buildRiskBlockMessage(message);
   const result = await sendTelegramMessage(text);
   appendAlert({ id: `risk-${Date.now()}`, time: new Date().toLocaleString("ko-KR"), symbol: "SYSTEM", content: text, riskLevel: "위험", status: result.ok ? "전송됨" : "mock", serviceState: result.serviceState });

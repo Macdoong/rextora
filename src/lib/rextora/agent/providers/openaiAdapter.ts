@@ -6,6 +6,10 @@
 import { getProviderKey } from "../providerConfig";
 import type { EvidencePackage, LLMProviderAdapter, LLMResult } from "../llmTypes";
 import { buildInterpretationPrompt } from "./promptBuilder";
+import {
+  openaiMaxOutputParam,
+  openaiTemperatureParam,
+} from "../v2/providers/openaiRequestParams";
 
 const OPENAI_CHAT_URL = "https://api.openai.com/v1/chat/completions";
 const TIMEOUT_MS = 12_000;
@@ -56,8 +60,8 @@ export class OpenAIAdapter implements LLMProviderAdapter {
         body: JSON.stringify({
           model: this.model,
           messages,
-          max_tokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.3,
+          ...openaiMaxOutputParam(this.model, MAX_OUTPUT_TOKENS),
+          ...openaiTemperatureParam(this.model, 0.3),
         }),
         signal,
       });
@@ -129,7 +133,7 @@ export class OpenAIAdapter implements LLMProviderAdapter {
         body: JSON.stringify({
           model: this.model,
           messages: [{ role: "user", content: "안녕" }],
-          max_tokens: 3,
+          ...openaiMaxOutputParam(this.model, 3),
         }),
         signal: controller.signal,
       });

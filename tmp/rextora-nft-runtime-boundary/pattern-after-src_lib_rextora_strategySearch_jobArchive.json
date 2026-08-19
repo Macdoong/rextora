@@ -1,0 +1,11 @@
+{
+  "entrypoint": "src/lib/rextora/strategySearch/jobArchive.ts",
+  "elapsedMs": 857.041958,
+  "tracedFileCount": 101,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/rextora/**/*",
+    "data/strategies/**/*"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "classification": "development-runtime contamination",
+  "cause": "A production build overwrote .next while the existing next dev process was running, breaking its HMR endpoint and preventing Agent hydration.",
+  "firstGate": {
+    "command": "node conversation-browser-dev.mjs",
+    "startedAt": "2026-08-05T14:35:00Z",
+    "finishedAt": "2026-08-05T14:35:31Z",
+    "durationMs": 30812,
+    "exitCode": 1,
+    "failure": "390: global-agent-fab unavailable; HMR WebSocket invalid response"
+  },
+  "correction": "Restarted only the proven Rextora next dev process and used the canonical localhost origin.",
+  "productSourceChangedForThisFailure": false
+}

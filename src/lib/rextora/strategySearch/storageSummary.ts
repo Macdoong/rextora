@@ -7,6 +7,7 @@ import path from "node:path";
 import { listSearchJobs, type StrategySearchStoreOptions } from "./jobStore";
 import { getRawTrialRetentionPolicy } from "./rawTrialRetention";
 import { listArchivedResearchJobs } from "./jobArchive";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export interface StorageSummary {
   totalJobs: number;
@@ -19,12 +20,7 @@ export interface StorageSummary {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationProviderFallback.test.ts tests/AgentConversationFirstApi.test.ts tests/agentConversationalEmployee.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  3 passed (3)
+      Tests  32 passed (32)
+   Start at  23:07:36
+   Duration  1.98s (transform 869ms, setup 32ms, import 576ms, tests 812ms, environment 0ms)
+

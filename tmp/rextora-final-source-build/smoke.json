@@ -1,0 +1,40 @@
+{
+  "malformedJsonCount": 0,
+  "chunkLoadErrorCount": 0,
+  "hydrationErrorCount": 0,
+  "immediateHTTP5xxCount": 0,
+  "checks": {
+    "dashboard": {
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "jsonOk": null
+    },
+    "settings": {
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "jsonOk": null
+    },
+    "providerSettings": {
+      "status": 200,
+      "contentType": "application/json",
+      "jsonOk": true
+    },
+    "agentRead": {
+      "status": 200,
+      "contentType": "application/json",
+      "jsonOk": true
+    },
+    "css": {
+      "status": 200,
+      "contentType": "text/css; charset=UTF-8"
+    },
+    "staticChunk": {
+      "status": 200,
+      "contentType": "application/javascript; charset=UTF-8"
+    }
+  },
+  "providerConfigured": {
+    "openai": true,
+    "gemini": true
+  }
+}

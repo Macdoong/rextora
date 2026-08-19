@@ -1,0 +1,7 @@
+
+> rextora@0.1.0 lint
+> eslint . --max-warnings=0
+
+real 59.74
+user 63.50
+sys 3.67

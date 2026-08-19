@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:42479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:42479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (2.1m)
+  ✓  2 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.8m)
+
+  2 passed (3.9m)

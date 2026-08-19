@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "installedEvidence": {
+    "nextVersion": "16.2.6",
+    "nextConfigType": "NextConfig.serverExternalPackages?: string[]",
+    "schemaSupport": "node_modules/next/dist/server/config-schema.js declares serverExternalPackages as an optional string array",
+    "webpackSupport": "node_modules/next/dist/build/webpack-config.js incorporates serverExternalPackages into optOutBundlingPackages"
+  },
+  "candidates": [
+    {
+      "candidate": "outputFileTracingExcludes",
+      "classification": "INSUFFICIENT",
+      "reason": "Applied after the crashing TraceEntryPointsPlugin NFT phase."
+    },
+    {
+      "candidate": "larger V8 heap",
+      "classification": "INSUFFICIENT",
+      "reason": "The controlled 8 GiB build also exited 134 in AfterScanDir."
+    },
+    {
+      "candidate": "eval, Function, obfuscated strings, webpackIgnore comments",
+      "classification": "UNSUPPORTED",
+      "reason": "Analyzer evasion would be fragile and is explicitly prohibited."
+    },
+    {
+      "candidate": "custom Webpack plugin patching Next TraceEntryPointsPlugin",
+      "classification": "UNSUPPORTED",
+      "reason": "Depends on Next internals and would not satisfy the standalone real-entrypoint NFT gate."
+    },
+    {
+      "candidate": "externalize all storage implementations",
+      "classification": "SUPPORTED_BUT_EXCESSIVE",
+      "reason": "Would move/refactor many stores and enlarge the runtime contract surface unnecessarily."
+    },
+    {
+      "candidate": "externalized server-only runtime-path provider",
+      "classification": "SUPPORTED_BUT_FAILED_ACCEPTANCE",
+      "reason": "Next supports the external-package mechanism and the isolated provider probe generated zero asset globs, but the mandatory unfiltered Agent-route NFT reproduction still entered a broad strategy-search/trials scan and did not terminate successfully. The candidate was therefore rejected and fully reverted."
+    }
+  ],
+  "selectedForTrial": "externalized server-only runtime-path provider",
+  "finalDisposition": "REJECTED_AND_REVERTED",
+  "acceptanceGate": {
+    "result": "FAILED",
+    "reason": "The real Agent entrypoint retained a generic **/*.json trace trigger through strategyStore and reached data/rextora/strategy-search/trials.",
+    "productionBuildAuthorized": false
+  }
+}

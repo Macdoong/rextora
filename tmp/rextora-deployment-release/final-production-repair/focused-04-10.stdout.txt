@@ -1,0 +1,67 @@
+
+Running 8 tests using 1 worker
+
+(node:38190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (3.2m)
+(node:38377) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38377) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.3m)
+(node:38482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (56.2s)
+  ✓  4 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.2m)
+(node:38633) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38633) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (1.9s)
+  ✓  6 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.2m)
+(node:38767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (2.7s)
+  ✓  8 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.1m)
+
+
+  1) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers.ts:125
+
+      123 |   for (let attempt = 0; attempt < 3; attempt++) {
+      124 |     try {
+    > 125 |       await page.waitForFunction(
+          |                  ^
+      126 |         ({ id, min }) => {
+      127 |           const sel = document.querySelector(`[data-testid="${id}"]`) as HTMLSelectElement | null;
+      128 |           return Boolean(sel && sel.options.length >= min);
+        at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:125:18)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:135:9)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+  7 passed (9.0m)

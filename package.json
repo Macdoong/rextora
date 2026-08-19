@@ -14,6 +14,8 @@
     "check:prelive": "npm run lint && npm run build && npm run verify:rextora"
   },
   "dependencies": {
+    "@rextora/strategy-runtime-io": "file:packages/rextora-strategy-runtime-io/rextora-strategy-runtime-io-1.0.0.tgz",
+    "@rextora/runtime-paths": "file:packages/rextora-runtime-paths/rextora-runtime-paths-1.0.0.tgz",
     "lucide-react": "^1.25.0",
     "next": "latest",
     "react": "latest",

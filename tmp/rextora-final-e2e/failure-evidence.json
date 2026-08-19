@@ -1,0 +1,18 @@
+{
+  "classification": "HARNESS_DEFECT",
+  "rationale": "Page rendered fully (Playwright snapshot shows styled live-trading shell, nav, gates). Failure is page.goto waitUntil:networkidle timeout at 30s. Live-trading page shows ongoing gate polling ('게이트를 불러오는 중…') preventing network idle. Same route passed in rextora-smoke.spec.ts with a different wait strategy.",
+  "test": {
+    "file": "tests/e2e/rextora-shell-styles.spec.ts",
+    "name": "/live-trading loads styled shell on direct entry",
+    "line": 95,
+    "viewport": "1440x1000 chromium"
+  },
+  "firstFailedAssertion": "page.goto(route, { waitUntil: 'networkidle' }) — Test timeout of 30000ms exceeded",
+  "passedCounterpart": "rextora-smoke.spec.ts renders /live-trading with pre-live safety state — PASS",
+  "networkFailure": "none (navigation did not reach networkidle; no HTTP 5xx observed in snapshot)",
+  "browserConsole": "not captured separately; pageerror handler reported no CSS errors before timeout",
+  "trace": "test-results/rextora-shell-styles-Rexto-2bc66-tyled-shell-on-direct-entry-chromium/trace.zip",
+  "errorContext": "test-results/rextora-shell-styles-Rexto-2bc66-tyled-shell-on-direct-entry-chromium/error-context.md",
+  "applicationSourceChangeRequired": false,
+  "BUILD_IDStillValid": true
+}

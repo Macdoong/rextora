@@ -1,0 +1,30 @@
+
+Running 1 test using 1 worker
+
+(node:2073) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2073) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tmp/rextora-final-tester-completion/tester-journey-continuation.pw.ts:15:5 › continue actual production journey after proven approval segment (3.6s)
+
+
+  1) tmp/rextora-final-tester-completion/tester-journey-continuation.pw.ts:15:5 › continue actual production journey after proven approval segment 
+
+    Error: answer_semantic_mismatch:실전매매 활성화나 실제 거래소 주문은
+
+       at ../../tests/e2e/release/helpers.ts:689
+
+      687 |   }
+      688 |   if (options.pattern && !options.pattern.test(trimmed)) {
+    > 689 |     throw new Error(`answer_semantic_mismatch:${trimmed.slice(0, 80)}`);
+          |           ^
+      690 |   }
+      691 |   if (options.minChars && trimmed.length < options.minChars) {
+      692 |     throw new Error(`answer_too_short:${trimmed.length}`);
+        at expectProviderAnswer (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:689:11)
+        at /Users/macdoong/Documents/Rextora/tmp/rextora-final-tester-completion/tester-journey-continuation.pw.ts:69:23
+
+    Error Context: test-results/tester-journey-continuatio-c71a5-ter-proven-approval-segment/error-context.md
+
+  1 failed
+    tmp/rextora-final-tester-completion/tester-journey-continuation.pw.ts:15:5 › continue actual production journey after proven approval segment 

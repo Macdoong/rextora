@@ -1,0 +1,23 @@
+{
+  "malformedJsonCount": 0,
+  "ChunkLoadErrorCount": 0,
+  "hydrationErrorCount": 0,
+  "HTTP5xxCount": 0,
+  "unexpectedConsoleErrorCount": 0,
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "duplicateExecutionCount": 0,
+  "unintendedWriteCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "rows": [],
+  "sources": [
+    "tmp/rextora-deployment-release/browser-production/results.json"
+  ],
+  "stdoutMentions": {
+    "ChunkLoadError": 0,
+    "hydration": 0,
+    "malformedJson": 0,
+    "HTTP5xx": 0
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "jobId": "search_d0000001-0000-4000-8000-000000000001",
+  "iteration": 1,
+  "candidateId": "search_d0000001-0000-4000-8000-000000000001_candidate_00000001",
+  "params": {
+    "ema_fast": 17,
+    "demo": true
+  },
+  "paramsHash": "demo_params_00000001",
+  "generatorType": "random",
+  "parentCandidateIds": [],
+  "score": 0.39999999999999997,
+  "passed": false,
+  "failureReasons": [
+    {
+      "code": "demo_below_threshold",
+      "message": "demo non-qualified sample"
+    }
+  ],
+  "windowResults": [
+    {
+      "windowId": "demo_w1",
+      "totalReturn": 0.032,
+      "mdd": -0.085,
+      "trades": 17,
+      "winRate": 0.55,
+      "profitFactor": 1.15
+    }
+  ],
+  "costStressResults": [],
+  "jitterResults": [],
+  "durationMs": 40,
+  "createdAt": "2026-08-12T15:27:14.272Z"
+}

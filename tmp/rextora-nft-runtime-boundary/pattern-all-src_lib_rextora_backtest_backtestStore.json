@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/backtest/backtestStore.ts",
+  "elapsedMs": 81.808708,
+  "tracedFileCount": 5,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

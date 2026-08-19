@@ -6,6 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { StrategySearchStoreOptions } from "./jobStore";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export interface StrategySearchRecoveryAuditRecord {
   jobId: string;
@@ -20,12 +21,7 @@ export interface StrategySearchRecoveryAuditRecord {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

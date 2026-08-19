@@ -1,0 +1,20 @@
+{
+  "entrypoint": "app/api/rextora/agent/session/route.ts",
+  "elapsedMs": 98.48375,
+  "tracedFileCount": 10,
+  "esmFileCount": 0,
+  "warningCount": 0,
+  "warnings": [],
+  "tracedFiles": [
+    "app/api/rextora/agent/session/route.ts",
+    "package.json",
+    "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+    "src/lib/rextora/agent/v2/session/sessionStore.ts",
+    "src/lib/rextora/agent/v2/session/sessionTypes.ts",
+    "src/lib/rextora/agent/v2/session/workspaceMerge.ts",
+    "src/lib/rextora/agent/v2/tasks/index.ts",
+    "src/lib/rextora/agent/v2/tasks/taskStore.ts",
+    "src/lib/rextora/agent/v2/tasks/taskTypes.ts",
+    "src/lib/rextora/storage/runtimePaths.ts"
+  ]
+}

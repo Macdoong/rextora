@@ -1,0 +1,3140 @@
+{
+  "config": {
+    "configFile": "/Users/macdoong/Documents/Rextora/playwright.deployment-prod.config.mjs",
+    "rootDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "prod-390",
+        "name": "prod-390",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts",
+          "settings-browser.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "prod-768",
+        "name": "prod-768",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts",
+          "settings-browser.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "prod-1024",
+        "name": "prod-1024",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts",
+          "settings-browser.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "prod-1440",
+        "name": "prod-1440",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts",
+          "settings-browser.spec.ts"
+        ],
+        "timeout": 300000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tmp/rextora-deployment-release/browser-production/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "deployment-matrix.spec.ts",
+      "file": "deployment-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Deployment provider-backed matrix",
+          "file": "deployment-matrix.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8298,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:15.281Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-68fe0d114e5de3ccbefb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4692,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:23.724Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-80e10779796477633728",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 461,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:28.422Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-eb15ef94664976d8567b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 73,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:28.889Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b920d7a296c81d5cb47f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 457,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:28.968Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0a057f5126973593894c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 60289,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:18:29.431Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-45d3274a851298980dcb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 73187,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:19:29.727Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-58f00acc2ae65f644bf4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 76172,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:20:42.921Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-018d9a7f2691c0e52541",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 92185,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:21:59.101Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b06b7f3da24be124de06",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 60378,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:23:31.294Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-05a30077f2694ec6a6c3",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 106367,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:24:31.678Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ea7a0e8f9b1a255d3be1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 60410,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:26:18.053Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-87060b611cccbef0b1f1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18832,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:27:18.471Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-09d0609656121459ada5",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 97360,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:27:37.313Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-31b1489758caa0ea6b76",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 110369,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:29:14.680Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-34cbc118ff157732f61e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 91617,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:31:05.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f053eb738cb03395dd86",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 38270,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:32:36.681Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-52f738a6db4aba0e6397",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 399,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:14.957Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-3543636d62fca000506f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 207,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:15.363Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0aa7942b459307291605",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4319,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:15.576Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b2f963128f84683eaf5d",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3813,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:19.901Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0c9949dc9350b4396cad",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-390",
+                  "projectName": "prod-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 24235,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:23.720Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c0e2d428a45dbb71e09c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14329,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:33:48.705Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-1b1d80ac2fb39c2dedd9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13625,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:03.605Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8707a9caf9e4b35539fe",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13774,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:17.237Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dafba8d7e3fdae5caa02",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 507,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:31.018Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ab1afe4e96e3332d95ec",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13220,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:31.531Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8c31ee0cf81b726a6da0",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3440,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:44.757Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-27fe023648d9f3202c7f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19178,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:34:48.202Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f3960c19b779bdbae6e3",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19705,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:35:07.387Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d94211550dabc47450da",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 40572,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:35:27.099Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-36df49b20907a7023f4a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4040,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:36:07.678Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b9a631de3c75af0d99b2",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 55586,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:36:11.726Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c14de00715d977337580",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5746,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:37:07.316Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dc0402ef43b286344f76",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18889,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:37:13.069Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f82a52be3e3aec910490",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 52176,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:37:31.964Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6068653860b7d7fb026f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 49012,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:38:24.148Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-69a4210cd09ccac573d8",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 51717,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:39:13.166Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9db582439155568c271c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 51642,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:40:04.890Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c17535ebd9763cc5a02f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 950,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:40:56.540Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ebf7f77b057e25a6850b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 592,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:40:57.496Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-e6ff97dac8afb33ab1a5",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9920,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:40:58.094Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-07b3c3b6390974b5f5be",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9648,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:41:08.020Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-383c4b4931ad62f94ea5",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-768",
+                  "projectName": "prod-768",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 26477,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:41:17.676Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c7ae698656a2a723d064",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17281,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:41:44.857Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-71eb5538f397d5e73d8d",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15662,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:03.234Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-2e016ede9db1481e46d4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15201,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:18.904Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b1ea8625d6478aca3fa7",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1157,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:34.112Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-403c32c2d0280a81f2f5",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15296,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:35.277Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-fdc77cbac863be9c1960",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9016,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:50.579Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b182c2f513c6e9751147",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 24387,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:42:59.603Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-cce4aa37020c47e2dc91",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 28422,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:43:23.997Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-254192bcc38b782a2a61",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 42694,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:43:52.427Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-5001d6e4eb51f6f6e23a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8493,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:44:35.129Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a62e2e22ae56036578fa",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 57742,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:44:43.629Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-73bf83fdc8f2270e2f1c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11573,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:45:41.378Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f023a378787c1c60b75e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 24187,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:45:52.958Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-1fa0382fcfd1fc4b97e9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 57393,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:46:17.153Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6937fd0b9a17df23b3ab",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 49494,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:47:14.553Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-3c5677fb43a1bc235354",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 51225,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:48:04.055Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-51b288198ddf0daabc36",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 58790,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:48:55.297Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ebf3e35deb0c5d3cf3f2",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1151,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:49:54.095Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-e0c4fdd6935d972e13c7",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 680,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:49:55.252Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4f741b76f0c36211c341",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14831,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:49:55.938Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-e66bf0a88db64c169cd6",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14077,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:50:10.775Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-e67e37dfc56a758a66ff",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1024",
+                  "projectName": "prod-1024",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 38827,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:50:24.859Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6f84f88c54ee44c8161e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18631,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:51:04.413Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6324c8c39f9030a98d17",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 20682,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:51:24.938Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-7019da456a4dc58970ec",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18276,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:51:45.628Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-49208ccdfe22dbd4809b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2968,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:52:03.911Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9140c7b0a416f533867e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17860,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:52:06.886Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-5ed1c4c79f0c99ede4d2",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14922,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:52:24.753Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-1ba9ed4f140e20d7eb3e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 32693,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:52:39.682Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a47f4a959702f5311ca4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 32272,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:53:12.384Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-e4485538a35c655fdaa4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 51873,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:53:44.665Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-eb8d49443170a60faf41",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12330,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:54:36.507Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b553d8fd87d8447f100c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 59398,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:54:48.842Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-56e8d7b207f7eb4f1912",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18341,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:55:48.245Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-82b32728ee65152bb7c9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 34606,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:56:06.592Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-33eb9b4a5af9d3433222",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 58898,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:56:41.205Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-61609ec3a1be17c9cc43",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 54132,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:57:40.110Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0de5d766f6d8c981a0ff",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 45977,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:58:34.249Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-038906e9f63e71416222",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 58550,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T16:59:20.233Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ee915281aa742e3b9418",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1352,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T17:00:18.790Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-044c0aeab06745fff0ec",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1137,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T17:00:20.148Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8b1caa39934da25e0b17",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17869,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T17:00:21.291Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c232d71abe16dcd95345",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 20083,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T17:00:39.166Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-192a5a36a0dc18269e76",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "prod-1440",
+                  "projectName": "prod-1440",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 42744,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-13T17:00:59.255Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f42fe29a83d84e3c0dbe",
+              "file": "deployment-matrix.spec.ts",
+              "line": 58,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-13T16:18:14.918Z",
+    "duration": 2607427.903,
+    "expected": 88,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

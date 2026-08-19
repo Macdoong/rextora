@@ -1,0 +1,2 @@
+terminated_pid=69071
+reason=pathological RSS growth to approximately 15.7 GiB within 46 seconds with no forward build phase progress

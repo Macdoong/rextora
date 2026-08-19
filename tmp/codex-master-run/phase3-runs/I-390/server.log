@@ -1,0 +1,124 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:63473
+- Network:       http://172.30.1.38:63473
+✓ Ready in 106ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:64206
+- Network:       http://172.30.1.38:64206
+✓ Ready in 104ms
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:64404
+- Network:       http://172.30.1.38:64404
+- Environments: .env.local
+✓ Ready in 356ms
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next/dev/dev/types/**/*.ts'
+
+
+ GET /dashboard 200 in 248ms (next.js: 89ms, application-code: 159ms)
+ GET /dashboard 200 in 37ms (next.js: 1566µs, application-code: 35ms)
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "127.0.0.1".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['127.0.0.1'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[?25h
+▲ Next.js 16.2.6
+- Local:         http://localhost:64580
+- Network:       http://172.30.1.38:64580
+✓ Ready in 94ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:64692
+- Network:       http://172.30.1.38:64692
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:64867
+- Network:       http://172.30.1.38:64867
+✓ Ready in 93ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:64995
+- Network:       http://172.30.1.38:64995
+✓ Ready in 96ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:65528
+- Network:       http://172.30.1.38:65528
+✓ Ready in 106ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:49577
+- Network:       http://172.30.1.38:49577
+✓ Ready in 96ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:49958
+- Network:       http://172.30.1.38:49958
+✓ Ready in 94ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:61086
+- Network:       http://172.30.1.38:61086
+✓ Ready in 99ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:63845
+- Network:       http://172.30.1.38:63845
+✓ Ready in 106ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:51408
+- Network:       http://172.30.1.38:51408
+✓ Ready in 96ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55419
+- Network:       http://172.30.1.38:55419
+✓ Ready in 104ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:63203
+- Network:       http://172.30.1.38:63203
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:52232
+- Network:       http://172.30.1.38:52232
+✓ Ready in 123ms
+[rextora] orphan search recovery skipped Cannot find module '/Users/macdoong/Documents/Rextora/.next/server/chunks/src/lib/rextora/strategySearch/orphanJobRecovery' imported from /Users/macdoong/Documents/Rextora/.next/server/chunks/instrumentation_ts_0zq9-xz._.js
+▲ Next.js 16.2.6
+- Local:         http://localhost:53946
+- Network:       http://172.30.1.38:53946
+✓ Ready in 230ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:60380
+- Network:       http://172.30.1.38:60380
+✓ Ready in 129ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:51155
+- Network:       http://172.30.1.38:51155
+✓ Ready in 98ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55962
+- Network:       http://172.30.1.38:55962
+✓ Ready in 106ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:58442
+- Network:       http://172.30.1.38:58442
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:51144
+- Network:       http://172.30.1.38:51144
+✓ Ready in 92ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:58034
+- Network:       http://172.30.1.38:58034
+✓ Ready in 92ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:61495
+- Network:       http://172.30.1.38:61495
+✓ Ready in 93ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:54592
+- Network:       http://172.30.1.38:54592
+✓ Ready in 94ms

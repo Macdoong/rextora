@@ -1,0 +1,49 @@
+
+Running 3 tests using 1 worker
+
+(node:38919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [prod-1440] › tests/e2e/release/model-switching.spec.ts:17:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (2.4m)
+  ✘  2 [prod-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (19.9s)
+(node:39340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [prod-1440] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.8s)
+
+
+  1) [prod-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      64 |     if (hasProviderKeys()) {
+      65 |       expect(after.body.openai?.stored).toBe(true);
+    > 66 |       expect(after.body.gemini?.stored).toBe(true);
+         |                                         ^
+      67 |       expect(after.body.openai?.envFallback).toBe(false);
+      68 |       expect(after.body.gemini?.envFallback).toBe(false);
+      69 |       expect(after.body.openai?.fingerprint).toBeTruthy();
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/settings-browser.spec.ts:66:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [prod-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+  2 passed (2.8m)

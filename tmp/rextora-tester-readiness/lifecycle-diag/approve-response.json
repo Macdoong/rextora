@@ -1,0 +1,15 @@
+{
+  "conclusionKo": "탐색 작업을 시작했습니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다.",
+  "intentType": "approve_pending",
+  "mode": "APPROVAL_CONTROL",
+  "executionResult": {
+    "commandId": "rr_mspo59qd_wo970s",
+    "commandType": "tool_plan",
+    "executionStatus": "succeeded",
+    "resultReference": null,
+    "jobId": "search_077e55e3-a3a4-4b11-92df-47a5893a6e3d",
+    "runId": null,
+    "alreadyExecuted": false,
+    "summaryKo": "탐색 작업을 시작했습니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다."
+  }
+}

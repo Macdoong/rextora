@@ -1,0 +1,1154 @@
+
+Running 28 tests using 1 worker
+
+(node:79693) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79693) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (267ms)
+(node:79700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (131ms)
+(node:79707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (135ms)
+(node:79715) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79715) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (138ms)
+(node:79726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   5 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (134ms)
+(node:79733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   6 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (138ms)
+(node:79740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (109ms)
+(node:79745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   8 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (144ms)
+(node:79758) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79758) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (138ms)
+(node:79765) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79765) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  10 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (140ms)
+(node:79771) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79771) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  11 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (137ms)
+(node:79778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  12 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (140ms)
+(node:79785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  13 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (140ms)
+(node:79793) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79793) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  14 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (118ms)
+(node:79798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  15 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (145ms)
+(node:79806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  16 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (144ms)
+(node:79818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  17 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (143ms)
+(node:79825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  18 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (145ms)
+(node:79831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  19 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (139ms)
+(node:79839) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79839) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  20 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (138ms)
+(node:79846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  21 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (113ms)
+(node:79851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (147ms)
+(node:79859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  23 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (143ms)
+(node:79866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  24 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (141ms)
+(node:79877) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79877) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  25 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (150ms)
+(node:79883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  26 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (195ms)
+(node:79891) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79891) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  27 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (151ms)
+(node:79898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  28 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (122ms)
+
+
+  1) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/settings
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/settings", waiting until "load"[22m
+
+
+       at helpers.ts:79
+
+      77 |
+      78 | export async function openAiProviderTab(page: Page) {
+    > 79 |   await page.goto("/settings");
+         |              ^
+      80 |   await page.getByTestId("settings-tab-btn-ai").click();
+      81 |   await page.getByTestId("ai-provider-settings").waitFor();
+      82 | }
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:79:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:113:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:157:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:173:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:213:31)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:297:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:327:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    Error: apiRequestContext.get: connect ECONNREFUSED 127.0.0.1:3000
+    Call log:
+    [2m  - → GET http://127.0.0.1:3000/api/rextora/settings/ai-providers[22m
+    [2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36[22m
+    [2m    - accept: */*[22m
+    [2m    - accept-encoding: gzip,deflate,br[22m
+
+
+       at helpers.ts:74
+
+      72 |
+      73 | export async function fetchSettings(request: APIRequestContext) {
+    > 74 |   const res = await request.get("/api/rextora/settings/ai-providers");
+         |                             ^
+      75 |   return { status: res.status(), body: await res.json() };
+      76 | }
+      77 |
+        at fetchSettings (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:74:29)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:386:36)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/settings
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/settings", waiting until "load"[22m
+
+
+       at helpers.ts:79
+
+      77 |
+      78 | export async function openAiProviderTab(page: Page) {
+    > 79 |   await page.goto("/settings");
+         |              ^
+      80 |   await page.getByTestId("settings-tab-btn-ai").click();
+      81 |   await page.getByTestId("ai-provider-settings").waitFor();
+      82 | }
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:79:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:113:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:157:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:173:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:213:31)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:297:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:327:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    Error: apiRequestContext.get: connect ECONNREFUSED 127.0.0.1:3000
+    Call log:
+    [2m  - → GET http://127.0.0.1:3000/api/rextora/settings/ai-providers[22m
+    [2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36[22m
+    [2m    - accept: */*[22m
+    [2m    - accept-encoding: gzip,deflate,br[22m
+
+
+       at helpers.ts:74
+
+      72 |
+      73 | export async function fetchSettings(request: APIRequestContext) {
+    > 74 |   const res = await request.get("/api/rextora/settings/ai-providers");
+         |                             ^
+      75 |   return { status: res.status(), body: await res.json() };
+      76 | }
+      77 |
+        at fetchSettings (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:74:29)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:386:36)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/settings
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/settings", waiting until "load"[22m
+
+
+       at helpers.ts:79
+
+      77 |
+      78 | export async function openAiProviderTab(page: Page) {
+    > 79 |   await page.goto("/settings");
+         |              ^
+      80 |   await page.getByTestId("settings-tab-btn-ai").click();
+      81 |   await page.getByTestId("ai-provider-settings").waitFor();
+      82 | }
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:79:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:113:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:157:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:173:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:213:31)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:297:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:327:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    Error: apiRequestContext.get: connect ECONNREFUSED 127.0.0.1:3000
+    Call log:
+    [2m  - → GET http://127.0.0.1:3000/api/rextora/settings/ai-providers[22m
+    [2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36[22m
+    [2m    - accept: */*[22m
+    [2m    - accept-encoding: gzip,deflate,br[22m
+
+
+       at helpers.ts:74
+
+      72 |
+      73 | export async function fetchSettings(request: APIRequestContext) {
+    > 74 |   const res = await request.get("/api/rextora/settings/ai-providers");
+         |                             ^
+      75 |   return { status: res.status(), body: await res.json() };
+      76 | }
+      77 |
+        at fetchSettings (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:74:29)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:386:36)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/settings
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/settings", waiting until "load"[22m
+
+
+       at helpers.ts:79
+
+      77 |
+      78 | export async function openAiProviderTab(page: Page) {
+    > 79 |   await page.goto("/settings");
+         |              ^
+      80 |   await page.getByTestId("settings-tab-btn-ai").click();
+      81 |   await page.getByTestId("ai-provider-settings").waitFor();
+      82 | }
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:79:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:113:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e5ea9-rio-04-Gemini-model-catalog-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:157:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:173:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:213:31)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:297:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3000/dashboard
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3000/dashboard", waiting until "load"[22m
+
+
+       at helpers.ts:129
+
+      127 |
+      128 | export async function openAgentDashboard(page: Page) {
+    > 129 |   await page.goto("/dashboard");
+          |              ^
+      130 |   await page.getByTestId("dashboard-agent-workspace").waitFor();
+      131 |   await page.getByTestId("agent-provider-select").waitFor({ timeout: 60_000 });
+      132 | }
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:129:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:120:9)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:327:40)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    Error: apiRequestContext.get: connect ECONNREFUSED 127.0.0.1:3000
+    Call log:
+    [2m  - → GET http://127.0.0.1:3000/api/rextora/settings/ai-providers[22m
+    [2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36[22m
+    [2m    - accept: */*[22m
+    [2m    - accept-encoding: gzip,deflate,br[22m
+
+
+       at helpers.ts:74
+
+      72 |
+      73 | export async function fetchSettings(request: APIRequestContext) {
+    > 74 |   const res = await request.get("/api/rextora/settings/ai-providers");
+         |                             ^
+      75 |   return { status: res.status(), body: await res.json() };
+      76 | }
+      77 |
+        at fetchSettings (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:74:29)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:386:36)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28 failed
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 

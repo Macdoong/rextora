@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { SendHorizontal, Square } from "lucide-react";
 
 interface AgentInputProps {
@@ -21,8 +21,18 @@ export function AgentInput({
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    const syncFromDom = () => {
+      setValue(ta.value);
+    };
+    ta.addEventListener("input", syncFromDom);
+    return () => ta.removeEventListener("input", syncFromDom);
+  }, []);
+
   const handleSend = useCallback(() => {
-    const trimmed = value.trim();
+    const trimmed = (textareaRef.current?.value ?? value).trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue("");
@@ -68,6 +78,7 @@ export function AgentInput({
         placeholder={placeholder}
         disabled={disabled}
         rows={1}
+        data-testid="agent-input-textarea"
         className="min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
         aria-label="에이전트에게 질문"
         aria-describedby={disabled && disabledReason ? "agent-input-disabled-reason" : undefined}
@@ -76,6 +87,7 @@ export function AgentInput({
         onClick={disabled && onStop ? onStop : handleSend}
         disabled={disabled ? !onStop : !canSend}
         aria-label={disabled ? "응답 중지" : "전송"}
+        data-testid="agent-input-send"
         className={`flex size-11 shrink-0 items-center justify-center rounded-lg text-white transition ${
           disabled
             ? "border border-slate-600 bg-slate-800 hover:bg-slate-700"

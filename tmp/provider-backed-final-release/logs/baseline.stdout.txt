@@ -1,0 +1,4 @@
+{
+  "baseline": "/Users/macdoong/Documents/Rextora/tmp/provider-backed-final-release/baseline",
+  "e2eResolution": "Prior final-report.json e2e1/e2e2/e2e3 values are shell EXIT CODES (0=success), not test counts. Raw stdout confirms 31 passed per run."
+}

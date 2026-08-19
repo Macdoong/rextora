@@ -1,0 +1,14 @@
+{
+  "scenario": "K",
+  "width": 390,
+  "startedAt": "2026-08-05T21:08:58.180Z",
+  "finishedAt": "2026-08-05T21:09:52.674Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-K-390-f23d3a-Bmfcs7",
+  "port": 57043,
+  "provider": "gemini",
+  "error": "page.evaluate: Target page, context or browser has been closed\n    at uiMetrics (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:286:41)\n    at async scenarioE (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:489:19)\n    at async scenarioK (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:744:20)\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:917:28)\n    at async file:///Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1015:23\n    at async main (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1012:26)",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "passed": false
+}

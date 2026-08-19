@@ -1,0 +1,18 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (98 tests | 4 failed) 37ms
+     × D current state · search-planned-state 4ms
+     × D current state · stale-expired-approval-state 1ms
+     × D current state · multiple-approvals-state 0ms
+     × D current state · prior-different-strategy-state 0ms
+
+ Test Files  1 failed | 197 passed (198)
+      Tests  4 failed | 1508 passed (1512)
+   Start at  09:24:47
+   Duration  82.31s (transform 2.20s, setup 1.18s, import 9.87s, tests 46.22s, environment 12ms)
+

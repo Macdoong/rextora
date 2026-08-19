@@ -1,0 +1,46 @@
+{
+  "phase": "event-driven-monitoring-and-lifecycle",
+  "verdict": "VERIFIED",
+  "buildId": "YVXoPs8QhBABVOlYcVKd0",
+  "focusedTests": {
+    "filesPassed": 5,
+    "testsPassed": 19,
+    "lifecycleSuite": "tests/AgentV2EventLifecycle.test.ts"
+  },
+  "qualityGates": {
+    "lint": "passed",
+    "build": "passed"
+  },
+  "capabilities": {
+    "appendOnlyPersistedEvents": true,
+    "idempotentEventIds": true,
+    "replayAndReconciliation": true,
+    "semanticToolLifecycleEvents": true,
+    "boundedSearchWatcher": true,
+    "refreshTaskRestoration": true,
+    "autonomousUnapprovedWrite": false
+  },
+  "browserMatrix": [
+    { "width": 390, "scenario": "I", "passed": true, "consoleErrors": 0, "horizontalOverflow": false },
+    { "width": 768, "scenario": "I", "passed": true, "consoleErrors": 0, "horizontalOverflow": false },
+    { "width": 1024, "scenario": "I", "passed": true, "consoleErrors": 0, "horizontalOverflow": false },
+    { "width": 1440, "scenario": "I", "passed": true, "consoleErrors": 0, "horizontalOverflow": false }
+  ],
+  "browserEvidence": {
+    "semanticToolEvents": true,
+    "watcherEventPersisted": true,
+    "idempotentEventIds": true,
+    "sessionRestoredTaskSummary": true,
+    "refreshContinuesExactWorkflow": true,
+    "taskState": "monitoring",
+    "noAutonomousExtraTask": true,
+    "thinkingCleared": true
+  },
+  "safe": {
+    "path": "data/strategies/SAFE_v44_i4060.json",
+    "paramsHash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": "empty"
+  }
+}

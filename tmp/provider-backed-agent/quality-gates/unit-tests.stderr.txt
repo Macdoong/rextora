@@ -1,0 +1,206 @@
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 33 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationProviderFallback.test.ts > conversation provider failure preserves route mode > answers stable direct topic without provider: 렉스토라는 뭐 하는 앱이야?
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      Object {
+        "availableToolIds": Array [],
+        "context": null,
+        "entities": Object {
+          "jobId": null,
+          "lifecycleStage": null,
+          "paperSessionId": null,
+          "pendingPlan": null,
+          "pendingProposedAction": null,
+          "pinnedObjectiveKo": null,
+          "pipelineStage": null,
+          "previousConclusion": null,
+          "previousReason": null,
+          "previousRecommendation": null,
+          "runId": null,
+          "strategyId": null,
+          "strategyLabel": null,
+          "symbol": null,
+          "timeframe": null,
+        },
+        "facts": Array [
+          Object {
+            "fetchedAt": "2026-08-06T11:49:35.176Z",
+            "labelKo": "제품 지식 근거",
+            "source": "system_status",
+            "value": "렉스토라는 자동으로 주문을 내는 봇이 아니라, 전략을 찾고 검증해서 사람이 더 좋은 판단을 하도록 돕는 AI 트레이딩 직원입니다.",
+          },
+          Object {
+            "fetchedAt": "2026-08-06T11:49:35.176Z",
+            "labelKo": "제품 지식 보충",
+            "source": "system_status",
+            "value": "시장 연구와 전략 탐색, 백테스트, 모의매매 준비, 결과 설명을 맡습니다. 상태를 바꾸는 작업은 먼저 계획을 보여 주고 승인을 받은 뒤 한 번만 실행하며, 실전매매는 별도 안전 게이트 없이 시작하지 않습니다.",
+          },
+        ],
+        "goal": null,
+        "history": Array [],
+        "intentType": "unknown",
+        "lifecycleStage": null,
+        "pendingPlan": null,
+        "pendingProposedAction": null,
+        "policiesKo": Array [
+          "Live·실주문·SAFE 변경 금지",
+          "Write 도구는 명시적 승인 필요",
+          "검증된 사실만 인용",
+          "완료 주장은 Tool 결과 전까지 금지",
+        ],
+        "query": "렉스토라는 뭐 하는 앱이야?",
+        "sessionId": "agent_fallback_ndurw1dp",
+        "toolMetadata": Array [],
+        "workspace": null,
+      },
+      Object {
+        "sessionSelection": null,
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ tests/AgentConversationProviderFallback.test.ts:76:39
+     74|     expect(response.conversationRoute?.topic).toBe(topic);
+     75|     expect(response.proposedAction).toBeNull();
+     76|     expect(callReasoningProvider).not.toHaveBeenCalled();
+       |                                       ^
+     77|   });
+     78|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/33]⎯
+
+ FAIL  tests/AgentConversationProviderFallback.test.ts > conversation provider failure preserves route mode > answers stable direct topic without provider: MDD가 왜 중요해?
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      Object {
+        "availableToolIds": Array [],
+        "context": null,
+        "entities": Object {
+          "jobId": null,
+          "lifecycleStage": null,
+          "paperSessionId": null,
+          "pendingPlan": null,
+          "pendingProposedAction": null,
+          "pinnedObjectiveKo": null,
+          "pipelineStage": null,
+          "previousConclusion": null,
+          "previousReason": null,
+          "previousRecommendation": null,
+          "runId": null,
+          "strategyId": null,
+          "strategyLabel": null,
+          "symbol": null,
+          "timeframe": null,
+        },
+        "facts": Array [
+          Object {
+            "fetchedAt": "2026-08-06T11:49:35.190Z",
+            "labelKo": "제품 지식 근거",
+            "source": "system_status",
+            "value": "MDD는 자산이 이전 최고점에서 가장 크게 떨어진 폭입니다.",
+          },
+          Object {
+            "fetchedAt": "2026-08-06T11:49:35.190Z",
+            "labelKo": "제품 지식 보충",
+            "source": "system_status",
+            "value": "수익률이 높아도 MDD가 너무 크면 실제 운용 중 버티기 어렵고, 손실 회복에도 더 큰 수익이 필요합니다. 그래서 수익률과 함께 위험의 크기를 보는 핵심 지표입니다.",
+          },
+        ],
+        "goal": null,
+        "history": Array [],
+        "intentType": "unknown",
+        "lifecycleStage": null,
+        "pendingPlan": null,
+        "pendingProposedAction": null,
+        "policiesKo": Array [
+          "Live·실주문·SAFE 변경 금지",
+          "Write 도구는 명시적 승인 필요",
+          "검증된 사실만 인용",
+          "완료 주장은 Tool 결과 전까지 금지",
+        ],
+        "query": "MDD가 왜 중요해?",
+        "sessionId": "agent_fallback_vle7d57d",
+        "toolMetadata": Array [],
+        "workspace": null,
+      },
+      Object {
+        "sessionSelection": null,
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ tests/AgentConversationProviderFallback.test.ts:76:39
+     74|     expect(response.conversationRoute?.topic).toBe(topic);
+     75|     expect(response.proposedAction).toBeNull();
+     76|     expect(callReasoningProvider).not.toHaveBeenCalled();
+       |                                       ^
+     77|   });
+     78|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/33]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · empty-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · empty-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · search-planned-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · search-planned-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · search-running-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · search-running-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · search-completed-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · search-completed-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · backtest-available-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · backtest-available-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · paper-pending-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · paper-pending-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · paper-active-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · paper-active-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · stale-expired-approval-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · stale-expired-approval-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · multiple-approvals-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · multiple-approvals-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > A product · prior-different-strategy-product
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > C concept · prior-different-strategy-concept
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · empty-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · search-planned-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · search-running-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · search-completed-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · backtest-available-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > J correction · paper-pending-correction
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > B feature · empty-feature
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > B feature · search-planned-feature
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > B feature · search-running-feature
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > B feature · search-completed-feature
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > B feature · backtest-available-feature
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:438:38
+    436|       expect(route.mode).toBe(item.mode);
+    437|       expect(route.topic).toBe(item.topic);
+    438|       expect(route.providerExpected).toBe(item.provider);
+       |                                      ^
+    439|       expect(route.requiresApproval).toBe(item.approval);
+    440|       expect(route.lifecycleInfluencedRouting).toBe(item.lifecycleInfl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/33]⎯
+

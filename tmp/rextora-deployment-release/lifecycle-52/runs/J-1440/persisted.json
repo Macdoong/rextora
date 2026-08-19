@@ -1,0 +1,260 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "backtest.detail",
+      "sessionId": "agent_fd723b42a332487d",
+      "arguments": {
+        "runId": "bt_msspspwz_7e8dfd"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 1,
+      "approved": true,
+      "timestamp": "2026-08-14T08:58:54.664Z",
+      "approvalId": "pa_2cf25c9bff0ebea0"
+    },
+    {
+      "toolId": "backtest.run",
+      "sessionId": "agent_fd723b42a332487d",
+      "arguments": {
+        "strategyId": "demo_strategy_btc_v1",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "period": null,
+        "initialCapital": null,
+        "fees": null,
+        "slippage": null,
+        "positionSizing": null,
+        "notes": "필수 파라미터(기간, 초기 자본, 수수료·슬리피지, 포지션 규칙)를 사용자 승인 전에 확인해야 합니다."
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 453,
+      "approved": true,
+      "timestamp": "2026-08-14T08:58:55.117Z",
+      "approvalId": "pa_2cf25c9bff0ebea0"
+    },
+    {
+      "toolId": "memory.recall",
+      "sessionId": "agent_fd723b42a332487d",
+      "arguments": {},
+      "result": {
+        "ok": false,
+        "status": "validation_error",
+        "errorCode": "INPUT_INVALID",
+        "summary": "$.query: required"
+      },
+      "durationMs": 0,
+      "approved": false,
+      "timestamp": "2026-08-14T09:00:57.294Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "memory.recall",
+      "sessionId": "agent_fd723b42a332487d",
+      "arguments": {},
+      "result": {
+        "ok": false,
+        "status": "validation_error",
+        "errorCode": "INPUT_INVALID",
+        "summary": "$.query: required"
+      },
+      "durationMs": 0,
+      "approved": false,
+      "timestamp": "2026-08-14T09:03:47.327Z",
+      "approvalId": null
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T08:58:19.978Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspsqtm_1zg1nl",
+      "turnId": "turn-1786697899959",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:58:53.715Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspsqtm_1zg1nl",
+      "turnId": "turn-1786697899959",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 33730,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:58:55.120Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspthxs_878rii",
+      "turnId": "turn-1786697934656",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:58:55.121Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspthxs_878rii",
+      "turnId": "turn-1786697934656",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:00:57.297Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspw47l_ivgm6y",
+      "turnId": "turn-1786698057290",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:01:15.720Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspw47l_ivgm6y",
+      "turnId": "turn-1786698057290",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 18421,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:03:47.329Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspzrep_1yy75c",
+      "turnId": "turn-1786698227323",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:04:07.809Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspzrep_1yy75c",
+      "turnId": "turn-1786698227323",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 20478,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_msspspwz_7e8dfd.chart.json",
+    "bt_msspspwz_7e8dfd.json",
+    "bt_msspthxl_822a92.chart.json",
+    "bt_msspthxl_822a92.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_fd723b42a332487d",
+      "kind": "actual_result",
+      "statementKo": "백테스트의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "run",
+          "id": "bt_msspthxl_822a92"
+        },
+        {
+          "type": "event",
+          "id": "event_e15ae0ae82e735f23202"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:58:55.117Z",
+      "sourceEventId": "event_e15ae0ae82e735f23202",
+      "metadata": {
+        "eventType": "backtest.completed",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_112a8b507e1654c54846"
+    },
+    {
+      "sessionId": "agent_fd723b42a332487d",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 백테스트 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_220f042a3127464c9e4e"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:58:55.119Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_2cf25c9bff0ebea0",
+        "meaningfulHash": "cd6af6b68f49f9fbae42b14c"
+      },
+      "memoryId": "memory_ee2da27623051cba7e77"
+    },
+    {
+      "sessionId": "agent_fd723b42a332487d",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_220f042a3127464c9e4e"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:58:55.119Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_2cf25c9bff0ebea0",
+        "meaningfulHash": "cd6af6b68f49f9fbae42b14c"
+      },
+      "memoryId": "memory_be6747398f5d10dc79cb"
+    }
+  ],
+  "sessionFiles": [
+    "agent_fd723b42a332487d"
+  ]
+}

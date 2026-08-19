@@ -1,0 +1,164 @@
+{
+  "recordedAt": "2026-08-04T10:40:25.567Z",
+  "BUILD_ID": "eZtUlBGDBVyiy8Lviw5SU",
+  "gates": {
+    "focused": {
+      "command": "npx vitest run (focused suite)",
+      "startedAt": null,
+      "finishedAt": null,
+      "durationMs": null,
+      "exitCode": 0,
+      "stdoutLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/focused-tests.log",
+      "stderrLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/focused-tests.stderr.log",
+      "parsedResult": {
+        "tests": 35,
+        "files": 7
+      },
+      "BUILD_ID": null,
+      "evidenceComplete": true,
+      "pass": true
+    },
+    "lint": {
+      "command": "npm run lint",
+      "startedAt": "2026-08-04T10:30:43.417Z",
+      "finishedAt": "2026-08-04T10:30:59.383Z",
+      "durationMs": 15966,
+      "exitCode": 0,
+      "stdoutLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/lint.stdout.log",
+      "stderrLogPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/logs/lint.stderr.log",
+      "parsedResult": null,
+      "BUILD_ID": "ssEKrey6MwlCk4vBIwfE0",
+      "evidenceComplete": true,
+      "signal": null,
+      "error": null,
+      "pass": true
+    },
+    "build": {
+      "command": "npm run build",
+      "startedAt": "2026-08-04T10:36:01.878Z",
+      "finishedAt": "2026-08-04T10:40:25.566Z",
+      "durationMs": null,
+      "exitCode": 0,
+      "stdoutLogPath": "tmp/cursor-tester-ready-fix/logs/build.stdout.log",
+      "stderrLogPath": "tmp/cursor-tester-ready-fix/logs/build.stderr.log",
+      "parsedResult": {
+        "note": "final rebuild after instrumentation turbopackIgnore"
+      },
+      "BUILD_ID": "eZtUlBGDBVyiy8Lviw5SU",
+      "evidenceComplete": true,
+      "pass": true
+    }
+  },
+  "verdict": {
+    "verdict": "PASS",
+    "reason": null,
+    "pass": true
+  },
+  "traceInspection": {
+    "inspectedAt": "2026-08-04T10:40:25.307Z",
+    "nextDir": "/Users/macdoong/Documents/Rextora/.next",
+    "totalSizeBytes": 4923921461,
+    "totalSizeHuman": "4.59GB",
+    "nftManifestCount": 114,
+    "traced": {
+      "tmp": 0,
+      "screenshots": 0,
+      "gitEvidence": 0,
+      "envFiles": 0,
+      "acceptanceArtifacts": 0
+    },
+    "samples": {
+      "tmp": [],
+      "screenshots": [],
+      "envFiles": [],
+      "gitEvidence": []
+    },
+    "largestTracedPaths": [
+      {
+        "file": "./route_client-reference-manifest.js",
+        "count": 79
+      },
+      {
+        "file": "./page/react-loadable-manifest.json",
+        "count": 32
+      },
+      {
+        "file": "./page_client-reference-manifest.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/@swc/helpers/cjs/_interop_require_default.cjs",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/@swc/helpers/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/build/adapter/setup-node-env.external.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/app-router-headers.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/hooks-server-context.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/components/static-generation-bailout.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/client/lib/console.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/@opentelemetry/api/index.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/@opentelemetry/api/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/jsonwebtoken/index.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/jsonwebtoken/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.prod.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/source-map/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/source-map/source-map.js",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/stacktrace-parser/package.json",
+        "count": 32
+      },
+      {
+        "file": "../../../../../../node_modules/next/dist/compiled/stacktrace-parser/stack-trace-parser.cjs.js",
+        "count": 32
+      }
+    ],
+    "runtimeRequired": {
+      "safeStrategyPresent": true
+    },
+    "secretTraceFailure": false,
+    "pass": true
+  }
+}

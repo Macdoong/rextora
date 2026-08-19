@@ -1,0 +1,10 @@
+{
+  "command": "npm test",
+  "startedAt": "2026-08-05T14:44:19Z",
+  "finishedAt": "2026-08-05T14:45:39Z",
+  "durationMs": 80100,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/quality-gates/unit.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/unit.stderr.log",
+  "BUILD_ID": "a0jdDmcIxl_8oa5KRn2Fl"
+}

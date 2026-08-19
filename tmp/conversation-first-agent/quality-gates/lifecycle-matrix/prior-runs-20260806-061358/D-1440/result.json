@@ -1,0 +1,14 @@
+{
+  "scenario": "D",
+  "width": 1440,
+  "startedAt": "2026-08-05T17:38:24.437Z",
+  "finishedAt": "2026-08-05T17:53:42.128Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-D-1440-37c208-pTiTw2",
+  "port": 54437,
+  "provider": "gemini",
+  "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioD (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:448:25)\n    at runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:910:34)\n    at async file:///Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1015:23\n    at async main (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1012:26)",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "passed": false
+}

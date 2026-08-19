@@ -1,0 +1,25 @@
+{
+  "entrypoint": "app/api/rextora/settings/ai-providers/route.ts",
+  "elapsedMs": 126.673833,
+  "tracedFileCount": 15,
+  "esmFileCount": 0,
+  "warningCount": 0,
+  "warnings": [],
+  "tracedFiles": [
+    "app/api/rextora/settings/ai-providers/route.ts",
+    "package.json",
+    "src/lib/rextora/agent/v2/providers/index.ts",
+    "src/lib/rextora/agent/v2/providers/openaiRequestParams.ts",
+    "src/lib/rextora/agent/v2/providers/providerCatalog.ts",
+    "src/lib/rextora/agent/v2/providers/providerConnectionTest.ts",
+    "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+    "src/lib/rextora/agent/v2/providers/providerRequestGuard.ts",
+    "src/lib/rextora/agent/v2/providers/providerRuntimeConfig.ts",
+    "src/lib/rextora/agent/v2/providers/providerSettingsService.ts",
+    "src/lib/rextora/agent/v2/providers/providerSettingsStore.ts",
+    "src/lib/rextora/agent/v2/providers/providerTypes.ts",
+    "src/lib/rextora/agent/v2/providers/safeUpstreamJson.ts",
+    "src/lib/rextora/storage/jsonStore.ts",
+    "src/lib/rextora/storage/runtimePaths.ts"
+  ]
+}

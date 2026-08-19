@@ -1,0 +1,6 @@
+execution-390: demo 801ms
+execution-390: server 1341ms
+execution-390: browser 1548ms
+execution-390: turn 새 전략을 탐색해줘. 11834ms
+execution-390: PASS
+{"passed":true,"total":1,"passedCount":1,"failures":[]}

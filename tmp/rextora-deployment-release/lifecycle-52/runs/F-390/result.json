@@ -1,0 +1,138 @@
+{
+  "scenario": "F",
+  "width": 390,
+  "startedAt": "2026-08-14T06:06:52.618Z",
+  "finishedAt": "2026-08-14T06:11:58.094Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-F-390-947821-OHzWzK",
+  "port": 54014,
+  "provider": "openai",
+  "consoleErrorCount": 2,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:54014/api/rextora/settings/ai-providers/models?provider=gemini:0:0",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:54014/api/rextora/settings/ai-providers/models?provider=gemini:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T06:06:53.855Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjo9zz_fepwsd",
+      "turnId": "turn-1786687613835",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:06:53.952Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjo9zz_fepwsd",
+      "turnId": "turn-1786687613835",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 90,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T06:06:54.940Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjoau4_zlbssv",
+      "turnId": "turn-1786687614888",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:06:54.941Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjoau4_zlbssv",
+      "turnId": "turn-1786687614888",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:06:55.963Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjobmj_amsg3g",
+      "turnId": "turn-1786687615892",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:06:55.964Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjobmj_amsg3g",
+      "turnId": "turn-1786687615892",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:09:27.023Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjrk6n_q83yc4",
+      "turnId": "turn-1786687766980",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:09:27.026Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjrk6n_q83yc4",
+      "turnId": "turn-1786687766980",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "jobId": "search_f101e059-b597-40c1-9c02-ee223c3b140d",
+    "firstFallbackUsed": true,
+    "firstToolIds": [
+      "search.status"
+    ],
+    "secondResponseReceived": true,
+    "secondFallbackUsed": true,
+    "secondDirectAnswer": false,
+    "providerStartedCount": 0,
+    "completedCount": 2,
+    "noDuplicateProviderLoop": true,
+    "noWriteToolExecuted": true,
+    "writeToolIds": [],
+    "firstThinkingCleared": true,
+    "conversationContinued": true,
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "horizontalOverflow": false,
+    "thinkingCleared": true,
+    "primaryText": "지금 실행 중인 탐색을 먼저 확인하세요.\n\n1개 작업이 실행 중입니다.\n\n탐색 상태·결과를 확인하세요.",
+    "hasApproval": false,
+    "hasExecutionResult": false
+  },
+  "passed": true
+}

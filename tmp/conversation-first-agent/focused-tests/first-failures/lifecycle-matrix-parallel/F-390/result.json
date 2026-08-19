@@ -1,0 +1,118 @@
+{
+  "scenario": "F",
+  "width": 390,
+  "startedAt": "2026-08-05T18:07:17.174Z",
+  "finishedAt": "2026-08-05T20:51:30.637Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-F-390-75f240-dBJrW6",
+  "port": 54551,
+  "provider": "gemini",
+  "consoleErrorCount": 6,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54551/api/rextora/strategies:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54551/api/rextora/strategies:0:0",
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54551/api/rextora/strategies:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54551/api/rextora/strategies:0:0",
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54551/api/rextora/strategy-search:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54551/api/rextora/strategy-search:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-05T18:07:19.747Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg3b7_k8y328",
+      "turnId": "turn-1785953239724",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:19.930Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg3b7_k8y328",
+      "turnId": "turn-1785953239724",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 177,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-05T18:07:20.981Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg49h_vi4p00",
+      "turnId": "turn-1785953240868",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:20.981Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg49h_vi4p00",
+      "turnId": "turn-1785953240868",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:22.053Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg539_yehcft",
+      "turnId": "turn-1785953242025",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:22.057Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg539_yehcft",
+      "turnId": "turn-1785953242025",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "jobId": "search_328a591c-8eb2-407a-ac3f-b0c527fba682",
+    "firstFallbackUsed": true,
+    "firstToolIds": [
+      "search.status"
+    ],
+    "secondResponseReceived": true,
+    "secondFallbackUsed": false,
+    "secondDirectAnswer": true,
+    "providerStartedCount": 0,
+    "completedCount": 1,
+    "noDuplicateProviderLoop": true,
+    "noWriteToolExecuted": true,
+    "writeToolIds": [],
+    "firstThinkingCleared": true,
+    "conversationContinued": true,
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "horizontalOverflow": false,
+    "thinkingCleared": true,
+    "primaryText": "전략 탐색은 여러 규칙과 설정을 실제 과거 데이터에 적용해 검토할 후보를 찾는 단계입니다.\n\n탐색 결과는 아직 채택된 전략이 아닙니다. 결과 등록과 백테스트 검토를 거쳐야 하며, 새 탐색이나 취소처럼 상태를 바꾸는 작업은 승인 후 실행됩니다.",
+    "hasApproval": false,
+    "hasExecutionResult": false
+  },
+  "passed": false
+}

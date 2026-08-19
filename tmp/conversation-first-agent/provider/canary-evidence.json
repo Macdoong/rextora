@@ -1,0 +1,86 @@
+{
+  "requestedProvider": "gemini",
+  "selectedProvider": "gemini",
+  "providerAttempted": true,
+  "providerSucceeded": true,
+  "structuredOutputValid": true,
+  "canaryPassed": true,
+  "checks": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "configured": false
+    },
+    {
+      "ok": true,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latencyMs": 1385,
+      "configured": true
+    }
+  ],
+  "fallbackUsed": false,
+  "fallbackReason": null,
+  "writeToolAuditCount": 0,
+  "canary": {
+    "status": 200,
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "fallbackUsed": false,
+    "validationOk": true,
+    "toolIds": [
+      "workspace.current",
+      "lifecycle.current"
+    ],
+    "writeToolExecuted": false,
+    "structuredOutputValid": true,
+    "conclusionKo": "현재 대시보드에 있으며, 비트코인 15분봉을 보고 계십니다. 1개의 전략 탐색 작업이 완료되었고, 2개의 전략 중 1개가 실전 가능 후보입니다. 최근 백테스트는 1회 실행되었으며, 주목 전략은 'demo_strategy_btc_v1'입니다. 시스템은 백테스트가 검증된 'demo_strategy_btc_v1' 전략에 대해 모의매매를 검토할 것을 권장하고 있습니다.",
+    "latencyMs": 5434,
+    "errorKo": null
+  },
+  "verification": {
+    "requestedProvider": "gemini",
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "fallbackReason": null,
+    "canaryPassed": true,
+    "healthyMarked": true,
+    "checksEmpty": false,
+    "canaryNull": false,
+    "writeToolsBlocked": true,
+    "plannedWriteTools": []
+  },
+  "attempts": [
+    {
+      "requestedProvider": "gemini",
+      "providerSucceeded": true,
+      "canaryPassed": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "writeToolAuditCount": 0
+    }
+  ],
+  "provider": "gemini",
+  "health": {
+    "activeProvider": "gemini",
+    "openaiConfigured": false,
+    "geminiConfigured": true,
+    "checks": [
+      {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "configured": false
+      },
+      {
+        "ok": true,
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "latencyMs": 1385,
+        "configured": true
+      }
+    ],
+    "checkedAt": "2026-08-06T07:28:51.726Z"
+  }
+}

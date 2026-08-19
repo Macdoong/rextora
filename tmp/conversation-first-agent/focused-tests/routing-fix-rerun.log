@@ -1,0 +1,107 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (97 tests | 5 failed) 36ms
+     × E result analysis · empty-analysis 4ms
+     × E result analysis · search-planned-analysis 0ms
+     × E result analysis · search-running-analysis 0ms
+     × E result analysis · search-completed-analysis 0ms
+     × E result analysis · backtest-available-analysis 0ms
+ ❯ tests/AgentConversationRandomized.test.ts (11 tests | 4 failed) 27ms
+     × conversation 3: search_running 4ms
+     × conversation 7: paper_active 1ms
+     × conversation 9: search_failed 1ms
+     × conversation 10: live_review 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 3: search_running
+AssertionError: 현재 탐색 취소하고 다른 조합으로 다시 해: expected 'READ_AND_ANSWER' to be 'PLAN_AND_APPROVE' // Object.is equality
+
+Expected: "PLAN_AND_APPROVE"
+Received: "READ_AND_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:211:40
+    209|           pendingApprovals: profile.pending,
+    210|         });
+    211|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    212|         if (turn.noLifecycle) {
+    213|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 7: paper_active
+AssertionError: 모의매매랑 백테스트 차이?: expected 'READ_AND_ANSWER' to be 'DIRECT_ANSWER' // Object.is equality
+
+Expected: "DIRECT_ANSWER"
+Received: "READ_AND_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:211:40
+    209|           pendingApprovals: profile.pending,
+    210|         });
+    211|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    212|         if (turn.noLifecycle) {
+    213|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 9: search_failed
+AssertionError: 거래 비용이 성과에 왜 영향 줘?: expected 'READ_AND_ANSWER' to be 'DIRECT_ANSWER' // Object.is equality
+
+Expected: "DIRECT_ANSWER"
+Received: "READ_AND_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:211:40
+    209|           pendingApprovals: profile.pending,
+    210|         });
+    211|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    212|         if (turn.noLifecycle) {
+    213|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 10: live_review
+AssertionError: Paper와 실전매매 차이가 뭐야?: expected 'READ_AND_ANSWER' to be 'DIRECT_ANSWER' // Object.is equality
+
+Expected: "DIRECT_ANSWER"
+Received: "READ_AND_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:211:40
+    209|           pendingApprovals: profile.pending,
+    210|         });
+    211|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    212|         if (turn.noLifecycle) {
+    213|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > E result analysis · empty-analysis
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > E result analysis · search-planned-analysis
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > E result analysis · search-running-analysis
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > E result analysis · search-completed-analysis
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > E result analysis · backtest-available-analysis
+AssertionError: expected 'strategy_explanation' to be 'strategy_risk' // Object.is equality
+
+Expected: "strategy_risk"
+Received: "strategy_explanation"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:422:27
+    420|
+    421|       expect(route.mode).toBe(item.mode);
+    422|       expect(route.topic).toBe(item.topic);
+       |                           ^
+    423|       expect(route.providerExpected).toBe(item.provider);
+    424|       expect(route.requiresApproval).toBe(item.approval);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  9 failed | 117 passed (126)
+   Start at  06:11:40
+   Duration  2.13s (transform 808ms, setup 44ms, import 368ms, tests 1.07s, environment 0ms)
+

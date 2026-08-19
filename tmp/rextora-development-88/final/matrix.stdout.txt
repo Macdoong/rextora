@@ -1,0 +1,929 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 78485
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 20
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 968
+    }
+  ]
+}
+
+Running 96 tests using 1 worker
+
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.3s)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (1.6m)
+  ✘   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (4.6m)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (96ms)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.3s)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (4.5s)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (14.7s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (28.3s)
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (36.0s)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.3m)
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (2.4m)
+  ✓  13 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.1m)
+  ✓  14 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (14.5s)
+  ✓  15 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (3.4m)
+  ✓  16 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (43.7s)
+  ✓  17 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.5m)
+  ✓  18 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (3.0m)
+  ✓  19 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (762ms)
+  ✓  20 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (804ms)
+  ✓  21 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (1.4m)
+  ✓  22 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (46.1s)
+  ✓  23 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.8m)
+  ✓  24 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:53:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+  ✓  25 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✘  26 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (1.6m)
+  ✓  27 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (48.1s)
+  ✘  28 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.6m)
+  ✓  29 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (1.2s)
+  ✓  30 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (48.9s)
+  ✓  31 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (2.5m)
+  ✓  32 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (1.2m)
+  ✓  33 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.2m)
+  ✓  34 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.7m)
+  ✓  35 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.5m)
+  ✓  36 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.9m)
+  ✓  37 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (2.2m)
+  ✓  38 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (1.3m)
+  ✓  39 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.9m)
+  ✓  40 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (3.4m)
+  ✘  41 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (5.0m)
+  ✘  42 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (5.0m)
+  ✘  43 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (0ms)
+  -  44 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  45 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  46 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  47 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+  ✓  48 [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:53:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (2ms)
+  ✓  49 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓  50 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (1.5m)
+  ✘  51 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (1.7m)
+  ✘  52 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (0ms)
+  -  53 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog
+  -  54 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model
+  -  55 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector
+  -  56 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation
+  -  57 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation
+  -  58 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance
+  -  59 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis
+  -  60 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up
+  -  61 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh
+  -  62 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior
+  -  63 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan
+  -  64 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution
+  -  65 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution
+  -  66 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting
+  -  67 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled
+  -  68 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  69 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  70 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  71 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+  ✓  72 [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:53:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (2ms)
+  ✓  73 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓  74 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (1.6m)
+  ✓  75 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (3.0m)
+  ✘  76 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (5.0m)
+  ✓  77 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (2.7s)
+  ✘  78 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.6m)
+  ✘  79 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (5.0m)
+  ✘  80 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (5.0m)
+  ✘  81 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (5.0m)
+  ✘  82 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (5.0m)
+  ✘  83 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (5.0m)
+  ✘  84 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (5.0m)
+  ✘  85 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (5.0m)
+  ✘  86 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (5.0m)
+  ✘  87 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (5.0m)
+  ✘  88 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (5.0m)
+  ✘  89 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (5.0m)
+  ✘  90 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (5.0m)
+  ✓  91 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (397ms)
+  ✓  92 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (386ms)
+  ✘  93 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (5.2m)
+  ✘  94 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (0ms)
+  -  95 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+  ✓  96 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:53:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (2ms)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+
+    TimeoutError: page.waitForFunction: Timeout 60000ms exceeded.
+
+       at helpers.ts:221
+
+      219 |   for (let attempt = 0; attempt < 3; attempt++) {
+      220 |     try {
+    > 221 |       await page.waitForFunction(
+          |                  ^
+      222 |         ({ id, min }) => {
+      223 |           const sel = document.querySelector(`[data-testid="${id}"]`) as HTMLSelectElement | null;
+      224 |           return Boolean(sel && sel.options.length >= min);
+        at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:221:18)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:101:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    TimeoutError: locator.waitFor: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-settings-shell-ready="true"]')[22m
+
+
+       at helpers.ts:182
+
+      180 |       throw error;
+      181 |     }
+    > 182 |     await page.locator('[data-settings-shell-ready="true"]').waitFor({
+          |                                                              ^
+      183 |       state: "attached",
+      184 |       timeout: 90_000,
+      185 |     });
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:71:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+
+    TimeoutError: locator.waitFor: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-settings-shell-ready="true"]')[22m
+
+
+       at helpers.ts:182
+
+      180 |       throw error;
+      181 |     }
+    > 182 |     await page.locator('[data-settings-shell-ready="true"]').waitFor({
+          |                                                              ^
+      183 |       state: "attached",
+      184 |       timeout: 90_000,
+      185 |     });
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:100:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-768/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state 
+
+    TimeoutError: page.goto: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3101/settings", waiting until "domcontentloaded"[22m
+
+
+       at helpers.ts:155
+
+      153 | export async function openAiProviderTab(page: Page) {
+      154 |   for (let attempt = 0; attempt < 3; attempt++) {
+    > 155 |     await page.goto("/settings", { waitUntil: "domcontentloaded", timeout: 90_000 });
+          |                ^
+      156 |     const broken = await page
+      157 |       .evaluate(() => {
+      158 |         const text = document.body?.innerText ?? "";
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:155:16)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:91:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    Error Context: test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-1024/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1024/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: page.reload: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for navigation until "load"[22m
+    [2m    - navigated to "http://127.0.0.1:3101/settings"[22m
+
+
+       at helpers.ts:232
+
+      230 |     } catch (error) {
+      231 |       if (attempt === 2) throw error;
+    > 232 |       await page.reload();
+          |                  ^
+      233 |       await page.getByTestId("settings-tab-btn-ai").click();
+      234 |       await page.getByTestId("ai-provider-settings").waitFor();
+      235 |     }
+        at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:232:18)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:101:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model 
+
+    TimeoutError: locator.waitFor: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-settings-shell-ready="true"]')[22m
+
+
+       at helpers.ts:182
+
+      180 |       throw error;
+      181 |     }
+    > 182 |     await page.locator('[data-settings-shell-ready="true"]').waitFor({
+          |                                                              ^
+      183 |       state: "attached",
+      184 |       timeout: 90_000,
+      185 |     });
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:162:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    TimeoutError: locator.waitFor: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:171:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:183:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:198:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:211:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:227:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:245:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:264:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:289:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:304:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:323:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:343:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible[22m
+
+
+       at helpers.ts:301
+
+      299 |     try {
+      300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+    > 301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+          |                                                           ^
+      302 |       await page.waitForFunction(
+      303 |         () =>
+      304 |           document
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:375:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3101/dashboard", waiting until "domcontentloaded"[22m
+
+
+       at helpers.ts:300
+
+      298 |   for (let attempt = 0; attempt < 3; attempt++) {
+      299 |     try {
+    > 300 |       await page.goto("/dashboard", { waitUntil: "domcontentloaded", timeout: 90_000 });
+          |                  ^
+      301 |       await page.getByTestId("dashboard-agent-workspace").waitFor({ timeout: 90_000 });
+      302 |       await page.waitForFunction(
+      303 |         () =>
+        at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:300:18)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:416:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    Error Context: test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-220c9-io-21-SAFE-mutation-refusal-dev-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-220c9-io-21-SAFE-mutation-refusal-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-220c9-io-21-SAFE-mutation-refusal-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+    [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+    [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+    [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [dev-768] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+    [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state 
+    [dev-1024] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal 
+  24 did not run
+  48 passed (2.5h)

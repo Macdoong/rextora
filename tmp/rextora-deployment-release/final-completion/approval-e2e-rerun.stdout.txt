@@ -1,0 +1,10 @@
+{
+  "turnA_planMode": true,
+  "turnA_hasApproval": true,
+  "turnA_httpOk": true,
+  "turnB_approvalMode": true,
+  "turnB_noProviderFallback": true,
+  "turnC_duplicateBlocked": true,
+  "turnD_reportOk": true,
+  "passed": true
+}

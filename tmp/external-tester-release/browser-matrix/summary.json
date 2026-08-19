@@ -1,0 +1,56 @@
+{
+  "command": "PHASE3_SCENARIOS=A..M node tmp/codex-master-run/phase3-isolated-acceptance.mjs",
+  "startedAt": "2026-08-05T11:16:36Z",
+  "finishedAt": "2026-08-05T11:58:05Z",
+  "durationMs": 2488570,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/browser-matrix.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/browser-matrix.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "passed": true,
+    "total": 52,
+    "passedCount": 52,
+    "failures": [],
+    "buildId": "-Cxu4VyOHFfrQb9h3COOq",
+    "provider": "gemini",
+    "conversationB": [
+      {
+        "width": 390,
+        "passed": true,
+        "repeatApprovalCreatedNothing": true,
+        "providerCallCount": 0,
+        "duplicateExecutionCount": 0,
+        "oldJobStillActive": true,
+        "oldJobStatusPreApproval": "running"
+      },
+      {
+        "width": 768,
+        "passed": true,
+        "repeatApprovalCreatedNothing": true,
+        "providerCallCount": 0,
+        "duplicateExecutionCount": 0,
+        "oldJobStillActive": true,
+        "oldJobStatusPreApproval": "running"
+      },
+      {
+        "width": 1024,
+        "passed": true,
+        "repeatApprovalCreatedNothing": true,
+        "providerCallCount": 0,
+        "duplicateExecutionCount": 0,
+        "oldJobStillActive": true,
+        "oldJobStatusPreApproval": "running"
+      },
+      {
+        "width": 1440,
+        "passed": true,
+        "repeatApprovalCreatedNothing": true,
+        "providerCallCount": 0,
+        "duplicateExecutionCount": 0,
+        "oldJobStillActive": true,
+        "oldJobStatusPreApproval": "queued"
+      }
+    ]
+  }
+}

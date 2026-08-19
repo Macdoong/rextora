@@ -1,0 +1,6 @@
+=== dev-390 s01-11 ===
+{"viewport":"390","batch":"s01-11","exitCode":0,"durationMs":561978}
+=== dev-390 s12-16 ===
+{"viewport":"390","batch":"s12-16","exitCode":0,"durationMs":499861}
+=== dev-390 s17-22 ===
+{"viewport":"390","batch":"s17-22","exitCode":1,"durationMs":591815}

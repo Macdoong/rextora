@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "reachableLocalFileCount": 569,
+  "reachableLocalBytes": 4091094,
+  "edgeCount": 2156,
+  "directRuntimeOrEvidenceImportEdges": [],
+  "unignoredRuntimeFsCalls": [],
+  "peakRssBytes": 211795968
+}

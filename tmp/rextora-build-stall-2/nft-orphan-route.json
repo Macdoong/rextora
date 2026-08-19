@@ -1,0 +1,11 @@
+{
+  "entry": "app/api/rextora/internal/orphan-recovery/route.ts",
+  "durationMs": 5,
+  "fileCount": 2,
+  "warnings": [
+    "Error: Failed to parse /Users/macdoong/Documents/Rextora/app/api/rextora/internal/orphan-recovery/route.ts as module:\nUnexpected token (4:35)"
+  ],
+  "relevantRuntimeCount": 0,
+  "relevantRuntime": [],
+  "reasons": {}
+}

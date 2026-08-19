@@ -1,0 +1,97 @@
+{
+  "requestedProvider": "openai",
+  "selectedProvider": "openai",
+  "providerAttempted": true,
+  "providerSucceeded": true,
+  "structuredOutputValid": true,
+  "canaryPassed": true,
+  "checks": [
+    {
+      "ok": false,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "latencyMs": 923,
+      "errorKo": "OpenAI 응답 오류 (200)",
+      "configured": true
+    },
+    {
+      "ok": true,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "latencyMs": 649,
+      "configured": true
+    }
+  ],
+  "fallbackUsed": false,
+  "fallbackReason": null,
+  "writeToolAuditCount": 0,
+  "canary": {
+    "status": 200,
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "fallbackUsed": false,
+    "validationOk": true,
+    "toolIds": [],
+    "writeToolExecuted": false,
+    "structuredOutputValid": true,
+    "conclusionKo": "현재는 대시보드에서 비트코인 15분봉과 demo_strategy_btc_v1를 보고 있으며, 최근 백테스트가 있어 시스템은 모의매매 화면(/모의매매-trading)으로의 이동을 권장합니다. 새 작업 생성 없이 모의매매로 넘어가 검토하세요.",
+    "latencyMs": 26127,
+    "errorKo": null
+  },
+  "verification": {
+    "requestedProvider": "openai",
+    "selectedProvider": "openai",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "fallbackReason": null,
+    "canaryPassed": true,
+    "healthyMarked": true,
+    "checksEmpty": false,
+    "canaryNull": false,
+    "writeToolsBlocked": true,
+    "plannedWriteTools": []
+  },
+  "attempts": [
+    {
+      "requestedProvider": "openai",
+      "providerSucceeded": true,
+      "canaryPassed": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "writeToolAuditCount": 0
+    },
+    {
+      "requestedProvider": "gemini",
+      "providerSucceeded": true,
+      "canaryPassed": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "writeToolAuditCount": 0
+    }
+  ],
+  "provider": "openai",
+  "health": {
+    "activeProvider": "openai",
+    "openaiConfigured": true,
+    "geminiConfigured": true,
+    "checks": [
+      {
+        "ok": false,
+        "provider": "openai",
+        "model": "gpt-5-mini",
+        "latencyMs": 923,
+        "errorKo": "OpenAI 응답 오류 (200)",
+        "configured": true
+      },
+      {
+        "ok": true,
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "latencyMs": 649,
+        "configured": true
+      }
+    ],
+    "checkedAt": "2026-08-11T02:46:03.995Z"
+  }
+}

@@ -1,0 +1,40 @@
+
+> rextora@0.1.0 test:e2e
+> playwright test
+
+
+Running 31 tests using 3 workers
+
+  ✓   1 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /dashboard with pre-live safety state (236ms)
+  ✓   2 [chromium] › tests/e2e/strategy-search-flow.spec.ts:432:7 › Strategy Search operator UI (intercepted API) › renders simplified page and Korean nav (872ms)
+  ✓   4 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /strategy-search with pre-live safety state (641ms)
+  ✓   6 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /results with pre-live safety state (362ms)
+  ✓   7 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /backtest with pre-live safety state (394ms)
+  ✓   3 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /dashboard loads styled shell on direct entry (1.7s)
+  ✓   8 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /paper-trading with pre-live safety state (412ms)
+  ✓  10 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /live-trading with pre-live safety state (653ms)
+  ✓   5 [chromium] › tests/e2e/strategy-search-flow.spec.ts:462:7 › Strategy Search operator UI (intercepted API) › create starts search, controls, status, qualified panel, Korean errors (1.9s)
+  ✓  11 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /settings with pre-live safety state (252ms)
+  ✓  13 [chromium] › tests/e2e/rextora-smoke.spec.ts:45:7 › Rextora lifecycle smoke › sidebar has exactly seven primary nav items (386ms)
+  ✓   9 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /strategy-search loads styled shell on direct entry (1.8s)
+  ✓  14 [chromium] › tests/e2e/rextora-smoke.spec.ts:56:7 › Rextora lifecycle smoke › dashboard shows lifecycle sections and primary actions (215ms)
+  ✓  16 [chromium] › tests/e2e/rextora-smoke.spec.ts:69:7 › Rextora lifecycle smoke › research form keeps expert section collapsed by default (920ms)
+  ✓  17 [chromium] › tests/e2e/rextora-smoke.spec.ts:105:7 › Rextora lifecycle smoke › results page shows SAFE baseline and highlights (138ms)
+  ✓  15 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /results loads styled shell on direct entry (1.5s)
+  ✓  19 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /backtest loads styled shell on direct entry (1.5s)
+  ✓  18 [chromium] › tests/e2e/rextora-smoke.spec.ts:118:7 › Rextora lifecycle smoke › results research history management controls are visible (2.6s)
+  ✓  20 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /paper-trading loads styled shell on direct entry (1.2s)
+  ✓  21 [chromium] › tests/e2e/rextora-smoke.spec.ts:136:7 › Rextora lifecycle smoke › live activation gates never auto-start live (2.1s)
+  ✓  23 [chromium] › tests/e2e/rextora-smoke.spec.ts:144:7 › Rextora lifecycle smoke › settings includes system and expert sections (685ms)
+  ✓  24 [chromium] › tests/e2e/rextora-smoke.spec.ts:158:7 › Rextora lifecycle smoke › expert wizard remains available via query gate (138ms)
+  ✓  25 [chromium] › tests/e2e/rextora-smoke.spec.ts:166:7 › Rextora lifecycle smoke › legacy strategy-performance redirects to results (216ms)
+  ✓  22 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /live-trading loads styled shell on direct entry (2.9s)
+  ✓  26 [chromium] › tests/e2e/rextora-smoke.spec.ts:171:7 › Rextora lifecycle smoke › backtest page still runs (216ms)
+  ✓  28 [chromium] › tests/e2e/rextora-smoke.spec.ts:183:7 › Rextora lifecycle smoke › paper feedback actions visible (332ms)
+  ✓  27 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /settings loads styled shell on direct entry (1.3s)
+  ✓  12 [chromium] › tests/e2e/strategy-search-flow.spec.ts:533:7 › Strategy Search operator UI (intercepted API) › polling stops after terminal and keeps last detail on transient failure (10.6s)
+  ✓  30 [chromium] › tests/e2e/strategy-search-flow.spec.ts:583:7 › Strategy Search operator UI (intercepted API) › failed job shows failureMessage; exhausted shows operator label (408ms)
+  ✓  29 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:108:7 › Rextora shell styles (production) › client navigation between lifecycle routes keeps shell (2.5s)
+  ✓  31 [chromium] › tests/e2e/strategy-search-flow.spec.ts:618:7 › Strategy Search operator UI (intercepted API) › catalog builder controls persist through intercepted create (678ms)
+
+  31 passed (15.9s)

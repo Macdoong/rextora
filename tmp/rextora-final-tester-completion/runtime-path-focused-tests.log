@@ -1,0 +1,27 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ✓ tests/runtimePathsNftBoundary.test.ts > runtimePaths NFT boundary > preserves the default and canonical repository roots without filesystem writes 2ms
+ ✓ tests/runtimePathsNftBoundary.test.ts > runtimePaths NFT boundary > preserves REXTORA_DATA_DIR and all nested runtime paths 1ms
+ ✓ tests/runtimePathsNftBoundary.test.ts > runtimePaths NFT boundary > preserves specific override precedence 1ms
+ ✓ tests/runtimePathsNftBoundary.test.ts > runtimePaths NFT boundary > keeps missing-directory and JSON read/write behavior inside the isolated root 2ms
+ ✓ tests/runtimePathsNftBoundary.test.ts > runtimePaths NFT boundary > keeps Paper risk, provider settings, and provider secret storage under the isolated root 6ms
+ ✓ tests/strategyStoreNftBoundary.test.ts > strategyStore NFT runtime boundary > preserves exact index and strategy path construction 1ms
+ ✓ tests/strategyStoreNftBoundary.test.ts > strategyStore NFT runtime boundary > preserves list, read, write, delete, missing, custom-root, and runtime-file behavior 20ms
+ ✓ tests/strategyStoreNftBoundary.test.ts > strategyStore NFT runtime boundary > preserves malformed user-strategy failure behavior without touching SAFE 3ms
+ ✓ tests/paperRiskReadiness.test.ts > Paper tester risk policy > adds finite Paper headroom without mutating the LIVE-configured threshold 2ms
+ ✓ tests/paperRiskReadiness.test.ts > Paper tester risk policy > starts a deliberately new Paper session from deterministic clean counters 2ms
+ ✓ tests/paperRiskReadiness.test.ts > Paper tester risk policy > identifies the exact breached limiter for deterministic alert deduplication 1ms
+ ✓ tests/paperRiskReadiness.test.ts > Telegram risk transition alerts > alerts once while blocked, then allows the same risk after recovery 15ms
+ ✓ tests/paperRiskReadiness.test.ts > Telegram risk transition alerts > does not suppress a distinct risk event in an already blocked state 1ms
+ ✓ tests/providerRuntimePathIsolation.test.ts > provider runtime path isolation > rextoraDataRoot and jsonStore follow REXTORA_DATA_DIR 2ms
+ ✓ tests/providerRuntimePathIsolation.test.ts > provider runtime path isolation > credential secrets dir resolves under REXTORA_DATA_DIR 7ms
+ ✓ tests/AgentSessionPersistence.test.ts > AgentSessionPersistence > creates session directory layout with required files 5ms
+ ✓ tests/AgentSessionPersistence.test.ts > AgentSessionPersistence > persists and reloads conversation turns via jsonl 4ms
+ ✓ tests/AgentSessionPersistence.test.ts > AgentSessionPersistence > patchAgentSession stores pending plan under plans/ 4ms
+
+ Test Files  5 passed (5)
+      Tests  18 passed (18)
+   Start at  14:59:46
+   Duration  1.05s (transform 163ms, setup 47ms, import 214ms, tests 86ms, environment 0ms)
+

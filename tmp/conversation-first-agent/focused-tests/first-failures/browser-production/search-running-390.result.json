@@ -1,0 +1,50 @@
+{
+  "profile": "search-running",
+  "width": 390,
+  "port": 64950,
+  "buildId": "A7TNfHHgPmBYU48e0cCix",
+  "startedAt": "2026-08-06T00:18:04.106Z",
+  "finishedAt": "2026-08-06T00:18:11.794Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-search-running-390-0e6HBO",
+  "turnResults": [
+    {
+      "query": "현재 진행 상황 알려줘.",
+      "expectedMode": "READ_AND_ANSWER",
+      "expectedTopic": "search_status",
+      "mode": "READ_AND_ANSWER",
+      "topic": "workspace_status",
+      "provider": "gemini",
+      "fallbackUsed": false,
+      "readTools": [
+        "workspace.current",
+        "lifecycle.current"
+      ],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "현재 1개의 전략 탐색 작업이 완료되었고, 'demo_strategy_btc_v1' 전략에 대한 백테스트가 최근 완료되었습니다. 이 전략은 실전 가능 후보로 등록되어 있습니다. 시스템은 검증된 백테스트와 모의매매 가능한 전략이 있으므로, 승인 후 모의매매 화",
+    "primaryText": "현재 1개의 전략 탐색 작업이 완료되었고, 'demo_strategy_btc_v1' 전략에 대한 백테스트가 최근 완료되었습니다. 이 전략은 실전 가능 후보로 등록되어 있습니다. 시스템은 검증된 백테스트와 모의매매 가능한 전략이 있으므로, 승인 후 모의매매 화\n오전 09:18 · 백테스트 검토",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": false,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": null,
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 2,
+  "passed": false
+}

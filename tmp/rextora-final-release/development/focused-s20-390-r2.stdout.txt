@@ -1,0 +1,59 @@
+
+Running 1 test using 1 worker
+
+(node:66739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (1.6m)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 
+
+    TimeoutError: page.waitForResponse: Timeout 90000ms exceeded while waiting for event "response"
+
+       at helpers.ts:325
+
+      323 |     }
+      324 |   };
+    > 325 |   const responsePromise = page.waitForResponse(
+          |                                ^
+      326 |     (r) => {
+      327 |       if (!r.url().includes("/api/rextora/agent") || r.request().method() !== "POST") {
+      328 |         return false;
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:325:32)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:417:34)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    Error: page.waitForFunction: Test ended.
+
+       at helpers.ts:166
+
+      164 |   await textarea.fill("");
+      165 |   await textarea.pressSequentially(query, { delay: 5 });
+    > 166 |   await page.waitForFunction(
+          |              ^
+      167 |     () => {
+      168 |       const ta = document.querySelector(
+      169 |         '[data-testid="agent-input-textarea"]',
+        at commitAgentQueryInput (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:166:14)
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:334:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:417:34)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 

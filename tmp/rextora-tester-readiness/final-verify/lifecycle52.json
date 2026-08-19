@@ -1,0 +1,25 @@
+{
+  "BUILD_ID": "-6CTCAJcZAMY02xezkvRO",
+  "matrixBuildId": "-6CTCAJcZAMY02xezkvRO",
+  "exitCode": 0,
+  "passed": false,
+  "expectedRows": 52,
+  "executedRows": 52,
+  "passedRows": 49,
+  "failedRows": 3,
+  "failures": [
+    {
+      "scenario": "D",
+      "width": 390
+    },
+    {
+      "scenario": "I",
+      "width": 390
+    },
+    {
+      "scenario": "B",
+      "width": 1024
+    }
+  ],
+  "durationSec": 12551
+}

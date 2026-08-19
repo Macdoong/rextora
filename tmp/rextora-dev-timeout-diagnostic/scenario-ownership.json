@@ -1,0 +1,89 @@
+{
+  "scenario01": {
+    "id": 1,
+    "name": "OpenAI settings configured state",
+    "file": "tests/e2e/release/scenarioRegistry.ts",
+    "requiresProviderKeys": false,
+    "setup": [
+      "fetchSettings(request) GET /api/rextora/settings/ai-providers",
+      "If hasProviderKeys() && openai.stored !== true: openAiProviderTab, fill OPENAI key, select gpt-5-mini, save",
+      "API assertions: openai configured/stored/envFallback=false, secret scan on JSON body",
+      "openAiProviderTab(page) second navigation",
+      "UI assertions: ai-provider-card-openai visible, key input empty"
+    ],
+    "browserContextLifecycle": "New page+context per Playwright test (default); workers=1 in deployment-matrix",
+    "sessionLifecycle": "No agent session; Settings page only",
+    "mutations": [
+      "May POST credential via UI if openai.stored !== true (keys in env)",
+      "May write ai-provider-settings.json and encrypted credentials via save",
+      "Does NOT clear provider cache explicitly",
+      "Second openAiProviderTab leaves Settings on AI tab in same page until test ends"
+    ],
+    "apiCalls": [
+      "GET /api/rextora/settings/ai-providers (fetchSettings, up to 3 retries)",
+      "POST /api/rextora/settings/ai-providers/credential (conditional save)",
+      "GET /api/rextora/settings/ai-providers/models?provider=openai (via panel mount after tab click)"
+    ],
+    "waits": [
+      "openAiProviderTab: goto /settings, click settings-tab-btn-ai, wait ai-provider-settings (inherits test timeout up to 300s)",
+      "expect toBeVisible save toast timeout 90s (conditional path only)"
+    ],
+    "cleanup": "None explicit; browser context destroyed after test"
+  },
+  "scenario02": {
+    "id": 2,
+    "name": "Gemini settings configured state",
+    "file": "tests/e2e/release/scenarioRegistry.ts",
+    "requiresProviderKeys": false,
+    "setup": [
+      "fetchSettings(request)",
+      "If hasProviderKeys() && gemini.stored !== true: openAiProviderTab, fill GEMINI key, save",
+      "API assertions: gemini configured/stored/envFallback=false",
+      "openAiProviderTab(page) second navigation",
+      "UI assertions: ai-provider-card-gemini visible, key input empty"
+    ],
+    "browserContextLifecycle": "Fresh context if B; same worker sequential order if matrix",
+    "sessionLifecycle": "No agent session",
+    "mutations": [
+      "Conditional Gemini credential save only if gemini.stored !== true",
+      "Does not depend on scenario01 browser state when fresh context (experiment B)"
+    ],
+    "apiCalls": [
+      "GET /api/rextora/settings/ai-providers",
+      "POST credential (conditional)",
+      "GET models for openai+gemini when AI panel mounts"
+    ],
+    "waits": [
+      "openAiProviderTab ai-provider-settings wait (300s test timeout in matrix)",
+      "expect gemini card visible (default expect timeout 120s)"
+    ],
+    "cleanup": "None explicit"
+  },
+  "sharedHarness": {
+    "spec": "tests/e2e/release/deployment-matrix.spec.ts",
+    "helpers": "tests/e2e/release/helpers.ts",
+    "openAiProviderTab": {
+      "symbol": "openAiProviderTab",
+      "steps": [
+        "page.goto('/settings')",
+        "page.getByTestId('settings-tab-btn-ai').click()",
+        "page.getByTestId('ai-provider-settings').waitFor()"
+      ]
+    },
+    "playwrightConfig": "playwright.deployment-dev.config.mjs",
+    "workers": 1,
+    "testTimeoutMs": 300000,
+    "expectTimeoutMs": 120000,
+    "webServer": "REXTORA_ORPHAN_AUTO_RESUME_LIMIT=0 npm run dev --port 3101 --webpack",
+    "viewport390": "dev-390 project 390x844"
+  },
+  "crossScenarioStateHypothesis": {
+    "browserSession": "Default Playwright isolates context per test — scenario01 DOM/storage should NOT carry to scenario02",
+    "serverSide": "Scenario01 may trigger model catalog fetches, settings writes, webpack HMR, in-memory provider cache (5s TTL settings, 10m catalog)",
+    "scenario01ConsumesByScenario02": [
+      "Server-side provider settings/credential files (persistent, expected stored=true)",
+      "Possible dev-server compile/HMR pressure after scenario01 navigation",
+      "NOT browser localStorage (fresh context per test in matrix)"
+    ]
+  }
+}

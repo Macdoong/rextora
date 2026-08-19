@@ -1,0 +1,53 @@
+{
+  "name": "SAFE_v44_i4060",
+  "params_hash": "7893ca3f0e30",
+  "type": "안정형",
+  "live_eligible_candidate": true,
+  "verified_for_live": false,
+  "interpretation": "preserved safe baseline strategy/not explosive",
+  "recent_3m": {
+    "trades": 89,
+    "total_return": 0.3822,
+    "max_drawdown": -0.0946,
+    "neg_months": 0,
+    "sharpe": 2.22,
+    "cagr": 0.3822,
+    "win_rate": 0.6404,
+    "score": 96.7
+  },
+  "prev_3m": {
+    "trades": 59,
+    "total_return": 0.0469,
+    "max_drawdown": -0.0765,
+    "neg_months": 1,
+    "sharpe": 1.04,
+    "cagr": 0.0469,
+    "win_rate": 0.583,
+    "score": 82.1
+  },
+  "full_10m": {
+    "trades": 201,
+    "total_return": 0.2228,
+    "max_drawdown": -0.17,
+    "neg_months": 5,
+    "sharpe": 1.85,
+    "cagr": 0.2228,
+    "win_rate": 0.6189,
+    "score": 92.4
+  },
+  "params": {
+    "ema_fast": 20,
+    "ema_mid": 60,
+    "ema_slow": 200,
+    "rsi_period": 14,
+    "atr_period": 14,
+    "sl_atr_mult": 1.8814680172969074,
+    "tp_atr_mult": 4.475374424448608,
+    "max_hold_bars": 5,
+    "use_trailing": true,
+    "use_dynamic_leverage": true,
+    "lev_min": 1.2,
+    "lev_base": 1.667409360218415,
+    "lev_max": 2.5
+  }
+}

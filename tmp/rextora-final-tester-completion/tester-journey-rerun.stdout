@@ -1,0 +1,39 @@
+
+Running 1 test using 1 worker
+
+(node:880) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:880) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey (3.6m)
+
+
+  1) tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeHidden[2m([22m[2m)[22m failed
+
+    Locator:  getByTestId('agent-approval-center')
+    Expected: hidden
+    Received: visible
+    Timeout:  60000ms
+
+    Call log:
+    [2m  - Expect "toBeHidden" with timeout 60000ms[22m
+    [2m  - waiting for getByTestId('agent-approval-center')[22m
+    [2m    123 × locator resolved to <section aria-label="통합 승인 센터" data-testid="agent-approval-center" class="space-y-2 rounded-xl border border-amber-500/25 bg-amber-950/15 px-3 py-3">…</section>[22m
+    [2m        - unexpected value "visible"[22m
+
+
+       99 |   await page.reload({ waitUntil: "domcontentloaded" });
+      100 |   await ensureAgentDashboardReady(page);
+    > 101 |   await expect(page.getByTestId("agent-approval-center")).toBeHidden();
+          |                                                           ^
+      102 |
+      103 |   const results = await page.goto("/results", { waitUntil: "domcontentloaded" });
+      104 |   expect(results?.status()).toBe(200);
+        at /Users/macdoong/Documents/Rextora/tmp/rextora-final-tester-completion/tester-journey.spec.ts:101:59
+
+    Error Context: test-results/tester-journey-concise-actual-production-tester-journey/error-context.md
+
+  1 failed
+    tmp/rextora-final-tester-completion/tester-journey.spec.ts:24:5 › concise actual production tester journey 

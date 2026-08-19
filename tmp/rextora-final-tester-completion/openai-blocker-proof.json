@@ -1,0 +1,14 @@
+{
+  "httpStatus": 200,
+  "requestedProvider": "openai",
+  "requestedModel": "gpt-5-mini",
+  "providerAttempted": true,
+  "selectedProvider": "local",
+  "selectedModel": "v1_fallback",
+  "fallbackUsed": true,
+  "structuredOutputValid": true,
+  "writeToolCount": 0,
+  "billingOrQuotaFailure": true,
+  "errorCategory": null,
+  "providerSucceeded": false
+}

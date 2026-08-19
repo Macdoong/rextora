@@ -1,0 +1,32 @@
+{
+  "runs": [
+    {
+      "run": 1,
+      "discoveredCount": 31,
+      "passed": 31,
+      "exitCode": 0,
+      "retries": 0,
+      "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-1.log",
+      "pass": true
+    },
+    {
+      "run": 2,
+      "discoveredCount": 31,
+      "passed": 31,
+      "exitCode": 0,
+      "retries": 0,
+      "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-2.log",
+      "pass": true
+    },
+    {
+      "run": 3,
+      "discoveredCount": 31,
+      "passed": 31,
+      "exitCode": 0,
+      "retries": 0,
+      "logPath": "tmp/final-tester-ready-revalidation/logs/e2e-run-3.log",
+      "pass": true
+    }
+  ],
+  "allPass": true
+}

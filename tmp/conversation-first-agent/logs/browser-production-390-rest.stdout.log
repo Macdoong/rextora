@@ -1,0 +1,11 @@
+search-running-390: demo 790ms
+search-running-390: server 1307ms
+search-running-390: browser 1489ms
+search-running-390: turn 현재 진행 상황 알려줘 8995ms
+search-running-390: PASS
+backtest-available-390: demo 798ms
+backtest-available-390: server 1322ms
+backtest-available-390: browser 1506ms
+backtest-available-390: turn 최근 검증된 전략의 위 18217ms
+backtest-available-390: FAIL
+{"passed":false,"total":2,"passedCount":1,"failures":["backtest-available-390"]}

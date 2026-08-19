@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+  "elapsedMs": 77.398708,
+  "tracedFileCount": 6,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

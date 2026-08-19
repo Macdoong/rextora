@@ -1,0 +1,99 @@
+{
+  "scenario": "E",
+  "width": 390,
+  "startedAt": "2026-08-06T08:01:05.120Z",
+  "finishedAt": "2026-08-06T08:03:14.603Z",
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-E-390-3fa244-mBmDsI",
+  "port": 53925,
+  "provider": "gemini",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-06T08:01:06.349Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh88c31_qvta9v",
+      "turnId": "turn-1786003266332",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:01:12.580Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh88c31_qvta9v",
+      "turnId": "turn-1786003266332",
+      "providerAttempt": 1,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "latencyMs": 6226,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:01:13.542Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh88hmu_t6dguz",
+      "turnId": "turn-1786003273523",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:01:13.543Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh88hmu_t6dguz",
+      "turnId": "turn-1786003273523",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "plannedTools": [
+      "paper.prepare"
+    ],
+    "sessionId": "paper_2c94a479-7269-4288-8d06-b3a0bad26819",
+    "executed": {
+      "intentType": "approve_pending",
+      "executionResult": {
+        "commandId": "rr_msh88hmu_t6dguz",
+        "commandType": "tool_plan",
+        "executionStatus": "succeeded",
+        "resultReference": null,
+        "jobId": null,
+        "runId": null,
+        "alreadyExecuted": false,
+        "summaryKo": "모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다."
+      }
+    },
+    "beforeSessionIds": [],
+    "createdSessionIds": [
+      "paper_2c94a479-7269-4288-8d06-b3a0bad26819"
+    ],
+    "oneSessionCreated": true,
+    "internalStatus": "pending_approval",
+    "exchangeCalled": false,
+    "executorStarted": false,
+    "separateActivationApprovalExplained": true,
+    "primaryText": "모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다.\n\n진행 상황을 확인하세요\n모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": true,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

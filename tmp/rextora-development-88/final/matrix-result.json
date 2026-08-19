@@ -1,0 +1,4220 @@
+{
+  "config": {
+    "configFile": "/Users/macdoong/Documents/Rextora/playwright.deployment-dev.config.mjs",
+    "rootDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/macdoong/Documents/Rextora/tests/e2e/release/global-setup.dev.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-390",
+        "name": "dev-390",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-768",
+        "name": "dev-768",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1024",
+        "name": "dev-1024",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      },
+      {
+        "outputDir": "/Users/macdoong/Documents/Rextora/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "dev-1440",
+        "name": "dev-1440",
+        "testDir": "/Users/macdoong/Documents/Rextora/tests/e2e/release",
+        "testIgnore": [],
+        "testMatch": [
+          "deployment-matrix.spec.ts",
+          "model-switching.spec.ts",
+          "model-switch-390.spec.ts"
+        ],
+        "timeout": 300000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tmp/rextora-development-88/final/matrix-result.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "REXTORA_ORPHAN_AUTO_RESUME_LIMIT=0 npm run dev -- --port 3101 --hostname 127.0.0.1 --webpack",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "reuseExistingServer": true,
+      "timeout": 300000
+    }
+  },
+  "suites": [
+    {
+      "title": "deployment-matrix.spec.ts",
+      "file": "deployment-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Deployment scenario registry",
+          "file": "deployment-matrix.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:58:19.332Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dcc21d67ddbddc2f644a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            },
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:23:34.843Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-71bac925c524a0425e67",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            },
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:06.428Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-7b2ff963dafec1f34f71",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            },
+            {
+              "title": "contains exactly 22 unique scenario IDs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.850Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-62c8884611e566185fca",
+              "file": "deployment-matrix.spec.ts",
+              "line": 12,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Deployment provider-backed matrix",
+          "file": "deployment-matrix.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2317,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:58:19.353Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-807ed182086f113126eb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 94029,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:58:22.006Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c418996dca440f623643",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 276392,
+                      "error": {
+                        "message": "TimeoutError: page.waitForFunction: Timeout 60000ms exceeded.",
+                        "stack": "TimeoutError: page.waitForFunction: Timeout 60000ms exceeded.\n    at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:221:18)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:101:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 18,
+                          "line": 221
+                        },
+                        "snippet": "   at helpers.ts:221\n\n  219 |   for (let attempt = 0; attempt < 3; attempt++) {\n  220 |     try {\n> 221 |       await page.waitForFunction(\n      |                  ^\n  222 |         ({ id, min }) => {\n  223 |           const sel = document.querySelector(`[data-testid=\"${id}\"]`) as HTMLSelectElement | null;\n  224 |           return Boolean(sel && sel.options.length >= min);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 18,
+                            "line": 221
+                          },
+                          "message": "TimeoutError: page.waitForFunction: Timeout 60000ms exceeded.\n\n   at helpers.ts:221\n\n  219 |   for (let attempt = 0; attempt < 3; attempt++) {\n  220 |     try {\n> 221 |       await page.waitForFunction(\n      |                  ^\n  222 |         ({ id, min }) => {\n  223 |           const sel = document.querySelector(`[data-testid=\"${id}\"]`) as HTMLSelectElement | null;\n  224 |           return Boolean(sel && sel.options.length >= min);\n    at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:221:18)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:101:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T12:59:56.039Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-390/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 18,
+                        "line": 221
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ecfc2e57419de535f22b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 96,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:04:33.010Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-55603b403013e7b6e71c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1300,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:04:33.278Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d64551d1e85a054bc67c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4497,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:04:34.584Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c42f1932559b171da5e7",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14656,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:04:39.087Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-073cdb8dfc745edfd828",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 28272,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:04:53.750Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0a5fcb345848a5bc4811",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 36034,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:05:22.029Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-81f6fa9cc1db9b6f97db",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 79309,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:05:58.075Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-26438ed51f8e0c179218",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 145396,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:07:17.395Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-242dab2b80f2076490cd",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 63652,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:09:42.801Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a5e1a09e6505b7eff60f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14463,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:10:46.459Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a536c601a81b155a484c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 202197,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:11:00.930Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-dccf81faf24403219496",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 43707,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:14:23.131Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ef5c87c0c164b3bf6e93",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 89043,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:15:06.844Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0fb10887e01223a9f589",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 181978,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:16:35.903Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a45d9322464556e002c1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 762,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:19:37.884Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f16f1b6f7506bb57499f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 804,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:19:38.653Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-39c339b6f07ebbb2015c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 82772,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:19:39.463Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8bf2f13c8cafbe01a3bb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 46110,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:21:02.233Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4207fd9d4250f8411193",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 105198,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:21:48.349Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-79e3c310b9edbe40e5a9",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 94609,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:71:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 62,
+                          "line": 182
+                        },
+                        "snippet": "   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 62,
+                            "line": 182
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n\n   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:71:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:23:34.864Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-768/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 62,
+                        "line": 182
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-56e3e5f335896972bf62",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 48071,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:25:11.197Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9ad03a7ae54367cc4121",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 94429,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:100:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 62,
+                          "line": 182
+                        },
+                        "snippet": "   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 62,
+                            "line": 182
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n\n   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:100:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:26:00.154Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-768/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 62,
+                        "line": 182
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a4c9bd74caebb4e8e369",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1189,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:27:35.788Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a7063895061378446416",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 48903,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:27:37.478Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0280623c414f5828f011",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 149129,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:28:26.387Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-497657d2e3c50e1ddfb8",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 70578,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:30:55.520Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-67bc8572d6a9714b1cfc",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 70598,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:32:06.103Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-fa90a1eb542c2eddda8e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 104349,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:33:16.706Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-71c4ca710dfeabdd4542",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 87986,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:35:01.062Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4f5b87bfb3f4aba3af0a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 111927,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:36:29.055Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a42ef7da2b2a30f771ad",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 132452,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:38:20.986Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a0baee95faf761467250",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 80072,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:40:33.442Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-656f8cdc291dddc6426c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 113067,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:41:53.519Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c21c55b138eafd712623",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 202958,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:43:46.591Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-fcc3095c742761f4e588",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302000,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:47:09.552Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-768/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-50a4e96f539190a794a1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302299,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:52:14.177Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-768/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0e6ce8be56a41fefac3b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "Error: dev_warm_gate_failed",
+                        "stack": "Error: dev_warm_gate_failed\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                          "column": 11,
+                          "line": 36
+                        },
+                        "snippet": "  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                            "column": 11,
+                            "line": 36
+                          },
+                          "message": "Error: dev_warm_gate_failed\n\n  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:57:20.581Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-768/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-768/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                        "column": 11,
+                        "line": 36
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-657a92053e9c8647adb8",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:05.694Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-84bce51accaa8c3fa277",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:05.695Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f061671b0d77f13cdb96",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:05.695Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6274d0b88dd463bdc6da",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:05.695Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-198cb38e32157e2a87c0",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 90491,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:06.449Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-7b01fd8bb77aadbac2ff",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 102005,
+                      "error": {
+                        "message": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                        "stack": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:155:16)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:91:30)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 16,
+                          "line": 155
+                        },
+                        "snippet": "   at helpers.ts:155\n\n  153 | export async function openAiProviderTab(page: Page) {\n  154 |   for (let attempt = 0; attempt < 3; attempt++) {\n> 155 |     await page.goto(\"/settings\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                ^\n  156 |     const broken = await page\n  157 |       .evaluate(() => {\n  158 |         const text = document.body?.innerText ?? \"\";"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 16,
+                            "line": 155
+                          },
+                          "message": "TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n   at helpers.ts:155\n\n  153 | export async function openAiProviderTab(page: Page) {\n  154 |   for (let attempt = 0; attempt < 3; attempt++) {\n> 155 |     await page.goto(\"/settings\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                ^\n  156 |     const broken = await page\n  157 |       .evaluate(() => {\n  158 |         const text = document.body?.innerText ?? \"\";\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:155:16)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:91:30)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:01:05.564Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-1024/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-1024/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 16,
+                        "line": 155
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ebd7747bf90b124fb99b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "Error: dev_warm_gate_failed",
+                        "stack": "Error: dev_warm_gate_failed\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                          "column": 11,
+                          "line": 36
+                        },
+                        "snippet": "  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                            "column": 11,
+                            "line": 36
+                          },
+                          "message": "Error: dev_warm_gate_failed\n\n  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:02:47.996Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1024/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1024/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                        "column": 11,
+                        "line": 36
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-971c0f922edd4e9eec74",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-8523a1ed2977ebd9769f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-cfea06ed640b5f6c8707",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d07907731a4c7f435a8e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-78ad601519ca65815141",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-82bb5701a91674ea3fa0",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-34602ba58e764f2875ca",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-50c523b233b15936fa3f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-1ab27f0335a12921d4bf",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-cc48929256df1fb9e3d7",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-154c01a9f4cfa6afba9f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f0ab4ea2c08ce58e15ab",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9550bd95e2a7b181d506",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-02063ef33a517ab391a3",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d567d880ece55a656370",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-5ae64930a7771eae0f5d",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d5e1df04a24e6c5f9178",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-92f2fd39f48f4084d018",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b35e2a2bddb30797c08d",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-965892cd9fc725359b77",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 01: OpenAI settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 94313,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.870Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-66159cac72c430f45192",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 02: Gemini settings configured state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 181913,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:06:23.853Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-2446dc2bfd75dc969435",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 03: OpenAI model catalog",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301655,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 18,
+                            "line": 232
+                          },
+                          "message": "Error: page.reload: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\u001b[2m    - navigated to \"http://127.0.0.1:3101/settings\"\u001b[22m\n\n\n   at helpers.ts:232\n\n  230 |     } catch (error) {\n  231 |       if (attempt === 2) throw error;\n> 232 |       await page.reload();\n      |                  ^\n  233 |       await page.getByTestId(\"settings-tab-btn-ai\").click();\n  234 |       await page.getByTestId(\"ai-provider-settings\").waitFor();\n  235 |     }\n    at waitForProviderModelOptions (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:232:18)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:101:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:09:25.767Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-0f304-rio-03-OpenAI-model-catalog-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4e50d4cf4532f552cfcb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 04: Gemini model catalog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2723,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:14:29.312Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-fab999f2e4b235c372cb",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 05: Global default provider/model",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 96885,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:162:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                          "column": 62,
+                          "line": 182
+                        },
+                        "snippet": "   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 62,
+                            "line": 182
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-settings-shell-ready=\"true\"]')\u001b[22m\n\n\n   at helpers.ts:182\n\n  180 |       throw error;\n  181 |     }\n> 182 |     await page.locator('[data-settings-shell-ready=\"true\"]').waitFor({\n      |                                                              ^\n  183 |       state: \"attached\",\n  184 |       timeout: 90_000,\n  185 |     });\n    at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:182:62)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:162:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:14:32.894Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-57e55-obal-default-provider-model-dev-1440/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                        "column": 62,
+                        "line": 182
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-b93f325362c815748644",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 06: Per-chat model selector",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301817,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:171:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:16:10.808Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-09251--06-Per-chat-model-selector-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-aa17ccbd5f191c6ada24",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 07: OpenAI typo/free-form conversation",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301756,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:183:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:21:15.956Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-a23e7807966d54067231",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 08: OpenAI capability conversation",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302518,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:198:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:26:20.361Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4cb117de178e8ffb2ca4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 09: OpenAI next-action guidance",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301917,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:211:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:31:26.900Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-389ae-OpenAI-next-action-guidance-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-5b07da2fbc07acc61f40",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 10: OpenAI current-workspace analysis",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301850,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:227:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:36:31.664Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-e06ed--current-workspace-analysis-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-0080f7ba515c21ff9d01",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 11: Gemini model switch + contextual follow-up",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301724,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:245:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:41:32.386Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-f1483-switch-contextual-follow-up-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-62d35641b50a3577c6b0",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 12: Session provider/model persistence after refresh",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302022,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:264:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:46:36.664Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-08643-l-persistence-after-refresh-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-2eeddeb9db2524f05e74",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 13: New-chat global default behavior",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302218,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:289:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:51:42.896Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6b295-hat-global-default-behavior-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-4ade4206071c896c9552",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 14: Explicit safe action → typed plan",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301989,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:304:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:56:47.704Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-27bcd-it-safe-action-→-typed-plan-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c377bafb2f42484e12a1",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 15: Approval → actual safe execution",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301843,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:323:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:01:55.709Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-11910-val-→-actual-safe-execution-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-2200256b51d1180131fe",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 16: Repeated approval → exactly zero additional execution",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 302606,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:343:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:07:00.670Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-6748a-y-zero-additional-execution-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-c7cd657572dc261b894b",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 17: Execution-result reporting",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 24,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 301760,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 59,
+                            "line": 301
+                          },
+                          "message": "Error: locator.waitFor: Test timeout of 300000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('dashboard-agent-workspace') to be visible\u001b[22m\n\n\n   at helpers.ts:301\n\n  299 |     try {\n  300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n> 301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n      |                                                           ^\n  302 |       await page.waitForFunction(\n  303 |         () =>\n  304 |           document\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:301:59)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:375:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:12:09.396Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6e6f07c1e1a97a0120b4",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 18: Provider failure with fallback disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 397,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:17:19.910Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-6fecce90d6bc7a463c30",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 19: Provider failure with fallback enabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 386,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:17:22.955Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-ecd6f757836dbe3f03cc",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 20: Live/real-order refusal",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 311951,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 300000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts",
+                            "column": 18,
+                            "line": 300
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3101/dashboard\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n   at helpers.ts:300\n\n  298 |   for (let attempt = 0; attempt < 3; attempt++) {\n  299 |     try {\n> 300 |       await page.goto(\"/dashboard\", { waitUntil: \"domcontentloaded\", timeout: 90_000 });\n      |                  ^\n  301 |       await page.getByTestId(\"dashboard-agent-workspace\").waitFor({ timeout: 90_000 });\n  302 |       await page.waitForFunction(\n  303 |         () =>\n    at openAgentDashboard (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:300:18)\n    at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:289:3)\n    at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:416:7)\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:17:23.347Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-1440/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-db2ef128503dd35fd2db",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 21: SAFE mutation refusal",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 26,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 0,
+                      "error": {
+                        "message": "Error: dev_warm_gate_failed",
+                        "stack": "Error: dev_warm_gate_failed\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11",
+                        "location": {
+                          "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                          "column": 11,
+                          "line": 36
+                        },
+                        "snippet": "  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                            "column": 11,
+                            "line": 36
+                          },
+                          "message": "Error: dev_warm_gate_failed\n\n  34 |       await new Promise((resolve) => setTimeout(resolve, 2000));\n  35 |     }\n> 36 |     throw new Error(\"dev_warm_gate_failed\");\n     |           ^\n  37 |   });\n  38 |\n  39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {\n    at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:22:37.320Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-220c9-io-21-SAFE-mutation-refusal-dev-1440/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/macdoong/Documents/Rextora/test-results/deployment-matrix-Deployme-220c9-io-21-SAFE-mutation-refusal-dev-1440/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts",
+                        "column": 11,
+                        "line": 36
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-f891723ebe1c6038d21e",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            },
+            {
+              "title": "scenario 22: Full secret/raw-enum leak inspection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:24:22.417Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-d07950661da548b573b2",
+              "file": "deployment-matrix.spec.ts",
+              "line": 40,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Deployment viewport coverage metadata",
+          "file": "deployment-matrix.spec.ts",
+          "line": 52,
+          "column": 6,
+          "specs": [
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-390",
+                  "projectName": "dev-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:23:33.551Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-bcf8a04b73ad74ede65f",
+              "file": "deployment-matrix.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-768",
+                  "projectName": "dev-768",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T13:59:06.046Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-15b07992a73e32f6e50a",
+              "file": "deployment-matrix.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1024",
+                  "projectName": "dev-1024",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T14:04:33.477Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-92afe924b8ce15fbca3c",
+              "file": "deployment-matrix.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "playwright project defines all required viewports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "dev-1440",
+                  "projectName": "dev-1440",
+                  "results": [
+                    {
+                      "workerIndex": 27,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-11T15:24:22.824Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0d11ea1c242aea7875b1-9af1ef7fa0f8de04a820",
+              "file": "deployment-matrix.spec.ts",
+              "line": 53,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-11T12:54:44.237Z",
+    "duration": 8978664.932999998,
+    "expected": 48,
+    "skipped": 24,
+    "unexpected": 24,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "id": "bt_ms31dync_01317b",
+  "trades": [
+    {
+      "id": "t_trendline",
+      "side": "LONG",
+      "entryTime": "2026-06-01T00:00:00.000Z",
+      "exitTime": "2026-06-01T01:00:00.000Z",
+      "entryPrice": 100.0,
+      "exitPrice": 101.0,
+      "netPnlUsdt": 1.0,
+      "feeUsdt": 0.04,
+      "slippageUsdt": 0.02,
+      "patternType": "trendline",
+      "patternBlocks": [
+        {
+          "blockId": "trendline_0",
+          "family": "trendline",
+          "role": "entry_zone",
+          "order": 0,
+          "status": "detected",
+          "patternType": "trendline",
+          "required": true,
+          "weight": 1,
+          "priority": 0,
+          "operatorPassed": true,
+          "detectorParams": {},
+          "measuredValues": {},
+          "thresholds": {},
+          "lineAnchors": [
+            {
+              "bar": 1,
+              "price": 100.0,
+              "time": "2026-06-01T00:00:00.000Z"
+            },
+            {
+              "bar": 5,
+              "price": 101.0,
+              "time": "2026-06-01T01:00:00.000Z"
+            }
+          ],
+          "creationBar": 1
+        }
+      ],
+      "lineAnchors": [
+        {
+          "bar": 1,
+          "price": 100.0,
+          "time": "2026-06-01T00:00:00.000Z"
+        },
+        {
+          "bar": 5,
+          "price": 101.0,
+          "time": "2026-06-01T01:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}

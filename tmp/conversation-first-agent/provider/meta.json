@@ -1,0 +1,11 @@
+{
+  "command": "node scripts/providerCanaryProbe.mjs --out=tmp/conversation-first-agent/provider/canary-evidence.json",
+  "startedAt": "2026-08-05T22:08:19Z",
+  "finishedAt": "2026-08-05T22:08:28Z",
+  "durationMs": 8899,
+  "exitCode": 0,
+  "BUILD_ID": "A7TNfHHgPmBYU48e0cCix",
+  "canaryPassed": true,
+  "selectedProvider": "gemini",
+  "fallbackUsed": false
+}

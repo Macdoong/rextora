@@ -1,0 +1,22 @@
+{
+  "currentPage": "/strategy-search",
+  "currentStrategyId": null,
+  "currentStrategyLabel": null,
+  "currentSearchJobId": "search_e2e_flow_0001",
+  "currentBacktestRunId": null,
+  "currentPaperSessionId": null,
+  "currentLiveCandidateId": null,
+  "pinnedObjective": "현재 연구 상태를 확인하고 다음 단계를 준비합니다.",
+  "pendingApprovals": [],
+  "currentRecommendation": "현재 연구 상태 확인",
+  "currentBlockers": [
+    "실전 주문 · SAFE 수정 · 자동 실행"
+  ],
+  "currentSymbol": null,
+  "currentTimeframe": null,
+  "currentPatterns": [],
+  "currentLeverage": null,
+  "researchWorkspace": null,
+  "lastRoute": "/strategy-search",
+  "updatedAt": "2026-08-13T12:17:05.543Z"
+}

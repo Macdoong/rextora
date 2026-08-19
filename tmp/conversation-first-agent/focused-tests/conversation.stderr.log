@@ -1,0 +1,125 @@
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 3: search_running
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 4: results_review
+AssertionError: expected 'READ_AND_ANSWER' to be 'PLAN_AND_APPROVE' // Object.is equality
+
+Expected: "PLAN_AND_APPROVE"
+Received: "READ_AND_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:28
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode).toBe(turn.mode);
+       |                            ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 6: paper_ready
+AssertionError: expected 'DIRECT_ANSWER' to be 'PLAN_AND_APPROVE' // Object.is equality
+
+Expected: "PLAN_AND_APPROVE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:28
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode).toBe(turn.mode);
+       |                            ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 8: paper_active
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 9: search_failed
+AssertionError: expected 'DIRECT_ANSWER' to be 'READ_AND_ANSWER' // Object.is equality
+
+Expected: "READ_AND_ANSWER"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:28
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode).toBe(turn.mode);
+       |                            ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 10: live_review
+AssertionError: expected 'DIRECT_ANSWER' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:28
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode).toBe(turn.mode);
+       |                            ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > I ambiguous reference · prior-different-strategy-deictic
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > H cancellation · empty-cancel
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > H cancellation · search-running-cancel
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > H cancellation · search-completed-cancel
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > H cancellation · backtest-available-cancel
+AssertionError: expected 'DIRECT_ANSWER' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:398:26
+    396|       });
+    397|
+    398|       expect(route.mode).toBe(item.mode);
+       |                          ^
+    399|       expect(route.topic).toBe(item.topic);
+    400|       expect(route.providerExpected).toBe(item.provider);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > G approval command · empty-approve
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > G approval command · paper-active-approve
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:402:48
+    400|       expect(route.providerExpected).toBe(item.provider);
+    401|       expect(route.requiresApproval).toBe(item.approval);
+    402|       expect(route.lifecycleInfluencedRouting).toBe(item.lifecycleInfl…
+       |                                                ^
+    403|       expect(route.requestedReadTools.length > 0).toBe(item.reads === …
+    404|       expect(route.requestedWriteTools.length > 0).toBe(item.writes ==…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > H cancellation · search-planned-cancel
+AssertionError: expected 'DIRECT_ANSWER' to be 'APPROVAL_CONTROL' // Object.is equality
+
+Expected: "APPROVAL_CONTROL"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:398:26
+    396|       });
+    397|
+    398|       expect(route.mode).toBe(item.mode);
+       |                          ^
+    399|       expect(route.topic).toBe(item.topic);
+    400|       expect(route.providerExpected).toBe(item.provider);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+

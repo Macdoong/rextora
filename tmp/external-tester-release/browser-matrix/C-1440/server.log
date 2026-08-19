@@ -1,0 +1,45 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:58133
+- Network:       http://172.30.1.38:58133
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:63798
+- Network:       http://172.30.1.38:63798
+✓ Ready in 86ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:50317
+- Network:       http://172.30.1.38:50317
+✓ Ready in 97ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:62322
+- Network:       http://172.30.1.38:62322
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:49817
+- Network:       http://172.30.1.38:49817
+✓ Ready in 112ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:53918
+- Network:       http://172.30.1.38:53918
+✓ Ready in 94ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:61723
+- Network:       http://172.30.1.38:61723
+✓ Ready in 106ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:64394
+- Network:       http://172.30.1.38:64394
+✓ Ready in 127ms
+[rextora] orphan search recovery skipped Cannot find module '/Users/macdoong/Documents/Rextora/.next/server/chunks/src/lib/rextora/strategySearch/orphanJobRecovery' imported from /Users/macdoong/Documents/Rextora/.next/server/chunks/instrumentation_ts_0zq9-xz._.js
+▲ Next.js 16.2.6
+- Local:         http://localhost:49436
+- Network:       http://172.30.1.38:49436
+✓ Ready in 105ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:56271
+- Network:       http://172.30.1.38:56271
+✓ Ready in 95ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:58023
+- Network:       http://172.30.1.38:58023
+✓ Ready in 115ms

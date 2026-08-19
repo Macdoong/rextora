@@ -1,0 +1,38 @@
+{
+  "verdict": "REXTORA FINAL DEPLOYMENT FAILED",
+  "buildId": "1RI-a5VYNeZrqk3iONskX",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "previousBackgroundTasksAlive": false,
+  "gates": {
+    "processStateRecorded": true,
+    "sourceRebuiltAfterChange": true,
+    "productionBrowser6888": false,
+    "developmentBrowser6888": false,
+    "lifecycle52": false,
+    "deploymentSmoke": false,
+    "openaiMandatory8of8": true,
+    "geminiMandatory8of8": true,
+    "approvalE2e": true,
+    "unit1540": true,
+    "lint": true,
+    "e2e31x3": false,
+    "safeUnchanged": true,
+    "secretLeak0": true
+  },
+  "productionMatrix": {
+    "totalTests": 96,
+    "passedTests": 77,
+    "failedTests": 19,
+    "scenarioRowsExpected": 88,
+    "scenarioRowsPassedEstimate": 69,
+    "failedScenarios": ["04@1024", "07@all", "08@390", "11@multi", "16@390,1024", "17@all", "22@all"]
+  },
+  "rootCauses": [
+    "harness: waitForAgentInputReady incorrectly required send button enabled (empty textarea disables send) — fixed",
+    "harness: agent-new-conversation disabled when thread empty — fixed via startFreshAgentConversation",
+    "harness: model catalog race at 390px — fixed via waitForProviderModelOptions",
+    "harness: sendAgentQueryAwaitResponse timeout 300s on typo query 백태스트가 뭐야? — browser POST not observed within test window despite API 16s success",
+    "infra: first prod matrix attempt ECONNREFUSED — prod server died when shell exited; fixed via persistent node next start",
+    "load: E2E run 1 had 2 failures under concurrent prod server load (strategy-search networkidle, live-trading body empty)"
+  ]
+}

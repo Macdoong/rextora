@@ -1,0 +1,75 @@
+{
+  "buildId": "-6CTCAJcZAMY02xezkvRO",
+  "sourceMatrix": "tmp/rextora-deployment-release/lifecycle-52/lifecycle-matrix.json",
+  "harness": "scripts/deploymentLifecycle52.mjs",
+  "failures": {
+    "D-390": {
+      "scenario": "D",
+      "viewport": 390,
+      "query": "이 전략 백테스트까지 진행해.",
+      "setup": "fresh isolated runtime + initDemo; openDrawer on /dashboard; no prior strategy selection",
+      "expected": "backtest.run planned and executed; runId persisted; persistedRunCreated=true",
+      "firstDivergence": "approval execution: strategy.detail failed with strategyId=<확정된_strategyId>",
+      "evidence": {
+        "plannedTools": ["strategy.list", "strategy.detail", "backtest.run"],
+        "executionStrategyId": "<확정된_strategyId>",
+        "toolAuditStrategyDetail": {
+          "arguments": { "strategyId": "<확정된_strategyId>" },
+          "result": {
+            "ok": false,
+            "summary": "잘못된 전략 고유번호입니다. 영문·숫자·_-만 사용할 수 있습니다."
+          }
+        },
+        "runId": null,
+        "persistedRunCreated": false,
+        "provider": "openai",
+        "fallbackUsed": false
+      },
+      "passingControl": {
+        "row": "D-768",
+        "plannedTools": ["backtest.run"],
+        "runId": "bt_mss5i6uo_b0655b",
+        "provider": "local v1_fallback"
+      }
+    },
+    "I-390": {
+      "scenario": "I",
+      "viewport": 390,
+      "setup": "createRunningSearch (search plan query + approve) → 1.5s wait → reload → continue query",
+      "expected": "search.created + search.started events; watcher search.progress or search.completed",
+      "firstDivergence": "after approve: only search.create executed; job status queued; no search.start step",
+      "evidence": {
+        "jobId": "search_2e65a3bf-2d2b-4120-9c1a-9227f7f69546",
+        "jobStatus": "queued",
+        "toolAuditTools": ["workspace.current", "search.create"],
+        "missingTool": "search.start",
+        "eventTypes": ["search.created"],
+        "semanticToolEvents": false,
+        "watcherEventPersisted": false,
+        "provider": "openai",
+        "fallbackUsed": false
+      },
+      "passingControl": {
+        "row": "I-768",
+        "toolAuditTools": ["search.create", "search.start"],
+        "eventTypesInclude": ["search.created", "search.started", "search.progress"]
+      }
+    },
+    "B-1024": {
+      "scenario": "B",
+      "viewport": 1024,
+      "setup": "createRunningSearch throws before scenario body",
+      "expected": "approve returns executionResult.jobId from search create/start",
+      "firstDivergence": "createRunningSearch: approve missing executionResult.jobId → initial_search_not_started",
+      "evidence": {
+        "error": "initial_search_not_started",
+        "durationSec": 47,
+        "note": "failed run threw before persisted.json write; stale persisted.json on disk is from prior run"
+      },
+      "passingControl": {
+        "row": "B-390",
+        "initialPlanPath": "provider validation failed → v1_fallback → search.create + search.start"
+      }
+    }
+  }
+}

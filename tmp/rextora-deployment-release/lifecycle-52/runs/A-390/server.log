@@ -1,0 +1,86 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:56437
+- Network:       http://172.30.1.38:56437
+✓ Ready in 91ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:49287
+- Network:       http://172.30.1.38:49287
+✓ Ready in 92ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:62178
+- Network:       http://172.30.1.38:62178
+✓ Ready in 97ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:60882
+- Network:       http://172.30.1.38:60882
+✓ Ready in 96ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:62900
+- Network:       http://172.30.1.38:62900
+✓ Ready in 103ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:50183
+- Network:       http://172.30.1.38:50183
+✓ Ready in 100ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:50444
+- Network:       http://172.30.1.38:50444
+✓ Ready in 158ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:54999
+- Network:       http://172.30.1.38:54999
+✓ Ready in 100ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55417
+- Network:       http://172.30.1.38:55417
+✓ Ready in 104ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55678
+- Network:       http://172.30.1.38:55678
+✓ Ready in 93ms
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:61278
+- Network:       http://172.30.1.38:61278
+- Environments: .env.local
+✓ Ready in 270ms
+
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 3.8min (next.js: 3.8min, application-code: 138ms)
+ GET /dashboard 200 in 33ms (next.js: 1659µs, application-code: 31ms)
+ GET /api/rextora/agent/session?sessionId=agent_3a2614fe13be43c3 200 in 173ms (next.js: 161ms, application-code: 12ms)
+ GET /api/rextora/first-run 200 in 216ms (next.js: 202ms, application-code: 14ms)
+ GET /api/rextora/strategy-search 200 in 271ms (next.js: 256ms, application-code: 14ms)
+ GET /api/rextora/strategies 200 in 310ms (next.js: 307ms, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 367ms (next.js: 348ms, application-code: 19ms)
+ GET /api/rextora/paper/session?active=1 200 in 394ms (next.js: 392ms, application-code: 2ms)
+ GET /api/rextora/first-run 200 in 7ms (next.js: 1375µs, application-code: 5ms)
+ GET /api/rextora/settings/ai-providers 200 in 77ms (next.js: 73ms, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 967µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 1067µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 759µs, application-code: 3ms)
+ PATCH /api/rextora/agent/session 200 in 6ms (next.js: 1215µs, application-code: 5ms)
+ PATCH /api/rextora/agent/session 200 in 5ms (next.js: 1261µs, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 664ms (next.js: 62ms, application-code: 602ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 3ms (next.js: 1084µs, application-code: 1800µs)
+ POST /api/rextora/agent 200 in 2.9s (next.js: 100ms, application-code: 2.8s)
+▲ Next.js 16.2.6
+- Local:         http://localhost:51482
+- Network:       http://172.30.1.38:51482
+✓ Ready in 109ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:56735
+- Network:       http://172.30.1.38:56735
+✓ Ready in 85ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:59443
+- Network:       http://172.30.1.38:59443
+✓ Ready in 151ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:52865
+- Network:       http://172.30.1.38:52865
+✓ Ready in 103ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:53241
+- Network:       http://172.30.1.38:53241
+✓ Ready in 113ms

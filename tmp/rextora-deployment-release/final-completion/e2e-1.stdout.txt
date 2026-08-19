@@ -1,0 +1,111 @@
+
+> rextora@0.1.0 test:e2e
+> playwright test
+
+
+Running 31 tests using 3 workers
+
+(node:66801) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66801) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /dashboard with pre-live safety state (260ms)
+  ✓   3 [chromium] › tests/e2e/strategy-search-flow.spec.ts:432:7 › Strategy Search operator UI (intercepted API) › renders simplified page and Korean nav (1.3s)
+  ✓   4 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /strategy-search with pre-live safety state (1.3s)
+  ✓   6 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /results with pre-live safety state (561ms)
+  ✓   7 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /backtest with pre-live safety state (904ms)
+  ✓   5 [chromium] › tests/e2e/strategy-search-flow.spec.ts:462:7 › Strategy Search operator UI (intercepted API) › create starts search, controls, status, qualified panel, Korean errors (2.2s)
+  ✓   8 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /paper-trading with pre-live safety state (2.9s)
+  ✓   2 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /dashboard loads styled shell on direct entry (18.3s)
+  ✓   9 [chromium] › tests/e2e/strategy-search-flow.spec.ts:533:7 › Strategy Search operator UI (intercepted API) › polling stops after terminal and keeps last detail on transient failure (22.5s)
+  ✘  10 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /live-trading with pre-live safety state (30.0s)
+(node:66859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  11 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /strategy-search loads styled shell on direct entry (30.0s)
+(node:66876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:66876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /settings with pre-live safety state (12.5s)
+  ✓  12 [chromium] › tests/e2e/strategy-search-flow.spec.ts:583:7 › Strategy Search operator UI (intercepted API) › failed job shows failureMessage; exhausted shows operator label (26.0s)
+  ✓  15 [chromium] › tests/e2e/rextora-smoke.spec.ts:45:7 › Rextora lifecycle smoke › sidebar has exactly seven primary nav items (4.9s)
+  ✓  17 [chromium] › tests/e2e/rextora-smoke.spec.ts:56:7 › Rextora lifecycle smoke › dashboard shows lifecycle sections and primary actions (3.9s)
+  ✓  14 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /results loads styled shell on direct entry (9.4s)
+  ✓  18 [chromium] › tests/e2e/rextora-smoke.spec.ts:69:7 › Rextora lifecycle smoke › research form keeps expert section collapsed by default (1.0s)
+  ✓  20 [chromium] › tests/e2e/rextora-smoke.spec.ts:105:7 › Rextora lifecycle smoke › results page shows SAFE baseline and highlights (137ms)
+  ✓  19 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /backtest loads styled shell on direct entry (1.3s)
+  ✓  16 [chromium] › tests/e2e/strategy-search-flow.spec.ts:618:7 › Strategy Search operator UI (intercepted API) › catalog builder controls persist through intercepted create (8.1s)
+  ✓  22 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /paper-trading loads styled shell on direct entry (1.2s)
+  ✓  21 [chromium] › tests/e2e/rextora-smoke.spec.ts:118:7 › Rextora lifecycle smoke › results research history management controls are visible (2.8s)
+  ✓  23 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /live-trading loads styled shell on direct entry (1.2s)
+  ✓  24 [chromium] › tests/e2e/rextora-smoke.spec.ts:136:7 › Rextora lifecycle smoke › live activation gates never auto-start live (667ms)
+  ✓  26 [chromium] › tests/e2e/rextora-smoke.spec.ts:144:7 › Rextora lifecycle smoke › settings includes system and expert sections (752ms)
+  ✓  27 [chromium] › tests/e2e/rextora-smoke.spec.ts:158:7 › Rextora lifecycle smoke › expert wizard remains available via query gate (136ms)
+  ✓  25 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /settings loads styled shell on direct entry (1.5s)
+  ✓  28 [chromium] › tests/e2e/rextora-smoke.spec.ts:166:7 › Rextora lifecycle smoke › legacy strategy-performance redirects to results (270ms)
+  ✓  30 [chromium] › tests/e2e/rextora-smoke.spec.ts:171:7 › Rextora lifecycle smoke › backtest page still runs (254ms)
+  ✓  31 [chromium] › tests/e2e/rextora-smoke.spec.ts:183:7 › Rextora lifecycle smoke › paper feedback actions visible (1.0s)
+  ✓  29 [chromium] › tests/e2e/rextora-shell-styles.spec.ts:108:7 › Rextora shell styles (production) › client navigation between lifecycle routes keeps shell (3.0s)
+
+
+  1) [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /strategy-search loads styled shell on direct entry 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3100/strategy-search", waiting until "networkidle"[22m
+
+
+      41 |
+      42 |   try {
+    > 43 |     const response = await page.goto(route, { waitUntil: "networkidle" });
+         |                                 ^
+      44 |     expect(response?.ok() ?? false).toBe(true);
+      45 |
+      46 |     const stylesheets = page.locator('link[rel="stylesheet"]');
+        at assertStyledShell (/Users/macdoong/Documents/Rextora/tests/e2e/rextora-shell-styles.spec.ts:43:33)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/rextora-shell-styles.spec.ts:103:13
+
+    Error Context: test-results/rextora-shell-styles-Rexto-2966b-tyled-shell-on-direct-entry-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /live-trading with pre-live safety state 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('body')
+    Expected substring: not [32m"Application error"[39m
+    Received string: [31m""[39m
+
+    Call log:
+    [2m  - Expect "not toContainText" with timeout 10000ms[22m
+    [2m  - waiting for locator('body')[22m
+
+
+      38 |       await expect(page.getByText("Rextora").first()).toBeVisible();
+      39 |       await expect(page.getByText("모의 거래").first()).toBeVisible();
+    > 40 |       await expect(page.locator("body")).not.toContainText("Application error");
+         |                                              ^
+      41 |       await expect(page.locator("body")).not.toContainText("Unhandled Runtime Error");
+      42 |     });
+      43 |   }
+        at /Users/macdoong/Documents/Rextora/tests/e2e/rextora-smoke.spec.ts:40:46
+
+    Error Context: test-results/rextora-smoke-Rextora-life-fd36c--with-pre-live-safety-state-chromium/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/rextora-shell-styles.spec.ts:95:9 › Rextora shell styles (production) › /strategy-search loads styled shell on direct entry 
+    [chromium] › tests/e2e/rextora-smoke.spec.ts:36:9 › Rextora lifecycle smoke › renders /live-trading with pre-live safety state 
+  29 passed (1.1m)

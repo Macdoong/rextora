@@ -1,0 +1,108 @@
+{
+  "scenario": "D",
+  "width": 390,
+  "startedAt": "2026-08-14T06:01:16.839Z",
+  "finishedAt": "2026-08-14T06:04:06.813Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-D-390-9cc19f-o7Eqn5",
+  "port": 53753,
+  "provider": "openai",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T06:01:18.118Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjh2xy_zkpren",
+      "turnId": "turn-1786687278093",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:03.290Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjh2xy_zkpren",
+      "turnId": "turn-1786687278093",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 45165,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:04.815Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssji2z3_w1wyi1",
+      "turnId": "turn-1786687324233",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:04.815Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssji2z3_w1wyi1",
+      "turnId": "turn-1786687324233",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "plannedTools": [
+      "backtest.run"
+    ],
+    "runId": "bt_mssji2yr_f5b154",
+    "counts": {
+      "before": 1,
+      "after": 2,
+      "finalCount": 2
+    },
+    "executed": {
+      "intentType": "approve_pending",
+      "executionResult": {
+        "commandId": "rr_mssji2z3_w1wyi1",
+        "commandType": "tool_plan",
+        "executionStatus": "succeeded",
+        "resultReference": null,
+        "jobId": null,
+        "runId": "bt_mssji2yr_f5b154",
+        "alreadyExecuted": false,
+        "summaryKo": "백테스트를 실행하고 결과를 저장했습니다. 저장된 지표는 아래에서 확인할 수 있습니다."
+      }
+    },
+    "repeatExecutionResult": {
+      "commandId": "approval_receipt_pa_42c2f2581c844891",
+      "commandType": "tool_plan",
+      "executionStatus": "skipped_idempotent",
+      "resultReference": null,
+      "jobId": null,
+      "runId": "bt_mssji2yr_f5b154",
+      "alreadyExecuted": true,
+      "summaryKo": "백테스트를 실행하고 결과를 저장했습니다. 저장된 지표는 아래에서 확인할 수 있습니다."
+    },
+    "persistedRunCreated": true,
+    "repeatedApprovalNoDuplicate": true,
+    "actualMetricsOnly": true,
+    "primaryText": "진행할 대기 작업이 없습니다. 다시 요청해 주세요.\n\n제안된 작업이 없거나 만료되었습니다.\n\n원하는 작업을 다시 말씀해 주세요.\n백테스트를 실행하고 결과를 저장했습니다. 저장된 지표는 아래에서 확인할 수 있습니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": true,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

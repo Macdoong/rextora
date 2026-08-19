@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-08-03T09:49:24Z",
+  "repositoryRoot": "/Users/macdoong/Documents/Rextora",
+  "runtime": {
+    "node": "v25.8.0",
+    "npm": "11.11.0"
+  },
+  "reasoningFlagsConfiguredInProcess": {
+    "AGENT_V2_REASONING_ENABLED": false,
+    "AGENT_V2_REASONING_SHADOW": false,
+    "AI_AGENT_PROVIDER": false
+  },
+  "providerCredentialsPresent": {
+    "openai": true,
+    "gemini": false
+  },
+  "notes": [
+    "Only credential presence was recorded; no secret value was read into this artifact.",
+    "Provider selection falls back to OpenAI when it is configured and AI_AGENT_PROVIDER is unset.",
+    "The required Phase 3 flags must be supplied to each isolated production runtime."
+  ]
+}

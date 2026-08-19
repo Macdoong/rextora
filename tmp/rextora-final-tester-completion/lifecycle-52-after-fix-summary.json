@@ -1,0 +1,268 @@
+{
+  "buildId": "-6CTCAJcZAMY02xezkvRO",
+  "passed": true,
+  "perViewport": [
+    {
+      "viewport": 390,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "viewport": 768,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "viewport": 1024,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "viewport": 1440,
+      "passed": 13,
+      "failed": 0
+    }
+  ],
+  "approvalB": [
+    {
+      "width": 390,
+      "beforeApproval": {
+        "hasApproval": true,
+        "noToolExecuted": true
+      },
+      "afterApproval": {
+        "approvalCleared": true,
+        "duplicateExecutionCount": 0,
+        "providerCallCount": 0,
+        "persistedStateMatch": true
+      },
+      "repeat": {
+        "alreadyExecuted": true,
+        "executionStatus": "skipped_idempotent",
+        "writeAuditDelta": 0,
+        "jobCountDelta": 0,
+        "afterSnapshotJobCount": 3,
+        "exactExpectedJobSet": true,
+        "providerCallDelta": 0,
+        "auditsBeforeApprove": 2,
+        "provider": "local",
+        "fallbackUsed": false
+      }
+    },
+    {
+      "width": 768,
+      "beforeApproval": {
+        "hasApproval": true,
+        "noToolExecuted": true
+      },
+      "afterApproval": {
+        "approvalCleared": true,
+        "duplicateExecutionCount": 0,
+        "providerCallCount": 0,
+        "persistedStateMatch": true
+      },
+      "repeat": {
+        "alreadyExecuted": true,
+        "executionStatus": "skipped_idempotent",
+        "writeAuditDelta": 0,
+        "jobCountDelta": 0,
+        "afterSnapshotJobCount": 3,
+        "exactExpectedJobSet": true,
+        "providerCallDelta": 0,
+        "auditsBeforeApprove": 2,
+        "provider": "local",
+        "fallbackUsed": false
+      }
+    },
+    {
+      "width": 1024,
+      "beforeApproval": {
+        "hasApproval": true,
+        "noToolExecuted": true
+      },
+      "afterApproval": {
+        "approvalCleared": true,
+        "duplicateExecutionCount": 0,
+        "providerCallCount": 0,
+        "persistedStateMatch": true
+      },
+      "repeat": {
+        "alreadyExecuted": true,
+        "executionStatus": "skipped_idempotent",
+        "writeAuditDelta": 0,
+        "jobCountDelta": 0,
+        "afterSnapshotJobCount": 3,
+        "exactExpectedJobSet": true,
+        "providerCallDelta": 0,
+        "auditsBeforeApprove": 2,
+        "provider": "local",
+        "fallbackUsed": false
+      }
+    },
+    {
+      "width": 1440,
+      "beforeApproval": {
+        "hasApproval": true,
+        "noToolExecuted": true
+      },
+      "afterApproval": {
+        "approvalCleared": true,
+        "duplicateExecutionCount": 0,
+        "providerCallCount": 0,
+        "persistedStateMatch": true
+      },
+      "repeat": {
+        "alreadyExecuted": true,
+        "executionStatus": "skipped_idempotent",
+        "writeAuditDelta": 0,
+        "jobCountDelta": 0,
+        "afterSnapshotJobCount": 3,
+        "exactExpectedJobSet": true,
+        "providerCallDelta": 0,
+        "auditsBeforeApprove": 2,
+        "provider": "local",
+        "fallbackUsed": false
+      }
+    }
+  ],
+  "paperK": [
+    {
+      "width": 390,
+      "statuses": [
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "paused",
+          "actual": "paused",
+          "responseReceived": true
+        },
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "stopped",
+          "actual": "stopped",
+          "responseReceived": true
+        }
+      ],
+      "exchangeNeverCalled": true,
+      "deleteDependencyBlocked": true
+    },
+    {
+      "width": 768,
+      "statuses": [
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "paused",
+          "actual": "paused",
+          "responseReceived": true
+        },
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "stopped",
+          "actual": "stopped",
+          "responseReceived": true
+        }
+      ],
+      "exchangeNeverCalled": true,
+      "deleteDependencyBlocked": true
+    },
+    {
+      "width": 1024,
+      "statuses": [
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "paused",
+          "actual": "paused",
+          "responseReceived": true
+        },
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "stopped",
+          "actual": "stopped",
+          "responseReceived": true
+        }
+      ],
+      "exchangeNeverCalled": true,
+      "deleteDependencyBlocked": true
+    },
+    {
+      "width": 1440,
+      "statuses": [
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "paused",
+          "actual": "paused",
+          "responseReceived": true
+        },
+        {
+          "expected": "active",
+          "actual": "active",
+          "responseReceived": true
+        },
+        {
+          "expected": "stopped",
+          "actual": "stopped",
+          "responseReceived": true
+        }
+      ],
+      "exchangeNeverCalled": true,
+      "deleteDependencyBlocked": true
+    }
+  ],
+  "safetyL": [
+    {
+      "width": 390,
+      "allBlockedLocally": true,
+      "noWriteAudit": true,
+      "noPaperSession": true,
+      "noLiveRuntime": true
+    },
+    {
+      "width": 768,
+      "allBlockedLocally": true,
+      "noWriteAudit": true,
+      "noPaperSession": true,
+      "noLiveRuntime": true
+    },
+    {
+      "width": 1024,
+      "allBlockedLocally": true,
+      "noWriteAudit": true,
+      "noPaperSession": true,
+      "noLiveRuntime": true
+    },
+    {
+      "width": 1440,
+      "allBlockedLocally": true,
+      "noWriteAudit": true,
+      "noPaperSession": true,
+      "noLiveRuntime": true
+    }
+  ]
+}

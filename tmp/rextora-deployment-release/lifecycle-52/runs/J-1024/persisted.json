@@ -1,0 +1,240 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "backtest.run",
+      "sessionId": "agent_85d34f15d7fc413f",
+      "arguments": {
+        "operation": "prepare_approval_draft",
+        "referenceRunId": "bt_mssnxsj6_6f0147",
+        "strategyId": "demo_strategy_btc_v1",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "notes": "사용자 확인 필요: 기간, 초기자본, 수수료/슬리피지, 백테스트명. 현재는 최근 실행을 참조한 승인 초안 준비 단계."
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 496,
+      "approved": true,
+      "timestamp": "2026-08-14T08:07:00.686Z",
+      "approvalId": "pa_6c41736b77ca1273"
+    },
+    {
+      "toolId": "memory.recall",
+      "sessionId": "agent_85d34f15d7fc413f",
+      "arguments": {},
+      "result": {
+        "ok": false,
+        "status": "validation_error",
+        "errorCode": "INPUT_INVALID",
+        "summary": "$.query: required"
+      },
+      "durationMs": 0,
+      "approved": false,
+      "timestamp": "2026-08-14T08:09:02.847Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "memory.recall",
+      "sessionId": "agent_85d34f15d7fc413f",
+      "arguments": {},
+      "result": {
+        "ok": false,
+        "status": "validation_error",
+        "errorCode": "INPUT_INVALID",
+        "summary": "$.query: required"
+      },
+      "durationMs": 0,
+      "approved": false,
+      "timestamp": "2026-08-14T08:11:51.741Z",
+      "approvalId": null
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T08:06:17.701Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssnxtnp_llbyqg",
+      "turnId": "turn-1786694777677",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:06:59.240Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssnxtnp_llbyqg",
+      "turnId": "turn-1786694777677",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 41532,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:07:00.695Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssnyqtz_c53gxl",
+      "turnId": "turn-1786694820182",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:07:00.695Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssnyqtz_c53gxl",
+      "turnId": "turn-1786694820182",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:09:02.850Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msso1d36_du72jw",
+      "turnId": "turn-1786694942841",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:09:20.141Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msso1d36_du72jw",
+      "turnId": "turn-1786694942841",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 17285,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:11:51.744Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msso4zeo_c0ug83",
+      "turnId": "turn-1786695111737",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:12:06.823Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msso4zeo_c0ug83",
+      "turnId": "turn-1786695111737",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 15077,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssnxsj6_6f0147.chart.json",
+    "bt_mssnxsj6_6f0147.json",
+    "bt_mssnyqtl_77ef08.chart.json",
+    "bt_mssnyqtl_77ef08.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_85d34f15d7fc413f",
+      "kind": "actual_result",
+      "statementKo": "백테스트의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "run",
+          "id": "bt_mssnyqtl_77ef08"
+        },
+        {
+          "type": "event",
+          "id": "event_6698395f7a4fe1036d86"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:07:00.687Z",
+      "sourceEventId": "event_6698395f7a4fe1036d86",
+      "metadata": {
+        "eventType": "backtest.completed",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_940496dc997c72c37f5d"
+    },
+    {
+      "sessionId": "agent_85d34f15d7fc413f",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 백테스트 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_efdea03c1f404d1aa8d6"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:07:00.691Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_6c41736b77ca1273",
+        "meaningfulHash": "536865bdc08e211f8ef52640"
+      },
+      "memoryId": "memory_be37db25569ea1a227e8"
+    },
+    {
+      "sessionId": "agent_85d34f15d7fc413f",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_efdea03c1f404d1aa8d6"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:07:00.691Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_6c41736b77ca1273",
+        "meaningfulHash": "536865bdc08e211f8ef52640"
+      },
+      "memoryId": "memory_cc089df4ec77b36a1bc2"
+    }
+  ],
+  "sessionFiles": [
+    "agent_85d34f15d7fc413f"
+  ]
+}

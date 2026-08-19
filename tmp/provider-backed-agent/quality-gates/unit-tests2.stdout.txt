@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  202 passed (202)
+      Tests  1532 passed (1532)
+   Start at  20:50:58
+   Duration  157.59s (transform 2.22s, setup 1.16s, import 10.18s, tests 121.33s, environment 12ms)
+

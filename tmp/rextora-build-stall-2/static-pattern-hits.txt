@@ -1,0 +1,296 @@
+next.config.ts:30:      "screenshots/**/*",
+next.config.ts:31:      "data/rextora/strategy-search/jobs/**/*",
+next.config.ts:32:      "data/rextora/strategy-search/trials/**/*",
+next.config.ts:33:      "data/rextora/strategy-search/owners/**/*",
+next.config.ts:39:      "**/data/rextora/strategy-search/jobs/**",
+next.config.ts:40:      "**/data/rextora/strategy-search/trials/**",
+next.config.ts:41:      "**/data/rextora/strategy-search/owners/**",
+instrumentation.ts:6:export async function register() {
+src/lib/rextora/strategy/strategyStore.ts:1:import fs from "node:fs";
+src/lib/rextora/strategy/strategyStore.ts:42:  return path.resolve(/* turbopackIgnore: true */ process.cwd(), "data", "strategies");
+src/lib/rextora/strategy/strategyStore.ts:60:  const cwd = path.resolve(/* turbopackIgnore: true */ process.cwd());
+src/lib/rextora/strategy/strategyStore.ts:190:    parsed = JSON.parse(fs.readFileSync(filePath, "utf8")) as StoredStrategyV1;
+src/lib/rextora/strategy/strategyStore.ts:260:  if (strategy.id === SAFE_STRATEGY_ID && fs.existsSync(file)) {
+src/lib/rextora/strategy/strategyStore.ts:285:  if (fs.existsSync(INDEX())) {
+src/lib/rextora/strategy/strategyStore.ts:287:      const cur = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+src/lib/rextora/strategy/strategyStore.ts:326:  if (!fs.existsSync(INDEX())) return [];
+src/lib/rextora/strategy/strategyStore.ts:328:    const index = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+src/lib/rextora/strategy/strategyStore.ts:337:      if (!fs.existsSync(full)) continue;
+src/lib/rextora/strategy/strategyStore.ts:344:            JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+src/lib/rextora/strategy/strategyStore.ts:358:  if (!fs.existsSync(ROOT())) return [];
+src/lib/rextora/strategy/strategyStore.ts:359:  const names = fs.readdirSync(ROOT()).filter((n) => n.endsWith(".json") && n !== "index.json");
+src/lib/rextora/strategy/strategyStore.ts:374:          JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+src/lib/rextora/strategy/strategyStore.ts:390:  if (!fs.existsSync(safePath)) {
+src/lib/rextora/strategy/strategyStore.ts:397:  let indexNeedsRepair = !fs.existsSync(INDEX());
+src/lib/rextora/strategy/strategyStore.ts:399:  if (!loaded.length && fs.existsSync(INDEX())) {
+src/lib/rextora/strategy/strategyStore.ts:409:    if (fs.existsSync(INDEX())) {
+src/lib/rextora/strategy/strategyStore.ts:411:        const index = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+src/lib/rextora/strategy/strategyStore.ts:425:  if (!fs.existsSync(INDEX())) {
+src/lib/rextora/strategy/strategyStore.ts:442:  if (!fs.existsSync(INDEX()) || !fs.existsSync(strategyFilePath(SAFE_STRATEGY_ID))) {
+src/lib/rextora/strategy/strategyStore.ts:766:  if (fs.existsSync(file)) fs.unlinkSync(file);
+src/lib/rextora/strategy/strategyStore.ts:844:      if (fs.existsSync(file)) fs.unlinkSync(file);
+src/lib/rextora/strategy/strategyStore.ts:852:    if (!fs.existsSync(safePath)) {
+src/lib/rextora/firstRun/firstRunStateStore.ts:3: * Lives at data/rextora/first-run.json — never contains secrets.
+src/lib/rextora/firstRun/firstRunStateStore.ts:6:import fs from "node:fs";
+src/lib/rextora/firstRun/firstRunStateStore.ts:8:import { firstRunStatePath, rextoraDataRoot } from "../storage/runtimePaths";
+src/lib/rextora/firstRun/firstRunStateStore.ts:40:  if (!fs.existsSync(fp)) return emptyFirstRunState();
+src/lib/rextora/firstRun/firstRunStateStore.ts:42:    const raw = JSON.parse(fs.readFileSync(fp, "utf8")) as Partial<FirstRunPersistedState>;
+src/lib/rextora/firstRun/firstRunStateStore.ts:56:  fs.mkdirSync(rextoraDataRoot(), { recursive: true });
+src/lib/rextora/firstRun/firstRunStatus.ts:6:import fs from "node:fs";
+src/lib/rextora/firstRun/firstRunStatus.ts:8:import { rextoraDataRoot } from "../storage/runtimePaths";
+src/lib/rextora/firstRun/firstRunStatus.ts:68:    return fs.existsSync(p) && fs.statSync(p).isDirectory();
+src/lib/rextora/firstRun/firstRunStatus.ts:82:  const root = rextoraDataRoot();
+src/lib/rextora/paper/paperSessionStore.ts:3: * Writes only under data/rextora/paper-sessions/ — never touches SAFE strategy files.
+src/lib/rextora/paper/paperSessionStore.ts:14:import fs from "node:fs";
+src/lib/rextora/paper/paperSessionStore.ts:157:  if (!fs.existsSync(filePath)) return fallback;
+src/lib/rextora/paper/paperSessionStore.ts:159:    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+src/lib/rextora/paper/paperSessionStore.ts:452:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/paper/paperSessionStore.ts:455:    parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as Record<string, unknown>;
+src/lib/rextora/live/liveDryRunEngine.ts:6:import fs from "node:fs";
+src/lib/rextora/live/liveDryRunEngine.ts:87:  /** Injectable root for tests. Default: data/rextora/live-dry-run */
+src/lib/rextora/live/liveDryRunEngine.ts:103:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/live/liveDryRunEngine.ts:146:  if (!fs.existsSync(filePath)) return fallback;
+src/lib/rextora/live/liveDryRunEngine.ts:148:    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+src/lib/rextora/live/liveDryRunEngine.ts:426:  if (fs.existsSync(dir)) {
+src/lib/rextora/live/liveDryRunEngine.ts:427:    for (const name of fs.readdirSync(dir)) {
+src/lib/rextora/report/aiTradeReport.ts:1:import fs from "node:fs";
+src/lib/rextora/report/aiTradeReport.ts:60:  return path.join(/* turbopackIgnore: true */ process.cwd(), STORE_REL);
+src/lib/rextora/report/aiTradeReport.ts:65:  if (!fs.existsSync(p)) return [];
+src/lib/rextora/report/aiTradeReport.ts:67:    const raw = JSON.parse(fs.readFileSync(p, "utf8"));
+src/lib/rextora/strategy/safeV44Strategy.ts:1:import fs from "node:fs";
+src/lib/rextora/strategy/safeV44Strategy.ts:32:  const full = path.join(/* turbopackIgnore: true */ process.cwd(), relativePath);
+src/lib/rextora/strategy/safeV44Strategy.ts:33:  if (!fs.existsSync(full)) return null;
+src/lib/rextora/strategy/safeV44Strategy.ts:35:    return JSON.parse(fs.readFileSync(full, "utf8")) as Record<string, unknown>;
+src/lib/rextora/agent/commandStore.ts:3: * Files under data/rextora/agent-commands/ — never Live / exchange.
+src/lib/rextora/agent/commandStore.ts:6:import fs from "node:fs";
+src/lib/rextora/agent/commandStore.ts:14:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/agent/commandStore.ts:37:    const raw = fs.readFileSync(fileFor(commandId), "utf8");
+src/lib/rextora/agent/commandStore.ts:49:  const files = fs.readdirSync(root).filter((f) => f.endsWith(".json"));
+src/lib/rextora/agent/commandStore.ts:54:        fs.readFileSync(path.join(root, file), "utf8"),
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:3:import fs from "node:fs";
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:476:      /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:481:    if (fs.existsSync(p)) {
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:482:      const raw = JSON.parse(fs.readFileSync(p, "utf8")) as {
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:496:  const lockedExists = fs.existsSync(
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:498:      /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:528:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategy/definition/safeParamCatalog.ts:534:  if (fs.existsSync(locked)) return "locked_file";
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:3: * Layout: data/rextora/agent-sessions/{sessionId}/
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:6:import fs from "node:fs";
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:8:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:22:  return path.join(rextoraDataRoot(), "agent-sessions");
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:77:    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:85:    return fs.existsSync(metadataPath(sessionId));
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:93:  if (!fs.existsSync(file)) return [];
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:94:  const lines = fs.readFileSync(file, "utf8").split("\n").filter(Boolean);
+src/lib/rextora/agent/v2/session/sessionPersistence.ts:213:  if (!fs.existsSync(dir)) return;
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:16:  const cwd = process.cwd();
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:23:    if (!fs.existsSync(dir)) continue;
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:25:      .readdirSync(dir)
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:7:import fs from "node:fs";
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:9:import { rextoraDataRoot } from "../../../storage/runtimePaths";
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:13:  // Must follow rextoraDataRoot() so isolated runtimes (REXTORA_DATA_DIR)
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:14:  // cannot silently inherit the operator credential file from process.cwd().
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:15:  return path.join(rextoraDataRoot(), "secrets");
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:28:  if (!fs.existsSync(dir)) {
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:45:  if (fs.existsSync(keyPath)) {
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:46:    const raw = fs.readFileSync(keyPath, "utf8").trim();
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:51:  // Auto-create local master key (gitignored under data/rextora/).
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:78:  if (!fs.existsSync(file)) return emptyRecord();
+src/lib/rextora/agent/v2/providers/providerCredentialStore.ts:80:    return JSON.parse(fs.readFileSync(file, "utf8")) as ProviderCredentialRecord;
+src/lib/rextora/strategySearch/storageSummary.ts:5:import fs from "node:fs";
+src/lib/rextora/strategySearch/storageSummary.ts:23:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/storageSummary.ts:35:  if (!fs.existsSync(dir)) return 0;
+src/lib/rextora/strategySearch/storageSummary.ts:38:    const st = fs.statSync(p);
+src/lib/rextora/strategySearch/storageSummary.ts:44:      for (const name of fs.readdirSync(p)) walk(path.join(p, name));
+src/lib/rextora/strategySearch/storageSummary.ts:53:  if (!fs.existsSync(trialsDir)) return 0;
+src/lib/rextora/strategySearch/storageSummary.ts:55:  for (const jobDir of fs.readdirSync(trialsDir)) {
+src/lib/rextora/strategySearch/storageSummary.ts:57:    if (!fs.statSync(fp).isDirectory()) continue;
+src/lib/rextora/strategySearch/storageSummary.ts:58:    for (const name of fs.readdirSync(fp)) {
+src/lib/rextora/strategySearch/storageSummary.ts:67:  if (!fs.existsSync(jobsDir)) return 0;
+src/lib/rextora/strategySearch/storageSummary.ts:68:  return fs.readdirSync(jobsDir).filter((n) => n.endsWith(".top10.json")).length;
+src/lib/rextora/strategySearch/deletionSafety.ts:7:import fs from "node:fs";
+src/lib/rextora/strategySearch/deletionSafety.ts:49:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/deletionSafety.ts:61:  if (!fs.existsSync(dir)) return 0;
+src/lib/rextora/strategySearch/deletionSafety.ts:64:    const st = fs.statSync(p);
+src/lib/rextora/strategySearch/deletionSafety.ts:70:      for (const name of fs.readdirSync(p)) walk(path.join(p, name));
+src/lib/rextora/strategySearch/deletionSafety.ts:79:    return fs.existsSync(fp) ? fs.statSync(fp).size : 0;
+src/lib/rextora/strategySearch/deletionSafety.ts:147:      /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/deletionSafety.ts:153:    if (fs.existsSync(liveSession)) {
+src/lib/rextora/strategySearch/deletionSafety.ts:154:      const raw = JSON.parse(fs.readFileSync(liveSession, "utf8")) as {
+src/lib/rextora/strategySearch/deletionSafety.ts:229:          fs.existsSync(p),
+src/lib/rextora/agent/v2/planner/planStore.ts:1:import fs from "node:fs";
+src/lib/rextora/agent/v2/planner/planStore.ts:3:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/planner/planStore.ts:16:    : path.join(rextoraDataRoot(), "agent-plans-v2");
+src/lib/rextora/agent/v2/planner/planStore.ts:22:    const parsed = JSON.parse(fs.readFileSync(filePath(sessionId), "utf8")) as PlanLedger;
+src/lib/rextora/backtest/chartEvidenceStore.ts:3: * Stored beside the run JSON under data/rextora/backtests/<runId>.chart.json
+src/lib/rextora/backtest/chartEvidenceStore.ts:7:import fs from "node:fs";
+src/lib/rextora/backtest/chartEvidenceStore.ts:93:  if (!fs.existsSync(full)) return null;
+src/lib/rextora/backtest/chartEvidenceStore.ts:95:    const raw = JSON.parse(fs.readFileSync(full, "utf8")) as BacktestChartEvidence;
+src/lib/rextora/backtest/chartEvidenceStore.ts:122:  return fs.existsSync(chartEvidencePath(runId));
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:10:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:69:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:109:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:112:      fs.readFileSync(fp, "utf8"),
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:175:  if (!fs.existsSync(fp)) return [];
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:177:  const lines = fs.readFileSync(fp, "utf8").split("\n").filter(Boolean);
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:353:  if (!fs.existsSync(dir)) return [];
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:355:  for (const name of fs.readdirSync(dir)) {
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:386:  if (!fs.existsSync(dir)) return;
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:387:  for (const name of fs.readdirSync(dir)) {
+src/lib/rextora/strategySearch/jobExecutionOwnership.ts:397:  if (fs.existsSync(fp)) {
+src/lib/rextora/agent/v2/memory/memoryIndex.ts:1:import fs from "node:fs";
+src/lib/rextora/strategySearch/researchGeneration.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/researchGeneration.ts:64:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/researchGeneration.ts:100:  if (!fs.existsSync(fp)) return [];
+src/lib/rextora/strategySearch/researchGeneration.ts:102:    const raw = JSON.parse(fs.readFileSync(fp, "utf8")) as ResearchGenerationFile;
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:6:import fs from "node:fs";
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:8:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:29:    : path.join(rextoraDataRoot(), "agent-approval-receipts");
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:45:  if (!fs.existsSync(file)) return null;
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:47:    return JSON.parse(fs.readFileSync(file, "utf8")) as ApprovalExecutionReceipt;
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:114:  if (!fs.existsSync(dir)) return null;
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:117:  for (const name of fs.readdirSync(dir)) {
+src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts:121:        fs.readFileSync(path.join(dir, name), "utf8"),
+src/lib/rextora/backtest/backtestStore.ts:1:import fs from "node:fs";
+src/lib/rextora/backtest/backtestStore.ts:56:  if (!fs.existsSync(indexPath)) return [];
+src/lib/rextora/backtest/backtestStore.ts:58:    return JSON.parse(fs.readFileSync(indexPath, "utf8")) as IndexRow[];
+src/lib/rextora/backtest/backtestStore.ts:79:    if (!fs.existsSync(full)) continue;
+src/lib/rextora/backtest/backtestStore.ts:81:      return JSON.parse(fs.readFileSync(full, "utf8")) as SavedBacktestResult;
+src/lib/rextora/backtest/backtestStore.ts:178:    if (!fs.existsSync(full)) continue;
+src/lib/rextora/backtest/backtestStore.ts:180:      out.push(JSON.parse(fs.readFileSync(full, "utf8")) as SavedBacktestResult);
+src/lib/rextora/backtest/backtestStore.ts:191:  if (!fs.existsSync(full)) return null;
+src/lib/rextora/backtest/backtestStore.ts:192:  return JSON.parse(fs.readFileSync(full, "utf8")) as SavedBacktestResult;
+src/lib/rextora/backtest/backtestStore.ts:208:  if (!fs.existsSync(full)) return { ok: false, reason: "not_found" };
+src/lib/rextora/backtest/backtestStore.ts:217:  if (fs.existsSync(chartPath)) {
+src/lib/rextora/agent/v2/memory/memoryStore.ts:2:import fs from "node:fs";
+src/lib/rextora/agent/v2/memory/memoryStore.ts:4:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/memory/memoryStore.ts:15:  return override ? path.resolve(override) : path.join(rextoraDataRoot(), "agent-memory-v2");
+src/lib/rextora/agent/v2/memory/memoryStore.ts:27:    return fs.readdirSync(root)
+src/lib/rextora/agent/v2/memory/memoryStore.ts:38:    return fs.readFileSync(file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
+src/lib/rextora/strategySearch/rawTrialRetention.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/rawTrialRetention.ts:41:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/rawTrialRetention.ts:60:  if (!fs.existsSync(fp)) return DEFAULT_RAW_TRIAL_RETENTION;
+src/lib/rextora/strategySearch/rawTrialRetention.ts:62:    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as {
+src/lib/rextora/strategySearch/rawTrialRetention.ts:115:    return fs.existsSync(fp) ? fs.statSync(fp).size : 0;
+src/lib/rextora/strategySearch/rawTrialRetention.ts:193:    if (!fs.existsSync(fp)) continue;
+src/lib/rextora/agent/v2/events/eventStore.ts:1:import fs from "node:fs";
+src/lib/rextora/agent/v2/events/eventStore.ts:3:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/events/eventStore.ts:9:  return override ? path.resolve(override) : path.join(rextoraDataRoot(), "agent-events");
+src/lib/rextora/agent/v2/events/eventStore.ts:21:    return fs.readdirSync(root).filter((name) => pattern.test(name)).sort().map((name) => path.join(root, name));
+src/lib/rextora/agent/v2/events/eventStore.ts:29:    return fs.readFileSync(file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
+src/lib/rextora/backtest/backtestTypes.ts:185:   * reuse). Own path data/rextora/backtests/<id>.chart.json is preferred
+src/lib/rextora/backtest/backtestTypes.ts:191:   * data/rextora/backtests/<id>.chart.json (schema v1), or via chartEvidenceRef.
+src/lib/rextora/strategySearch/searchPlan.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/searchPlan.ts:394:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/strategySearch/searchPlan.ts:396:    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as StrategySearchPlan;
+src/lib/rextora/strategySearch/jobRecordRecovery.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobRecordRecovery.ts:41:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/jobRecordRecovery.ts:67:  if (!fs.existsSync(fp)) return [];
+src/lib/rextora/strategySearch/jobRecordRecovery.ts:69:    const raw = JSON.parse(fs.readFileSync(fp, "utf8")) as {
+src/lib/rextora/strategySearch/jobRecordRecovery.ts:354:    if (fs.existsSync(jobPath)) continue;
+src/lib/rextora/strategySearch/jobArchive.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobArchive.ts:25:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/jobArchive.ts:45:  if (!fs.existsSync(fp)) return false;
+src/lib/rextora/strategySearch/jobArchive.ts:47:    const rec = JSON.parse(fs.readFileSync(fp, "utf8")) as JobArchiveRecord;
+src/lib/rextora/strategySearch/jobArchive.ts:98:  if (!fs.existsSync(fp)) {
+src/lib/rextora/strategySearch/jobArchive.ts:101:  const prev = JSON.parse(fs.readFileSync(fp, "utf8")) as JobArchiveRecord;
+src/lib/rextora/strategySearch/jobArchive.ts:119:  if (!fs.existsSync(jobsDir)) return [];
+src/lib/rextora/strategySearch/jobArchive.ts:121:  for (const name of fs.readdirSync(jobsDir)) {
+src/lib/rextora/strategySearch/jobArchive.ts:125:        fs.readFileSync(path.join(jobsDir, name), "utf8"),
+src/lib/rextora/strategySearch/jobApiService.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobApiService.ts:1701:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/jobApiService.ts:1706:  const bytes = fs.readFileSync(safePath);
+src/lib/rextora/strategySearch/jobExecutionProfile.ts:10:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobExecutionProfile.ts:53:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/jobExecutionProfile.ts:117:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/strategySearch/jobExecutionProfile.ts:119:    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as
+src/lib/rextora/strategySearch/jobStore.ts:1:import fs from "node:fs";
+src/lib/rextora/strategySearch/jobStore.ts:21:  /** Injectable root for tests. Default: data/rextora/strategy-search */
+src/lib/rextora/strategySearch/jobStore.ts:147:    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+src/lib/rextora/strategySearch/jobStore.ts:157:    if (!fs.existsSync(filePath)) return { ok: false };
+src/lib/rextora/strategySearch/jobStore.ts:158:    const text = fs.readFileSync(filePath, "utf8");
+src/lib/rextora/strategySearch/jobStore.ts:202:    if (fs.existsSync(targetPath)) {
+src/lib/rextora/strategySearch/jobStore.ts:222:    if (!fs.existsSync(targetPath) && tryParseJsonFile(bak).ok) {
+src/lib/rextora/strategySearch/jobStore.ts:255:  const targetExists = fs.existsSync(targetPath);
+src/lib/rextora/strategySearch/jobStore.ts:256:  const bakExists = fs.existsSync(bak);
+src/lib/rextora/strategySearch/jobStore.ts:257:  const tmpExists = fs.existsSync(tmp);
+src/lib/rextora/strategySearch/jobStore.ts:745:  if (!fs.existsSync(dir)) return [];
+src/lib/rextora/strategySearch/jobStore.ts:747:    .readdirSync(dir)
+src/lib/rextora/strategySearch/jobStore.ts:783:    if (fs.existsSync(dirPath)) {
+src/lib/rextora/storage/jsonStore.ts:1:import fs from "node:fs";
+src/lib/rextora/storage/jsonStore.ts:3:import { rextoraDataRoot } from "./runtimePaths";
+src/lib/rextora/storage/jsonStore.ts:16:  // Must follow rextoraDataRoot() so isolated runtimes (REXTORA_DATA_DIR)
+src/lib/rextora/storage/jsonStore.ts:17:  // cannot silently inherit operator AI settings from process.cwd().
+src/lib/rextora/storage/jsonStore.ts:18:  return rextoraDataRoot();
+src/lib/rextora/storage/jsonStore.ts:23:  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+src/lib/rextora/storage/jsonStore.ts:32:  if (!fs.existsSync(fp)) return 0;
+src/lib/rextora/storage/jsonStore.ts:33:  return fs.statSync(fp).mtimeMs;
+src/lib/rextora/storage/jsonStore.ts:55:  if (!fs.existsSync(fp)) {
+src/lib/rextora/storage/jsonStore.ts:62:    const value = JSON.parse(fs.readFileSync(fp, "utf8")) as T;
+src/lib/rextora/strategySearch/researchTop10.ts:7:import fs from "node:fs";
+src/lib/rextora/strategySearch/researchTop10.ts:500:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/strategySearch/researchTop10.ts:502:    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as ResearchTop10Snapshot;
+src/lib/rextora/strategySearch/researchTop10.ts:552:  if (!fs.existsSync(jobsDir)) return null;
+src/lib/rextora/strategySearch/researchTop10.ts:554:  for (const name of fs.readdirSync(jobsDir)) {
+src/lib/rextora/strategySearch/researchTop10.ts:670:  if (!fs.existsSync(fp)) return [];
+src/lib/rextora/strategySearch/researchTop10.ts:672:  const lines = fs.readFileSync(fp, "utf8").split("\n").filter(Boolean);
+src/lib/rextora/strategySearch/searchConfigStore.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/searchConfigStore.ts:15:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/searchConfigStore.ts:61:  if (!fs.existsSync(dir)) {
+src/lib/rextora/strategySearch/searchConfigStore.ts:137:  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
+src/lib/rextora/strategySearch/searchConfigStore.ts:142:      const raw = fs.readFileSync(path.join(dir, file), "utf8");
+src/lib/rextora/strategySearch/searchConfigStore.ts:178:  if (!fs.existsSync(fp)) return null;
+src/lib/rextora/strategySearch/searchConfigStore.ts:181:      fs.readFileSync(fp, "utf8"),
+src/lib/rextora/strategySearch/searchConfigStore.ts:200:  const existing = fs.existsSync(fp) ? loadStrategySearchConfig(safeName, options) : null;
+src/lib/rextora/strategySearch/searchConfigStore.ts:322:  if (!fs.existsSync(fp)) return false;
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:3:import fs from "node:fs";
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:23:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:46:  if (!fs.existsSync(file)) return [];
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:48:    .readFileSync(file, "utf8")
+src/lib/rextora/storage/runtimePaths.ts:2: * Central runtime path resolution for data/rextora stores.
+src/lib/rextora/storage/runtimePaths.ts:3: * Optional REXTORA_DATA_DIR enables isolated empty-runtime tests without
+src/lib/rextora/storage/runtimePaths.ts:18:export function rextoraDataRoot(): string {
+src/lib/rextora/storage/runtimePaths.ts:19:  const override = process.env.REXTORA_DATA_DIR?.trim();
+src/lib/rextora/storage/runtimePaths.ts:22:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/storage/runtimePaths.ts:28:/** Real checkout runtime root — ignores REXTORA_DATA_DIR. */
+src/lib/rextora/storage/runtimePaths.ts:31:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/storage/runtimePaths.ts:40:  return path.join(rextoraDataRoot(), "strategy-search");
+src/lib/rextora/storage/runtimePaths.ts:46:  return path.join(rextoraDataRoot(), "backtests");
+src/lib/rextora/storage/runtimePaths.ts:50:  return path.join(rextoraDataRoot(), "strategies");
+src/lib/rextora/storage/runtimePaths.ts:59:  return path.join(rextoraDataRoot(), "paper-sessions");
+src/lib/rextora/storage/runtimePaths.ts:63:  return path.join(rextoraDataRoot(), "first-run.json");
+src/lib/rextora/strategySearch/strategyDeletionSafety.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/strategyDeletionSafety.ts:69:      /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/strategyDeletionSafety.ts:75:    if (!fs.existsSync(liveSession)) return [];
+src/lib/rextora/strategySearch/strategyDeletionSafety.ts:76:    const raw = JSON.parse(fs.readFileSync(liveSession, "utf8")) as {
+src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:5:import fs from "node:fs";
+src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:15:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:24:  if (!fs.existsSync(dir)) {
+src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:91:  if (!fs.existsSync(file)) return [];
+src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:92:  const lines = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean);
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:2:import fs from "node:fs";
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:4:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:19:    : path.join(rextoraDataRoot(), "agent-tool-idempotency");
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:47:  if (!fs.existsSync(file)) return { hit: false };
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:48:  const receipt = JSON.parse(fs.readFileSync(file, "utf8")) as ToolIdempotencyReceipt;
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:64:  if (fs.existsSync(file)) return;
+src/lib/rextora/agent/v2/tools/toolIdempotency.ts:78:    if (fs.existsSync(file)) fs.unlinkSync(temporary);
+src/lib/rextora/agent/v2/tasks/taskStore.ts:1:import fs from "node:fs";
+src/lib/rextora/agent/v2/tasks/taskStore.ts:3:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/tasks/taskStore.ts:9:  return override ? path.resolve(override) : path.join(rextoraDataRoot(), "agent-tasks");
+src/lib/rextora/agent/v2/tasks/taskStore.ts:19:    const parsed = JSON.parse(fs.readFileSync(file, "utf8")) as TaskLedger;
+src/lib/rextora/strategySearch/recoveryAudit.ts:6:import fs from "node:fs";
+src/lib/rextora/strategySearch/recoveryAudit.ts:24:    /* turbopackIgnore: true */ process.cwd(),
+src/lib/rextora/strategySearch/recoveryAudit.ts:54:  if (!fs.existsSync(fp)) return [];
+src/lib/rextora/strategySearch/recoveryAudit.ts:56:  const lines = fs.readFileSync(fp, "utf8").split("\n").filter(Boolean);
+src/lib/rextora/agent/v2/tools/toolAudit.ts:2: * Append-only tool audit log under data/rextora/agent-tool-audit/
+src/lib/rextora/agent/v2/tools/toolAudit.ts:5:import fs from "node:fs";
+src/lib/rextora/agent/v2/tools/toolAudit.ts:7:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/tools/toolAudit.ts:28:  return path.join(rextoraDataRoot(), "agent-tool-audit");
+src/lib/rextora/agent/v2/tools/toolAudit.ts:65:  if (!fs.existsSync(file)) return [];
+src/lib/rextora/agent/v2/tools/toolAudit.ts:67:    .readFileSync(file, "utf8")
+src/lib/rextora/agent/v2/research/researchAudit.ts:1:import fs from "node:fs";
+src/lib/rextora/agent/v2/research/researchAudit.ts:3:import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
+src/lib/rextora/agent/v2/research/researchAudit.ts:16:    : path.join(rextoraDataRoot(), "agent-research-audit");

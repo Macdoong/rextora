@@ -1,0 +1,24 @@
+{
+  "repo": "/Users/macdoong/Documents/Rextora",
+  "branch": "main",
+  "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+  "node": "v25.8.0",
+  "npm": "11.11.0",
+  "defects": [
+    "isReasoningActive false when AGENT_V2_REASONING_ENABLED unset",
+    "productKnowledge DIRECT_ANSWER skips provider (providerExpected=false)",
+    "exact regex topic matching; typo fails to safeConversationalFallback",
+    "workspace.currentSearchJobId vs entityMemory.jobId split",
+    "no settings AI provider UI; env-only keys; no OpenAI/Google SDK"
+  ],
+  "conversationModules": "src/lib/rextora/agent/v2/conversation/",
+  "reasoningGate": "route.ts:553 isReasoningActive()",
+  "adapters": [
+    "providers/openaiAdapter.ts",
+    "providers/geminiAdapter.ts",
+    "v2/reasoning/reasoningProvider.ts"
+  ],
+  "settingsHasAiProvider": false,
+  "secretStore": "env-only"
+}

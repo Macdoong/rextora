@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-08-06T14:30:00.000Z",
+  "verdict": "REXTORA PROVIDER-BACKED EXTERNAL RELEASE PARTIAL",
+  "BUILD_ID": "o-WYHk8ovF3mqveCEbzMy",
+  "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "baseline": {
+    "pwd": "/Users/macdoong/Documents/Rextora",
+    "branch": "recorded in baseline/branch.txt",
+    "reasoningActive": true,
+    "emergencyDisabled": false,
+    "evidenceDir": "tmp/provider-backed-final-release/baseline/"
+  },
+  "e2eContradictionResolution": {
+    "priorReportValues": { "e2e1": 0, "e2e2": 0, "e2e3": 0 },
+    "interpretation": "Shell exit codes (success), not test counts",
+    "rawEvidence": [
+      "tmp/provider-backed-agent-final/quality-gates/e2e-1.stdout.txt",
+      "tmp/provider-backed-final-release/quality-gates/e2e-1.stdout.txt"
+    ],
+    "resolvedCounts": { "run1": "31 passed", "run2": "31 passed", "run3": "31 passed" },
+    "note": "Default playwright.config.ts polluted E2E with release tests; fixed via testIgnore **/release/**"
+  },
+  "credentialPersistence": {
+    "openai": {
+      "stored": true,
+      "configured": true,
+      "enabled": true,
+      "model": "gpt-5-mini",
+      "envFallback": false,
+      "fingerprintPrefix": "b3af4e7459d9081d",
+      "evidence": "tmp/provider-backed-final-release/baseline/credential-store-meta.json"
+    },
+    "gemini": {
+      "stored": true,
+      "configured": true,
+      "enabled": true,
+      "model": "gemini-2.5-flash",
+      "envFallback": false,
+      "fingerprintPrefix": "cd8b5c525302f2b4",
+      "evidence": "tmp/provider-backed-final-release/baseline/credential-store-meta.json"
+    }
+  },
+  "canaries": {
+    "openai": {
+      "passed": true,
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "writeToolAuditCount": 0,
+      "evidence": "tmp/provider-backed-final-release/openai-canary/result.json"
+    },
+    "gemini": {
+      "passed": true,
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "writeToolAuditCount": 0,
+      "evidence": "tmp/provider-backed-final-release/gemini-canary/result.json"
+    }
+  },
+  "openaiStability": {
+    "passed": true,
+    "run": "run4",
+    "total": 32,
+    "mandatoryTotal": 8,
+    "mandatoryPassed": 8,
+    "providerBacked": 24,
+    "fallbackCount": 8,
+    "evidence": "tmp/provider-backed-final-release/openai-stability/run4.stdout.txt",
+    "firstFailurePreserved": "tmp/provider-backed-final-release/openai-stability/run2.stdout.txt (7/8 mandatory before fixes)"
+  },
+  "geminiStability": {
+    "passed": true,
+    "total": 32,
+    "mandatoryTotal": 8,
+    "mandatoryPassed": 8,
+    "providerBacked": 27,
+    "fallbackCount": 5,
+    "evidence": "tmp/provider-backed-final-release/gemini-stability/run.stdout.txt"
+  },
+  "settingsBrowserMatrix": {
+    "viewports": [390, 768, 1024, 1440],
+    "testsPerViewport": 2,
+    "latestCleanRun": "included in browser-production/run.stdout.txt first run (10/10 settings scenarios passed)",
+    "evidence": "tmp/provider-backed-final-release/browser-production/run.stdout.txt"
+  },
+  "modelSwitchBrowserMatrix": {
+    "viewports": [390, 768, 1024, 1440],
+    "firstRunPassed": 3,
+    "run2Failed": {
+      "viewport": 390,
+      "reason": "answer length 8 for typo question (flake/timeout)",
+      "evidence": "tmp/provider-backed-final-release/browser-production/run2.stdout.txt"
+    },
+    "firstFailurePreserved": true
+  },
+  "secretLeakAudit": {
+    "secretLeakCount": 0,
+    "evidence": [
+      "tmp/provider-backed-final-release/secret-scan/audit.json",
+      "tmp/provider-backed-final-release/secret-leak/scan.stdout.txt"
+    ]
+  },
+  "developmentBrowserMatrix": {
+    "status": "NOT_RUN_AS_SEPARATE_GATE",
+    "note": "Release Playwright config exercises production server on port 3000 across 4 viewports"
+  },
+  "production22ScenarioMatrix": {
+    "status": "INCOMPLETE",
+    "implementedScenarios": [1, 2, 7, 8, 9, 20, 21, 22],
+    "implementedCount": 8,
+    "requiredCount": 22,
+    "firstRun": { "passed": 43, "failed": 1, "failure": "scenario 8 at 1024 viewport", "evidence": "browser-production/run.stdout.txt" },
+    "scenario8Rerun": { "passed": 4, "failed": 0, "evidence": "browser-production/scenario8-rerun.stdout.txt" },
+    "run2": { "passed": 43, "failed": 1, "failure": "model-switch at 390", "evidence": "browser-production/run2.stdout.txt" }
+  },
+  "lifecycleRegression": {
+    "unitTests": "1538/1538 passed",
+    "routingMatrix": ">=72 cases in AgentConversationRoutingMatrix.test.ts",
+    "evidence": "tmp/provider-backed-final-release/quality-gates/unit.stdout.txt"
+  },
+  "qualityGates": {
+    "lint": { "exitCode": 0, "evidence": "quality-gates/lint.exit" },
+    "unit": { "passed": 1538, "total": 1538, "evidence": "quality-gates/unit.stdout.txt" },
+    "build": { "exitCode": 0, "BUILD_ID": "o-WYHk8ovF3mqveCEbzMy", "evidence": "quality-gates/build3.stdout.txt" },
+    "e2e": [
+      { "run": 1, "exitCode": 0, "passed": 31, "evidence": "quality-gates/e2e-1.stdout.txt" },
+      { "run": 2, "exitCode": 0, "passed": 31, "evidence": "quality-gates/e2e-2.stdout.txt" },
+      { "run": 3, "exitCode": 0, "passed": 31, "evidence": "quality-gates/e2e-3.stdout.txt" }
+    ]
+  },
+  "safe": {
+    "before": {
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32"
+    },
+    "after": {
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+      "diffEmpty": true
+    }
+  },
+  "git": {
+    "commitCreated": false,
+    "pushPerformed": false,
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663"
+  },
+  "remainingBlockers": [
+    "Production 22-scenario matrix spec implements 8/22 scenarios only",
+    "Release browser matrix 43/44 on latest full rerun (model-switch 390 flake)",
+    "Action-plan turn '탐색 시작해줘' still provider-fallback in stability gate (approval chain not verified end-to-end)",
+    "Dedicated development browser matrix not executed as separate gate"
+  ],
+  "fixesAppliedThisCycle": [
+    "playwright.config.ts testIgnore release folder for clean E2E 31/31",
+    "conversationContext product/correction routing for '앱 기능'",
+    "conversationRouter execution_report routing for '방금 실제로 뭘 했어?'",
+    "route.ts ensureAgentSession + INVALID_SESSION_ID guard on PLAN_AND_APPROVE persist",
+    "Stability scripts use agent_* session IDs with ensureSession",
+    "production-matrix scenario 8 selects OpenAI explicitly"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "processes": {
+    "72946": {
+      "pid": 72946,
+      "ppid": 72943,
+      "argv": [
+        "/opt/homebrew/Cellar/node/25.8.0/bin/node",
+        "/opt/homebrew/lib/node_modules/npm/bin/npm-cli.js",
+        "exec"
+      ],
+      "startedAt": "2026-08-13T04:17:19.485Z",
+      "updatedAt": "2026-08-13T04:18:15.516Z",
+      "totalCalls": 1,
+      "totalReturnedEntries": 12,
+      "peakRssBytes": 87261184,
+      "peakHeapUsedBytes": 17253576,
+      "inFlight": [],
+      "directories": [
+        {
+          "api": "fs.promises.readdir",
+          "path": "<HOME>/.npm/_logs",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 12,
+          "maxEntriesInOneScan": 12,
+          "totalElapsedMs": 178.537917,
+          "maxElapsedMs": 178.537917,
+          "firstCallerSample": "    at #cleanLogs (/opt/homebrew/lib/node_modules/npm/lib/utils/log-file.js:208:28)\n    at LogFiles.load (/opt/homebrew/lib/node_modules/npm/lib/utils/log-file.js:90:27)\n    at #load (/opt/homebrew/lib/node_modules/npm/lib/npm.js:181:43)\n    at async Npm.load (/opt/homebrew/lib/node_modules/npm/lib/npm.js:82:14)\n    at async module.exports (/opt/homebrew/lib/node_modules/npm/lib/cli/entry.js:35:37)",
+          "firstErrorCode": null
+        }
+      ]
+    },
+    "72959": {
+      "pid": 72959,
+      "ppid": 72946,
+      "argv": [
+        "/opt/homebrew/Cellar/node/25.8.0/bin/node"
+      ],
+      "startedAt": "2026-08-13T04:17:23.985Z",
+      "updatedAt": "2026-08-13T04:18:16.008Z",
+      "totalCalls": 0,
+      "totalReturnedEntries": 0,
+      "peakRssBytes": 0,
+      "peakHeapUsedBytes": 0,
+      "inFlight": [],
+      "directories": []
+    }
+  },
+  "updatedAt": "2026-08-13T04:18:16.008Z"
+}

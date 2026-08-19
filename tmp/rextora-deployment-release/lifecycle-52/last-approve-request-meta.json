@@ -1,0 +1,13 @@
+{
+  "pendingInBody": true,
+  "actionId": "pa_7e2d5dcf0cc9b462",
+  "query": "진행해",
+  "conclusionPreview": "선택한 탐색 결과를 전략으로 승격했습니다. 같은 요청을 다시 승인해도 전략은 중복 생성되지 않습니다.",
+  "intentType": "approve_pending",
+  "mode": "APPROVAL_CONTROL",
+  "hasExecutionResult": true,
+  "jobId": "search_d0000001-0000-4000-8000-000000000001",
+  "stepSummaries": [],
+  "createBodyKeys": null,
+  "createBodyBytes": 0
+}

@@ -1,0 +1,89 @@
+{
+  "before": {
+    "mode": "PLAN_AND_APPROVE",
+    "pending": 1,
+    "write": 0,
+    "meta": {
+      "provider": "local",
+      "model": "v1_fallback",
+      "providerAttempted": null,
+      "fallbackUsed": true,
+      "skipProvider": null,
+      "fallbackReason": null,
+      "latencyMs": 38771,
+      "toolIds": [
+        "search.create",
+        "search.start"
+      ],
+      "reasoningId": "rr_msq8ofx2_ry1yoi"
+    },
+    "exec": null
+  },
+  "approve1": {
+    "mode": "APPROVAL_CONTROL",
+    "write": 1,
+    "meta": {
+      "provider": "local",
+      "model": "approval_fast_path",
+      "providerAttempted": null,
+      "fallbackUsed": false,
+      "skipProvider": null,
+      "fallbackReason": null,
+      "latencyMs": 0,
+      "toolIds": [],
+      "reasoningId": "rr_msq8pdxu_6kdh9k"
+    },
+    "exec": {
+      "commandId": "rr_msq8pdxu_6kdh9k",
+      "commandType": "tool_plan",
+      "executionStatus": "succeeded",
+      "resultReference": null,
+      "jobId": "search_7d1091f2-d80f-4691-bf08-1d1a0c60786d",
+      "runId": null,
+      "alreadyExecuted": false,
+      "summaryKo": "탐색 작업을 시작했습니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다."
+    },
+    "http": 200
+  },
+  "approve2": {
+    "mode": "APPROVAL_CONTROL",
+    "write": 0,
+    "meta": {
+      "provider": "local",
+      "model": "approval_receipt_replay",
+      "providerAttempted": null,
+      "fallbackUsed": false,
+      "skipProvider": null,
+      "fallbackReason": null,
+      "latencyMs": 0,
+      "toolIds": [],
+      "reasoningId": "approval_replay_pa_9006ef3bf140d0df"
+    },
+    "exec": {
+      "commandId": "approval_receipt_pa_9006ef3bf140d0df",
+      "commandType": "tool_plan",
+      "executionStatus": "skipped_idempotent",
+      "resultReference": null,
+      "jobId": "search_7d1091f2-d80f-4691-bf08-1d1a0c60786d",
+      "runId": null,
+      "alreadyExecuted": true,
+      "summaryKo": "탐색 작업을 시작했습니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다."
+    }
+  },
+  "report": {
+    "mode": "DIRECT_ANSWER",
+    "write": 0,
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "providerAttempted": null,
+      "fallbackUsed": null,
+      "skipProvider": null,
+      "fallbackReason": null,
+      "latencyMs": 9064,
+      "toolIds": null,
+      "reasoningId": null
+    },
+    "preview": "방금 저는 대화로만 응답했습니다. 외부 도구 호출이나 실제 주문·시스템 변경은 전혀 없었습니다."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "route": "/live-trading",
+  "shellRenderedBeforeTimeout": true,
+  "shellVisibleAtMs": 277,
+  "networkIdleReached": true,
+  "networkIdleError": null,
+  "navigationElapsedMs": 1277,
+  "persistentRequests": [
+    {
+      "url": "/api/rextora/trading/dashboard",
+      "method": "GET",
+      "resourceType": "fetch",
+      "repeatCount": 6,
+      "approximateIntervalMs": 6400,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "originatesFromLiveTradingPolling": true
+    },
+    {
+      "url": "/api/rextora/bot/status",
+      "method": "GET",
+      "resourceType": "fetch",
+      "repeatCount": 5,
+      "approximateIntervalMs": 8000,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "originatesFromLiveTradingPolling": true
+    }
+  ],
+  "pollingConfirmed": true,
+  "applicationErrorObserved": false,
+  "http5xxCount": 0,
+  "chunkLoadErrorCount": 0,
+  "hydrationErrorCount": 0,
+  "pageErrorCount": 0,
+  "consoleErrorCount": 0,
+  "classification": "UNPROVEN",
+  "reasonNetworkIdleInvalid": "Live-trading page schedules refresh() on mount and setInterval(refresh, 8000), repeatedly fetching /api/rextora/trading/dashboard and /api/rextora/bot/status. Playwright networkidle requires zero in-flight network connections for 500ms; 8s polling prevents that indefinitely while the styled shell is already rendered.",
+  "evidenceSource": "app/live-trading/page.tsx useEffect setInterval 8000ms + prove-networkidle.mjs request trace"
+}

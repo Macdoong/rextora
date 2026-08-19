@@ -1,0 +1,105 @@
+{
+  "buildId": "-cXnmJYA44ljdq75mjyA_",
+  "startedAt": "2026-08-01T12:48:00.596Z",
+  "checks": {
+    "dashboardAgent": 1,
+    "globalFab": 1,
+    "workspacePanel": 1,
+    "approvalCenter": 1,
+    "missionTimeline": 1,
+    "globalFabOnSearch": 1,
+    "globalDrawer": 1,
+    "sharedTurnsVisible": 9,
+    "globalFabMobile": 1
+  },
+  "prompts": [
+    {
+      "q": "오늘 무엇을 해야 하지?",
+      "answer": "현재 연구를 확인했습니다. 권장 다음 단계는 실패 탐색 원인 확인입니다.\n\n오늘 완료된 탐색이 확인되지 않았습니다.\n최근 검증·주목 전략은 custom_ms1y7u04입니다.\n활성 모의매매 세션은 없습니다.\n실패 탐색이 있어 원인 확인 후 재실행이 필요합니다.\n탐색 계획을 준비해 드릴까요?\n\n실패 탐색 원인 확인.",
+      "approvalReq": 0,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "좋은 전략을 찾아줘.",
+      "answer": "ETHUSDT 15m · Order Block + Fair Value Gap 설정으로 탐색 계획을 준비하는 것을 권장합니다.\n\nsymbol=ETHUSDT · timeframe=15m · patterns=Order Block + Fair Value Gap · patternConfigLevel=automatic · leverageMode=automatic\n\n탐색 계획 검토.",
+      "approvalReq": 1,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "왜 이 전략이 좋은 거야?",
+      "answer": "추천 이유: symbol=ETHUSDT · timeframe=15m · patterns=Order Block + Fair Value Gap · patternConfigLevel=automatic · leverageMode=automatic\n\n이전 결론: ETHUSDT 15m · Order Block + Fair Value Gap 설정으로 탐색 계획을 준비하는 것을 권장합니다. 검증된 데이터만으로 권장했습니다.\n\n탐색 계획 검토.",
+      "approvalReq": 2,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "이어서 하자",
+      "answer": "이어서 「탐색 계획 검토」을 검토하세요. 엔진은 자동 실행되지 않습니다.\n\n이전 대화의 승인 대기 항목을 복원했습니다. 승인하면 관련 화면만 열립니다.\n\n탐색 계획 검토.",
+      "approvalReq": 3,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "왜 기다리는 거야?",
+      "answer": "「탐색 계획 검토」을 기다리는 이유: 사용자 승인 전까지 엔진을 시작하지 않기 때문입니다.\n\n대화에서 승인해 화면을 열어도 엔진은 자동 실행되지 않습니다. 실제 시작은 해당 화면의 승인 게이트에서 결정합니다.\n\n계획 검토 후 승인하거나 취소하세요.",
+      "approvalReq": 4,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "지금 승인하면 어떤 일이 일어나?",
+      "answer": "「승인 초안」을 승인하면 관련 화면이 열립니다. 아직 실행되지 않습니다.\n\n대화에서 승인하면 관련 화면으로 이동합니다.\n엔진(탐색·백테스트·모의매매·실전)은 자동으로 시작되지 않습니다.\n실제 시작·실행은 해당 화면의 승인 게이트에서 사용자가 직접 결정합니다.\n이동 경로: 전문가 화면\n\n탐색 계획 검토.",
+      "approvalReq": 5,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "백테스트 해볼까?",
+      "answer": "선택 전략 · BTCUSDT 백테스트 계획을 준비했습니다. 아직 실행되지 않았습니다.\n\n심볼·전략 범위만 초안으로 잡았습니다. 승인 후 백테스트 화면에서 직접 실행하세요.\n\n백테스트 계획 검토.",
+      "approvalReq": 6,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "다음 단계는?",
+      "answer": "이어서 백테스트 계획 검토를 진행하는 것이 좋습니다.\n\n심볼·전략 범위만 초안으로 잡았습니다. 승인 후 백테스트 화면에서 직접 실행하세요.\n\n실패 탐색 원인 확인.",
+      "approvalReq": 7,
+      "approvalCenter": 1,
+      "actionSlots": 1,
+      "approvalTrio": 0,
+      "isGeneric": false
+    }
+  ],
+  "strips": {
+    "search": 1,
+    "results": 1,
+    "backtest": 1,
+    "paper": 1,
+    "live": 1
+  },
+  "verdict": "PASS",
+  "metrics": {
+    "prompts": 8,
+    "unknownishGeneric": 0,
+    "usefulAnswers": 8,
+    "stripsOk": true,
+    "continuityOk": true
+  },
+  "finishedAt": "2026-08-01T12:48:15.345Z"
+}

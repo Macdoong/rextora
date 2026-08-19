@@ -1,0 +1,99 @@
+{
+  "scenario": "E",
+  "width": 1024,
+  "startedAt": "2026-08-14T07:45:36.471Z",
+  "finishedAt": "2026-08-14T07:48:18.131Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-E-1024-6870c2-FwAGR2",
+  "port": 58110,
+  "provider": "openai",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T07:45:37.627Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssn78t7_jfaak2",
+      "turnId": "turn-1786693537612",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:46:16.062Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssn78t7_jfaak2",
+      "turnId": "turn-1786693537612",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 38428,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T07:46:17.013Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssn8379_7ndrxa",
+      "turnId": "turn-1786693576999",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:46:17.013Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssn8379_7ndrxa",
+      "turnId": "turn-1786693576999",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "plannedTools": [
+      "paper.prepare"
+    ],
+    "sessionId": "paper_54be0ed0-74d1-459e-9614-788931d64a76",
+    "executed": {
+      "intentType": "approve_pending",
+      "executionResult": {
+        "commandId": "rr_mssn8379_7ndrxa",
+        "commandType": "tool_plan",
+        "executionStatus": "succeeded",
+        "resultReference": null,
+        "jobId": null,
+        "runId": null,
+        "alreadyExecuted": false,
+        "summaryKo": "모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다."
+      }
+    },
+    "beforeSessionIds": [],
+    "createdSessionIds": [
+      "paper_54be0ed0-74d1-459e-9614-788931d64a76"
+    ],
+    "oneSessionCreated": true,
+    "internalStatus": "pending_approval",
+    "exchangeCalled": false,
+    "executorStarted": false,
+    "separateActivationApprovalExplained": true,
+    "primaryText": "모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다.\n\n진행 상황을 확인하세요\n모의매매 세션을 준비했습니다. 모의매매 화면에서 별도 활성화 승인이 필요합니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": true,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

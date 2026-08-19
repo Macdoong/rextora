@@ -1,0 +1,67 @@
+{
+  "title": "REXTORA PROVIDER-BACKED AI EMPLOYEE COMPLETION",
+  "verdict": "REXTORA PROVIDER-BACKED AI EMPLOYEE PARTIAL",
+  "BUILD_ID": "O5MqlOEKs8liifj_TKUBu",
+  "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "unchanged": true
+  },
+  "openaiCanary": {
+    "ok": true,
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "latencyMs": 1858,
+    "structuredOutputValid": true,
+    "writeToolAuditCount": 0,
+    "errorKo": null,
+    "responseFingerprint": "openai:chatcmpl-E9qiiT7mILTIg9zWfbtagxf2t7VSg"
+  },
+  "geminiCanary": {
+    "ok": true,
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "latencyMs": 965,
+    "structuredOutputValid": true,
+    "writeToolAuditCount": 0,
+    "errorKo": null,
+    "responseFingerprint": "gemini:gemini-2.5-flash:965"
+  },
+  "modelSwitch": {
+    "t1": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "source": "llm"
+    },
+    "t2": {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "source": "llm"
+    }
+  },
+  "secretGet": {
+    "reasoningActive": true,
+    "openaiConfigured": true,
+    "geminiConfigured": true,
+    "hasSk": false,
+    "hasAiza": false,
+    "hasApiKeyField": false
+  },
+  "gates": {
+    "lint": 0,
+    "unit": 0,
+    "build": 0,
+    "e2e": [
+      0,
+      0,
+      0
+    ]
+  },
+  "remaining": [
+    "Full Playwright browser matrix for Settings AI provider UI and multi-viewport model switching not executed end-to-end in this cycle",
+    ".env.local OPENAI_API_KEY contains non-ASCII lookalikes; shell/process OpenAI key is valid and used by next start; re-paste via Settings recommended",
+    "Some READ_AND_ANSWER OpenAI turns still fall back locally on JSON parse/timeout under load"
+  ]
+}

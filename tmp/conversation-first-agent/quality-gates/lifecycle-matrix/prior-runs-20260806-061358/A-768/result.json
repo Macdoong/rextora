@@ -1,0 +1,16 @@
+{
+  "scenario": "A",
+  "width": 768,
+  "startedAt": "2026-08-05T16:52:29.803Z",
+  "finishedAt": "2026-08-05T17:06:15.341Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-A-768-cd1387-7o8VNi",
+  "port": 54208,
+  "provider": "gemini",
+  "error": "page.waitForResponse: Timeout 120000ms exceeded while waiting for event \"response\"\n    at send (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:239:32)\n    at scenarioA (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:307:27)\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:907:39)\n    at async file:///Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1015:23\n    at async main (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1012:26)",
+  "consoleErrorCount": 1,
+  "consoleErrors": [
+    "Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://127.0.0.1:54208/api/rextora/agent:0:0"
+  ],
+  "passed": false
+}

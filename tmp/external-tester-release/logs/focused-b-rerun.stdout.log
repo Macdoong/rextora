@@ -1,0 +1,9 @@
+B-390: PASS
+B-1440: PASS
+B-1024: PASS
+B-768: PASS
+{
+  "passed": true,
+  "failures": [],
+  "provider": "gemini"
+}

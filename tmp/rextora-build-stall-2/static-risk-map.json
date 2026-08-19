@@ -1,0 +1,150 @@
+{
+  "generatedAt": "2026-08-13T03:33:24.552Z",
+  "graphSummary": {
+    "entries": 117,
+    "reachableLocalFiles": 569,
+    "reachableLocalBytes": 4082219,
+    "edges": 2156,
+    "directRuntimeOrEvidenceImports": 0,
+    "staticSafeJsonImports": 2,
+    "staticSafeJsonBytes": 1175
+  },
+  "paths": [
+    {
+      "file": "instrumentation.ts",
+      "symbol": "register",
+      "importedBy": "Next instrumentation endpoint",
+      "operation": "delayed localhost POST to orphan-recovery route",
+      "moduleScope": false,
+      "possibleFilesystemScope": "indirect strategy-search runtime recovery on production server start only",
+      "provenBuildTimeExecution": false,
+      "reason": "returns for NEXT_PHASE=phase-production-build or npm_lifecycle_event=build before scheduling timer"
+    },
+    {
+      "file": "app/api/rextora/internal/orphan-recovery/route.ts",
+      "symbol": "POST",
+      "importedBy": "App Route entrypoint",
+      "operation": "statically imports recoverOrphanSearchJobs; invokes only on POST",
+      "moduleScope": false,
+      "possibleFilesystemScope": "strategy-search jobs/trials/ownership/recovery records",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "symbol": "filePath/getFileMtimeMs/readJsonStore",
+      "importedBy": [
+        "strategy-search generations route",
+        "system route",
+        "settings server component"
+      ],
+      "operation": "dynamic path.join + existsSync/statSync/readFileSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/<dynamic>",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMatchedFiles": [
+        308788,
+        77197
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "symbol": "trialsDir/trialFilePath/listSearchTrials",
+      "importedBy": "strategy-search routes and orphan recovery graph",
+      "operation": "dynamic paths + existsSync/readdirSync/readFileSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/strategy-search/jobs and trials",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 291314
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+      "symbol": "retainedTrialPath/list/read retention",
+      "importedBy": "strategy-search API graph",
+      "operation": "dynamic trial paths + existsSync/statSync/readFileSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/strategy-search/trials",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 582346
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/storageSummary.ts",
+      "symbol": "walk/trialCount/jobCount",
+      "importedBy": "strategy-search status routes",
+      "operation": "recursive readdirSync/statSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/strategy-search including trials",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 152549
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "symbol": "directorySizeBytes/trialArtifacts",
+      "importedBy": "strategy deletion routes",
+      "operation": "recursive existsSync/readdirSync/statSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "strategy-search trials",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 582350
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "symbol": "fileFor/getCommand/findCommandByIdempotencyKey",
+      "importedBy": "Agent App Route",
+      "operation": "dynamic JSON path + readFileSync/readdirSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/agent-commands",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 158106
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "symbol": "load/list/delete backtests",
+      "importedBy": "backtest and Agent routes",
+      "operation": "dynamic JSON paths + existsSync/readFileSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora/backtests",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 75819
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyStore.ts",
+      "symbol": "load/list/delete strategies",
+      "importedBy": "strategy, backtest, Agent routes",
+      "operation": "dynamic JSON paths + existsSync/readFileSync/readdirSync",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/strategies and data/rextora/strategies",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "priorMaxMatchedFiles": 75819
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/** runtime stores",
+      "symbol": "session/provider/memory/event/task/plan/audit/idempotency stores",
+      "importedBy": "Agent App Route graph",
+      "operation": "dynamic runtime paths + fs calls",
+      "moduleScope": false,
+      "possibleFilesystemScope": "data/rextora agent runtime stores",
+      "provenBuildTimeExecution": false,
+      "provenBuildTimeStaticAnalysis": true,
+      "note": "Some were added after the capped prior warning set; all are reachable and now use the same runtime-only boundary."
+    }
+  ],
+  "conclusion": "No module-scope runtime traversal or startup recovery executed during build. Prior build warnings prove Turbopack static fs pattern inference over runtime-only calls. A candidate turbopackIgnore annotation repair bounded the source-level probe but did not bound the real Next 16.2.6 native build and was reverted.",
+  "candidateRepair": {
+    "status": "DISPROVEN_AND_REVERTED",
+    "focusedTests": "83/83 passed",
+    "focusedEslintExitCode": 0,
+    "sourceLevelProbe": "passed",
+    "authoritativeBuildExitCode": 143,
+    "authoritativeBuildPeakRssBytes": 16801153024,
+    "reason": "The build reproduced pathological native Turbopack growth before leaving the compile phase."
+  }
+}

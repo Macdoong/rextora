@@ -7,17 +7,12 @@ import fs from "node:fs";
 import path from "node:path";
 import type { StrategySearchOperatorFormState } from "@/components/rextora/strategySearch/formDefaults";
 import { createDefaultOperatorFormState } from "@/components/rextora/strategySearch/formDefaults";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 const CONFIG_SCHEMA_VERSION = 1 as const;
 
 function defaultConfigsDir(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-    "configs",
-  );
+  return path.join(strategySearchRoot(), "configs");
 }
 
 export type StrategySearchSavedConfig = {

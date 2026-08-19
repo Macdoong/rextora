@@ -1,0 +1,48 @@
+{
+  "settingsSafe": {
+    "reasoningActive": true,
+    "openaiConfigured": true,
+    "geminiConfigured": true,
+    "openaiError": null,
+    "geminiError": null,
+    "secretInPayload": false
+  },
+  "openai": {
+    "status": 200,
+    "count": 70,
+    "hasGpt5Mini": true,
+    "sample": [
+      "gpt-5-mini",
+      "gpt-3.5-turbo",
+      "gpt-3.5-turbo-0125",
+      "gpt-3.5-turbo-1106",
+      "gpt-3.5-turbo-16k",
+      "gpt-3.5-turbo-instruct",
+      "gpt-3.5-turbo-instruct-0914",
+      "gpt-4",
+      "gpt-4-0613",
+      "gpt-4-turbo",
+      "gpt-4-turbo-2024-04-09",
+      "gpt-4.1"
+    ]
+  },
+  "gemini": {
+    "status": 200,
+    "count": 33,
+    "preferred": "gemini-2.5-flash",
+    "sample": [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-001",
+      "gemini-2.0-flash-lite",
+      "gemini-2.0-flash-lite-001",
+      "gemini-2.5-flash-lite",
+      "gemini-3.1-flash-lite",
+      "gemini-3.5-flash",
+      "gemini-3.5-flash-lite",
+      "gemini-3.6-flash",
+      "gemini-3-flash-preview",
+      "gemini-3.1-flash-lite-preview"
+    ]
+  }
+}

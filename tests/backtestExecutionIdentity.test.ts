@@ -330,17 +330,21 @@ describe("backtest polish UI source contracts", () => {
 
   it("tab navigation order and active state wiring are present", () => {
     const src = wb();
-    const nav = src.slice(
-      src.indexOf("workbenchSections"),
-      src.indexOf("scrollWorkbenchSection"),
-    );
+    const navStart = src.indexOf("workbenchSections");
+    const navEnd = src.indexOf("selectWorkbenchSection");
+    expect(navStart).toBeGreaterThan(0);
+    expect(navEnd).toBeGreaterThan(navStart);
+    const nav = src.slice(navStart, navEnd);
     expect(nav.indexOf('"차트"')).toBeLessThan(nav.indexOf('"거래"'));
     expect(nav.indexOf('"거래"')).toBeLessThan(nav.indexOf('"월별"'));
     expect(nav.indexOf('"월별"')).toBeGreaterThan(0);
     expect(src).toContain("activeNavSection");
-    expect(src).toContain("bt-force-expand");
-    expect(src).toContain("navClickLocked");
-    expect(src).toContain("scrollBottomGap");
+    expect(src).toContain("selectWorkbenchSection");
+    expect(src).toContain("analysisSection");
+    // Click-owned tabs — scroll-spy lock / bottom-gap pin removed.
+    expect(src).not.toContain("navClickLocked");
+    expect(src).not.toContain("scrollBottomGap");
+    expect(src).not.toContain("IntersectionObserver");
   });
 
   it("overlay controls keep three groups with accessible disabled reasons", () => {

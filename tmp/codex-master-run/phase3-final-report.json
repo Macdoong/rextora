@@ -1,0 +1,47 @@
+{
+  "phase": "Agent V2 Phase 3",
+  "verdict": "VERIFIED",
+  "verifiedAt": "2026-08-03T12:30:00+09:00",
+  "buildId": "vR5nS7fcKl-P6q8UH0wwJ",
+  "browserMatrix": {
+    "scenarios": ["A", "B", "C", "D", "E"],
+    "viewports": [390, 768, 1024, 1440],
+    "total": 20,
+    "passed": 20,
+    "sharedRuntime": false,
+    "allProcessesCleared": true,
+    "allPortsCleared": true,
+    "evidenceRoot": "tmp/codex-master-run/phase3-runs",
+    "screenshotsRoot": "tmp/codex-master-run/phase3-screenshots"
+  },
+  "provider": {
+    "configuredProvider": "gemini",
+    "oneAttemptBoundary": true,
+    "approvalFastPathSkipsProvider": true,
+    "deterministicFallbackVerified": true,
+    "controlledFailureScenario": "F-390",
+    "controlledFailurePassed": true,
+    "lifecycleAuditPersisted": true
+  },
+  "qualityGates": {
+    "focusedTests": {"passed": 29, "failed": 0, "exitCode": 0},
+    "lint": {"exitCode": 0},
+    "unit": {"filesPassed": 177, "testsPassed": 1290, "failed": 0, "exitCode": 0},
+    "build": {"exitCode": 0},
+    "e2e": [
+      {"run": 1, "passed": 31, "failed": 0, "exitCode": 0},
+      {"run": 2, "passed": 31, "failed": 0, "exitCode": 0},
+      {"run": 3, "passed": 31, "failed": 0, "exitCode": 0}
+    ]
+  },
+  "safety": {
+    "liveActivated": false,
+    "exchangeOrderCalled": false,
+    "paperActivationPerformed": false,
+    "safePath": "data/strategies/SAFE_v44_i4060.json",
+    "safeParamsHash": "7893ca3f0e30",
+    "safeSha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "safeGitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "safeProtectedDiffEmpty": true
+  }
+}

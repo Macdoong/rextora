@@ -1,0 +1,6 @@
+{
+  "scenarioId": "16",
+  "classification": "APPLICATION_DEFECT",
+  "rootCause": "Repeated text approval 승인할게 after first button approve cleared pendingProposedAction; route required approvalId for receipt replay and blocked findLatestSessionApprovalReceipt when stale pendingPlan remained in entity memory → CLARIFY_REFERENCE.",
+  "fixes": ["findLatestSessionApprovalReceipt in approvalExecutionStore", "route.ts replay when approvalId absent", "harness waits first APPROVAL_CONTROL before second send"]
+}

@@ -36,6 +36,28 @@ export interface OrphanJobRecoveryResult {
   }>;
 }
 
+/** Default max jobs auto-resumed into the current process on one boot. */
+export const DEFAULT_ORPHAN_AUTO_RESUME_LIMIT = 2;
+
+/**
+ * Resolve boot auto-resume limit.
+ * - REXTORA_ORPHAN_AUTO_RESUME_LIMIT=N overrides (0 disables auto-resume).
+ * - Unset in development → 0 (Turbopack compile cannot share the event loop
+ *   with even a small search-worker stampede; Settings UI never mounts).
+ * - Unset in production → DEFAULT_ORPHAN_AUTO_RESUME_LIMIT.
+ * - Invalid / negative values fall back to the same NODE_ENV defaults.
+ */
+export function resolveOrphanAutoResumeLimit(
+  env: NodeJS.ProcessEnv = process.env,
+): number {
+  const developmentDefault = env.NODE_ENV === "development" ? 0 : DEFAULT_ORPHAN_AUTO_RESUME_LIMIT;
+  const raw = env.REXTORA_ORPHAN_AUTO_RESUME_LIMIT?.trim();
+  if (raw == null || raw === "") return developmentDefault;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return developmentDefault;
+  return Math.floor(n);
+}
+
 /**
  * Find incomplete jobs on disk and restore/resume per safe rules.
  * Idempotent: skips jobs that are already executing in-process.
@@ -111,6 +133,12 @@ export function recoverOrphanSearchJobs(
     .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
     .slice(0, 100);
 
+  // Hard cap auto-resumes per boot. Resuming dozens of shared-disk orphans into one
+  // Next process (especially next-dev / Turbopack) saturates the event loop, blocks
+  // compilation, and drops Settings/Agent HTTP readiness. Remaining eligible orphans
+  // stay on disk for a later boot or explicit operator resume.
+  const resumeLimit = resolveOrphanAutoResumeLimit();
+
   for (const job of scan) {
     if (job.status !== "running" && job.status !== "queued") {
       skipped.push(job.id);
@@ -122,6 +150,10 @@ export function recoverOrphanSearchJobs(
       continue;
     }
     if (isSearchJobExecutionWorkerActive(job.id, store)) {
+      skipped.push(job.id);
+      continue;
+    }
+    if (resumed.length >= resumeLimit) {
       skipped.push(job.id);
       continue;
     }

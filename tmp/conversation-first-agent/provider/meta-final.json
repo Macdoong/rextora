@@ -1,0 +1,112 @@
+{
+  "command": "node scripts/providerCanaryProbe.mjs --out=tmp/conversation-first-agent/provider/canary-evidence-final.json",
+  "startedAt": "2026-08-06T07:50:46Z",
+  "finishedAt": "2026-08-06T07:50:57Z",
+  "durationMs": 10945,
+  "exitCode": 0,
+  "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+  "evidence": {
+    "requestedProvider": "gemini",
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "structuredOutputValid": true,
+    "canaryPassed": true,
+    "checks": [
+      {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "configured": false
+      },
+      {
+        "ok": true,
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "latencyMs": 1059,
+        "configured": true
+      }
+    ],
+    "fallbackUsed": false,
+    "fallbackReason": null,
+    "writeToolAuditCount": 0,
+    "canary": {
+      "status": 200,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "validationOk": true,
+      "toolIds": [
+        "workspace.current",
+        "lifecycle.current"
+      ],
+      "writeToolExecuted": false,
+      "structuredOutputValid": true,
+      "conclusionKo": "\ud604\uc7ac \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc5d0 \uc788\uc73c\uba70, \ube44\ud2b8\ucf54\uc778 15\ubd84\ubd09 \uc2ec\ubcfc\uc774 \uc120\ud0dd\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \uc804\ub7b5 \ud0d0\uc0c9 \uc791\uc5c5 1\uac1c\uac00 \uc644\ub8cc\ub418\uc5c8\uace0, \ucd1d 2\uac1c\uc758 \uc804\ub7b5 \uc911 1\uac1c\uac00 \uc2e4\uc804 \uac00\ub2a5 \ud6c4\ubcf4\uc785\ub2c8\ub2e4. \ucd5c\uadfc \ubc31\ud14c\uc2a4\ud2b8\ub294 1\ud68c \uc2e4\ud589\ub418\uc5c8\uc73c\uba70, \uc804\ub7b5 \uc2dd\ubcc4 \uc815\ubcf4\ub294 demo_strategy_btc_v1\uc785\ub2c8\ub2e4. \uc2dc\uc2a4\ud15c\uc740 \uac80\uc99d\ub41c \ubc31\ud14c\uc2a4\ud2b8\uc640 \ubaa8\uc758\ub9e4\ub9e4 \uac00\ub2a5\ud55c \uc804\ub7b5\uc774 \uc788\uc5b4 \ubaa8\uc758\ub9e4\ub9e4 \ud654\uba74\uc744 \uc5f4\uc5b4 \uac80\ud1a0\ud560 \uac83\uc744 \uad8c\uc7a5\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4.",
+      "latencyMs": 5746,
+      "errorKo": null
+    },
+    "verification": {
+      "requestedProvider": "gemini",
+      "selectedProvider": "gemini",
+      "providerAttempted": true,
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "canaryPassed": true,
+      "healthyMarked": true,
+      "checksEmpty": false,
+      "canaryNull": false,
+      "writeToolsBlocked": true,
+      "plannedWriteTools": []
+    },
+    "attempts": [
+      {
+        "requestedProvider": "gemini",
+        "providerSucceeded": true,
+        "canaryPassed": true,
+        "fallbackUsed": false,
+        "fallbackReason": null,
+        "writeToolAuditCount": 0
+      }
+    ],
+    "provider": "gemini",
+    "health": {
+      "activeProvider": "gemini",
+      "openaiConfigured": false,
+      "geminiConfigured": true,
+      "checks": [
+        {
+          "provider": "openai",
+          "model": "gpt-4o-mini",
+          "configured": false
+        },
+        {
+          "ok": true,
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "latencyMs": 1059,
+          "configured": true
+        }
+      ],
+      "checkedAt": "2026-08-06T07:50:51.694Z"
+    }
+  },
+  "canaryPassed": true,
+  "selectedProvider": "gemini",
+  "fallbackUsed": false,
+  "provider": "gemini",
+  "verification": {
+    "requestedProvider": "gemini",
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "fallbackReason": null,
+    "canaryPassed": true,
+    "healthyMarked": true,
+    "checksEmpty": false,
+    "canaryNull": false,
+    "writeToolsBlocked": true,
+    "plannedWriteTools": []
+  }
+}

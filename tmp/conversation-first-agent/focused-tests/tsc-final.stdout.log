@@ -1,0 +1,173 @@
+tests/agentConversationalEmployee.test.ts(83,12): error TS18048: 'response.entityMemory' is possibly 'undefined'.
+tests/agentConversationalEmployee.test.ts(97,12): error TS18048: 'response.entityMemory' is possibly 'undefined'.
+tests/AgentConversationFirstApi.test.ts(14,5): error TS2820: Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tests/AgentConversationRandomized.test.ts(17,5): error TS2820: Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tests/AgentConversationRoutingMatrix.test.ts(21,5): error TS2820: Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tests/AgentV2ApprovalFastPath.test.ts(75,11): error TS2322: Type 'null' is not assignable to type 'string'.
+tests/AgentV2ProviderFallback.test.ts(20,7): error TS2322: Type '"pause_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ProviderFallback.test.ts(46,7): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ProviderFallback.test.ts(64,7): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ProviderFallback.test.ts(146,7): error TS2322: Type '"monitor_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ProviderFallback.test.ts(207,7): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ReasoningPolicy.test.ts(15,5): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ReasoningPolicy.test.ts(156,7): error TS2322: Type '"monitor_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ReasoningRequestDedup.test.ts(21,55): error TS2322: Type 'Mock<() => Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>>' is not assignable to type '() => Promise<ReasoningEngineResult>'.
+  Type 'Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>' is not assignable to type 'Promise<ReasoningEngineResult>'.
+    Type '{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }' is not assignable to type 'ReasoningEngineResult'.
+      Types of property 'artifact' are incompatible.
+        Type '{ reasoningId: string; }' is missing the following properties from type 'ReasoningArtifact': sessionId, goal, userIntent, confidence, and 15 more.
+tests/AgentV2ReasoningRequestDedup.test.ts(22,55): error TS2322: Type 'Mock<() => Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>>' is not assignable to type '() => Promise<ReasoningEngineResult>'.
+  Type 'Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>' is not assignable to type 'Promise<ReasoningEngineResult>'.
+    Type '{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }' is not assignable to type 'ReasoningEngineResult'.
+      Types of property 'artifact' are incompatible.
+        Type '{ reasoningId: string; }' is missing the following properties from type 'ReasoningArtifact': sessionId, goal, userIntent, confidence, and 15 more.
+tests/AgentV2ReasoningRequestDedup.test.ts(41,50): error TS2322: Type 'Mock<() => Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>>' is not assignable to type '() => Promise<ReasoningEngineResult>'.
+  Type 'Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>' is not assignable to type 'Promise<ReasoningEngineResult>'.
+    Type '{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }' is not assignable to type 'ReasoningEngineResult'.
+      Types of property 'artifact' are incompatible.
+        Type '{ reasoningId: string; }' is missing the following properties from type 'ReasoningArtifact': sessionId, goal, userIntent, confidence, and 15 more.
+tests/AgentV2ReasoningRequestDedup.test.ts(42,50): error TS2322: Type 'Mock<() => Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>>' is not assignable to type '() => Promise<ReasoningEngineResult>'.
+  Type 'Promise<{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }>' is not assignable to type 'Promise<ReasoningEngineResult>'.
+    Type '{ artifact: { reasoningId: string; }; validation: { ok: boolean; artifact: null; issues: never[]; blocked: boolean; blockedReason: null; }; usedFallback: boolean; providerErrorKo: null; providerLatencyMs: number; }' is not assignable to type 'ReasoningEngineResult'.
+      Types of property 'artifact' are incompatible.
+        Type '{ reasoningId: string; }' is missing the following properties from type 'ReasoningArtifact': sessionId, goal, userIntent, confidence, and 15 more.
+tests/AgentV2ShadowMode.test.ts(16,7): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ShadowMode.test.ts(26,7): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ShadowMode.test.ts(41,9): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/AgentV2ShadowMode.test.ts(49,13): error TS2322: Type '"plan_search"' is not assignable to type 'AgentGoal | null'.
+tests/backtestExecutionIdentity.test.ts(29,3): error TS2724: '"../src/lib/rextora/backtest/backtestTypes"' has no exported member named 'BacktestTrade'. Did you mean 'BacktestDataMode'?
+tests/backtestExecutionIdentity.test.ts(42,3): error TS2741: Property 'sourceStatus' is missing in type '{ strategyId: string; strategyHash: string; strategyName: string; symbol: string; symbols: string[]; timeframe: string; fromDate: string; toDate: string; requestedFrom: null; requestedTo: null; actualFirstCandleTime: null; ... 21 more ...; validation: { ...; }; }' but required in type 'BacktestReport'.
+tests/backtestMultiSymbol.test.ts(45,5): error TS2322: Type '"BINANCE_EMPTY"' is not assignable to type 'HistoricalLoadErrorCode'.
+tests/backtestMultiSymbol.test.ts(58,5): error TS2345: Argument of type '({ symbol }: LoadHistoricalCandlesInput) => Promise<{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }>' is not assignable to parameter of type '(input: LoadHistoricalCandlesInput) => Promise<LoadHistoricalCandlesResult>'.
+  Type 'Promise<{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }>' is not assignable to type 'Promise<LoadHistoricalCandlesResult>'.
+    Type '{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }' is missing the following properties from type 'LoadHistoricalCandlesResult': source, symbol, timeframe
+tests/backtestMultiSymbol.test.ts(131,7): error TS2345: Argument of type '({ symbol }: LoadHistoricalCandlesInput) => Promise<{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }>' is not assignable to parameter of type '(input: LoadHistoricalCandlesInput) => Promise<LoadHistoricalCandlesResult>'.
+  Type 'Promise<{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }>' is not assignable to type 'Promise<LoadHistoricalCandlesResult>'.
+    Type '{ candles: OhlcvCandle[]; intervalMs: number; dataSource: "binance"; requestedFrom: string; requestedTo: string; actualFirstCandleTime: string; actualLastCandleTime: string; }' is missing the following properties from type 'LoadHistoricalCandlesResult': source, symbol, timeframe
+tests/backtestSymbolSelector.test.ts(23,3): error TS2724: '"../src/lib/rextora/backtest/backtestTypes"' has no exported member named 'BacktestTrade'. Did you mean 'BacktestDataMode'?
+tests/backtestSymbolSelector.test.ts(35,3): error TS2741: Property 'sourceStatus' is missing in type '{ strategyId: string; strategyHash: string; strategyName: string; symbol: string; symbols: string[]; timeframe: string; fromDate: string; toDate: string; requestedFrom: null; requestedTo: null; actualFirstCandleTime: null; ... 21 more ...; validation: { ...; }; }' but required in type 'BacktestReport'.
+tests/cancellationLifecycle.test.ts(228,5): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.
+tests/commercialOverlayHydration.test.ts(31,11): error TS2339: Property 'patternType' does not exist on type 'BacktestTrade'.
+tests/commercialOverlayHydration.test.ts(55,42): error TS2345: Argument of type 'BacktestTrade' is not assignable to parameter of type 'BacktestTrade & Record<string, unknown>'.
+  Type 'BacktestTrade' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'BacktestTrade'.
+tests/e2e/strategy-search-flow.spec.ts(516,11): error TS2339: Property 'rejectCreate' does not exist on type '{ jobId: string; status: JobStatus; completedIterations: number; executionActive: boolean; detailGets: number[]; }'.
+tests/e2e/strategy-search-flow.spec.ts(659,24): error TS2339: Property 'operatorPlan' does not exist on type 'never'.
+tests/e2e/strategy-search-flow.spec.ts(665,19): error TS2339: Property 'operatorPlan' does not exist on type 'never'.
+tests/entryTriggerRevalidation.test.ts(202,23): error TS2339: Property 'errors' does not exist on type '{ ok: true; } | { ok: false; errors: string[]; }'.
+  Property 'errors' does not exist on type '{ ok: true; }'.
+tests/entryTriggerRevalidation.test.ts(202,36): error TS7006: Parameter 'error' implicitly has an 'any' type.
+tests/eventSequenceLeverage.test.ts(19,9): error TS2322: Type 'SafeV44Params' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SafeV44Params'.
+tests/eventSequenceLeverage.test.ts(30,9): error TS2322: Type 'SafeV44Params' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SafeV44Params'.
+tests/eventSequenceLeverage.test.ts(56,7): error TS2322: Type 'SafeV44Params' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SafeV44Params'.
+tests/eventSequenceLeverage.test.ts(61,7): error TS2322: Type 'SafeV44Params' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'SafeV44Params'.
+tests/finalReadyVerifyMatrix.test.ts(50,5): error TS2322: Type '"15"' is not assignable to type 'DurationPresetId'.
+tests/finalReadyVerifyMatrix.test.ts(99,5): error TS2322: Type '"15"' is not assignable to type 'DurationPresetId'.
+tests/finalReadyVerifyMatrix.test.ts(127,5): error TS2322: Type '"15"' is not assignable to type 'DurationPresetId'.
+tests/finalReadyVerifyMatrix.test.ts(198,7): error TS2322: Type '"15"' is not assignable to type 'DurationPresetId'.
+tests/harnessDependencyResolution.test.ts(2,43): error TS7016: Could not find a declaration file for module '../scripts/providerCanaryProbe.mjs'. '/Users/macdoong/Documents/Rextora/scripts/providerCanaryProbe.mjs' implicitly has an 'any' type.
+tests/harnessDependencyResolution.test.ts(3,32): error TS7016: Could not find a declaration file for module '../scripts/loadProjectEnv.mjs'. '/Users/macdoong/Documents/Rextora/scripts/loadProjectEnv.mjs' implicitly has an 'any' type.
+tests/harnessDependencyResolution.test.ts(4,33): error TS7016: Could not find a declaration file for module '../scripts/repoPaths.mjs'. '/Users/macdoong/Documents/Rextora/scripts/repoPaths.mjs' implicitly has an 'any' type.
+tests/jobExecutionOwnership.test.ts(181,7): error TS2322: Type '() => Promise<{ passed: boolean; score: number; paramsHash: string; failureReasons: never[]; costStressResults: never[]; jitterResults: never[]; windowResults: never[]; }>' is not assignable to type '(input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>'.
+  Type 'Promise<{ passed: boolean; score: number; paramsHash: string; failureReasons: never[]; costStressResults: never[]; jitterResults: never[]; windowResults: never[]; }>' is not assignable to type 'Promise<StrategySearchCompleteCandidateEvaluation>'.
+    Type '{ passed: boolean; score: number; paramsHash: string; failureReasons: never[]; costStressResults: never[]; jitterResults: never[]; windowResults: never[]; }' is missing the following properties from type 'StrategySearchCompleteCandidateEvaluation': candidateId, baseEvaluation, basePass, baseScore, and 6 more.
+tests/jobExecutionOwnership.test.ts(202,7): error TS2345: Argument of type '{ jobId: string; iteration: number; paramsHash: string; score: number; passed: false; failureReasons: never[]; costStressResults: never[]; jitterResults: never[]; windowResults: never[]; params: {}; createdAt: string; }' is not assignable to parameter of type 'StrategySearchTrial'.
+  Type '{ jobId: string; iteration: number; paramsHash: string; score: number; passed: false; failureReasons: never[]; costStressResults: never[]; jitterResults: never[]; windowResults: never[]; params: {}; createdAt: string; }' is missing the following properties from type 'StrategySearchTrial': candidateId, generatorType, parentCandidateIds, durationMs
+tests/multiPatternUiVerifyRegression.test.ts(89,5): error TS2322: Type '{ id: string; family: string; role: "trend_filter" | "entry_zone"; order: number; required: true; weight: number; priority: number; params: {}; }[]' is not assignable to type 'PatternCombinationBlockConfig[]'.
+  Type '{ id: string; family: string; role: "trend_filter" | "entry_zone"; order: number; required: true; weight: number; priority: number; params: {}; }' is not assignable to type 'PatternCombinationBlockConfig'.
+    Types of property 'family' are incompatible.
+      Type 'string' is not assignable to type 'PatternFamilyId'.
+tests/multiPatternUiVerifyRegression.test.ts(157,5): error TS2322: Type '{ id: string; family: string; role: "trend_filter" | "entry_zone"; order: number; required: true; weight: number; priority: number; params: {}; }[]' is not assignable to type 'PatternCombinationBlockConfig[]'.
+  Type '{ id: string; family: string; role: "trend_filter" | "entry_zone"; order: number; required: true; weight: number; priority: number; params: {}; }' is not assignable to type 'PatternCombinationBlockConfig'.
+    Types of property 'family' are incompatible.
+      Type 'string' is not assignable to type 'PatternFamilyId'.
+tests/orderBlockSearchEngine.test.ts(22,8): error TS2459: Module '"../src/lib/rextora/strategySearch/jobStore"' declares 'StrategySearchConfig' locally, but it is not exported.
+tests/orderBlockZoneBasis.test.ts(121,11): error TS2353: Object literal may only specify known properties, and 'volTargetPct' does not exist in type 'PositionSizingSettings'.
+tests/patternCombinationEval.test.ts(265,54): error TS2339: Property 'combinationOperator' does not exist on type '{ penetrationPct: number; stopAtrMult: number; }'.
+tests/patternSearchCompletionExtras.test.ts(41,5): error TS2322: Type '"not_registered"' is not assignable to type '"미등록" | "등록됨" | "중복" | "등록 실패"'.
+tests/patternTraceabilityMatrix.test.ts(488,9): error TS2698: Spread types may only be created from object types.
+tests/researchHistoryManagement.test.ts(33,8): error TS2459: Module '"@/src/lib/rextora/strategySearch/jobStore"' declares 'StrategySearchConfig' locally, but it is not exported.
+tests/researchHistoryManagement.test.ts(226,11): error TS2322: Type '"ok"' is not assignable to type 'CostStatusKo'.
+tests/researchHistoryManagement.test.ts(227,11): error TS2322: Type '"ok"' is not assignable to type 'SampleConfidenceKo'.
+tests/researchHistoryManagement.test.ts(277,27): error TS2339: Property 'completionReason' does not exist on type 'StrategySearchJob'.
+tests/researchOutcomeAndClustering.test.ts(197,9): error TS2353: Object literal may only specify known properties, and 'balance' does not exist in type 'StrategySearchConfig'.
+tests/researchResultsCompletion.test.ts(131,7): error TS2353: Object literal may only specify known properties, and 'balance' does not exist in type 'StrategySearchConfig'.
+tests/researchResultsUx.test.ts(393,9): error TS2353: Object literal may only specify known properties, and 'balance' does not exist in type 'StrategySearchConfig'.
+tests/researchTop10AndConfigMgmt.test.ts(316,7): error TS2352: Conversion of type '{ jobId: string; iteration: number; candidateId: string; paramsHash: string; params: { ema_fast: number; }; metrics: { totalReturn: number; maxDrawdown: number; tradeCount: number; profitFactor: number; }; passed: true; createdAt: string; }' to type 'StrategySearchTrial' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ jobId: string; iteration: number; candidateId: string; paramsHash: string; params: { ema_fast: number; }; metrics: { totalReturn: number; maxDrawdown: number; tradeCount: number; profitFactor: number; }; passed: true; createdAt: string; }' is missing the following properties from type 'StrategySearchTrial': generatorType, parentCandidateIds, score, failureReasons, and 4 more.
+tests/searchLiveTop10AndConfig.test.ts(30,8): error TS2459: Module '"../src/lib/rextora/strategySearch/jobStore"' declares 'StrategySearchConfig' locally, but it is not exported.
+tests/stabilizationPass.test.ts(173,31): error TS2345: Argument of type '{ config: { strategyId: string; symbols: string[]; timeframe: string; balance: number; feeRate: number; slippageRate: number; fundingRate: number; applyFunding: boolean; applySpread: boolean; spreadRate: number; costStressMultipliers: number[]; costGuardK: number; }; report: { ...; }; trades: never[]; }' is not assignable to parameter of type 'Omit<SavedBacktestResult, "id" | "createdAt">'.
+  Types of property 'report' are incompatible.
+    Type '{ strategyName: string; strategyHash: string; strategyId: string; sourceStatus: string; symbol: string; symbols: string[]; timeframe: string; fromDate: null; toDate: null; candleCount: number; totalReturn: number; ... 13 more ...; validation: { ...; }; }' is missing the following properties from type 'BacktestReport': requestedFrom, requestedTo, actualFirstCandleTime, actualLastCandleTime, and 5 more.
+tests/stabilizationPass.test.ts(173,65): error TS2345: Argument of type '{ config: { strategyId: string; symbols: string[]; timeframe: string; balance: number; feeRate: number; slippageRate: number; fundingRate: number; applyFunding: boolean; applySpread: boolean; spreadRate: number; costStressMultipliers: number[]; costGuardK: number; }; report: { ...; }; trades: never[]; }' is not assignable to parameter of type 'Omit<SavedBacktestResult, "id" | "createdAt">'.
+  Types of property 'report' are incompatible.
+    Type '{ strategyName: string; strategyHash: string; strategyId: string; sourceStatus: string; symbol: string; symbols: string[]; timeframe: string; fromDate: null; toDate: null; candleCount: number; totalReturn: number; ... 13 more ...; validation: { ...; }; }' is missing the following properties from type 'BacktestReport': requestedFrom, requestedTo, actualFirstCandleTime, actualLastCandleTime, and 5 more.
+tests/strategySearchApi.test.ts(440,5): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.
+tests/strategySearchCheckpointCorruption.test.ts(310,47): error TS2554: Expected 0 arguments, but got 1.
+tests/strategySearchJobRunner.test.ts(234,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(254,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(268,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(287,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; ... 8 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(309,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; ... 8 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(343,20): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(359,24): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(366,20): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(380,24): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; ... 8 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(391,20): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchJobRunner.test.ts(400,40): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchNoAutoPromote.test.ts(64,9): error TS2353: Object literal may only specify known properties, and 'balance' does not exist in type 'StrategySearchConfig'.
+tests/strategySearchPromote.test.ts(138,27): error TS2322: Type 'Promise<{ candidateId: string; paramsHash: string; baseEvaluation: { candidateId: string; paramsHash: string; symbols: string[]; timeframe: string; windows: never[]; costConfig: { feeRate: number; slippageRate: number; fundingRate: number; applyFunding: false; applySpread: false; spreadRate: number; }; startedAt: st...' is not assignable to type 'Promise<StrategySearchCompleteCandidateEvaluation>'.
+  Type '{ candidateId: string; paramsHash: string; baseEvaluation: { candidateId: string; paramsHash: string; symbols: string[]; timeframe: string; windows: never[]; costConfig: { feeRate: number; slippageRate: number; fundingRate: number; applyFunding: false; applySpread: false; spreadRate: number; }; startedAt: string; co...' is missing the following properties from type 'StrategySearchCompleteCandidateEvaluation': costStressResults, costStressPassed, finalPassed, startedAt, and 2 more.
+tests/strategySearchPromote.test.ts(367,39): error TS2345: Argument of type '{ evaluate: (input: EvaluateCompleteCandidateInput) => Promise<StrategySearchCompleteCandidateEvaluation>; windows: { id: string; label: string; requestedFrom: number; requestedTo: number; requiredForPass: boolean; }[]; ... 7 more ...; storeOptions: { ...; }; }' is not assignable to parameter of type 'RunSearchJobInput'.
+  Types of property 'costStressScenarios' are incompatible.
+    The type 'readonly []' is 'readonly' and cannot be assigned to the mutable type 'StrategySearchCostStressScenario[]'.
+tests/strategySearchRuntimeCorrection.test.ts(295,7): error TS2345: Argument of type '{ searchVersion: string; strategyTemplateId: string; symbols: string[]; timeframe: string; dataVersion: string; seed: number; generatorType: "random"; maxIterations: number; parameterRanges: StrategySearchParameterRange[]; evaluationWindows: { ...; }[]; }' is not assignable to parameter of type 'StrategySearchConfig'.
+  Type '{ searchVersion: string; strategyTemplateId: string; symbols: string[]; timeframe: string; dataVersion: string; seed: number; generatorType: "random"; maxIterations: number; parameterRanges: StrategySearchParameterRange[]; evaluationWindows: { ...; }[]; }' is missing the following properties from type 'StrategySearchConfig': passCriteria, costStress, jitter
+tests/strategySearchUi.test.ts(237,45): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+tests/userBacktestRun.test.ts(12,3): error TS2724: '"../src/lib/rextora/backtest/backtestTypes"' has no exported member named 'BacktestTrade'. Did you mean 'BacktestDataMode'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(55,9): error TS2322: Type '{ pipelineStage: "paper_active"; lifecycleStage: string; paperSessionId: string; pendingProposedAction: { actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; ... 11 more ...; expiresAt: null; }; ... 10 more ...; pinnedObjectiveKo: string | null; }' is not assignable to type 'ConversationEntityMemory'.
+  The types of 'pendingProposedAction.actionType' are incompatible between these types.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(66,7): error TS2322: Type '{ pipelineStage: "paper_active"; lifecycleStage: string; paperSessionId: string; pendingProposedAction: { actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; ... 11 more ...; expiresAt: null; }; ... 10 more ...; pinnedObjectiveKo: string | null; }' is not assignable to type 'ConversationEntityMemory'.
+  The types of 'pendingProposedAction.actionType' are incompatible between these types.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(77,72): error TS2345: Argument of type '{ pipelineStage: "paper_active"; lifecycleStage: string; paperSessionId: string; pendingProposedAction: { actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; ... 11 more ...; expiresAt: null; }; ... 10 more ...; pinnedObjectiveKo: string | null; }' is not assignable to parameter of type 'ConversationEntityMemory'.
+  The types of 'pendingProposedAction.actionType' are incompatible between these types.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(78,68): error TS2345: Argument of type '{ pipelineStage: "paper_active"; lifecycleStage: string; paperSessionId: string; pendingProposedAction: { actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; ... 11 more ...; expiresAt: null; }; ... 10 more ...; pinnedObjectiveKo: string | null; }' is not assignable to parameter of type 'ConversationEntityMemory'.
+  The types of 'pendingProposedAction.actionType' are incompatible between these types.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(87,7): error TS2322: Type '{ pipelineStage: "paper_active"; lifecycleStage: string; paperSessionId: string; pendingProposedAction: { actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; ... 11 more ...; expiresAt: null; }; ... 10 more ...; pinnedObjectiveKo: string | null; }' is not assignable to type 'ConversationEntityMemory'.
+  The types of 'pendingProposedAction.actionType' are incompatible between these types.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?
+tmp/external-tester-release/evidence/product-question-audit.test.ts(90,7): error TS2322: Type '{ actionId: string; actionType: "prepare_paper_plan"; summary: string; reason: string; targetRoute: string; strategyId: string; jobId: null; runId: string; symbol: string; timeframe: string; parameters: {}; ... 4 more ...; expiresAt: null; }' is not assignable to type 'ProposedAction'.
+  Types of property 'actionType' are incompatible.
+    Type '"prepare_paper_plan"' is not assignable to type 'ProposedActionType'. Did you mean '"prepare_search_plan"'?

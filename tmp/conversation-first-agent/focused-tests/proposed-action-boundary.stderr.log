@@ -1,0 +1,41 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/agentConversationalEmployee.test.ts > conversational response hierarchy > returns conclusion + explanation + one action, hides IDs in prose
+AssertionError: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/agentConversationalEmployee.test.ts:59:49
+     57|     expect(response.conclusionKo).not.toMatch(/search_[a-f0-9-]+/i);
+     58|     expect(response.explanationKo).not.toMatch(/search_[a-f0-9-]+/i);
+     59|     expect(response.proposedAction?.actionType).toBeTruthy();
+       |                                                 ^
+     60|     expect(response.facts.some((f) => f.labelKo === "탐색 작업 ID")).toBe(…
+     61|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/agentConversationalEmployee.test.ts > Conversation A — recommend → why → approve > resolves multi-turn pending navigation without fabrication
+AssertionError: expected null to be truthy
+
+- Expected:
+true
+
++ Received:
+null
+
+ ❯ tests/agentConversationalEmployee.test.ts:112:34
+    110|     const first = buildAgentResponse(parseIntent("지금 뭘 해야 해?"), facts);
+    111|     expect(first.conclusionKo).toMatch(/탐색|결과|검토/);
+    112|     expect(first.proposedAction).toBeTruthy();
+       |                                  ^
+    113|
+    114|     const entities = mergeEntityMemory(emptyEntityMemory(), null, {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

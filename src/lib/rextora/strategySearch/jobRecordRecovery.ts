@@ -25,6 +25,7 @@ import type {
 } from "./types";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import { appendRecoveryAudit } from "./recoveryAudit";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export interface JobRecordRecoveryResult {
   jobId: string;
@@ -37,12 +38,7 @@ export interface JobRecordRecoveryResult {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

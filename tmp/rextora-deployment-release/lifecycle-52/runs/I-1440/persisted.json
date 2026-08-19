@@ -1,0 +1,319 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    },
+    {
+      "id": "search_ff154950-dc36-4c2b-ba5a-873017077a2a",
+      "status": "completed",
+      "progress": 2880,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "order_block",
+        "fvg"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "search.create",
+      "sessionId": "agent_817556aa41c1464d",
+      "arguments": {
+        "createBody": {
+          "searchVersion": "1",
+          "strategyTemplateId": "agent_draft_BTCUSDT_15m",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "timeframe": "15m",
+          "dataVersion": "binance-v1",
+          "seed": 42,
+          "generatorType": "random",
+          "maxIterations": 40,
+          "parameterRanges": [
+            {
+              "key": "ema_fast",
+              "min": 8,
+              "max": 40,
+              "step": 1,
+              "valueType": "integer"
+            }
+          ],
+          "evaluationWindows": [
+            {
+              "id": "full",
+              "label": "전체 구간",
+              "fromOpenTime": 1781481600000,
+              "toOpenTime": 1786751999999,
+              "requiredForPass": true
+            }
+          ],
+          "balance": 10000,
+          "baseCostConfig": {
+            "feeRate": 0.0004,
+            "slippageRate": 0.0002,
+            "fundingRate": 0.0001,
+            "applyFunding": false,
+            "applySpread": true,
+            "spreadRate": 0.0001
+          },
+          "passPolicy": {
+            "thresholds": {
+              "minTradeCount": 10,
+              "minTotalReturn": 0,
+              "maxMdd": -0.25,
+              "minWinRate": null
+            }
+          },
+          "scoreWeights": {
+            "returnWeight": 1,
+            "mddWeight": 0.5,
+            "profitFactorWeight": 0.25,
+            "winRateWeight": 0.25,
+            "tradeAdequacyWeight": 0.25,
+            "negativeMonthWeight": 0.1,
+            "consistencyWeight": 0.1
+          },
+          "costStressScenarios": [
+            {
+              "id": "stress_1_5x",
+              "label": "비용 1.5배",
+              "requiredForPass": false,
+              "feeMultiplier": 1.5,
+              "slippageMultiplier": 1.5,
+              "fundingMultiplier": 1,
+              "spreadMultiplier": 1.5,
+              "costGuardKMultiplier": 1
+            }
+          ],
+          "jitterConfig": {
+            "enabled": true,
+            "sampleCount": 2,
+            "mutationScale": 0.2,
+            "seed": 7,
+            "minimumPassRate": 0,
+            "maximumScoreDropRatio": 1,
+            "parameterRanges": [
+              {
+                "key": "ema_fast",
+                "min": 8,
+                "max": 40,
+                "step": 1,
+                "valueType": "integer"
+              }
+            ]
+          },
+          "dataRef": {
+            "source": "binance_historical",
+            "availableFrom": 1781481600000,
+            "availableTo": 1786751999999
+          },
+          "operatorPlan": {
+            "depthProfile": "standard",
+            "qualificationProfile": "balanced",
+            "qualifiedTarget": 3,
+            "stopWhenQualifiedTarget": false,
+            "candidateBudget": 200,
+            "stageBatchSize": 40,
+            "maxRuntimeMs": 10800000,
+            "minScore": null,
+            "searchName": "agent_draft_BTCUSDT_15m",
+            "errorWarningRate": 0.35,
+            "errorAutoPauseRate": 0.55,
+            "repeatedSignatureThreshold": 25,
+            "patternSelectionMode": "manual",
+            "selectedSpaceIds": [
+              "order_block",
+              "fvg"
+            ],
+            "leverageMode": "automatic",
+            "leverageFixed": null,
+            "leverageMin": 1,
+            "leverageMax": 5,
+            "adaptiveLeverageEnabled": true,
+            "patternConfigLevel": "basic",
+            "patternDirection": "both",
+            "patternRetestMode": "required",
+            "patternConfirmStrength": "standard",
+            "patternConfirmClose": "required",
+            "patternConfirmationMode": "single_close",
+            "patternConfirmationCandleCount": 2,
+            "patternConfirmationWindow": 4,
+            "patternExpiryBars": 48,
+            "patternRiskStyle": "balanced",
+            "patternStrength": "standard",
+            "patternSrSensitivity": "standard",
+            "patternCombinationTemplate": "single",
+            "patternCombinationOperator": "and",
+            "patternCombinationInvalidationMode": "any",
+            "patternCombinationFailurePolicy": "any",
+            "patternCombinationWeightedThreshold": null,
+            "patternCombinationFamilies": null,
+            "patternCombinationSpec": null
+          },
+          "marketMode": "manual"
+        }
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "queued"
+      },
+      "durationMs": 36,
+      "approved": true,
+      "timestamp": "2026-08-14T08:55:52.743Z",
+      "approvalId": "pa_36d57a3ad4fbc721"
+    },
+    {
+      "toolId": "search.start",
+      "sessionId": "agent_817556aa41c1464d",
+      "arguments": {
+        "jobId": "search_ff154950-dc36-4c2b-ba5a-873017077a2a"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "queued"
+      },
+      "durationMs": 10,
+      "approved": true,
+      "timestamp": "2026-08-14T08:55:52.755Z",
+      "approvalId": "pa_36d57a3ad4fbc721"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T08:55:10.215Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspooef_4spwmi",
+      "turnId": "turn-1786697710199",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:55:51.759Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspooef_4spwmi",
+      "turnId": "turn-1786697710199",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 41536,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T08:55:52.758Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssppl86_x112am",
+      "turnId": "turn-1786697752699",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:55:52.759Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssppl86_x112am",
+      "turnId": "turn-1786697752699",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:55:57.421Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssppotp_8fjyyx",
+      "turnId": "turn-1786697756770",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:56:16.707Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssppotp_8fjyyx",
+      "turnId": "turn-1786697756770",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 18730,
+      "errorCategory": "provider_or_validation"
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssponhh_cf5eaa.chart.json",
+    "bt_mssponhh_cf5eaa.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_817556aa41c1464d",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 탐색 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_91474b504b6c4f049355"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:55:52.756Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_36d57a3ad4fbc721",
+        "meaningfulHash": "320af203a79afb9665e0e0b6"
+      },
+      "memoryId": "memory_41136ad915f9b79bb0bb"
+    },
+    {
+      "sessionId": "agent_817556aa41c1464d",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_91474b504b6c4f049355"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:55:52.756Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_36d57a3ad4fbc721",
+        "meaningfulHash": "320af203a79afb9665e0e0b6"
+      },
+      "memoryId": "memory_20ba78fdcd788577ef07"
+    }
+  ],
+  "sessionFiles": [
+    "agent_817556aa41c1464d"
+  ]
+}

@@ -1,0 +1,1 @@
+{"passed":true,"durationMs":175,"inputBytes":20661,"outputBytes":130066,"warnings":[],"plugins":["@tailwindcss/postcss@4.3.0","autoprefixer@10.5.0"],"memoryUsage":{"rss":135020544,"heapTotal":60047360,"heapUsed":36092440,"external":2236234,"arrayBuffers":22051}}

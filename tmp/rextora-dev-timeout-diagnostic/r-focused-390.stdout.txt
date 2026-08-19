@@ -1,0 +1,38 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 79253
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1003
+    }
+  ]
+}
+
+Running 5 tests using 1 worker
+
+(node:77534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (1.4m)
+  ✓  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (39.1s)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/settings/ai-providers/models'
+[WebServer] }
+  ✓  3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.6m)
+  ✓  4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (17.8s)
+  ✓  5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (40.3s)
+
+  5 passed (8.2m)

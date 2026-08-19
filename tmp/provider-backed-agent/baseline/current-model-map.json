@@ -1,0 +1,10 @@
+{
+  "openaiDefaultCode": "gpt-4o-mini",
+  "geminiDefaultCode": "gemini-2.5-flash",
+  "targetOpenAiDefault": "gpt-5-mini",
+  "sdkInstalled": {
+    "openai": false,
+    "google": false
+  },
+  "transport": "native fetch"
+}

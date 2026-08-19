@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "importChain": [
+    "app/api/rextora/agent/route.ts",
+    "src/lib/rextora/agent/commandExecutor.ts",
+    "src/lib/rextora/strategy/strategyStore.ts"
+  ],
+  "source": {
+    "file": "src/lib/rextora/strategy/strategyStore.ts",
+    "pathConstructor": {
+      "line": 127,
+      "symbol": "strategyFilePath",
+      "expression": "path.resolve(ROOT(), `${id}.json`)",
+      "inputs": [
+        "ROOT(): REXTORA_STRATEGIES_DIR at runtime or production data/rextora/strategies",
+        "id: validated runtime strategy identifier"
+      ]
+    },
+    "filesystemConsumers": [
+      { "line": 260, "symbol": "writeStrategyFile", "api": "fs.existsSync", "expression": "fs.existsSync(file)" },
+      { "line": 337, "symbol": "readAllStrategyFiles", "api": "fs.existsSync", "expression": "fs.existsSync(full)" },
+      { "line": 344, "symbol": "readAllStrategyFiles", "api": "fs.readFileSync", "expression": "fs.readFileSync(full, 'utf8')" },
+      { "line": 374, "symbol": "discoverStrategyFilesOnDisk", "api": "fs.readFileSync", "expression": "fs.readFileSync(full, 'utf8')" },
+      { "line": 390, "symbol": "ensureStrategyStore", "api": "fs.existsSync", "expression": "fs.existsSync(safePath)" },
+      { "line": 442, "symbol": "listStrategies", "api": "fs.existsSync", "expression": "fs.existsSync(strategyFilePath(SAFE_STRATEGY_ID))" },
+      { "line": 766, "symbol": "deleteStrategy", "api": "fs.existsSync / fs.unlinkSync", "expression": "fs.existsSync(file) / fs.unlinkSync(file)" },
+      { "line": 844, "symbol": "purgeTestStrategies", "api": "fs.existsSync / fs.unlinkSync", "expression": "fs.existsSync(file) / fs.unlinkSync(file)" },
+      { "line": 852, "symbol": "purgeTestStrategies", "api": "fs.existsSync", "expression": "fs.existsSync(safePath)" }
+    ]
+  },
+  "runtimeIntent": "Read, write, list, validate, and delete strategy JSON files inside the selected strategy root while protecting SAFE.",
+  "expectedDirectoryScope": "Only ROOT(), normally data/rextora/strategies or an explicit REXTORA_STRATEGIES_DIR test/runtime override.",
+  "observedNftExpression": "<dynamic> '/' <dynamic> '.json' | <dynamic> '.json'",
+  "observedGeneratedPattern": "**/*.json",
+  "matchedFilesPerHistoricalWarning": 75819,
+  "warningLocations": 9,
+  "aggregateHistoricalMatches": 682371,
+  "whyNftCannotConstrain": "Both the directory root and strategy identifier are runtime values when the local fs calls are analyzed. NFT cannot prove that ROOT() stays inside the strategy directory, so its asset evaluator widens the dynamic .json expression to a repository-root recursive glob."
+}

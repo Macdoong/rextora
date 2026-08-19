@@ -1,0 +1,58 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 87805
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 22
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 985
+    }
+  ]
+}
+
+Running 7 tests using 1 worker
+
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (2.3m)
+  ✘  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (56.0s)
+  ✓  3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (269ms)
+  ✓  4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (14.9s)
+  ✓  5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (1.8m)
+  ✓  6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (44.2s)
+  ✓  7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:71:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+
+    Error: dev_scenario_gate_failed
+
+      52 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      53 |     }
+    > 54 |     throw new Error("dev_scenario_gate_failed");
+         |           ^
+      55 |   });
+      56 |
+      57 |   for (const scenario of DEPLOYMENT_SCENARIOS) {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:54:11
+
+    Error Context: test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+  6 passed (9.8m)

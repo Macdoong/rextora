@@ -1,0 +1,26 @@
+{
+  "checkpoints": [
+    {
+      "id": "T0",
+      "elapsedMs": 1,
+      "event": "browser_page_ready",
+      "url": "about:blank"
+    },
+    {
+      "id": "T1",
+      "elapsedMs": 1,
+      "event": "settings_navigation_started"
+    }
+  ],
+  "apiEvents": [],
+  "consoleErrors": [],
+  "failedNetwork": [],
+  "result": {
+    "passed": false,
+    "failure": "page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3101/settings\", waiting until \"domcontentloaded\"\n",
+    "lastCheckpoint": "T1",
+    "domSnapshot": null,
+    "diagnosticCapExceeded": true
+  },
+  "durationMs": 166698
+}

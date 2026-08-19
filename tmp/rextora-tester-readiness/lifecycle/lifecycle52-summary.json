@@ -1,0 +1,11 @@
+{
+  "BUILD_ID": "Bt9hwUM42EQX4tnRiIVUW",
+  "exitCode": 0,
+  "passed": true,
+  "expectedRows": 52,
+  "executedRows": 52,
+  "passedRows": 52,
+  "failedRows": 0,
+  "failures": [],
+  "durationSec": 12426
+}

@@ -7,6 +7,50 @@ import { computeRiskUsagePct, normalizeDailyLossPct } from "./metrics/riskFormul
 
 const RISK_STATE_FILE = "risk-state.json";
 
+/**
+ * Paper-only tester default. The observed legitimate simulation reached four
+ * consecutive losses; six preserves 50% headroom while retaining a finite
+ * emergency stop. LIVE continues to use config.risk.consecutiveLossLimit.
+ */
+export const PAPER_MAX_CONSECUTIVE_LOSSES = 6;
+
+export function applyPaperRiskDefaults(status: RiskStatus): RiskStatus {
+  return {
+    ...status,
+    settings: {
+      ...status.settings,
+      consecutiveLossLimit: PAPER_MAX_CONSECUTIVE_LOSSES
+    }
+  };
+}
+
+export function loadPaperRiskState(): RiskStatus {
+  return applyPaperRiskDefaults(loadRiskState());
+}
+
+/** Start a deliberately new Paper simulation without reusing prior outcomes. */
+export function resetPaperRiskStateForNewSession(): RiskStatus {
+  const shared = loadRiskState();
+  const liveConsecutiveLossLimit = getConfig().risk.consecutiveLossLimit;
+  const saved = saveRiskState({
+    ...shared,
+    settings: {
+      ...shared.settings,
+      consecutiveLossLimit: liveConsecutiveLossLimit
+    },
+    dailyLossPct: 0,
+    totalLossPct: 0,
+    consecutiveLosses: 0,
+    dailyTrades: 0,
+    openPositions: 0,
+    currentLeverage: 1,
+    riskSettingsConfirmed: true,
+    riskState: "정상",
+    serviceState: "simulated"
+  });
+  return applyPaperRiskDefaults(saved);
+}
+
 export function loadRiskState(): RiskStatus {
   const config = getConfig();
   const stored = readJsonStore<RiskStatus | null>(RISK_STATE_FILE, null, { ttlMs: config.market.jsonStoreTtlMs });

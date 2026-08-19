@@ -1,0 +1,34 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (98 tests | 1 failed) 36ms
+     × G approval command · multiple-approvals-approve 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > G approval command · multiple-approvals-approve
+AssertionError: expected 'APPROVAL_CONTROL' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "APPROVAL_CONTROL"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:437:26
+    435|       });
+    436|
+    437|       expect(route.mode).toBe(item.mode);
+       |                          ^
+    438|       expect(route.topic).toBe(item.topic);
+    439|       expect(route.providerExpected).toBe(item.provider);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 204 passed (205)
+      Tests  1 failed | 1550 passed (1551)
+   Start at  09:28:41
+   Duration  129.08s (transform 2.57s, setup 1.29s, import 11.22s, tests 90.19s, environment 12ms)
+

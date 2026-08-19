@@ -1,0 +1,59 @@
+{
+  "D-390": {
+    "classification": "APPLICATION_DEFECT",
+    "exactRootCause": "OpenAI provider plan included strategy.detail/backtest.run with placeholder strategyId '<확정된_strategyId>' which fails assertSafeStrategyId; execution aborted before backtest.run",
+    "responsibleFile": "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+    "responsibleSymbol": "enrichPartialProviderPlan / normalizeProviderToolPlan",
+    "failingBoundary": "Provider tool plan acceptance → approval execution (strategy.detail validation)",
+    "failedStateEvidence": {
+      "plannedTools": ["strategy.list", "strategy.detail", "backtest.run"],
+      "executionStrategyId": "<확정된_strategyId>",
+      "runId": null
+    },
+    "passingReproState": {
+      "plannedTools": ["backtest.run"],
+      "executionStrategyId": "demo_strategy_btc_v1",
+      "runId": "bt_mssb7b0g_79d3f6"
+    },
+    "applicationMustChange": true,
+    "harnessMustChange": false
+  },
+  "I-390": {
+    "classification": "APPLICATION_DEFECT",
+    "exactRootCause": "OpenAI provider plan executed search.create without search.start; job remained queued; only search.created lifecycle event persisted; watcher never started",
+    "responsibleFile": "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+    "responsibleSymbol": "normalizeProviderToolPlan → injectMissingSearchStart",
+    "failingBoundary": "Provider plan enrichment before approval execution",
+    "failedStateEvidence": {
+      "toolAuditTools": ["workspace.current", "search.create"],
+      "jobStatus": "queued",
+      "eventTypes": ["search.created"]
+    },
+    "passingReproState": {
+      "toolAuditTools": ["search.create", "search.start"],
+      "eventTypesInclude": ["search.created", "search.started", "search.progress"]
+    },
+    "applicationMustChange": true,
+    "harnessMustChange": false
+  },
+  "B-1024": {
+    "classification": "APPLICATION_DEFECT",
+    "exactRootCause": "createRunningSearch approve returned no executionResult.jobId because provider plan for prepare_search_plan lacked executable search.create/search.start chain (non-fallback path); harness correctly surfaced initial_search_not_started",
+    "responsibleFile": "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+    "responsibleSymbol": "normalizeProviderToolPlan → ensurePrepareSearchPlanSteps",
+    "failingBoundary": "Initial search plan provider response → approval execution jobId",
+    "failedStateEvidence": {
+      "error": "initial_search_not_started",
+      "durationSec": 47
+    },
+    "passingReproState": {
+      "initialPlanPath": "v1_fallback → search.create + search.start",
+      "passed": true
+    },
+    "applicationMustChange": true,
+    "harnessMustChange": false
+  },
+  "viewportComparison": {
+    "note": "No harness or application code branches on viewport width for D/I/B scenarios. Failures correlate with OpenAI provider plan shape; passing rows used v1_fallback or direct backtest.run with demo_strategy_btc_v1."
+  }
+}

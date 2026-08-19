@@ -13,7 +13,7 @@ const MAX_OUTPUT_TOKENS = 250;
 
 interface GeminiResponse {
   candidates?: Array<{
-    content?: { parts?: Array<{ text?: string }> };
+    content?: { parts?: Array<{ text?: string; thought?: boolean }> };
     finishReason?: string;
   }>;
   usageMetadata?: {
@@ -22,6 +22,15 @@ interface GeminiResponse {
     totalTokenCount?: number;
   };
   error?: { code?: number; message?: string; status?: string };
+}
+
+function candidateText(body: GeminiResponse): string {
+  const parts = body.candidates?.[0]?.content?.parts ?? [];
+  return (
+    parts.find(
+      (part) => part.thought !== true && typeof part.text === "string",
+    )?.text?.trim() ?? ""
+  );
 }
 
 function normalizeGeminiError(status: number, body: GeminiResponse): string {
@@ -67,6 +76,7 @@ export class GeminiAdapter implements LLMProviderAdapter {
           generationConfig: {
             maxOutputTokens: MAX_OUTPUT_TOKENS,
             temperature: 0.3,
+            thinkingConfig: { thinkingBudget: 0 },
           },
         }),
         signal,
@@ -96,7 +106,7 @@ export class GeminiAdapter implements LLMProviderAdapter {
       };
     }
 
-    const text = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const text = candidateText(body);
     if (!text) {
       return { ok: false, errorKo: "Gemini 응답에 텍스트가 없습니다.", provider: "gemini", retriable: false };
     }
@@ -136,14 +146,18 @@ export class GeminiAdapter implements LLMProviderAdapter {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: "안녕" }] }],
-          generationConfig: { maxOutputTokens: 3 },
+          generationConfig: {
+            maxOutputTokens: 16,
+            temperature: 0,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
         }),
         signal: controller.signal,
       });
       clearTimeout(timer);
       const latencyMs = Date.now() - start;
       const body = await response.json() as GeminiResponse;
-      const ok = response.ok && Boolean(body.candidates?.[0]?.content?.parts?.[0]?.text);
+      const ok = response.ok && Boolean(candidateText(body));
       return {
         ok,
         provider: "gemini",

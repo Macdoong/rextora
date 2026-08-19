@@ -162,6 +162,41 @@ export async function fetchSearchStatusFacts(): Promise<FactItem[]> {
   }
 }
 
+async function fetchResearchBrainFacts(
+  context?: AgentLifecycleContext | null,
+): Promise<FactItem[]> {
+  try {
+    const { listSearchJobs } = await import("@/src/lib/rextora/strategySearch/jobStore");
+    const { buildResearchResultsSummary } = await import("@/src/lib/rextora/strategySearch/researchResultsSummary");
+    const {
+      analyzeResearchGaps,
+      evidenceFromResearchSummary,
+      recommendNextResearch,
+    } = await import("@/src/lib/rextora/agent/v2/research");
+    const jobs = listSearchJobs();
+    const job = jobs.find((item) => item.id === context?.jobId)
+      ?? jobs.find((item) => item.status === "completed")
+      ?? jobs[0];
+    if (!job) return [fact("연구 분석", "분석할 저장 탐색이 없습니다.", "strategy_search_jobs")];
+    const summary = buildResearchResultsSummary(job.id);
+    const evidence = evidenceFromResearchSummary(summary);
+    const gaps = analyzeResearchGaps(evidence);
+    const recommendation = recommendNextResearch(evidence);
+    const gapText = gaps.map((gap) => gap.summaryKo).join(" ");
+    return [
+      fact("연구 분석", recommendation.summaryKo, "strategy_search_jobs"),
+      fact("연구 근거", evidence.length > 0
+        ? `저장된 상위 결과 ${evidence.length}개와 누락 증거 ${gaps.length}개를 확인했습니다.`
+        : `해당 탐색의 저장 결과를 확인했습니다. ${gapText || "비교 가능한 후보가 없습니다."}`,
+      "strategy_search_jobs"),
+      fact("권장 다음 작업", recommendation.kind === "backtest" ? "선택 후보 백테스트 검토" : "추가 탐색 증거 준비", "strategy_search_jobs"),
+      fact("증거 참조", recommendation.evidenceRefs.join(", ") || job.id, "strategy_search_jobs"),
+    ];
+  } catch {
+    return [fact("연구 분석", "저장된 연구 증거를 읽지 못했습니다.", "strategy_search_jobs")];
+  }
+}
+
 // ─── Search failure explanation ───────────────────────────────────────────────
 
 export async function fetchSearchFailureFacts(
@@ -1024,6 +1059,8 @@ export async function fetchFactsForIntent(
 ): Promise<FactItem[]> {
   switch (intentType) {
     case "search_status":
+    case "search_pause_request":
+    case "search_resume_request":
       return [
         ...(await fetchSearchStatusFacts()),
         ...fetchLifecycleContextFacts(context).slice(0, 3),
@@ -1034,18 +1071,61 @@ export async function fetchFactsForIntent(
       return fetchStrategyFacts(params.strategyHint);
     case "compare_strategies":
       return fetchCompareFacts(params.symbolA, params.symbolB);
+    case "compare_plans":
+      return [];
     case "backtest_summary":
     case "explain_rejection":
       return fetchBacktestFacts(params.symbol ?? context?.symbol ?? undefined);
     case "risk_summary":
       return fetchRiskFacts();
+    case "paper_status":
     case "paper_start_request":
+    case "paper_pause_request":
+    case "paper_resume_request":
+    case "paper_stop_request":
       return fetchPaperStartFacts(context);
+    case "strategy_rename_request":
+    case "strategy_archive_request":
+    case "strategy_restore_request":
+    case "strategy_delete_request":
+      return fetchStrategyFacts(params.strategyHint);
     case "first_run_help":
     case "demo_overview":
       return fetchFirstRunFacts(intentType);
+    case "workspace_status":
     case "recommend_next":
+    case "follow_up_why":
+    case "continue_session":
+    case "explain_waiting":
       return fetchRecommendNextFacts(context);
+    case "approve_pending":
+    case "cancel_pending":
+    case "explain_approval":
+      return [
+        fact("대기 제안", "클라이언트 세션에서 확인", "system_status"),
+      ];
+    case "prepare_search_plan":
+      return [
+        fact("탐색 계획", "초안 준비 경로", "strategy_search_jobs"),
+      ];
+    case "prepare_backtest_plan":
+      return [
+        ...(await fetchBacktestFacts(
+          params.symbol ?? context?.symbol ?? undefined,
+        )),
+        ...(await fetchStrategyFacts(params.strategyHint)),
+        ...fetchLifecycleContextFacts(context).slice(0, 4),
+      ];
+    case "prepare_paper_plan":
+      return fetchPaperStartFacts(context);
+    case "research_workspace":
+      return fetchRecommendNextFacts(context);
+    case "research_analysis":
+      return fetchResearchBrainFacts(context);
+    case "results_promote_request":
+      return fetchResearchBrainFacts(context);
+    case "memory_recall":
+      return [];
     case "market_status":
       return [
         fact("시장 데이터", "실시간 시세 연결 필요", "market_data"),

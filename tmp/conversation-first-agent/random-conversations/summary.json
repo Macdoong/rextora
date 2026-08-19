@@ -1,0 +1,12 @@
+{
+  "command": "npm test -- conversation routing/random/skipped-write/sanitizer/leak",
+  "startedAt": "2026-08-06T07:51:06Z",
+  "finishedAt": "2026-08-06T07:51:08Z",
+  "durationMs": 2139,
+  "exitCode": 0,
+  "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+  "passedCount": 135,
+  "filesPassed": 5,
+  "tail": "\n> rextora@0.1.0 test\n> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationRandomized.test.ts tests/AgentV2SkippedWriteApproval.test.ts tests/AgentV2UserVisibleSanitizer.test.ts tests/AgentV2LeakageDJK.test.ts\n\n\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  5 passed (5)\n      Tests  135 passed (135)\n   Start at  16:51:06\n   Duration  1.55s (transform 639ms, setup 41ms, import 795ms, tests 80ms, environment 0ms)\n\n",
+  "note": "randomized suite included in semantic-matrix run"
+}

@@ -1,0 +1,15 @@
+{
+  "verdict": "REXTORA COMPLETE DEPLOYMENT FAILED",
+  "startedAt": "2026-08-11T15:33:00+09:00",
+  "finishedAt": "2026-08-12T05:55:00+09:00",
+  "development": {
+    "390": { "passed": 22, "expected": 22, "verifiedRun": "orchestrator-v6" },
+    "768": { "passed": 11, "expected": 22, "failedBatch": "s12-22", "verifiedRun": "orchestrator-v6" },
+    "1024": { "passed": 0, "expected": 22, "status": "not_executed" },
+    "1440": { "passed": 0, "expected": 22, "status": "not_executed" },
+    "aggregate": { "expectedRows": 88, "passedRows": 22, "failedRows": 11, "executedRows": 44 }
+  },
+  "rootCause": "tmp/rextora-release-completion/dev-degradation/root-cause.json",
+  "safeUnchanged": true,
+  "git": { "branch": "main", "commit": "5e0f089e", "uncommitted": true }
+}

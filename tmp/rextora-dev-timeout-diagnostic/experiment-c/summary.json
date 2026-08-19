@@ -1,0 +1,13 @@
+{
+  "experiment": "C",
+  "serverAfter": {
+    "pid": 75173,
+    "etime": "01:03",
+    "cpu_pct": "0.0",
+    "mem_pct": "0.0",
+    "rss_kb": "0",
+    "state": "Z",
+    "open_files": "0"
+  },
+  "logPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-dev-timeout-diagnostic/experiment-c/playwright.stdout.txt"
+}

@@ -1,0 +1,207 @@
+
+Running 88 tests using 1 worker
+
+(node:61723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (0ms)
+  -   2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state
+  -   3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog
+  -   4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog
+  -   5 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model
+  -   6 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector
+  -   7 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation
+  -   8 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation
+  -   9 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance
+  -  10 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis
+  -  11 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up
+  -  12 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh
+  -  13 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior
+  -  14 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan
+  -  15 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution
+  -  16 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution
+  -  17 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting
+  -  18 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled
+  -  19 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  20 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  21 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  22 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+(node:61844) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61844) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  23 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (0ms)
+  -  24 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state
+  -  25 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog
+  -  26 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog
+  -  27 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model
+  -  28 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector
+  -  29 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation
+  -  30 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation
+  -  31 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance
+  -  32 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis
+  -  33 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up
+  -  34 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh
+  -  35 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior
+  -  36 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan
+  -  37 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution
+  -  38 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution
+  -  39 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting
+  -  40 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled
+  -  41 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  42 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  43 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  44 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+(node:61954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  45 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (0ms)
+  -  46 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state
+  -  47 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog
+  -  48 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog
+  -  49 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model
+  -  50 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector
+  -  51 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation
+  -  52 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation
+  -  53 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance
+  -  54 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis
+  -  55 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up
+  -  56 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh
+  -  57 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior
+  -  58 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan
+  -  59 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution
+  -  60 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution
+  -  61 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting
+  -  62 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled
+  -  63 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  64 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  65 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  66 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+(node:62068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  67 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (0ms)
+  -  68 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state
+  -  69 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog
+  -  70 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog
+  -  71 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model
+  -  72 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector
+  -  73 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation
+  -  74 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation
+  -  75 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance
+  -  76 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis
+  -  77 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up
+  -  78 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh
+  -  79 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior
+  -  80 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan
+  -  81 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution
+  -  82 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution
+  -  83 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting
+  -  84 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled
+  -  85 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  86 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  87 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  88 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+
+
+  1) [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   test.beforeEach(async ({ request }) => {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-390/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   test.beforeEach(async ({ request }) => {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-768/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   test.beforeEach(async ({ request }) => {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1024/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   test.beforeEach(async ({ request }) => {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+    [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+    [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+  84 did not run

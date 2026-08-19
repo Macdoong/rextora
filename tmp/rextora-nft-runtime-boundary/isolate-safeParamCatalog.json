@@ -1,0 +1,7 @@
+{
+  "entrypoint": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+  "elapsedMs": 71.524625,
+  "tracedFileCount": 4,
+  "warningCount": 0,
+  "observedAssetGlobInputs": []
+}

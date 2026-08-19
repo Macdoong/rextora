@@ -1,0 +1,8 @@
+{
+  "entrypoint": "app/api/rextora/paper/session/route.ts",
+  "elapsedMs": 1015.954667,
+  "tracedFileCount": 174,
+  "esmFileCount": 0,
+  "warningCount": 0,
+  "warnings": []
+}

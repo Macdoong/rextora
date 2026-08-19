@@ -1,0 +1,33 @@
+{
+  "count": 15,
+  "classification": "APPLICATION_PARSE_DEFECT",
+  "summary": "Repeated SyntaxError: Unexpected end of JSON input on /api/rextora/settings/ai-providers/models and related routes during long sequential matrix; correlated with Settings loading stalls and 300s agent timeouts but not every occurrence caused immediate test failure",
+  "errors": [
+    {
+      "timestamp": "2026-08-11T12:59:56.094Z",
+      "url": "/api/rextora/settings/ai-providers/models",
+      "stream": "stderr",
+      "affectedScenario": "03 @390",
+      "scenarioPassed": false,
+      "fallbackUsed": false,
+      "note": "Next.js dev route compilation parse during models catalog fetch"
+    },
+    {
+      "timestamp": "2026-08-11T13:45:13.205Z",
+      "url": "/api/rextora/settings/ai-providers",
+      "stream": "stderr",
+      "affectedScenario": "01 @768",
+      "scenarioPassed": false,
+      "fallbackUsed": false
+    },
+    {
+      "timestamp": "2026-08-11T15:19:00.178Z",
+      "url": "/api/rextora/settings/ai-providers/models",
+      "stream": "stderr",
+      "affectedScenario": "03-17 @1440",
+      "scenarioPassed": false,
+      "fallbackUsed": false,
+      "note": "Cluster during systemic 300s failure cascade on dev-1440"
+    }
+  ]
+}

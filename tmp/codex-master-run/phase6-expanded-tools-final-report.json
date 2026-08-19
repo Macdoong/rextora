@@ -1,0 +1,56 @@
+{
+  "phase": "expanded-safe-employee-tools",
+  "verdict": "VERIFIED",
+  "buildId": "ssEKrey6MwlCk4vBIwfE0",
+  "writes": [
+    "paper.approve_start",
+    "paper.pause",
+    "paper.resume",
+    "paper.stop",
+    "strategy.rename",
+    "strategy.archive",
+    "strategy.restore",
+    "strategy.delete",
+    "results.promote"
+  ],
+  "reads": [
+    "settings.get",
+    "lifecycle.get",
+    "workspace.get",
+    "strategy.list",
+    "strategy.detail",
+    "research.summary",
+    "paper.status",
+    "backtest.list",
+    "backtest.detail",
+    "search.list",
+    "search.status",
+    "search.result"
+  ],
+  "browser": {
+    "scenarios": [
+      "K",
+      "L",
+      "M"
+    ],
+    "rowsPassed": 12,
+    "rowsTotal": 12,
+    "evidenceRoot": "tmp/codex-master-run/phase3-runs"
+  },
+  "controls": {
+    "strictSchemas": true,
+    "explicitApproval": true,
+    "persistentIdempotency": true,
+    "audits": true,
+    "semanticEvents": true,
+    "dependencyProtection": true,
+    "exchangeCalled": false
+  },
+  "safe": {
+    "path": "data/strategies/SAFE_v44_i4060.json",
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedPathDiff": ""
+  }
+}

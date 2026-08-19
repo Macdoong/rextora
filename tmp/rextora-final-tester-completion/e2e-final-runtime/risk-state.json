@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "dailyLossLimitPct": -5,
+    "totalLossLimitPct": -10,
+    "consecutiveLossLimit": 3,
+    "maxDailyTrades": 20,
+    "maxLeverage": 2.5,
+    "maxSimultaneousPositions": 3,
+    "maxPositionSizePerCoinPct": 3,
+    "overtradingCooldownMinutes": 15
+  },
+  "dailyLossPct": -1.28,
+  "totalLossPct": -2.31,
+  "consecutiveLosses": 0,
+  "dailyTrades": 6,
+  "openPositions": 1,
+  "currentLeverage": 2,
+  "riskSettingsConfirmed": true,
+  "riskState": "정상",
+  "serviceState": "simulated"
+}

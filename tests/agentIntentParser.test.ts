@@ -9,6 +9,47 @@ import {
 } from "../src/lib/rextora/agent/intentParser";
 
 describe("agentIntentParser", () => {
+  it("detects exact Search pause and resume requests", () => {
+    expect(parseIntent("현재 작업 중지해").type).toBe("search_pause_request");
+    expect(parseIntent("다시 시작해").type).toBe("search_resume_request");
+  });
+
+  it("distinguishes a plan comparison from strategy comparison", () => {
+    expect(parseIntent("방금 계획과 무엇이 달라?").type).toBe("compare_plans");
+  });
+
+  it("routes a conversational timeframe edit to Search plan modification", () => {
+    expect(parseIntent("15분 말고 1시간으로 해").type).toBe("prepare_search_plan");
+  });
+
+  it("routes Research Brain evidence questions", () => {
+    for (const query of [
+      "이전 탐색과 겹치지 않는 연구를 해줘",
+      "왜 이 조합을 추천해?",
+      "실패 원인을 분석하고 다른 설정으로 다시 해",
+      "두 전략 중 무엇을 먼저 백테스트해야 해?",
+      "수수료 때문에 실패한 건지 분석해",
+      "MDD가 높아진 원인을 근거로 설명해",
+      "아직 검증하지 않은 패턴 조합을 찾아줘",
+    ]) {
+      expect(parseIntent(query).type).toBe("research_analysis");
+    }
+  });
+
+  it("routes result promotion through an explicit approval intent", () => {
+    expect(parseIntent("선택한 결과를 전략으로 승격해").type).toBe(
+      "results_promote_request",
+    );
+    expect(parseIntent("best candidate promote to strategy").type).toBe(
+      "results_promote_request",
+    );
+  });
+
+  it("routes verified memory recall questions", () => {
+    expect(parseIntent("우리가 무엇을 배웠어?").type).toBe("memory_recall");
+    expect(parseIntent("이전 거절 이유를 기억해서 알려줘").type).toBe("memory_recall");
+  });
+
   it("detects search_status from Korean query", () => {
     expect(parseIntent("탐색 상태 알려줘").type).toBe("search_status");
     expect(parseIntent("현재 연구 어디까지 됐어").type).toBe("search_status");
@@ -109,7 +150,9 @@ describe("agentIntentParser", () => {
   });
 
   it("detects first_run_help and demo_overview", () => {
-    expect(parseIntent("지금 뭘 해야 해?").type).toBe("first_run_help");
+    // "지금/오늘 뭘 해야" is lifecycle recommend (working session), not first-run-only
+    expect(parseIntent("지금 뭘 해야 해?").type).toBe("recommend_next");
+    expect(parseIntent("오늘 뭘 해야 해?").type).toBe("recommend_next");
     expect(parseIntent("결과가 왜 없어?").type).toBe("first_run_help");
     expect(parseIntent("처음에는 어떻게 시작해?").type).toBe("first_run_help");
     expect(parseIntent("데모 보여줘").type).toBe("demo_overview");

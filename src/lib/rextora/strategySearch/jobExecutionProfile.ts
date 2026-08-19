@@ -21,6 +21,7 @@ import type {
   StrategySearchPassPolicy,
   StrategySearchScoreWeights,
 } from "./types";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export const STRATEGY_SEARCH_EXECUTION_PROFILE_VERSION = 1 as const;
 
@@ -49,12 +50,7 @@ export interface StrategySearchExecutionProfile {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

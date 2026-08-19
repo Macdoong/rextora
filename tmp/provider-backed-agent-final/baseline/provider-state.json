@@ -1,0 +1,36 @@
+{
+  "reasoningActive": true,
+  "reasoningMode": "enabled",
+  "runtime": {
+    "active": true,
+    "emergencyDisabled": false,
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "source": "env",
+    "fallbackEnabled": true,
+    "fallbackProvider": null,
+    "openaiConfigured": true,
+    "geminiConfigured": true
+  },
+  "openai": {
+    "configured": true,
+    "stored": false,
+    "fingerprint": null,
+    "enabled": true,
+    "selectedModel": "gpt-5-mini",
+    "envFallback": true,
+    "lastTestOk": null,
+    "lastErrorKo": null
+  },
+  "gemini": {
+    "configured": true,
+    "stored": false,
+    "fingerprint": null,
+    "enabled": true,
+    "selectedModel": "gemini-2.5-flash",
+    "envFallback": true
+  },
+  "defaultProvider": null,
+  "emergencyDisabled": false,
+  "getHasApiKey": false
+}

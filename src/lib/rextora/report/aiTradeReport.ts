@@ -57,7 +57,7 @@ export interface AiTradeReport {
 const STORE_REL = path.join("data", "rextora", "ai-trade-reports.json");
 
 function storePath(): string {
-  return path.join(process.cwd(), STORE_REL);
+  return path.join(/* turbopackIgnore: true */ process.cwd(), STORE_REL);
 }
 
 function readStore(): AiTradeReport[] {

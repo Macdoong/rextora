@@ -1,0 +1,8 @@
+{
+  "entrypoint": "app/api/rextora/backtest/run/route.ts",
+  "elapsedMs": 404.042958,
+  "tracedFileCount": 51,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [],
+  "observedPackageInputs": []
+}

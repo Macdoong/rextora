@@ -1,0 +1,101 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationRandomized.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+stdout | tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 4: results_review
+ROUTE_MISMATCH {
+  query: '그거 위험하진 않아?',
+  expected: 'CLARIFY_REFERENCE',
+  route: {
+    mode: 'DIRECT_ANSWER',
+    topic: 'unknown',
+    resolvedReference: {
+      kind: 'backtest',
+      labelKo: '방금 설명한 백테스트',
+      id: null,
+      source: 'recent_assistant_turn',
+      confidence: 0.78
+    },
+    confidence: 0.78,
+    needsWorkspaceFacts: false,
+    requestedReadTools: [],
+    requestedWriteTools: [],
+    requiresApproval: false,
+    answerIntent: 'resolved_reference_answer',
+    reason: 'deictic reference resolved above workflow state',
+    legacyIntent: 'unknown',
+    clarificationQuestionKo: null,
+    providerExpected: false,
+    lifecycleInfluencedRouting: false
+  }
+}
+
+stdout | tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 8: paper_active
+ROUTE_MISMATCH {
+  query: '그 전략은?',
+  expected: 'CLARIFY_REFERENCE',
+  route: {
+    mode: 'DIRECT_ANSWER',
+    topic: 'strategy_explanation',
+    resolvedReference: {
+      kind: 'backtest',
+      labelKo: '방금 설명한 백테스트',
+      id: null,
+      source: 'recent_assistant_turn',
+      confidence: 0.78
+    },
+    confidence: 0.78,
+    needsWorkspaceFacts: false,
+    requestedReadTools: [],
+    requestedWriteTools: [],
+    requiresApproval: false,
+    answerIntent: 'resolved_reference_answer',
+    reason: 'deictic reference resolved above workflow state',
+    legacyIntent: 'unknown',
+    clarificationQuestionKo: null,
+    providerExpected: false,
+    lifecycleInfluencedRouting: false
+  }
+}
+
+stdout | tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 10: live_review
+ROUTE_MISMATCH {
+  query: '이게 대체 뭐하는 카드야?',
+  expected: 'CLARIFY_REFERENCE',
+  route: {
+    mode: 'DIRECT_ANSWER',
+    topic: 'unknown',
+    resolvedReference: {
+      kind: 'product',
+      labelKo: '렉스토라 앱',
+      id: null,
+      source: 'recent_assistant_turn',
+      confidence: 0.82
+    },
+    confidence: 0.82,
+    needsWorkspaceFacts: false,
+    requestedReadTools: [],
+    requestedWriteTools: [],
+    requiresApproval: false,
+    answerIntent: 'resolved_reference_answer',
+    reason: 'deictic reference resolved above workflow state',
+    legacyIntent: 'unknown',
+    clarificationQuestionKo: null,
+    providerExpected: false,
+    lifecycleInfluencedRouting: false
+  }
+}
+
+ ❯ tests/AgentConversationRandomized.test.ts (11 tests | 3 failed) 29ms
+     × conversation 4: results_review 6ms
+     × conversation 8: paper_active 1ms
+     × conversation 10: live_review 1ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 8 passed (11)
+   Start at  22:27:49
+   Duration  366ms (transform 73ms, setup 18ms, import 79ms, tests 29ms, environment 0ms)
+

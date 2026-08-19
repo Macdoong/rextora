@@ -1,0 +1,39 @@
+{
+  "id": "bt_ms31e01l_5d6b9f",
+  "trades": [
+    {
+      "id": "t_support_resistance",
+      "side": "LONG",
+      "entryTime": "2026-06-01T00:00:00.000Z",
+      "exitTime": "2026-06-01T01:00:00.000Z",
+      "entryPrice": 100.0,
+      "exitPrice": 101.0,
+      "netPnlUsdt": 1.0,
+      "feeUsdt": 0.04,
+      "slippageUsdt": 0.02,
+      "patternType": "support_resistance",
+      "patternBlocks": [
+        {
+          "blockId": "support_resistance_0",
+          "family": "support_resistance",
+          "role": "entry_zone",
+          "order": 0,
+          "status": "detected",
+          "patternType": "support_resistance",
+          "required": true,
+          "weight": 1,
+          "priority": 0,
+          "operatorPassed": true,
+          "detectorParams": {},
+          "measuredValues": {},
+          "thresholds": {},
+          "zoneHigh": 103.0,
+          "zoneLow": 102.0,
+          "creationBar": 3
+        }
+      ],
+      "zoneHigh": 103.0,
+      "zoneLow": 102.0
+    }
+  ]
+}

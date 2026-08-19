@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationRandomized.test.ts tests/AgentV2SkippedWriteApproval.test.ts tests/AgentV2UserVisibleSanitizer.test.ts tests/AgentV2LeakageDJK.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  5 passed (5)
+      Tests  135 passed (135)
+   Start at  16:51:06
+   Duration  1.55s (transform 639ms, setup 41ms, import 795ms, tests 80ms, environment 0ms)
+

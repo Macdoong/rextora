@@ -1,0 +1,10 @@
+{
+  "command": "npm run lint",
+  "startedAt": "2026-08-05T14:44:02Z",
+  "finishedAt": "2026-08-05T14:44:19Z",
+  "durationMs": 16884,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/quality-gates/lint.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/lint.stderr.log",
+  "BUILD_ID": "a0jdDmcIxl_8oa5KRn2Fl"
+}

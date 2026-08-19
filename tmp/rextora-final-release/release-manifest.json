@@ -1,0 +1,35 @@
+{
+  "buildId": "XqaW0-NPmj__QhJfwcwai",
+  "developmentBrowser": {
+    "expected": 88,
+    "passed": 0,
+    "executed": 14,
+    "failed": 6,
+    "note": "Matrix stopped fail-fast after systemic 300s timeouts; not 88/88"
+  },
+  "lifecycle": {
+    "expected": 52,
+    "passed": 0,
+    "note": "Not run — blocked on Development 88/88"
+  },
+  "productionBrowser": {
+    "expected": 88,
+    "passed": 0,
+    "note": "Not run"
+  },
+  "openaiPassed": false,
+  "geminiPassed": false,
+  "approvalE2E": false,
+  "repeatedApprovalAdditionalWrites": 0,
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "safeMutationCount": 0,
+  "safeUnchanged": true,
+  "lintPassed": false,
+  "unitPassed": false,
+  "e2eRunsPassed": 0,
+  "deploymentSmokePassed": false,
+  "releaseReady": false
+}

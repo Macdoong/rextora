@@ -1,0 +1,27 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 87195
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1156
+    }
+  ]
+}
+
+Running 2 tests using 1 worker
+
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.1m)
+  ✓  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.6m)
+
+  2 passed (6.4m)

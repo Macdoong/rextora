@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-13T22:22:16.463Z",
+  "strategies": [
+    {
+      "id": "SAFE_v44_i4060",
+      "name": "SAFE_v44_i4060",
+      "paramsHash": "7893ca3f0e30",
+      "locked": true,
+      "paperActive": true,
+      "liveActive": false,
+      "file": "SAFE_v44_i4060.json"
+    },
+    {
+      "id": "demo_strategy_btc_v1",
+      "name": "Demo Strategy",
+      "paramsHash": "df0d78616614",
+      "strategyHash": "a8532604fb8fbbe541a8968ed1ad30425ae03599018717e8e99af1d12bdcd44e",
+      "locked": false,
+      "paperActive": false,
+      "liveActive": false,
+      "file": "demo_strategy_btc_v1.json"
+    }
+  ]
+}

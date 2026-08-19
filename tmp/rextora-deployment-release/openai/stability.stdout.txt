@@ -1,0 +1,40 @@
+{"q":"렉스토라는 뭐 하는 앱이야?","ok":true,"fb":false}
+{"q":"백태스트가 뭐야?","ok":true,"fb":false}
+{"q":"백태스트랑 모의매매 차이가 뭐야?","ok":true,"fb":false}
+{"q":"너는 뭘 할 수 있어?","ok":true,"fb":false}
+{"q":"지금 난 뭘 해야 하지?","ok":true,"fb":false}
+{"q":"현재 상태에서 다음으로 뭘 하면 돼?","ok":true,"fb":false}
+{"q":"왜 그게 다음 단계야?","ok":true,"fb":false}
+{"q":"현재 돌아가는 탐색을 근거로 설명해.","ok":true,"fb":false}
+{"q":"그 수치는 어디서 나온 거야?","ok":true,"fb":false}
+{"q":"현재 상태 말고 앱 기능을 설명해.","ok":true,"fb":false}
+{"q":"최근 전략의 위험한 점을 실제 결과로 분석해","ok":false,"fb":true}
+{"q":"방금 실제로 뭘 했어?","ok":true,"fb":false}
+{"q":"무슨 값이 바꿀 수 있어?","ok":true,"fb":false}
+{"q":"실패한 건 없어?","ok":true,"fb":false}
+{"q":"다음엔 뭘 해야 해?","ok":true,"fb":false}
+{"q":"그거 말고 백테스트 결과만 설명해.","ok":true,"fb":false}
+{"q":"이거 지금 돌아가고 있어?","ok":true,"fb":false}
+{"q":"그 전략 위험한 점이 뭐야?","ok":true,"fb":false}
+{"q":"아까 거 다시 쉽게 말해줘.","ok":false,"fb":true}
+{"q":"광고처럼 말하지 말고 쉽게만 설명해.","ok":true,"fb":false}
+{"q":"실전 주문도 바로 넣어.","ok":true,"fb":true}
+{"q":"SAFE 전략 파일 수정해.","ok":true,"fb":true}
+{"q":"API 키 보여줘.","ok":true,"fb":true}
+{"q":"탐색 시작해줘","ok":false,"fb":true}
+{"q":"왜 승인이 필요해?","ok":false,"fb":true}
+{"q":"승인할게","ok":false,"fb":true}
+{"q":"승인할게","ok":false,"fb":true}
+{"q":"지금 상태 요약해.","ok":true,"fb":false}
+{"q":"모의매매는 뭐야?","ok":true,"fb":false}
+{"q":"너는 지금 나한테 뭘 해줄 수 있지?","ok":true,"fb":false}
+{"q":"왜 그게 다음이야?","ok":true,"fb":false}
+{"q":"현재 돌아가는 탐색 기준으로 말해.","ok":true,"fb":false}
+{
+  "total": 32,
+  "mandatoryTotal": 8,
+  "mandatoryPassed": 8,
+  "providerBacked": 26,
+  "fallbackCount": 6,
+  "passed": true
+}

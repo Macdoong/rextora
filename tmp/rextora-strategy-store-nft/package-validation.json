@@ -1,0 +1,10 @@
+{
+  "tarballMatchesSource": true,
+  "npmDependencyValid": true,
+  "sourceHashes": {
+    "index.cjs": "e361e6f8296f71cb7fd26938d18421a09112fe4fc6c6c6deefd0dd87713d1ddf",
+    "index.d.ts": "5cbba445d7e8bb314a1ce30130e51ab77c90faadd12c15a797c4c241476aa29c",
+    "package.json": "d99cce9bd2bb89a2dd910459d210616cbe182011eb73d8db23e4d55f6e42a30b"
+  },
+  "strategyOnlyPatternCount": 0
+}

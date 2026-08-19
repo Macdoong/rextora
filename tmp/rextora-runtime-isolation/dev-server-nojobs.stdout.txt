@@ -1,0 +1,14 @@
+
+> rextora@0.1.0 dev
+> next dev --port 3101
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3101
+- Network:       http://172.30.1.38:3101
+- Environments: .env.local
+✓ Ready in 385ms
+
+ POST /api/rextora/internal/orphan-recovery 200 in 64s (next.js: 362ms, application-code: 64s)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 1505ms (next.js: 1091ms, application-code: 414ms)
+ GET /settings 200 in 692ms (next.js: 416ms, application-code: 276ms)

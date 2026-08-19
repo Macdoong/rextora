@@ -1,0 +1,441 @@
+{
+  "status": 201,
+  "body": {
+    "ok": true,
+    "data": {
+      "id": "search_d703b064-3b4d-49f3-a277-a3f93831679e",
+      "status": "queued",
+      "createdAt": "2026-08-12T05:48:46.614Z",
+      "updatedAt": "2026-08-12T05:48:46.614Z",
+      "startedAt": null,
+      "finishedAt": null,
+      "elapsedMs": 0,
+      "remainingMs": 10800000,
+      "maxRuntimeMs": 10800000,
+      "campaignStartedAtMs": null,
+      "pausedAtMs": null,
+      "accumulatedPauseMs": 0,
+      "resumedAtMs": null,
+      "expectedCompletionAtMs": null,
+      "maxIterations": 40,
+      "completedIterations": 0,
+      "nextIteration": 0,
+      "progressRatio": 0,
+      "statistics": null,
+      "bestScore": null,
+      "bestCandidateHash": null,
+      "bestPassedCandidateHash": null,
+      "failureMessage": null,
+      "terminationReason": null,
+      "executionActive": false,
+      "searchVersion": "1",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "timeframe": "15m",
+      "seed": 42,
+      "searchSpaceExhausted": false,
+      "searchName": "agent_draft_BTCUSDT_15m",
+      "depthProfile": "standard",
+      "qualificationProfile": "balanced",
+      "qualifiedTarget": 3,
+      "qualifiedCount": 0,
+      "uniqueEvaluatedCount": 0,
+      "duplicateSkippedCount": 0,
+      "exhaustedSpaceCount": 0,
+      "completionReason": null,
+      "candidateBudget": 200,
+      "promotionWarnings": 0,
+      "currentSearchFamily": "Order Block",
+      "currentCombinationLabel": null,
+      "patternCombinationFamilies": null,
+      "patternCombinationOperator": "and",
+      "searchStageIndex": 1,
+      "searchStageTotal": 2,
+      "searchProgression": [
+        {
+          "id": "order_block",
+          "labelKo": "Order Block",
+          "status": "active",
+          "budgetAllocated": null,
+          "budgetSpent": 0,
+          "uniqueEvaluated": 0
+        },
+        {
+          "id": "fvg",
+          "labelKo": "Fair Value Gap",
+          "status": "pending",
+          "budgetAllocated": null,
+          "budgetSpent": 0,
+          "uniqueEvaluated": 0
+        }
+      ],
+      "bestReturn": null,
+      "currentBestSummary": null,
+      "remainingBudget": 200,
+      "candidateBudgetUsed": 0,
+      "overallProgressPct": 0,
+      "currentImprovementStage": "Order Block",
+      "familyBudgetRemaining": 0,
+      "lastMutation": null,
+      "counters": null,
+      "initialCandidateBudget": 200,
+      "resourceSafetyCeiling": 50000,
+      "outcomePresentation": "running",
+      "candidatesPreserved": false,
+      "preservedCandidateCount": 0,
+      "retryable": false,
+      "failedStage": null,
+      "lastSuccessfulStage": null,
+      "terminationDetail": null,
+      "symbolSelection": {
+        "mode": "manual",
+        "selectedSymbol": "BTCUSDT",
+        "reasonKo": "사용자가 직접 선택",
+        "liquidityStatus": "사용자 지정",
+        "volatilityStatus": "사용자 지정",
+        "dataAvailability": "요청 시점 확인",
+        "excludedAlternatives": []
+      },
+      "currentBestRisk": {
+        "netReturn": null,
+        "maxDrawdown": null,
+        "tradeCount": null,
+        "totalCost": null,
+        "profitFactor": null,
+        "robustnessStatus": "검증 대기",
+        "overfittingRisk": "검증 대기",
+        "eligibilityStatus": "추천 불가",
+        "recommendable": false
+      },
+      "liveTop10": null,
+      "config": {
+        "searchVersion": "1",
+        "strategyTemplateId": "agent_draft_BTCUSDT_15m",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "timeframe": "15m",
+        "dataVersion": "binance-v1",
+        "seed": 42,
+        "generatorType": "random",
+        "maxIterations": 40,
+        "parameterRangeKeys": [
+          "direction",
+          "penetrationPct",
+          "requireTouch",
+          "confirmationMode",
+          "confirmationCandleCount",
+          "confirmationWindow",
+          "invalidationMode",
+          "touchBasis",
+          "revalidateAtEntry",
+          "maxBarsAfterTouch",
+          "maxBarsAfterConfirmation",
+          "entryExecution",
+          "entryPriceTolerancePct",
+          "stopAtrMult",
+          "tpAtrMult",
+          "maxHoldBars",
+          "zoneLookback",
+          "zoneBasis",
+          "wickExtensionPct",
+          "institutionalQuality",
+          "requireBodyEngulf",
+          "minBodyEngulfPct",
+          "minDisplacementBodyMult",
+          "minSourceBodyPct",
+          "minSourceBodyAtrMult",
+          "minSourceBodyRangeRatio",
+          "maxSourceUpperWickPct",
+          "maxSourceLowerWickPct",
+          "minImpulseBodyRangeRatio",
+          "minZoneHeightPct",
+          "minZoneHeightAtrMult",
+          "maxZoneHeightAtrMult",
+          "requireStructureBreak",
+          "structureBreakLookback",
+          "minImpulseAtrMult",
+          "minImpulsePct",
+          "minVolumeMult",
+          "mitigationPct",
+          "firstTouchOnly",
+          "retestAllowed",
+          "entryInsideBlock",
+          "invalidateOnCloseBeyond"
+        ],
+        "evaluationWindowIds": [
+          "full"
+        ]
+      },
+      "checkpoint": {
+        "completedIterations": 0,
+        "nextIteration": 0,
+        "bestCandidate": null,
+        "bestPassedCandidate": null,
+        "updatedAt": "2026-08-12T05:48:46.614Z",
+        "hasRunnerPayload": false
+      },
+      "appliedSearchSummary": {
+        "jobId": "search_d703b064-3b4d-49f3-a277-a3f93831679e",
+        "titleKo": "설정 당시 적용값",
+        "subtitleKo": "이후 프리셋 변경과 무관하게, 이 탐색 시작 시 저장된 설정입니다.",
+        "sections": [
+          {
+            "id": "target",
+            "titleKo": "탐색 대상",
+            "rows": [
+              {
+                "labelKo": "시장 모드",
+                "valueKo": "수동 선택"
+              },
+              {
+                "labelKo": "심볼",
+                "valueKo": "BTCUSDT"
+              },
+              {
+                "labelKo": "선택 이유",
+                "valueKo": "사용자가 직접 선택"
+              },
+              {
+                "labelKo": "타임프레임",
+                "valueKo": "15m"
+              }
+            ]
+          },
+          {
+            "id": "period",
+            "titleKo": "탐색 기간",
+            "rows": [
+              {
+                "labelKo": "분석 구간 시작",
+                "valueKo": "2026. 6. 13. AM 9:00:00"
+              },
+              {
+                "labelKo": "분석 구간 종료",
+                "valueKo": "2026. 8. 13. AM 8:59:59"
+              },
+              {
+                "labelKo": "요청 연구 시간",
+                "valueKo": "180분"
+              }
+            ]
+          },
+          {
+            "id": "strategy_scope",
+            "titleKo": "전략 범위",
+            "rows": [
+              {
+                "labelKo": "활성 전략 패밀리",
+                "valueKo": "order_block, fvg"
+              },
+              {
+                "labelKo": "롱/숏",
+                "valueKo": "SafeV44 파라미터 기준 (양방향 가능)"
+              },
+              {
+                "labelKo": "패턴 유형 (OB/FVG/추세선/지지저항)",
+                "valueKo": "Order Block: 검증 필요 · Fair Value Gap: 검증 필요"
+              },
+              {
+                "labelKo": "지표·거래량 확인",
+                "valueKo": "SafeV44 내장 규칙 사용"
+              }
+            ]
+          },
+          {
+            "id": "risk",
+            "titleKo": "위험 설정",
+            "rows": [
+              {
+                "labelKo": "최대 낙폭 기준",
+                "valueKo": "25.00%"
+              },
+              {
+                "labelKo": "레버리지 모드",
+                "valueKo": "자동 추천"
+              },
+              {
+                "labelKo": "레버리지 값",
+                "valueKo": "엔진 기본 범위"
+              },
+              {
+                "labelKo": "포지션 사이징",
+                "valueKo": "SafeV44 size/risk 파라미터"
+              }
+            ]
+          },
+          {
+            "id": "validation",
+            "titleKo": "검증 설정",
+            "rows": [
+              {
+                "labelKo": "최소 거래",
+                "valueKo": "10"
+              },
+              {
+                "labelKo": "최소 수익",
+                "valueKo": "0.00%"
+              },
+              {
+                "labelKo": "수수료",
+                "valueKo": "0.04%"
+              },
+              {
+                "labelKo": "슬리피지",
+                "valueKo": "0.02%"
+              },
+              {
+                "labelKo": "비용 스트레스",
+                "valueKo": "사용"
+              },
+              {
+                "labelKo": "거래 안정성(지터)",
+                "valueKo": "사용"
+              },
+              {
+                "labelKo": "합격 프로필",
+                "valueKo": "balanced"
+              }
+            ]
+          },
+          {
+            "id": "engine",
+            "titleKo": "탐색 엔진",
+            "rows": [
+              {
+                "labelKo": "단계 묶음",
+                "valueKo": "40"
+              },
+              {
+                "labelKo": "후보 예산",
+                "valueKo": "200"
+              },
+              {
+                "labelKo": "최소 확보 합격",
+                "valueKo": "3"
+              },
+              {
+                "labelKo": "시드",
+                "valueKo": "42"
+              },
+              {
+                "labelKo": "깊이 프로필",
+                "valueKo": "standard"
+              },
+              {
+                "labelKo": "탐색 이름",
+                "valueKo": "agent_draft_BTCUSDT_15m"
+              }
+            ]
+          },
+          {
+            "id": "pattern_config",
+            "titleKo": "패턴 탐색 설정",
+            "rows": [
+              {
+                "labelKo": "설정 수준",
+                "valueKo": "기본"
+              },
+              {
+                "labelKo": "선택 모드",
+                "valueKo": "수동 선택"
+              },
+              {
+                "labelKo": "방향",
+                "valueKo": "롱·숏"
+              },
+              {
+                "labelKo": "재테스트",
+                "valueKo": "재테스트 필수"
+              },
+              {
+                "labelKo": "확인 강도",
+                "valueKo": "표준"
+              },
+              {
+                "labelKo": "확인 종가",
+                "valueKo": "확인 종가 필수"
+              },
+              {
+                "labelKo": "만료 봉 수",
+                "valueKo": "48봉"
+              },
+              {
+                "labelKo": "위험 스타일",
+                "valueKo": "균형형"
+              },
+              {
+                "labelKo": "패턴 강도",
+                "valueKo": "표준"
+              },
+              {
+                "labelKo": "지지/저항·추세선 민감도",
+                "valueKo": "표준"
+              },
+              {
+                "labelKo": "조합 연산자",
+                "valueKo": "AND"
+              },
+              {
+                "labelKo": "실패 정책",
+                "valueKo": "ANY (하나라도 실패)"
+              },
+              {
+                "labelKo": "적용 패턴 패밀리",
+                "valueKo": "—"
+              },
+              {
+                "labelKo": "블록 (역할·필수·가중·우선)",
+                "valueKo": "—"
+              }
+            ]
+          }
+        ],
+        "developerPayload": {
+          "jobId": "search_d703b064-3b4d-49f3-a277-a3f93831679e",
+          "status": "queued",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "timeframe": "15m",
+          "seed": 42,
+          "depthProfile": "standard",
+          "qualificationProfile": "balanced",
+          "spaceIds": [
+            "order_block",
+            "fvg"
+          ],
+          "leverageMode": "automatic",
+          "leverageFixed": null,
+          "leverageMin": 1,
+          "leverageMax": 5,
+          "maxRuntimeMs": 10800000,
+          "candidateBudget": 200,
+          "qualifiedTarget": 3,
+          "patternSelectionMode": "manual",
+          "patternConfigLevel": "basic",
+          "patternDirection": "both",
+          "patternRetestMode": "required",
+          "patternConfirmStrength": "standard",
+          "patternConfirmClose": "required",
+          "patternExpiryBars": 48,
+          "patternRiskStyle": "balanced",
+          "patternStrength": "standard",
+          "patternSrSensitivity": "standard",
+          "patternCombinationOperator": "and",
+          "patternCombinationFailurePolicy": "any",
+          "patternCombinationInvalidationMode": "any",
+          "patternCombinationFamilies": null,
+          "patternCombinationSpec": null
+        }
+      }
+    },
+    "meta": {
+      "source": "rextora-strategy-search",
+      "cached": false,
+      "durationMs": 33,
+      "updatedAt": "2026-08-12T05:48:46.647Z"
+    }
+  }
+}

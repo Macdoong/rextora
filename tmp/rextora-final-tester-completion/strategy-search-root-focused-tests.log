@@ -1,0 +1,75 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > clamps retention bounds 1ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > maps legacy terminal states safely 0ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > does nothing when fewer than 20 eligible jobs 424ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > does nothing when exactly 20 eligible jobs 1606ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > deletes oldest eligible when 21 terminal jobs exist 1837ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > retains newest 20 eligible jobs 2204ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > never deletes active, paused, or cancel-requested jobs 2015ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > protects jobs referenced by registered strategies 1823ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > deletes job-owned trials, checkpoint job file, execution, plan, and index entry 1841ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > uses deterministic id tie-breaker for identical timestamps 1855ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > runs cleanup after successful create and not after failed create 1784ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > cleanup failure does not corrupt the job index 1692ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > history API returns newest first and defaults to visible limit 20 2016ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > legacy description matching requires exact job= token 0ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > manual delete allows terminal eligible and rejects active/protected 784ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > SAFE and Strategy Management records remain unchanged 1809ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > UI displays Korean retention note 0ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > deleteSearchJob removes only one job scope 159ms
+ ✓ tests/strategySearchHistoryRetention.test.ts > strategy search history retention > integration: create with active + protected + >20 terminal 1883ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > classifies archive_only when registered strategy references job 209ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > archives and restores; archived jobs hidden from default list API 109ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > deletes deletable job atomically with audit; preserves registered strategy 406ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > blocks delete for archive_only and protected classifications 344ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > impact preview reports trials, top10, refs, and bytes 134ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > bulk delete filters out active and protected jobs 457ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > preset selectors pick failed and user-stopped jobs only 0ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > does not touch SAFE during deletion operations 179ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > restore archive writes audit event 92ms
+ ✓ tests/researchHistoryManagement.test.ts > research history archive/delete management > exports required Korean classification labels 0ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > creates a job with search_<uuid> id and persists/reloads 20ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > generates candidate ids with 8-digit iteration padding 1ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > lists jobs from the temporary root only 31ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > allows valid status transitions including pause/resume and cancel 187ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > rejects invalid status transitions 23ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > updates checkpoints and preserves createdAt 45ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > persists trials, supports identical idempotency, rejects conflicts 48ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > persists failed jobs with failure message 68ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > completes a job and refuses resume from terminal states 78ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > rejects path-traversal and invalid job ids 2ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > isolates storage to the provided temporary root 26ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > supports queued → cancel_requested → cancelled 94ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch jobStore > supports maxIterations null in config 19ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > keeps valid target authoritative and removes stale .tmp 20ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > restores missing target from valid .bak 18ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > restores invalid target from valid .bak 19ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > promotes valid .tmp when target and .bak are missing 19ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > throws corruption error when target/bak/tmp are all invalid 18ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > preserves trial conflict protection after .bak recovery 31ms
+ ✓ tests/strategySearchJobStore.test.ts > strategySearch recoverable persistence > recovers index.json and preserves all job summaries 39ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > applied settings terminology > uses initial batch label instead of total evaluation count 3ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > caps at 10 unique identities and includes role strategies without duplication 0ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > persists top10 and records rank changes on refresh 21ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > selectResearchTop10 > keeps Top-10 job-local and does not import peer-job entries 52ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > search config management > renames, duplicates, sets default, deletes without affecting jobs 12ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > raw trial retention > defaults to keep_30_days and never cleans Top-10 source trials 41ms
+ ✓ tests/researchTop10AndConfigMgmt.test.ts > deletion safety and archive > archives paused job and restores; preview classifies missing refs 99ms
+ ✓ tests/jobRecordRecoveryAndErrors.test.ts > job record recovery > rebuilds missing job.json from plan/trials as paused without deleting trials 54ms
+ ✓ tests/jobRecordRecoveryAndErrors.test.ts > job record recovery > create API read-back succeeds and returns persisted id 47ms
+ ✓ tests/jobRecordRecoveryAndErrors.test.ts > calculation error breakdown > does not count qualification failures as calculation errors 0ms
+ ✓ tests/jobRecordRecoveryAndErrors.test.ts > orphan recovery recordRecovered field > exposes recordRecovered array 1ms
+ ✓ tests/jobExecutionOwnership.test.ts > job execution ownership > two simultaneous acquire attempts: one accepted, one rejected 9ms
+ ✓ tests/jobExecutionOwnership.test.ts > job execution ownership > same owner re-acquire is idempotent 8ms
+ ✓ tests/jobExecutionOwnership.test.ts > job execution ownership > stale owner can be recovered without force-stealing fresh lease 10ms
+ ✓ tests/jobExecutionOwnership.test.ts > job execution ownership > registry rejects second in-process start for same job 44ms
+ ✓ tests/jobExecutionOwnership.test.ts > job execution ownership > existing trial contents are never overwritten when replay matches 26ms
+ ✓ tests/jobExecutionOwnership.test.ts > process owner id > is stable within the process 0ms
+
+ Test Files  6 passed (6)
+      Tests  66 passed (66)
+   Start at  15:01:18
+   Duration  28.77s (transform 564ms, setup 59ms, import 1.00s, tests 26.91s, environment 0ms)
+

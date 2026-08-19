@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationRandomized.test.ts tests/AgentConversationFirstApi.test.ts tests/AgentConversationProviderFallback.test.ts tests/AgentGeminiResponse.test.ts tests/AgentV2ApprovalFastPath.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  6 passed (6)
+      Tests  122 passed (122)
+   Start at  00:08:45
+   Duration  2.40s (transform 874ms, setup 48ms, import 409ms, tests 1.17s, environment 0ms)
+

@@ -1,0 +1,33 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts (98 tests | 1 failed) 34ms
+     × I ambiguous reference · prior-different-strategy-deictic 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > I ambiguous reference · prior-different-strategy-deictic
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:438:38
+    436|       expect(route.mode).toBe(item.mode);
+    437|       expect(route.topic).toBe(item.topic);
+    438|       expect(route.providerExpected).toBe(item.provider);
+       |                                      ^
+    439|       expect(route.requiresApproval).toBe(item.approval);
+    440|       expect(route.lifecycleInfluencedRouting).toBe(item.lifecycleInfl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 101 passed (102)
+   Start at  20:50:40
+   Duration  1.34s (transform 725ms, setup 22ms, import 57ms, tests 931ms, environment 0ms)
+

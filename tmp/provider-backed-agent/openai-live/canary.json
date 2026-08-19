@@ -1,0 +1,15 @@
+{
+  "configuredViaResolver": false,
+  "envPresent": true,
+  "envLength": 164,
+  "nonAsciiCount": 9,
+  "startsWithSk": true,
+  "fingerprintOfEnvIfAscii": null,
+  "providerSucceeded": false,
+  "structuredOutputValid": false,
+  "fallbackUsed": false,
+  "selectedModel": "gpt-5-mini",
+  "writeToolAuditCount": 0,
+  "errorKo": "OpenAI API 키에 허용되지 않는 문자가 포함되어 있습니다. 키를 다시 붙여넣어 주세요.",
+  "note": "Do not modify credentials to force a pass. Non-ASCII corruption blocks resolver."
+}

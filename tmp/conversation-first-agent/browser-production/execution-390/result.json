@@ -1,0 +1,59 @@
+{
+  "profile": "execution",
+  "width": 390,
+  "port": 52951,
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "startedAt": "2026-08-06T07:47:11.534Z",
+  "finishedAt": "2026-08-06T07:47:21.196Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-execution-390-XlVpDB",
+  "turnResults": [
+    {
+      "query": "새 전략을 탐색해줘.",
+      "expectedMode": "PLAN_AND_APPROVE",
+      "expectedTopic": "workflow_action",
+      "mode": "PLAN_AND_APPROVE",
+      "topic": "workflow_action",
+      "provider": "local",
+      "fallbackUsed": true,
+      "readTools": [
+        "workspace.current",
+        "lifecycle.current"
+      ],
+      "writeTools": [
+        "search.create",
+        "search.start"
+      ],
+      "approvalPresent": true,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "어떤 승인 계획을 진행할지 선택해 주세요.",
+    "primaryText": "어떤 승인 계획을 진행할지 선택해 주세요.\n오후 04:47 · 탐색 필요",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": true,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": {
+    "firstExecuted": true,
+    "repeatExecuted": false,
+    "executionAuditDelta": 2,
+    "repeatAuditDelta": 0,
+    "providerDuringApproval": 0
+  },
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 2,
+  "passed": true
+}

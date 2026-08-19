@@ -1,0 +1,26 @@
+B-768: PASS
+{
+  "passed": true,
+  "failures": [],
+  "provider": "openai"
+}
+real 219.24
+user 104.40
+sys 28.69
+           621740032  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              762666  page reclaims
+                 978  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                6421  messages sent
+                3554  messages received
+                   1  signals received
+               82527  voluntary context switches
+              154851  involuntary context switches
+          6190227350  instructions retired
+          3416000340  cycles elapsed
+           153663048  peak memory footprint

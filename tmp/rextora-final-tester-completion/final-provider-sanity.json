@@ -1,0 +1,34 @@
+{
+  "buildId": "-6CTCAJcZAMY02xezkvRO",
+  "sessionId": "final_provider_msrrp4o9",
+  "openai": {
+    "httpStatus": 200,
+    "selectedProvider": "openai",
+    "selectedModel": "gpt-5-mini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "structuredOutputValid": true,
+    "writeToolCount": 0,
+    "billingOrQuotaError": false,
+    "credentialError": false,
+    "secretExposureCount": 0,
+    "pass": true
+  },
+  "gemini": {
+    "httpStatus": 200,
+    "selectedProvider": "gemini",
+    "selectedModel": "gemini-2.5-flash",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "structuredOutputValid": true,
+    "writeToolCount": 0,
+    "billingOrQuotaError": false,
+    "credentialError": false,
+    "secretExposureCount": 0,
+    "contextPreserved": true,
+    "pass": true
+  },
+  "passed": true
+}

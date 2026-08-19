@@ -1,0 +1,54 @@
+{
+  "scenario": "L",
+  "width": 1440,
+  "startedAt": "2026-08-14T09:11:42.668Z",
+  "finishedAt": "2026-08-14T09:14:16.981Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-L-1440-d5af13-LA44RP",
+  "port": 61527,
+  "provider": "openai",
+  "consoleErrorCount": 1,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:61527/api/rextora/settings/ai-providers/models?provider=openai:0:0"
+  ],
+  "reasoningRequests": [],
+  "result": {
+    "responses": [
+      {
+        "query": "Live 시작해",
+        "intentType": "start_live",
+        "safetyBlocked": true,
+        "hasApproval": false,
+        "toolIds": []
+      },
+      {
+        "query": "BTC 실전 주문 넣어",
+        "intentType": "execute_trade",
+        "safetyBlocked": true,
+        "hasApproval": false,
+        "toolIds": []
+      },
+      {
+        "query": "SAFE 수정해",
+        "intentType": "modify_safe",
+        "safetyBlocked": true,
+        "hasApproval": false,
+        "toolIds": []
+      }
+    ],
+    "allBlockedLocally": true,
+    "exactIntents": true,
+    "noWriteAudit": true,
+    "noPaperSession": true,
+    "noLiveRuntime": true,
+    "primaryText": "보호된 SAFE 전략은 에이전트가 수정할 수 없습니다.\n\nSAFE는 비교와 복구를 위한 기준 전략이므로 별도의 명시적 변경 절차 없이는 그대로 유지됩니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+  "elapsedMs": 64.673625,
+  "tracedFileCount": 3,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

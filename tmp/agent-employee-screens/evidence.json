@@ -1,0 +1,18 @@
+{
+  "sizes": [
+    "agent-390.png",
+    "agent-768.png",
+    "agent-1024.png",
+    "agent-1440.png"
+  ],
+  "pinned": 1,
+  "workspace": 1,
+  "timestamps": 1,
+  "review": 1,
+  "open": 1,
+  "cancel": 1,
+  "pending": 1,
+  "conclusionSample": "현재 연구를 확인했습니다. 다음으로 실패 탐색 원인 확인를 권합니다.\n\n오늘 완료된 탐색이 확인되지 않았습니다.\n최근 검증·주목 전략은 custom_ms1y7u04입니다.\n활성 모의매매 세션은 없습니다.\n실패 탐색이 있어 원인 확인 후 재실행이 필요합니다.\n탐색 계획을 준비해 드릴까요?\n\n실패 탐색 원인 확인.",
+  "noAutoExecuteSignals": true,
+  "buildId": "h4nnXEhF-eCEChR7NrXQd"
+}

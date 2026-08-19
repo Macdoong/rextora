@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/strategySearch/searchPlan.ts",
+  "elapsedMs": 216.487125,
+  "tracedFileCount": 12,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

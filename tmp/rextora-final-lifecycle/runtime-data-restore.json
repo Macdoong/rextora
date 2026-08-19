@@ -1,0 +1,81 @@
+{
+  "verifiedAt": "2026-08-14T05:50:00Z",
+  "buildMeta": {
+    "command": "npx next build --webpack",
+    "parkedPaths": [
+      "data/rextora/strategy-search/jobs",
+      "data/rextora/strategy-search/trials",
+      "data/rextora/strategy-search/owners"
+    ],
+    "exitCode": 0,
+    "durationMs": 26847,
+    "BUILD_ID": "j4lAiIKoy4ofnQNdt2mFF",
+    "finishedAt": "2026-08-14T05:22:14.255Z"
+  },
+  "parkRestoreImplementation": {
+    "script": "scripts/buildTesterCandidate.mjs",
+    "parkedPaths": [
+      "data/rextora/strategy-search/jobs",
+      "data/rextora/strategy-search/trials",
+      "data/rextora/strategy-search/owners"
+    ],
+    "temporaryParkingPattern": "{TMPDIR}/rextora-build-park-*/data__rextora__strategy-search__{jobs|trials|owners}",
+    "parkMechanism": "fs.renameSync (atomic move, not copy)",
+    "placeholderDuringBuild": "empty mkdir at original path for path stability",
+    "restoreTiming": "finally block after build attempt, always runs before exit",
+    "parkRootCleanup": "fs.rmSync(parkRoot, { recursive: true }) after restore",
+    "interruptSafety": "restore() executes in finally even when build fails",
+    "manifestLogs": [
+      "tmp/rextora-tester-readiness/build/build-meta.json",
+      "tmp/rextora-final-source-build/build-run.log"
+    ]
+  },
+  "authoritativePathsNow": {
+    "data/rextora/strategy-search/jobs": {
+      "exists": true,
+      "fileCount": 3085,
+      "totalSizeBytes": 3687112103,
+      "latestMtimeIso": "2026-08-14T05:23:36Z",
+      "isEmpty": false
+    },
+    "data/rextora/strategy-search/trials": {
+      "exists": true,
+      "fileCount": 2095606,
+      "totalSizeBytes": 1431646402,
+      "latestMtimeIso": "2026-08-14T05:23:36Z",
+      "isEmpty": false
+    },
+    "data/rextora/strategy-search/owners": {
+      "exists": true,
+      "fileCount": 2,
+      "totalSizeBytes": 608,
+      "latestMtimeIso": "2026-08-14T05:23:31Z",
+      "isEmpty": false
+    }
+  },
+  "leftoverParkRoots": [],
+  "leftoverParkContents": [],
+  "olderFileSample": {
+    "jobs": { "scanned": 3085, "olderThanBuildFinish": 3077, "truncated": false },
+    "trials": { "scanned": 20000, "olderThanBuildFinish": 20000, "truncated": true },
+    "owners": { "scanned": 2, "olderThanBuildFinish": 0, "truncated": false }
+  },
+  "parkedPathsRestored": true,
+  "missingOriginalPaths": [],
+  "unexpectedParkedCopies": [],
+  "unexpectedDuplicateTrees": [],
+  "dataLossEvidence": false,
+  "rationale": [
+    "Build exitCode=0; finally block executed restore() and parkRoot cleanup",
+    "No rextora-build-park-* directories remain under TMPDIR, /tmp, or repo tmp",
+    "Authoritative paths exist, non-empty, and sampled files predate build finish (mtime evidence)",
+    "Latest mtimes after build finish indicate operator data continued under restored paths",
+    "2,095,606 trial files present — incompatible with unreceived empty placeholder"
+  ],
+  "operatorRuntimeState": {
+    "activeNextPlaywrightProcesses": false,
+    "activeSearchJobsQueuedOrRunning": 236,
+    "paperSessionFiles": 3,
+    "lifecycleIsolationNote": "deploymentLifecycle52 uses isolated REXTORA_DATA_DIR per row; operator data/rextora paths not mutated by harness"
+  }
+}

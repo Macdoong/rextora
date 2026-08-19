@@ -1,0 +1,18 @@
+{"name":"backtest_tab_stability","ok":true}
+{"name":"strategy_management","ok":true}
+{"name":"fab_collision_1440","ok":true}
+{"name":"fab_collision_1024","ok":true}
+{"name":"fab_collision_768","ok":true}
+{"name":"fab_collision_390","ok":true}
+{"name":"agent_drawer","ok":true}
+{"name":"ai_search_plan","ok":true}
+{"name":"ai_search_execute","ok":true}
+{"name":"ai_search_idempotent","ok":true}
+{"name":"ai_backtest_plan","ok":true}
+{"name":"ai_backtest_execute","ok":true}
+{"name":"ai_paper_plan","ok":true}
+{"name":"ai_paper_execute","ok":true}
+{"name":"safety_live_blocked","ok":true}
+{"name":"safety_order_blocked","ok":true}
+ACCEPTANCE_OK true
+FAILED []

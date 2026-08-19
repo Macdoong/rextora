@@ -1,0 +1,24 @@
+{
+  "buildId": "AKGGYNTPCkYoh0VM3fvnU",
+  "requestedProvider": "openai",
+  "requestedModel": "gpt-5-mini",
+  "httpStatus": 200,
+  "providerAttempted": true,
+  "providerSucceeded": true,
+  "fallbackUsed": false,
+  "structuredOutputValid": true,
+  "writeToolCount": 0,
+  "billingOrQuotaError": false,
+  "secretExposureCount": 0,
+  "selectedProvider": "openai",
+  "selectedModel": "gpt-5-mini",
+  "error": null,
+  "gemini": {
+    "httpStatus": 200,
+    "configured": true,
+    "enabled": true,
+    "stored": false,
+    "envFallback": true
+  },
+  "passed": true
+}

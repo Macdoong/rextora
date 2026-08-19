@@ -1,0 +1,14 @@
+{"at":"2026-08-13T12:17:01.257Z","entries":[{"rank":1,"strategyHash":"demo_hash_0001"}],"rankChanges":[]}
+{"at":"2026-08-13T12:17:01.270Z","entries":[{"rank":1,"strategyHash":"demo_hash_0001"}],"rankChanges":[]}
+{"at":"2026-08-13T12:17:04.753Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"신규 진입","previousRank":null,"currentRank":1,"movementReasonKo":"더 강한 후보 진입"}]}
+{"at":"2026-08-13T12:17:04.757Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"신규 진입","previousRank":null,"currentRank":1,"movementReasonKo":"더 강한 후보 진입"}]}
+{"at":"2026-08-13T12:17:07.133Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:07.135Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:08.050Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:08.053Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:08.305Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:08.306Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:13.649Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:13.654Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:13.722Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}
+{"at":"2026-08-13T12:17:13.725Z","entries":[{"rank":1,"strategyHash":"demo_params_00000000"}],"rankChanges":[{"strategyHash":"demo_params_00000000","change":"순위 유지","previousRank":1,"currentRank":1,"movementReasonKo":"1위 유지"}]}

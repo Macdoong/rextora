@@ -1,0 +1,10 @@
+{
+  "command": "npm run test:e2e",
+  "run": 3,
+  "startedAt": "2026-08-06T02:50:56Z",
+  "finishedAt": "2026-08-06T02:51:15Z",
+  "durationMs": 18904,
+  "exitCode": 0,
+  "BUILD_ID": "njqJD7SYb5n_Cj5ObL9a4",
+  "passedCount": 31
+}

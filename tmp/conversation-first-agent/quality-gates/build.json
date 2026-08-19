@@ -1,0 +1,19 @@
+{
+  "command": "rm -rf .next && npm run build",
+  "startedAt": "2026-08-05T15:09:04Z",
+  "finishedAt": "2026-08-05T15:10:36Z",
+  "durationMs": 92127,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/quality-gates/build.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/build.stderr.log",
+  "BUILD_ID": "UASAeXnhYajkc6qyo1p-q",
+  "processBaseline": {
+    "port3000ClearBeforeBuild": true
+  },
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "diffEmpty": true
+  }
+}

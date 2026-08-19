@@ -1,0 +1,10 @@
+{
+  "entrypoint": "app/api/rextora/strategy-search/storage-summary/route.ts",
+  "elapsedMs": 757.93325,
+  "tracedFileCount": 104,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/strategy-search/**/*"
+  ],
+  "observedPackageInputs": []
+}

@@ -1,0 +1,71 @@
+
+<--- Last few GCs --->
+
+[72819:0x82180c000]    23004 ms: Scavenge (during sweeping) 4061.6 (4083.4) -> 4059.9 (4086.9) MB, pooled: 0.0 MB, 12.41 / 0.00 ms (average mu = 0.192, current mu = 0.126) allocation failure; 
+[72819:0x82180c000]    24732 ms: Mark-Compact (reduce) 4079.3 (4101.1) -> 4072.0 (4087.6) MB, pooled: 0.0 MB, 48.08 / 0.00 ms (+ 1559.2 ms in 311 steps since start of marking, biggest step 5.3 ms, walltime since start of marking 1648 ms) (average mu = 0.1
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x108c62750 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 2: 0x108f79a9c v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 3: 0x108f79a54 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 4: 0x109125ce0 v8::internal::Heap::ShouldOptimizeForLoadTime() const [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 5: 0x10912826c v8::internal::Heap::OldGenerationConsumedBytes() const [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 6: 0x109128114 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector, v8::base::TimeTicks) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 7: 0x109135bb4 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1::operator()() const [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 8: 0x109135858 void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1>(heap::base::Stack*, void*, void const*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+ 9: 0x10974afc0 PushAllRegistersAndIterateStack [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+10: 0x109124460 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+11: 0x1090b4440 v8::internal::StackGuard::HandleInterrupts(v8::internal::StackGuard::InterruptLevel) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+12: 0x10940eeb8 v8::internal::Runtime_StackGuard(int, unsigned long*, v8::internal::Isolate*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+13: 0x108a7d474 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+14: 0x108ab2e54 Builtins_ArrayPrototypeSlice [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+15: 0x1344e2cec 
+16: 0x13417920c 
+17: 0x134293acc 
+18: 0x134179150 
+19: 0x134293acc 
+20: 0x134833924 
+21: 0x13404704c 
+22: 0x134046740 
+23: 0x134077b30 
+24: 0x1089da96c Builtins_JSEntryTrampoline [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+25: 0x1089da610 Builtins_JSEntry [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+26: 0x109090d64 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+27: 0x109090748 v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+28: 0x109c9f44c v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+29: 0x108bbc0f4 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context, v8::Local<v8::Value>) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+30: 0x108bcaec4 node::AsyncWrap::MakeCallback(v8::Local<v8::Function>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+31: 0x108c67528 node::fs::FSReqCallback::Resolve(v8::Local<v8::Value>) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+32: 0x108c681ac node::fs::AfterScanDir(uv_fs_s*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+33: 0x108c5bf7c node::MakeLibuvRequestCallback<uv_fs_s, void (*)(uv_fs_s*)>::Wrapper(uv_fs_s*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+34: 0x1048e6db8 uv__work_done [/opt/homebrew/Cellar/libuv/1.52.0/lib/libuv.1.0.0.dylib]
+35: 0x1048ea320 uv__async_io [/opt/homebrew/Cellar/libuv/1.52.0/lib/libuv.1.0.0.dylib]
+36: 0x1048f9088 uv__io_poll [/opt/homebrew/Cellar/libuv/1.52.0/lib/libuv.1.0.0.dylib]
+37: 0x1048eaab8 uv_run [/opt/homebrew/Cellar/libuv/1.52.0/lib/libuv.1.0.0.dylib]
+38: 0x108bbcdfc node::SpinEventLoopInternal(node::Environment*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+39: 0x108c90d3c node::NodeMainInstance::Run(node::ExitCode*, node::Environment*) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+40: 0x108c90a70 node::NodeMainInstance::Run() [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+41: 0x108c34c44 node::Start(int, char**) [/opt/homebrew/Cellar/node/25.8.0/lib/libnode.141.dylib]
+42: 0x180af7e00 start [/usr/lib/dyld]
+time: command terminated abnormally
+real 24.85
+user 79.77
+sys 6.96
+          5022842880  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              341906  page reclaims
+                  84  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               77616  voluntary context switches
+              372875  involuntary context switches
+        451923047841  instructions retired
+        263211447822  cycles elapsed
+          5258301864  peak memory footprint

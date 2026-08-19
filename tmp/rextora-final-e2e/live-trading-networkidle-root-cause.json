@@ -1,0 +1,70 @@
+{
+  "route": "/live-trading",
+  "shellRenderedBeforeTimeout": true,
+  "shellVisibleAtMs": 277,
+  "networkIdleReachedInIsolatedRun": true,
+  "networkIdleFailedInFullSuite": true,
+  "originalFailure": {
+    "test": "tests/e2e/rextora-shell-styles.spec.ts — /live-trading loads styled shell on direct entry",
+    "error": "page.goto: Test timeout of 30000ms exceeded waiting until networkidle",
+    "evidence": "tmp/rextora-final-e2e/stdout.txt test 27; Playwright error-context snapshot shows full styled shell already rendered",
+    "suiteContext": "31-test E2E with 3 workers; live-trading shell test ran concurrently with long-running shell/smoke/strategy-search tests"
+  },
+  "networkIdleReached": false,
+  "persistentRequests": [
+    {
+      "url": "/api/rextora/trading/dashboard",
+      "method": "GET",
+      "resourceType": "fetch",
+      "repeatCount": 6,
+      "approximateIntervalMs": 6400,
+      "statuses": [200, 200, 200, 200, 200, 200],
+      "originatesFromLiveTradingPolling": true,
+      "source": "app/live-trading/page.tsx refresh() in useEffect"
+    },
+    {
+      "url": "/api/rextora/bot/status",
+      "method": "GET",
+      "resourceType": "fetch",
+      "repeatCount": 5,
+      "approximateIntervalMs": 8000,
+      "statuses": [200, 200, 200, 200, 200],
+      "originatesFromLiveTradingPolling": true,
+      "source": "app/live-trading/page.tsx refresh() in useEffect"
+    },
+    {
+      "url": "/api/rextora/live/readiness",
+      "method": "GET",
+      "resourceType": "fetch",
+      "originatesFromLiveTradingPolling": true,
+      "source": "components/rextora/live/LiveActivationGates.tsx gate bootstrap fetch"
+    },
+    {
+      "url": "/api/rextora/strategy/approve",
+      "method": "GET",
+      "resourceType": "fetch",
+      "originatesFromLiveTradingPolling": false,
+      "source": "LiveActivationGates.tsx gate bootstrap fetch"
+    },
+    {
+      "url": "/api/rextora/risk",
+      "method": "GET",
+      "resourceType": "fetch",
+      "originatesFromLiveTradingPolling": false,
+      "source": "LiveActivationGates.tsx gate bootstrap fetch"
+    }
+  ],
+  "pollingConfirmed": true,
+  "pollingCodeEvidence": "app/live-trading/page.tsx lines 24-32: setInterval(() => void refresh(), 8000) fetching /api/rextora/trading/dashboard and /api/rextora/bot/status",
+  "applicationErrorObserved": false,
+  "http5xxCount": 0,
+  "chunkLoadErrorCount": 0,
+  "hydrationErrorCount": 0,
+  "smokeTestComparison": {
+    "test": "rextora-smoke.spec.ts renders /live-trading with pre-live safety state",
+    "navigation": "page.goto(route) default wait (load, not networkidle)",
+    "result": "PASS in full 31-test suite"
+  },
+  "classification": "HARNESS_DEFECT",
+  "reasonNetworkIdleInvalid": "Live-trading intentionally polls dashboard/bot status every 8s while gate components fetch readiness/risk endpoints. Playwright networkidle requires 500ms with zero in-flight connections. Under concurrent E2E load the page shell renders quickly but repeating fetch activity prevents networkidle within the 30s test timeout. The test's style/shell assertions do not require all network traffic to stop; smoke validation of the same route passes without networkidle."
+}

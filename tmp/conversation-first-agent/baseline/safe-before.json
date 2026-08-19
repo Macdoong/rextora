@@ -1,0 +1,8 @@
+{
+  "path": "data/strategies/SAFE_v44_i4060.json",
+  "params_hash": "7893ca3f0e30",
+  "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+  "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+  "protected_diff_empty": true,
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663"
+}

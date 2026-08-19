@@ -1,0 +1,28 @@
+[
+  {
+    "k": "foundAt",
+    "v": 0
+  },
+  {
+    "k": "visible",
+    "v": true
+  },
+  {
+    "k": "aiTabClass",
+    "v": "rounded-lg border px-3 py-1.5 text-sm border-sky-500/50 bg-sky-500/15 text-sky-50"
+  },
+  {
+    "k": "dataTabClass",
+    "v": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+  },
+  {
+    "k": "api",
+    "v": {
+      "status": 200,
+      "openaiStored": true,
+      "geminiStored": true,
+      "envO": false,
+      "envG": false
+    }
+  }
+]

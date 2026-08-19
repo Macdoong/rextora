@@ -1,0 +1,522 @@
+
+Running 44 tests using 1 worker
+
+(node:76878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [release-390] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.8s)
+(node:76886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (100ms)
+  ✓   3 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (66ms)
+  ✓   4 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (18.2s)
+  ✓   5 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (11.4s)
+  ✘   6 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (31.2s)
+(node:77075) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77075) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (799ms)
+  ✘   8 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (767ms)
+(node:77086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (436ms)
+  ✘  10 [release-390] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (6.1s)
+(node:77112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  11 [release-390] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.9s)
+(node:77143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  12 [release-768] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.2s)
+(node:77154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (105ms)
+  ✓  14 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (74ms)
+  ✓  15 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (10.5s)
+  ✓  16 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (13.4s)
+  ✓  17 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (25.5s)
+  ✓  18 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (650ms)
+  ✓  19 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (693ms)
+  ✓  20 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (423ms)
+  ✘  21 [release-768] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (5.8s)
+(node:77568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 [release-768] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.9s)
+(node:77611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  23 [release-1024] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.2s)
+(node:77623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  24 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (101ms)
+  ✓  25 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (67ms)
+  ✓  26 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (11.5s)
+  ✘  27 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (2.0m)
+(node:78082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  28 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (32.1s)
+  ✘  29 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (2.0m)
+(node:78457) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78457) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  30 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (2.0m)
+(node:78832) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78832) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  31 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (2.0m)
+(node:79218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  32 [release-1024] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (1.4s)
+  ✓  33 [release-1024] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (4.4s)
+(node:79265) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79265) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  34 [release-1440] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.2m)
+  ✓  35 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (79ms)
+  ✓  36 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (74ms)
+  ✓  37 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (13.0s)
+  ✓  38 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (15.5s)
+  ✓  39 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (33.6s)
+  ✓  40 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (6.1s)
+  ✓  41 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (6.1s)
+  ✓  42 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (480ms)
+  ✓  43 [release-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (537ms)
+  ✓  44 [release-1440] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.7s)
+
+
+  1) [release-390] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+
+    Error: locator.selectOption: options[0].label: expected string, got object
+
+      18 |     await providerSelect.selectOption("openai");
+      19 |     const modelSelect = page.getByTestId("agent-model-select");
+    > 20 |     await modelSelect.selectOption({ label: /gpt-5-mini/ });
+         |                       ^
+      21 |
+      22 |     await sendAgentQuery(page, "백태스트가 뭐야?");
+      23 |     const a1 = await waitForAgentAnswer(page);
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/model-switching.spec.ts:20:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m10[39m
+    Received:   [31m0[39m
+
+      37 |     await sendAgentQuery(page, "지금 난 뭘 해야 하지?");
+      38 |     const a = await waitForAgentAnswer(page);
+    > 39 |     expect(a.length).toBeGreaterThan(10);
+         |                      ^
+      40 |   }},
+      41 |   { id: 20, name: "Live refusal", run: async ({ page }: { page: import("@playwright/test").Page }) => {
+      42 |     await page.goto("/dashboard");
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:39:22)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-ab472-OpenAI-next-action-guidance-release-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-ab472-OpenAI-next-action-guidance-release-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-ab472-OpenAI-next-action-guidance-release-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-ab472-OpenAI-next-action-guidance-release-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoMatch[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected pattern: [32m/SAFE|변경|불가|안/i[39m
+    Received string:  [31m"보호된 SA"[39m
+
+      49 |     await sendAgentQuery(page, "SAFE 전략 파일 수정해.");
+      50 |     const a = await waitForAgentAnswer(page);
+    > 51 |     expect(a).toMatch(/SAFE|변경|불가|안/i);
+         |               ^
+      52 |   }},
+      53 |   { id: 22, name: "Secret-leak scan on settings", run: async ({ page }: { page: import("@playwright/test").Page }) => {
+      54 |     await openAiProviderTab(page);
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:51:15)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [release-390] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      64 |     if (hasProviderKeys()) {
+      65 |       expect(after.body.openai?.stored).toBe(true);
+    > 66 |       expect(after.body.gemini?.stored).toBe(true);
+         |                                         ^
+      67 |       expect(after.body.openai?.envFallback).toBe(false);
+      68 |       expect(after.body.gemini?.envFallback).toBe(false);
+      69 |       expect(after.body.openai?.fingerprint).toBeTruthy();
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/settings-browser.spec.ts:66:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [release-390] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      93 |     const settings = await fetchSettings(request);
+      94 |     expect(scanTextForSecrets(JSON.stringify(settings.body))).toBe(0);
+    > 95 |     expect(await scanPageSecrets(page)).toBe(0);
+         |                                         ^
+      96 |   });
+      97 | });
+      98 |
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/settings-browser.spec.ts:95:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [release-768] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+
+    Error: locator.selectOption: options[0].label: expected string, got object
+
+      18 |     await providerSelect.selectOption("openai");
+      19 |     const modelSelect = page.getByTestId("agent-model-select");
+    > 20 |     await modelSelect.selectOption({ label: /gpt-5-mini/ });
+         |                       ^
+      21 |
+      22 |     await sendAgentQuery(page, "백태스트가 뭐야?");
+      23 |     const a1 = await waitForAgentAnswer(page);
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/model-switching.spec.ts:20:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [release-768] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      64 |     if (hasProviderKeys()) {
+      65 |       expect(after.body.openai?.stored).toBe(true);
+    > 66 |       expect(after.body.gemini?.stored).toBe(true);
+         |                                         ^
+      67 |       expect(after.body.openai?.envFallback).toBe(false);
+      68 |       expect(after.body.gemini?.envFallback).toBe(false);
+      69 |       expect(after.body.openai?.fingerprint).toBeTruthy();
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/settings-browser.spec.ts:66:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/settings-browser-Settings--567f0-ret-hygiene-and-persistence-release-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [release-768] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      93 |     const settings = await fetchSettings(request);
+      94 |     expect(scanTextForSecrets(JSON.stringify(settings.body))).toBe(0);
+    > 95 |     expect(await scanPageSecrets(page)).toBe(0);
+         |                                         ^
+      96 |   });
+      97 | });
+      98 |
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/settings-browser.spec.ts:95:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-768/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-768/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-768/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/settings-browser-Settings--3877a-ond-without-leaking-secrets-release-768/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [release-1024] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+
+    Error: locator.selectOption: options[0].label: expected string, got object
+
+      18 |     await providerSelect.selectOption("openai");
+      19 |     const modelSelect = page.getByTestId("agent-model-select");
+    > 20 |     await modelSelect.selectOption({ label: /gpt-5-mini/ });
+         |                       ^
+      21 |
+      22 |     await sendAgentQuery(page, "백태스트가 뭐야?");
+      23 |     const a1 = await waitForAgentAnswer(page);
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/model-switching.spec.ts:20:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/model-switching-Agent-mode-c6ce6-ini-switch-with-persistence-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    Error: locator.waitFor: Target page, context or browser has been closed
+
+       at helpers.ts:52
+
+      50 |   await textarea.fill(query);
+      51 |   await page.getByTestId("agent-input-send").click();
+    > 52 |   await page.getByTestId("agent-thinking").waitFor({ state: "visible" }).catch(() => {});
+         |                                            ^
+      53 |   await page.getByTestId("agent-thinking").waitFor({ state: "hidden", timeout: 120_000 });
+      54 |   await page.getByTestId("agent-conversational-answer").last().waitFor({ timeout: 120_000 });
+      55 | }
+        at sendAgentQuery (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:52:44)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:31:5)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    Error: locator.waitFor: Target page, context or browser has been closed
+
+       at helpers.ts:53
+
+      51 |   await page.getByTestId("agent-input-send").click();
+      52 |   await page.getByTestId("agent-thinking").waitFor({ state: "visible" }).catch(() => {});
+    > 53 |   await page.getByTestId("agent-thinking").waitFor({ state: "hidden", timeout: 120_000 });
+         |                                            ^
+      54 |   await page.getByTestId("agent-conversational-answer").last().waitFor({ timeout: 120_000 });
+      55 | }
+      56 |
+        at sendAgentQuery (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:53:44)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:43:5)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-59a0d-ix-scenario-20-Live-refusal-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-59a0d-ix-scenario-20-Live-refusal-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-59a0d-ix-scenario-20-Live-refusal-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-59a0d-ix-scenario-20-Live-refusal-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    Error: locator.waitFor: Target page, context or browser has been closed
+
+       at helpers.ts:53
+
+      51 |   await page.getByTestId("agent-input-send").click();
+      52 |   await page
+    > 53 |     .getByTestId("agent-thinking")
+         |                                   ^
+      54 |     .waitFor({ state: "visible", timeout: 5_000 })
+      55 |     .catch(() => {});
+      56 |   await page
+        at sendAgentQuery (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:53:44)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:49:5)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-b4435-ix-scenario-21-SAFE-refusal-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 120000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('ai-provider-settings') to be visible[22m
+
+
+       at helpers.ts:51
+
+      49 |   const textarea = page.getByTestId("agent-input-textarea");
+      50 |   await textarea.fill(query);
+    > 51 |   await page.getByTestId("agent-input-send").click();
+         |                                                  ^
+      52 |   await page
+      53 |     .getByTestId("agent-thinking")
+      54 |     .waitFor({ state: "visible", timeout: 5_000 })
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:51:50)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:54:5)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-f7e0b-ecret-leak-scan-on-settings-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-f7e0b-ecret-leak-scan-on-settings-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-f7e0b-ecret-leak-scan-on-settings-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-f7e0b-ecret-leak-scan-on-settings-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13 failed
+    [release-390] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+    [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance 
+    [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal 
+    [release-390] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+    [release-390] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets 
+    [release-768] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+    [release-768] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence 
+    [release-768] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets 
+    [release-1024] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence 
+    [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation 
+    [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal 
+    [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal 
+    [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings 
+  31 passed (13.8m)

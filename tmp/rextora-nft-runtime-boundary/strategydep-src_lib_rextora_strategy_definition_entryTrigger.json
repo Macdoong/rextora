@@ -1,0 +1,7 @@
+{
+  "entrypoint": "src/lib/rextora/strategy/definition/entryTrigger.ts",
+  "elapsedMs": 64.333834,
+  "tracedFileCount": 2,
+  "warningCount": 0,
+  "observedAssetGlobInputs": []
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "before": {
+    "source": "prior unfiltered reproduction and tmp/rextora-final-build-path artifacts",
+    "terminalResult": "exit 134",
+    "elapsedSeconds": 24.85,
+    "peakRssBytes": 5022842880,
+    "terminalFrame": "node::fs::AfterScanDir",
+    "trialFilesReachable": 2088621,
+    "accepted": false
+  },
+  "candidateAfter": {
+    "source": "nft-agent-fs-after.json and nft-agent-after.stderr.txt",
+    "terminalResult": "terminated by signal after failure to reach normal completion",
+    "elapsedSeconds": 61.78,
+    "timePeakRssBytes": 766132224,
+    "tracerPeakRssBytes": 450510848,
+    "tracerPeakHeapUsedBytes": 174922512,
+    "completedFilesystemCalls": 1613,
+    "returnedEntries": 25251,
+    "recordedDirectories": 1610,
+    "inFlightFilesystemCallsAtFinalFlush": 4641,
+    "trialRootReached": true,
+    "trialRootPath": "<REPO>/data/rextora/strategy-search/trials",
+    "trialLeafEnumerationProvenComplete": false,
+    "normalSuccess": false,
+    "accepted": false
+  },
+  "patternProbe": {
+    "removedPatterns": [
+      "data/rextora/**/*",
+      "data/rextora/strategy-search/**/*"
+    ],
+    "remainingBlockingPattern": "**/*.json",
+    "remainingSource": "src/lib/rextora/strategy/strategyStore.ts"
+  },
+  "conclusion": "The attempted runtime-path boundary reduced explicit root-derived patterns and observed peak RSS, but it did not pass the mandatory isolated NFT gate because the trial root remained reachable and the trace did not complete normally. No build was run; the candidate was reverted."
+}

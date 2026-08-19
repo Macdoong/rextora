@@ -1,0 +1,16 @@
+{
+  "command": "npm run test:e2e",
+  "run": 1,
+  "startedAt": "2026-08-05T14:55:03Z",
+  "finishedAt": "2026-08-05T14:55:22Z",
+  "durationMs": 18927,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/quality-gates/e2e-1.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/e2e-1.stderr.log",
+  "BUILD_ID": "E0hf07WzbucpoXwZfA5R0",
+  "parsed": {
+    "retryMentions": 0,
+    "orphanWarning": false,
+    "moduleNotFound": false
+  }
+}

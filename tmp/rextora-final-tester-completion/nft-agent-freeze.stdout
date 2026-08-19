@@ -1,0 +1,8 @@
+{
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "elapsedMs": 1481.293584,
+  "tracedFileCount": 315,
+  "esmFileCount": 0,
+  "warningCount": 0,
+  "warnings": []
+}

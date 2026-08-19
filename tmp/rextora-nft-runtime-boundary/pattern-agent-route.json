@@ -1,0 +1,14 @@
+{
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "elapsedMs": 1650.804083,
+  "tracedFileCount": 294,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/rextora/**/*",
+    "data/rextora/agent-commands/**/*",
+    "data/rextora/reasoning-shadow/**/*",
+    "data/rextora/strategy-search/**/*",
+    "data/strategies/**/*"
+  ]
+}

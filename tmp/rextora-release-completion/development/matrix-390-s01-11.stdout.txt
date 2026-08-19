@@ -1,0 +1,39 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 90652
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 993
+    }
+  ]
+}
+
+Running 12 tests using 1 worker
+
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.3s)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (2.1s)
+  ✓   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.5s)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (93ms)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.6s)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (3.8s)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (15.1s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.5m)
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (35.0s)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (18.9s)
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (2.7m)
+
+  Slow test file: [dev-390] › tests/e2e/release/deployment-matrix.spec.ts (5.6m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  12 passed (9.4m)

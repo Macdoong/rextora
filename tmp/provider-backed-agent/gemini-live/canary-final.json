@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "latencyMs": 965,
+  "structuredOutputValid": true,
+  "writeToolAuditCount": 0,
+  "errorKo": null,
+  "responseFingerprint": "gemini:gemini-2.5-flash:965"
+}

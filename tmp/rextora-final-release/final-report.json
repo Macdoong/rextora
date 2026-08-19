@@ -1,0 +1,25 @@
+{
+  "verdict": "REXTORA DEPLOYMENT RELEASE FAILED",
+  "releaseReady": false,
+  "branch": "main",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "buildId": "XqaW0-NPmj__QhJfwcwai",
+  "buildIdStale": true,
+  "sourceFingerprintFinal": "ea874063788c41c5",
+  "development": {
+    "expected": 88,
+    "passed": 0,
+    "status": "FAILED_PARTIAL",
+    "executedPartial": 14,
+    "systemicFailure": "300s test timeout under sequential matrix"
+  },
+  "lifecycle": { "expected": 52, "passed": 0, "status": "NOT_RUN" },
+  "lint": { "status": "NOT_RUN" },
+  "unit": { "status": "NOT_RUN" },
+  "e2eRuns": { "required": 3, "passed": 0, "status": "NOT_RUN" },
+  "production": { "expected": 88, "passed": 0, "status": "NOT_RUN" },
+  "safeUnchanged": true,
+  "safeParamsHash": "7893ca3f0e30",
+  "gitCommitted": false,
+  "gitPushed": false
+}

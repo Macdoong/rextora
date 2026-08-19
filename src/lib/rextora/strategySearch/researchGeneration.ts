@@ -16,6 +16,7 @@ import type {
   StrategySearchAdjustmentPlan,
   WeaknessAnalysisResult,
 } from "./weaknessAnalysis";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export const RESEARCH_GENERATION_VERSION = 1 as const;
 
@@ -60,12 +61,7 @@ export interface ResearchGenerationFile {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

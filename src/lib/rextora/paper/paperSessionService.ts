@@ -86,9 +86,9 @@ function rememberIdempotent(
   return null;
 }
 
-async function startExecutorSafe(): Promise<void> {
+async function startExecutorSafe(options?: { resetPaperRiskState?: boolean }): Promise<void> {
   const { startBotRuntime } = await import("../botRuntime");
-  const result = await startBotRuntime();
+  const result = await startBotRuntime(options);
   if (!result.ok) {
     throw new PaperSessionError(
       result.message || "paper executor failed to start",
@@ -177,7 +177,7 @@ export async function approveAndStartPaperSession(
 
   if (shouldManageExecutor(options)) {
     try {
-      await startExecutorSafe();
+      await startExecutorSafe({ resetPaperRiskState: true });
     } catch (err) {
       failPaperSession(
         activated.id,

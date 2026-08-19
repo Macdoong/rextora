@@ -1,0 +1,15 @@
+{
+  "command": "npm run build",
+  "startedAt": "2026-08-04T10:49:07.526Z",
+  "finishedAt": "2026-08-04T10:50:35.410Z",
+  "durationMs": 87883,
+  "exitCode": 0,
+  "stdoutLogPath": "tmp/final-tester-ready-revalidation/logs/build.stdout.log",
+  "stderrLogPath": "tmp/final-tester-ready-revalidation/logs/build.stderr.log",
+  "parsedResult": null,
+  "BUILD_ID": "mwEjoK4ic1cyT-pd5_Omz",
+  "evidenceComplete": true,
+  "signal": null,
+  "error": null,
+  "pass": true
+}

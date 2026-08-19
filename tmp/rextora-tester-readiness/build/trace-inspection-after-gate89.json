@@ -1,0 +1,9 @@
+{
+  "outPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/trace-inspection.json",
+  "totalSizeHuman": "391.1MB",
+  "tracedTmp": 0,
+  "tracedScreenshots": 0,
+  "tracedEnv": 0,
+  "secretTraceFailure": false,
+  "pass": true
+}

@@ -1,0 +1,70 @@
+=== dev-390 scenario 01:|scenario 02: ===
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 86619
+    },
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 1306
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    }
+  ]
+}
+
+Running 2 tests using 1 worker
+
+(node:76245) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76245) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.4s)
+  ✘  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (1.5m)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state 
+
+    TimeoutError: locator.waitFor: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('ai-provider-settings') to be visible[22m
+
+
+       at helpers.ts:134
+
+      132 |     }
+      133 |     await page.getByTestId("settings-tab-btn-ai").click({ timeout: 15_000 });
+    > 134 |     await page.getByTestId("ai-provider-settings").waitFor({
+          |                                                    ^
+      135 |       state: "visible",
+      136 |       timeout: 90_000,
+      137 |     });
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:134:52)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:91:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-ebbf4-i-settings-configured-state-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state 
+  1 passed (5.1m)
+EXIT:

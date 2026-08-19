@@ -1,0 +1,111 @@
+{
+  "scenario": "J",
+  "width": 1024,
+  "startedAt": "2026-08-05T21:00:53.647Z",
+  "finishedAt": "2026-08-05T21:08:36.107Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-J-1024-d29b89-k18DW4",
+  "port": 56178,
+  "provider": "gemini",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-05T21:00:54.842Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgknbne_o3nr13",
+      "turnId": "turn-1785963654824",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T21:00:59.291Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgknbne_o3nr13",
+      "turnId": "turn-1785963654824",
+      "providerAttempt": 1,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "latencyMs": 4445,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T21:01:01.277Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgkngm5_4haby8",
+      "turnId": "turn-1785963660247",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T21:01:01.278Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgkngm5_4haby8",
+      "turnId": "turn-1785963660247",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T21:03:33.426Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgkqq0i_rvumt7",
+      "turnId": "turn-1785963813417",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T21:03:33.427Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgkqq0i_rvumt7",
+      "turnId": "turn-1785963813417",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "backtestRunId": "bt_msgkngle_c14491",
+    "memoryKinds": [
+      "actual_result",
+      "approved_goal",
+      "approved_plan"
+    ],
+    "terminalMemoryPersisted": true,
+    "approvedPlanRemembered": true,
+    "recallIntent": "memory_recall",
+    "recalledEvidenceLinked": true,
+    "recallHasNoApproval": true,
+    "refreshRecallIntent": "unknown",
+    "memoryStableAcrossRefresh": true,
+    "noAutonomousWrite": true,
+    "primaryText": "결과 화면은 탐색에서 나온 후보를 비교하고, 실제 검증 대상으로 등록할지 판단하는 곳입니다.\n\n후보의 출처와 설정을 확인한 뒤 등록해야 백테스트와 후속 검토로 이어집니다. 탐색 점수만으로 우수하다고 단정하지 않습니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": false
+}

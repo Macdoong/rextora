@@ -9,8 +9,13 @@ import { getRextoraSettings } from "./settings/settingsService";
 import { getConfig } from "./config";
 import { refreshMarketData, getMarketSnapshotAgeMs, getMarketDataSource } from "./marketDataStore";
 import { invalidateCandidateCache, getCandidateSnapshotAgeMs } from "./aiRanker";
-import { loadRiskState, resolveRiskStateFromStatus } from "./riskStateStore";
+import {
+  loadPaperRiskState,
+  resetPaperRiskStateForNewSession,
+  resolveRiskStateFromStatus
+} from "./riskStateStore";
 import { isRiskLimitBreached } from "./safety";
+import { getRiskBreachKeys } from "./riskRules";
 import {
   emergencyStopPaper,
   getPaperBotStatus,
@@ -26,7 +31,7 @@ import { evaluateCostGuard } from "./cost/costGuard";
 import { calculateSafeV44Risk } from "./risk/safeV44RiskEngine";
 import { getWatchedSymbols } from "./marketWatcherService";
 import { getAccountState } from "./accountStateStore";
-import { sendRiskAlertIfNeeded } from "./telegramAssistant";
+import { markRiskAlertStateNormal, sendRiskAlertIfNeeded } from "./telegramAssistant";
 import { logSystemEvent } from "./learningLogger";
 import { cancelAllScheduledTasks, scheduleInterval } from "./scheduler";
 import {
@@ -184,13 +189,15 @@ async function runExecutionScanLoop(mode: TradingMode): Promise<void> {
     const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
 
     if (mode === "PAPER") {
-      const risk = loadRiskState();
+      const risk = loadPaperRiskState();
       if (isRiskLimitBreached(risk)) {
-        await sendRiskAlertIfNeeded("리스크 한도 위반으로 자동 중단");
+        const breachFingerprint = getRiskBreachKeys(risk).sort().join("|");
+        await sendRiskAlertIfNeeded("리스크 한도 위반으로 자동 중단", breachFingerprint);
         await emergencyStopPaper();
         markEmergencyStop("리스크 한도 위반");
         return;
       }
+      markRiskAlertStateNormal();
       void resolveRiskStateFromStatus(risk);
 
       const scan = await runSafePaperScanLoop({ maxSymbols: 40, maxNewEntries: 2 });
@@ -269,7 +276,7 @@ function startHeartbeat(): void {
   });
 }
 
-export async function startBotRuntime(): Promise<EngineResult> {
+export async function startBotRuntime(options?: { resetPaperRiskState?: boolean }): Promise<EngineResult> {
   clearEmergencyStop();
   try {
     const { recoverOrphanSearchJobs } = await import(
@@ -303,6 +310,11 @@ export async function startBotRuntime(): Promise<EngineResult> {
       serviceState: "paper",
       blockedReasons: ["PAPER_SESSION_UNAVAILABLE"],
     };
+  }
+
+  if (options?.resetPaperRiskState) {
+    resetPaperRiskStateForNewSession();
+    markRiskAlertStateNormal();
   }
 
   const result = await startPaperBot();

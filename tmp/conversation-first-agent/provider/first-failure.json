@@ -1,0 +1,21 @@
+{
+  "attempt": 1,
+  "canaryPassed": false,
+  "providerSucceeded": false,
+  "selectedProvider": null,
+  "requestedProvider": "gemini",
+  "providerAttempted": true,
+  "structuredOutputValid": false,
+  "fallbackUsed": true,
+  "fallbackReason": "deterministic_fallback",
+  "writeToolAuditCount": 0,
+  "health": {
+    "configured": true,
+    "httpStatus": 200,
+    "ok": false,
+    "latencyMs": 736,
+    "errorKo": "Gemini 응답 오류 (200)"
+  },
+  "rootCause": "Gemini 2.5 Flash health check allowed only 3 output tokens while model thinking remained enabled, so HTTP 200 could contain no accepted answer text. Response parsing also assumed the first part was user-visible text.",
+  "correction": "Disable thinking budget for these structured calls, allocate 16 health output tokens, and select a non-thought text part."
+}

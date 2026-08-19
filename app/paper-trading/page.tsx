@@ -9,6 +9,7 @@ import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { DemoDataBadge } from "@/components/rextora/DemoDataBadge";
+import { AgentContextStrip } from "@/components/rextora/agent/AgentContextStrip";
 import {
   displayParamsHashLabel,
   formatDataSourceMeta,
@@ -329,6 +330,7 @@ function PaperTradingPageInner() {
           확인한 뒤 실전 검토로 넘어갈 수 있습니다.
         </p>
       </div>
+      <AgentContextStrip pageLabelKo="모의 매매" />
 
       {isDemoDeepLink ||
       (strategy && isDemoStrategyRecord(strategy)) ? (

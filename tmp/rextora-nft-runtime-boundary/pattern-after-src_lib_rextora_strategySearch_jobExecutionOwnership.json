@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+  "elapsedMs": 84.692042,
+  "tracedFileCount": 5,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

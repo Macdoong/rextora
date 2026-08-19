@@ -1,0 +1,197 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-05T11:36:45.424Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0ht9s_kb5e8c",
+      "turnId": "turn-1785929805371",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:45.437Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0ht9s_kb5e8c",
+      "turnId": "turn-1785929805371",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:46.463Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0hu2n_t1kyiz",
+      "turnId": "turn-1785929806422",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:46.467Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0hu2n_t1kyiz",
+      "turnId": "turn-1785929806422",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:47.458Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0huua_55f1hw",
+      "turnId": "turn-1785929807419",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:47.469Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0huua_55f1hw",
+      "turnId": "turn-1785929807419",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:48.510Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0hvni_lq0lr7",
+      "turnId": "turn-1785929808468",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:48.514Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0hvni_lq0lr7",
+      "turnId": "turn-1785929808468",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:49.515Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0hwff_nuyt7i",
+      "turnId": "turn-1785929809471",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:49.525Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0hwff_nuyt7i",
+      "turnId": "turn-1785929809471",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:50.494Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0hx6m_yoyr4f",
+      "turnId": "turn-1785929810472",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:50.494Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0hx6m_yoyr4f",
+      "turnId": "turn-1785929810472",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:51.493Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg0hxyd_5fqn26",
+      "turnId": "turn-1785929811454",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:36:51.498Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg0hxyd_5fqn26",
+      "turnId": "turn-1785929811454",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_msg0hs8t_a98a29.chart.json",
+    "bt_msg0hs8t_a98a29.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_722508edb1c84715"
+  ]
+}

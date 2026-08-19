@@ -1,0 +1,146 @@
+{
+  "classification": "TURBOPACK_PACKAGE_DEFECT",
+  "mechanism": "Next 16.2.6 native Turbopack performs broad Node fs path-pattern analysis for reachable dynamic runtime-store paths while writing the whole-application entrypoint graph. Historical Turbopack output directly reported millions of matched files; the current native build again accumulated pathological memory before completing that graph phase.",
+  "exactBoundary": "node_modules/next/dist/build/turbopack-build/impl.js project.writeAllEntrypointsToDisk -> next-swc.darwin-arm64.node Tokio graph work -> Node fs/path static analysis for reachable Rextora runtime store modules",
+  "responsibleFiles": [
+    "src/lib/rextora/agent/commandStore.ts",
+    "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+    "src/lib/rextora/agent/v2/events/eventStore.ts",
+    "src/lib/rextora/agent/v2/memory/memoryIndex.ts",
+    "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+    "src/lib/rextora/agent/v2/planner/planStore.ts",
+    "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+    "src/lib/rextora/agent/v2/research/researchAudit.ts",
+    "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+    "src/lib/rextora/agent/v2/tasks/taskStore.ts",
+    "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+    "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+    "src/lib/rextora/backtest/backtestStore.ts",
+    "src/lib/rextora/backtest/chartEvidenceStore.ts",
+    "src/lib/rextora/firstRun/firstRunStateStore.ts",
+    "src/lib/rextora/firstRun/firstRunStatus.ts",
+    "src/lib/rextora/live/liveDryRunEngine.ts",
+    "src/lib/rextora/paper/paperSessionStore.ts",
+    "src/lib/rextora/report/aiTradeReport.ts",
+    "src/lib/rextora/storage/jsonStore.ts",
+    "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+    "src/lib/rextora/strategy/safeV44Strategy.ts",
+    "src/lib/rextora/strategy/strategyStore.ts",
+    "src/lib/rextora/strategySearch/deletionSafety.ts",
+    "src/lib/rextora/strategySearch/jobApiService.ts",
+    "src/lib/rextora/strategySearch/jobArchive.ts",
+    "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+    "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+    "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+    "src/lib/rextora/strategySearch/jobStore.ts",
+    "src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts",
+    "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+    "src/lib/rextora/strategySearch/recoveryAudit.ts",
+    "src/lib/rextora/strategySearch/researchGeneration.ts",
+    "src/lib/rextora/strategySearch/researchTop10.ts",
+    "src/lib/rextora/strategySearch/searchConfigStore.ts",
+    "src/lib/rextora/strategySearch/searchPlan.ts",
+    "src/lib/rextora/strategySearch/storageSummary.ts",
+    "src/lib/rextora/strategySearch/strategyDeletionSafety.ts"
+  ],
+  "responsibleSymbols": "Next 16.2.6 project.writeAllEntrypointsToDisk/native next-swc Tokio graph analysis, triggered by direct fs.* calls whose first path argument is a dynamic runtime-store path",
+  "importChains": [
+    [
+      "app/api/rextora/strategy-search/[jobId]/generations/route.ts",
+      "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "src/lib/rextora/storage/jsonStore.ts",
+      "data/rextora/<dynamic> inferred file pattern"
+    ],
+    [
+      "app/api/rextora/system/route.ts",
+      "src/lib/rextora/storage/auditStore.ts",
+      "src/lib/rextora/storage/jsonStore.ts",
+      "data/rextora/<dynamic> inferred file pattern"
+    ],
+    [
+      "app/settings/page.tsx",
+      "src/lib/rextora/telegramAssistant.ts",
+      "src/lib/rextora/storage/jsonStore.ts",
+      "data/rextora/<dynamic> inferred file pattern"
+    ],
+    [
+      "app/api/rextora/internal/orphan-recovery/route.ts",
+      "src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+      "job/recovery/store modules",
+      "jobs/trials inferred file patterns"
+    ],
+    [
+      "app/api/rextora/agent/route.ts",
+      "Agent V2 stores",
+      "dynamic JSON/JSONL runtime paths",
+      "broad inferred file patterns"
+    ]
+  ],
+  "evidence": {
+    "priorTurbopackWarnings": 102,
+    "parsedWarningLocations": 80,
+    "uniqueWarningFiles": 24,
+    "aggregateMatchedFilesAcrossParsedWarnings": 9238706,
+    "maximumFilesMatchedByOnePriorPattern": 582350,
+    "priorWarningDataSnapshot": "2026-08-05, before current >2,088,621 strategy-trial-file state",
+    "currentApplicationGraph": {
+      "localFiles": 569,
+      "bytes": 4082219,
+      "edges": 2156,
+      "directRuntimeTreeImports": 0
+    },
+    "priorBuild": {
+      "durationSeconds": 2346,
+      "peakRssBytes": 19776192512,
+      "systemSwapApproxGiB": 44,
+      "exitCode": 143,
+      "buildStage": "compile/writeAllEntrypointsToDisk"
+    },
+    "lateSample": {
+      "process": "main next build Node process",
+      "nativeComponent": "next-swc.darwin-arm64.node Tokio runtime",
+      "mainThread": "kevent wait",
+      "activeThread": "one deep native next-swc Tokio worker",
+      "postcssWorker": "idle",
+      "javascriptGcDominant": false,
+      "serializationOrCacheWriteEvidenced": false,
+      "separateSwcProcess": false
+    },
+    "candidateRepairValidation": {
+      "directUnignoredFsCallsInReachableGraph": 0,
+      "focusedTests": "83/83",
+      "focusedEslintExitCode": 0,
+      "staticGraphProbeMaxRssBytes": 211795968
+    },
+    "authoritativeConfirmationBuild": {
+      "exitCode": 143,
+      "deliberatelyTerminated": true,
+      "durationSeconds": 60.21,
+      "peakRssBytes": 16801153024,
+      "observedParentRssKiBAt46Seconds": 15668416,
+      "swapUsedMiBAtTermination": 3440.12,
+      "lastPhase": "Creating an optimized production build",
+      "buildIdPresent": false,
+      "result": "candidate repair disproven"
+    }
+  },
+  "whyPostcssRepairWasInsufficient": "source(none) bounded Tailwind discovery, but whole-app entrypoint graph construction still analyzed independent dynamic Node fs paths in server routes and runtime stores.",
+  "memoryAttribution": "Native next-swc/Turbopack whole-entrypoint graph work associated with broad runtime filesystem pattern expansion. Historical warning counts establish the path expansion; current samples establish native Tokio graph work and rule out PostCSS/JavaScript GC dominance. This is not classified as a memory leak.",
+  "runtimeDataInvolved": true,
+  "runtimeDataExecutedAtBuildTime": false,
+  "turbopackSpecific": true,
+  "applicationSemanticsAffectedByRepair": false,
+  "repair": {
+    "candidate": "Add /* turbopackIgnore: true */ to direct runtime fs path arguments.",
+    "status": "DISPROVEN_AND_REVERTED",
+    "reason": "The source-level probe passed, but the real Next 16.2.6 build reached 16.8 GB peak RSS in 60 seconds without leaving compilation.",
+    "minimumProvenRepairApplied": false,
+    "nextSafeDirection": "Architecturally isolate runtime filesystem stores from Turbopack static analysis or use an upstream package fix, then validate in a separately authorized build attempt. Neither direction is yet proven in this repository."
+  },
+  "instrumentationSideEffect": false,
+  "generatedSourceDefect": false,
+  "packageVersionDefect": true,
+  "confidenceLimits": "The package boundary and application trigger are proven. A smallest successful repair is not proven because the only authorized confirmation build disproved the candidate and no further build was permitted."
+}

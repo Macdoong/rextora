@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+  "elapsedMs": 72.173208,
+  "tracedFileCount": 3,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

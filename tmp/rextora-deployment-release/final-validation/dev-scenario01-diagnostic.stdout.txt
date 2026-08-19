@@ -1,0 +1,52 @@
+
+Running 1 test using 1 worker
+
+(node:38473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (5.0m)
+
+
+  1) [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 300000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('ai-provider-settings') to be visible[22m
+    [2m    - waiting for" http://127.0.0.1:3101/settings" navigation to finish...[22m
+    [2m    - navigated to "http://127.0.0.1:3101/settings"[22m
+
+
+       at helpers.ts:116
+
+      114 |   await page.goto("/settings");
+      115 |   await page.getByTestId("settings-tab-btn-ai").click();
+    > 116 |   await page.getByTestId("ai-provider-settings").waitFor();
+          |                                                  ^
+      117 | }
+      118 |
+      119 | /** Settings model selects load asynchronously; 390px runs can read before options populate. */
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:116:50)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:52:9)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-5b01e-I-settings-configured-state-dev-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Slow test file: [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts (5.0m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 failed
+    [dev-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state 

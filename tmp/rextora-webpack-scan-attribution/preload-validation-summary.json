@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "processes": {
+    "72711": {
+      "pid": 72711,
+      "ppid": 72709,
+      "argv": [
+        "/opt/homebrew/Cellar/node/25.8.0/bin/node"
+      ],
+      "startedAt": "2026-08-13T04:12:58.918Z",
+      "updatedAt": "2026-08-13T04:12:58.937Z",
+      "totalCalls": 8,
+      "totalReturnedEntries": 8,
+      "peakRssBytes": 50921472,
+      "peakHeapUsedBytes": 5686368,
+      "directories": [
+        {
+          "api": "fs.readdirSync",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 2,
+          "successfulCalls": 2,
+          "errorCount": 0,
+          "totalReturnedEntries": 4,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 0.23366599999999998,
+          "maxElapsedMs": 0.118666,
+          "firstCallerSample": "    at Object.tracedReaddirSync [as readdirSync] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:182:5)\n    at [stdin]:3:16\n    at [stdin]:13:3\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [stdin]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 0.224042,
+          "maxElapsedMs": 0.224042,
+          "firstCallerSample": "    at tracedCallback (<REPO>/scripts/diagnostics/traceBuildFs.cjs:169:5)\n    at FSReqCallback.oncomplete (node:fs:180:23)",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 0.121416,
+          "maxElapsedMs": 0.121416,
+          "firstCallerSample": "    at Object.tracedPromisesReaddir [as readdir] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:223:5)\n    at async [stdin]:6:18",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.opendir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.247084,
+          "maxElapsedMs": 0.247084,
+          "firstCallerSample": "    at Object.tracedPromisesOpendir [as opendir] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:236:5)\n    at async [stdin]:7:12",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation/missing",
+          "callCount": 1,
+          "successfulCalls": 0,
+          "errorCount": 1,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.181167,
+          "maxElapsedMs": 0.181167,
+          "firstCallerSample": "    at Object.tracedPromisesReaddir [as readdir] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:226:5)\n    at async waitForActual (node:assert:621:5)\n    at async assert.rejects (node:assert:744:25)\n    at async [stdin]:10:2",
+          "firstErrorCode": "ENOENT"
+        },
+        {
+          "api": "fs.opendirSync",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.062792,
+          "maxElapsedMs": 0.062792,
+          "firstCallerSample": "    at Object.tracedOpendirSync [as opendirSync] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:209:5)\n    at [stdin]:8:19",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.readdirSync",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation/missing",
+          "callCount": 1,
+          "successfulCalls": 0,
+          "errorCount": 1,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.02675,
+          "maxElapsedMs": 0.02675,
+          "firstCallerSample": "    at Object.tracedReaddirSync [as readdirSync] (<REPO>/scripts/diagnostics/traceBuildFs.cjs:185:5)\n    at [stdin]:9:23\n    at getActual (node:assert:586:5)\n    at assert.throws (node:assert:734:24)\n    at [stdin]:9:9",
+          "firstErrorCode": "ENOENT"
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-08-13T04:12:58.937Z"
+}

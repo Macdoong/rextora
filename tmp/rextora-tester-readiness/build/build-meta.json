@@ -1,0 +1,12 @@
+{
+  "command": "npx next build --webpack",
+  "parkedPaths": [
+    "data/rextora/strategy-search/jobs",
+    "data/rextora/strategy-search/trials",
+    "data/rextora/strategy-search/owners"
+  ],
+  "exitCode": 0,
+  "durationMs": 26847,
+  "BUILD_ID": "j4lAiIKoy4ofnQNdt2mFF",
+  "finishedAt": "2026-08-14T05:22:14.255Z"
+}

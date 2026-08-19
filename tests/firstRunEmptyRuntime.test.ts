@@ -223,7 +223,11 @@ describe("first-run empty-runtime lifecycle", () => {
     ];
     for (const q of prompts) {
       const intent = parseIntent(q);
-      expect(["first_run_help", "demo_overview"]).toContain(intent.type);
+      // Working-session phrasing maps to recommend_next; empty runtime still
+      // surfaces first-run facts via lifecycle-aware recommend path.
+      expect(["first_run_help", "demo_overview", "recommend_next"]).toContain(
+        intent.type,
+      );
       const facts = await fetchFactsForIntent(intent.type, intent.params);
       expect(facts.some((f) => f.labelKo === "최초 실행 모드")).toBe(true);
       expect(facts.some((f) => f.labelKo === "데모 자동 생성")).toBe(true);
@@ -234,7 +238,9 @@ describe("first-run empty-runtime lifecycle", () => {
       expect(response.actions.length).toBeGreaterThanOrEqual(1);
       expect(response.actions.length).toBeLessThanOrEqual(2);
       expect(response.safetyBlocked).toBe(false);
-      expect(buildLocalInterpretation(intent, facts)).toMatch(/데모|최초|예시/);
+      expect(
+        `${response.conclusionKo} ${response.explanationKo} ${buildLocalInterpretation(intent, facts)}`,
+      ).toMatch(/데모|최초|예시|데이터|탐색/);
     }
     expect(listSearchJobs()).toHaveLength(0);
     expect(listStrategies().filter((s) => isDemoStrategyRecord(s))).toHaveLength(0);

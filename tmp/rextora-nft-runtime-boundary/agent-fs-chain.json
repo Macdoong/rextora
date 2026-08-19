@@ -1,0 +1,3275 @@
+{
+  "entrypoint": "app/api/rextora/agent/route.ts",
+  "reachableLocalModuleCount": 182,
+  "reachableLocalModules": [
+    "app/api/rextora/agent/route.ts",
+    "components/rextora/strategySearch/formDefaults.ts",
+    "components/rextora/strategySearch/types.ts",
+    "components/rextora/strategySearch/unitMapping.ts",
+    "data/strategies/SAFE_v44_i4060.json",
+    "src/lib/rextora/agent/agentDataFetcher.ts",
+    "src/lib/rextora/agent/agentLLM.ts",
+    "src/lib/rextora/agent/agentResponseBuilder.ts",
+    "src/lib/rextora/agent/canonicalCommandPayload.ts",
+    "src/lib/rextora/agent/commandExecutor.ts",
+    "src/lib/rextora/agent/commandStore.ts",
+    "src/lib/rextora/agent/conversationContext.ts",
+    "src/lib/rextora/agent/conversationState.ts",
+    "src/lib/rextora/agent/decisionContext.ts",
+    "src/lib/rextora/agent/executionRequestClassifier.ts",
+    "src/lib/rextora/agent/goalDetector.ts",
+    "src/lib/rextora/agent/intentParser.ts",
+    "src/lib/rextora/agent/lifecycleStage.ts",
+    "src/lib/rextora/agent/llmTypes.ts",
+    "src/lib/rextora/agent/missionTimeline.ts",
+    "src/lib/rextora/agent/planDrafts.ts",
+    "src/lib/rextora/agent/proposedAction.ts",
+    "src/lib/rextora/agent/providerConfig.ts",
+    "src/lib/rextora/agent/providers/geminiAdapter.ts",
+    "src/lib/rextora/agent/providers/openaiAdapter.ts",
+    "src/lib/rextora/agent/providers/promptBuilder.ts",
+    "src/lib/rextora/agent/researchWorkspace.ts",
+    "src/lib/rextora/agent/safetyGuard.ts",
+    "src/lib/rextora/agent/searchPlanDraft.ts",
+    "src/lib/rextora/agent/typedCommand.ts",
+    "src/lib/rextora/agent/types.ts",
+    "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+    "src/lib/rextora/agent/v2/conversation/index.ts",
+    "src/lib/rextora/agent/v2/memory/index.ts",
+    "src/lib/rextora/agent/v2/orchestration/index.ts",
+    "src/lib/rextora/agent/v2/planner/index.ts",
+    "src/lib/rextora/agent/v2/providers/index.ts",
+    "src/lib/rextora/agent/v2/providers/openaiRequestParams.ts",
+    "src/lib/rextora/agent/v2/reasoning/index.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningSchema.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningTaskProfile.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningTypes.ts",
+    "src/lib/rextora/agent/v2/reasoning/toolPlanBuilder.ts",
+    "src/lib/rextora/agent/v2/reasoning/userVisibleSanitizer.ts",
+    "src/lib/rextora/agent/v2/research/index.ts",
+    "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+    "src/lib/rextora/agent/v2/session/sessionStore.ts",
+    "src/lib/rextora/agent/v2/session/sessionTypes.ts",
+    "src/lib/rextora/agent/v2/session/workspaceMerge.ts",
+    "src/lib/rextora/agent/v2/tasks/index.ts",
+    "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+    "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+    "src/lib/rextora/agent/v2/tools/registry.ts",
+    "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+    "src/lib/rextora/agent/v2/tools/toolContext.ts",
+    "src/lib/rextora/agent/v2/tools/toolEvents.ts",
+    "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+    "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+    "src/lib/rextora/agent/v2/tools/toolPolicy.ts",
+    "src/lib/rextora/agent/v2/tools/toolResult.ts",
+    "src/lib/rextora/agent/v2/tools/toolSchemas.ts",
+    "src/lib/rextora/agent/v2/tools/toolTypes.ts",
+    "src/lib/rextora/agent/v2/tools/toolValidator.ts",
+    "src/lib/rextora/backtest/backtestEngine.ts",
+    "src/lib/rextora/backtest/backtestReport.ts",
+    "src/lib/rextora/backtest/backtestRunner.ts",
+    "src/lib/rextora/backtest/backtestStore.ts",
+    "src/lib/rextora/backtest/backtestTypes.ts",
+    "src/lib/rextora/backtest/chartEvidenceStore.ts",
+    "src/lib/rextora/backtest/equityBasis.ts",
+    "src/lib/rextora/backtest/statusThresholds.ts",
+    "src/lib/rextora/backtest/tradeEventTrace.ts",
+    "src/lib/rextora/binance/binanceHttpClient.ts",
+    "src/lib/rextora/binance/binanceReadOnlyService.ts",
+    "src/lib/rextora/binance/binanceSigner.ts",
+    "src/lib/rextora/binance/binanceTypes.ts",
+    "src/lib/rextora/config.ts",
+    "src/lib/rextora/cost/costGuard.ts",
+    "src/lib/rextora/data/historicalCandleLoader.ts",
+    "src/lib/rextora/data/ohlcvTypes.ts",
+    "src/lib/rextora/data/timeframes.ts",
+    "src/lib/rextora/env.ts",
+    "src/lib/rextora/firstRun/demoIdentity.ts",
+    "src/lib/rextora/indicator/indicatorEngine.ts",
+    "src/lib/rextora/metrics/types.ts",
+    "src/lib/rextora/metrics/unifiedCost.ts",
+    "src/lib/rextora/paper/paperSessionService.ts",
+    "src/lib/rextora/paper/paperSessionStore.ts",
+    "src/lib/rextora/patternParameterCatalog.ts",
+    "src/lib/rextora/patternSelectionMode.ts",
+    "src/lib/rextora/results/eligibility.ts",
+    "src/lib/rextora/results/researchDisplay.ts",
+    "src/lib/rextora/risk/safeV44RiskEngine.ts",
+    "src/lib/rextora/seedData.ts",
+    "src/lib/rextora/settings/defaultSettings.ts",
+    "src/lib/rextora/settings/settingsService.ts",
+    "src/lib/rextora/settings/settingsStore.ts",
+    "src/lib/rextora/settings/settingsTypes.ts",
+    "src/lib/rextora/settings/settingsValidation.ts",
+    "src/lib/rextora/signal/safeV44SignalEngine.ts",
+    "src/lib/rextora/storage/auditStore.ts",
+    "src/lib/rextora/storage/jsonStore.ts",
+    "src/lib/rextora/storage/runtimePaths.ts",
+    "src/lib/rextora/strategy/conditionBacktest.ts",
+    "src/lib/rextora/strategy/conditions/evaluator.ts",
+    "src/lib/rextora/strategy/conditions/fvg.ts",
+    "src/lib/rextora/strategy/conditions/indicators.ts",
+    "src/lib/rextora/strategy/conditions/orderBlock.ts",
+    "src/lib/rextora/strategy/conditions/orderBlockZoneBasis.ts",
+    "src/lib/rextora/strategy/conditions/structure.ts",
+    "src/lib/rextora/strategy/conditions/supplyDemand.ts",
+    "src/lib/rextora/strategy/conditions/supportResistance.ts",
+    "src/lib/rextora/strategy/conditions/trendLine.ts",
+    "src/lib/rextora/strategy/definition/bridge.ts",
+    "src/lib/rextora/strategy/definition/entryTrigger.ts",
+    "src/lib/rextora/strategy/definition/eventSequence.ts",
+    "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+    "src/lib/rextora/strategy/definition/types.ts",
+    "src/lib/rextora/strategy/definition/validator.ts",
+    "src/lib/rextora/strategy/eventSequenceBacktest.ts",
+    "src/lib/rextora/strategy/libraryArchive.ts",
+    "src/lib/rextora/strategy/safeV44Params.ts",
+    "src/lib/rextora/strategy/safeV44Strategy.ts",
+    "src/lib/rextora/strategy/strategyHash.ts",
+    "src/lib/rextora/strategy/strategyStore.ts",
+    "src/lib/rextora/strategy/strategyTestFilter.ts",
+    "src/lib/rextora/strategy/strategyTypes.ts",
+    "src/lib/rextora/strategySearch/backtestAdapter.ts",
+    "src/lib/rextora/strategySearch/cancellationLifecycle.ts",
+    "src/lib/rextora/strategySearch/candidateEvaluator.ts",
+    "src/lib/rextora/strategySearch/candidateGenerator.ts",
+    "src/lib/rextora/strategySearch/costStress.ts",
+    "src/lib/rextora/strategySearch/deletionSafety.ts",
+    "src/lib/rextora/strategySearch/engineErrorClassification.ts",
+    "src/lib/rextora/strategySearch/evaluationPolicy.ts",
+    "src/lib/rextora/strategySearch/historyRetention.ts",
+    "src/lib/rextora/strategySearch/jitterEvaluator.ts",
+    "src/lib/rextora/strategySearch/jobApiService.ts",
+    "src/lib/rextora/strategySearch/jobApiValidation.ts",
+    "src/lib/rextora/strategySearch/jobArchive.ts",
+    "src/lib/rextora/strategySearch/jobCheckpoint.ts",
+    "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+    "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+    "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+    "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+    "src/lib/rextora/strategySearch/jobRunner.ts",
+    "src/lib/rextora/strategySearch/jobState.ts",
+    "src/lib/rextora/strategySearch/jobStatistics.ts",
+    "src/lib/rextora/strategySearch/jobStore.ts",
+    "src/lib/rextora/strategySearch/leverageMode.ts",
+    "src/lib/rextora/strategySearch/operatorProfiles.ts",
+    "src/lib/rextora/strategySearch/overfittingEvidence.ts",
+    "src/lib/rextora/strategySearch/paramSpace.ts",
+    "src/lib/rextora/strategySearch/patternCombination.ts",
+    "src/lib/rextora/strategySearch/patternConfirmation.ts",
+    "src/lib/rextora/strategySearch/patternEventSequence.ts",
+    "src/lib/rextora/strategySearch/patternParameterCatalog.ts",
+    "src/lib/rextora/strategySearch/patternSearchConfig.ts",
+    "src/lib/rextora/strategySearch/patternSearchSpaces.ts",
+    "src/lib/rextora/strategySearch/patternSupportMatrix.ts",
+    "src/lib/rextora/strategySearch/persistedSearchSummary.ts",
+    "src/lib/rextora/strategySearch/promoteFromSearch.ts",
+    "src/lib/rextora/strategySearch/random.ts",
+    "src/lib/rextora/strategySearch/readableStrategyName.ts",
+    "src/lib/rextora/strategySearch/recoveryAudit.ts",
+    "src/lib/rextora/strategySearch/researchGeneration.ts",
+    "src/lib/rextora/strategySearch/researchOutcome.ts",
+    "src/lib/rextora/strategySearch/researchProvenance.ts",
+    "src/lib/rextora/strategySearch/researchResultsSummary.ts",
+    "src/lib/rextora/strategySearch/researchTop10.ts",
+    "src/lib/rextora/strategySearch/searchId.ts",
+    "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+    "src/lib/rextora/strategySearch/searchPlan.ts",
+    "src/lib/rextora/strategySearch/searchSpaceMutation.ts",
+    "src/lib/rextora/strategySearch/searchSpaces.ts",
+    "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+    "src/lib/rextora/strategySearch/symbolSelection.ts",
+    "src/lib/rextora/strategySearch/terminationReason.ts",
+    "src/lib/rextora/strategySearch/types.ts",
+    "src/lib/rextora/strategySearch/weaknessAnalysis.ts",
+    "src/lib/rextora/strategySearch/windowPlanner.ts",
+    "src/lib/rextora/types.ts"
+  ],
+  "filesystemOperationCount": 193,
+  "relevantFilesystemOperationCount": 100,
+  "operations": [
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "line": 23,
+      "symbol": "ensureDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(commandsRoot(), { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "commandStore",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "line": 32,
+      "symbol": "saveCommand",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fileFor(command.commandId), JSON.stringify(command, null, 2))",
+      "neededAtImportTime": false,
+      "focusFamily": "commandStore",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "line": 38,
+      "symbol": "getCommand",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fileFor(commandId), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "commandStore",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "line": 50,
+      "symbol": "findByIdempotencyKey",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(root)",
+      "neededAtImportTime": false,
+      "focusFamily": "commandStore",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/commandStore.ts",
+      "line": 55,
+      "symbol": "findByIdempotencyKey",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(path.join(root, file), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "commandStore",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 46,
+      "symbol": "readApprovalExecutionReceipt",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 48,
+      "symbol": "readApprovalExecutionReceipt",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(file, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 64,
+      "symbol": "claimApprovalExecution",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 80,
+      "symbol": "claimApprovalExecution",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(file, JSON.stringify(placeholder, null, 2), { flag: \"wx\" })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 94,
+      "symbol": "claimApprovalExecution",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(file, JSON.stringify(placeholder, null, 2))",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 103,
+      "symbol": "writeApprovalExecutionReceipt",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 106,
+      "symbol": "writeApprovalExecutionReceipt",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(file, JSON.stringify(finalized, null, 2))",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 115,
+      "symbol": "findLatestSessionApprovalReceipt",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 118,
+      "symbol": "findLatestSessionApprovalReceipt",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+      "line": 122,
+      "symbol": "findLatestSessionApprovalReceipt",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(path.join(dir, name), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 64,
+      "symbol": "ensureSessionDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 65,
+      "symbol": "ensureSessionDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(plansDir(sessionId), { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 70,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 72,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(tmp, JSON.stringify(data, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 73,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 78,
+      "symbol": "readJsonFile",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(filePath, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 86,
+      "symbol": "sessionExists",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(metadataPath(sessionId))",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 94,
+      "symbol": "readTurnsJsonl",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 95,
+      "symbol": "readTurnsJsonl",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(file, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 119,
+      "symbol": "writeTurnsJsonl",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(tmp, payload ? `${payload}\\n` : \"\", \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 120,
+      "symbol": "writeTurnsJsonl",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 128,
+      "symbol": "appendSessionEvent",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync(eventsPath(sessionId), `${JSON.stringify(event)}\\n`, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 143,
+      "symbol": "writePendingPlan",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 214,
+      "symbol": "deleteSessionRecord",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+      "line": 215,
+      "symbol": "deleteSessionRecord",
+      "filesystemApi": "fs.rmSync",
+      "expression": "fs.rmSync(dir, { recursive: true, force: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "app/api/rextora/agent/route.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "line": 1706,
+      "symbol": "readProtectedSafeSnapshot",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(safePath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/agent/commandExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 53,
+      "symbol": "writeToolAudit",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(root, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 60,
+      "symbol": "writeToolAudit",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync(file, `${line}\\n`, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 66,
+      "symbol": "readToolAuditLines",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+      "line": 67,
+      "symbol": "readToolAuditLines",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs .readFileSync(file, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 48,
+      "symbol": "readToolIdempotency",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 49,
+      "symbol": "readToolIdempotency",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(file, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 63,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(directory, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 65,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 75,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(temporary, JSON.stringify(receipt), { encoding: \"utf8\", mode: 0o600 })",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 77,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(temporary, file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 79,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(file)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+      "line": 79,
+      "symbol": "writeToolIdempotency",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(temporary)",
+      "neededAtImportTime": false,
+      "focusFamily": "/agent/v2/",
+      "importingParent": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolIdempotency.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 71,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 74,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(tmp, \"w\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 76,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fd, payload, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 77,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 79,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 81,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 117,
+      "symbol": "getJobExecutionProfile",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+      "line": 119,
+      "symbol": "getJobExecutionProfile",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/jobExecutionProfile.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 81,
+      "symbol": "ensureDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 147,
+      "symbol": "safeUnlink",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 147,
+      "symbol": "safeUnlink",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 157,
+      "symbol": "tryParseJsonFile",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 158,
+      "symbol": "tryParseJsonFile",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(filePath, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 166,
+      "symbol": "writeTmpFlushed",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(tmpFile, \"w\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 168,
+      "symbol": "writeTmpFlushed",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fd, payload, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 169,
+      "symbol": "writeTmpFlushed",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 171,
+      "symbol": "writeTmpFlushed",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 177,
+      "symbol": "tryFsyncDirectory",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(dir, \"r\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 179,
+      "symbol": "tryFsyncDirectory",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 181,
+      "symbol": "tryFsyncDirectory",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 202,
+      "symbol": "recoverableWriteJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 204,
+      "symbol": "recoverableWriteJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(targetPath, bak)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 207,
+      "symbol": "recoverableWriteJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 222,
+      "symbol": "recoverableWriteJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 224,
+      "symbol": "recoverableWriteJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(bak, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 255,
+      "symbol": "recoverReadJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 256,
+      "symbol": "recoverReadJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(bak)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 257,
+      "symbol": "recoverReadJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(tmp)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 271,
+      "symbol": "recoverReadJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(bak, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 295,
+      "symbol": "recoverReadJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 745,
+      "symbol": "listSearchTrials",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 746,
+      "symbol": "listSearchTrials",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs .readdirSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 783,
+      "symbol": "safeRmDir",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dirPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobStore.ts",
+      "line": 784,
+      "symbol": "safeRmDir",
+      "filesystemApi": "fs.rmSync",
+      "expression": "fs.rmSync(dirPath, { recursive: true, force: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "jobStore",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 205,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 208,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(tmp, \"w\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 210,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fd, payload, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 211,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 213,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 215,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 394,
+      "symbol": "getSearchPlan",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+      "line": 396,
+      "symbol": "getSearchPlan",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/searchPlan.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "line": 67,
+      "symbol": "readIndexJobs",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "line": 69,
+      "symbol": "readIndexJobs",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "line": 354,
+      "symbol": "recoverOrphanIndexEntries",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(jobPath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 61,
+      "symbol": "dirBytes",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 64,
+      "symbol": "walk",
+      "filesystemApi": "fs.statSync",
+      "expression": "fs.statSync(p)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 70,
+      "symbol": "walk",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(p)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 79,
+      "symbol": "fileBytes",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 79,
+      "symbol": "fileBytes",
+      "filesystemApi": "fs.statSync",
+      "expression": "fs.statSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 90,
+      "symbol": "appendAudit",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(root, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 91,
+      "symbol": "appendAudit",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync(fp, `${JSON.stringify(event)}\\n`, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 153,
+      "symbol": "previewResearchJobDeletion",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(liveSession)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 154,
+      "symbol": "previewResearchJobDeletion",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(liveSession, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "line": 229,
+      "symbol": "previewResearchJobDeletion",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(p)",
+      "neededAtImportTime": false,
+      "focusFamily": "deletionSafety",
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/deletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 45,
+      "symbol": "isJobArchived",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 47,
+      "symbol": "isJobArchived",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 74,
+      "symbol": "archiveResearchJob",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(path.join(root, \"jobs\"), { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 75,
+      "symbol": "archiveResearchJob",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync( archivePath(root, jobId), JSON.stringify(record, null, 2), \"utf8\", )",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 98,
+      "symbol": "restoreArchivedResearchJob",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 101,
+      "symbol": "restoreArchivedResearchJob",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 106,
+      "symbol": "restoreArchivedResearchJob",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fp, JSON.stringify(next, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 119,
+      "symbol": "listArchivedResearchJobs",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(jobsDir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 121,
+      "symbol": "listArchivedResearchJobs",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(jobsDir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+      "line": 125,
+      "symbol": "listArchivedResearchJobs",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(path.join(jobsDir, name), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobArchive.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 500,
+      "symbol": "getResearchTop10",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 502,
+      "symbol": "getResearchTop10",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 516,
+      "symbol": "saveResearchTop10",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(jobsDir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 519,
+      "symbol": "saveResearchTop10",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(tmp, JSON.stringify(snapshot, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 520,
+      "symbol": "saveResearchTop10",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 523,
+      "symbol": "saveResearchTop10",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync( historyPath(root, snapshot.jobId), `${JSON.stringify({ at: snapshot.updatedAt, entries: snapshot.entries.map((e) => ({ rank: e.rank, strategyHash: e.strategyHash, })), rankChanges: snapshot.rankChanges, })}\\n`, \"utf8\", )",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 552,
+      "symbol": "findLatestSameScopeTop10",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(jobsDir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 554,
+      "symbol": "findLatestSameScopeTop10",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(jobsDir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 670,
+      "symbol": "listTop10History",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+      "line": 672,
+      "symbol": "listTop10History",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/researchTop10.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 12,
+      "symbol": "ensure",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(DIR(), { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 56,
+      "symbol": "readIndex",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(indexPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 58,
+      "symbol": "readIndex",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(indexPath, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 65,
+      "symbol": "writeIndex",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync( path.join(DIR(), \"index.json\"), JSON.stringify(index.slice(0, 200), null, 2), \"utf8\", )",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 79,
+      "symbol": "findPriorByResultHash",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 81,
+      "symbol": "findPriorByResultHash",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(full, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 154,
+      "symbol": "saveBacktestResult",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync( path.join(DIR(), `${saved.id}.json`), JSON.stringify(saved, null, 2), \"utf8\", )",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 178,
+      "symbol": "listSavedBacktests",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 180,
+      "symbol": "listSavedBacktests",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(full, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 191,
+      "symbol": "getSavedBacktest",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 192,
+      "symbol": "getSavedBacktest",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(full, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 208,
+      "symbol": "deleteSavedBacktest",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 210,
+      "symbol": "deleteSavedBacktest",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 217,
+      "symbol": "deleteSavedBacktest",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(chartPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/backtestStore.ts",
+      "line": 219,
+      "symbol": "deleteSavedBacktest",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(chartPath)",
+      "neededAtImportTime": false,
+      "focusFamily": "backtestStore",
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/backtestStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 65,
+      "symbol": "saveChartEvidence",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir(), { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 83,
+      "symbol": "saveChartEvidence",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync( chartEvidencePath(input.runId), JSON.stringify(evidence), \"utf8\", )",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 93,
+      "symbol": "loadChartEvidence",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 95,
+      "symbol": "loadChartEvidence",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(full, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+      "line": 122,
+      "symbol": "hasChartEvidence",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(chartEvidencePath(runId))",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/backtest/backtestRunner.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/backtest/backtestRunner.ts",
+        "src/lib/rextora/backtest/chartEvidenceStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 131,
+      "symbol": "ensureDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 152,
+      "symbol": "writeJson",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(tmp, JSON.stringify(value, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 153,
+      "symbol": "writeJson",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 157,
+      "symbol": "readJson",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(filePath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 159,
+      "symbol": "readJson",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(filePath, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 452,
+      "symbol": "readSessionRaw",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "line": 455,
+      "symbol": "readSessionRaw",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/paper/paperSessionService.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/paper/paperSessionService.ts",
+        "src/lib/rextora/paper/paperSessionStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "line": 33,
+      "symbol": "readResearchJsonIfExists",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(full)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategy/strategyStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategy/strategyStore.ts",
+        "src/lib/rextora/strategy/safeV44Strategy.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "line": 35,
+      "symbol": "readResearchJsonIfExists",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(full, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategy/strategyStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategy/strategyStore.ts",
+        "src/lib/rextora/strategy/safeV44Strategy.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 481,
+      "symbol": "loadSnapshotConfirmedKeys",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(p)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/paramSpace.ts",
+        "src/lib/rextora/strategy/definition/safeParamCatalog.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 482,
+      "symbol": "loadSnapshotConfirmedKeys",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(p, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/paramSpace.ts",
+        "src/lib/rextora/strategy/definition/safeParamCatalog.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 496,
+      "symbol": "getSafeParamCatalog",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync( path.join( /* turbopackIgnore: true */ process.cwd(), \"research\", \"results\", \"v44\", \"locked_final_i4060.json\", ), )",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/paramSpace.ts",
+        "src/lib/rextora/strategy/definition/safeParamCatalog.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+      "line": 534,
+      "symbol": "getParamConfirmSource",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(locked)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/strategySearch/jobApiValidation.ts",
+        "src/lib/rextora/strategySearch/paramSpace.ts",
+        "src/lib/rextora/strategy/definition/safeParamCatalog.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 109,
+      "symbol": "readOwnerRecord",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 112,
+      "symbol": "readOwnerRecord",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 124,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 128,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(tmp, \"w\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 130,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fd, payload, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 131,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 133,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 135,
+      "symbol": "writeOwnerRecord",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 142,
+      "symbol": "appendOwnershipAudit",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(root, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 143,
+      "symbol": "appendOwnershipAudit",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync(auditPath(root), `${JSON.stringify(record)}\\n`, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 175,
+      "symbol": "listJobExecutionOwnershipAudits",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 177,
+      "symbol": "listJobExecutionOwnershipAudits",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 341,
+      "symbol": "releaseJobExecutionOwnership",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 353,
+      "symbol": "recoverStaleJobExecutionOwnership",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 355,
+      "symbol": "recoverStaleJobExecutionOwnership",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 372,
+      "symbol": "recoverStaleJobExecutionOwnership",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(ownerFilePath(root, jobId))",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 386,
+      "symbol": "resetJobExecutionOwnershipForTests",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 387,
+      "symbol": "resetJobExecutionOwnershipForTests",
+      "filesystemApi": "fs.readdirSync",
+      "expression": "fs.readdirSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 390,
+      "symbol": "resetJobExecutionOwnershipForTests",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(path.join(dir, name))",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 397,
+      "symbol": "resetJobExecutionOwnershipForTests",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+      "line": 399,
+      "symbol": "resetJobExecutionOwnershipForTests",
+      "filesystemApi": "fs.unlinkSync",
+      "expression": "fs.unlinkSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/jobExecutionOwnership.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "line": 44,
+      "symbol": "appendRecoveryAudit",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(root, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+        "src/lib/rextora/strategySearch/recoveryAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "line": 46,
+      "symbol": "appendRecoveryAudit",
+      "filesystemApi": "fs.appendFileSync",
+      "expression": "fs.appendFileSync(auditPath(root), line, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+        "src/lib/rextora/strategySearch/recoveryAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "line": 54,
+      "symbol": "listRecoveryAudits",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+        "src/lib/rextora/strategySearch/recoveryAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+      "line": 56,
+      "symbol": "listRecoveryAudits",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+        "src/lib/rextora/strategySearch/recoveryAudit.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+      "line": 75,
+      "symbol": "liveRefsForStrategy",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(liveSession)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+        "src/lib/rextora/strategySearch/strategyDeletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+      "line": 76,
+      "symbol": "liveRefsForStrategy",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(liveSession, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+        "src/lib/rextora/strategySearch/strategyDeletionSafety.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 82,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 84,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.openSync",
+      "expression": "fs.openSync(tmp, \"w\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 86,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fd, JSON.stringify(value, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 87,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.fsyncSync",
+      "expression": "fs.fsyncSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 89,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.closeSync",
+      "expression": "fs.closeSync(fd)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 91,
+      "symbol": "writeJsonAtomic",
+      "filesystemApi": "fs.renameSync",
+      "expression": "fs.renameSync(tmp, targetPath)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 100,
+      "symbol": "listResearchGenerations",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+      "line": 102,
+      "symbol": "listResearchGenerations",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": null,
+      "importingParent": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/strategySearch/jobApiService.ts",
+        "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+        "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+        "src/lib/rextora/strategySearch/researchGeneration.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 23,
+      "symbol": "ensureDir",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(dir)",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 23,
+      "symbol": "ensureDir",
+      "filesystemApi": "fs.mkdirSync",
+      "expression": "fs.mkdirSync(dir, { recursive: true })",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 32,
+      "symbol": "getFileMtimeMs",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 33,
+      "symbol": "getFileMtimeMs",
+      "filesystemApi": "fs.statSync",
+      "expression": "fs.statSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 55,
+      "symbol": "readJsonStore",
+      "filesystemApi": "fs.existsSync",
+      "expression": "fs.existsSync(fp)",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 62,
+      "symbol": "readJsonStore",
+      "filesystemApi": "fs.readFileSync",
+      "expression": "fs.readFileSync(fp, \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    },
+    {
+      "file": "src/lib/rextora/storage/jsonStore.ts",
+      "line": 75,
+      "symbol": "writeJsonStore",
+      "filesystemApi": "fs.writeFileSync",
+      "expression": "fs.writeFileSync(fp, JSON.stringify(value, null, 2), \"utf8\")",
+      "neededAtImportTime": false,
+      "focusFamily": "jsonStore",
+      "importingParent": "src/lib/rextora/storage/auditStore.ts",
+      "importChain": [
+        "app/api/rextora/agent/route.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/settings/settingsService.ts",
+        "src/lib/rextora/storage/auditStore.ts",
+        "src/lib/rextora/storage/jsonStore.ts"
+      ]
+    }
+  ]
+}

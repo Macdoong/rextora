@@ -1,0 +1,251 @@
+{
+  "title": "REXTORA CONVERSATION-FIRST AI EMPLOYEE COMPLETION",
+  "verdict": "REXTORA CONVERSATION-FIRST AI EMPLOYEE VERIFIED",
+  "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+  "completedAt": "2026-08-06T10:47:34Z",
+  "gates": {
+    "lint": {
+      "command": "npm run lint",
+      "startedAt": "2026-08-06T07:50:44Z",
+      "finishedAt": "2026-08-06T07:51:01Z",
+      "durationMs": 16305,
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "stdout": "tmp/conversation-first-agent/quality-gates/lint/stdout-final.log",
+      "stderr": "tmp/conversation-first-agent/quality-gates/lint/stderr-final.log"
+    },
+    "unit": {
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "testsPassed": 1515,
+      "filesPassed": 199,
+      "durationMs": 86675
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "note": "rebuild after skipped-write approval fix"
+    },
+    "trace": {
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "parsed": {
+        "outPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/trace-inspection.json",
+        "totalSizeHuman": "856.1MB",
+        "tracedTmp": 0,
+        "tracedScreenshots": 0,
+        "tracedEnv": 0,
+        "secretTraceFailure": false,
+        "pass": true
+      },
+      "durationMs": 4437
+    },
+    "providerCanary": {
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "canaryPassed": true,
+      "selectedProvider": "gemini",
+      "fallbackUsed": false,
+      "provider": "gemini"
+    },
+    "e2e": [
+      {
+        "run": 1,
+        "exitCode": 0,
+        "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+        "passedCount": 31
+      },
+      {
+        "run": 2,
+        "exitCode": 0,
+        "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+        "passedCount": 31
+      },
+      {
+        "run": 3,
+        "exitCode": 0,
+        "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+        "passedCount": 31
+      }
+    ],
+    "browserProduction": {
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "parsed": {
+        "passed": true,
+        "total": 32,
+        "passedCount": 32,
+        "failures": []
+      }
+    },
+    "browserDev": {
+      "exitCode": 0,
+      "parsed": {
+        "passed": true,
+        "total": 4,
+        "failures": []
+      }
+    },
+    "lifecycleMatrix": {
+      "command": "PHASE3 A-M sequential alone after skipped-write fix",
+      "startedAt": "2026-08-06T07:45:41Z",
+      "finishedAt": "2026-08-06T10:46:56Z",
+      "durationMs": 10874750,
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "passed": true,
+      "failures": []
+    },
+    "semanticMatrix": {
+      "command": "npm test -- conversation routing/random/skipped-write/sanitizer/leak",
+      "startedAt": "2026-08-06T07:51:06Z",
+      "finishedAt": "2026-08-06T07:51:08Z",
+      "durationMs": 2139,
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "passedCount": 135,
+      "filesPassed": 5,
+      "tail": "\n> rextora@0.1.0 test\n> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationRandomized.test.ts tests/AgentV2SkippedWriteApproval.test.ts tests/AgentV2UserVisibleSanitizer.test.ts tests/AgentV2LeakageDJK.test.ts\n\n\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  5 passed (5)\n      Tests  135 passed (135)\n   Start at  16:51:06\n   Duration  1.55s (transform 639ms, setup 41ms, import 795ms, tests 80ms, environment 0ms)\n\n"
+    },
+    "randomConversations": {
+      "command": "npm test -- conversation routing/random/skipped-write/sanitizer/leak",
+      "startedAt": "2026-08-06T07:51:06Z",
+      "finishedAt": "2026-08-06T07:51:08Z",
+      "durationMs": 2139,
+      "exitCode": 0,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "passedCount": 135,
+      "filesPassed": 5,
+      "tail": "\n> rextora@0.1.0 test\n> vitest run tests/AgentConversationRoutingMatrix.test.ts tests/AgentConversationRandomized.test.ts tests/AgentV2SkippedWriteApproval.test.ts tests/AgentV2UserVisibleSanitizer.test.ts tests/AgentV2LeakageDJK.test.ts\n\n\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  5 passed (5)\n      Tests  135 passed (135)\n   Start at  16:51:06\n   Duration  1.55s (transform 639ms, setup 41ms, import 795ms, tests 80ms, environment 0ms)\n\n",
+      "note": "randomized suite included in semantic-matrix run"
+    }
+  },
+  "SAFE": {
+    "before": {
+      "path": "data/strategies/SAFE_v44_i4060.json",
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+      "protected_diff_empty": true,
+      "head": "5e0f089e5b2e02761705944710e6f6156c5d7663"
+    },
+    "after": {
+      "path": "data/strategies/SAFE_v44_i4060.json",
+      "params_hash": "7893ca3f0e30",
+      "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+      "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+      "protectedPathDiffEmpty": true,
+      "BUILD_ID": "8MIVgd66wyBLFLu7IpbHY",
+      "at": "2026-08-06T10:47:33Z"
+    }
+  },
+  "git": {
+    "branch": "main",
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "log1": "5e0f089 feat: commercial readiness step 1-4",
+    "statusShortLines": 164,
+    "committed": false,
+    "pushed": false
+  },
+  "tools": {
+    "toolIdsSample": [
+      "search.list",
+      "search.status",
+      "search.result",
+      "results.list",
+      "results.detail",
+      "strategy.list",
+      "strategy.detail",
+      "backtest.list",
+      "backtest.detail",
+      "paper.status",
+      "paper.session",
+      "workspace.current",
+      "workspace.get",
+      "lifecycle.current",
+      "lifecycle.get",
+      "settings.current",
+      "settings.get",
+      "research.summary",
+      "memory.recall",
+      "memory.export",
+      "memory.reset",
+      "search.create",
+      "search.start",
+      "search.pause",
+      "search.cancel",
+      "backtest.run",
+      "paper.prepare",
+      "paper.approve_start",
+      "paper.pause",
+      "paper.resume",
+      "paper.stop",
+      "results.promote",
+      "strategy.rename",
+      "strategy.archive",
+      "strategy.restore",
+      "strategy.delete"
+    ],
+    "toolIdCount": 36,
+    "badTools": [],
+    "hasLiveTool": false,
+    "hasBinanceOrderTool": false,
+    "paperExchangeNeverCalledOnK": true,
+    "kRows": 4
+  },
+  "filesCreatedConversation": [
+    "src/lib/rextora/agent/v2/conversation/conversationContext.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationPolicy.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationTypes.ts",
+    "src/lib/rextora/agent/v2/conversation/domainAssistant.ts",
+    "src/lib/rextora/agent/v2/conversation/index.ts",
+    "src/lib/rextora/agent/v2/conversation/productKnowledge.ts",
+    "src/lib/rextora/agent/v2/conversation/referenceResolver.ts",
+    "src/lib/rextora/agent/v2/conversation/responseComposer.ts"
+  ],
+  "routingExpectModeAsserts": 5,
+  "gatesOk": true,
+  "semanticCaseCount": 92,
+  "randomTurnCount": 60,
+  "randomConversationCount": 10,
+  "filesCreated": [
+    "src/lib/rextora/agent/v2/conversation/conversationTypes.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationContext.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+    "src/lib/rextora/agent/v2/conversation/referenceResolver.ts",
+    "src/lib/rextora/agent/v2/conversation/productKnowledge.ts",
+    "src/lib/rextora/agent/v2/conversation/domainAssistant.ts",
+    "src/lib/rextora/agent/v2/conversation/conversationPolicy.ts",
+    "src/lib/rextora/agent/v2/conversation/responseComposer.ts",
+    "src/lib/rextora/agent/v2/conversation/index.ts",
+    "tests/AgentConversationRoutingMatrix.test.ts",
+    "tests/AgentConversationRandomized.test.ts",
+    "tests/AgentConversationFirstApi.test.ts",
+    "tests/AgentConversationProviderFallback.test.ts",
+    "tests/AgentConversationApprovalValidation.test.ts",
+    "tests/AgentV2SkippedWriteApproval.test.ts",
+    "tmp/conversation-first-agent/conversation-browser-matrix.mjs",
+    "tmp/conversation-first-agent/conversation-browser-dev.mjs"
+  ],
+  "filesModified": [
+    "app/api/rextora/agent/route.ts",
+    "components/rextora/agent/AgentMessage.tsx",
+    "components/rextora/agent/AgentContextStrip.tsx",
+    "components/rextora/agent/ApprovalCenter.tsx",
+    "src/lib/rextora/agent/agentResponseBuilder.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningSchema.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningValidator.ts",
+    "src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts",
+    "src/lib/rextora/agent/v2/reasoning/userVisibleSanitizer.ts",
+    "src/lib/rextora/agent/v2/reasoning/primaryLeakDetector.ts",
+    "tmp/codex-master-run/phase3-isolated-acceptance.mjs"
+  ],
+  "browserProductionMetrics": {
+    "rawLeakSum": 0,
+    "consoleErrorSum": 0,
+    "passed": 32,
+    "total": 32
+  }
+}

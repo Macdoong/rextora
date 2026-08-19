@@ -1,0 +1,34 @@
+{
+  "buildId": "AKGGYNTPCkYoh0VM3fvnU",
+  "base": "http://127.0.0.1:3100",
+  "dashboardStatus": 200,
+  "settingsStatus": 200,
+  "providerApiStatus": 200,
+  "providerApiValidJson": true,
+  "providers": {
+    "openai": {
+      "configured": true,
+      "stored": true,
+      "enabled": true,
+      "envFallback": false
+    },
+    "gemini": {
+      "configured": true,
+      "stored": true,
+      "enabled": true,
+      "envFallback": false
+    }
+  },
+  "agentStatus": 200,
+  "agentValidJson": true,
+  "agentWriteToolCount": 0,
+  "cssAssets": 1,
+  "staticChunkAssets": 10,
+  "staticAssetFailures": [],
+  "malformedJsonCount": 0,
+  "chunkLoadErrorCount": 0,
+  "immediateHTTP5xxCount": 0,
+  "hydrationErrorCount": 0,
+  "consoleErrors": [],
+  "passed": true
+}

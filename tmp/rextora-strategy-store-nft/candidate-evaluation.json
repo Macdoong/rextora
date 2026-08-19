@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "installed": {
+    "next": "16.2.6",
+    "node": "25.8.0",
+    "serverExternalPackagesSchema": "supported optional string array",
+    "serverExternalPackagesWebpackUse": "included in optOutBundlingPackages"
+  },
+  "candidates": [
+    {
+      "name": "make ROOT structurally explicit in strategyStore",
+      "classification": "INSUFFICIENT",
+      "reason": "REXTORA_STRATEGIES_DIR and runtime strategy IDs must remain dynamic; local fs calls still expose <dynamic>/<dynamic>.json to NFT."
+    },
+    {
+      "name": "move only readdirSync behind a runtime module",
+      "classification": "INSUFFICIENT",
+      "reason": "Historical evidence attributes the same broad pattern to nine exists/read/unlink call sites, not only directory enumeration."
+    },
+    {
+      "name": "static JSON imports or copied strategy assets",
+      "classification": "REJECTED",
+      "reason": "Would bundle runtime-managed user strategies and change persistence semantics."
+    },
+    {
+      "name": "external server-only strategy filesystem adapter",
+      "classification": "SUPPORTED",
+      "reason": "Uses Next serverExternalPackages. The adapter exports the exact synchronous Node fs functions, while only strategyStore crosses the boundary and retains all path validation and business logic."
+    }
+  ],
+  "selected": "external server-only strategy filesystem and path adapter",
+  "implementationNote": "The local package is installed from a deterministic npm tarball so NFT sees a node_modules package boundary rather than following a workspace symlink back into source. Next serverExternalPackages retains the package as a server runtime dependency."
+}

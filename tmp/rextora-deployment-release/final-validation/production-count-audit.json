@@ -1,0 +1,19 @@
+{
+  "scenarioRows": 88,
+  "registryTests": 4,
+  "metadataTests": 4,
+  "otherTests": 0,
+  "totalPlaywrightTests": 96,
+  "breakdown": {
+    "scenario": 88,
+    "registry": 4,
+    "metadata": 4,
+    "other": []
+  },
+  "projects": [
+    "prod-390",
+    "prod-768",
+    "prod-1024",
+    "prod-1440"
+  ]
+}

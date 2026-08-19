@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/rextora/Sidebar";
+import { AppShell } from "@/components/rextora/agent/AppShell";
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="dashboard-shell">
           <Sidebar />
-          <main className="dashboard-main">{children}</main>
+          <main className="dashboard-main">
+            <AppShell>{children}</AppShell>
+          </main>
         </div>
       </body>
     </html>

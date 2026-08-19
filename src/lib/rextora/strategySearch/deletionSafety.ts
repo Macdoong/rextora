@@ -24,6 +24,7 @@ import { parseSourceResearchJobId } from "./researchResultsSummary";
 import { listSavedBacktests } from "../backtest/backtestStore";
 import { listPaperSessions } from "../paper/paperSessionStore";
 import { isProvenanceDetached } from "./researchProvenance";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export type DeletionClass = "deletable" | "archive_only" | "protected";
 
@@ -45,12 +46,7 @@ export interface DeletionImpactPreview {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {
@@ -144,7 +140,7 @@ export function previewResearchJobDeletion(
   const liveRefs: string[] = [];
   try {
     const liveSession = path.join(
-      process.cwd(),
+      /* turbopackIgnore: true */ process.cwd(),
       "data",
       "rextora",
       "live-dry-run",

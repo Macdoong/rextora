@@ -1,0 +1,17 @@
+{
+  "scannedFiles": 952,
+  "findings": {
+    "openai_key_like": [],
+    "gemini_key_like": [],
+    "runtime_search_job": [],
+    "runtime_trial": [],
+    "agent_session_path": [],
+    "tmp_rextora_tree": [],
+    "playwright_profile": [
+      ".next/required-server-files.js",
+      ".next/required-server-files.json"
+    ]
+  },
+  "runtimeDataLeak": true,
+  "secretPatternHits": 0
+}

@@ -1,0 +1,7 @@
+{
+  "entrypoint": "data/strategies/SAFE_v44_i4060.json",
+  "elapsedMs": 3.984917,
+  "tracedFileCount": 1,
+  "warningCount": 0,
+  "observedAssetGlobInputs": []
+}

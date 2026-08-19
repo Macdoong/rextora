@@ -1,32 +1,68 @@
 /**
  * AI Agent Control Plane — type definitions.
  *
- * Architecture: Natural Language → Intent Parser → Typed Command →
- * Schema Validation → Policy Engine → Safety Guard → Data Fetcher →
- * Response Builder → AgentResponse
+ * Conversational product contract:
+ * Natural Language → Intent → Facts → Decision Context → Interpretation →
+ * One Recommended Action → Explicit Approval → Typed Command (deep-link) →
+ * Existing Engines
  *
- * The agent is READ-ONLY in Phase 1. It never executes trades,
- * modifies strategies, or triggers live actions autonomously.
+ * Phase 1 remains non-executing for Search/Backtest/Paper/Live engines.
+ * The agent never bypasses approval gates or modifies SAFE.
  */
+
+import type { ProposedAction } from "./proposedAction";
+import type { ConversationEntityMemory } from "./conversationContext";
+import type { AgentPlanDraft } from "./planDrafts";
+import type { PipelineLifecycleStage } from "./lifecycleStage";
+import type { ResearchWorkspaceSummary } from "./researchWorkspace";
+import type { DecisionContext } from "./decisionContext";
+import type { ConversationWorkingState } from "./conversationState";
+import type { AgentGoal } from "./goalDetector";
+import type { MissionTimeline } from "./missionTimeline";
 
 // ─── Intent ──────────────────────────────────────────────────────────────────
 
 export type AgentIntentType =
-  | "search_status" // "탐색 상태 알려줘"
-  | "explain_strategy" // "SAFE 전략 설명해줘"
-  | "backtest_summary" // "최근 백테스트 결과 보여줘"
-  | "explain_rejection" // "왜 거부됐어"
-  | "compare_strategies" // "BTC와 ETH 전략 비교"
-  | "market_status" // "시장 상황 어때"
-  | "risk_summary" // "리스크 현황", "왜 MDD 높아"
-  | "recommend_next" // "다음에 뭐 해야 해", "가장 좋은 전략"
-  | "first_run_help" // "지금 뭘 해야 해", "결과가 왜 없어", "처음에는 어떻게 시작해"
-  | "demo_overview" // "데모 보여줘"
-  | "paper_start_request" // "Paper 시작" — deep-link only, never executes
-  | "search_failure_explanation" // "실패한 탐색 원인"
-  | "modify_safe" // BLOCKED
-  | "execute_trade" // BLOCKED
-  | "start_live" // BLOCKED
+  | "search_status"
+  | "search_pause_request"
+  | "search_resume_request"
+  | "explain_strategy"
+  | "backtest_summary"
+  | "explain_rejection"
+  | "compare_strategies"
+  | "compare_plans"
+  | "market_status"
+  | "risk_summary"
+  | "recommend_next"
+  | "first_run_help"
+  | "demo_overview"
+  | "paper_start_request"
+  | "paper_status"
+  | "paper_pause_request"
+  | "paper_resume_request"
+  | "paper_stop_request"
+  | "strategy_rename_request"
+  | "strategy_archive_request"
+  | "strategy_restore_request"
+  | "strategy_delete_request"
+  | "search_failure_explanation"
+  | "prepare_search_plan"
+  | "prepare_backtest_plan"
+  | "prepare_paper_plan"
+  | "research_workspace"
+  | "workspace_status"
+  | "research_analysis"
+  | "results_promote_request"
+  | "memory_recall"
+  | "follow_up_why"
+  | "explain_approval"
+  | "explain_waiting"
+  | "continue_session"
+  | "approve_pending"
+  | "cancel_pending"
+  | "modify_safe"
+  | "execute_trade"
+  | "start_live"
   | "unknown";
 
 export interface AgentIntent {
@@ -52,7 +88,7 @@ export interface AgentLifecycleContext {
   timeframe?: string | null;
 }
 
-/** Explicit scope echo for UI — never invents missing fields. */
+/** Explicit scope echo for evidence — never invents missing fields. */
 export interface AgentScope {
   route?: string | null;
   strategyId?: string | null;
@@ -116,10 +152,48 @@ export interface AgentAction {
 
 export interface AgentRequest {
   query: string;
+  /** Stable client session identity for server stores and idempotency. */
+  sessionId?: string;
+  /** Per-turn identity used to deduplicate provider reasoning. */
+  turnId?: string;
   /** Optional conversation history for multi-turn context. Max 10 turns. */
   history?: AgentTurn[];
   /** Optional operator lifecycle context from the current UI. */
   context?: AgentLifecycleContext;
+  /** Optional prior entity memory from the client session (bounded). */
+  entityMemory?: ConversationEntityMemory | null;
+  /** Optional pending proposed action from the prior turn. */
+  pendingProposedAction?: ProposedAction | null;
+  /** All visible pending approvals; used to refuse ambiguous approval commands. */
+  pendingApprovals?: ProposedAction[];
+  /** Explicitly selected UI object has higher precedence than workflow state. */
+  selectedUiObject?: {
+    kind:
+      | "product"
+      | "feature"
+      | "strategy"
+      | "search_job"
+      | "backtest"
+      | "paper_session"
+      | "approval"
+      | "assistant_statement"
+      | "unknown";
+    labelKo: string;
+    id?: string | null;
+    descriptionKo?: string | null;
+  } | null;
+  /** Conversation topic is persisted separately from workflow entity memory. */
+  conversationContext?: {
+    currentTopic?: string | null;
+    previousTopic?: string | null;
+    clarificationState?: "none" | "needed" | "resolved";
+    confidence?: number;
+  } | null;
+  /** Per-session provider/model override selected in the Agent chat header. */
+  providerSelection?: {
+    provider: "openai" | "gemini";
+    model: string;
+  } | null;
 }
 
 export interface AgentTurn {
@@ -145,9 +219,22 @@ export interface ProviderMeta {
 export interface AgentResponse {
   /** Detected intent type. */
   intentType: AgentIntentType;
-  /** Verified facts from real data sources — labelled distinctly from interpretation. */
+  /**
+   * Conversational conclusion — primary visible answer.
+   * Must not include raw internal IDs.
+   */
+  conclusionKo: string;
+  /**
+   * Short explanation — why the conclusion matters.
+   * Must not include raw internal IDs.
+   */
+  explanationKo: string;
+  /** Verified facts from real data sources — collapsed evidence by default. */
   facts: FactItem[];
-  /** AI interpretation in Korean — always clearly separated from facts. */
+  /**
+   * Full interpretation text (legacy + LLM). Kept for compatibility;
+   * UI prefers conclusionKo + explanationKo.
+   */
   interpretationKo: string;
   /** Single recommended next action in Korean (operator-facing). */
   recommendedActionKo?: string;
@@ -155,9 +242,34 @@ export interface AgentResponse {
   interpretationSource: InterpretationSource;
   /** LLM provider metadata — shown in developer details only, never in main UI. */
   providerMeta?: ProviderMeta;
-  /** Optional recommended actions for the user to approve (deep links only). */
+  /** Exactly one primary action when applicable (deep links only). */
   actions: AgentAction[];
-  /** Echo of strategy/job/run/symbol scope used for this answer. */
+  /** Typed proposed action for multi-turn approval. */
+  proposedAction?: ProposedAction | null;
+  /** Structured planning object (draft only — never execution). */
+  plan?: AgentPlanDraft | null;
+  /** Deterministic decision surface for UI (understanding / evidence / decision / reason). */
+  decision?: Pick<
+    DecisionContext,
+    | "situationKo"
+    | "meaningKo"
+    | "whyMattersKo"
+    | "recommendedActionKo"
+    | "whyBetterThanAlternativesKo"
+    | "uncertaintyKo"
+    | "conclusionKo"
+    | "explanationKo"
+    | "evidenceKeys"
+  > | null;
+  /** Pipeline lifecycle stage derived from verified facts. */
+  lifecycleStage?: PipelineLifecycleStage | null;
+  /** Pinned session objective for the operator. */
+  pinnedObjectiveKo?: string | null;
+  /** Optional research workspace snapshot (recommend / workspace intents). */
+  workspace?: ResearchWorkspaceSummary | null;
+  /** Updated entity memory for the client session. */
+  entityMemory?: ConversationEntityMemory;
+  /** Echo of strategy/job/run/symbol scope used for this answer (evidence only). */
   scope?: AgentScope;
   /** Whether the safety guard blocked any action. */
   safetyBlocked: boolean;
@@ -165,6 +277,64 @@ export interface AgentResponse {
   safetyReasonKo?: string;
   /** ISO timestamp of the response. */
   respondedAt: string;
+  /** Optional follow-up suggestion chips (conversational, not technical). */
+  followUpSuggestions?: string[];
+  /** Working-session state machine snapshot. */
+  conversationState?: ConversationWorkingState | null;
+  /** Detected operator goal. */
+  goal?: AgentGoal | null;
+  /** Mission timeline for the commercial workspace. */
+  missionTimeline?: MissionTimeline | null;
+  /** Real typed-command execution result after explicit approval. */
+  executionResult?: {
+    commandId: string;
+    commandType: string;
+    executionStatus: string;
+    resultReference: string | null;
+    jobId: string | null;
+    runId: string | null;
+    alreadyExecuted: boolean;
+    summaryKo: string | null;
+  } | null;
+  /** Agent V2 reasoning evidence — developer/evidence panel only. */
+  reasoningMeta?: {
+    reasoningId: string;
+    fallbackUsed: boolean;
+    provider: string;
+    model: string;
+    validationOk: boolean;
+    toolIds: string[];
+    verifiedFactRefs: string[];
+    requestHash: string | null;
+    latencyMs?: number;
+  } | null;
+  /** Conversation-first route evidence; developer/evidence surfaces only. */
+  conversationRoute?: {
+    mode:
+      | "DIRECT_ANSWER"
+      | "READ_AND_ANSWER"
+      | "PLAN_AND_APPROVE"
+      | "APPROVAL_CONTROL"
+      | "CLARIFY_REFERENCE"
+      | "SAFE_REFUSAL";
+    topic: string;
+    confidence: number;
+    resolvedReference: string | null;
+    needsWorkspaceFacts: boolean;
+    requestedReadTools: string[];
+    requestedWriteTools: string[];
+    requiresApproval: boolean;
+    providerExpected: boolean;
+    lifecycleInfluencedRouting: boolean;
+    reason: string;
+  } | null;
+  /** Conversation topic state, intentionally separate from workflow memory. */
+  conversationContext?: {
+    currentTopic: string;
+    previousTopic: string | null;
+    clarificationState: "none" | "needed" | "resolved";
+    confidence: number;
+  } | null;
 }
 
 export interface AgentErrorResponse {

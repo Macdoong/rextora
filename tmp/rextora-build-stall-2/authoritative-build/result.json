@@ -1,0 +1,17 @@
+{
+  "command": "npm run build",
+  "attemptCountForThisStage": 1,
+  "exitCode": 143,
+  "deliberatelyTerminated": true,
+  "terminationReason": "Pathological RSS growth with no progress beyond Creating an optimized production build",
+  "durationSeconds": 60.21,
+  "peakRssBytes": 16801153024,
+  "observedParentRssKiBAt46Seconds": 15668416,
+  "parentRssKiBAtTerminationSnapshot": 12161008,
+  "postcssWorkerRssKiBAtTermination": 45120,
+  "swapUsedMiBAtTermination": 3440.12,
+  "buildPhase": "Creating an optimized production build",
+  "buildIdPresent": false,
+  "confirmation": "FAILED_PATHOLOGICAL_GROWTH",
+  "anotherBuildPermittedByStageInstructions": false
+}

@@ -1,0 +1,10 @@
+{
+  "command": "npm test -- focused conversation tests",
+  "startedAt": "2026-08-05T13:24:42Z",
+  "finishedAt": "2026-08-05T13:24:46Z",
+  "durationMs": 3276,
+  "exitCode": 1,
+  "stdout": "tmp/conversation-first-agent/focused-tests/conversation.stdout.log",
+  "stderr": "tmp/conversation-first-agent/focused-tests/conversation.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq"
+}

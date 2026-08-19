@@ -1,0 +1,14 @@
+{
+  "command": "npm test",
+  "startedAt": "2026-08-05T11:00:36Z",
+  "finishedAt": "2026-08-05T11:01:59Z",
+  "durationMs": 83020,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/unit-test.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/unit-test.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "ok": true,
+    "tail": "\n> rextora@0.1.0 test\n> vitest run\n\n\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  191 passed (191)\n      Tests  1372 passed (1372)\n   Start at  20:00:36\n   Duration  82.42s (transform 2.22s, setup 1.17s, import 9.91s, tests 46.74s, environment 11ms)\n\n"
+  }
+}

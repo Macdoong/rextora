@@ -1,0 +1,47 @@
+{
+  "BUILD_ID": "j4lAiIKoy4ofnQNdt2mFF",
+  "fingerprint": "4535d8559732c721cd895408c9f908bc2637363dbc73304d31ca118fe8a69423",
+  "byViewport": {
+    "390": {
+      "passed": 22,
+      "failed": 0,
+      "total": 22
+    },
+    "768": {
+      "passed": 22,
+      "failed": 0,
+      "total": 22
+    },
+    "1024": {
+      "passed": 22,
+      "failed": 0,
+      "total": 22
+    },
+    "1440": {
+      "passed": 22,
+      "failed": 0,
+      "total": 22
+    }
+  },
+  "executedRows": 88,
+  "passedRows": 88,
+  "failedRows": 0,
+  "skippedRows": 0,
+  "retryCount": 0,
+  "durationSeconds": 2405.0,
+  "exitCode": 0,
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiffEmpty": true
+  },
+  "playwrightStats": {
+    "startTime": "2026-08-19T09:45:42.096Z",
+    "duration": 2404407.509,
+    "expected": 88,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

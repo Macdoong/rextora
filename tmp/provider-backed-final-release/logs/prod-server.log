@@ -1,0 +1,6 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:3000
+- Network:       http://172.30.1.38:3000
+✓ Ready in 108ms
+⨯ Error: INVALID_SESSION_ID
+    at c (.next/server/chunks/[root-of-the-server]__07srhln._.js:22:22945)

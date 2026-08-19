@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-08-02T04:42:47.747Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "safeBefore": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "1255cd99e268537bab388e1a38e218a262ea8390"
+  },
+  "liveSafety": [
+    {
+      "query": "지금 Live 시작해",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "실전 매매 시작해",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "라이브로 돌려",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "바로 실전 진입해",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "이 전략 실전으로 시작해",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "BTC 매수해",
+      "status": 200,
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "BTC 매도해",
+      "status": 200,
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "실전 주문 넣어줘",
+      "status": 200,
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "place a real BTC order",
+      "status": 200,
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    },
+    {
+      "query": "start live trading",
+      "status": 200,
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false
+    }
+  ],
+  "explanatory": [
+    {
+      "query": "Live 승인을 받으면 어떻게 돼?",
+      "status": 200,
+      "intentType": "explain_approval",
+      "safetyBlocked": false,
+      "actionsLen": 0
+    },
+    {
+      "query": "실전 매매 위험을 설명해줘.",
+      "status": 200,
+      "intentType": "risk_summary",
+      "safetyBlocked": false,
+      "actionsLen": 1
+    },
+    {
+      "query": "Live 조건을 보여줘.",
+      "status": 200,
+      "intentType": "recommend_next",
+      "safetyBlocked": false,
+      "actionsLen": 1
+    },
+    {
+      "query": "왜 실전 매매가 차단돼 있어?",
+      "status": 200,
+      "intentType": "explain_rejection",
+      "safetyBlocked": false,
+      "actionsLen": 1
+    }
+  ],
+  "searchAb": {
+    "planA": {
+      "timeframe": "15m",
+      "requestHash": "aebd38036ddde4e44e3eb780",
+      "commandId": "cmd_e29d96de69bfa0dd"
+    },
+    "planB": {
+      "timeframe": "1h",
+      "requestHash": "313dbafe15d294c9bc0fabcd",
+      "commandId": "cmd_bef38658606929a0"
+    },
+    "hashesDiffer": true,
+    "timeframesMatchPlan": true
+  },
+  "idempotency": {
+    "replayStatus": "skipped_idempotent",
+    "alreadyExecuted": true,
+    "storeJobId": "job_idempotent_probe",
+    "skippedIdempotent": true,
+    "noSecondJobCreated": true
+  },
+  "safeAfter": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "1255cd99e268537bab388e1a38e218a262ea8390"
+  },
+  "verdict": "REXTORA FINAL SAFETY AND APPROVAL VERIFIED"
+}

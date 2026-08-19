@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-04T13:30:00.000Z",
+  "mission": "final-blocker-closure",
+  "1_liveReadinessRootCause": "tests/liveReadinessChecklist.test.ts lacked isolated settings reset; when run after other suites that enable allowLiveTrading, getExpectedRemainingLiveBlocks() returned empty and the fragile Korean substring assertion failed even though liveSafetyGate still blocks LIVE correctly.",
+  "2_liveReadinessCorrection": "Test corrected (not product): added beforeEach settings/runtime reset, exported LIVE_BLOCK_REASON_ALLOW_LIVE_OFF from liveSafetyGate.ts, asserted semantic block reason instead of substring-only check, added regression cases for allowLive=false, missing operator approval, missing credentials, emergency stop, and satisfied prerequisites except explicit LIVE start.",
+  "3_providerDiscrepancyRootCause": "Standalone probe used production data root without initDemo and single-pass activeProvider selection; matrix used isolated runtime + initDemo + structured canary. Standalone also did not iterate configured providers.",
+  "4_externalProviderCanary": {
+    "evidencePath": "tmp/final-blocker-closure/evidence/provider-canary.json",
+    "requestedProvider": "gemini",
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "structuredOutputValid": true,
+    "canaryPassed": true,
+    "fallbackUsed": false,
+    "writeToolAuditCount": 0,
+    "attemptCount": 1,
+    "pass": true
+  },
+  "5_harnessPathCorrection": "phase3-isolated-acceptance.mjs now resolves repo root via assertHarnessDependencies(import.meta.url) and imports ../../scripts/* directly; uses shared loadProjectEnv + runStructuredProviderCanaryProbe; no tmp/scripts symlinks required.",
+  "6_orphanJobRecoveryCorrection": "instrumentation.ts no longer dynamic-imports orphanJobRecovery (NFT/trace + runtime resolution failures). Added localhost-only POST /api/rextora/internal/orphan-recovery boot route; instrumentation triggers recovery via internal fetch with x-rextora-boot header.",
+  "7_filesModified": [
+    "src/lib/rextora/liveSafetyGate.ts",
+    "tests/liveReadinessChecklist.test.ts",
+    "src/lib/rextora/agent/v2/reasoning/providerCanary.ts",
+    "scripts/repoPaths.mjs",
+    "scripts/loadProjectEnv.mjs",
+    "scripts/providerCanaryProbe.mjs",
+    "tmp/codex-master-run/phase3-isolated-acceptance.mjs",
+    "instrumentation.ts",
+    "app/api/rextora/internal/orphan-recovery/route.ts",
+    "src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts",
+    "tests/AgentV2ProviderCanary.test.ts",
+    "tests/instrumentationBoot.test.ts",
+    "tests/harnessDependencyResolution.test.ts",
+    "tests/orphanRecoveryRoute.test.ts"
+  ],
+  "8_focusedTests": {
+    "command": "vitest focused blocker set",
+    "passed": 34,
+    "failed": 0,
+    "logPath": "tmp/final-blocker-closure/logs/focused-tests.log",
+    "pass": true
+  },
+  "9_lint": {
+    "exitCode": 0,
+    "logPath": "tmp/final-blocker-closure/logs/lint.log",
+    "pass": true
+  },
+  "10_unitTests": {
+    "testFiles": 190,
+    "tests": 1365,
+    "passed": 1365,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "logPath": "tmp/final-blocker-closure/logs/unit-tests-final.log",
+    "pass": true
+  },
+  "11_build": {
+    "BUILD_ID": "Dgq7olffIETFHSPoBQtsv",
+    "exitCode": 0,
+    "tracePass": true,
+    "tracedTmp": 0,
+    "tracedScreenshots": 0,
+    "tracedEnv": 0,
+    "evidencePath": "tmp/final-blocker-closure/evidence/trace-inspection.json",
+    "pass": true
+  },
+  "12_e2eRuns": [
+    { "run": 1, "passed": 31, "total": 31, "exitCode": 0, "retries": 0, "orphanWarning": false, "logPath": "tmp/final-blocker-closure/logs/e2e-run-1.log" },
+    { "run": 2, "passed": 31, "total": 31, "exitCode": 0, "retries": 0, "orphanWarning": false, "logPath": "tmp/final-blocker-closure/logs/e2e-run-2.log" },
+    { "run": 3, "passed": 31, "total": 31, "exitCode": 0, "retries": 0, "orphanWarning": false, "logPath": "tmp/final-blocker-closure/logs/e2e-run-3.log" }
+  ],
+  "13_browserMatrix": {
+    "passed": 51,
+    "total": 52,
+    "failures": ["B-1440"],
+    "failureReason": "repeatApprovalCreatedNothing=false after provider_or_validation fallback during repeat-approval step at 1440 viewport; all other Conversation B criteria met including zero leaks",
+    "buildId": "Dgq7olffIETFHSPoBQtsv",
+    "logPath": "tmp/final-blocker-closure/logs/browser-matrix.log",
+    "evidencePath": "tmp/final-blocker-closure/evidence/browser-matrix.json",
+    "pass": false
+  },
+  "14_conversationB": {
+    "B-390": "PASS",
+    "B-768": "PASS",
+    "B-1024": "PASS",
+    "B-1440": "FAIL",
+    "pass": false
+  },
+  "15_visibleLeakage": {
+    "rawLeakCountTotal": 0,
+    "consoleErrorCountTotal": 0,
+    "pass": true
+  },
+  "16_safetyTools": {
+    "writeToolsRequireApproval": true,
+    "noLiveOrderBinanceSafeMutationTools": true,
+    "providerCallsDuringApprovalFastPath": 0,
+    "pass": true
+  },
+  "17_safeBeforeAfter": {
+    "before": { "params_hash": "7893ca3f0e30", "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0", "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32", "protectedDiffBytes": 0 },
+    "after": { "params_hash": "7893ca3f0e30", "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0", "git_hash_object": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32", "protectedDiffBytes": 0 },
+    "pass": true
+  },
+  "18_gitState": {
+    "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "committed": false,
+    "pushed": false,
+    "BUILD_ID": "Dgq7olffIETFHSPoBQtsv"
+  },
+  "19_remainingWarningsOrContradictions": [
+    "Browser matrix row B-1440 failed repeatApprovalCreatedNothing after provider_or_validation local fallback (51/52 overall).",
+    "Gemini health check reported ok:false while structured canary passed (health ping vs full reasoning canary divergence)."
+  ],
+  "20_externalTesterDecision": "Blockers 1–4 are closed with preserved evidence; external tester onboarding may proceed for all gates except the known B-1440 repeat-approval flake at 1440px until that row passes in a future run.",
+  "21_finalVerdict": "REXTORA AI TRADING EMPLOYEE TESTER READY PARTIAL",
+  "blockerClosure": {
+    "liveReadinessTest": "CLOSED",
+    "providerCanaryParity": "CLOSED",
+    "harnessSymlinkDependency": "CLOSED",
+    "orphanJobRecoveryWarning": "CLOSED"
+  },
+  "gateSummary": {
+    "focusedGate": "PASS",
+    "lint": "PASS",
+    "unitTests": "PASS",
+    "buildTrace": "PASS",
+    "providerCanary": "PASS",
+    "e2eX3": "PASS",
+    "browserMatrix52": "FAIL (51/52)",
+    "safeIntegrity": "PASS"
+  }
+}

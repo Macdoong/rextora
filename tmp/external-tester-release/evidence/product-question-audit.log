@@ -1,0 +1,152 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+stdout | tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > turn1 intent paths
+{
+  "label": "turn1",
+  "parsed": {
+    "type": "unknown",
+    "params": {},
+    "confidence": 0,
+    "rawQuery": "이건 뭐하는거야?"
+  },
+  "noCtx": {
+    "goal": "lifecycle_fallback",
+    "intent": {
+      "type": "recommend_next",
+      "params": {},
+      "confidence": 0.45,
+      "rawQuery": "이건 뭐하는거야?"
+    },
+    "confidence": 0.45,
+    "method": "lifecycle_fallback",
+    "scores": {
+      "recommend_next": 1
+    }
+  },
+  "paper": {
+    "goal": "lifecycle_fallback",
+    "intent": {
+      "type": "paper_start_request",
+      "params": {},
+      "confidence": 0.5,
+      "rawQuery": "이건 뭐하는거야?"
+    },
+    "confidence": 0.5,
+    "method": "lifecycle_fallback",
+    "scores": {
+      "recommend_next": 1,
+      "explain_approval": 1,
+      "explain_waiting": 1.5,
+      "continue_session": 1.5,
+      "approve": 0.5,
+      "explain_why": 1.5
+    }
+  },
+  "exec": {
+    "kind": "none"
+  }
+}
+
+stdout | tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > turn2 intent paths
+{
+  "label": "turn2",
+  "parsed": {
+    "type": "unknown",
+    "params": {},
+    "confidence": 0,
+    "rawQuery": "아니 렉스토라가 뭐하는 앱이냐고"
+  },
+  "noCtx": {
+    "goal": "lifecycle_fallback",
+    "intent": {
+      "type": "recommend_next",
+      "params": {},
+      "confidence": 0.45,
+      "rawQuery": "아니 렉스토라가 뭐하는 앱이냐고"
+    },
+    "confidence": 0.45,
+    "method": "lifecycle_fallback",
+    "scores": {
+      "recommend_next": 1
+    }
+  },
+  "paper": {
+    "goal": "lifecycle_fallback",
+    "intent": {
+      "type": "paper_start_request",
+      "params": {},
+      "confidence": 0.5,
+      "rawQuery": "아니 렉스토라가 뭐하는 앱이냐고"
+    },
+    "confidence": 0.5,
+    "method": "lifecycle_fallback",
+    "scores": {
+      "recommend_next": 1,
+      "explain_approval": 1,
+      "explain_waiting": 1.5,
+      "continue_session": 1.5,
+      "approve": 0.5,
+      "explain_why": 1.5
+    }
+  },
+  "exec": {
+    "kind": "none"
+  }
+}
+
+stdout | tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > response paths for paper ctx turn1
+{
+  "intent": "paper_start_request",
+  "goal": "lifecycle_fallback",
+  "method": "lifecycle_fallback",
+  "decision": {
+    "intentType": "paper_start_request",
+    "situationKo": "Paper 후보 없음",
+    "meaningKo": "Paper는 승인 후에만 시작할 수 있습니다.",
+    "whyMattersKo": "모의매매도 명시 승인 게이트를 통과해야 합니다.",
+    "recommendedActionKo": "모의매매 화면을 열고 승인하세요.",
+    "whyBetterThanAlternativesKo": "에이전트 자동 시작은 금지되어 있으며, 화면에서 직접 승인하는 경로만 허용됩니다.",
+    "uncertaintyKo": "Paper 가능 전략 없음",
+    "conclusionKo": "Paper 가능 전략이 확인되지 않았습니다. 에이전트는 자동 시작하지 않습니다.",
+    "explanationKo": "화면만 열리며, 세션 시작은 사용자가 승인해야 합니다. 자동 시작하지 않습니다.",
+    "evidenceKeys": [
+      "후보 전략",
+      "후보 Paper 자격",
+      "활성 Paper 세션"
+    ]
+  },
+  "local": "에이전트는 모의매매를 자동 시작하지 않습니다. Paper Trading 화면에서 전략을 확인한 뒤 명시적으로 승인해야 합니다. 현재 Paper 가능 전략이 확인되지 않았습니다. 활성 Paper 세션은 없습니다.",
+  "fallbackConclusion": "Paper 가능 전략이 확인되지 않았습니다. 에이전트는 자동 시작하지 않습니다.",
+  "fallbackExplanation": "화면만 열리며, 세션 시작은 사용자가 승인해야 합니다. 자동 시작하지 않습니다."
+}
+
+stdout | tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > sanitizer and UI leak vectors
+{ in: 'paper_active', out: '해당 모의매매', forbidden: [] }
+{
+  in: 'Paper approval state',
+  out: '모의매매 approval state',
+  forbidden: []
+}
+{
+  in: 'Paper approval pending',
+  out: '모의매매 approval pending',
+  forbidden: []
+}
+{ in: '현재 상황 · paper_active', out: '해당 모의매매', forbidden: [] }
+{
+  in: '승인 설명 · pending approval',
+  out: '승인 설명 · pending approval',
+  forbidden: []
+}
+
+ ✓ tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > turn1 intent paths 11ms
+ ✓ tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > turn2 intent paths 0ms
+ ✓ tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > response paths for paper ctx turn1 1ms
+ ✓ tmp/external-tester-release/evidence/product-question-audit.test.ts > product question audit > sanitizer and UI leak vectors 5ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  21:42:18
+   Duration  937ms (transform 641ms, setup 18ms, import 770ms, tests 19ms, environment 0ms)
+

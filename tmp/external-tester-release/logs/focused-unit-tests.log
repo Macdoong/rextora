@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentV2TerminalApprovalIdempotency.test.ts tests/AgentV2ApprovalFastPath.test.ts tests/AgentV2PostExecutionApprovalClear.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  3 passed (3)
+      Tests  9 passed (9)
+   Start at  19:50:41
+   Duration  1.44s (transform 685ms, setup 35ms, import 971ms, tests 27ms, environment 0ms)
+

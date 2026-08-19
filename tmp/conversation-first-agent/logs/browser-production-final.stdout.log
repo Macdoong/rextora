@@ -1,0 +1,12 @@
+clean-390: demo 788ms
+clean-390: server 1295ms
+clean-390: browser 1481ms
+clean-390: turn 렉스토라는 뭐 하는 앱 1807ms
+clean-390: turn 실전매매 바로 시작해. 2102ms
+clean-390: PASS
+search-running-390: demo 768ms
+search-running-390: server 1279ms
+search-running-390: browser 1458ms
+search-running-390: turn 현재 진행 상황 알려줘 5510ms
+search-running-390: FAIL
+{"passed":false,"total":2,"passedCount":1,"failures":["search-running-390"]}

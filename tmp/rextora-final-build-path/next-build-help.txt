@@ -1,0 +1,25 @@
+Usage: next build [directory] [options]
+
+Creates an optimized production build of your application. The output displays
+information about each route.
+
+Arguments:
+  [directory]                              A directory on which to build the application. If no directory is provided, the current directory will be used.
+
+Options:
+  --experimental-analyze                   Analyze bundle output. Only compatible with Turbopack.
+  -d, --debug                              Enables a more verbose build output.
+  --debug-prerender                        Enables debug mode for prerendering. Not for production use!
+  --no-mangling                            Disables mangling.
+  --profile                                Enables production profiling for React.
+  --experimental-app-only                  Builds only App Router routes.
+  --turbo                                  Builds using Turbopack.
+  --turbopack                              Builds using Turbopack.
+  --webpack                                Builds using webpack.
+  --experimental-build-mode [mode]         Uses an experimental build mode. (choices: "compile", "generate", "generate-env", default: "default")
+  --experimental-debug-memory-usage        Enables memory profiling features to debug memory consumption.
+  --experimental-upload-trace, <traceUrl>  Reports a subset of the debugging trace to a remote HTTP URL. Includes sensitive data.
+  --experimental-next-config-strip-types   Use Node.js native TypeScript resolution for next.config.(ts|mts)
+  --debug-build-paths <patterns>           Comma-separated glob patterns or explicit paths for selective builds. Use "!" prefix to exclude. Examples: "app/*", "app/page.tsx", "app/**/page.tsx", "app/**,!app/[slug]/**"
+  --experimental-cpu-prof                  Enable CPU profiling. Profile is saved to .next/cpu-profiles/ on completion.
+  -h, --help                               Displays this message.

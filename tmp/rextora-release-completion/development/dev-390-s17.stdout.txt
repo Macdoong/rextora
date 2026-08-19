@@ -1,0 +1,30 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 90752
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1030
+    }
+  ]
+}
+
+Running 1 test using 1 worker
+
+(node:22557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (56.4s)
+
+  1 passed (4.7m)

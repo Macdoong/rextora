@@ -1,0 +1,10 @@
+{
+  "command": "node scripts/inspect-next-trace.mjs",
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/trace-inspect.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/trace-inspect.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "rawHead": "{\n  \"outPath\": \"/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/trace-inspection.json\",\n  \"totalSizeHuman\": \"655.9MB\",\n  \"tracedTmp\": 0,\n  \"tracedScreenshots\": 0,\n  \"tracedEnv\": 0,\n  \"secretTraceFailure\": false,\n  \"pass\": true\n}\n"
+  }
+}

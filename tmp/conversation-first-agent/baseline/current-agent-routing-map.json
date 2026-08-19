@@ -1,0 +1,54 @@
+{
+  "entrypoint": "app/api/rextora/agent/route.ts:POST",
+  "requestFlow": [
+    "sanitize request context, entityMemory, pendingProposedAction, history",
+    "detectGoal(query, entities, entities.pipelineStage)",
+    "classifyExecutionRequest defence-in-depth",
+    "checkIntentSafety",
+    "fetchFactsForIntent",
+    "build V1 plan/workspace/approval surfaces",
+    "terminal approval receipt check",
+    "approved tool-plan or typed-command execution",
+    "runReasoningEngine",
+    "buildResponseFromReasoning or buildAgentResponse"
+  ],
+  "currentRouting": {
+    "explicitExecutionSafety": "executionRequestClassifier before planning",
+    "deterministicFollowUps": "detectFollowUpKind inside detectGoal",
+    "regexIntent": "parseIntent",
+    "semanticBags": "goalDetector.GOAL_BAGS",
+    "unknownFallback": "lifecycleFallbackIntent",
+    "stalePaperDefect": "unknown + pipelineStage=paper_active maps to paper_start_request"
+  },
+  "provider": {
+    "selector": "providerConfig.getProviderConfig",
+    "structuredCall": "v2/reasoning/reasoningProvider.callReasoningProvider",
+    "attemptsPerTurn": 1,
+    "timeoutMs": 20000,
+    "validation": "reasoningSchema + reasoningValidator",
+    "fallback": "reasoningFallback.buildFallbackReasoning"
+  },
+  "approval": {
+    "fastPath": "route.ts approve_pending before provider",
+    "terminalReceipt": "v2/approval/approvalExecutionStore",
+    "toolExecution": "v2/reasoning/reasoningExecution -> tools/toolExecutor",
+    "providerCallsDuringApproval": 0
+  },
+  "stores": {
+    "session": "data/rextora/agent-sessions",
+    "workspace": "session workspace.json",
+    "memory": "data/rextora/agent-memory-v2",
+    "approvalReceipts": "data/rextora/agent-approval-receipts",
+    "commands": "data/rextora/agent-commands",
+    "plans": "data/rextora/agent-plans-v2",
+    "tasks": "data/rextora/agent-tasks",
+    "events": "data/rextora/agent-events",
+    "toolAudit": "data/rextora/agent-tool-audit",
+    "reasoningAudit": "configured reasoning audit root"
+  },
+  "uiLeaks": [
+    "AgentMessage renders response.lifecycleStage raw",
+    "AgentContextStrip renders entityMemory.pipelineStage/lifecycleStage raw",
+    "primary leak detector does not enumerate lifecycle enums or context-strip/status surfaces"
+  ]
+}

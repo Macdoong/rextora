@@ -1,0 +1,34 @@
+{
+  "command": "node scripts/providerCanaryProbe.mjs --out=tmp/external-tester-release/evidence/provider-canary-full.json",
+  "startedAt": "2026-08-05T11:03:31Z",
+  "finishedAt": "2026-08-05T11:03:44Z",
+  "durationMs": 13457,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/provider-canary-full.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/provider-canary-full.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "requestedProviders": [
+      "gemini"
+    ],
+    "selectedProvider": "gemini",
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "structuredOutputValid": true,
+    "canaryPassed": true,
+    "checksNonEmpty": true,
+    "checksCount": 2,
+    "fallbackUsed": false,
+    "writeToolAuditCount": 0,
+    "attempts": [
+      {
+        "requestedProvider": "gemini",
+        "providerSucceeded": true,
+        "canaryPassed": true,
+        "fallbackUsed": false,
+        "fallbackReason": null,
+        "writeToolAuditCount": 0
+      }
+    ]
+  }
+}

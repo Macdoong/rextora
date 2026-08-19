@@ -1,0 +1,20 @@
+{
+  "currentPage": null,
+  "currentStrategyId": null,
+  "currentStrategyLabel": null,
+  "currentSearchJobId": null,
+  "currentBacktestRunId": null,
+  "currentPaperSessionId": null,
+  "currentLiveCandidateId": null,
+  "pinnedObjective": null,
+  "pendingApprovals": [],
+  "currentRecommendation": null,
+  "currentBlockers": [],
+  "currentSymbol": null,
+  "currentTimeframe": null,
+  "currentPatterns": [],
+  "currentLeverage": null,
+  "researchWorkspace": null,
+  "lastRoute": null,
+  "updatedAt": "2026-08-13T12:17:10.405Z"
+}

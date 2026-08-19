@@ -1,0 +1,26 @@
+{
+  "verdict": "REXTORA DEVELOPMENT 88 FAILED",
+  "scenarioCount": 22,
+  "viewportCount": 4,
+  "expectedRows": 88,
+  "executedRows": 70,
+  "passedRows": 46,
+  "failedRows": 24,
+  "skippedRows": 18,
+  "failedScenarioIds": ["01", "02", "03", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "21"],
+  "byViewport": {
+    "390": { "passed": 21, "failed": 1, "skipped": 0, "failedIds": ["03"] },
+    "768": { "passed": 17, "failed": 5, "skipped": 0, "failedIds": ["01", "03", "16", "17", "18"] },
+    "1024": { "passed": 2, "failed": 2, "skipped": 18, "failedIds": ["02", "03"] },
+    "1440": { "passed": 6, "failed": 16, "skipped": 0, "failedIds": ["03", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "20", "21"] }
+  },
+  "totalDurationMs": 8980034,
+  "totalDurationHuman": "2h 29m",
+  "systemicFailureBoundary": "300s test timeout after cumulative webpack dev server degradation",
+  "modelsApiJsonParse": "APPLICATION_PARSE_DEFECT — 15 occurrences",
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "safeUnchanged": true
+}

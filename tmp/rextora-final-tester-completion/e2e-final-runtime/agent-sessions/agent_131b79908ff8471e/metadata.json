@@ -1,0 +1,29 @@
+{
+  "sessionId": "agent_131b79908ff8471e",
+  "schemaVersion": 1,
+  "createdAt": "2026-08-13T12:17:04.652Z",
+  "updatedAt": "2026-08-13T12:17:04.652Z",
+  "pendingApproval": null,
+  "entityMemory": null,
+  "currentLifecycle": null,
+  "missionTimeline": null,
+  "taskQueueSummary": {
+    "pendingCommandCount": 0,
+    "activeJobId": null,
+    "lastCommandId": null,
+    "summaryKo": null
+  },
+  "reasoningContext": {
+    "lastIntentType": null,
+    "lastGoal": null,
+    "pinnedObjectiveKo": null,
+    "followUpKind": null,
+    "currentTopic": null,
+    "previousTopic": null,
+    "clarificationState": "none",
+    "conversationalConfidence": 0,
+    "updatedAt": "2026-08-13T12:17:04.652Z"
+  },
+  "lastExecution": null,
+  "lastRecommendation": null
+}

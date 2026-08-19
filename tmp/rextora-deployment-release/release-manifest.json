@@ -1,0 +1,55 @@
+{
+  "buildId": "2-RjvN6kLmSfKLidxHUzi",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "previousBuildIdInvalidated": "1XWJaOd-qF4VMUWBKK157",
+  "openai": {
+    "stored": true,
+    "model": "gpt-5-mini",
+    "canaryPassed": true
+  },
+  "gemini": {
+    "stored": true,
+    "model": "gemini-2.5-flash",
+    "canaryPassed": true
+  },
+  "developmentBrowser": {
+    "expected": 88,
+    "executedRows": 88,
+    "passedRows": 20,
+    "failedRows": 68,
+    "evidence": "tmp/rextora-deployment-release/final-validation/development-matrix-88-r2.stdout.txt"
+  },
+  "productionBrowser": {
+    "expected": 88,
+    "executedRows": 88,
+    "passedRows": 88,
+    "failedRows": 0,
+    "evidence": "tmp/rextora-deployment-release/final-validation/production-matrix-88-r2.stdout.txt"
+  },
+  "lifecycle": {
+    "expected": 52,
+    "executedRows": 52,
+    "passedRows": 21,
+    "failedRows": 31,
+    "evidence": "tmp/rextora-deployment-release/lifecycle-52/lifecycle-matrix.json"
+  },
+  "approvalE2E": true,
+  "repeatedApprovalAdditionalWrites": 0,
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "duplicateExecutionCount": 0,
+  "unintendedWriteCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "safeMutationCount": 0,
+  "safeUnchanged": true,
+  "safeParamsHash": "7893ca3f0e30",
+  "safeSha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+  "lintPassed": true,
+  "unitPassed": true,
+  "unitCount": "1541/1541",
+  "e2eRunsPassed": 3,
+  "e2eCountPerRun": 31,
+  "deploymentSmokePassed": false,
+  "releaseReady": false
+}

@@ -1,0 +1,14 @@
+
+> rextora@0.1.0 dev
+> next dev --port 3101 --hostname 127.0.0.1 --webpack
+
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use 127.0.0.1:3101
+    at <unknown> (Error: listen EADDRINUSE: address already in use 127.0.0.1:3101) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 3101
+}
+[?25h

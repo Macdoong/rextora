@@ -1,0 +1,120 @@
+{
+  "scenario": "F",
+  "width": 1024,
+  "startedAt": "2026-08-05T18:07:17.892Z",
+  "finishedAt": "2026-08-05T20:51:30.642Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-F-1024-8da120-ETlGZD",
+  "port": 54554,
+  "provider": "gemini",
+  "consoleErrorCount": 8,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54554/api/rextora/strategies:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54554/api/rextora/strategies:0:0",
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54554/api/rextora/strategy-search:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54554/api/rextora/strategy-search:0:0",
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54554/api/rextora/strategies:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54554/api/rextora/strategies:0:0",
+    "Failed to load resource: the server responded with a status of 408 (Request Timeout) @ http://127.0.0.1:54554/api/rextora/strategies:0:0",
+    "Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:54554/api/rextora/strategies:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-05T18:07:19.727Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg3an_deurlq",
+      "turnId": "turn-1785953239711",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:19.931Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg3an_deurlq",
+      "turnId": "turn-1785953239711",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 197,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-05T18:07:20.987Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg49n_uc228a",
+      "turnId": "turn-1785953240868",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:20.988Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg49n_uc228a",
+      "turnId": "turn-1785953240868",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:22.127Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msgeg55b_icjgot",
+      "turnId": "turn-1785953242024",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T18:07:22.127Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msgeg55b_icjgot",
+      "turnId": "turn-1785953242024",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "jobId": "search_730d4e81-21a9-4b30-b361-ff5adf90b306",
+    "firstFallbackUsed": true,
+    "firstToolIds": [
+      "search.status"
+    ],
+    "secondResponseReceived": true,
+    "secondFallbackUsed": false,
+    "secondDirectAnswer": true,
+    "providerStartedCount": 0,
+    "completedCount": 1,
+    "noDuplicateProviderLoop": true,
+    "noWriteToolExecuted": true,
+    "writeToolIds": [],
+    "firstThinkingCleared": true,
+    "conversationContinued": true,
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "horizontalOverflow": false,
+    "thinkingCleared": true,
+    "primaryText": "전략 탐색은 여러 규칙과 설정을 실제 과거 데이터에 적용해 검토할 후보를 찾는 단계입니다.\n\n탐색 결과는 아직 채택된 전략이 아닙니다. 결과 등록과 백테스트 검토를 거쳐야 하며, 새 탐색이나 취소처럼 상태를 바꾸는 작업은 승인 후 실행됩니다.",
+    "hasApproval": false,
+    "hasExecutionResult": false
+  },
+  "passed": false
+}

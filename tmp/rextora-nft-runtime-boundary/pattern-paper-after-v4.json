@@ -1,0 +1,10 @@
+{
+  "entrypoint": "src/lib/rextora/paper/paperSessionStore.ts",
+  "elapsedMs": 213.388375,
+  "tracedFileCount": 16,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/strategies/**/*"
+  ]
+}

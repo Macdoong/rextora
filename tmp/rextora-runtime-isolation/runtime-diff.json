@@ -1,0 +1,148 @@
+{
+  "comparedAt": "2026-08-11T01:15:00.000Z",
+  "fields": {
+    "cwd": {
+      "production": "/Users/macdoong/Documents/Rextora",
+      "development": "/Users/macdoong/Documents/Rextora",
+      "lifecycle": "/Users/macdoong/Documents/Rextora",
+      "smoke": "/Users/macdoong/Documents/Rextora",
+      "equal": true
+    },
+    "HOME": {
+      "production": "/Users/macdoong",
+      "development": "/Users/macdoong",
+      "lifecycle": "/Users/macdoong",
+      "smoke": "/Users/macdoong",
+      "equal": true
+    },
+    "USER": {
+      "production": "macdoong",
+      "development": "macdoong",
+      "lifecycle": "macdoong",
+      "smoke": "macdoong",
+      "equal": true
+    },
+    "NODE_ENV": {
+      "production": "production",
+      "development": "development",
+      "lifecycle": "production",
+      "smoke": "production",
+      "equal": false,
+      "note": "development uses next-dev NODE_ENV=development; others production"
+    },
+    "port": {
+      "production": 3000,
+      "development": 3101,
+      "lifecycle": "ephemeral",
+      "smoke": 3000,
+      "equal": false
+    },
+    "hostname": {
+      "production": "127.0.0.1",
+      "development": "127.0.0.1",
+      "lifecycle": "127.0.0.1",
+      "smoke": "127.0.0.1",
+      "equal": true
+    },
+    "applicationDataRoot_preFix": {
+      "production": "/Users/macdoong/Documents/Rextora/data/rextora",
+      "development": "/Users/macdoong/Documents/Rextora/data/rextora",
+      "lifecycle": "/Users/macdoong/Documents/Rextora/data/rextora (IGNORED REXTORA_DATA_DIR for AI stores)",
+      "smoke": "/Users/macdoong/Documents/Rextora/data/rextora",
+      "equal": false,
+      "note": "Lifecycle sets REXTORA_DATA_DIR for search/paper/sessions but AI credential+settings previously ignored it"
+    },
+    "providerCredentialStorePath_preFix": {
+      "production": "/Users/macdoong/Documents/Rextora/data/rextora/secrets/ai-provider-credentials.enc.json",
+      "development": "SAME inode as production",
+      "lifecycle": "SAME cwd path as production (defect)",
+      "smoke": "SAME as production",
+      "equal": false
+    },
+    "providerSettingsStorePath_preFix": {
+      "production": "/Users/macdoong/Documents/Rextora/data/rextora/ai-provider-settings.json",
+      "development": "SAME inode as production",
+      "lifecycle": "SAME cwd path as production (defect)",
+      "smoke": "SAME as production",
+      "equal": false
+    },
+    "masterKeySourceType": {
+      "production": "file:.master.key",
+      "development": "file:.master.key",
+      "lifecycle": "file:.master.key under cwd secrets (pre-fix)",
+      "smoke": "file:.master.key",
+      "equal": true,
+      "note": "Pre-fix lifecycle incorrectly shared production master-key file"
+    },
+    "encryptedCredentialFileExists": {
+      "production": true,
+      "development": true,
+      "lifecycle": true_via_cwd_leak,
+      "smoke": true,
+      "equal": true
+    },
+    "openai.stored": {
+      "production": true,
+      "development": "unreachable_when_dev_crashed",
+      "lifecycle": "true_via_cwd_leak",
+      "smoke": true,
+      "equal": false
+    },
+    "gemini.stored": {
+      "production": true,
+      "development": "unreachable_when_dev_crashed",
+      "lifecycle": "true_via_cwd_leak",
+      "smoke": "API true / UI assert false (race)",
+      "equal": false
+    },
+    "envFallback": {
+      "production": false,
+      "development": "n/a_crashed",
+      "lifecycle": "false_because_stored_cwd_credentials_preferred",
+      "smoke": false,
+      "equal": false
+    },
+    "sharedSearchJobPressure": {
+      "production": { "running": 49, "queued": 126, "totalActiveish": 175 },
+      "development": "SAME shared jobs directory — orphan resume stampede",
+      "lifecycle": "isolated via REXTORA_STRATEGY_SEARCH_DIR / REXTORA_DATA_DIR",
+      "smoke": "same as production",
+      "equal": false
+    },
+    "orphanAutoResumePreFix": {
+      "production": "resumes all eligible of newest 100",
+      "development": "resumed>=13 then Turbopack hung/died",
+      "lifecycle": "isolated empty search dir — no stampede",
+      "smoke": "same as production under load",
+      "equal": false
+    },
+    "settingsApiLatencyMs": {
+      "production": 22,
+      "development": "timeout_or_connection_refused",
+      "lifecycle": "varies; models catalog 400 observed",
+      "smoke": "production base",
+      "equal": false
+    },
+    "providerClientCache": {
+      "all": "process-local Map — not shared across processes",
+      "equal": true,
+      "note": "Cache poisoning across servers is not the defect; shared disk jobs + shared credential path are"
+    },
+    "modelCatalogCache": {
+      "all": "process-local TTL 10m",
+      "equal": true
+    }
+  },
+  "summary": {
+    "sameCwdHomeUser": true,
+    "sameCredentialFilePreFix": true,
+    "lifecycleHonoredRextoraDataDirForAiStoresPreFix": false,
+    "developmentDistinctCredentialStore": false,
+    "primaryDivergences": [
+      "NODE_ENV / next-dev vs next-start",
+      "orphan auto-resume into shared strategy-search job disk on :3101",
+      "lifecycle AI credential+settings ignored REXTORA_DATA_DIR",
+      "lifecycle harness overwrote scenario F AI_AGENT_PROVIDER after extra env"
+    ]
+  }
+}

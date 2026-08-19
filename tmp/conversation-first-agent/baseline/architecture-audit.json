@@ -1,0 +1,88 @@
+{
+  "repositoryRoot": "/Users/macdoong/Documents/Rextora",
+  "branch": "main",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "node": "v25.8.0",
+  "npm": "11.11.0",
+  "buildId": "-Cxu4VyOHFfrQb9h3COOq",
+  "activeServers": [
+    {
+      "port": 3000,
+      "process": "next-server (v16.2.6)",
+      "parent": "node /Users/macdoong/Documents/Rextora/node_modules/.bin/next dev",
+      "mode": "development"
+    }
+  ],
+  "ownership": {
+    "v1ControlPlane": [
+      "intentParser",
+      "goalDetector",
+      "agentDataFetcher",
+      "decisionContext",
+      "agentResponseBuilder",
+      "planDrafts",
+      "typedCommand/commandExecutor"
+    ],
+    "v2ControlPlane": [
+      "structured reasoning/provider/fallback",
+      "validated tool planning",
+      "tool policy/execution/audit/idempotency",
+      "server sessions/workspaces",
+      "plans/tasks/events",
+      "verified memory",
+      "approval execution receipts"
+    ],
+    "enginesPreserved": [
+      "strategySearch",
+      "results/strategy registration",
+      "backtest",
+      "paper",
+      "live safety gate"
+    ]
+  },
+  "responsePaths": [
+    "safety-blocked local buildAgentResponse",
+    "V1 local/legacy callLLM buildAgentResponse",
+    "V2 provider/fallback buildResponseFromReasoning",
+    "approval replay/empty approval deterministic responses",
+    "approved tool/typed command execution responses"
+  ],
+  "verifiedDefects": [
+    "No product/app-meta intent or conversation route mode exists",
+    "Unknown questions are always forced through lifecycleFallbackIntent",
+    "paper_active maps unrelated unknown questions to paper_start_request",
+    "mixed ConversationEntityMemory combines conversation topic and workflow state",
+    "raw lifecycle enums render in AgentMessage and AgentContextStrip",
+    "sanitizer and leak detector do not cover all lifecycle enum/status surfaces",
+    "existing 52-row harness has lifecycle scenarios A-M but no product-meta question after stale Paper context"
+  ],
+  "safetyInvariants": {
+    "safeParamsHash": "7893ca3f0e30",
+    "safeDiffEmpty": true,
+    "toolRegistryLiveExchangeSafeMutationAbsent": true,
+    "writeToolsRequireApproval": true,
+    "unknownToolsDenied": true,
+    "paperSimulated": true,
+    "approvalProviderCalls": 0,
+    "approvalReceiptTerminalReplay": true
+  },
+  "architectureConclusion": {
+    "decision": "extend existing control plane with focused v2/conversation modules",
+    "preserve": [
+      "existing engines",
+      "tool registry and policy",
+      "approval fast path and receipt ledger",
+      "server session stores",
+      "reasoning provider and validation",
+      "verified-memory evidence rules"
+    ],
+    "add": [
+      "conversation-first six-mode router",
+      "separate conversation/workflow context views",
+      "reference resolver",
+      "stable Rextora product/domain knowledge",
+      "natural response composer",
+      "central Korean lifecycle labels and expanded leak coverage"
+    ]
+  }
+}

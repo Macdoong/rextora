@@ -1,0 +1,45 @@
+{
+  "status": 200,
+  "body": {
+    "emergencyDisabled": false,
+    "defaultProvider": null,
+    "fallbackEnabled": true,
+    "fallbackProvider": null,
+    "openai": {
+      "configured": true,
+      "enabled": true,
+      "fingerprint": null,
+      "selectedModel": "gpt-5-mini",
+      "lastTestAt": null,
+      "lastTestOk": null,
+      "lastErrorKo": null,
+      "catalogCount": 0,
+      "envFallback": true,
+      "stored": false
+    },
+    "gemini": {
+      "configured": true,
+      "enabled": true,
+      "fingerprint": null,
+      "selectedModel": "gemini-2.5-flash",
+      "lastTestAt": null,
+      "lastTestOk": null,
+      "lastErrorKo": null,
+      "catalogCount": 0,
+      "envFallback": true,
+      "stored": false
+    },
+    "reasoningActive": true,
+    "runtime": {
+      "active": true,
+      "emergencyDisabled": false,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "source": "env",
+      "fallbackEnabled": true,
+      "fallbackProvider": null,
+      "openaiConfigured": true,
+      "geminiConfigured": true
+    }
+  }
+}

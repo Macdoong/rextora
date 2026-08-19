@@ -1,0 +1,9 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  12:33:55
+   Duration  191ms (transform 17ms, setup 19ms, import 7ms, tests 25ms, environment 0ms)
+

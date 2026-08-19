@@ -1,0 +1,181 @@
+clean-390: demo 802ms
+clean-390: server 1314ms
+clean-390: browser 1535ms
+clean-390: turn 렉스토라는 뭐 하는 앱 1838ms
+clean-390: turn 실전매매 바로 시작해. 2128ms
+clean-390: PASS
+search-running-390: demo 773ms
+search-running-390: server 1286ms
+search-running-390: browser 1486ms
+search-running-390: turn 현재 진행 상황 알려줘 1812ms
+search-running-390: PASS
+backtest-available-390: demo 949ms
+backtest-available-390: server 1453ms
+backtest-available-390: browser 1606ms
+backtest-available-390: turn 최근 검증된 전략의 위 5982ms
+backtest-available-390: PASS
+paper-pending-390: demo 748ms
+paper-pending-390: server 1252ms
+paper-pending-390: browser 1417ms
+paper-pending-390: turn 이건 뭐하는거야? 1769ms
+paper-pending-390: turn 아니 렉스토라 앱 자체 2055ms
+paper-pending-390: turn 좀 더 쉽게 설명해줘. 2345ms
+paper-pending-390: turn 아냐 취소. 2642ms
+paper-pending-390: PASS
+paper-active-390: demo 762ms
+paper-active-390: server 1265ms
+paper-active-390: browser 1447ms
+paper-active-390: turn 백테스트가 뭐야? 1764ms
+paper-active-390: turn 그럼 모의매매랑 차이는 2049ms
+paper-active-390: PASS
+stale-approval-390: demo 737ms
+stale-approval-390: server 1238ms
+stale-approval-390: browser 1390ms
+stale-approval-390: turn 아까 거 진행해. 1738ms
+stale-approval-390: PASS
+multiple-approvals-390: demo 754ms
+multiple-approvals-390: server 1257ms
+multiple-approvals-390: browser 1443ms
+multiple-approvals-390: turn 진행해. 1757ms
+multiple-approvals-390: PASS
+execution-390: demo 800ms
+execution-390: server 1313ms
+execution-390: browser 1505ms
+execution-390: turn 새 전략을 탐색해줘. 7170ms
+execution-390: PASS
+clean-768: demo 744ms
+clean-768: server 1241ms
+clean-768: browser 1446ms
+clean-768: turn 렉스토라는 뭐 하는 앱 1783ms
+clean-768: turn 실전매매 바로 시작해. 2079ms
+clean-768: PASS
+search-running-768: demo 751ms
+search-running-768: server 1252ms
+search-running-768: browser 1455ms
+search-running-768: turn 현재 진행 상황 알려줘 1798ms
+search-running-768: PASS
+backtest-available-768: demo 759ms
+backtest-available-768: server 1257ms
+backtest-available-768: browser 1410ms
+backtest-available-768: turn 최근 검증된 전략의 위 6749ms
+backtest-available-768: PASS
+paper-pending-768: demo 757ms
+paper-pending-768: server 1260ms
+paper-pending-768: browser 1415ms
+paper-pending-768: turn 이건 뭐하는거야? 1787ms
+paper-pending-768: turn 아니 렉스토라 앱 자체 2088ms
+paper-pending-768: turn 좀 더 쉽게 설명해줘. 2380ms
+paper-pending-768: turn 아냐 취소. 2695ms
+paper-pending-768: PASS
+paper-active-768: demo 757ms
+paper-active-768: server 1260ms
+paper-active-768: browser 1421ms
+paper-active-768: turn 백테스트가 뭐야? 1790ms
+paper-active-768: turn 그럼 모의매매랑 차이는 2101ms
+paper-active-768: PASS
+stale-approval-768: demo 751ms
+stale-approval-768: server 1247ms
+stale-approval-768: browser 1441ms
+stale-approval-768: turn 아까 거 진행해. 1762ms
+stale-approval-768: PASS
+multiple-approvals-768: demo 755ms
+multiple-approvals-768: server 1257ms
+multiple-approvals-768: browser 1417ms
+multiple-approvals-768: turn 진행해. 1781ms
+multiple-approvals-768: PASS
+execution-768: demo 760ms
+execution-768: server 1256ms
+execution-768: browser 1452ms
+execution-768: turn 새 전략을 탐색해줘. 7782ms
+execution-768: PASS
+clean-1024: demo 752ms
+clean-1024: server 1250ms
+clean-1024: browser 1442ms
+clean-1024: turn 렉스토라는 뭐 하는 앱 1845ms
+clean-1024: turn 실전매매 바로 시작해. 2172ms
+clean-1024: PASS
+search-running-1024: demo 750ms
+search-running-1024: server 1248ms
+search-running-1024: browser 1446ms
+search-running-1024: turn 현재 진행 상황 알려줘 1795ms
+search-running-1024: PASS
+backtest-available-1024: demo 757ms
+backtest-available-1024: server 1263ms
+backtest-available-1024: browser 1421ms
+backtest-available-1024: turn 최근 검증된 전략의 위 6921ms
+backtest-available-1024: PASS
+paper-pending-1024: demo 757ms
+paper-pending-1024: server 1264ms
+paper-pending-1024: browser 1430ms
+paper-pending-1024: turn 이건 뭐하는거야? 1816ms
+paper-pending-1024: turn 아니 렉스토라 앱 자체 2150ms
+paper-pending-1024: turn 좀 더 쉽게 설명해줘. 2453ms
+paper-pending-1024: turn 아냐 취소. 2762ms
+paper-pending-1024: PASS
+paper-active-1024: demo 759ms
+paper-active-1024: server 1261ms
+paper-active-1024: browser 1466ms
+paper-active-1024: turn 백테스트가 뭐야? 1802ms
+paper-active-1024: turn 그럼 모의매매랑 차이는 2129ms
+paper-active-1024: PASS
+stale-approval-1024: demo 739ms
+stale-approval-1024: server 1236ms
+stale-approval-1024: browser 1446ms
+stale-approval-1024: turn 아까 거 진행해. 1788ms
+stale-approval-1024: PASS
+multiple-approvals-1024: demo 758ms
+multiple-approvals-1024: server 1255ms
+multiple-approvals-1024: browser 1459ms
+multiple-approvals-1024: turn 진행해. 1798ms
+multiple-approvals-1024: PASS
+execution-1024: demo 756ms
+execution-1024: server 1261ms
+execution-1024: browser 1465ms
+execution-1024: turn 새 전략을 탐색해줘. 7249ms
+execution-1024: PASS
+clean-1440: demo 750ms
+clean-1440: server 1253ms
+clean-1440: browser 1460ms
+clean-1440: turn 렉스토라는 뭐 하는 앱 1853ms
+clean-1440: turn 실전매매 바로 시작해. 2203ms
+clean-1440: PASS
+search-running-1440: demo 752ms
+search-running-1440: server 1244ms
+search-running-1440: browser 1416ms
+search-running-1440: turn 현재 진행 상황 알려줘 1826ms
+search-running-1440: PASS
+backtest-available-1440: demo 754ms
+backtest-available-1440: server 1253ms
+backtest-available-1440: browser 1416ms
+backtest-available-1440: turn 최근 검증된 전략의 위 6721ms
+backtest-available-1440: PASS
+paper-pending-1440: demo 759ms
+paper-pending-1440: server 1263ms
+paper-pending-1440: browser 1452ms
+paper-pending-1440: turn 이건 뭐하는거야? 1826ms
+paper-pending-1440: turn 아니 렉스토라 앱 자체 2169ms
+paper-pending-1440: turn 좀 더 쉽게 설명해줘. 2468ms
+paper-pending-1440: turn 아냐 취소. 2768ms
+paper-pending-1440: PASS
+paper-active-1440: demo 757ms
+paper-active-1440: server 1260ms
+paper-active-1440: browser 1456ms
+paper-active-1440: turn 백테스트가 뭐야? 1828ms
+paper-active-1440: turn 그럼 모의매매랑 차이는 2173ms
+paper-active-1440: PASS
+stale-approval-1440: demo 744ms
+stale-approval-1440: server 1242ms
+stale-approval-1440: browser 1446ms
+stale-approval-1440: turn 아까 거 진행해. 1816ms
+stale-approval-1440: PASS
+multiple-approvals-1440: demo 749ms
+multiple-approvals-1440: server 1247ms
+multiple-approvals-1440: browser 1458ms
+multiple-approvals-1440: turn 진행해. 1805ms
+multiple-approvals-1440: PASS
+execution-1440: demo 760ms
+execution-1440: server 1258ms
+execution-1440: browser 1424ms
+execution-1440: turn 새 전략을 탐색해줘. 8415ms
+execution-1440: PASS
+{"passed":true,"total":32,"passedCount":32,"failures":[]}

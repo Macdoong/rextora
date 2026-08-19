@@ -214,8 +214,48 @@ function HelpTitle({ title, help }: { title: string; help: string }) {
   );
 }
 
-function SectionAnchor({ id, children }: { id: string; children: ReactNode }) {
-  return <section id={`bt-${id}`} data-section={id} className="scroll-mt-20">{children}</section>;
+const WORKSPACE_TAB_IDS = [
+  "price",
+  "trades",
+  "monthly",
+  "cost",
+  "equity",
+  "timeline",
+  "advanced",
+  "validation",
+] as const;
+
+type WorkspaceTabId = (typeof WORKSPACE_TAB_IDS)[number];
+
+function isWorkspaceTabId(id: string): id is WorkspaceTabId {
+  return (WORKSPACE_TAB_IDS as readonly string[]).includes(id);
+}
+
+function SectionAnchor({
+  id,
+  children,
+  activeSection,
+}: {
+  id: string;
+  children: ReactNode;
+  /** When set, workspace sections are exclusive tabs — only the active one mounts visibly. */
+  activeSection?: WorkspaceTabId | string;
+}) {
+  const exclusive = isWorkspaceTabId(id);
+  const hidden = exclusive && activeSection != null && activeSection !== id;
+  return (
+    <section
+      id={`bt-${id}`}
+      data-section={id}
+      data-workspace-tab={exclusive ? "true" : undefined}
+      data-tab-active={exclusive ? (hidden ? "false" : "true") : undefined}
+      hidden={hidden || undefined}
+      aria-hidden={hidden || undefined}
+      className={`scroll-mt-20 ${hidden ? "hidden" : ""}`}
+    >
+      {children}
+    </section>
+  );
 }
 
 function MetricsGrid({ items, cols = "md:grid-cols-3 lg:grid-cols-5" }: { items: Array<{ label: string; value: ReactNode; tone?: Tone; help?: string }>; cols?: string }) {
@@ -814,6 +854,14 @@ export function BacktestAnalysisView({
     return () => root?.removeEventListener("bt-force-expand", onForce);
   }, []);
 
+  // Selected workspace tab forces content open — no scroll-driven tab mutation.
+  const tradesOpen = activeSection === "trades" || tradeListExpanded;
+  const equityOpen = activeSection === "equity" || equityExpanded;
+  const timelineOpen = activeSection === "timeline" || timelineExpanded;
+  const advancedOpen = activeSection === "advanced" || advancedExpanded;
+  const validationOpen =
+    activeSection === "validation" || validationDetailsOpen;
+
   const scrollToSection = (id: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation") => {
     if (id === "equity") setEquityExpanded(true);
     if (id === "timeline") setTimelineExpanded(true);
@@ -821,9 +869,6 @@ export function BacktestAnalysisView({
     if (id === "validation") setValidationDetailsOpen(true);
     if (id === "trades") setTradeListExpanded(true);
     onSectionChange?.(id);
-    requestAnimationFrame(() => {
-      document.getElementById(`bt-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
   };
 
   const navigateTrade = (dir: -1 | 1) => {
@@ -865,7 +910,7 @@ export function BacktestAnalysisView({
     return worst;
   }, null);
   const previewTradeRows = (() => {
-    if (tradeListExpanded) return pageRows;
+    if (tradesOpen) return pageRows;
     const pick = new Map<string, EnrichedTrade>();
     if (selectedTradeId) {
       const sel = filtered.find((t) => t.id === selectedTradeId);
@@ -916,7 +961,7 @@ export function BacktestAnalysisView({
         </p>
       ) : null}
 
-      <SectionAnchor id="summary">
+      <SectionAnchor id="summary" activeSection={activeSection}>
         <Card title="핵심 성과" data-testid="backtest-summary">
           <div className="mb-3 flex flex-wrap gap-3 text-xs rx-text-muted">
             <span>데이터 출처: {dataSourceLabel}</span>
@@ -1066,7 +1111,7 @@ export function BacktestAnalysisView({
         </Card>
       </SectionAnchor>
 
-      <SectionAnchor id="price">
+      <SectionAnchor id="price" activeSection={activeSection}>
         <div data-testid="backtest-price-chart">
           <h2 className="mb-2 text-sm font-semibold text-slate-100">가격 차트</h2>
           <details
@@ -1462,7 +1507,7 @@ export function BacktestAnalysisView({
         </div>
       </SectionAnchor>
 
-      <SectionAnchor id="trades">
+      <SectionAnchor id="trades" activeSection={activeSection}>
         {hasTrades ? (
           <Card title="거래 목록" data-testid="backtest-trade-list">
             <div
@@ -1510,7 +1555,7 @@ export function BacktestAnalysisView({
                   </div>
                   <span className="text-xs rx-text-muted">
                     {filtered.length}건
-                    {tradeListExpanded
+                    {tradesOpen
                       ? ` · ${safePage + 1}/${pageCount} 페이지`
                       : " · 미리보기"}
                   </span>
@@ -1568,7 +1613,7 @@ export function BacktestAnalysisView({
                   ))}
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {!tradeListExpanded ? (
+                  {!tradesOpen ? (
                     <Button
                       size="sm"
                       variant="outline"
@@ -1638,7 +1683,7 @@ export function BacktestAnalysisView({
       </SectionAnchor>
 
       {hasTrades ? (
-        <SectionAnchor id="monthly">
+        <SectionAnchor id="monthly" activeSection={activeSection}>
           <Card title="월별 성과" data-testid="backtest-monthly">
             <HelpTitle
               title="달력 월 집계"
@@ -1683,7 +1728,7 @@ export function BacktestAnalysisView({
       ) : null}
 
       {hasTrades ? (
-        <SectionAnchor id="cost">
+        <SectionAnchor id="cost" activeSection={activeSection}>
           <Card title="비용 요약" data-testid="backtest-cost-analysis">
             <MetricsGrid
               cols="md:grid-cols-4"
@@ -1777,9 +1822,9 @@ export function BacktestAnalysisView({
         </SectionAnchor>
       ) : null}
 
-      <SectionAnchor id="equity">
+      <SectionAnchor id="equity" activeSection={activeSection}>
         <Card title="자산·낙폭" data-testid="backtest-equity-section">
-          {!equityExpanded ? (
+          {!equityOpen ? (
             <button
               type="button"
               className="w-full text-left text-sm text-slate-200"
@@ -1835,9 +1880,9 @@ export function BacktestAnalysisView({
         </Card>
       </SectionAnchor>
 
-      <SectionAnchor id="timeline">
+      <SectionAnchor id="timeline" activeSection={activeSection}>
         <Card title="거래 타임라인" data-testid="backtest-timeline">
-          {!timelineExpanded ? (
+          {!timelineOpen ? (
             <button
               type="button"
               className="w-full text-left text-sm text-slate-200"
@@ -1911,9 +1956,9 @@ export function BacktestAnalysisView({
         </Card>
       </SectionAnchor>
 
-      <SectionAnchor id="advanced">
+      <SectionAnchor id="advanced" activeSection={activeSection}>
         <Card title="상세 분석" data-testid="backtest-advanced">
-          {!advancedExpanded ? (
+          {!advancedOpen ? (
             <div className="space-y-1 text-sm text-slate-300">
               <p>
                 거래 분포 · {report.tradeCount}개 거래 · 이익 {winCount}개 · 손실{" "}
@@ -2025,7 +2070,7 @@ export function BacktestAnalysisView({
       </SectionAnchor>
 
 
-      <SectionAnchor id="validation">
+      <SectionAnchor id="validation" activeSection={activeSection}>
         <Card title="검증 결과" data-testid="backtest-validation">
           <ValidationGrid
             report={report}
@@ -2043,7 +2088,7 @@ export function BacktestAnalysisView({
             hasRejectedTraces={
               rejectedSetups.length > 0 || rejectedFromTraces.length > 0
             }
-            detailsOpen={validationDetailsOpen}
+            detailsOpen={validationOpen}
             onToggleDetails={() => setValidationDetailsOpen((v) => !v)}
           />
         </Card>

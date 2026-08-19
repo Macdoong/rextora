@@ -1,0 +1,55 @@
+{
+  "requestedProvider": "openai",
+  "selectedProvider": null,
+  "providerAttempted": true,
+  "providerSucceeded": false,
+  "structuredOutputValid": false,
+  "canaryPassed": false,
+  "checks": [
+    {
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "configured": true,
+      "ok": true,
+      "latencyMs": 2226
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "configured": true,
+      "ok": false,
+      "latencyMs": 1025,
+      "errorKo": "Gemini 응답 오류 (200)"
+    }
+  ],
+  "fallbackUsed": true,
+  "fallbackReason": "unusable_structured_output",
+  "writeToolAuditCount": 0,
+  "canary": {
+    "status": 200,
+    "provider": null,
+    "model": null,
+    "fallbackUsed": null,
+    "validationOk": null,
+    "toolIds": [],
+    "writeToolExecuted": false,
+    "structuredOutputValid": false,
+    "conclusionKo": "대시보드에서 상태를 확인하세요.",
+    "latencyMs": null,
+    "errorKo": null
+  },
+  "verification": {
+    "requestedProvider": "openai",
+    "selectedProvider": null,
+    "providerAttempted": true,
+    "providerSucceeded": false,
+    "fallbackUsed": true,
+    "fallbackReason": "unusable_structured_output",
+    "canaryPassed": false,
+    "healthyMarked": false,
+    "checksEmpty": false,
+    "canaryNull": false,
+    "writeToolsBlocked": true
+  },
+  "healthActiveProvider": "openai"
+}

@@ -65,6 +65,9 @@ describe("safetyGuard: write-blocking", () => {
       "recommend_next",
       "paper_start_request",
       "search_failure_explanation",
+      "prepare_search_plan",
+      "follow_up_why",
+      "approve_pending",
       "unknown",
     ] as const;
     for (const intent of readOnly) {
@@ -217,7 +220,7 @@ describe("agentResponseBuilder", () => {
     expect(resp.interpretationKo).toBeTruthy();
   });
 
-  it("LLM interpretation overrides local when provided", () => {
+  it("LLM metadata is preserved while conversational decision prose leads", () => {
     const intent = pi("탐색 상태 알려줘");
     const resp = buildAgentResponse(intent, facts, {
       interpretationKo: "LLM generated text",
@@ -225,9 +228,11 @@ describe("agentResponseBuilder", () => {
       providerMeta: { provider: "openai", model: "gpt-4o-mini", latencyMs: 400 },
     });
     expect(resp.interpretationSource).toBe("llm");
-    expect(resp.interpretationKo).toBe("LLM generated text");
+    expect(resp.conclusionKo.length).toBeGreaterThan(5);
+    expect(resp.explanationKo.length).toBeGreaterThan(5);
+    expect(resp.interpretationKo).toContain(resp.conclusionKo);
     expect(resp.providerMeta?.provider).toBe("openai");
-    // Facts must still be present and separate
+    // Facts must still be present and separate (collapsed evidence)
     expect(resp.facts).toHaveLength(3);
   });
 
@@ -281,7 +286,9 @@ describe("agentResponseBuilder", () => {
     expect(resp.actions).toHaveLength(1);
     expect(resp.actions[0]?.href).toContain("/paper-trading");
     expect(resp.actions[0]?.requiresApproval).toBe(true);
-    expect(resp.interpretationKo).toMatch(/자동 시작하지 않습니다/);
+    expect(resp.interpretationKo + resp.conclusionKo + resp.explanationKo).toMatch(
+      /승인|화면만/,
+    );
   });
 
   it("compare_strategies refuses when verified data is missing", () => {
@@ -306,9 +313,10 @@ describe("agentResponseBuilder", () => {
         fetchedAt: "2026-01-01T00:00:00Z",
       },
     ]);
-    expect(resp.interpretationKo).toMatch(/완료할 수 없습니다/);
-    expect(resp.interpretationKo).toMatch(/만들지 않습니다/);
-    expect(resp.interpretationKo).not.toMatch(/\d+(\.\d+)?%/);
+    expect(resp.conclusionKo + resp.explanationKo).toMatch(/비교할 수 없/);
+    expect(resp.conclusionKo + resp.explanationKo).toMatch(/만들지 않습니다|추정/);
+    expect(resp.conclusionKo).not.toMatch(/\d+(\.\d+)?%/);
+    expect(resp.actions[0]?.type).toBe("open_backtest");
   });
 });
 

@@ -1,0 +1,138 @@
+{
+  "scenario": "F",
+  "width": 1440,
+  "startedAt": "2026-08-14T08:39:44.013Z",
+  "finishedAt": "2026-08-14T08:44:49.726Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-F-1440-8083be-FM723b",
+  "port": 60326,
+  "provider": "openai",
+  "consoleErrorCount": 2,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:60326/api/rextora/settings/ai-providers/models?provider=gemini:0:0",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:60326/api/rextora/settings/ai-providers/models?provider=gemini:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T08:39:45.172Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssp4ums_h2di4e",
+      "turnId": "turn-1786696785156",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:39:45.269Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssp4ums_h2di4e",
+      "turnId": "turn-1786696785156",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 90,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T08:39:46.264Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssp4vh4_bklfhs",
+      "turnId": "turn-1786696786210",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:39:46.265Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssp4vh4_bklfhs",
+      "turnId": "turn-1786696786210",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:39:47.241Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssp4w89_qr50a0",
+      "turnId": "turn-1786696787212",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:39:47.242Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssp4w89_qr50a0",
+      "turnId": "turn-1786696787212",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:42:18.571Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssp84zv_6gh3y5",
+      "turnId": "turn-1786696938218",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:42:18.572Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssp84zv_6gh3y5",
+      "turnId": "turn-1786696938218",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "jobId": "search_36d0b262-7afd-4a67-9697-0bdd1513cfee",
+    "firstFallbackUsed": true,
+    "firstToolIds": [
+      "search.status"
+    ],
+    "secondResponseReceived": true,
+    "secondFallbackUsed": true,
+    "secondDirectAnswer": false,
+    "providerStartedCount": 0,
+    "completedCount": 2,
+    "noDuplicateProviderLoop": true,
+    "noWriteToolExecuted": true,
+    "writeToolIds": [],
+    "firstThinkingCleared": true,
+    "conversationContinued": true,
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "horizontalOverflow": false,
+    "thinkingCleared": true,
+    "primaryText": "지금 실행 중인 탐색을 먼저 확인하세요.\n\n1개 작업이 실행 중입니다.\n\n탐색 상태·결과를 확인하세요.",
+    "hasApproval": false,
+    "hasExecutionResult": false
+  },
+  "passed": true
+}

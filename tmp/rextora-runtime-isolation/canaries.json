@@ -1,0 +1,26 @@
+{
+  "openai": {
+    "provider": "openai",
+    "httpStatus": 200,
+    "latencyMs": 21391,
+    "responseProvider": "openai",
+    "model": "gpt-5-mini",
+    "fallbackUsed": false,
+    "validationOk": true,
+    "providerSucceeded": true,
+    "secretLeakCount": 0,
+    "hasText": true
+  },
+  "gemini": {
+    "provider": "gemini",
+    "httpStatus": 200,
+    "latencyMs": 5103,
+    "responseProvider": "gemini",
+    "model": "gemini-2.5-flash",
+    "fallbackUsed": false,
+    "validationOk": true,
+    "providerSucceeded": true,
+    "secretLeakCount": 0,
+    "hasText": true
+  }
+}

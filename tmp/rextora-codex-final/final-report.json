@@ -1,0 +1,77 @@
+{
+  "verdict": "REXTORA TESTER READINESS FAILED",
+  "branch": "main",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "initialBuildId": "Bt9hwUM42EQX4tnRiIVUW",
+  "finalTesterBuildId": null,
+  "finalSourceFingerprint": "732f3e52f66484cc163f7ee25a3702de5fb37bb232c712606ac1fb7dfb0ff780",
+  "risk": {
+    "rootCause": "Persisted consecutiveLosses=4 was reused on a new Paper start and exceeded consecutiveLossLimit=3.",
+    "previousPaperLimit": 3,
+    "newPaperLimit": 6,
+    "derivation": "Observed legitimate Paper state 4 plus 50 percent finite headroom.",
+    "liveLimit": 3,
+    "newSessionCountersReset": true,
+    "hardStopPreserved": true
+  },
+  "telegram": {
+    "rootCause": "A 60-second cooldown allowed the same persistent blocked state to alert again after the cooldown or restart.",
+    "fix": "Persisted risk-state transition and breach-fingerprint deduplication.",
+    "sameStateSuppressed": true,
+    "recoveredThenBlockedAlertsAgain": true,
+    "distinctBreachAlerts": true
+  },
+  "testerGapFixes": [
+    "Ambiguous approval with multiple valid pending actions now asks for clarification and executes nothing.",
+    "New Paper sessions no longer reuse prior simulated risk outcomes.",
+    "Paper and Live consecutive-loss limits are mode-separated.",
+    "Repeated Telegram risk alerts are state-transition deduplicated."
+  ],
+  "focused": {
+    "finalPassed": 179,
+    "finalFailed": 0,
+    "openaiCanaryPreBuildPassed": true,
+    "geminiCanaryPreBuildPassed": true,
+    "a390DevelopmentAttemptAccepted": false,
+    "a390DevelopmentAttemptReason": "Known Turbopack development compilation stall; stopped without product result."
+  },
+  "quality": {
+    "lintPreFinalCorrectionExitCode": 0,
+    "unitPreFinalCorrectionPassed": 1551,
+    "unitPreFinalCorrectionDiscovered": 1551,
+    "finalSourceLintCredited": false,
+    "finalSourceUnitCredited": false
+  },
+  "build": {
+    "command": "npm run build",
+    "attempts": 2,
+    "passed": false,
+    "buildId": null,
+    "commonFailure": "Turbopack app/globals.css PostCSS worker timeout: failed to receive message / reading packet length / deadline elapsed.",
+    "firstAttemptAlsoEmittedCorruptedGeneratedCssWarnings": true,
+    "secondAttemptSameBoundary": true
+  },
+  "gates": {
+    "lifecycle52": "NOT_RUN_AFTER_BUILD_BLOCKER",
+    "production88": "NOT_RUN_AFTER_BUILD_BLOCKER",
+    "standardE2e": "NOT_RUN_AFTER_BUILD_BLOCKER",
+    "finalProviderApproval": "NOT_RUN_ON_FINAL_BUILD",
+    "paperRuntimeSanity": "NOT_RUN_ON_FINAL_BUILD",
+    "testerSmoke": "NOT_RUN_ON_FINAL_BUILD"
+  },
+  "safety": {
+    "liveStarted": false,
+    "realOrders": 0,
+    "binanceOrderCalls": 0,
+    "safeMutations": 0,
+    "safeParamsHash": "7893ca3f0e30",
+    "safeSha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "safeGitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "safeProtectedDiffEmpty": true
+  },
+  "git": {
+    "committed": false,
+    "pushed": false
+  },
+  "testerReady": false
+}

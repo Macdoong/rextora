@@ -1,0 +1,20 @@
+paper-active-390: demo 775ms
+paper-active-390: server 1304ms
+paper-active-390: browser 1505ms
+paper-active-390: turn 백테스트가 뭐야? 1827ms
+paper-active-390: turn 그럼 모의매매랑 차이는 2115ms
+paper-active-390: PASS
+stale-approval-390: demo 762ms
+stale-approval-390: server 1261ms
+stale-approval-390: browser 1446ms
+stale-approval-390: turn 아까 거 진행해. 1759ms
+stale-approval-390: PASS
+multiple-approvals-390: demo 751ms
+multiple-approvals-390: server 1250ms
+multiple-approvals-390: browser 1447ms
+multiple-approvals-390: turn 진행해. 1762ms
+multiple-approvals-390: PASS
+execution-390: demo 772ms
+execution-390: server 1279ms
+execution-390: browser 1448ms
+execution-390: turn 새 전략을 탐색해줘. 13031ms

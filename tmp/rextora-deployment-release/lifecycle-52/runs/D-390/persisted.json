@@ -1,0 +1,169 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "backtest.run",
+      "sessionId": "agent_9e175edbaf564561",
+      "arguments": {
+        "strategyId": "demo_strategy_btc_v1",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "runMode": "approval_draft",
+        "notes": "기본은 최신 저장된 심볼/타임프레임 유지. 실행에 필요한 시작/종료일, 초기 자본, 수수료/슬리피지, 포지션 규칙을 사용자 확인 후 최종화합니다.",
+        "requiredParameters": [
+          "startDate",
+          "endDate",
+          "initialCapital",
+          "feeModel",
+          "slippageModel",
+          "positionSizing"
+        ]
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 569,
+      "approved": true,
+      "timestamp": "2026-08-14T06:02:04.809Z",
+      "approvalId": "pa_42c2f2581c844891"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T06:01:18.118Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssjh2xy_zkpren",
+      "turnId": "turn-1786687278093",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:03.290Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssjh2xy_zkpren",
+      "turnId": "turn-1786687278093",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 45165,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:04.815Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssji2z3_w1wyi1",
+      "turnId": "turn-1786687324233",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:02:04.815Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssji2z3_w1wyi1",
+      "turnId": "turn-1786687324233",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssjh1xy_72f1c5.chart.json",
+    "bt_mssjh1xy_72f1c5.json",
+    "bt_mssji2yr_f5b154.chart.json",
+    "bt_mssji2yr_f5b154.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_9e175edbaf564561",
+      "kind": "actual_result",
+      "statementKo": "백테스트의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "run",
+          "id": "bt_mssji2yr_f5b154"
+        },
+        {
+          "type": "event",
+          "id": "event_c6b8422d6154cd24209a"
+        }
+      ],
+      "verifiedAt": "2026-08-14T06:02:04.809Z",
+      "sourceEventId": "event_c6b8422d6154cd24209a",
+      "metadata": {
+        "eventType": "backtest.completed",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_c31fa6bd83a3e18361fa"
+    },
+    {
+      "sessionId": "agent_9e175edbaf564561",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 백테스트 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_ef4da3394a284ea7bf1d"
+        }
+      ],
+      "verifiedAt": "2026-08-14T06:02:04.812Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_42c2f2581c844891",
+        "meaningfulHash": "349eec715828d256a9c07689"
+      },
+      "memoryId": "memory_25b9177cb4c28c666665"
+    },
+    {
+      "sessionId": "agent_9e175edbaf564561",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_ef4da3394a284ea7bf1d"
+        }
+      ],
+      "verifiedAt": "2026-08-14T06:02:04.812Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_42c2f2581c844891",
+        "meaningfulHash": "349eec715828d256a9c07689"
+      },
+      "memoryId": "memory_e0fb468ac54addb63056"
+    }
+  ],
+  "sessionFiles": [
+    "agent_9e175edbaf564561"
+  ]
+}

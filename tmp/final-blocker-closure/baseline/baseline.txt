@@ -1,0 +1,202 @@
+=== pwd ===
+/Users/macdoong/Documents/Rextora
+=== branch ===
+main
+=== HEAD ===
+5e0f089e5b2e02761705944710e6f6156c5d7663
+=== git status --short ===
+ M app/api/rextora/agent/route.ts
+ M app/backtest/page.tsx
+ M app/dashboard/page.tsx
+ M app/globals.css
+ M app/layout.tsx
+ M app/live-trading/page.tsx
+ M app/paper-trading/page.tsx
+ M app/results/page.tsx
+ M app/strategy-search/page.tsx
+ M components/rextora/agent/ActionCard.tsx
+ M components/rextora/agent/AgentMessage.tsx
+ M components/rextora/agent/AgentPanel.tsx
+ M components/rextora/agent/AgentSuggestions.tsx
+ M components/rextora/agent/useAgentSession.ts
+ M components/rextora/backtest/BacktestReviewWorkbench.tsx
+ M components/rextora/charts/BacktestAnalysisView.tsx
+ M instrumentation.ts
+ M next.config.ts
+ M src/lib/rextora/agent/agentDataFetcher.ts
+ M src/lib/rextora/agent/agentResponseBuilder.ts
+ M src/lib/rextora/agent/intentParser.ts
+ M src/lib/rextora/agent/llmTypes.ts
+ M src/lib/rextora/agent/providerConfig.ts
+ M src/lib/rextora/agent/providers/promptBuilder.ts
+ M src/lib/rextora/agent/safetyGuard.ts
+ M src/lib/rextora/agent/types.ts
+ M src/lib/rextora/report/aiTradeReport.ts
+ M src/lib/rextora/storage/jsonStore.ts
+ M src/lib/rextora/strategySearch/deletionSafety.ts
+ M src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+ M tests/agentCommercialUx.test.ts
+ M tests/agentIntentParser.test.ts
+ M tests/agentProvider.test.ts
+ M tests/backtestExecutionIdentity.test.ts
+ M tests/backtestSymbolSelector.test.ts
+ M tests/commercialOverlayHydration.test.ts
+ M tests/e2e/rextora-smoke.spec.ts
+ M tests/firstRunEmptyRuntime.test.ts
+ M tsconfig.json
+ M tsconfig.tsbuildinfo
+?? .DS_Store
+?? app/api/rextora/agent/session/
+?? components/rextora/ClientHydrated.tsx
+?? components/rextora/agent/AgentContextStrip.tsx
+?? components/rextora/agent/AgentSessionProvider.tsx
+?? components/rextora/agent/AgentWorkspacePanel.tsx
+?? components/rextora/agent/AppShell.tsx
+?? components/rextora/agent/ApprovalCenter.tsx
+?? components/rextora/agent/GlobalAgentAssistant.tsx
+?? components/rextora/agent/MissionTimeline.tsx
+?? components/rextora/agent/agentPersistence.ts
+?? components/rextora/agent/agentSessionSync.ts
+?? components/rextora/backtest/BacktestStrategyManageDrawer.tsx
+?? scripts/commandEvidence.mjs
+?? scripts/inspect-next-trace.mjs
+?? scripts/primaryLeakDetector.mjs
+?? scripts/providerCanary.mjs
+?? src/lib/rextora/agent/canonicalCommandPayload.ts
+?? src/lib/rextora/agent/commandExecutor.ts
+?? src/lib/rextora/agent/commandStore.ts
+?? src/lib/rextora/agent/conversationContext.ts
+?? src/lib/rextora/agent/conversationState.ts
+?? src/lib/rextora/agent/decisionContext.ts
+?? src/lib/rextora/agent/executionRequestClassifier.ts
+?? src/lib/rextora/agent/goalDetector.ts
+?? src/lib/rextora/agent/lifecycleStage.ts
+?? src/lib/rextora/agent/missionTimeline.ts
+?? src/lib/rextora/agent/planDrafts.ts
+?? src/lib/rextora/agent/proposedAction.ts
+?? src/lib/rextora/agent/researchWorkspace.ts
+?? src/lib/rextora/agent/searchPlanDraft.ts
+?? src/lib/rextora/agent/typedCommand.ts
+?? src/lib/rextora/agent/v2/
+?? src/lib/rextora/backtest/workspaceTabState.ts
+?? tests/AgentSessionPersistence.test.ts
+?? tests/AgentV2ApprovalFastPath.test.ts
+?? tests/AgentV2CancelReplace.test.ts
+?? tests/AgentV2ConversationalProse.test.ts
+?? tests/AgentV2EventLifecycle.test.ts
+?? tests/AgentV2ExecutionFlow.test.ts
+?? tests/AgentV2ExpandedSafeTools.test.ts
+?? tests/AgentV2GateEvidence.test.ts
+?? tests/AgentV2LeakageDJK.test.ts
+?? tests/AgentV2LongTermMemory.test.ts
+?? tests/AgentV2NextTraceInspect.test.ts
+?? tests/AgentV2NoFabrication.test.ts
+?? tests/AgentV2PlanDiff.test.ts
+?? tests/AgentV2PlanModification.test.ts
+?? tests/AgentV2PlannerOrchestration.test.ts
+?? tests/AgentV2PostExecutionApprovalClear.test.ts
+?? tests/AgentV2ProviderCanary.test.ts
+?? tests/AgentV2ProviderFallback.test.ts
+?? tests/AgentV2ReasoningPolicy.test.ts
+?? tests/AgentV2ReasoningRequestDedup.test.ts
+?? tests/AgentV2ReasoningSchema.test.ts
+?? tests/AgentV2ResearchBrain.test.ts
+?? tests/AgentV2ShadowMode.test.ts
+?? tests/AgentV2ShadowModeMatrix.test.ts
+?? tests/AgentV2ToolSelection.test.ts
+?? tests/AgentV2UserVisibleSanitizer.test.ts
+?? tests/ConversationRefresh.test.ts
+?? tests/SessionRecovery.test.ts
+?? tests/ToolAudit.test.ts
+?? tests/ToolEvents.test.ts
+?? tests/ToolExecution.test.ts
+?? tests/ToolPolicy.test.ts
+?? tests/ToolRegistry.test.ts
+?? tests/ToolValidation.test.ts
+?? tests/WorkspaceMerge.test.ts
+?? tests/agentConversationalEmployee.test.ts
+?? tests/agentConversationalIntelligence.test.ts
+?? tests/agentExecutionSafety.test.ts
+?? tests/agentProductCompletion.test.ts
+?? tests/agentTradingEmployeeCommercial.test.ts
+?? tests/agentTypedCommand.test.ts
+?? tests/backtestWorkspaceTabStability.test.ts
+?? tests/fixtures/
+?? tmp/agent-conversational-screens/
+?? tmp/agent-employee-screens/
+?? tmp/agent-v2-browser-only.mjs
+?? tmp/agent-v2-final-verification.mjs
+?? tmp/agent-v2-final-verification/
+?? tmp/agent-v2-live-acceptance.mjs
+?? tmp/agent-v2-live-acceptance/
+?? tmp/agent-v2-phase1/
+?? tmp/codex-baseline/
+?? tmp/codex-master-run/
+?? tmp/cursor-tester-ready-fix/
+?? tmp/final-3point-verification.mjs
+?? tmp/final-3point-verification/
+?? tmp/final-blocker-closure/
+?? tmp/final-safety-api-verify.mjs
+?? tmp/final-safety-api-verify.ts
+?? tmp/final-tester-ready-revalidation/
+?? tmp/operator-fix/
+?? tmp/reasoning-shadow/
+?? tmp/scripts/
+?? tmp/step6-audit/
+?? tmp/step7-audit/
+?? tmp/step8-audit/
+?? tmp/tester-readiness-verification.mjs
+?? tmp/tester-readiness/
+=== git diff --stat ===
+ app/api/rextora/agent/route.ts                     | 911 +++++++++++++++++++--
+ app/backtest/page.tsx                              |   2 +
+ app/dashboard/page.tsx                             |  12 +-
+ app/globals.css                                    |   6 +
+ app/layout.tsx                                     |   5 +-
+ app/live-trading/page.tsx                          |   2 +
+ app/paper-trading/page.tsx                         |   2 +
+ app/results/page.tsx                               |   2 +
+ app/strategy-search/page.tsx                       |  18 +-
+ components/rextora/agent/ActionCard.tsx            | 141 +++-
+ components/rextora/agent/AgentMessage.tsx          | 504 ++++++++----
+ components/rextora/agent/AgentPanel.tsx            | 259 ++++--
+ components/rextora/agent/AgentSuggestions.tsx      |  22 +-
+ components/rextora/agent/useAgentSession.ts        | 473 ++++++++++-
+ .../rextora/backtest/BacktestReviewWorkbench.tsx   | 117 +--
+ components/rextora/charts/BacktestAnalysisView.tsx |  87 +-
+ instrumentation.ts                                 |   2 +-
+ next.config.ts                                     |  16 +
+ src/lib/rextora/agent/agentDataFetcher.ts          |  78 ++
+ src/lib/rextora/agent/agentResponseBuilder.ts      | 450 +++++++++-
+ src/lib/rextora/agent/intentParser.ts              | 237 +++++-
+ src/lib/rextora/agent/llmTypes.ts                  |  21 +
+ src/lib/rextora/agent/providerConfig.ts            |  28 +-
+ src/lib/rextora/agent/providers/promptBuilder.ts   |  47 +-
+ src/lib/rextora/agent/safetyGuard.ts               |  23 +
+ src/lib/rextora/agent/types.ts                     | 157 +++-
+ src/lib/rextora/report/aiTradeReport.ts            |   2 +-
+ src/lib/rextora/storage/jsonStore.ts               |   6 +-
+ src/lib/rextora/strategySearch/deletionSafety.ts   |   2 +-
+ .../strategySearch/strategyDeletionSafety.ts       |   2 +-
+ tests/agentCommercialUx.test.ts                    |  19 +-
+ tests/agentIntentParser.test.ts                    |  45 +-
+ tests/agentProvider.test.ts                        |  22 +-
+ tests/backtestExecutionIdentity.test.ts            |  18 +-
+ tests/backtestSymbolSelector.test.ts               |  11 +-
+ tests/commercialOverlayHydration.test.ts           |  20 +-
+ tests/e2e/rextora-smoke.spec.ts                    |   4 +-
+ tests/firstRunEmptyRuntime.test.ts                 |  10 +-
+ tsconfig.json                                      |   3 +-
+ tsconfig.tsbuildinfo                               |   2 +-
+ 40 files changed, 3214 insertions(+), 574 deletions(-)
+=== BUILD_ID ===
+mwEjoK4ic1cyT-pd5_Omz=== node ===
+v25.8.0
+=== npm ===
+11.11.0
+=== SAFE ===
+  "params_hash": "7893ca3f0e30",
+fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0  data/strategies/SAFE_v44_i4060.json
+4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32
+=== protected diff bytes ===
+       0

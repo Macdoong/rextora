@@ -1,0 +1,108 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 93726
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1024
+    }
+  ]
+}
+
+Running 24 tests using 1 worker
+
+(node:24586) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24586) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.6s)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (2.1s)
+  ✓   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.3s)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (124ms)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.5s)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (1.6m)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (18.6s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.3m)
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.5m)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.4m)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/settings/ai-providers/models'
+[WebServer] }
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.7m)
+[WebServer] [browser] Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead. 
+  ✓  13 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (2.6m)
+  ✓  14 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (22.3s)
+  ✓  15 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (51.2s)
+  ✓  16 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (40.3s)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/settings/ai-providers/models'
+[WebServer] }
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/strategy-search/search_6e9f5bd3-6a02-4ac9-804a-821a9d90ec40/generations'
+[WebServer] }
+  ✓  17 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (2.2m)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/settings/ai-providers'
+[WebServer] }
+  ✓  18 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (2.9m)
+  ✓  19 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (1.2s)
+  ✓  20 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (1.3s)
+[WebServer] [browser] Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead. 
+  ✓  21 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (2.4m)
+  ✓  22 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (46.0s)
+  ✘  23 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (2.8m)
+(node:26498) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26498) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  24 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:67:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (2ms)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    TimeoutError: page.goto: Timeout 90000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3101/settings", waiting until "domcontentloaded"[22m
+
+
+       at helpers.ts:171
+
+      169 |       }
+      170 |     }
+    > 171 |     await page.goto("/settings", { waitUntil: "domcontentloaded", timeout: 90_000 });
+          |                ^
+      172 |     const broken = await page
+      173 |       .evaluate(() => {
+      174 |         const text = document.body?.innerText ?? "";
+        at openAiProviderTab (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:171:16)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:453:30)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:61:7
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:54:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+  23 passed (27.2m)

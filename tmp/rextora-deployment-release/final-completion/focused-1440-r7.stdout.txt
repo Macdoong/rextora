@@ -1,0 +1,137 @@
+
+Running 3 tests using 1 worker
+
+(node:46919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (3.0m)
+(node:47119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (3.0m)
+(node:47327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:47327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (1.9m)
+
+
+  1) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    Error: page.waitForFunction: Test timeout of 180000ms exceeded.
+
+       at helpers.ts:104
+
+      102 | export async function waitForAgentInputReady(page: Page): Promise<void> {
+      103 |   await page.getByTestId("agent-input-textarea").waitFor({ state: "visible", timeout: 60_000 });
+    > 104 |   await page.waitForFunction(
+          |              ^
+      105 |     () => {
+      106 |       const ta = document.querySelector(
+      107 |         '[data-testid="agent-input-textarea"]',
+        at waitForAgentInputReady (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:104:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:132:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:152:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-28b19-typo-free-form-conversation-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    Error: page.waitForFunction: Test timeout of 180000ms exceeded.
+
+       at helpers.ts:104
+
+      102 | export async function waitForAgentInputReady(page: Page): Promise<void> {
+      103 |   await page.getByTestId("agent-input-textarea").waitFor({ state: "visible", timeout: 60_000 });
+    > 104 |   await page.waitForFunction(
+          |              ^
+      105 |     () => {
+      106 |       const ta = document.querySelector(
+      107 |         '[data-testid="agent-input-textarea"]',
+        at waitForAgentInputReady (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:104:14)
+        at startFreshAgentConversation (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:132:3)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:324:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 
+
+    TimeoutError: page.waitForResponse: Timeout 90000ms exceeded while waiting for event "response"
+
+       at scenarioRegistry.ts:395
+
+      393 |       expect(await scanPageSecrets(page)).toBe(0);
+      394 |       await openAgentDashboard(page);
+    > 395 |       const leakQueryPromise = page.waitForResponse(
+          |                                     ^
+      396 |         (r) => r.url().includes("/api/rextora/agent") && r.request().method() === "POST",
+      397 |         { timeout: 90_000 },
+      398 |       );
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:395:37)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    Error: page.waitForFunction: Test ended.
+
+       at helpers.ts:104
+
+      102 | export async function waitForAgentInputReady(page: Page): Promise<void> {
+      103 |   await page.getByTestId("agent-input-textarea").waitFor({ state: "visible", timeout: 60_000 });
+    > 104 |   await page.waitForFunction(
+          |              ^
+      105 |     () => {
+      106 |       const ta = document.querySelector(
+      107 |         '[data-testid="agent-input-textarea"]',
+        at waitForAgentInputReady (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:104:14)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:399:7)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-99a21-et-raw-enum-leak-inspection-prod-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection 

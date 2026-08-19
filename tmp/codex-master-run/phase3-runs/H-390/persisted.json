@@ -1,0 +1,258 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_44d52d71be3845b3",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 7,
+      "approved": true,
+      "timestamp": "2026-08-06T08:13:16.177Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_44d52d71be3845b3",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-06T08:13:18.073Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_44d52d71be3845b3",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-06T08:13:19.022Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_44d52d71be3845b3",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-06T08:13:19.972Z",
+      "approvalId": null
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-06T08:13:15.210Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8nyh6_ax01pp",
+      "turnId": "turn-1786003995191",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:15.214Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8nyh6_ax01pp",
+      "turnId": "turn-1786003995191",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:16.179Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8nz83_2k3htl",
+      "turnId": "turn-1786003996165",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:16.180Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8nz83_2k3htl",
+      "turnId": "turn-1786003996165",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:17.120Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8nzy8_i4xwpw",
+      "turnId": "turn-1786003997114",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:17.120Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8nzy8_i4xwpw",
+      "turnId": "turn-1786003997114",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:18.075Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8o0or_wyaw7g",
+      "turnId": "turn-1786003998066",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:18.075Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8o0or_wyaw7g",
+      "turnId": "turn-1786003998066",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:19.025Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8o1f5_aj37rr",
+      "turnId": "turn-1786003999015",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:19.025Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8o1f5_aj37rr",
+      "turnId": "turn-1786003999015",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:19.975Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8o25j_6xee8g",
+      "turnId": "turn-1786003999965",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:19.975Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8o25j_6xee8g",
+      "turnId": "turn-1786003999965",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:20.932Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh8o2w4_1t9adv",
+      "turnId": "turn-1786004000925",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:13:20.933Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh8o2w4_1t9adv",
+      "turnId": "turn-1786004000925",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_msh8nxjh_f0d217.chart.json",
+    "bt_msh8nxjh_f0d217.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_44d52d71be3845b3"
+  ]
+}

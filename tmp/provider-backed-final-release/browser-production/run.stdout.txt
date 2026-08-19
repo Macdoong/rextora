@@ -1,0 +1,103 @@
+
+Running 44 tests using 1 worker
+
+(node:79125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [release-390] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.3m)
+  ✓   2 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (78ms)
+  ✓   3 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (67ms)
+  ✓   4 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (14.6s)
+  ✓   5 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (12.6s)
+  ✓   6 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (32.7s)
+  ✓   7 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (6.3s)
+  ✓   8 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (6.2s)
+  ✓   9 [release-390] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (430ms)
+  ✓  10 [release-390] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (516ms)
+  ✓  11 [release-390] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.7s)
+(node:79663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [release-768] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.1m)
+  ✓  13 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (70ms)
+  ✓  14 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (67ms)
+  ✓  15 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (12.5s)
+  ✓  16 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (14.0s)
+  ✓  17 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (32.1s)
+  ✓  18 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (6.1s)
+  ✓  19 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (6.2s)
+  ✓  20 [release-768] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (429ms)
+  ✓  21 [release-768] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (469ms)
+  ✓  22 [release-768] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.6s)
+(node:79993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [release-1024] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (1.2m)
+  ✓  24 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (74ms)
+  ✓  25 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (66ms)
+  ✓  26 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (16.5s)
+  ✘  27 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (13.3s)
+(node:80202) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80202) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  28 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (43.3s)
+  ✓  29 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (6.1s)
+  ✓  30 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (6.1s)
+  ✓  31 [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (457ms)
+  ✓  32 [release-1024] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (480ms)
+  ✓  33 [release-1024] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.7s)
+(node:80335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  34 [release-1440] › tests/e2e/release/model-switching.spec.ts:12:7 › Agent model switching browser matrix › OpenAI → Gemini switch with persistence (52.3s)
+  ✓  35 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 1: OpenAI settings status (77ms)
+  ✓  36 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 2: Gemini settings status (73ms)
+  ✓  37 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 7: OpenAI typo conversation (12.5s)
+  ✓  38 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation (13.0s)
+  ✓  39 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 9: OpenAI next-action guidance (28.6s)
+  ✓  40 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 20: Live refusal (6.1s)
+  ✓  41 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 21: SAFE refusal (6.1s)
+  ✓  42 [release-1440] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 22: Secret-leak scan on settings (477ms)
+  ✓  43 [release-1440] › tests/e2e/release/settings-browser.spec.ts:11:7 › Settings AI provider browser matrix › configured status, DOM/network secret hygiene, and persistence (510ms)
+  ✓  44 [release-1440] › tests/e2e/release/settings-browser.spec.ts:84:7 › Settings AI provider browser matrix › connection test buttons respond without leaking secrets (3.7s)
+
+
+  1) [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m20[39m
+    Received:   [31m11[39m
+
+      31 |     await sendAgentQuery(page, "너는 뭘 할 수 있어?");
+      32 |     const a = await waitForAgentAnswer(page);
+    > 33 |     expect(a.length).toBeGreaterThan(20);
+         |                      ^
+      34 |   }},
+      35 |   { id: 9, name: "OpenAI next-action guidance", run: async ({ page }: { page: import("@playwright/test").Page }) => {
+      36 |     await page.goto("/dashboard");
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:33:22)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/production-matrix.spec.ts:64:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-matrix-Producti-57e7f-nAI-capability-conversation-release-1024/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [release-1024] › tests/e2e/release/production-matrix.spec.ts:63:9 › Production provider-backed matrix › scenario 8: OpenAI capability conversation 
+  43 passed (9.7m)

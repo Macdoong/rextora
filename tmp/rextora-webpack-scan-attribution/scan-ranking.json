@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "bounded-real-entrypoint-nft-reproduction-plus-streaming-runtime-inventory",
+  "representativeEntrypoint": "app/api/rextora/agent/route.ts",
+  "reproduction": {
+    "exitCode": 134,
+    "elapsedSeconds": 24.85,
+    "peakRssBytes": 5022842880,
+    "completedDirectoryCalls": 25,
+    "completedReturnedEntries": 9233,
+    "terminalFrame": "node::fs::AfterScanDir"
+  },
+  "rankedCompletedScans": [
+    {
+      "path": "data/rextora/agent-sessions",
+      "entryCount": 4266,
+      "callCount": 1,
+      "elapsedMs": 233.481,
+      "callerPackage": "next/dist/compiled/glob",
+      "callerFile": "node_modules/next/dist/compiled/glob/glob.js",
+      "callerSymbol": "Glob._readdir",
+      "scope": "runtime data"
+    },
+    {
+      "path": "data/rextora/strategy-search/jobs",
+      "entryCount": 3057,
+      "callCount": 1,
+      "elapsedMs": 235.423,
+      "callerPackage": "next/dist/compiled/glob",
+      "callerFile": "node_modules/next/dist/compiled/glob/glob.js",
+      "callerSymbol": "Glob._readdir",
+      "scope": "runtime data"
+    },
+    {
+      "path": "data/rextora/agent-tasks",
+      "entryCount": 335,
+      "callCount": 1,
+      "elapsedMs": 211.473,
+      "callerPackage": "next/dist/compiled/glob",
+      "callerFile": "node_modules/next/dist/compiled/glob/glob.js",
+      "callerSymbol": "Glob._readdir",
+      "scope": "runtime data"
+    },
+    {
+      "path": "data/rextora/agent-plans-v2",
+      "entryCount": 335,
+      "callCount": 1,
+      "elapsedMs": 192.572,
+      "callerPackage": "next/dist/compiled/glob",
+      "callerFile": "node_modules/next/dist/compiled/glob/glob.js",
+      "callerSymbol": "Glob._readdir",
+      "scope": "runtime data"
+    },
+    {
+      "path": "data/rextora/strategy-search/trials",
+      "entryCount": 255,
+      "callCount": 1,
+      "elapsedMs": 219.346,
+      "callerPackage": "next/dist/compiled/glob",
+      "callerFile": "node_modules/next/dist/compiled/glob/glob.js",
+      "callerSymbol": "Glob._readdir",
+      "scope": "runtime data",
+      "streamingInventory": {
+        "elapsedSeconds": 5.812,
+        "totalFiles": 2088621,
+        "totalDirectories": 255,
+        "symlinkTraversal": false,
+        "maximumImmediateDirectoryEntries": 32488,
+        "maximumImmediateDirectoryPath": "data/rextora/strategy-search/trials/search_69220610-05e4-4651-893a-9922efb46084"
+      }
+    }
+  ],
+  "repeatedScansObserved": [
+    {
+      "path": "data/rextora/strategy-search",
+      "callCount": 3,
+      "totalReturnedEntries": 24,
+      "elapsedMs": 897.743
+    },
+    {
+      "path": "data/rextora/agent-commands",
+      "callCount": 2,
+      "totalReturnedEntries": 38,
+      "elapsedMs": 381.295
+    },
+    {
+      "path": "data/rextora/reasoning-shadow",
+      "callCount": 2,
+      "totalReturnedEntries": 4,
+      "elapsedMs": 254.157
+    }
+  ],
+  "historicalPatternEvidence": {
+    "warningRows": 80,
+    "aggregateMatchedFiles": 9238706,
+    "maximumSinglePatternMatchedFiles": 582350,
+    "note": "These are NFT pattern-match totals, not unique on-disk file counts."
+  },
+  "unexpectedTreesObservedInBoundedTrace": {
+    "tmp": false,
+    ".git": false,
+    "node_modules": false,
+    "browserProfiles": false,
+    "screenshots": false,
+    "note": "The reproduction exhausted memory while descending data/rextora, before a complete repository scan could finish."
+  }
+}

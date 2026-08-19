@@ -1,0 +1,30 @@
+{
+  "classification": "MULTIPLE_PROVEN_DEFECTS",
+  "classifications": [
+    "CLIENT_PARSE_DEFECT",
+    "NEXT_DEV_RESOURCE_DEGRADATION",
+    "ABORTED_FETCH_PARSE_DEFECT"
+  ],
+  "exactFailingBoundary": "Client components called response.json() on empty/truncated bodies when webpack next-dev returned incomplete responses during long sequential matrix runs; uncaught SyntaxError froze Settings/Agent hydration",
+  "responsibleFiles": [
+    "components/rextora/settings/AiProviderSettingsPanel.tsx",
+    "components/rextora/agent/AgentModelSelector.tsx",
+    "src/lib/rextora/agent/v2/providers/providerCatalog.ts"
+  ],
+  "responsibleSymbols": [
+    "AiProviderSettingsPanel useEffect",
+    "AgentModelSelector.loadModels",
+    "listOpenAiModels",
+    "listGeminiModels"
+  ],
+  "earlyVsDegraded": {
+    "early": "API 18-267ms, valid JSON, scenarios pass in isolation",
+    "degraded": "After ~90min single webpack dev process: empty/truncated HTTP bodies, ChunkLoadError, 300s agent timeouts"
+  },
+  "repair": [
+    "src/lib/rextora/client/safeFetchJson.ts",
+    "src/lib/rextora/agent/v2/providers/safeUpstreamJson.ts",
+    "Viewport-segmented Development execution with fresh dev server per viewport"
+  ],
+  "verdict": "CLIENT_PARSE_DEFECT proven; NEXT_DEV_RESOURCE_DEGRADATION proven for single 2.5h process"
+}

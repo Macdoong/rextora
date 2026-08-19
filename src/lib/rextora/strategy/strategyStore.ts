@@ -1,6 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
 import crypto from "node:crypto";
+import strategyRuntimeIo from "@rextora/strategy-runtime-io";
 import { CONTEXT_FALLBACK_PARAMS, mergeSafeParams } from "./safeV44Params";
 import { computeParamsHash, computeStrategyHash } from "./strategyHash";
 import { loadSafeV44Strategy } from "./safeV44Strategy";
@@ -18,7 +17,6 @@ import { assertSafeStrategyId, StrategyValidationError, validateCanonicalDefinit
 import { definitionToStoredPatch, storedToDefinition, type StoredStrategyV1 } from "./definition/bridge";
 import type { CanonicalStrategyDefinition } from "./definition/types";
 import { isTestStrategyRecord } from "./strategyTestFilter";
-import { strategiesRootDefault, productionStrategiesRootCanonical } from "../storage/runtimePaths";
 import { isDemoLiveBlocked } from "../firstRun/demoIdentity";
 
 export const UNSAFE_TEST_STRATEGY_STORE =
@@ -35,30 +33,26 @@ export function isStrategyStoreTestRuntime(): boolean {
 }
 
 export function productionStrategiesRoot(): string {
-  return path.resolve(productionStrategiesRootCanonical());
+  return strategyRuntimeIo.productionStrategiesRoot(process.cwd());
 }
 
 export function canonicalSafeSourceDir(): string {
-  return path.resolve(/* turbopackIgnore: true */ process.cwd(), "data", "strategies");
+  return strategyRuntimeIo.canonicalSafeSourceDir(process.cwd());
 }
 
 function isPathInside(child: string, parent: string): boolean {
-  const c = path.resolve(child);
-  const p = path.resolve(parent);
-  if (c === p) return true;
-  const prefix = p.endsWith(path.sep) ? p : p + path.sep;
-  return c.startsWith(prefix);
+  return strategyRuntimeIo.isPathInside(child, parent);
 }
 
 function assertIsolatedRootNotProduction(resolvedRoot: string): void {
   if (!resolvedRoot || resolvedRoot.trim() === "") {
     throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
   }
-  const root = path.resolve(resolvedRoot);
+  const root = strategyRuntimeIo.absolutePath(resolvedRoot);
   const prod = productionStrategiesRoot();
   const canonical = canonicalSafeSourceDir();
-  const cwd = path.resolve(/* turbopackIgnore: true */ process.cwd());
-  const fsRoot = path.parse(root).root;
+  const cwd = strategyRuntimeIo.absolutePath(process.cwd());
+  const fsRoot = strategyRuntimeIo.fileSystemRoot(root);
   if (root === fsRoot || root === cwd || root === prod || root === canonical) {
     throw new StrategyValidationError(
       `${UNSAFE_TEST_STRATEGY_STORE} Isolated root collides with a protected path.`
@@ -86,31 +80,31 @@ const ROOT = () => {
     if (!override) {
       throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
     }
-    const resolved = path.resolve(/* turbopackIgnore: true */ override);
+    const resolved = strategyRuntimeIo.absolutePath(override);
     assertIsolatedRootNotProduction(resolved);
     return resolved;
   }
-  if (override) return path.resolve(/* turbopackIgnore: true */ override);
+  if (override) return strategyRuntimeIo.absolutePath(override);
   return productionStrategiesRoot();
 };
 
-const INDEX = () => path.join(ROOT(), "index.json");
+const INDEX = () => strategyRuntimeIo.resolveIndexPath(ROOT());
 
 export function getStrategiesRoot(): string {
   return ROOT();
 }
 
 function ensureDir(): void {
-  fs.mkdirSync(ROOT(), { recursive: true });
+  strategyRuntimeIo.ensureDirectory(ROOT());
 }
 
 function assertDestructiveTargetAllowed(targetFile: string): void {
-  const resolved = path.resolve(targetFile);
-  if (path.basename(resolved) === `${SAFE_STRATEGY_ID}.json`) {
+  const resolved = strategyRuntimeIo.absolutePath(targetFile);
+  if (strategyRuntimeIo.baseName(resolved) === `${SAFE_STRATEGY_ID}.json`) {
     throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
   }
-  const canonicalSafeFile = path.join(canonicalSafeSourceDir(), `${SAFE_STRATEGY_ID}.json`);
-  if (resolved === path.resolve(canonicalSafeFile)) {
+  const canonicalSafeFile = strategyRuntimeIo.canonicalSafeFile(process.cwd(), SAFE_STRATEGY_ID);
+  if (resolved === strategyRuntimeIo.absolutePath(canonicalSafeFile)) {
     throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
   }
   const root = ROOT();
@@ -126,8 +120,8 @@ function assertDestructiveTargetAllowed(targetFile: string): void {
 
 function strategyFilePath(id: string): string {
   assertSafeStrategyId(id);
-  const root = path.resolve(ROOT());
-  const file = path.resolve(root, `${id}.json`);
+  const root = strategyRuntimeIo.absolutePath(ROOT());
+  const file = strategyRuntimeIo.resolveStrategyPath(root, id);
   if (!isPathInside(file, root) || file === root) {
     throw new StrategyValidationError("잘못된 전략 경로입니다.");
   }
@@ -187,7 +181,7 @@ function buildLockedSafeStrategy(): StoredStrategyV1 {
 function assertExistingSafeIntegrity(filePath: string): StoredStrategyV1 {
   let parsed: StoredStrategyV1;
   try {
-    parsed = JSON.parse(fs.readFileSync(filePath, "utf8")) as StoredStrategyV1;
+    parsed = JSON.parse(strategyRuntimeIo.readText(filePath)) as StoredStrategyV1;
   } catch {
     throw new StrategyValidationError(
       `${PROTECTED_STRATEGY_INTEGRITY}: SAFE strategy file is corrupt and will not be overwritten.`
@@ -257,7 +251,7 @@ function buildIndexPayload(strategies: StoredStrategy[]): StrategyIndexFile {
 function writeStrategyFile(strategy: StoredStrategy): void {
   ensureDir();
   const file = strategyFilePath(strategy.id);
-  if (strategy.id === SAFE_STRATEGY_ID && fs.existsSync(file)) {
+  if (strategy.id === SAFE_STRATEGY_ID && strategyRuntimeIo.hasPath(file)) {
     throw new StrategyValidationError(
       `${PROTECTED_STRATEGY_INTEGRITY}: existing SAFE strategy file must not be rewritten.`
     );
@@ -270,21 +264,21 @@ function writeStrategyFile(strategy: StoredStrategy): void {
       throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
     }
   }
-  fs.writeFileSync(file, JSON.stringify(strategy, null, 2), "utf8");
+  strategyRuntimeIo.writeText(file, JSON.stringify(strategy, null, 2));
 }
 
 function writeIndex(strategies: StoredStrategy[]): void {
   ensureDir();
   const index = buildIndexPayload(strategies);
-  fs.writeFileSync(INDEX(), JSON.stringify(index, null, 2), "utf8");
+  strategyRuntimeIo.writeText(INDEX(), JSON.stringify(index, null, 2));
 }
 
 /** Write index only when strategy rows actually changed. */
 function writeIndexIfChanged(strategies: StoredStrategy[]): void {
   const next = buildIndexPayload(strategies);
-  if (fs.existsSync(INDEX())) {
+  if (strategyRuntimeIo.hasPath(INDEX())) {
     try {
-      const cur = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+      const cur = JSON.parse(strategyRuntimeIo.readText(INDEX())) as StrategyIndexFile;
       if (indexStrategiesEqual(cur.strategies ?? [], next.strategies)) {
         return;
       }
@@ -323,9 +317,9 @@ function hydrateStrategyIdentity(strategy: StoredStrategyV1): StoredStrategyV1 {
 
 function readAllStrategyFiles(): StoredStrategyV1[] {
   ensureDir();
-  if (!fs.existsSync(INDEX())) return [];
+  if (!strategyRuntimeIo.hasPath(INDEX())) return [];
   try {
-    const index = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+    const index = JSON.parse(strategyRuntimeIo.readText(INDEX())) as StrategyIndexFile;
     const out: StoredStrategyV1[] = [];
     for (const row of index.strategies) {
       try {
@@ -334,14 +328,14 @@ function readAllStrategyFiles(): StoredStrategyV1[] {
         continue;
       }
       const full = strategyFilePath(row.id);
-      if (!fs.existsSync(full)) continue;
+      if (!strategyRuntimeIo.hasPath(full)) continue;
       if (row.id === SAFE_STRATEGY_ID) {
         const safe = assertExistingSafeIntegrity(full);
         out.push(overlaySafeActivationFromIndex(safe, row));
       } else {
         out.push(
           hydrateStrategyIdentity(
-            JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+            JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
           ),
         );
       }
@@ -355,8 +349,8 @@ function readAllStrategyFiles(): StoredStrategyV1[] {
 
 function discoverStrategyFilesOnDisk(): StoredStrategyV1[] {
   ensureDir();
-  if (!fs.existsSync(ROOT())) return [];
-  const names = fs.readdirSync(ROOT()).filter((n) => n.endsWith(".json") && n !== "index.json");
+  if (!strategyRuntimeIo.hasPath(ROOT())) return [];
+  const names = strategyRuntimeIo.listNames(ROOT()).filter((n) => n.endsWith(".json") && n !== "index.json");
   const out: StoredStrategyV1[] = [];
   for (const name of names) {
     const id = name.replace(/\.json$/, "");
@@ -371,7 +365,7 @@ function discoverStrategyFilesOnDisk(): StoredStrategyV1[] {
     } else {
       out.push(
         hydrateStrategyIdentity(
-          JSON.parse(fs.readFileSync(full, "utf8")) as StoredStrategyV1,
+          JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
         ),
       );
     }
@@ -387,16 +381,16 @@ export function ensureStrategyStore(): StoredStrategy[] {
   ensureDir();
   const safePath = strategyFilePath(SAFE_STRATEGY_ID);
 
-  if (!fs.existsSync(safePath)) {
+  if (!strategyRuntimeIo.hasPath(safePath)) {
     writeStrategyFile(buildLockedSafeStrategy());
   } else {
     assertExistingSafeIntegrity(safePath);
   }
 
   let loaded = readAllStrategyFiles();
-  let indexNeedsRepair = !fs.existsSync(INDEX());
+  let indexNeedsRepair = !strategyRuntimeIo.hasPath(INDEX());
 
-  if (!loaded.length && fs.existsSync(INDEX())) {
+  if (!loaded.length && strategyRuntimeIo.hasPath(INDEX())) {
     // Index present but empty/unreadable entries — discover from disk once
     loaded = discoverStrategyFilesOnDisk();
     indexNeedsRepair = true;
@@ -406,9 +400,9 @@ export function ensureStrategyStore(): StoredStrategy[] {
     const safe = assertExistingSafeIntegrity(safePath);
     let paperActive = true;
     let liveActive = false;
-    if (fs.existsSync(INDEX())) {
+    if (strategyRuntimeIo.hasPath(INDEX())) {
       try {
-        const index = JSON.parse(fs.readFileSync(INDEX(), "utf8")) as StrategyIndexFile;
+        const index = JSON.parse(strategyRuntimeIo.readText(INDEX())) as StrategyIndexFile;
         const row = index.strategies.find((r) => r.id === SAFE_STRATEGY_ID);
         if (row) {
           paperActive = row.paperActive;
@@ -422,7 +416,7 @@ export function ensureStrategyStore(): StoredStrategy[] {
     indexNeedsRepair = true;
   }
 
-  if (!fs.existsSync(INDEX())) {
+  if (!strategyRuntimeIo.hasPath(INDEX())) {
     loaded = discoverStrategyFilesOnDisk();
     if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
       loaded = [assertExistingSafeIntegrity(safePath), ...loaded];
@@ -439,7 +433,7 @@ export function ensureStrategyStore(): StoredStrategy[] {
 
 export function listStrategies(): StoredStrategy[] {
   ensureDir();
-  if (!fs.existsSync(INDEX()) || !fs.existsSync(strategyFilePath(SAFE_STRATEGY_ID))) {
+  if (!strategyRuntimeIo.hasPath(INDEX()) || !strategyRuntimeIo.hasPath(strategyFilePath(SAFE_STRATEGY_ID))) {
     return ensureStrategyStore();
   }
   // Validate SAFE in place without rewriting
@@ -763,7 +757,7 @@ export function deleteStrategy(id: string): void {
   }
   const file = strategyFilePath(id);
   assertDestructiveTargetAllowed(file);
-  if (fs.existsSync(file)) fs.unlinkSync(file);
+  if (strategyRuntimeIo.hasPath(file)) strategyRuntimeIo.removeFile(file);
   const all = listStrategies().filter((s) => s.id !== id);
   writeIndex(all);
 }
@@ -841,7 +835,7 @@ export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
     if (isTestStrategyRecord(s as StoredStrategyV1 & { testData?: boolean })) {
       const file = strategyFilePath(s.id);
       assertDestructiveTargetAllowed(file);
-      if (fs.existsSync(file)) fs.unlinkSync(file);
+      if (strategyRuntimeIo.hasPath(file)) strategyRuntimeIo.removeFile(file);
       removed.push(s.id);
     } else {
       kept.push(s);
@@ -849,7 +843,7 @@ export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
   }
   if (!kept.some((s) => s.id === SAFE_STRATEGY_ID)) {
     const safePath = strategyFilePath(SAFE_STRATEGY_ID);
-    if (!fs.existsSync(safePath)) {
+    if (!strategyRuntimeIo.hasPath(safePath)) {
       writeStrategyFile(buildLockedSafeStrategy());
     }
     kept.unshift(assertExistingSafeIntegrity(strategyFilePath(SAFE_STRATEGY_ID)));

@@ -1,0 +1,109 @@
+{
+  "checkpoints": [
+    {
+      "id": "T0",
+      "elapsedMs": 0,
+      "event": "browser_page_ready",
+      "url": "about:blank"
+    },
+    {
+      "id": "T1",
+      "elapsedMs": 0,
+      "event": "settings_navigation_started"
+    },
+    {
+      "id": "T2",
+      "elapsedMs": 130,
+      "event": "settings_page_loaded",
+      "url": "http://127.0.0.1:3101/settings",
+      "lifecycleShell": true,
+      "pageCouldntLoad": false
+    },
+    {
+      "id": "T3",
+      "elapsedMs": 130,
+      "event": "ai_tab_located",
+      "tabVisible": true
+    },
+    {
+      "id": "T4",
+      "elapsedMs": 655,
+      "event": "ai_tab_click_dispatched"
+    },
+    {
+      "id": "T8",
+      "elapsedMs": 659,
+      "event": "ai_provider_settings_dom",
+      "exists": true,
+      "text": "AI 공급자\n\n불러오는 중…"
+    },
+    {
+      "id": "T7",
+      "elapsedMs": 827,
+      "event": "settings_api_via_request_context",
+      "status": 200,
+      "geminiStored": true,
+      "geminiConfigured": true,
+      "openaiStored": true
+    },
+    {
+      "id": "T9",
+      "elapsedMs": 852,
+      "event": "gemini_card_visible",
+      "keyEmpty": true
+    },
+    {
+      "id": "T10",
+      "elapsedMs": 852,
+      "event": "assertions_complete"
+    }
+  ],
+  "apiEvents": [
+    {
+      "phase": "request",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "elapsedMs": 627
+    },
+    {
+      "phase": "request",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "elapsedMs": 627
+    },
+    {
+      "phase": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "elapsedMs": 824
+    },
+    {
+      "phase": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers",
+      "elapsedMs": 830
+    },
+    {
+      "phase": "request",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers/models?provider=openai",
+      "elapsedMs": 830
+    },
+    {
+      "phase": "request",
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers/models?provider=gemini",
+      "elapsedMs": 830
+    },
+    {
+      "phase": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:3101/api/rextora/settings/ai-providers/models?provider=openai",
+      "elapsedMs": 839
+    }
+  ],
+  "consoleErrors": [],
+  "failedNetwork": [],
+  "result": {
+    "passed": true,
+    "failure": null,
+    "lastCheckpoint": "T10"
+  },
+  "durationMs": 852
+}

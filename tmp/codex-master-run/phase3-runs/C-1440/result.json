@@ -1,0 +1,105 @@
+{
+  "scenario": "C",
+  "width": 1440,
+  "startedAt": "2026-08-06T10:08:18.242Z",
+  "finishedAt": "2026-08-06T10:10:58.242Z",
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-C-1440-f9515d-CCapf5",
+  "port": 59668,
+  "provider": "gemini",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-06T10:08:19.472Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mshcrxu8_21f0gu",
+      "turnId": "turn-1786010899455",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T10:08:25.074Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mshcrxu8_21f0gu",
+      "turnId": "turn-1786010899455",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 5595,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-06T10:08:26.070Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mshcs2xi_zgvj6r",
+      "turnId": "turn-1786010906013",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T10:08:26.070Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mshcs2xi_zgvj6r",
+      "turnId": "turn-1786010906013",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T10:08:27.105Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mshcs3q9_aorno9",
+      "turnId": "turn-1786010907015",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T10:08:27.106Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mshcs3q9_aorno9",
+      "turnId": "turn-1786010907015",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "jobId": "search_ce65a2f9-cab4-4132-b6a9-3477cc017a8b",
+    "toolIds": [
+      "search.status"
+    ],
+    "exactActiveJob": true,
+    "actualPersistedProgress": 9,
+    "hasApproval": false,
+    "falseCompletion": false,
+    "persistedStateMatch": true,
+    "primaryText": "지금 실행 중인 탐색을 먼저 확인하세요.\n\n1개 작업이 실행 중입니다.\n\n탐색 상태·결과를 확인하세요.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

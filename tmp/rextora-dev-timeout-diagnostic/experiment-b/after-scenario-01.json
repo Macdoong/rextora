@@ -1,0 +1,34 @@
+{
+  "s01Duration": 1935,
+  "api": {
+    "ms": 189,
+    "status": 200,
+    "openai": {
+      "stored": true,
+      "configured": true,
+      "envFallback": false,
+      "enabled": true,
+      "selectedModel": "gpt-5-mini"
+    },
+    "gemini": {
+      "stored": true,
+      "configured": true,
+      "envFallback": false,
+      "enabled": true,
+      "selectedModel": "gemini-2.5-flash"
+    },
+    "reasoningActive": true
+  },
+  "files": {
+    "aiProviderSettings": {
+      "exists": false
+    },
+    "credentialEnc": {
+      "exists": false
+    }
+  },
+  "server": {
+    "pid": 75125,
+    "error": "process_gone"
+  }
+}

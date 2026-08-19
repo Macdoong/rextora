@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
 import { LiveActivationGates } from "@/components/rextora/live/LiveActivationGates";
+import { AgentContextStrip } from "@/components/rextora/agent/AgentContextStrip";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
 export default function LiveTradingPage() {
@@ -90,6 +91,7 @@ export default function LiveTradingPage() {
           뒤에만 실주문이 가능합니다.
         </p>
       </div>
+      <AgentContextStrip pageLabelKo="실전 매매" />
 
       <div
         className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"

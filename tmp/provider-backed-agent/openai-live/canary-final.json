@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "provider": "openai",
+  "model": "gpt-5-mini",
+  "latencyMs": 1858,
+  "structuredOutputValid": true,
+  "writeToolAuditCount": 0,
+  "errorKo": null,
+  "responseFingerprint": "openai:chatcmpl-E9qiiT7mILTIg9zWfbtagxf2t7VSg"
+}

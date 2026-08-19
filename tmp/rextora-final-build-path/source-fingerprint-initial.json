@@ -1,0 +1,11 @@
+{
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "fileCount": 926,
+  "sourceTreeSha256": "50a99389ab615d5234321ab06d1eeec62635e9f367a104cbb8aed652a45e9c07",
+  "capturedAt": "2026-08-13T03:54:29.775Z",
+  "exclusions": [
+    "tmp/**",
+    ".next/**",
+    ".DS_Store"
+  ]
+}

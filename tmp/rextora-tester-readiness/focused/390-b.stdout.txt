@@ -1,0 +1,28 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 94777
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 995
+    }
+  ]
+}
+
+Running 3 tests using 1 worker
+
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (4.5s)
+  ✓  2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (1.9s)
+  ✓  3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (11.9s)
+
+  3 passed (4.2m)

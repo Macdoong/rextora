@@ -1,0 +1,315 @@
+{
+  "entryCount": 117,
+  "reachableLocalFileCount": 569,
+  "reachableLocalBytes": 4082219,
+  "largestReachableFiles": [
+    {
+      "file": "components/rextora/charts/BacktestAnalysisView.tsx",
+      "bytes": 125599
+    },
+    {
+      "file": "components/rextora/results/ResultsWorkbench.tsx",
+      "bytes": 102934
+    },
+    {
+      "file": "components/rextora/strategySearch/JobCreateForm.tsx",
+      "bytes": 98714
+    },
+    {
+      "file": "src/lib/rextora/strategy/eventSequenceBacktest.ts",
+      "bytes": 89181
+    },
+    {
+      "file": "components/rextora/backtest/BacktestReviewWorkbench.tsx",
+      "bytes": 79007
+    },
+    {
+      "file": "components/rextora/results/CurrentResearchResultsPanel.tsx",
+      "bytes": 63747
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+      "bytes": 58329
+    },
+    {
+      "file": "app/api/rextora/agent/route.ts",
+      "bytes": 56109
+    },
+    {
+      "file": "components/rextora/strategy/builder/StrategyBuilderPanel.tsx",
+      "bytes": 44508
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/researchResultsSummary.ts",
+      "bytes": 43213
+    },
+    {
+      "file": "components/rextora/strategySearch/SearchStatusCard.tsx",
+      "bytes": 41822
+    },
+    {
+      "file": "components/rextora/charts/CandlestickChart.tsx",
+      "bytes": 40187
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "bytes": 39576
+    },
+    {
+      "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+      "bytes": 38995
+    },
+    {
+      "file": "src/lib/rextora/agent/agentResponseBuilder.ts",
+      "bytes": 38397
+    },
+    {
+      "file": "src/lib/rextora/agent/decisionContext.ts",
+      "bytes": 33847
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/paramSpace.ts",
+      "bytes": 33626
+    },
+    {
+      "file": "components/rextora/strategySearch/formDefaults.ts",
+      "bytes": 32755
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobRunner.ts",
+      "bytes": 32557
+    },
+    {
+      "file": "src/lib/rextora/strategy/definition/eventSequence.ts",
+      "bytes": 32229
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/patternCombination.ts",
+      "bytes": 31909
+    },
+    {
+      "file": "app/paper-trading/page.tsx",
+      "bytes": 31869
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+      "bytes": 31864
+    },
+    {
+      "file": "src/lib/rextora/strategy/strategyStore.ts",
+      "bytes": 31025
+    },
+    {
+      "file": "components/rextora/strategySearch/QualifiedResultsPanel.tsx",
+      "bytes": 29731
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+      "bytes": 28681
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionStore.ts",
+      "bytes": 28403
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+      "bytes": 27792
+    },
+    {
+      "file": "src/lib/rextora/backtest/visualAnalysis.ts",
+      "bytes": 26638
+    },
+    {
+      "file": "src/lib/rextora/strategySearch/backtestAdapter.ts",
+      "bytes": 26212
+    }
+  ],
+  "edgeCount": 2156,
+  "dataOrEvidenceImportEdges": [
+    {
+      "from": "src/lib/rextora/strategyRepository.ts",
+      "specifier": "@/data/strategies/SAFE_v44_i4060.json",
+      "to": "data/strategies/SAFE_v44_i4060.json"
+    },
+    {
+      "from": "src/lib/rextora/strategy/safeV44Strategy.ts",
+      "specifier": "@/data/strategies/SAFE_v44_i4060.json",
+      "to": "data/strategies/SAFE_v44_i4060.json"
+    }
+  ],
+  "moduleScopeRisks": [
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 69,
+      "call": "tool({\n    id: \"search.list\",\n    name: \"List search jobs\",\n    description: \"List strategy search jobs from the existing job store\",\n    category: \"search\",\n    inputSchema: listLimitSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"search_status\", \"research_workspace\"],\n    handler: handleSearchList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 110,
+      "call": "tool({\n    id: \"results.list\",\n    name: \"Results list\",\n    description: \"List research results summary for a job\",\n    category: \"results\",\n    inputSchema: jobIdInputSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"recommend_next\", \"research_workspace\"],\n    handler: handleResultsList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 138,
+      "call": "tool({\n    id: \"strategy.list\",\n    name: \"List strategies\",\n    description: \"List strategies from the strategy store\",\n    category: \"strategy\",\n    inputSchema: listLimitSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"compare_strategies\", \"explain_strategy\"],\n    handler: handleStrategyList,\n  })"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 166,
+      "call": "tool({\n    id: \"backtest.list\",\n    name: \"List backtests\",\n    description: \"List saved backtest runs\",\n    category: \"backtest\",\n    inputSchema: {\n      type: \"object\",\n      properties: {\n        limit: { type: \"number\" },\n        strategyId: { type: \"string\" },\n      },\n      additionalProperties: false,\n    },\n    outputSchema: genericOutputSchema,\n    requiresApproval: false,\n    executionMode: \"read\",\n    capabilities: [\"list\"],\n    intents: [\"backtest_summary\"],\n    handler: handleBackt"
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+      "line": 500,
+      "call": "tool({\n    id: \"results.promote\",\n    name: \"Promote research result\",\n    description: \"Register/promote research trials via existing promote APIs\",\n    category: \"results\",\n    inputSchema: resultsPromoteInputSchema,\n    outputSchema: genericOutputSchema,\n    requiresApproval: true,\n    executionMode: \"write\",\n    capabilities: [\"promote\"],\n    intents: [\"results_promote_request\", \"approve_pending\"],\n    handler: handleResultsPromote,\n  })"
+    }
+  ],
+  "dynamicImports": [
+    {
+      "file": "app/api/rextora/paper/session/route.ts",
+      "expression": "import(\n        \"@/src/lib/rextora/paper/paperSessionService\"\n      )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/paper/paperSessionService.ts",
+      "expression": "import(\"../botRuntime\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategySearch/jobStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/jobStore\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/researchResultsSummary\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"@/src/lib/rextora/agent/v2/research\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategySearch/jobStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/strategy/strategyStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/backtest/backtestStore\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\n      \"@/src/lib/rextora/paper/paperSessionService\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"../firstRun/firstRunStatus\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+      "expression": "import(\"../firstRun/demoFixture\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/botRuntime.ts",
+      "expression": "import(\n      \"./strategySearch/orphanJobRecovery\"\n    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/botRuntime.ts",
+      "expression": "import(\"./paper/paperSessionStore\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/execution/safePaperLoop.ts",
+      "expression": "import(\"../paper/paperSessionService\")",
+      "literal": true
+    },
+    {
+      "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+      "expression": "import(\n                      \"./apiClient\"\n                    )",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/binance/binanceTradeService.ts",
+      "expression": "import(\"./binanceHttpClient\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+      "expression": "import(\"./boundedLifecycleWatcher\")",
+      "literal": true
+    },
+    {
+      "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+      "expression": "import(\"@/src/lib/rextora/strategySearch/jobApiService\")",
+      "literal": true
+    }
+  ],
+  "unresolvedLocal": [],
+  "externalPackages": [
+    "@next/bundle-analyzer",
+    "lucide-react",
+    "next",
+    "next/font/google",
+    "next/link",
+    "next/navigation",
+    "next/server",
+    "node:crypto",
+    "node:fs",
+    "node:os",
+    "node:path",
+    "react",
+    "tailwindcss"
+  ]
+}

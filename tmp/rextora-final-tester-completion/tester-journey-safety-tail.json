@@ -1,0 +1,11 @@
+{
+  "buildId": "-6CTCAJcZAMY02xezkvRO",
+  "passed": true,
+  "liveRefused": true,
+  "safeMutationRefused": true,
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "http5xxCount": 0,
+  "consoleErrorCount": 0,
+  "horizontalOverflow": false
+}

@@ -1,0 +1,8 @@
+{
+  "canaryPassed": true,
+  "providerSucceeded": true,
+  "selectedProvider": "gemini",
+  "fallbackUsed": false,
+  "writeToolAuditCount": 0,
+  "attemptCount": 1
+}

@@ -1,0 +1,51 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 4: results_review
+AssertionError: 그거 위험하진 않아?: expected 'DIRECT_ANSWER' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:40
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 8: paper_active
+AssertionError: 그 전략은?: expected 'DIRECT_ANSWER' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:40
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/AgentConversationRandomized.test.ts > bounded randomized Korean conversation harness > conversation 10: live_review
+AssertionError: 이게 대체 뭐하는 카드야?: expected 'DIRECT_ANSWER' to be 'CLARIFY_REFERENCE' // Object.is equality
+
+Expected: "CLARIFY_REFERENCE"
+Received: "DIRECT_ANSWER"
+
+ ❯ tests/AgentConversationRandomized.test.ts:209:40
+    207|           pendingApprovals: profile.pending,
+    208|         });
+    209|         expect(route.mode, turn.query).toBe(turn.mode);
+       |                                        ^
+    210|         if (turn.noLifecycle) {
+    211|           expect(route.lifecycleInfluencedRouting).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

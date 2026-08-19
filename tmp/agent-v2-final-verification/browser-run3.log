@@ -1,0 +1,4 @@
+viewport 390
+Error: browserSend_timeout:현재 탐색 취소하고 1시간봉 다른 세팅으로 다시 해.
+    at browserSend (file:///Users/macdoong/Documents/Rextora/tmp/agent-v2-browser-only.mjs:41:9)
+    at async main (file:///Users/macdoong/Documents/Rextora/tmp/agent-v2-browser-only.mjs:92:5)

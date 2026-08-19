@@ -1,0 +1,13 @@
+{
+  "A_dev_settings_01_1440": "PASS",
+  "B_dev_settings_02_1440": "PASS",
+  "C_dev_openai_07_1440": "PASS",
+  "D_dev_gemini_switch_11_1440": "PASS",
+  "E_smoke_settings_browser_1440": "PASS",
+  "E_smoke_gemini_stored_mismatch": "RESOLVED (mismatch=false; API+browser stored=true)",
+  "F_lifecycle_provider_row_F_1440": "PASS",
+  "G_openai_canary": "PASS",
+  "H_gemini_canary": "PASS",
+  "unit_orphan_and_path_isolation": "PASS 7/7",
+  "BUILD_ID": "XqaW0-NPmj__QhJfwcwai"
+}

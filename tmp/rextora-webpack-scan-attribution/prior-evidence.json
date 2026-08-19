@@ -1,0 +1,65 @@
+{
+  "sources": [
+    "tmp/rextora-final-build-path/webpack-build",
+    "tmp/rextora-final-build-path/final-build",
+    "tmp/rextora-build-stall-2",
+    "tmp/rextora-build-repair"
+  ],
+  "webpack": {
+    "attempts": [
+      {
+        "exitCode": 134,
+        "durationSeconds": 28.77,
+        "peakRssBytes": 5007245312
+      },
+      {
+        "exitCode": 134,
+        "durationSeconds": 27.39,
+        "peakRssBytes": 5007376384
+      }
+    ],
+    "lastSuccessfulPhase": "Next CLI/config loaded; remained at Creating an optimized production build",
+    "buildIdPresent": false,
+    "gcEvidence": "Scavenge near 4.06-4.09 GB followed by ineffective Mark-Compact near the default old-space limit",
+    "terminalFrames": [
+      "node::OOMErrorHandler",
+      "v8::internal::V8::FatalProcessOutOfMemory",
+      "node::fs::FSReqCallback::Resolve",
+      "node::fs::AfterScanDir",
+      "uv__work_done",
+      "uv__io_poll"
+    ],
+    "conclusion": "JavaScript heap exhaustion while handling an asynchronous directory enumeration result"
+  },
+  "turbopack": {
+    "exitCode": 143,
+    "durationSeconds": 60.21,
+    "peakRssBytes": 16801153024,
+    "buildIdPresent": false
+  },
+  "historicalWarnings": {
+    "source": "tmp/external-tester-release/logs/final-build.stderr.log",
+    "warningRows": 80,
+    "aggregateMatchedFiles": 9238706,
+    "uniqueSourceFiles": 24,
+    "maximumSinglePatternMatchedFiles": 582350,
+    "topDirectories": [
+      "data/rextora/strategy-search/trials",
+      "data/rextora/strategy-search/jobs",
+      "data/rextora dynamic stores"
+    ]
+  },
+  "existingGraph": {
+    "entryCount": 117,
+    "reachableLocalFiles": 569,
+    "reachableLocalBytes": 4082219,
+    "edges": 2156,
+    "directRuntimeTreeImports": 0
+  },
+  "temporary80PercentIsolation": {
+    "thresholdFiles": 11,
+    "aggregateHistoricalMatches": 7413784,
+    "percent": 80.247,
+    "webpackResult": "unchanged exit 134 near 5.0 GB RSS; reverted"
+  }
+}

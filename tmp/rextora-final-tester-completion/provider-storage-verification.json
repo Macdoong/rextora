@@ -1,0 +1,37 @@
+{
+  "results": [
+    {
+      "provider": "openai",
+      "submitted": true,
+      "httpStatus": 200,
+      "ok": true,
+      "saved": true,
+      "structuredOutputValid": true,
+      "writeToolAuditCount": 0
+    },
+    {
+      "provider": "gemini",
+      "submitted": true,
+      "httpStatus": 200,
+      "ok": true,
+      "saved": true,
+      "structuredOutputValid": true,
+      "writeToolAuditCount": 0
+    }
+  ],
+  "verification": {
+    "openai": {
+      "configured": true,
+      "stored": true,
+      "enabled": true,
+      "envFallback": false
+    },
+    "gemini": {
+      "configured": true,
+      "stored": true,
+      "enabled": true,
+      "envFallback": false
+    }
+  },
+  "passed": true
+}

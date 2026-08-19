@@ -1,0 +1,10 @@
+{
+  "command": "PHASE3_SCENARIOS=B PHASE3_VIEWPORTS=390,768,1024,1440 node tmp/codex-master-run/phase3-isolated-acceptance.mjs",
+  "startedAt": "2026-08-05T10:54:06Z",
+  "finishedAt": "2026-08-05T10:58:12Z",
+  "durationMs": 245665,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/focused-b-matrix.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/focused-b-matrix.stderr.log",
+  "BUILD_ID": "D7FqIx7bs6mgike-bJ6nQ"
+}

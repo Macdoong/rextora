@@ -1,0 +1,53 @@
+{
+  "capturedAt": "2026-08-13T01:15:00Z",
+  "pwd": "/Users/macdoong/Documents/Rextora",
+  "branch": "main",
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "sourceFingerprintAtStageStart": "732f3e52f66484cc163f7ee25a3702de5fb37bb232c712606ac1fb7dfb0ff780",
+  "platform": {
+    "macOS": "26.5.2",
+    "architecture": "arm64",
+    "ramBytes": 34359738368,
+    "diskAvailable": "289 GiB"
+  },
+  "runtime": {
+    "node": "v25.8.0",
+    "npm": "11.11.0",
+    "nextCli": "16.2.6",
+    "NODE_OPTIONS": null,
+    "NODE_ENV": null,
+    "CI": null
+  },
+  "limits": {
+    "cpuTime": "unlimited",
+    "fileSize": "unlimited",
+    "dataSize": "unlimited",
+    "stackKiB": 8176,
+    "addressSpace": "unlimited",
+    "processes": 5333,
+    "fileDescriptors": 1048575
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "postcss": "8.5.15",
+    "nextBundledPostcss": "8.4.31",
+    "autoprefixer": "10.5.0",
+    "tailwindcss": "4.3.0",
+    "@tailwindcss/postcss": "4.3.0"
+  },
+  "packageLock": {
+    "sha256": "d720df0c50b5b6ad642d373e815d68be8024b83dde57a53eccfc379dc470a381",
+    "gitDiffEmpty": true
+  },
+  "processesAtCapture": [
+    {
+      "pid": 41433,
+      "command": "npm exec next start -H 127.0.0.1 -p 3000",
+      "cwd": "/Users/macdoong/Documents/Rextora",
+      "elapsed": "approximately 6h26m"
+    }
+  ],
+  "secretsPrinted": false
+}

@@ -1,0 +1,10 @@
+{
+  "command": "npm run build",
+  "startedAt": "2026-08-05T13:37:53Z",
+  "finishedAt": "2026-08-05T13:39:25Z",
+  "durationMs": 92292,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/logs/preliminary-build.stdout.log",
+  "stderr": "tmp/conversation-first-agent/logs/preliminary-build.stderr.log",
+  "BUILD_ID": "xByfqTJBEhiokeYutO8GM"
+}

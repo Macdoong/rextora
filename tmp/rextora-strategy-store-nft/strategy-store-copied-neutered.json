@@ -1,0 +1,12 @@
+{
+  "entrypoint": "src/lib/rextora/strategy/strategyStore.ts",
+  "elapsedMs": 211.020625,
+  "tracedFileCount": 15,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/rextora/**/*",
+    "data/strategies/**/*"
+  ],
+  "observedPackageInputs": []
+}

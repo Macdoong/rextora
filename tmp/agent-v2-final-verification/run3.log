@@ -1,0 +1,22 @@
+Building production server...
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-L66kNM",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-L66kNM/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbihkoh_257236",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbihkoh_257236&demo=1"
+  }
+}
+SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:4255:19)
+    at successSteps (node:internal/deps/undici/undici:6902:27)
+    at readAllBytes (node:internal/deps/undici/undici:5825:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

@@ -1,0 +1,77 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 88991
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1048
+    }
+  ]
+}
+
+Running 12 tests using 1 worker
+
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.6s)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (2.0s)
+  ✓   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.6s)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (72ms)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.5s)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (3.3s)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (16.4s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (53.8s)
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.5m)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (19.6s)
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (38.4s)
+
+  12 passed (7.6m)
+
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 86157
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1046
+    }
+  ]
+}
+
+Running 12 tests using 1 worker
+
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (6.6s)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (1.8m)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.9m)
+  ✓   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.5m)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.3m)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (1.6m)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (1.5s)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (1.4s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (1.2m)
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (42.5s)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (3.1m)
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:71:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (0ms)
+
+  Slow test file: [dev-390] › tests/e2e/release/deployment-matrix.spec.ts (13.2m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  12 passed (16.9m)

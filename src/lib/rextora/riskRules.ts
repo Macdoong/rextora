@@ -1,17 +1,28 @@
 import type { AiCandidate, MarketCoin, RiskStatus } from "./types";
 
+export type RiskBreachKey =
+  | "daily_loss"
+  | "total_loss"
+  | "consecutive_losses"
+  | "daily_trades"
+  | "leverage"
+  | "open_positions";
+
+export function getRiskBreachKeys(riskStatus: RiskStatus): RiskBreachKey[] {
+  const { settings } = riskStatus;
+  const breaches: RiskBreachKey[] = [];
+  if (riskStatus.dailyLossPct <= settings.dailyLossLimitPct) breaches.push("daily_loss");
+  if (riskStatus.totalLossPct <= settings.totalLossLimitPct) breaches.push("total_loss");
+  if (riskStatus.consecutiveLosses >= settings.consecutiveLossLimit) breaches.push("consecutive_losses");
+  if (riskStatus.dailyTrades >= settings.maxDailyTrades) breaches.push("daily_trades");
+  if (riskStatus.currentLeverage > settings.maxLeverage) breaches.push("leverage");
+  if (riskStatus.openPositions > settings.maxSimultaneousPositions) breaches.push("open_positions");
+  return breaches;
+}
+
 /** Pure risk-limit check with no safety/tpSl dependencies (avoids import cycles). */
 export function isRiskLimitBreached(riskStatus: RiskStatus): boolean {
-  const { settings } = riskStatus;
-
-  return (
-    riskStatus.dailyLossPct <= settings.dailyLossLimitPct ||
-    riskStatus.totalLossPct <= settings.totalLossLimitPct ||
-    riskStatus.consecutiveLosses >= settings.consecutiveLossLimit ||
-    riskStatus.dailyTrades >= settings.maxDailyTrades ||
-    riskStatus.currentLeverage > settings.maxLeverage ||
-    riskStatus.openPositions > settings.maxSimultaneousPositions
-  );
+  return getRiskBreachKeys(riskStatus).length > 0;
 }
 
 export function checkVolatilityRule(coin: MarketCoin): boolean {

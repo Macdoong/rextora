@@ -1,0 +1,7 @@
+{
+  "entrypoint": "node_modules/rextora-runtime-paths/index.cjs",
+  "elapsedMs": 8.489958,
+  "tracedFileCount": 2,
+  "warningCount": 0,
+  "observedAssetGlobInputs": []
+}

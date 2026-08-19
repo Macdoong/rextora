@@ -5,23 +5,41 @@
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "edge") return;
-  // Skip during `next build` / static analysis so NFT does not crawl trial trees.
   if (
     process.env.NEXT_PHASE === "phase-production-build" ||
     process.env.npm_lifecycle_event === "build"
   ) {
     return;
   }
+  // next-dev + Turbopack cannot compile Settings/Agent routes while boot-time
+  // orphan recovery walks multi-thousand job/trial trees on a shared disk.
+  // Production still recovers; development opts in via REXTORA_ORPHAN_RECOVERY=1.
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.REXTORA_ORPHAN_RECOVERY !== "1"
+  ) {
+    return;
+  }
 
-  // Defer so the server can finish bootstrapping before disk resume.
   setTimeout(() => {
     void (async () => {
       try {
-        const { recoverOrphanSearchJobs } = await import(
-          "./src/lib/rextora/strategySearch/orphanJobRecovery"
+        const port = process.env.PORT || "3000";
+        const response = await fetch(
+          `http://127.0.0.1:${port}/api/rextora/internal/orphan-recovery`,
+          {
+            method: "POST",
+            headers: { "x-rextora-boot": "1" },
+          },
         );
-        const result = recoverOrphanSearchJobs();
-        if (result.resumed.length > 0 || result.errors.length > 0) {
+        if (!response.ok) {
+          throw new Error(`orphan_recovery_http_${response.status}`);
+        }
+        const result = (await response.json()) as {
+          resumed?: string[];
+          errors?: unknown[];
+        };
+        if ((result.resumed?.length ?? 0) > 0 || (result.errors?.length ?? 0) > 0) {
           console.info("[rextora] orphan search recovery", result);
         }
       } catch (err) {

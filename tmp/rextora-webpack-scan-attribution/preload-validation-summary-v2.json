@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "processes": {
+    "72928": {
+      "pid": 72928,
+      "ppid": 44245,
+      "argv": [
+        "/opt/homebrew/Cellar/node/25.8.0/bin/node"
+      ],
+      "startedAt": "2026-08-13T04:17:09.206Z",
+      "updatedAt": "2026-08-13T04:17:09.224Z",
+      "totalCalls": 5,
+      "totalReturnedEntries": 6,
+      "peakRssBytes": 50708480,
+      "peakHeapUsedBytes": 4925280,
+      "inFlight": [],
+      "directories": [
+        {
+          "api": "fs.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 1.435542,
+          "maxElapsedMs": 1.435542,
+          "firstCallerSample": "    at c ([eval]:1:209)\n    at new Promise (<anonymous>)\n    at [eval]:1:185\n    at [eval]:1:596\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 0.706875,
+          "maxElapsedMs": 0.706875,
+          "firstCallerSample": "    at [eval]:1:268",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.readdirSync",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 2,
+          "maxEntriesInOneScan": 2,
+          "totalElapsedMs": 0.262584,
+          "maxElapsedMs": 0.262584,
+          "firstCallerSample": "    at [eval]:1:149\n    at [eval]:1:596\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.opendir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation",
+          "callCount": 1,
+          "successfulCalls": 1,
+          "errorCount": 0,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.842958,
+          "maxElapsedMs": 0.842958,
+          "firstCallerSample": "    at [eval]:1:305",
+          "firstErrorCode": null
+        },
+        {
+          "api": "fs.promises.readdir",
+          "path": "<REPO>/tmp/rextora-webpack-scan-attribution/preload-validation/missing",
+          "callCount": 1,
+          "successfulCalls": 0,
+          "errorCount": 1,
+          "totalReturnedEntries": 0,
+          "maxEntriesInOneScan": 0,
+          "totalElapsedMs": 0.577042,
+          "maxElapsedMs": 0.577042,
+          "firstCallerSample": "    at [eval]:1:451",
+          "firstErrorCode": "ENOENT"
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-08-13T04:17:09.224Z"
+}

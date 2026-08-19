@@ -1,0 +1,9 @@
+{
+  "entrypoint": "src/lib/rextora/storage/runtimePaths.ts",
+  "elapsedMs": 43.458958,
+  "tracedFileCount": 4,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "data/rextora/**/*"
+  ]
+}

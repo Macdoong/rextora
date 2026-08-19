@@ -1,10 +1,16 @@
 /**
  * Provider Configuration — SERVER-SIDE ONLY.
- * Reads AI provider settings from environment variables.
+ * Resolves provider/model from settings + encrypted credentials + env fallback.
  *
  * SECURITY: This module must never be imported by client components.
  * Keys are read here and NEVER forwarded to the browser, logs, or responses.
  */
+
+import {
+  resolveProviderApiKey,
+  resolveProviderRuntime,
+  type SessionProviderSelection,
+} from "./v2/providers";
 
 export type ProviderName = "openai" | "gemini" | "local";
 
@@ -18,32 +24,34 @@ export interface ProviderConfig {
 }
 
 /**
- * Reads provider configuration from environment.
- * Returns sanitised config — keys are present/absent flags only, never values.
+ * Reads provider configuration from runtime settings + environment.
+ * Optional session selection overrides the default for this resolution only.
  */
-export function getProviderConfig(): ProviderConfig {
-  const rawProvider = process.env.AI_AGENT_PROVIDER?.toLowerCase();
-  const provider: ProviderName =
-    rawProvider === "openai" || rawProvider === "gemini" || rawProvider === "local"
-      ? rawProvider
-      : "local";
-
+export function getProviderConfig(
+  session?: SessionProviderSelection | null,
+): ProviderConfig {
+  const runtime = resolveProviderRuntime(session ?? null);
   return {
-    provider,
-    openaiConfigured: Boolean(process.env.OPENAI_API_KEY?.trim()),
-    geminiConfigured: Boolean(process.env.GEMINI_API_KEY?.trim()),
-    openaiModel: process.env.AI_AGENT_OPENAI_MODEL?.trim() || "gpt-4o-mini",
-    geminiModel: process.env.AI_AGENT_GEMINI_MODEL?.trim() || "gemini-1.5-flash",
+    provider: runtime.provider,
+    openaiConfigured: runtime.openaiConfigured,
+    geminiConfigured: runtime.geminiConfigured,
+    openaiModel:
+      runtime.provider === "openai" && runtime.model
+        ? runtime.model
+        : process.env.AI_AGENT_OPENAI_MODEL?.trim() || "gpt-5-mini",
+    geminiModel:
+      runtime.provider === "gemini" && runtime.model
+        ? runtime.model
+        : process.env.AI_AGENT_GEMINI_MODEL?.trim() || "gemini-2.5-flash",
   };
 }
 
 /**
  * Returns only the API key for the specified provider.
  * Never logs, never forwards to client.
- * Called by adapters immediately before HTTP request — key does not persist in memory longer than needed.
  */
-export function getProviderKey(provider: "openai" | "gemini"): string | undefined {
-  if (provider === "openai") return process.env.OPENAI_API_KEY;
-  if (provider === "gemini") return process.env.GEMINI_API_KEY;
-  return undefined;
+export function getProviderKey(
+  provider: "openai" | "gemini",
+): string | undefined {
+  return resolveProviderApiKey(provider);
 }

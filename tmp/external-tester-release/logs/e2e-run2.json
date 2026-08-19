@@ -1,0 +1,17 @@
+{
+  "command": "npm run test:e2e",
+  "startedAt": "2026-08-05T11:02:22Z",
+  "finishedAt": "2026-08-05T11:02:39Z",
+  "durationMs": 16891,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/e2e-run2.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/e2e-run2.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "ok": true,
+    "orphanJobRecoveryWarning": false,
+    "moduleNotFoundWarning": false,
+    "warningLines": [],
+    "tail": "h intercepted create (1.1s)\n  \u2713  29 [chromium] \u203a tests/e2e/rextora-shell-styles.spec.ts:108:7 \u203a Rextora shell styles (production) \u203a client navigation between lifecycle routes keeps shell (2.6s)\n\n  31 passed (16.3s)\n\n(node:35361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  }
+}

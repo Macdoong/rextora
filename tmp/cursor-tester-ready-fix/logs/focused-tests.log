@@ -1,0 +1,18 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  7 passed (7)
+      Tests  35 passed (35)
+   Start at  19:30:30
+   Duration  2.16s (transform 737ms, setup 60ms, import 1.01s, tests 193ms, environment 0ms)
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  6 passed (6)
+      Tests  27 passed (27)
+   Start at  19:35:49
+   Duration  2.06s (transform 716ms, setup 75ms, import 873ms, tests 181ms, environment 0ms)
+

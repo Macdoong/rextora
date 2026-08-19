@@ -1,0 +1,15 @@
+{
+  "command": "npm test -- focused conversation suite",
+  "startedAt": "2026-08-05T13:28:56Z",
+  "finishedAt": "2026-08-05T13:28:59Z",
+  "durationMs": 2938,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/focused-tests/final-focused.stdout.log",
+  "stderr": "tmp/conversation-first-agent/focused-tests/final-focused.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "SAFE": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "diffEmpty": true
+  }
+}

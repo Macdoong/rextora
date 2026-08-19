@@ -1,0 +1,18 @@
+{
+  "candidateRepairOnly": true,
+  "candidateRepairFinalStatus": "DISPROVEN_AND_REVERTED",
+  "vitest": {
+    "exitCode": 0,
+    "testFilesPassed": 15,
+    "testsPassed": 83,
+    "durationSeconds": 5.71,
+    "capturedFromLocalCommandOutputAt": "2026-08-13T03:31:22.614Z"
+  },
+  "eslint": {
+    "exitCode": 0,
+    "filesChecked": 42,
+    "maxWarnings": 0,
+    "capturedFromLocalCommandOutputAt": "2026-08-13T03:31:31.148Z"
+  },
+  "limitation": "These checks validate the semantically no-op candidate annotations, but cannot override the failed authoritative build."
+}

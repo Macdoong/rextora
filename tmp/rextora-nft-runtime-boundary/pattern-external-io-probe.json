@@ -1,0 +1,11 @@
+{
+  "entrypoint": "tmp/rextora-nft-runtime-boundary/external-fs-probe.ts",
+  "elapsedMs": 40.408417,
+  "tracedFileCount": 2,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [],
+  "observedPackageInputs": [
+    "node_modules/rextora-runtime-paths/index.cjs",
+    "node_modules/rextora-runtime-paths/package.json"
+  ]
+}

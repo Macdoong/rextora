@@ -1,0 +1,13 @@
+{
+  "server": "http://localhost:3000",
+  "mode": "next dev",
+  "query": "렉스토라는 뭐 하는 앱이야?",
+  "visibleAnswer": "렉스토라는 자동으로 주문을 내는 봇이 아니라, 전략을 찾고 검증해서 사람이 더 좋은 판단을 하도록 돕는 AI 트레이딩 직원입니다. 시장 연구와 전략 탐색, 백테스트, 모의매매 준비, 결과 설명을 맡습니다. 상태를 바꾸는 작업은 먼저 계획을 보여 주고 승인을 받은 뒤 한 번만 실행하며, 실전매매는 별도 안전 게이트 없이 시작하지 않습니다.",
+  "productTopicMatched": true,
+  "paperWorkflowTakeover": false,
+  "rawLifecycleEnumVisibleInAgentAnswer": false,
+  "unintendedApproval": false,
+  "unintendedWrite": false,
+  "thinkingCleared": true,
+  "observedUnrelatedDevIssue": "Existing dashboard hydration error overlay was visible outside the Agent response."
+}

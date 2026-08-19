@@ -1,0 +1,35 @@
+{
+  "BUILD_ID": "Bt9hwUM42EQX4tnRiIVUW",
+  "sessionId": "agent_prov_msqi1xxy_lkr7jg",
+  "openai": {
+    "httpStatus": 200,
+    "latencyMs": 28166,
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "structuredOutputValid": true,
+    "writeToolCount": 0,
+    "writeCount": 0,
+    "selectedProvider": "openai",
+    "selectedModel": "gpt-5-mini",
+    "fallbackReason": null,
+    "answerPreview": "백테스트는 과거 가격 데이터를 이용해 특정 거래 규칙이 과거에 어떻게 작동했는지 모의로 확인하는 과정입니다. 렉스토라는 이런 검증과 근거 제시를 잘 해주지만, 실제 설정 변경이나 실거래는 당신의 승인이 있어야 진행됩니다. 따라서 다음으로는 테스트할 전략 규칙과 우선 성과지표를 정해서 승인 여부를 알려주시면, 승인 후 모의 백테스트를 수행해 결과와 근거를 보고하겠습니다.",
+    "pass": true
+  },
+  "gemini": {
+    "httpStatus": 200,
+    "latencyMs": 19690,
+    "providerAttempted": true,
+    "providerSucceeded": true,
+    "fallbackUsed": false,
+    "structuredOutputValid": true,
+    "writeToolCount": 0,
+    "writeCount": 0,
+    "contextPreserved": true,
+    "selectedProvider": "gemini",
+    "selectedModel": "gemini-2.5-flash",
+    "answerPreview": "렉스토라가 당신의 투자 아이디어를 대신 시험하고 좋은 전략을 찾으려면, 어떤 규칙으로 시험할지, 그리고 무엇을 기준으로 '좋다'고 판단할지 알려주셔야 해요. 그래야 렉스토라가 정확히 당신이 원하는 대로 움직일 수 있습니다.",
+    "pass": true
+  },
+  "passed": true
+}

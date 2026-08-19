@@ -1,0 +1,18 @@
+{
+  "preservedAt": "2026-08-06T14:20:00.000Z",
+  "viewport": 390,
+  "scenario": "model-switching OpenAI → Gemini",
+  "userTurn": "백태스트가 뭐야?",
+  "receivedAnswerLength": 8,
+  "assertion": "expect(a1.length).toBeGreaterThan(10)",
+  "rootCauseCategory": "test_harness_defect",
+  "rootCause": "StreamingAnswer animates text after agent-thinking clears. waitForAgentAnswer read innerText while data-streaming was still true, capturing only the first ~8 streamed characters.",
+  "applicationDefect": false,
+  "evidence": {
+    "pageSnapshotShowsFullAnswer": true,
+    "streamingComponent": "components/rextora/agent/AgentMessage.tsx StreamingAnswer",
+    "errorContext": "tmp/rextora-deployment-release/first-failures/390-model-switch-error-context.md",
+    "rawLog": "tmp/rextora-deployment-release/first-failures/390-model-switch-run2.stdout.txt"
+  },
+  "fix": "waitForAgentAnswer now waits for [data-streaming=\"false\"]; assertions replaced with semantic patterns instead of arbitrary length thresholds."
+}

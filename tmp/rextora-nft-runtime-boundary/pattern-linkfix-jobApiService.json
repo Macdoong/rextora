@@ -1,0 +1,10 @@
+{
+  "entrypoint": "src/lib/rextora/strategySearch/jobApiService.ts",
+  "elapsedMs": 819.7815,
+  "tracedFileCount": 99,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [
+    "**/*.json",
+    "data/strategies/**/*"
+  ]
+}

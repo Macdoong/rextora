@@ -1,0 +1,14 @@
+{
+  "scenario": "I",
+  "width": 1440,
+  "startedAt": "2026-08-05T19:38:45.637Z",
+  "finishedAt": "2026-08-05T19:54:23.747Z",
+  "buildId": "lJSQ4wvJVEICqIBxyXNeE",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-I-1440-2e83db-Oehqzd",
+  "port": 54743,
+  "provider": "gemini",
+  "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:54743/dashboard\", waiting until \"domcontentloaded\"\n\n    at openDrawer (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:230:14)\n    at scenarioI (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:682:9)\n    at async runOne (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:915:28)\n    at async file:///Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1015:23\n    at async main (/Users/macdoong/Documents/Rextora/tmp/codex-master-run/phase3-isolated-acceptance.mjs:1012:26)",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "passed": false
+}

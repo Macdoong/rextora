@@ -1,0 +1,11 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:63311
+- Network:       http://172.30.1.38:63311
+✓ Ready in 88ms
+Error: ENOENT: no such file or directory, scandir '/Users/macdoong/Documents/Rextora/.next/static'
+    at ignore-listed frames {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/Users/macdoong/Documents/Rextora/.next/static'
+}

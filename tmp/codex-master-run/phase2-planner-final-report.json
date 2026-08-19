@@ -1,0 +1,43 @@
+{
+  "phase": "Planner V2 and Task Orchestration",
+  "verdict": "VERIFIED",
+  "buildId": "q_cimU_zBDfsN8EFG8Tie",
+  "capabilities": {
+    "versionedPlanSchema": true,
+    "createModifyDiffCompareCancelSupersede": true,
+    "meaningfulHashApprovalInvalidation": true,
+    "displayOnlyHashStability": true,
+    "exactJobCancelPause": true,
+    "cancelReplaceDependencyOrdering": true,
+    "continueAndResume": true,
+    "oneActiveWriteTaskPerSession": true,
+    "idempotentReplay": true,
+    "optimisticMultiTabConflict": true,
+    "restartReconciliation": true,
+    "serverAuthoritativePersistence": true
+  },
+  "focusedTests": {"filesPassed": 5, "testsPassed": 42, "exitCode": 0},
+  "fullUnit": {"filesPassed": 178, "testsPassed": 1302, "exitCode": 0},
+  "lint": {"exitCode": 0},
+  "build": {"exitCode": 0},
+  "browser": {
+    "scenario": "G",
+    "viewports": [390, 768, 1024, 1440],
+    "passed": 4,
+    "total": 4,
+    "consoleErrors": 0,
+    "horizontalOverflow": false,
+    "rawLeakCount": 0,
+    "allProcessesAndPortsCleared": true,
+    "evidenceRoot": "tmp/codex-master-run/phase3-runs/G-*",
+    "screenshotPattern": "tmp/codex-master-run/phase3-screenshots/G-planner-orchestration-*.png"
+  },
+  "safety": {
+    "safeParamsHash": "7893ca3f0e30",
+    "safeSha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "safeGitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "safeProtectedDiffEmpty": true,
+    "liveActivated": false,
+    "exchangeOrderCalled": false
+  }
+}

@@ -1,0 +1,77 @@
+Building production server...
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-eQlhfM",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-eQlhfM/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbj0665_dfe0e9",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbj0665_dfe0e9&demo=1"
+  }
+}
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-B77deh",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-B77deh/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbj1u9o_d21303",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbj1u9o_d21303&demo=1"
+  }
+}
+Running browser acceptance...
+Browser acceptance failed: locator.waitFor: Timeout 180000ms exceeded.
+Call log:
+  - waiting for locator('[data-testid="global-agent-drawer"]').locator('[data-testid="agent-conversational-answer"]').last() to be visible
+
+    at browserSend (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:314:6)
+    at async runBrowserConversations (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:372:5)
+    at async main (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:739:5) {
+  name: 'TimeoutError'
+}
+Running quality gates...
+{
+  "verdict": "AGENT V2 REASONING NOT VERIFIED",
+  "defects": [
+    "browser_error:locator.waitFor: Timeout 180000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"global-agent-drawer\"]').locator('[data-testid=\"agent-conversational-answer\"]').last() to be visible\n"
+  ],
+  "section1": {
+    "originalJobId": "search_93f77899-b1e5-4bba-8e1d-8705eb40f9d1",
+    "newJobId": "search_437a2180-f037-40ad-ba1e-5c27ba434536",
+    "planTools": [
+      "search.cancel",
+      "search.create",
+      "search.start"
+    ],
+    "oldStatus": "cancelled"
+  },
+  "gates": {
+    "lint": 0,
+    "unit": 0,
+    "build": 0,
+    "e2e": [
+      {
+        "run": 1,
+        "exitCode": 0
+      },
+      {
+        "run": 2,
+        "exitCode": 0
+      },
+      {
+        "run": 3,
+        "exitCode": 0
+      }
+    ]
+  }
+}

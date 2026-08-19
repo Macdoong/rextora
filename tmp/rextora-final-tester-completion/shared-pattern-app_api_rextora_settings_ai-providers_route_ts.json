@@ -1,0 +1,8 @@
+{
+  "entrypoint": "app/api/rextora/settings/ai-providers/route.ts",
+  "elapsedMs": 125.323917,
+  "tracedFileCount": 15,
+  "warningCount": 0,
+  "observedAssetGlobInputs": [],
+  "observedPackageInputs": []
+}

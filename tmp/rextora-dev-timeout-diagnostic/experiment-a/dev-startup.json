@@ -1,0 +1,43 @@
+{
+  "pid": 75024,
+  "startupMs": 2548,
+  "metrics": {
+    "pid": 75024,
+    "etime": "00:02",
+    "cpu_pct": "0.0",
+    "mem_pct": "0.2",
+    "rss_kb": "68064",
+    "state": "S",
+    "open_files": "42"
+  },
+  "readiness": "ai-providers-api",
+  "dashboardProbe": {
+    "ok": false,
+    "ms": 15003,
+    "error": "The operation was aborted due to timeout"
+  },
+  "settingsProbe": {
+    "ok": false,
+    "ms": 15002,
+    "error": "The operation was aborted due to timeout"
+  },
+  "aiApiProbe": {
+    "ms": 1532,
+    "status": 200,
+    "openai": {
+      "stored": true,
+      "configured": true,
+      "envFallback": false,
+      "enabled": true,
+      "selectedModel": "gpt-5-mini"
+    },
+    "gemini": {
+      "stored": true,
+      "configured": true,
+      "envFallback": false,
+      "enabled": true,
+      "selectedModel": "gemini-2.5-flash"
+    },
+    "reasoningActive": true
+  }
+}

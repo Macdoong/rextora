@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { BacktestReviewWorkbench } from "@/components/rextora/backtest/BacktestReviewWorkbench";
 import { BacktestWorkbench } from "@/components/rextora/backtest/SafeBacktestPanel";
 import { ExpertRouteGuard } from "@/components/rextora/settings/ExpertRouteGuard";
+import { AgentContextStrip } from "@/components/rextora/agent/AgentContextStrip";
 
 export default async function BacktestPage({
   searchParams,
@@ -44,6 +45,7 @@ export default async function BacktestPage({
           진입·청산 근거를 확인하세요. 실주문 없음.
         </p>
       </div>
+      <AgentContextStrip pageLabelKo="백테스트" />
       <p className="rextora-caption">
         데이터 출처: 과거 데이터 시뮬레이션 · 실제 주문 없음 · 비용 기본값은
         시스템 설정

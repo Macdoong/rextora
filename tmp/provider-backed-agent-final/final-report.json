@@ -1,0 +1,53 @@
+{
+  "verdict": "REXTORA PROVIDER-BACKED AI EMPLOYEE FINAL PARTIAL",
+  "generatedAt": "2026-08-06T13:00:00.000Z",
+  "BUILD_ID": "_8-AcvZPxbV93M8SHTuAg",
+  "HEAD": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "openaiMandatoryReproduction": {
+    "total": 9,
+    "providerSucceeded": 9,
+    "fallbackUsed": 0,
+    "passed": true
+  },
+  "openaiLiveConversation": {
+    "providerBackedTurns": 8,
+    "fallbackTurns": 2,
+    "rawLeakCount": 0
+  },
+  "geminiLiveConversation": {
+    "providerBackedTurns": 8,
+    "fallbackTurns": 2,
+    "rawLeakCount": 0
+  },
+  "canaries": {
+    "openai": { "canaryPassed": true, "model": "gpt-5-mini", "fallbackUsed": false },
+    "gemini": { "canaryPassed": true, "model": "gemini-2.5-flash", "fallbackUsed": false }
+  },
+  "qualityGates": {
+    "lintExitCode": 0,
+    "unitTests": "1538/1538",
+    "e2e1": 0,
+    "e2e2": 0,
+    "e2e3": 0
+  },
+  "credentialState": {
+    "openaiConfigured": true,
+    "openaiStored": false,
+    "openaiEnvFallback": true,
+    "geminiConfigured": true,
+    "geminiStored": false,
+    "geminiEnvFallback": true
+  },
+  "secretLeakCount": 0,
+  "safe": {
+    "params_hash": "7893ca3f0e30",
+    "unchanged": true
+  },
+  "blockersRemaining": [
+    "Full Settings UI browser matrix at 390/768/1024/1440 not executed",
+    "Production 22-scenario browser matrix not executed",
+    "Development browser matrix not executed",
+    "OpenAI credential not persisted in encrypted store (env fallback only)",
+    "24+ turn per-provider conversation matrix not fully executed"
+  ]
+}

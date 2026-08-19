@@ -1,0 +1,311 @@
+{
+  "buildId": "xvND_5gE9zIg-DWpOUk_T",
+  "startedAt": "2026-08-01T13:41:45.347Z",
+  "cases": [
+    {
+      "name": "backtest_tab_stability",
+      "ok": true,
+      "oscCount": 0,
+      "strategyId": "custom_msadw1sl",
+      "runId": "bt_msaf1e1d_68fa60",
+      "url": "http://127.0.0.1:3000/backtest?strategyId=custom_msadw1sl&runId=bt_msaf1e1d_68fa60&symbol=BTCUSDT",
+      "tabOscillation": [
+        {
+          "label": "차트",
+          "before": {
+            "active": "price",
+            "aria": "차트"
+          },
+          "after": {
+            "active": "price",
+            "aria": "차트",
+            "visibleExclusive": [
+              "price"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "거래",
+          "before": {
+            "active": "trades",
+            "aria": "거래"
+          },
+          "after": {
+            "active": "trades",
+            "aria": "거래",
+            "visibleExclusive": [
+              "trades"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "월별",
+          "before": {
+            "active": "monthly",
+            "aria": "월별"
+          },
+          "after": {
+            "active": "monthly",
+            "aria": "월별",
+            "visibleExclusive": [
+              "monthly"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "비용",
+          "before": {
+            "active": "cost",
+            "aria": "비용"
+          },
+          "after": {
+            "active": "cost",
+            "aria": "비용",
+            "visibleExclusive": [
+              "cost"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "자산·낙폭",
+          "before": {
+            "active": "equity",
+            "aria": "자산·낙폭"
+          },
+          "after": {
+            "active": "equity",
+            "aria": "자산·낙폭",
+            "visibleExclusive": [
+              "equity"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "타임라인",
+          "before": {
+            "active": "timeline",
+            "aria": "타임라인"
+          },
+          "after": {
+            "active": "timeline",
+            "aria": "타임라인",
+            "visibleExclusive": [
+              "timeline"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "상세 분석",
+          "before": {
+            "active": "advanced",
+            "aria": "상세 분석"
+          },
+          "after": {
+            "active": "advanced",
+            "aria": "상세 분석",
+            "visibleExclusive": [
+              "advanced"
+            ]
+          },
+          "flipped": false
+        },
+        {
+          "label": "검증",
+          "before": {
+            "active": "validation",
+            "aria": "검증"
+          },
+          "after": {
+            "active": "validation",
+            "aria": "검증",
+            "visibleExclusive": [
+              "validation"
+            ]
+          },
+          "flipped": false
+        }
+      ],
+      "at": "2026-08-01T13:42:02.074Z"
+    },
+    {
+      "name": "strategy_management",
+      "ok": true,
+      "rowCount": 12,
+      "safeDeleteBlocked": true,
+      "at": "2026-08-01T13:42:02.228Z"
+    },
+    {
+      "name": "fab_collision_1440",
+      "ok": true,
+      "fabMode": "raised",
+      "fab": {
+        "top": 768,
+        "bottom": 812,
+        "right": 1420
+      },
+      "cta": {
+        "top": 834,
+        "bottom": 874.9,
+        "right": 1306,
+        "text": "연구 시작"
+      },
+      "overlap": false,
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "at": "2026-08-01T13:42:04.155Z"
+    },
+    {
+      "name": "fab_collision_1024",
+      "ok": true,
+      "fabMode": "raised",
+      "fab": {
+        "top": 636,
+        "bottom": 680,
+        "right": 1004
+      },
+      "cta": {
+        "top": 702,
+        "bottom": 742.9,
+        "right": 902,
+        "text": "연구 시작"
+      },
+      "overlap": false,
+      "viewport": {
+        "w": 1024,
+        "h": 768
+      },
+      "at": "2026-08-01T13:42:05.947Z"
+    },
+    {
+      "name": "fab_collision_768",
+      "ok": true,
+      "fabMode": "raised",
+      "fab": {
+        "top": 892,
+        "bottom": 936,
+        "right": 748
+      },
+      "cta": {
+        "top": 958,
+        "bottom": 998.9,
+        "right": 646,
+        "text": "연구 시작"
+      },
+      "overlap": false,
+      "viewport": {
+        "w": 768,
+        "h": 1024
+      },
+      "at": "2026-08-01T13:42:07.769Z"
+    },
+    {
+      "name": "fab_collision_390",
+      "ok": true,
+      "fabMode": "raised",
+      "fab": {
+        "top": 712,
+        "bottom": 756,
+        "right": 374
+      },
+      "cta": {
+        "top": 779,
+        "bottom": 823,
+        "right": 268,
+        "text": "연구 시작"
+      },
+      "overlap": false,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "at": "2026-08-01T13:42:09.513Z"
+    },
+    {
+      "name": "agent_drawer",
+      "ok": true,
+      "drawerWidth": 512,
+      "detailsCollapsed": true,
+      "at": "2026-08-01T13:42:11.094Z"
+    },
+    {
+      "name": "ai_search_plan",
+      "ok": true,
+      "intent": "prepare_search_plan",
+      "commandType": "create_strategy_search_job",
+      "at": "2026-08-01T13:42:11.281Z"
+    },
+    {
+      "name": "ai_search_execute",
+      "ok": true,
+      "jobId": "search_fba6c18f-882e-4129-b6e4-f56bfdd88e8d",
+      "executionStatus": "skipped_idempotent",
+      "summaryKo": "이미 실행된 동일 명령입니다. 결과: job:search_fba6c18f-882e-4129-b6e4-f56bfdd88e8d",
+      "at": "2026-08-01T13:42:11.382Z"
+    },
+    {
+      "name": "ai_search_idempotent",
+      "ok": true,
+      "status2": "skipped_idempotent",
+      "jobId2": "search_fba6c18f-882e-4129-b6e4-f56bfdd88e8d",
+      "alreadyExecuted": true,
+      "at": "2026-08-01T13:42:11.479Z"
+    },
+    {
+      "name": "ai_backtest_plan",
+      "ok": true,
+      "intent": "prepare_backtest_plan",
+      "commandType": "run_backtest",
+      "strategyId": "custom_msadw1sl",
+      "at": "2026-08-01T13:42:11.635Z"
+    },
+    {
+      "name": "ai_backtest_execute",
+      "ok": true,
+      "runId": "bt_msaf1e1d_68fa60",
+      "executionStatus": "skipped_idempotent",
+      "summaryKo": "이미 실행된 동일 명령입니다. 결과: run:bt_msaf1e1d_68fa60",
+      "at": "2026-08-01T13:42:11.810Z"
+    },
+    {
+      "name": "ai_paper_plan",
+      "ok": true,
+      "intent": "prepare_paper_plan",
+      "commandType": "prepare_paper_session",
+      "at": "2026-08-01T13:42:11.967Z"
+    },
+    {
+      "name": "ai_paper_execute",
+      "ok": true,
+      "executionStatus": "skipped_idempotent",
+      "resultReference": "paper:paper_bf028ba7-b04f-4f25-84ed-5a45eec5d2a8",
+      "exchangeCalled": false,
+      "summaryKo": "이미 실행된 동일 명령입니다. 결과: paper:paper_bf028ba7-b04f-4f25-84ed-5a45eec5d2a8",
+      "at": "2026-08-01T13:42:12.068Z"
+    },
+    {
+      "name": "safety_live_blocked",
+      "ok": true,
+      "intent": "recommend_next",
+      "safetyBlocked": false,
+      "at": "2026-08-01T13:42:12.757Z"
+    },
+    {
+      "name": "safety_order_blocked",
+      "ok": true,
+      "intent": "execute_trade",
+      "safetyBlocked": true,
+      "at": "2026-08-01T13:42:12.757Z"
+    }
+  ],
+  "consoleErrors": [],
+  "finishedAt": "2026-08-01T13:42:12.757Z",
+  "ok": true
+}

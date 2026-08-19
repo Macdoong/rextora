@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "expectedTests": 9,
+  "batches": [
+    {
+      "id": "390-a",
+      "project": "dev-390",
+      "grep": "scenario (03|17):",
+      "exitCode": 0,
+      "durationMs": 383533,
+      "passedMarks": 2,
+      "failedMarks": 0,
+      "signals": {
+        "malformedJson": 0,
+        "emptyManifest": 0,
+        "chunkLoad": 0,
+        "hydration": 0,
+        "unmountedState": 0,
+        "agentTimeout": 0
+      }
+    },
+    {
+      "id": "390-b",
+      "project": "dev-390",
+      "grep": "scenario (20|21|22):",
+      "exitCode": 0,
+      "durationMs": 249968,
+      "passedMarks": 3,
+      "failedMarks": 0,
+      "signals": {
+        "malformedJson": 1,
+        "emptyManifest": 0,
+        "chunkLoad": 0,
+        "hydration": 0,
+        "unmountedState": 0,
+        "agentTimeout": 0
+      }
+    },
+    {
+      "id": "768",
+      "project": "dev-768",
+      "grep": "scenario (17|20|21|22):",
+      "exitCode": 0,
+      "durationMs": 509635,
+      "passedMarks": 4,
+      "failedMarks": 0,
+      "signals": {
+        "malformedJson": 2,
+        "emptyManifest": 0,
+        "chunkLoad": 0,
+        "hydration": 0,
+        "unmountedState": 0,
+        "agentTimeout": 0
+      }
+    }
+  ],
+  "signals": {
+    "malformedJson": 3,
+    "emptyManifest": 0,
+    "chunkLoad": 0,
+    "hydration": 0,
+    "unmountedState": 0,
+    "agentTimeout": 0
+  },
+  "durationMs": 1151348,
+  "focusedKnownBlockersPassed": true
+}

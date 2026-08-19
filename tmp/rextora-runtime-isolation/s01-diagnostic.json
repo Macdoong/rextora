@@ -1,0 +1,135 @@
+{
+  "steps": [
+    {
+      "t": "2026-08-11T02:23:06.861Z",
+      "k": "url",
+      "v": "http://127.0.0.1:3101/settings"
+    },
+    {
+      "t": "2026-08-11T02:23:06.940Z",
+      "k": "tabCount",
+      "v": 1
+    },
+    {
+      "t": "2026-08-11T02:23:06.943Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    },
+    {
+      "t": "2026-08-11T02:23:07.145Z",
+      "k": "clicked",
+      "v": true
+    },
+    {
+      "t": "2026-08-11T02:23:07.946Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    },
+    {
+      "t": "2026-08-11T02:23:08.949Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    },
+    {
+      "t": "2026-08-11T02:23:09.954Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    },
+    {
+      "t": "2026-08-11T02:23:10.957Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED"
+    },
+    {
+      "t": "2026-08-11T02:23:11.964Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED"
+    },
+    {
+      "t": "2026-08-11T02:23:16.976Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED"
+    },
+    {
+      "t": "2026-08-11T02:23:21.994Z",
+      "k": "console",
+      "v": "WebSocket connection to 'ws://127.0.0.1:3101/_next/webpack-hmr?id=R413mE2svHciMTg5FR2kz' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED"
+    },
+    {
+      "t": "2026-08-11T02:23:22.145Z",
+      "k": "panelVisible",
+      "v": false
+    },
+    {
+      "t": "2026-08-11T02:23:22.146Z",
+      "k": "panelError",
+      "v": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n  - waiting for getByTestId('ai-provider-settings') to be visible\n"
+    },
+    {
+      "t": "2026-08-11T02:23:22.157Z",
+      "k": "tabs",
+      "v": [
+        {
+          "id": "settings-tab-btn-data",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-sky-500/50 bg-sky-500/15 text-sky-50"
+        },
+        {
+          "id": "settings-tab-btn-cost",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-research",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-exchange",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-ai",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-risk",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-alerts",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-system",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-btn-expert",
+          "aria": null,
+          "cls": "rounded-lg border px-3 py-1.5 text-sm border-slate-700 bg-slate-900/50 text-slate-300"
+        },
+        {
+          "id": "settings-tab-data",
+          "aria": null,
+          "cls": "rextora-card p-5 md:p-[1.35rem]  "
+        }
+      ]
+    },
+    {
+      "t": "2026-08-11T02:23:22.158Z",
+      "k": "bodySnippet",
+      "v": "R\nRextora\nAI 전략 연구 · 거래 수명주기\n현재 거래 모드\n모의 거래\n\n실전 매매는 게이트·승인·위험 제한을 모두 통과한 뒤에만 실행됩니다.\n\n대시보드\n전략 탐색\n탐색 결과\n백테스트\n모의 매매\n실전 매매\n시스템 설정\nRextora Quant · SAFE_v44 보호\n시스템 설정\n\n데이터·비용·탐색·거래소·위험·알림·상태·전문가 모드를 관리합니다. 비밀값은 환경변수로만 관리합니다.\n\n모의 거래 기본 · 실전 거래 차단\n데이터\n거래 비용\n탐색 엔진\n거래소 연결\nAI 공급자\n위험 제한\n알림\n시스템 상태\n전문가 모드\n데이터\n\n시장 데이터 공급·동기화·가용 심볼/타임프레임\n\n데이터 공급자\nBinance Futures OHLCV\n동기화 상태\n온디맨드 캐시\n가용 마켓\nUSDT-M Perpetual\n가용 타임프레임\n1m · 5m · 15m · 1h · 4h · 1d\n\n데이터 오류는 시스템 상태 탭과 백테스트/탐색 실행 로그에 표시됩니다. 별도 영구 동기화 워커가 없으면 마지막 동기화 시각"
+    },
+    {
+      "t": "2026-08-11T02:23:22.274Z",
+      "k": "screenshot",
+      "v": "s01-after-click.png"
+    }
+  ]
+}

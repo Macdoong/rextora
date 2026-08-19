@@ -1,0 +1,134 @@
+
+Running 88 tests using 1 worker
+
+(node:10723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (8.3s)
+  ✓   2 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (4.7s)
+  ✓   3 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (461ms)
+  ✓   4 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (73ms)
+  ✓   5 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (457ms)
+  ✓   6 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (1.0m)
+  ✓   7 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (1.2m)
+  ✓   8 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.3m)
+  ✓   9 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (1.5m)
+  ✓  10 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (1.0m)
+  ✓  11 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (1.8m)
+  ✓  12 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (1.0m)
+  ✓  13 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (18.8s)
+  ✓  14 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (1.6m)
+  ✓  15 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (1.8m)
+  ✓  16 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.5m)
+  ✓  17 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (38.3s)
+  ✓  18 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (399ms)
+  ✓  19 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (207ms)
+  ✓  20 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (4.3s)
+  ✓  21 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (3.8s)
+  ✓  22 [prod-390] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (24.2s)
+(node:14572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (14.3s)
+  ✓  24 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (13.6s)
+  ✓  25 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (13.8s)
+  ✓  26 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (507ms)
+  ✓  27 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (13.2s)
+  ✓  28 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (3.4s)
+  ✓  29 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (19.2s)
+  ✓  30 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (19.7s)
+  ✓  31 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (40.6s)
+  ✓  32 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (4.0s)
+  ✓  33 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (55.6s)
+  ✓  34 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (5.7s)
+  ✓  35 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (18.9s)
+  ✓  36 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (52.2s)
+  ✓  37 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (49.0s)
+  ✓  38 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (51.7s)
+  ✓  39 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (51.6s)
+  ✓  40 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (950ms)
+  ✓  41 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (592ms)
+  ✓  42 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (9.9s)
+  ✓  43 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (9.6s)
+  ✓  44 [prod-768] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (26.5s)
+(node:17222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  45 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (17.3s)
+  ✓  46 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (15.7s)
+  ✓  47 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (15.2s)
+  ✓  48 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (1.2s)
+  ✓  49 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (15.3s)
+  ✓  50 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (9.0s)
+  ✓  51 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (24.4s)
+  ✓  52 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (28.4s)
+  ✓  53 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (42.7s)
+  ✓  54 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (8.5s)
+  ✓  55 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (57.7s)
+  ✓  56 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (11.6s)
+  ✓  57 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (24.2s)
+  ✓  58 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (57.4s)
+  ✓  59 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (49.5s)
+  ✓  60 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (51.2s)
+  ✓  61 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (58.8s)
+  ✓  62 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (1.2s)
+  ✓  63 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (680ms)
+  ✓  64 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (14.8s)
+  ✓  65 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (14.1s)
+  ✓  66 [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (38.8s)
+(node:20280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  67 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (18.6s)
+  ✓  68 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (20.7s)
+  ✓  69 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (18.3s)
+  ✓  70 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (3.0s)
+  ✓  71 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (17.9s)
+  ✓  72 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (14.9s)
+  ✓  73 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (32.7s)
+  ✓  74 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (32.3s)
+  ✓  75 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (51.9s)
+  ✓  76 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (12.3s)
+  ✓  77 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (59.4s)
+  ✓  78 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (18.3s)
+  ✓  79 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (34.6s)
+  ✓  80 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (58.9s)
+  ✓  81 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (54.1s)
+  ✓  82 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (46.0s)
+  ✓  83 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (58.5s)
+  ✓  84 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (1.4s)
+  ✓  85 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled (1.1s)
+  ✓  86 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (17.9s)
+  ✓  87 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal (20.1s)
+  ✓  88 [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts:58:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection (42.7s)
+
+  Slow test file: [prod-390] › tests/e2e/release/deployment-matrix.spec.ts (15.5m)
+  Slow test file: [prod-1440] › tests/e2e/release/deployment-matrix.spec.ts (10.6m)
+  Slow test file: [prod-1024] › tests/e2e/release/deployment-matrix.spec.ts (9.3m)
+  Slow test file: [prod-768] › tests/e2e/release/deployment-matrix.spec.ts (7.9m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  88 passed (43.5m)
+real 2608.20
+user 1518.04
+sys 204.55
+           436355072  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+           103147544  page reclaims
+               22877  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+             1179189  messages sent
+              687730  messages received
+                   0  signals received
+              268472  voluntary context switches
+             5912915  involuntary context switches
+          2378795769  instructions retired
+           976227838  cycles elapsed
+            45913080  peak memory footprint

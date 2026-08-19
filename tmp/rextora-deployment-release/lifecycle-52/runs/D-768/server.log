@@ -1,0 +1,292 @@
+▲ Next.js 16.2.6
+- Local:         http://localhost:54252
+- Network:       http://172.30.1.38:54252
+✓ Ready in 88ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:52123
+- Network:       http://172.30.1.38:52123
+✓ Ready in 89ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:56616
+- Network:       http://172.30.1.38:56616
+✓ Ready in 91ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55847
+- Network:       http://172.30.1.38:55847
+✓ Ready in 90ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:60875
+- Network:       http://172.30.1.38:60875
+✓ Ready in 150ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:61252
+- Network:       http://172.30.1.38:61252
+✓ Ready in 88ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:62719
+- Network:       http://172.30.1.38:62719
+✓ Ready in 124ms
+▲ Next.js 16.2.6
+- Local:         http://localhost:55739
+- Network:       http://172.30.1.38:55739
+✓ Ready in 92ms
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:63678
+- Network:       http://172.30.1.38:63678
+- Environments: .env.local
+✓ Ready in 319ms
+
+ GET /dashboard 200 in 364ms (next.js: 209ms, application-code: 155ms)
+ GET /dashboard 200 in 36ms (next.js: 1619µs, application-code: 35ms)
+ GET /api/rextora/trading/dashboard 200 in 89ms (next.js: 58ms, application-code: 30ms)
+ GET /api/rextora/first-run 200 in 122ms (next.js: 116ms, application-code: 6ms)
+ GET /api/rextora/agent/session?sessionId=agent_d0cf25adfc29479c 200 in 21ms (next.js: 17ms, application-code: 5ms)
+ GET /api/rextora/strategy-search 200 in 70ms (next.js: 65ms, application-code: 4ms)
+ GET /api/rextora/strategies 200 in 112ms (next.js: 109ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 134ms (next.js: 130ms, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 156ms (next.js: 151ms, application-code: 5ms)
+ GET /api/rextora/first-run 200 in 10ms (next.js: 2ms, application-code: 7ms)
+ GET /api/rextora/settings/ai-providers 200 in 16ms (next.js: 11ms, application-code: 5ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 1732µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 3ms (next.js: 1081µs, application-code: 2ms)
+ PATCH /api/rextora/agent/session 200 in 5ms (next.js: 975µs, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 580ms (next.js: 21ms, application-code: 558ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 4ms (next.js: 998µs, application-code: 3ms)
+ PATCH /api/rextora/agent/session 200 in 4ms (next.js: 924µs, application-code: 3ms)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1375µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 18ms (next.js: 16ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 20ms (next.js: 19ms, application-code: 1339µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1254µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 19ms (next.js: 17ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 4ms, application-code: 1532µs)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1459µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 20ms (next.js: 17ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 22ms (next.js: 21ms, application-code: 1380µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1578µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 1083µs, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 6ms (next.js: 4ms, application-code: 1576µs)
+ POST /api/rextora/agent 200 in 37.2s (next.js: 60ms, application-code: 37.1s)
+ PATCH /api/rextora/agent/session 200 in 7ms (next.js: 1081µs, application-code: 5ms)
+ PATCH /api/rextora/agent/session 200 in 5ms (next.js: 1064µs, application-code: 4ms)
+ PATCH /api/rextora/agent/session 200 in 12ms (next.js: 4ms, application-code: 8ms)
+ POST /api/rextora/agent 200 in 490ms (next.js: 1123µs, application-code: 489ms)
+ PATCH /api/rextora/agent/session 200 in 8ms (next.js: 1357µs, application-code: 7ms)
+ PATCH /api/rextora/agent/session 200 in 7ms (next.js: 1137µs, application-code: 6ms)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1568µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 5ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 892µs, application-code: 1684µs)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 3ms, application-code: 1330µs)
+ POST /api/rextora/agent 200 in 5ms (next.js: 1083µs, application-code: 4ms)
+ PATCH /api/rextora/agent/session 200 in 8ms (next.js: 957µs, application-code: 7ms)
+ PATCH /api/rextora/agent/session 200 in 5ms (next.js: 1298µs, application-code: 4ms)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1436µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 4ms, application-code: 8ms)
+ GET /api/rextora/strategies 200 in 15ms (next.js: 13ms, application-code: 1685µs)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 3ms, application-code: 1200µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1100µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 4ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 15ms, application-code: 1635µs)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1995µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1360µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 4ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 14ms, application-code: 1695µs)
+ GET /api/rextora/paper/session?active=1 200 in 19ms (next.js: 17ms, application-code: 1923µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1285µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 5ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 14ms, application-code: 1643µs)
+ GET /api/rextora/paper/session?active=1 200 in 17ms (next.js: 16ms, application-code: 1137µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1104µs, application-code: 1935µs)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 892µs, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1566µs)
+ GET /api/rextora/strategy-search 200 in 7ms (next.js: 4ms, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 18ms (next.js: 7ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 917µs, application-code: 1890µs)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 4ms, application-code: 1154µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1298µs, application-code: 1915µs)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 15ms (next.js: 14ms, application-code: 1638µs)
+ GET /api/rextora/paper/session?active=1 200 in 17ms (next.js: 16ms, application-code: 1170µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1324µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 2ms (next.js: 849µs, application-code: 1620µs)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 3ms, application-code: 1281µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1223µs, application-code: 1924µs)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 14ms, application-code: 1555µs)
+ GET /api/rextora/paper/session?active=1 200 in 18ms (next.js: 17ms, application-code: 1718µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1602µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 2ms (next.js: 855µs, application-code: 1643µs)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 4ms, application-code: 1660µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1603µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 12ms (next.js: 4ms, application-code: 8ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 13ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 17ms (next.js: 16ms, application-code: 1242µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1203µs, application-code: 1956µs)
+ GET /api/rextora/trading/dashboard 200 in 13ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 16ms (next.js: 14ms, application-code: 1968µs)
+ GET /api/rextora/paper/session?active=1 200 in 3ms (next.js: 943µs, application-code: 1569µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1770µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 17ms (next.js: 15ms, application-code: 1674µs)
+ GET /api/rextora/paper/session?active=1 200 in 3ms (next.js: 1017µs, application-code: 1734µs)
+ GET /api/rextora/strategy-search 200 in 14ms (next.js: 6ms, application-code: 8ms)
+ GET /api/rextora/trading/dashboard 200 in 42ms (next.js: 14ms, application-code: 28ms)
+ GET /api/rextora/strategies 200 in 10ms (next.js: 5ms, application-code: 4ms)
+ GET /api/rextora/paper/session?active=1 200 in 16ms (next.js: 12ms, application-code: 4ms)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1876µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 35ms (next.js: 10ms, application-code: 25ms)
+ GET /api/rextora/strategies 200 in 38ms (next.js: 36ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 37ms (next.js: 34ms, application-code: 3ms)
+[?25h
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:65248
+- Network:       http://172.30.1.38:65248
+- Environments: .env.local
+✓ Ready in 279ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:64726
+- PID:          38490
+- Dir:          /Users/macdoong/Documents/Rextora
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 38490 to stop it.
+[?25h
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:50597
+- Network:       http://172.30.1.38:50597
+- Environments: .env.local
+✓ Ready in 287ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:50598
+- PID:          39484
+- Dir:          /Users/macdoong/Documents/Rextora
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 39484 to stop it.
+[?25h
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:51384
+- Network:       http://172.30.1.38:51384
+- Environments: .env.local
+✓ Ready in 334ms
+
+ GET /dashboard 200 in 441ms (next.js: 291ms, application-code: 150ms)
+ GET /dashboard 200 in 38ms (next.js: 2ms, application-code: 36ms)
+ GET /api/rextora/trading/dashboard 200 in 104ms (next.js: 71ms, application-code: 33ms)
+ GET /api/rextora/first-run 200 in 140ms (next.js: 135ms, application-code: 5ms)
+ GET /api/rextora/agent/session?sessionId=agent_e681fc82158f4ca9 200 in 29ms (next.js: 23ms, application-code: 5ms)
+ GET /api/rextora/strategy-search 200 in 84ms (next.js: 80ms, application-code: 4ms)
+ GET /api/rextora/strategies 200 in 125ms (next.js: 122ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 148ms (next.js: 144ms, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers 200 in 170ms (next.js: 166ms, application-code: 4ms)
+ GET /api/rextora/first-run 200 in 12ms (next.js: 3ms, application-code: 8ms)
+ GET /api/rextora/settings/ai-providers 200 in 15ms (next.js: 11ms, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 1122µs, application-code: 3ms)
+ GET /api/rextora/settings/ai-providers 200 in 4ms (next.js: 939µs, application-code: 3ms)
+ PATCH /api/rextora/agent/session 200 in 6ms (next.js: 1266µs, application-code: 4ms)
+ PATCH /api/rextora/agent/session 200 in 5ms (next.js: 1135µs, application-code: 4ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 1144ms (next.js: 26ms, application-code: 1118ms)
+ GET /api/rextora/settings/ai-providers/models?provider=openai 200 in 5ms (next.js: 2ms, application-code: 3ms)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1799µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 17ms (next.js: 6ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 22ms (next.js: 17ms, application-code: 5ms)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 1202µs, application-code: 2ms)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1692µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 18ms (next.js: 6ms, application-code: 12ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 1058µs, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 6ms (next.js: 4ms, application-code: 2ms)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1406µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 6ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 18ms (next.js: 17ms, application-code: 1800µs)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1403µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1558µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 20ms (next.js: 17ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 23ms (next.js: 20ms, application-code: 2ms)
+ POST /api/rextora/agent 200 in 31.5s (next.js: 64ms, application-code: 31.4s)
+ PATCH /api/rextora/agent/session 200 in 6ms (next.js: 1325µs, application-code: 5ms)
+ PATCH /api/rextora/agent/session 200 in 7ms (next.js: 1003µs, application-code: 6ms)
+ PATCH /api/rextora/agent/session 200 in 11ms (next.js: 1922µs, application-code: 10ms)
+ POST /api/rextora/agent 200 in 555ms (next.js: 1851µs, application-code: 553ms)
+ PATCH /api/rextora/agent/session 200 in 14ms (next.js: 1172µs, application-code: 13ms)
+ PATCH /api/rextora/agent/session 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ POST /api/rextora/agent 200 in 6ms (next.js: 1224µs, application-code: 4ms)
+ PATCH /api/rextora/agent/session 200 in 7ms (next.js: 2ms, application-code: 5ms)
+ PATCH /api/rextora/agent/session 200 in 12ms (next.js: 2ms, application-code: 10ms)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1324µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 4ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 951µs, application-code: 1804µs)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 3ms, application-code: 1296µs)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1653µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 5ms, application-code: 9ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 1082µs, application-code: 1871µs)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1788µs)
+ GET /api/rextora/strategy-search 200 in 6ms (next.js: 1955µs, application-code: 4ms)
+ GET /api/rextora/trading/dashboard 200 in 17ms (next.js: 7ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 20ms (next.js: 18ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 23ms (next.js: 21ms, application-code: 1582µs)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1483µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 20ms (next.js: 6ms, application-code: 14ms)
+ GET /api/rextora/strategies 200 in 5ms (next.js: 1772µs, application-code: 4ms)
+ GET /api/rextora/paper/session?active=1 200 in 8ms (next.js: 6ms, application-code: 2ms)
+ GET /api/rextora/strategy-search 200 in 5ms (next.js: 1896µs, application-code: 3ms)
+ GET /api/rextora/trading/dashboard 200 in 17ms (next.js: 6ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 20ms (next.js: 17ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 3ms (next.js: 1018µs, application-code: 2ms)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1097µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 15ms (next.js: 13ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 18ms (next.js: 16ms, application-code: 1590µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1394µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 17ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 19ms (next.js: 17ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 22ms (next.js: 20ms, application-code: 1735µs)
+ GET /api/rextora/strategy-search 200 in 13ms (next.js: 8ms, application-code: 5ms)
+ GET /api/rextora/trading/dashboard 200 in 30ms (next.js: 14ms, application-code: 16ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 1034µs, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1912µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1501µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 18ms (next.js: 16ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 3ms (next.js: 1166µs, application-code: 1995µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1283µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 18ms (next.js: 16ms, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 22ms (next.js: 19ms, application-code: 3ms)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1594µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 21ms (next.js: 18ms, application-code: 3ms)
+ GET /api/rextora/paper/session?active=1 200 in 8ms (next.js: 6ms, application-code: 3ms)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1254µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 17ms (next.js: 15ms, application-code: 1989µs)
+ GET /api/rextora/paper/session?active=1 200 in 20ms (next.js: 18ms, application-code: 1557µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1238µs, application-code: 1797µs)
+ GET /api/rextora/trading/dashboard 200 in 15ms (next.js: 4ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 18ms (next.js: 16ms, application-code: 1934µs)
+ GET /api/rextora/paper/session?active=1 200 in 20ms (next.js: 18ms, application-code: 1306µs)
+ GET /api/rextora/strategy-search 200 in 3ms (next.js: 1206µs, application-code: 1791µs)
+ GET /api/rextora/trading/dashboard 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/rextora/strategies 200 in 3ms (next.js: 1178µs, application-code: 2ms)
+ GET /api/rextora/paper/session?active=1 200 in 5ms (next.js: 3ms, application-code: 1165µs)
+ GET /api/rextora/strategy-search 200 in 4ms (next.js: 1673µs, application-code: 2ms)
+ GET /api/rextora/trading/dashboard 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/rextora/strategies 200 in 19ms (next.js: 17ms, application-code: 1819µs)
+ GET /api/rextora/paper/session?active=1 200 in 4ms (next.js: 3ms, application-code: 1237µs)
+[?25h
+▲ Next.js 16.2.6
+- Local:         http://localhost:55829
+- Network:       http://172.30.1.38:55829
+✓ Ready in 89ms

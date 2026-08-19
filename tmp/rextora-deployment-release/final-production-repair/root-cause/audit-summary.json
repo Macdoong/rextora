@@ -1,0 +1,54 @@
+{
+  "07": {
+    "classification": "HARNESS_DEFECT",
+    "failedViewports": ["390", "768", "1024", "1440"],
+    "input": "백태스트가 뭐야?",
+    "blockingWait": "sendAgentQueryAwaitResponse → waitForResponse(POST /api/rextora/agent) 120s inside 300s test timeout",
+    "apiDirectMs": "~16000",
+    "divergence": "Scenario uses fill+Enter; sendAgentQuery (fill+click) works in scenario 08. Enter/fill may not commit React controlled state before send; POST never observed → full test timeout.",
+    "fix": "Use sendAgentQuery + waitForAgentAnswer (same UI path as passing scenarios); add startFreshAgentConversation for session isolation."
+  },
+  "17": {
+    "classification": "HARNESS_DEFECT",
+    "failedViewports": ["390", "768", "1024", "1440"],
+    "input": "방금 실제로 뭘 했어? (after plan+approve chain)",
+    "blockingWait": "300s test timeout during long approval chain + sendAgentQueryAwaitResponse on report turn",
+    "divergence": "Multi-step chain accumulates waitForAgentAnswer streaming waits; report turn uses broken sendAgentQueryAwaitResponse",
+    "fix": "Use sendAgentQuery + waitForAgentAnswer for report; tighten approve wait to response not unbounded DOM streaming."
+  },
+  "22": {
+    "classification": "HARNESS_DEFECT",
+    "failedViewports": ["390", "768", "1024", "1440"],
+    "input": "백태스트가 뭐야? (after settings scan)",
+    "blockingWait": "sendAgentQueryAwaitResponse timeout → test 300s; assertNoHorizontalOverflow never reached",
+    "fix": "Use sendAgentQuery + waitForAgentAnswer; same as scenario 07 fix."
+  },
+  "08": {
+    "classification": "TEST_DATA_STATE_DEFECT",
+    "failedViewports": ["390"],
+    "error": "answer_semantic_mismatch: 나는 자동으로 실거래 주문을",
+    "divergence": "Sequential tests share browser context; stale prior answer read by waitForAgentAnswer without fresh session",
+    "fix": "startFreshAgentConversation before agent query scenarios."
+  },
+  "11": {
+    "classification": "HARNESS_DEFECT",
+    "failedViewports": ["390", "768", "1440"],
+    "error": "model inputValue gpt-5-mini after selectGeminiFlash",
+    "divergence": "selectGeminiFlash does not wait for async model catalog reload after provider switch",
+    "fix": "waitForAgentModelOption after provider change before selecting flash model."
+  },
+  "16": {
+    "classification": "TEST_DATA_STATE_DEFECT",
+    "failedViewports": ["390", "1024"],
+    "error": "CLARIFY_REFERENCE on second 승인할게",
+    "divergence": "Text 승인할게 sent without pending approval context after button approve; or first approve incomplete under load",
+    "fix": "Second idempotent action via approve button click when visible; wait approval center cleared after first approve."
+  },
+  "04": {
+    "classification": "HARNESS_DEFECT",
+    "failedViewports": ["1024"],
+    "error": "waitForProviderModelOptions timeout ~108s",
+    "divergence": "Gemini model catalog async load under matrix load at 1024 viewport",
+    "fix": "Retry openAiProviderTab + waitForProviderModelOptions once on failure."
+  }
+}

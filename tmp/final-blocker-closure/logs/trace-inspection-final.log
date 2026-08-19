@@ -1,0 +1,9 @@
+{
+  "outPath": "/Users/macdoong/Documents/Rextora/tmp/final-blocker-closure/evidence/trace-inspection.json",
+  "totalSizeHuman": "641.7MB",
+  "tracedTmp": 0,
+  "tracedScreenshots": 0,
+  "tracedEnv": 0,
+  "secretTraceFailure": false,
+  "pass": true
+}

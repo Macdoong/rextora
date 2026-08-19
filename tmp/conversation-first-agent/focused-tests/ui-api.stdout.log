@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentV2UserVisibleSanitizer.test.ts tests/AgentV2LeakageDJK.test.ts tests/AgentConversationFirstApi.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  3 passed (3)
+      Tests  34 passed (34)
+   Start at  22:32:05
+   Duration  2.00s (transform 1.14s, setup 32ms, import 1.41s, tests 47ms, environment 0ms)
+

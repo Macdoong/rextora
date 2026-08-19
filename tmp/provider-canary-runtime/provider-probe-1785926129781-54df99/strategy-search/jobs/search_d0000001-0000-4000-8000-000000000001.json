@@ -1,0 +1,60 @@
+{
+  "id": "search_d0000001-0000-4000-8000-000000000001",
+  "status": "completed",
+  "config": {
+    "searchVersion": "1",
+    "strategyTemplateId": "Demo BTC Research",
+    "symbols": [
+      "BTCUSDT"
+    ],
+    "timeframe": "15m",
+    "dataVersion": "demo-fixture-v1",
+    "seed": 20260728,
+    "generatorType": "random",
+    "maxIterations": 5,
+    "parameterRanges": [
+      {
+        "key": "ema_fast",
+        "min": 10,
+        "max": 30,
+        "step": 1
+      }
+    ],
+    "evaluationWindows": [
+      {
+        "id": "demo_w1",
+        "label": "demo-window",
+        "fromOpenTime": 1704067200000,
+        "toOpenTime": 1706745600000
+      }
+    ],
+    "passCriteria": {
+      "minTradeCount": 1,
+      "requireAllWindowsPass": false
+    },
+    "costStress": {
+      "enabled": false,
+      "multipliers": [
+        1
+      ]
+    },
+    "jitter": {
+      "enabled": false,
+      "samples": 0,
+      "relativeAmplitude": 0
+    }
+  },
+  "checkpoint": {
+    "completedIterations": 0,
+    "nextIteration": 0,
+    "randomState": null,
+    "bestCandidate": null,
+    "bestPassedCandidate": null,
+    "updatedAt": "2026-08-05T10:35:30.432Z"
+  },
+  "createdAt": "2026-08-05T10:35:30.432Z",
+  "updatedAt": "2026-08-05T10:35:30.502Z",
+  "startedAt": "2026-08-05T10:35:30.459Z",
+  "finishedAt": "2026-08-05T10:35:30.502Z",
+  "failureMessage": null
+}

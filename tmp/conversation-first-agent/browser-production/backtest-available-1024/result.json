@@ -1,0 +1,50 @@
+{
+  "profile": "backtest-available",
+  "width": 1024,
+  "port": 53123,
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "startedAt": "2026-08-06T07:48:21.166Z",
+  "finishedAt": "2026-08-06T07:48:29.927Z",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-conversation-backtest-available-1024-GzGtDz",
+  "turnResults": [
+    {
+      "query": "최근 검증된 전략의 위험한 점을 설명해줘.",
+      "expectedMode": "READ_AND_ANSWER",
+      "expectedTopic": "strategy_risk",
+      "mode": "READ_AND_ANSWER",
+      "topic": "strategy_risk",
+      "provider": "gemini",
+      "fallbackUsed": false,
+      "readTools": [
+        "backtest.detail",
+        "strategy.detail"
+      ],
+      "writeTools": [],
+      "approvalPresent": false,
+      "executionPresent": false,
+      "writeAuditDelta": 0
+    }
+  ],
+  "metrics": {
+    "answer": "현재 백테스트 요약 정보만으로는 전략의 위험 요소를 충분히 설명하기 어렵습니다. 상세 백테스트 결과를 조회하여 더 정확한 분석을 제공하겠습니다.\n\n사용자님께서 요청하신 전략의 위험한 점을 설명하기 위해, 현재 제공된",
+    "primaryText": "현재 백테스트 요약 정보만으로는 전략의 위험 요소를 충분히 설명하기 어렵습니다. 상세 백테스트 결과를 조회하여 더 정확한 분석을 제공하겠습니다.\n\n사용자님께서 요청하신 전략의 위험한 점을 설명하기 위해, 현재 제공된\n오후 04:48 · 탐색 필요\n백테스트 열기저장된 실행과 차트 증거를 확인합니다.승인 전에는 실행되지 않습니다백테스트 열기",
+    "rawLeakCount": 0,
+    "leaks": [],
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "networkErrorCount": 0,
+  "networkErrors": [],
+  "noUnintendedWrite": true,
+  "noUnintendedApproval": true,
+  "conversationalTopicMatch": true,
+  "lifecycleOverrideError": false,
+  "duplicateExecutionCount": 0,
+  "approvalExecution": null,
+  "persistedStateMatch": true,
+  "auditCountBefore": 0,
+  "auditCountAfter": 2,
+  "passed": true
+}

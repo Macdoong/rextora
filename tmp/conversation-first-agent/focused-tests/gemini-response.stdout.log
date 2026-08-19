@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentGeminiResponse.test.ts tests/agentProvider.test.ts tests/AgentV2ProviderCanary.test.ts tests/AgentConversationProviderFallback.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  4 passed (4)
+      Tests  55 passed (55)
+   Start at  23:50:16
+   Duration  1.66s (transform 798ms, setup 36ms, import 86ms, tests 1.03s, environment 0ms)
+

@@ -1,0 +1,80 @@
+
+Running 1 test using 1 worker
+
+(node:67599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:67599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal (7.1s)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 
+
+    TimeoutError: locator.click: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('dashboard-agent-workspace').getByTestId('agent-input-send')[22m
+    [2m    - locator resolved to <button aria-label="전송" data-testid="agent-input-send" class="flex size-11 shrink-0 items-center justify-center rounded-lg text-white transition bg-violet-600 hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500">…</button>[22m
+    [2m  - attempting click action[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+    [2m    - element is visible, enabled and stable[22m
+    [2m    - scrolling into view if needed[22m
+    [2m    - locator resolved to <button disabled aria-label="전송" data-testid="agent-input-send" class="flex size-11 shrink-0 items-center justify-center rounded-lg text-white transition bg-violet-600 hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500">…</button>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not enabled[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not enabled[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    5 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not enabled[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 500ms[22m
+
+
+       at helpers.ts:355
+
+      353 |     .getByTestId("dashboard-agent-workspace")
+      354 |     .getByTestId("agent-input-send")
+    > 355 |     .click({ timeout: 5_000 });
+          |      ^
+      356 |   try {
+      357 |     const res = await responsePromise;
+      358 |     const body = (await Promise.race([
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:355:6)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:417:34)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    Error: page.waitForResponse: Test ended.
+
+       at helpers.ts:343
+
+      341 |     }
+      342 |   };
+    > 343 |   const responsePromise = page.waitForResponse(
+          |                                ^
+      344 |     (r) => {
+      345 |       if (!r.url().includes("/api/rextora/agent") || r.request().method() !== "POST") {
+      346 |         return false;
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:343:32)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:417:34)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-bcb1b--20-Live-real-order-refusal-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal 

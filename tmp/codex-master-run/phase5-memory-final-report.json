@@ -1,0 +1,50 @@
+{
+  "phase": "long-term-memory-and-reflection",
+  "verdict": "VERIFIED",
+  "buildId": "LpYlx8vdQEp7E24kowo4I",
+  "focusedGates": {
+    "testFiles": 7,
+    "testsPassed": 64,
+    "lint": "passed",
+    "build": "passed"
+  },
+  "capabilities": {
+    "serverAuthoritativeAppendOnlyRecords": true,
+    "evidenceRequired": true,
+    "secretRejection": true,
+    "approvedGoalsAndPlans": true,
+    "planDiffs": true,
+    "terminalOutcomeReflectionOnly": true,
+    "failedConfigurationReuseRequiresJustification": true,
+    "boundedRotation": true,
+    "rebuildableIndex": true,
+    "operatorExport": true,
+    "explicitApprovedResetTool": true,
+    "autonomousExecution": false
+  },
+  "browserMatrix": [
+    { "width": 390, "scenario": "J", "passed": true, "consoleErrors": 0, "rawLeaks": 0 },
+    { "width": 768, "scenario": "J", "passed": true, "consoleErrors": 0, "rawLeaks": 0 },
+    { "width": 1024, "scenario": "J", "passed": true, "consoleErrors": 0, "rawLeaks": 0 },
+    { "width": 1440, "scenario": "J", "passed": true, "consoleErrors": 0, "rawLeaks": 0 }
+  ],
+  "browserEvidence": {
+    "actualBacktestTerminalMemoryPersisted": true,
+    "approvedPlanRemembered": true,
+    "recallIntent": "memory_recall",
+    "evidenceLinked": true,
+    "recallRequiresApproval": false,
+    "recallSurvivesRefresh": true,
+    "memoryStableAcrossRefresh": true,
+    "autonomousWrite": false,
+    "horizontalOverflow": false,
+    "thinkingCleared": true
+  },
+  "safe": {
+    "path": "data/strategies/SAFE_v44_i4060.json",
+    "paramsHash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": "empty"
+  }
+}

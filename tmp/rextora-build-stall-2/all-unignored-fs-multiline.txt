@@ -1,0 +1,8 @@
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:24:    const match = fs
+src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts:25:      .readdirSync(dir)
+src/lib/rextora/strategySearch/jobStore.ts:746:  const files = fs
+src/lib/rextora/strategySearch/jobStore.ts:747:    .readdirSync(dir)
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:47:  return fs
+src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts:48:    .readFileSync(file, "utf8")
+src/lib/rextora/agent/v2/tools/toolAudit.ts:66:  return fs
+src/lib/rextora/agent/v2/tools/toolAudit.ts:67:    .readFileSync(file, "utf8")

@@ -1,0 +1,3 @@
+macdoong         23387  13.8  0.9 436730784 309488   ??  S    11:48AM   0:02.43 node /Users/macdoong/Documents/Rextora/.next/dev/build/postcss.js 57875
+macdoong         21086  12.6  1.6 1892320048 549952   ??  S    11:33AM   0:19.18 Cursor Helper (Plugin): extension-host Rextora [1-7]                      
+macdoong         19529   0.0  0.2 444644016  68144   ??  S    11:17AM   0:00.24 node /Users/macdoong/Documents/Rextora/node_modules/.bin/next dev --port 3101

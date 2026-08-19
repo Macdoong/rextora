@@ -1,0 +1,77 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T05:50:07.391Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssj2pem_hjao25",
+      "turnId": "turn-1786686607373",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T05:50:46.424Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssj2pem_hjao25",
+      "turnId": "turn-1786686607373",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 39027,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T05:50:47.511Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssj3kd3_q9xh2e",
+      "turnId": "turn-1786686647503",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T05:51:32.913Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssj3kd3_q9xh2e",
+      "turnId": "turn-1786686647503",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 45396,
+      "errorCategory": "provider_or_validation"
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssj2ob3_1b505d.chart.json",
+    "bt_mssj2ob3_1b505d.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_9d8149fc4d52411f"
+  ]
+}

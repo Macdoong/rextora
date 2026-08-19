@@ -1,0 +1,17 @@
+{
+  "command": "npm run test:e2e",
+  "startedAt": "2026-08-05T11:02:39Z",
+  "finishedAt": "2026-08-05T11:02:59Z",
+  "durationMs": 19359,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/e2e-run3.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/e2e-run3.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "ok": true,
+    "orphanJobRecoveryWarning": false,
+    "moduleNotFoundWarning": false,
+    "warningLines": [],
+    "tail": "ell (2.5s)\n  \u2713  31 [chromium] \u203a tests/e2e/strategy-search-flow.spec.ts:618:7 \u203a Strategy Search operator UI (intercepted API) \u203a catalog builder controls persist through intercepted create (3.1s)\n\n  31 passed (18.7s)\n\n(node:35491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35491) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:35490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  }
+}

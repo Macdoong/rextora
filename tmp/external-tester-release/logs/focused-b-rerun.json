@@ -1,0 +1,49 @@
+{
+  "command": "PHASE3_SCENARIOS=B ...",
+  "startedAt": "2026-08-05T11:12:16Z",
+  "finishedAt": "2026-08-05T11:16:23Z",
+  "durationMs": 246697,
+  "exitCode": 0,
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "rows": [
+      {
+        "w": 390,
+        "passed": true,
+        "repeat": true,
+        "active": true,
+        "atCreate": "running",
+        "pre": "running",
+        "providerCalls": 0
+      },
+      {
+        "w": 768,
+        "passed": true,
+        "repeat": true,
+        "active": true,
+        "atCreate": "running",
+        "pre": "running",
+        "providerCalls": 0
+      },
+      {
+        "w": 1024,
+        "passed": true,
+        "repeat": true,
+        "active": true,
+        "atCreate": "running",
+        "pre": "completed",
+        "providerCalls": 0
+      },
+      {
+        "w": 1440,
+        "passed": true,
+        "repeat": true,
+        "active": true,
+        "atCreate": "running",
+        "pre": "running",
+        "providerCalls": 0
+      }
+    ],
+    "allPassed": true
+  }
+}

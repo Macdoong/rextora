@@ -1,0 +1,27 @@
+{
+  "segments": [
+    {
+      "viewport": "390",
+      "exitCode": 1,
+      "durationMs": 1426266,
+      "stdoutPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-development-88/final/matrix-390.stdout.txt",
+      "stderrPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-development-88/final/matrix-390.stderr.txt",
+      "resultPath": "/Users/macdoong/Documents/Rextora/tmp/rextora-development-88/final/matrix-390-result.json",
+      "modelsErrors": [
+        {
+          "viewport": "390",
+          "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+          "timestamp": "2026-08-11T12:53:59.217Z"
+        }
+      ]
+    }
+  ],
+  "allModelsErrors": [
+    {
+      "viewport": "390",
+      "line": "[WebServer] ⨯ SyntaxError: Unexpected end of JSON input",
+      "timestamp": "2026-08-11T12:53:59.217Z"
+    }
+  ],
+  "stoppedEarly": "390"
+}

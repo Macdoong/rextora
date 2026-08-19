@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-08-11T09:10:00.000Z",
+  "sourceFingerprint": "ea874063788c41c5",
+  "classification": "MULTIPLE_PROVEN_DEFECTS",
+  "classifications": [
+    "DEV_COMPILATION_DEFECT",
+    "UI_STATE_DEFECT",
+    "PLAYWRIGHT_HARNESS_DEFECT"
+  ],
+  "exactFailingBoundary": "Scenario 02 openAiProviderTab: React settings shell not interactive when Playwright clicks AI tab after scenario 01; compounded by webpack dev /settings cold-compile (~79–88s) starving the dev event loop before matrix rows execute",
+  "responsibleFiles": [
+    "scripts/warmDevRoutes.mjs",
+    "playwright.deployment-dev.config.mjs",
+    "tests/e2e/release/helpers.ts",
+    "components/rextora/settings/LifecycleSettingsShell.tsx"
+  ],
+  "responsibleSymbols": [
+    "openAiProviderTab",
+    "warmDevRoutes.main",
+    "LifecycleSettingsShell",
+    "playwright.deployment-dev.config.mjs webServer.url"
+  ],
+  "experimentA": {
+    "description": "Scenario 02 alone on clean dev runtime",
+    "coldFirstRun": "FAIL — webServer 300s timeout (dashboard-only readiness probe)",
+    "afterHarnessFix": "PASS — 2.0–3.0s test duration",
+    "classification": "DEV_COMPILATION_DEFECT + PLAYWRIGHT_HARNESS_DEFECT"
+  },
+  "experimentB": {
+    "description": "Scenario 01 then scenario 02 with fresh browser context",
+    "result": "PASS — 852ms diagnostic, all checkpoints T0–T10",
+    "classification": "Rules out cross-scenario browser/session state"
+  },
+  "experimentC": {
+    "description": "Exact release-matrix semantics (fresh page per test, workers=1)",
+    "warmServerRun": "PASS — s01 1.9s + s02 1.2s = 3.8s total",
+    "afterGlobalSetupColdCompile": "FAIL — s01 PASS 2.5s, s02 FAIL 90s on ai-provider-settings; error-context proves AI tab focused but data panel still rendered",
+    "classification": "UI_STATE_DEFECT (hydration race) + DEV_COMPILATION_DEFECT (post-warm server degradation)"
+  },
+  "browserApiDivergence": {
+    "apiFastBrowserHangs": "Proven when /api/rextora/settings/ai-providers responds in 5–267ms but browser tab click does not mount ai-provider-settings",
+    "apiAlsoSlow": "Proven during cold /settings compile (~79–88s) and server hang after sequential runs (curl timeout on 3101)",
+    "bothSucceedMatrixStillFails": "Not observed after fix"
+  },
+  "resourceEvidence": {
+    "settingsColdCompileMs": "78839–88891",
+    "dashboardColdCompileMs": "86619–88869 (removed from required warm path)",
+    "apiLatencyMsWhenHealthy": "18–19",
+    "serverHangAfterSequentialRuns": "curl /settings and /api timeout after degraded dev state",
+    "nextDevLog": "SyntaxError: Unexpected end of JSON input on /api/rextora/settings/ai-providers/models during agent scenarios (non-blocking)"
+  },
+  "whyIsolatedPassedMatrixFailed": "Isolated s02 runs after full route warm with no prior s01 browser navigation; matrix s01→s02 hit hydration race when Playwright clicked AI tab before LifecycleSettingsShell React handlers attached, leaving data tab visible while ai-provider-settings never mounted. Cold /dashboard warm in globalSetup previously added 86s compile pressure before first matrix row.",
+  "applicationDefects": [
+    {
+      "file": "components/rextora/settings/LifecycleSettingsShell.tsx",
+      "symbol": "LifecycleSettingsShell",
+      "defect": "Tab buttons rendered before client hydration; pre-hydration clicks do not call setTab"
+    }
+  ],
+  "harnessDefects": [
+    {
+      "file": "tests/e2e/release/helpers.ts",
+      "symbol": "openAiProviderTab",
+      "defect": "No hydration-ready gate, no tab-panel switch verification, 300s inherited wait"
+    },
+    {
+      "file": "playwright.deployment-dev.config.mjs",
+      "symbol": "webServer.url",
+      "defect": "Original /dashboard readiness probe exceeded 300s on cold webpack dev"
+    },
+    {
+      "file": "scripts/warmDevRoutes.mjs",
+      "symbol": "main",
+      "defect": "Required /dashboard warm added unnecessary 86s compile; no skip when routes already hot"
+    }
+  ],
+  "stateIsolationDefects": [],
+  "fixesApplied": [
+    "LifecycleSettingsShell: data-settings-shell-ready after mount",
+    "openAiProviderTab: wait shell-ready, retry tab click until settings-tab-ai visible",
+    "warmDevRoutes: settings+API required; dashboard optional; skip when already warm",
+    "playwright.deployment-dev.config.mjs: globalSetup + API readiness probe"
+  ],
+  "regressionResults": {
+    "s02_390": { "pass": true, "durationSec": 3.0 },
+    "s01_s02_390": { "pass": true, "s01Sec": 2.5, "s02Sec": 1.9 },
+    "s02_1440": { "pass": true, "durationSec": 2.8 },
+    "s01_s02_1440": { "pass": true, "s01Sec": 2.6, "s02Sec": 1.9 },
+    "focused_390": {
+      "s07": { "pass": true, "durationSec": 84 },
+      "s10": { "pass": true, "durationSec": 39.1 },
+      "s11": { "pass": true, "durationSec": 96 },
+      "s13": { "pass": true, "durationSec": 17.8 },
+      "s14": { "pass": true, "durationSec": 40.3 }
+    }
+  },
+  "verdict": "REXTORA DEVELOPMENT TIMEOUT ROOT CAUSE VERIFIED"
+}

@@ -1,0 +1,6 @@
+{
+  "scenarioId": "17",
+  "classification": "HARNESS_DEFECT",
+  "rootCause": "Same harness stack as 07/22: Enter-key send + scanPageRawLeaks 300s locator wait on report turn after approval chain.",
+  "fixes": ["sendAgentQueryAwaitResponse with send-button + query-filtered response", "scanPageRawLeaks evaluate-based read"]
+}

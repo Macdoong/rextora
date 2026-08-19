@@ -1,0 +1,61 @@
+pwd=/Users/macdoong/Documents/Rextora
+branch=main
+head=5e0f089e5b2e02761705944710e6f6156c5d7663
+BUILD_ID=1XWJaOd-qF4VMUWBKK157
+--- git status ---
+ M app/api/rextora/agent/route.ts
+ M app/backtest/page.tsx
+ M app/dashboard/page.tsx
+ M app/globals.css
+ M app/layout.tsx
+ M app/live-trading/page.tsx
+ M app/paper-trading/page.tsx
+ M app/results/page.tsx
+ M app/strategy-search/page.tsx
+ M components/rextora/agent/ActionCard.tsx
+ M components/rextora/agent/AgentInput.tsx
+ M components/rextora/agent/AgentMessage.tsx
+ M components/rextora/agent/AgentPanel.tsx
+ M components/rextora/agent/AgentSuggestions.tsx
+ M components/rextora/agent/useAgentSession.ts
+ M components/rextora/backtest/BacktestReviewWorkbench.tsx
+ M components/rextora/charts/BacktestAnalysisView.tsx
+ M components/rextora/settings/LifecycleSettingsShell.tsx
+ M instrumentation.ts
+ M next.config.ts
+ M playwright.config.ts
+ M src/lib/rextora/agent/agentDataFetcher.ts
+ M src/lib/rextora/agent/agentResponseBuilder.ts
+ M src/lib/rextora/agent/intentParser.ts
+ M src/lib/rextora/agent/llmTypes.ts
+ M src/lib/rextora/agent/providerConfig.ts
+ M src/lib/rextora/agent/providers/geminiAdapter.ts
+ M src/lib/rextora/agent/providers/openaiAdapter.ts
+ M src/lib/rextora/agent/providers/promptBuilder.ts
+ M src/lib/rextora/agent/safetyGuard.ts
+ M src/lib/rextora/agent/types.ts
+ M src/lib/rextora/liveSafetyGate.ts
+ M src/lib/rextora/report/aiTradeReport.ts
+ M src/lib/rextora/storage/jsonStore.ts
+ M src/lib/rextora/strategySearch/deletionSafety.ts
+ M src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+ M tests/agentCommercialUx.test.ts
+ M tests/agentIntentParser.test.ts
+ M tests/agentProvider.test.ts
+ M tests/backtestExecutionIdentity.test.ts
+ M tests/backtestSymbolSelector.test.ts
+ M tests/commercialOverlayHydration.test.ts
+ M tests/e2e/rextora-smoke.spec.ts
+ M tests/firstRunEmptyRuntime.test.ts
+ M tests/liveReadinessChecklist.test.ts
+ M tsconfig.json
+ M tsconfig.tsbuildinfo
+?? .DS_Store
+?? app/api/rextora/agent/session/
+?? app/api/rextora/internal/
+--- diff stat ---
+ app/api/rextora/agent/route.ts | 1633 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 1577 insertions(+), 56 deletions(-)
+--- route.ts mtime ---
+2026-08-10T12:48:52 app/api/rextora/agent/route.ts
+2026-08-09T19:56:34 .next/BUILD_ID

@@ -1,0 +1,445 @@
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Turbopack build encountered 17 warnings:
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/bot/start/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0km-zew._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/bot/status/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0.t91tr._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/dashboard/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__03buepl._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/emergency/stop-all/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0hdw0xz._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/orders/close-position/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0~od5fu._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/orders/partial-close/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0oar3uf._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/binance/diagnostics/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0zel73n._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/bot/start/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0qwmw8u._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/candidates/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0ba2aw.._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/market/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__11qqgka._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/paper/session/[id]/route.js
+  [output]/.next/server/chunks/_016b5ju._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/paper/session/route.js
+  [output]/.next/server/chunks/_07._-53._.js
+  [output]/.next/server/chunks/src_lib_rextora_0913it.._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/system/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0l-t.kh._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/cancel-all/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__11f30nj._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/dashboard/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0pqc9q-._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/emergency-stop/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0-gw5yd._.js
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/lib/rextora/strategy/safeV44Strategy.ts:3:1
+Module not found: Can't resolve '@/data/strategies/SAFE_v44_i4060.json'
+  [90m1 |[0m [36mimport[0m fs [36mfrom[0m [32m"node:fs"[0m;
+  [90m2 |[0m [36mimport[0m path [36mfrom[0m [32m"node:path"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m safeStrategyFile [36mfrom[0m [32m"@/data/strategies/SAFE_v44_i4060.json"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mCONTEXT_FALLBACK_PARAMS[0m, mergeSafeParams } [36mfrom[0m [32m"./safeV44Params"[0m;
+  [90m5 |[0m [36mimport[0m {
+  [90m6 |[0m   [33mEXPECTED_SAFE_PARAMS_HASH[0m,
+
+Import map: aliased to relative './data/strategies/SAFE_v44_i4060.json' inside of [project]/
+
+
+Import traces:
+  #1 [App Route]:
+    ./src/lib/rextora/strategy/safeV44Strategy.ts
+    ./app/api/rextora/market/route.ts
+
+  #2 [App Route]:
+    ./src/lib/rextora/strategy/safeV44Strategy.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  #3 [Server Component]:
+    ./src/lib/rextora/strategy/safeV44Strategy.ts
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./src/lib/rextora/strategyRepository.ts:1:1
+Module not found: Can't resolve '@/data/strategies/SAFE_v44_i4060.json'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m safeStrategyFile [36mfrom[0m [32m"@/data/strategies/SAFE_v44_i4060.json"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m { preservedStrategies } [36mfrom[0m [32m"./seedData"[0m;
+  [90m3 |[0m [36mimport[0m [36mtype[0m { [33mStrategy[0m } [36mfrom[0m [32m"./types"[0m;
+  [90m4 |[0m
+
+Import map: aliased to relative './data/strategies/SAFE_v44_i4060.json' inside of [project]/
+
+
+Import traces:
+  #1 [App Route]:
+    ./src/lib/rextora/strategyRepository.ts
+    ./app/api/dashboard/route.ts
+
+  #2 [App Route]:
+    ./src/lib/rextora/strategyRepository.ts
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  #3 [Server Component]:
+    ./src/lib/rextora/strategyRepository.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./src/lib/rextora/strategy/safeV44Strategy.ts:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./src/lib/rextora/strategyRepository.ts:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

@@ -1,0 +1,26 @@
+{
+  "label": "lifecycle_isolated",
+  "sourceEvidence": "tmp/rextora-deployment-release/lifecycle-52/runs/B-390/result.json",
+  "buildId": "2-RjvN6kLmSfKLidxHUzi",
+  "command": "next start -p <ephemeral>",
+  "cwd": "/Users/macdoong/Documents/Rextora",
+  "REXTORA_DATA_DIR": "os.tmpdir()/rextora-p3-B-390-*",
+  "portExample": 49465,
+  "providerSelection": "openai",
+  "credentialStoreResolvedTo": "/Users/macdoong/Documents/Rextora/data/rextora/secrets/ai-provider-credentials.enc.json",
+  "settingsStoreResolvedTo": "/Users/macdoong/Documents/Rextora/data/rextora/ai-provider-settings.json",
+  "respectsRextoraDataDirForCredentials": false,
+  "respectsRextoraDataDirForAiSettings": false,
+  "respectsRextoraDataDirForStrategySearch": true,
+  "consoleErrors": [
+    "Failed to load resource: 400 on /api/rextora/settings/ai-providers/models?provider=openai"
+  ],
+  "passEntryFailReasons": [
+    "consoleErrorCount !== 0 (models catalog 400)",
+    "afterApproval.persistedStateMatch === false (cancel/replace did not persist expected job transition)"
+  ],
+  "reasoning": {
+    "firstTurn": { "provider": "local", "fallbackUsed": true, "errorCategory": "provider_or_validation" }
+  },
+  "notes": "Lifecycle uses isolated REXTORA_DATA_DIR for search/paper/sessions but AI credential+settings stores still bind to process.cwd(). Row B also fails product assertions beyond provider catalog noise."
+}

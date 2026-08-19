@@ -1,0 +1,159 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "backtest.run",
+      "sessionId": "agent_cf548cb18b2f434b",
+      "arguments": {
+        "strategyId": "demo_strategy_btc_v1",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 436,
+      "approved": true,
+      "timestamp": "2026-08-05T11:24:39.010Z",
+      "approvalId": "pa_8b69b23937adde7e"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-05T11:24:31.386Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg022vu_5mjop0",
+      "turnId": "turn-1785929071366",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:24:37.627Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg022vu_5mjop0",
+      "turnId": "turn-1785929071366",
+      "providerAttempt": 1,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "latencyMs": 6238,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:24:39.015Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msg028rr_sqnebs",
+      "turnId": "turn-1785929078567",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:24:39.015Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msg028rr_sqnebs",
+      "turnId": "turn-1785929078567",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_msg021xr_85b2cb.chart.json",
+    "bt_msg021xr_85b2cb.json",
+    "bt_msg028ri_aa3942.chart.json",
+    "bt_msg028ri_aa3942.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_cf548cb18b2f434b",
+      "kind": "actual_result",
+      "statementKo": "백테스트의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "run",
+          "id": "bt_msg028ri_aa3942"
+        },
+        {
+          "type": "event",
+          "id": "event_1f3191498bfc52e0e0d9"
+        }
+      ],
+      "verifiedAt": "2026-08-05T11:24:39.011Z",
+      "sourceEventId": "event_1f3191498bfc52e0e0d9",
+      "metadata": {
+        "eventType": "backtest.completed",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_61645acd2670fcf865ef"
+    },
+    {
+      "sessionId": "agent_cf548cb18b2f434b",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 백테스트 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_27a61fab76af472889d0"
+        }
+      ],
+      "verifiedAt": "2026-08-05T11:24:39.013Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_8b69b23937adde7e",
+        "meaningfulHash": "816a43f283b9deffa2066067"
+      },
+      "memoryId": "memory_f466592a8bd2f8ac57c8"
+    },
+    {
+      "sessionId": "agent_cf548cb18b2f434b",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_27a61fab76af472889d0"
+        }
+      ],
+      "verifiedAt": "2026-08-05T11:24:39.013Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_8b69b23937adde7e",
+        "meaningfulHash": "816a43f283b9deffa2066067"
+      },
+      "memoryId": "memory_0e82b524895860b62639"
+    }
+  ],
+  "sessionFiles": [
+    "agent_cf548cb18b2f434b"
+  ]
+}

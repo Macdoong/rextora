@@ -1,0 +1,10 @@
+{
+  "command": "CONVERSATION_VIEWPORTS=390 node conversation-browser-matrix.mjs",
+  "startedAt": "2026-08-05T13:42:31Z",
+  "finishedAt": "2026-08-05T13:46:18Z",
+  "durationMs": 226867,
+  "exitCode": 1,
+  "stdout": "tmp/conversation-first-agent/logs/browser-production-390.stdout.log",
+  "stderr": "tmp/conversation-first-agent/logs/browser-production-390.stderr.log",
+  "BUILD_ID": "xByfqTJBEhiokeYutO8GM"
+}

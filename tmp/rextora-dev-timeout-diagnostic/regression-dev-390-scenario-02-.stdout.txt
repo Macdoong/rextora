@@ -1,0 +1,32 @@
+=== dev-390 scenario 02: ===
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 88869
+    },
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 1285
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    }
+  ]
+}
+
+Running 1 test using 1 worker
+
+(node:76069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (2.4s)
+
+  1 passed (3.6m)
+EXIT:

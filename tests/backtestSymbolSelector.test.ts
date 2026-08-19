@@ -299,10 +299,13 @@ describe("backtest symbol UI contracts", () => {
     expect(src).toContain("paper/session");
     expect(src).toContain("&symbol=");
     expect(src).toContain("/paper-trading?strategyId=");
-    expect(src).toContain("pickActive");
-    expect(src).toContain("bt-force-expand");
-    expect(src).toContain("backtest-nav-scroll-spacer");
-    expect(src).toContain("navClickLocked");
+    expect(src).toContain("selectWorkbenchSection");
+    expect(src).toContain("activeNavSection");
+    expect(src).toContain("analysisSection");
+    // Workspace tabs are click-owned — no scroll-spy spacer / lock.
+    expect(src).not.toContain("backtest-nav-scroll-spacer");
+    expect(src).not.toContain("IntersectionObserver");
+    expect(src).not.toContain("navClickLocked");
   });
 
   it("API validates symbol compatibility and filters saved runs", () => {

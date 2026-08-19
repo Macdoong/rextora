@@ -1,0 +1,6 @@
+params_hash=
+sha256=fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0
+gitBlob=4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32
+protectedDiffBytes=0
+BUILD_ID=mq-DjniC2qoEjqxZMr_hV
+fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0  data/strategies/SAFE_v44_i4060.json

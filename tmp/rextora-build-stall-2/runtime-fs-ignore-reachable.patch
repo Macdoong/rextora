@@ -1,0 +1,576 @@
+*** Begin Patch
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/events/eventStore.ts
+@@
+   const safeId = sanitizeSessionId(sessionId);
+   const pattern = new RegExp(`^${safeId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.jsonl$`);
+   try {
+-    return fs.readdirSync(root).filter((name) => pattern.test(name)).sort().map((name) => path.join(root, name));
++    return fs.readdirSync(/* turbopackIgnore: true */ root).filter((name) => pattern.test(name)).sort().map((name) => path.join(root, name));
+   } catch {
+     return [];
+   }
+@@
+ 
+ function readEventFile(file: string): AgentEvent[] {
+   try {
+-    return fs.readFileSync(file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
++    return fs.readFileSync(/* turbopackIgnore: true */ file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
+       try { return [JSON.parse(line) as AgentEvent]; } catch { return []; }
+     });
+   } catch {
+@@
+   const file = eventFile(sessionId);
+   if (readEventFile(file).length < limit) return;
+   const root = agentEventsRoot();
+-  fs.mkdirSync(root, { recursive: true });
+-  fs.renameSync(file, path.join(root, `${sanitizeSessionId(sessionId)}.${Date.now()}.jsonl`));
++  fs.mkdirSync(/* turbopackIgnore: true */ root, { recursive: true });
++  fs.renameSync(/* turbopackIgnore: true */ file, path.join(root, `${sanitizeSessionId(sessionId)}.${Date.now()}.jsonl`));
+   const archives = eventArchives(sessionId);
+-  for (const stale of archives.slice(0, Math.max(0, archives.length - 3))) fs.unlinkSync(stale);
++  for (const stale of archives.slice(0, Math.max(0, archives.length - 3))) fs.unlinkSync(/* turbopackIgnore: true */ stale);
+ }
+ 
+ export function appendAgentEvent(event: AgentEvent): { appended: boolean; event: AgentEvent } {
+@@
+   if (events.some((item) => item.eventId === event.eventId)) return { appended: false, event };
+   rotateEventLogIfNeeded(event.sessionId);
+   const file = eventFile(event.sessionId);
+-  fs.mkdirSync(path.dirname(file), { recursive: true });
+-  fs.appendFileSync(file, `${JSON.stringify(event)}\n`, "utf8");
++  fs.mkdirSync(/* turbopackIgnore: true */ path.dirname(file), { recursive: true });
++  fs.appendFileSync(/* turbopackIgnore: true */ file, `${JSON.stringify(event)}\n`, "utf8");
+   return { appended: true, event };
+ }
+ 
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/memory/memoryIndex.ts
+@@
+     })),
+   };
+   const file = indexFile(sessionId);
+-  fs.mkdirSync(path.dirname(file), { recursive: true });
+-  fs.writeFileSync(file, `${JSON.stringify(index, null, 2)}\n`, "utf8");
++  fs.mkdirSync(/* turbopackIgnore: true */ path.dirname(file), { recursive: true });
++  fs.writeFileSync(/* turbopackIgnore: true */ file, `${JSON.stringify(index, null, 2)}\n`, "utf8");
+   return index;
+ }
+ 
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/memory/memoryStore.ts
+@@
+   const safeId = sanitizeSessionId(sessionId);
+   const pattern = new RegExp(`^${safeId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.jsonl$`);
+   try {
+-    return fs.readdirSync(root)
++    return fs.readdirSync(/* turbopackIgnore: true */ root)
+       .filter((name) => pattern.test(name))
+       .map((name) => path.join(root, name))
+       .sort();
+@@
+ 
+ function readFile(file: string): VerifiedMemoryRecord[] {
+   try {
+-    return fs.readFileSync(file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
++    return fs.readFileSync(/* turbopackIgnore: true */ file, "utf8").split("\n").filter(Boolean).flatMap((line) => {
+       try { return [JSON.parse(line) as VerifiedMemoryRecord]; } catch { return []; }
+     });
+   } catch {
+@@
+   const file = activeFile(sessionId);
+   if (readFile(file).length < ACTIVE_RECORD_LIMIT) return;
+   const root = agentMemoryRoot();
+-  fs.mkdirSync(root, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ root, { recursive: true });
+   const archive = path.join(root, `${sanitizeSessionId(sessionId)}.${Date.now()}.jsonl`);
+-  fs.renameSync(file, archive);
++  fs.renameSync(/* turbopackIgnore: true */ file, archive);
+   const archives = archiveFiles(sessionId);
+   for (const stale of archives.slice(0, Math.max(0, archives.length - ARCHIVE_LIMIT))) {
+-    fs.unlinkSync(stale);
++    fs.unlinkSync(/* turbopackIgnore: true */ stale);
+   }
+ }
+ 
+@@
+   if (existing) return { appended: false, record: existing };
+   rotateIfNeeded(record.sessionId);
+   const file = activeFile(record.sessionId);
+-  fs.mkdirSync(path.dirname(file), { recursive: true });
+-  fs.appendFileSync(file, `${JSON.stringify(record)}\n`, "utf8");
++  fs.mkdirSync(/* turbopackIgnore: true */ path.dirname(file), { recursive: true });
++  fs.appendFileSync(/* turbopackIgnore: true */ file, `${JSON.stringify(record)}\n`, "utf8");
+   return { appended: true, record };
+ }
+ 
+@@
+   const files = [activeFile(sessionId), ...archiveFiles(sessionId)];
+   let removed = 0;
+   for (const file of files) {
+-    try { fs.unlinkSync(file); removed += 1; } catch { /* already absent */ }
++    try { fs.unlinkSync(/* turbopackIgnore: true */ file); removed += 1; } catch { /* already absent */ }
+   }
+   return removed;
+ }
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/providers/providerCredentialStore.ts
+@@
+ 
+ function ensureSecretsDir(): void {
+   const dir = secretsDir();
+-  if (!fs.existsSync(dir)) {
+-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
++  if (!fs.existsSync(/* turbopackIgnore: true */ dir)) {
++    fs.mkdirSync(/* turbopackIgnore: true */ dir, { recursive: true, mode: 0o700 });
+   }
+   try {
+-    fs.chmodSync(dir, 0o700);
++    fs.chmodSync(/* turbopackIgnore: true */ dir, 0o700);
+   } catch {
+     /* best-effort on platforms without chmod semantics */
+   }
+@@
+   }
+   ensureSecretsDir();
+   const keyPath = masterKeyFile();
+-  if (fs.existsSync(keyPath)) {
+-    const raw = fs.readFileSync(keyPath, "utf8").trim();
++  if (fs.existsSync(/* turbopackIgnore: true */ keyPath)) {
++    const raw = fs.readFileSync(/* turbopackIgnore: true */ keyPath, "utf8").trim();
+     if (raw.length >= 32) {
+       return crypto.createHash("sha256").update(raw).digest();
+     }
+   }
+   // Auto-create local master key (gitignored under data/rextora/).
+   const generated = crypto.randomBytes(48).toString("base64url");
+-  fs.writeFileSync(keyPath, generated, { encoding: "utf8", mode: 0o600 });
++  fs.writeFileSync(/* turbopackIgnore: true */ keyPath, generated, { encoding: "utf8", mode: 0o600 });
+   try {
+-    fs.chmodSync(keyPath, 0o600);
++    fs.chmodSync(/* turbopackIgnore: true */ keyPath, 0o600);
+   } catch {
+     /* ignore */
+   }
+@@
+ function readRecord(): ProviderCredentialRecord {
+   ensureSecretsDir();
+   const file = credentialsFile();
+-  if (!fs.existsSync(file)) return emptyRecord();
++  if (!fs.existsSync(/* turbopackIgnore: true */ file)) return emptyRecord();
+   try {
+-    return JSON.parse(fs.readFileSync(file, "utf8")) as ProviderCredentialRecord;
++    return JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ file, "utf8")) as ProviderCredentialRecord;
+   } catch {
+     return emptyRecord();
+   }
+@@
+   ensureSecretsDir();
+   const file = credentialsFile();
+   const next = { ...record, updatedAt: new Date().toISOString() };
+-  fs.writeFileSync(file, JSON.stringify(next, null, 2), {
++  fs.writeFileSync(/* turbopackIgnore: true */ file, JSON.stringify(next, null, 2), {
+     encoding: "utf8",
+     mode: 0o600,
+   });
+   try {
+-    fs.chmodSync(file, 0o600);
++    fs.chmodSync(/* turbopackIgnore: true */ file, 0o600);
+   } catch {
+     /* ignore */
+   }
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts
+@@
+   record: ReasoningLifecycleAuditRecord,
+ ): void {
+   const root = auditRoot();
+-  fs.mkdirSync(root, { recursive: true });
+-  fs.appendFileSync(
++  fs.mkdirSync(/* turbopackIgnore: true */ root, { recursive: true });
++  fs.appendFileSync(/* turbopackIgnore: true */ 
+     path.join(root, "reasoning-requests.jsonl"),
+     `${JSON.stringify(record)}\n`,
+     "utf8",
+@@
+   limit = 100,
+ ): ReasoningLifecycleAuditRecord[] {
+   const file = path.join(auditRoot(), "reasoning-requests.jsonl");
+-  if (!fs.existsSync(file)) return [];
++  if (!fs.existsSync(/* turbopackIgnore: true */ file)) return [];
+   return fs
+     .readFileSync(file, "utf8")
+     .split("\n")
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/research/researchAudit.ts
+@@
+   const root = process.env.REXTORA_AGENT_RESEARCH_AUDIT_DIR?.trim()
+     ? path.resolve(process.env.REXTORA_AGENT_RESEARCH_AUDIT_DIR)
+     : path.join(rextoraDataRoot(), "agent-research-audit");
+-  fs.mkdirSync(root, { recursive: true });
+-  fs.appendFileSync(path.join(root, "research.jsonl"), `${JSON.stringify(record)}\n`, "utf8");
++  fs.mkdirSync(/* turbopackIgnore: true */ root, { recursive: true });
++  fs.appendFileSync(/* turbopackIgnore: true */ path.join(root, "research.jsonl"), `${JSON.stringify(record)}\n`, "utf8");
+ }
+ 
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/session/sessionPersistence.ts
+@@
+ 
+ function ensureSessionDir(sessionId: string): void {
+   const dir = sessionDir(sessionId);
+-  fs.mkdirSync(dir, { recursive: true });
+-  fs.mkdirSync(plansDir(sessionId), { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ dir, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ plansDir(sessionId), { recursive: true });
+ }
+ 
+ function writeJsonAtomic(filePath: string, data: unknown): void {
+   const dir = path.dirname(filePath);
+-  fs.mkdirSync(dir, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ dir, { recursive: true });
+   const tmp = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2), "utf8");
+-  fs.renameSync(tmp, filePath);
++  fs.writeFileSync(/* turbopackIgnore: true */ tmp, JSON.stringify(data, null, 2), "utf8");
++  fs.renameSync(/* turbopackIgnore: true */ tmp, filePath);
+ }
+ 
+ function readJsonFile<T>(filePath: string): T | null {
+   try {
+-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
++    return JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ filePath, "utf8")) as T;
+   } catch {
+     return null;
+   }
+@@
+ 
+ export function sessionExists(sessionId: string): boolean {
+   try {
+-    return fs.existsSync(metadataPath(sessionId));
++    return fs.existsSync(/* turbopackIgnore: true */ metadataPath(sessionId));
+   } catch {
+     return false;
+   }
+@@
+ 
+ export function readTurnsJsonl(sessionId: string): PersistedConversationTurn[] {
+   const file = turnsPath(sessionId);
+-  if (!fs.existsSync(file)) return [];
+-  const lines = fs.readFileSync(file, "utf8").split("\n").filter(Boolean);
++  if (!fs.existsSync(/* turbopackIgnore: true */ file)) return [];
++  const lines = fs.readFileSync(/* turbopackIgnore: true */ file, "utf8").split("\n").filter(Boolean);
+   const turns: PersistedConversationTurn[] = [];
+   for (const line of lines) {
+     try {
+@@
+     .join("\n");
+   const file = turnsPath(sessionId);
+   const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
+-  fs.writeFileSync(tmp, payload ? `${payload}\n` : "", "utf8");
+-  fs.renameSync(tmp, file);
++  fs.writeFileSync(/* turbopackIgnore: true */ tmp, payload ? `${payload}\n` : "", "utf8");
++  fs.renameSync(/* turbopackIgnore: true */ tmp, file);
+ }
+ 
+ export function appendSessionEvent(
+@@
+   event: SessionEventRecord,
+ ): void {
+   ensureSessionDir(sessionId);
+-  fs.appendFileSync(eventsPath(sessionId), `${JSON.stringify(event)}\n`, "utf8");
++  fs.appendFileSync(/* turbopackIgnore: true */ eventsPath(sessionId), `${JSON.stringify(event)}\n`, "utf8");
+ }
+ 
+ export function readPendingPlan(sessionId: string): AgentPlanDraft | null {
+@@
+   const file = pendingPlanPath(sessionId);
+   if (!plan) {
+     try {
+-      fs.unlinkSync(file);
++      fs.unlinkSync(/* turbopackIgnore: true */ file);
+     } catch {
+       // ignore
+     }
+@@
+ 
+ export function deleteSessionRecord(sessionId: string): void {
+   const dir = sessionDir(sessionId);
+-  if (!fs.existsSync(dir)) return;
+-  fs.rmSync(dir, { recursive: true, force: true });
++  if (!fs.existsSync(/* turbopackIgnore: true */ dir)) return;
++  fs.rmSync(/* turbopackIgnore: true */ dir, { recursive: true, force: true });
+ }
+ 
+ export function createSessionOnDisk(sessionId: string): AgentSessionRecord {
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/agent/v2/tools/toolAudit.ts
+@@
+ 
+ export function writeToolAudit(record: ToolAuditRecord): string {
+   const root = auditRoot();
+-  fs.mkdirSync(root, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ root, { recursive: true });
+   const day = record.timestamp.slice(0, 10);
+   const file = path.join(root, `${day}.jsonl`);
+   const line = JSON.stringify({
+     ...record,
+     arguments: sanitizeArgs(record.arguments),
+   });
+-  fs.appendFileSync(file, `${line}\n`, "utf8");
++  fs.appendFileSync(/* turbopackIgnore: true */ file, `${line}\n`, "utf8");
+   return file;
+ }
+ 
+ export function readToolAuditLines(day: string, limit = 100): ToolAuditRecord[] {
+   const file = path.join(auditRoot(), `${day}.jsonl`);
+-  if (!fs.existsSync(file)) return [];
++  if (!fs.existsSync(/* turbopackIgnore: true */ file)) return [];
+   return fs
+     .readFileSync(file, "utf8")
+     .split("\n")
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/backtest/chartEvidenceStore.ts
+@@
+     drawdownCurve?: number[];
+   },
+ ): BacktestChartEvidence {
+-  fs.mkdirSync(dir(), { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ dir(), { recursive: true });
+   const evidence: BacktestChartEvidence = {
+     schemaVersion: CHART_EVIDENCE_SCHEMA_VERSION,
+     runId: input.runId,
+@@
+     savedAt: new Date().toISOString(),
+     equityBasis: input.equityBasis ?? EQUITY_BASIS,
+   };
+-  fs.writeFileSync(
++  fs.writeFileSync(/* turbopackIgnore: true */ 
+     chartEvidencePath(input.runId),
+     JSON.stringify(evidence),
+     "utf8",
+@@
+ 
+ export function loadChartEvidence(runId: string): BacktestChartEvidence | null {
+   const full = chartEvidencePath(runId);
+-  if (!fs.existsSync(full)) return null;
++  if (!fs.existsSync(/* turbopackIgnore: true */ full)) return null;
+   try {
+-    const raw = JSON.parse(fs.readFileSync(full, "utf8")) as BacktestChartEvidence;
++    const raw = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ full, "utf8")) as BacktestChartEvidence;
+     if (!raw || raw.schemaVersion !== CHART_EVIDENCE_SCHEMA_VERSION) return null;
+     if (!Array.isArray(raw.candles) || !Array.isArray(raw.equityCurve)) return null;
+     return raw;
+@@
+ }
+ 
+ export function hasChartEvidence(runId: string): boolean {
+-  return fs.existsSync(chartEvidencePath(runId));
++  return fs.existsSync(/* turbopackIgnore: true */ chartEvidencePath(runId));
+ }
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/firstRun/firstRunStateStore.ts
+@@
+ 
+ export function loadFirstRunState(): FirstRunPersistedState {
+   const fp = firstRunStatePath();
+-  if (!fs.existsSync(fp)) return emptyFirstRunState();
++  if (!fs.existsSync(/* turbopackIgnore: true */ fp)) return emptyFirstRunState();
+   try {
+-    const raw = JSON.parse(fs.readFileSync(fp, "utf8")) as Partial<FirstRunPersistedState>;
++    const raw = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ fp, "utf8")) as Partial<FirstRunPersistedState>;
+     return {
+       ...emptyFirstRunState(),
+       ...raw,
+@@
+ export function saveFirstRunState(
+   patch: Partial<FirstRunPersistedState>,
+ ): FirstRunPersistedState {
+-  fs.mkdirSync(rextoraDataRoot(), { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ rextoraDataRoot(), { recursive: true });
+   const current = loadFirstRunState();
+   const next: FirstRunPersistedState = {
+     ...current,
+@@
+   };
+   const fp = firstRunStatePath();
+   const tmp = `${fp}.tmp`;
+-  fs.writeFileSync(tmp, JSON.stringify(next, null, 2), "utf8");
+-  fs.renameSync(tmp, fp);
++  fs.writeFileSync(/* turbopackIgnore: true */ tmp, JSON.stringify(next, null, 2), "utf8");
++  fs.renameSync(/* turbopackIgnore: true */ tmp, fp);
+   return next;
+ }
+ 
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/report/aiTradeReport.ts
+@@
+ 
+ function readStore(): AiTradeReport[] {
+   const p = storePath();
+-  if (!fs.existsSync(p)) return [];
++  if (!fs.existsSync(/* turbopackIgnore: true */ p)) return [];
+   try {
+-    const raw = JSON.parse(fs.readFileSync(p, "utf8"));
++    const raw = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ p, "utf8"));
+     return Array.isArray(raw) ? (raw as AiTradeReport[]) : [];
+   } catch {
+     return [];
+@@
+ 
+ function writeStore(rows: AiTradeReport[]): void {
+   const p = storePath();
+-  fs.mkdirSync(path.dirname(p), { recursive: true });
+-  fs.writeFileSync(p, JSON.stringify(rows.slice(0, 500), null, 2), "utf8");
++  fs.mkdirSync(/* turbopackIgnore: true */ path.dirname(p), { recursive: true });
++  fs.writeFileSync(/* turbopackIgnore: true */ p, JSON.stringify(rows.slice(0, 500), null, 2), "utf8");
+ }
+ 
+ function bucketTimestamp(iso: string): string {
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategy/definition/safeParamCatalog.ts
+@@
+       "strategies",
+       "SAFE_v44_i4060.json",
+     );
+-    if (fs.existsSync(p)) {
+-      const raw = JSON.parse(fs.readFileSync(p, "utf8")) as {
++    if (fs.existsSync(/* turbopackIgnore: true */ p)) {
++      const raw = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ p, "utf8")) as {
+         params?: Record<string, unknown>;
+       };
+       for (const k of Object.keys(raw.params ?? {})) keys.add(k);
+@@
+ 
+ export function getSafeParamCatalog(): SafeParamCatalogEntry[] {
+   const confirmed = loadSnapshotConfirmedKeys();
+-  const lockedExists = fs.existsSync(
++  const lockedExists = fs.existsSync(/* turbopackIgnore: true */ 
+     path.join(
+       /* turbopackIgnore: true */ process.cwd(),
+       "research",
+@@
+     "v44",
+     "locked_final_i4060.json",
+   );
+-  if (fs.existsSync(locked)) return "locked_file";
++  if (fs.existsSync(/* turbopackIgnore: true */ locked)) return "locked_file";
+   return loadSnapshotConfirmedKeys().has(key) ? "data_file" : "unconfirmed";
+ }
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategy/safeV44Strategy.ts
+@@
+ 
+ function readResearchJsonIfExists(relativePath: string): Record<string, unknown> | null {
+   const full = path.join(/* turbopackIgnore: true */ process.cwd(), relativePath);
+-  if (!fs.existsSync(full)) return null;
++  if (!fs.existsSync(/* turbopackIgnore: true */ full)) return null;
+   try {
+-    return JSON.parse(fs.readFileSync(full, "utf8")) as Record<string, unknown>;
++    return JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ full, "utf8")) as Record<string, unknown>;
+   } catch {
+     return null;
+   }
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategySearch/jobApiService.ts
+@@
+     "strategies",
+     "SAFE_v44_i4060.json",
+   );
+-  const bytes = fs.readFileSync(safePath);
++  const bytes = fs.readFileSync(/* turbopackIgnore: true */ safePath);
+   const json = JSON.parse(bytes.toString("utf8")) as {
+     name: string;
+     params_hash: string;
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategySearch/researchTop10.ts
+@@
+ ): ResearchTop10Snapshot | null {
+   const root = resolveRoot(options);
+   const fp = top10Path(root, jobId);
+-  if (!fs.existsSync(fp)) return null;
++  if (!fs.existsSync(/* turbopackIgnore: true */ fp)) return null;
+   try {
+-    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as ResearchTop10Snapshot;
++    const parsed = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ fp, "utf8")) as ResearchTop10Snapshot;
+     if (parsed?.version !== RESEARCH_TOP10_VERSION) return null;
+     return parsed;
+   } catch {
+@@
+ ): ResearchTop10Snapshot {
+   const root = resolveRoot(options);
+   const jobsDir = path.join(root, "jobs");
+-  fs.mkdirSync(jobsDir, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ jobsDir, { recursive: true });
+   const fp = top10Path(root, snapshot.jobId);
+   const tmp = `${fp}.tmp`;
+-  fs.writeFileSync(tmp, JSON.stringify(snapshot, null, 2), "utf8");
+-  fs.renameSync(tmp, fp);
++  fs.writeFileSync(/* turbopackIgnore: true */ tmp, JSON.stringify(snapshot, null, 2), "utf8");
++  fs.renameSync(/* turbopackIgnore: true */ tmp, fp);
+   // Append history line (best-effort)
+   try {
+-    fs.appendFileSync(
++    fs.appendFileSync(/* turbopackIgnore: true */ 
+       historyPath(root, snapshot.jobId),
+       `${JSON.stringify({
+         at: snapshot.updatedAt,
+@@
+ ): ResearchTop10Snapshot | null {
+   const root = resolveRoot(options);
+   const jobsDir = path.join(root, "jobs");
+-  if (!fs.existsSync(jobsDir)) return null;
++  if (!fs.existsSync(/* turbopackIgnore: true */ jobsDir)) return null;
+   let best: ResearchTop10Snapshot | null = null;
+-  for (const name of fs.readdirSync(jobsDir)) {
++  for (const name of fs.readdirSync(/* turbopackIgnore: true */ jobsDir)) {
+     if (!name.endsWith(".top10.json")) continue;
+     const jobId = name.slice(0, -".top10.json".length);
+     if (jobId === excludeJobId) continue;
+@@
+ ): Array<Record<string, unknown>> {
+   const root = resolveRoot(options);
+   const fp = historyPath(root, jobId);
+-  if (!fs.existsSync(fp)) return [];
++  if (!fs.existsSync(/* turbopackIgnore: true */ fp)) return [];
+   const limit = Math.max(1, Math.min(100, options?.limit ?? 20));
+-  const lines = fs.readFileSync(fp, "utf8").split("\n").filter(Boolean);
++  const lines = fs.readFileSync(/* turbopackIgnore: true */ fp, "utf8").split("\n").filter(Boolean);
+   const out: Array<Record<string, unknown>> = [];
+   for (let i = lines.length - 1; i >= 0 && out.length < limit; i -= 1) {
+     try {
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategySearch/searchPlan.ts
+@@
+ 
+ function writeJsonAtomic(targetPath: string, value: unknown): void {
+   const dir = path.dirname(targetPath);
+-  fs.mkdirSync(dir, { recursive: true });
++  fs.mkdirSync(/* turbopackIgnore: true */ dir, { recursive: true });
+   const tmp = `${targetPath}.tmp`;
+   const payload = JSON.stringify(value, null, 2);
+-  const fd = fs.openSync(tmp, "w");
++  const fd = fs.openSync(/* turbopackIgnore: true */ tmp, "w");
+   try {
+-    fs.writeFileSync(fd, payload, "utf8");
+-    fs.fsyncSync(fd);
++    fs.writeFileSync(/* turbopackIgnore: true */ fd, payload, "utf8");
++    fs.fsyncSync(/* turbopackIgnore: true */ fd);
+   } finally {
+-    fs.closeSync(fd);
++    fs.closeSync(/* turbopackIgnore: true */ fd);
+   }
+-  fs.renameSync(tmp, targetPath);
++  fs.renameSync(/* turbopackIgnore: true */ tmp, targetPath);
+ }
+ 
+ export function createEmptySearchPlan(input: {
+@@
+ ): StrategySearchPlan | null {
+   const root = resolveRoot(options);
+   const fp = planPath(root, jobId);
+-  if (!fs.existsSync(fp)) return null;
++  if (!fs.existsSync(/* turbopackIgnore: true */ fp)) return null;
+   try {
+-    const parsed = JSON.parse(fs.readFileSync(fp, "utf8")) as StrategySearchPlan;
++    const parsed = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ fp, "utf8")) as StrategySearchPlan;
+     if (!parsed || parsed.version !== STRATEGY_SEARCH_PLAN_VERSION) return null;
+     if (!Array.isArray(parsed.spaces)) return null;
+     return normalizePlanSnapshot({
+*** Update File: /Users/macdoong/Documents/Rextora/src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+@@
+       "live-dry-run",
+       "session.json",
+     );
+-    if (!fs.existsSync(liveSession)) return [];
+-    const raw = JSON.parse(fs.readFileSync(liveSession, "utf8")) as {
++    if (!fs.existsSync(/* turbopackIgnore: true */ liveSession)) return [];
++    const raw = JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ liveSession, "utf8")) as {
+       strategyId?: string;
+     };
+     return raw.strategyId === strategyId ? [strategyId] : [];
+*** End Patch

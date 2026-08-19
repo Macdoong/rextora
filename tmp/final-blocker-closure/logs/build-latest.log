@@ -1,0 +1,2724 @@
+
+> rextora@0.1.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Turbopack build encountered 103 warnings:
+./instrumentation.ts:13:15
+A Node.js API is used (process.cwd at line: 13) which is not supported in the Edge Runtime.
+    Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+  [90m11 |[0m [36mfunction[0m loadOrphanJobRecoveryModule() {
+  [90m12 |[0m   [36mconst[0m candidateDirs = [
+[31m[1m>[0m [90m13 |[0m     path.join(process.cwd(), [32m".next/server/chunks"[0m),
+  [90m   |[0m               [31m[1m^^^^^^^^^^^[0m
+  [90m14 |[0m     path.join(process.cwd(), [32m".next/server/chunks/ssr"[0m),
+  [90m15 |[0m   ];
+  [90m16 |[0m   [36mfor[0m ([36mconst[0m dir [36mof[0m candidateDirs) {
+
+Ecmascript file had an error
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:14:15
+A Node.js API is used (process.cwd at line: 14) which is not supported in the Edge Runtime.
+    Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+  [90m12 |[0m   [36mconst[0m candidateDirs = [
+  [90m13 |[0m     path.join(process.cwd(), [32m".next/server/chunks"[0m),
+[31m[1m>[0m [90m14 |[0m     path.join(process.cwd(), [32m".next/server/chunks/ssr"[0m),
+  [90m   |[0m               [31m[1m^^^^^^^^^^^[0m
+  [90m15 |[0m   ];
+  [90m16 |[0m   [36mfor[0m ([36mconst[0m dir [36mof[0m candidateDirs) {
+  [90m17 |[0m     [36mif[0m (!fs.existsSync(dir)) [36mcontinue[0m;
+
+Ecmascript file had an error
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:5:1
+A Node.js module is loaded ('node:fs' at line 5) which is not supported in the Edge Runtime.
+    Learn More: https://nextjs.org/docs/messages/node-module-in-edge-runtime
+  [90m3 |[0m [90m * Never touches SAFE strategy files.[0m
+  [90m4 |[0m [90m */[0m
+[31m[1m>[0m [90m5 |[0m [36mimport[0m fs [36mfrom[0m [32m"node:fs"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m6 |[0m [36mimport[0m path [36mfrom[0m [32m"node:path"[0m;
+  [90m7 |[0m [36mimport[0m { createRequire } [36mfrom[0m [32m"node:module"[0m;
+  [90m8 |[0m
+
+Ecmascript file had an error
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:7:1
+A Node.js module is loaded ('node:module' at line 7) which is not supported in the Edge Runtime.
+    Learn More: https://nextjs.org/docs/messages/node-module-in-edge-runtime
+  [90m 5 |[0m [36mimport[0m fs [36mfrom[0m [32m"node:fs"[0m;
+  [90m 6 |[0m [36mimport[0m path [36mfrom[0m [32m"node:path"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { createRequire } [36mfrom[0m [32m"node:module"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m
+  [90m 9 |[0m [36mconst[0m require = createRequire([36mimport[0m.meta.url);
+  [90m10 |[0m
+
+Ecmascript file had an error
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:6:1
+A Node.js module is loaded ('node:path' at line 6) which is not supported in the Edge Runtime.
+    Learn More: https://nextjs.org/docs/messages/node-module-in-edge-runtime
+  [90m4 |[0m [90m */[0m
+  [90m5 |[0m [36mimport[0m fs [36mfrom[0m [32m"node:fs"[0m;
+[31m[1m>[0m [90m6 |[0m [36mimport[0m path [36mfrom[0m [32m"node:path"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m7 |[0m [36mimport[0m { createRequire } [36mfrom[0m [32m"node:module"[0m;
+  [90m8 |[0m
+  [90m9 |[0m [36mconst[0m require = createRequire([36mimport[0m.meta.url);
+
+Ecmascript file had an error
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:17:10
+The file pattern ('/ROOT/.next/server/chunks' | '/ROOT/.next/server/chunks/ssr' | <dynamic>) matches 78203 files in [project]/
+  [90m15 |[0m   ];
+  [90m16 |[0m   [36mfor[0m ([36mconst[0m dir [36mof[0m candidateDirs) {
+[31m[1m>[0m [90m17 |[0m     [36mif[0m (!fs.existsSync(dir)) [36mcontinue[0m;
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m18 |[0m     [36mconst[0m match = fs
+  [90m19 |[0m       .readdirSync(dir)
+  [90m20 |[0m       .find(
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./instrumentation.ts:27:20
+The file pattern ('/ROOT/.next/server/chunks/' <dynamic> | '/ROOT/.next/server/chunks/ssr/' <dynamic> | <dynamic> '/' <dynamic> | '/ROOT/.next/server/chunks' <dynamic> | '/ROOT/.next/server/chunks/ssr' <dynamic> | <dynamic>) matches 156364 files in [project]/
+  [90m25 |[0m       );
+  [90m26 |[0m     [36mif[0m (!match) [36mcontinue[0m;
+[31m[1m>[0m [90m27 |[0m     [36mreturn[0m require(path.join(dir, match)) [36mas[0m {
+  [90m   |[0m                    [31m[1m^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m       recoverOrphanSearchJobs?: () => unknown;
+  [90m29 |[0m     };
+  [90m30 |[0m   }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+
+./src/lib/rextora/storage/jsonStore.ts:24:10
+The file pattern ('/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>) matches 306432 files in [project]/
+  [90m22 |[0m
+  [90m23 |[0m [36mfunction[0m filePath(filename: string): string {
+[31m[1m>[0m [90m24 |[0m   [36mreturn[0m path.join([33mDATA_DIR[0m, filename);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m25 |[0m }
+  [90m26 |[0m
+  [90m27 |[0m [36mfunction[0m getFileMtimeMs(filename: string): number {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/storage/auditStore.ts
+    ./app/api/rextora/system/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/telegramAssistant.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/storage/jsonStore.ts:29:8
+The file pattern ('/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>) matches 76608 files in [project]/
+  [90m27 |[0m [36mfunction[0m getFileMtimeMs(filename: string): number {
+  [90m28 |[0m   [36mconst[0m fp = filePath(filename);
+[31m[1m>[0m [90m29 |[0m   [36mif[0m (!fs.existsSync(fp)) [36mreturn[0m [35m0[0m;
+  [90m   |[0m        [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m30 |[0m   [36mreturn[0m fs.statSync(fp).mtimeMs;
+  [90m31 |[0m }
+  [90m32 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/storage/auditStore.ts
+    ./app/api/rextora/system/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/telegramAssistant.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/storage/jsonStore.ts:30:10
+The file pattern ('/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>) matches 76608 files in [project]/
+  [90m28 |[0m   [36mconst[0m fp = filePath(filename);
+  [90m29 |[0m   [36mif[0m (!fs.existsSync(fp)) [36mreturn[0m [35m0[0m;
+[31m[1m>[0m [90m30 |[0m   [36mreturn[0m fs.statSync(fp).mtimeMs;
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^[0m
+  [90m31 |[0m }
+  [90m32 |[0m
+  [90m33 |[0m [36mexport[0m [36mfunction[0m invalidateJsonStoreCache(filename?: string): [36mvoid[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/storage/auditStore.ts
+    ./app/api/rextora/system/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/telegramAssistant.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/storage/jsonStore.ts:52:8
+The file pattern ('/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>) matches 76608 files in [project]/
+  [90m50 |[0m   }
+  [90m51 |[0m
+[31m[1m>[0m [90m52 |[0m   [36mif[0m (!fs.existsSync(fp)) {
+  [90m   |[0m        [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m53 |[0m     [36mconst[0m entry: [33mCacheEntry[0m<[33mT[0m> = { value: fallback, mtimeMs: [35m0[0m, expiresAt: [33mDate[0m.now() + tt...
+  [90m54 |[0m     storeCache.set(filename, entry);
+  [90m55 |[0m     [36mreturn[0m fallback;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/storage/auditStore.ts
+    ./app/api/rextora/system/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/telegramAssistant.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/storage/jsonStore.ts:59:30
+The file pattern ('/ROOT/data/rextora/' <dynamic> | '/ROOT/data/rextora' <dynamic>) matches 76608 files in [project]/
+  [90m57 |[0m
+  [90m58 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m59 |[0m     [36mconst[0m value = [33mJSON[0m.parse(fs.readFileSync(fp, [32m"utf8"[0m)) [36mas[0m [33mT[0m;
+  [90m   |[0m                              [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m60 |[0m     storeCache.set(filename, { value, mtimeMs, expiresAt: [33mDate[0m.now() + ttlMs });
+  [90m61 |[0m     [36mreturn[0m value;
+  [90m62 |[0m   } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/storage/auditStore.ts
+    ./app/api/rextora/system/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/jsonStore.ts
+    ./src/lib/rextora/telegramAssistant.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/agent/commandStore.ts:37:17
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json') matches 75310 files in [project]/
+  [90m35 |[0m [36mexport[0m [36mfunction[0m getCommand(commandId: string): [33mTypedCommand[0m | [36mnull[0m {
+  [90m36 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m37 |[0m     [36mconst[0m raw = fs.readFileSync(fileFor(commandId), [32m"utf8"[0m);
+  [90m   |[0m                 [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m38 |[0m     [36mreturn[0m [33mJSON[0m.parse(raw) [36mas[0m [33mTypedCommand[0m;
+  [90m39 |[0m   } [36mcatch[0m {
+  [90m40 |[0m     [36mreturn[0m [36mnull[0m;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/commandStore.ts:26:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/agent-commands/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/agent-commands' <dynamic> '.json') matches 75329 files in [project]/
+  [90m24 |[0m
+  [90m25 |[0m [36mfunction[0m fileFor(commandId: string): string {
+[31m[1m>[0m [90m26 |[0m   [36mreturn[0m path.join(commandsRoot(), [32m`[0m${commandId[32m}.json`[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m27 |[0m }
+  [90m28 |[0m
+  [90m29 |[0m [36mexport[0m [36mfunction[0m saveCommand(command: [33mTypedCommand[0m): [33mTypedCommand[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:87:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json') matches 75291 files in [project]/
+  [90m85 |[0m   options?: [33mStrategySearchConfigStoreOptions[0m,
+  [90m86 |[0m ): string {
+[31m[1m>[0m [90m87 |[0m   [36mreturn[0m path.join(ensureConfigsDir(options), [32m`[0m${name[32m}.json`[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m88 |[0m }
+  [90m89 |[0m
+  [90m90 |[0m [36mfunction[0m countAdvancedOverrides(form: [33mStrategySearchOperatorFormState[0m): number {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:178:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json') matches 75291 files in [project]/
+  [90m176 |[0m   [36mconst[0m safeName = validateConfigName(name);
+  [90m177 |[0m   [36mconst[0m fp = configPath(safeName, options);
+[31m[1m>[0m [90m178 |[0m   [36mif[0m (!fs.existsSync(fp)) [36mreturn[0m [36mnull[0m;
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m179 |[0m   [36mtry[0m {
+  [90m180 |[0m     [36mconst[0m parsed = [33mJSON[0m.parse(
+  [90m181 |[0m       fs.readFileSync(fp, [32m"utf8"[0m),
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:181:7
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json') matches 75291 files in [project]/
+  [90m179 |[0m   [36mtry[0m {
+  [90m180 |[0m     [36mconst[0m parsed = [33mJSON[0m.parse(
+[31m[1m>[0m [90m181 |[0m       fs.readFileSync(fp, [32m"utf8"[0m),
+  [90m    |[0m       [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m182 |[0m     ) [36mas[0m [33mStrategySearchSavedConfig[0m;
+  [90m183 |[0m     [36mreturn[0m normalizeRecord(safeName, parsed);
+  [90m184 |[0m   } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:200:20
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json') matches 75291 files in [project]/
+  [90m198 |[0m   [36mconst[0m safeName = validateConfigName(name);
+  [90m199 |[0m   [36mconst[0m fp = configPath(safeName, options);
+[31m[1m>[0m [90m200 |[0m   [36mconst[0m existing = fs.existsSync(fp) ? loadStrategySearchConfig(safeName, options) : [36mnull[0m;
+  [90m    |[0m                    [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m201 |[0m   [90m// Default overwrite=true preserves prior API behavior; UI must pass[0m
+  [90m202 |[0m   [90m// overwrite:false when creating a new named config that must not collide.[0m
+  [90m203 |[0m   [36mif[0m (existing && options?.overwrite === [36mfalse[0m) {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:322:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> '.json' | <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/configs' <dynamic> '.json') matches 75291 files in [project]/
+  [90m320 |[0m   [36mconst[0m safeName = validateConfigName(name);
+  [90m321 |[0m   [36mconst[0m fp = configPath(safeName, options);
+[31m[1m>[0m [90m322 |[0m   [36mif[0m (!fs.existsSync(fp)) [36mreturn[0m [36mfalse[0m;
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m323 |[0m   fs.unlinkSync(fp);
+  [90m324 |[0m   [36mreturn[0m [36mtrue[0m;
+  [90m325 |[0m }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/agent/v2/planner/planStore.ts:17:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m15 |[0m     ? path.resolve(process.env.[33mREXTORA_AGENT_PLANS_DIR[0m)
+  [90m16 |[0m     : path.join(rextoraDataRoot(), [32m"agent-plans-v2"[0m);
+[31m[1m>[0m [90m17 |[0m   [36mreturn[0m path.join(root, [32m`[0m${sanitizeSessionId(sessionId)[32m}.json`[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m18 |[0m }
+  [90m19 |[0m
+  [90m20 |[0m [36mexport[0m [36mfunction[0m readPlanLedger(sessionId: string): [33mPlanLedger[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/planner/planStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/planner/planStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/planner/planStore.ts:22:31
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m20 |[0m [36mexport[0m [36mfunction[0m readPlanLedger(sessionId: string): [33mPlanLedger[0m {
+  [90m21 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m22 |[0m     [36mconst[0m parsed = [33mJSON[0m.parse(fs.readFileSync(filePath(sessionId), [32m"utf8"[0m)) [36mas[0m [33mPlanLedger[0m;
+  [90m   |[0m                               [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m23 |[0m     [36mif[0m (parsed.sessionId === sessionId && [33mArray[0m.isArray(parsed.plans)) [36mreturn[0m parsed;
+  [90m24 |[0m   } [36mcatch[0m {
+  [90m25 |[0m     [90m// Empty ledger on first use.[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/planner/planStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/planner/planStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/tasks/taskStore.ts:13:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m11 |[0m
+  [90m12 |[0m [36mfunction[0m ledgerPath(sessionId: string): string {
+[31m[1m>[0m [90m13 |[0m   [36mreturn[0m path.join(taskStoreRoot(), [32m`[0m${sanitizeSessionId(sessionId)[32m}.json`[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m14 |[0m }
+  [90m15 |[0m
+  [90m16 |[0m [36mexport[0m [36mfunction[0m readTaskLedger(sessionId: string): [33mTaskLedger[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tasks/taskStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tasks/taskStore.ts
+    ./app/api/rextora/agent/session/route.ts
+
+
+./src/lib/rextora/agent/v2/tasks/taskStore.ts:19:31
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m17 |[0m   [36mconst[0m file = ledgerPath(sessionId);
+  [90m18 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m19 |[0m     [36mconst[0m parsed = [33mJSON[0m.parse(fs.readFileSync(file, [32m"utf8"[0m)) [36mas[0m [33mTaskLedger[0m;
+  [90m   |[0m                               [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m20 |[0m     [36mif[0m (parsed.sessionId === sessionId && [33mArray[0m.isArray(parsed.tasks)) [36mreturn[0m parsed;
+  [90m21 |[0m   } [36mcatch[0m {
+  [90m22 |[0m     [90m// Missing or invalid ledgers recover as an empty server record.[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tasks/taskStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tasks/taskStore.ts
+    ./app/api/rextora/agent/session/route.ts
+
+
+./src/lib/rextora/agent/v2/tools/toolIdempotency.ts:37:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m35 |[0m [36mfunction[0m receiptPath(toolId: string, sessionId: string | [36mnull[0m, idempotencyKey: string): st...
+  [90m36 |[0m   [36mconst[0m scope = digest([32m`[0m${sessionId ?? [32m"global"[0m[32m}:[0m${toolId[32m}:[0m${idempotencyKey[32m}`[0m);
+[31m[1m>[0m [90m37 |[0m   [36mreturn[0m path.join(root(), [32m`[0m${scope[32m}.json`[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m38 |[0m }
+  [90m39 |[0m
+  [90m40 |[0m [36mexport[0m [36mfunction[0m readToolIdempotency(input: {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./src/lib/rextora/agent/v2/tools/toolExecutor.ts
+    ./src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/tools/toolIdempotency.ts:47:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m45 |[0m }): { hit: [36mfalse[0m } | { hit: [36mtrue[0m; data: unknown } {
+  [90m46 |[0m   [36mconst[0m file = receiptPath(input.toolId, input.sessionId, input.idempotencyKey);
+[31m[1m>[0m [90m47 |[0m   [36mif[0m (!fs.existsSync(file)) [36mreturn[0m { hit: [36mfalse[0m };
+  [90m   |[0m        [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m48 |[0m   [36mconst[0m receipt = [33mJSON[0m.parse(fs.readFileSync(file, [32m"utf8"[0m)) [36mas[0m [33mToolIdempotencyReceipt[0m;
+  [90m49 |[0m   [36mconst[0m inputHash = digest(stable(input.arguments));
+  [90m50 |[0m   [36mif[0m (receipt.inputHash !== inputHash) [36mthrow[0m [36mnew[0m [33mError[0m([32m"IDEMPOTENCY_KEY_CONFLICT"[0m);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./src/lib/rextora/agent/v2/tools/toolExecutor.ts
+    ./src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/tools/toolIdempotency.ts:48:30
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m46 |[0m   [36mconst[0m file = receiptPath(input.toolId, input.sessionId, input.idempotencyKey);
+  [90m47 |[0m   [36mif[0m (!fs.existsSync(file)) [36mreturn[0m { hit: [36mfalse[0m };
+[31m[1m>[0m [90m48 |[0m   [36mconst[0m receipt = [33mJSON[0m.parse(fs.readFileSync(file, [32m"utf8"[0m)) [36mas[0m [33mToolIdempotencyReceipt[0m;
+  [90m   |[0m                              [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m49 |[0m   [36mconst[0m inputHash = digest(stable(input.arguments));
+  [90m50 |[0m   [36mif[0m (receipt.inputHash !== inputHash) [36mthrow[0m [36mnew[0m [33mError[0m([32m"IDEMPOTENCY_KEY_CONFLICT"[0m);
+  [90m51 |[0m   [36mreturn[0m { hit: [36mtrue[0m, data: receipt.data };
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./src/lib/rextora/agent/v2/tools/toolExecutor.ts
+    ./src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/tools/toolIdempotency.ts:64:7
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m62 |[0m   fs.mkdirSync(directory, { recursive: [36mtrue[0m });
+  [90m63 |[0m   [36mconst[0m file = receiptPath(input.toolId, input.sessionId, input.idempotencyKey);
+[31m[1m>[0m [90m64 |[0m   [36mif[0m (fs.existsSync(file)) [36mreturn[0m;
+  [90m   |[0m       [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m65 |[0m   [36mconst[0m receipt: [33mToolIdempotencyReceipt[0m = {
+  [90m66 |[0m     toolId: input.toolId,
+  [90m67 |[0m     sessionId: input.sessionId,
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./src/lib/rextora/agent/v2/tools/toolExecutor.ts
+    ./src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/v2/tools/toolIdempotency.ts:78:9
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m76 |[0m     fs.renameSync(temporary, file);
+  [90m77 |[0m   } [36mcatch[0m (error) {
+[31m[1m>[0m [90m78 |[0m     [36mif[0m (fs.existsSync(file)) fs.unlinkSync(temporary);
+  [90m   |[0m         [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m79 |[0m     [36melse[0m [36mthrow[0m error;
+  [90m80 |[0m   }
+  [90m81 |[0m }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/tools/toolIdempotency.ts
+    ./src/lib/rextora/agent/v2/tools/toolExecutor.ts
+    ./src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/backtest/backtestStore.ts:78:18
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m76 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m index) {
+  [90m77 |[0m     [36mif[0m (row.resultHash !== resultHash) [36mcontinue[0m;
+[31m[1m>[0m [90m78 |[0m     [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${row.id[32m}.json`[0m);
+  [90m   |[0m                  [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m79 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m80 |[0m     [36mtry[0m {
+  [90m81 |[0m       [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:79:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m77 |[0m     [36mif[0m (row.resultHash !== resultHash) [36mcontinue[0m;
+  [90m78 |[0m     [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${row.id[32m}.json`[0m);
+[31m[1m>[0m [90m79 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m80 |[0m     [36mtry[0m {
+  [90m81 |[0m       [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+  [90m82 |[0m     } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:81:25
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m79 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m80 |[0m     [36mtry[0m {
+[31m[1m>[0m [90m81 |[0m       [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+  [90m   |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m82 |[0m     } [36mcatch[0m {
+  [90m83 |[0m       [36mcontinue[0m;
+  [90m84 |[0m     }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:177:18
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m175 |[0m   [36mconst[0m out: [33mSavedBacktestResult[0m[] = [];
+  [90m176 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m index.slice([35m0[0m, limit * [35m2[0m)) {
+[31m[1m>[0m [90m177 |[0m     [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${row.id[32m}.json`[0m);
+  [90m    |[0m                  [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m178 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m179 |[0m     [36mtry[0m {
+  [90m180 |[0m       out.push([33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:178:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m176 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m index.slice([35m0[0m, limit * [35m2[0m)) {
+  [90m177 |[0m     [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${row.id[32m}.json`[0m);
+[31m[1m>[0m [90m178 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m    |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m179 |[0m     [36mtry[0m {
+  [90m180 |[0m       out.push([33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m);
+  [90m181 |[0m     } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:180:27
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m178 |[0m     [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m179 |[0m     [36mtry[0m {
+[31m[1m>[0m [90m180 |[0m       out.push([33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m);
+  [90m    |[0m                           [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m181 |[0m     } [36mcatch[0m {
+  [90m182 |[0m       [36mcontinue[0m;
+  [90m183 |[0m     }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:190:16
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m188 |[0m
+  [90m189 |[0m [36mexport[0m [36mfunction[0m getSavedBacktest(id: string): [33mSavedBacktestResult[0m | [36mnull[0m {
+[31m[1m>[0m [90m190 |[0m   [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${id[32m}.json`[0m);
+  [90m    |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m191 |[0m   [36mif[0m (!fs.existsSync(full)) [36mreturn[0m [36mnull[0m;
+  [90m192 |[0m   [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+  [90m193 |[0m }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:191:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m189 |[0m [36mexport[0m [36mfunction[0m getSavedBacktest(id: string): [33mSavedBacktestResult[0m | [36mnull[0m {
+  [90m190 |[0m   [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${id[32m}.json`[0m);
+[31m[1m>[0m [90m191 |[0m   [36mif[0m (!fs.existsSync(full)) [36mreturn[0m [36mnull[0m;
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m192 |[0m   [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+  [90m193 |[0m }
+  [90m194 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:192:21
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m190 |[0m   [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${id[32m}.json`[0m);
+  [90m191 |[0m   [36mif[0m (!fs.existsSync(full)) [36mreturn[0m [36mnull[0m;
+[31m[1m>[0m [90m192 |[0m   [36mreturn[0m [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mSavedBacktestResult[0m;
+  [90m    |[0m                     [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m193 |[0m }
+  [90m194 |[0m
+  [90m195 |[0m /**
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:207:16
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m205 |[0m     [36mreturn[0m { ok: [36mfalse[0m, reason: [32m"invalid_id"[0m };
+  [90m206 |[0m   }
+[31m[1m>[0m [90m207 |[0m   [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${id[32m}.json`[0m);
+  [90m    |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m208 |[0m   [36mif[0m (!fs.existsSync(full)) [36mreturn[0m { ok: [36mfalse[0m, reason: [32m"not_found"[0m };
+  [90m209 |[0m   [36mtry[0m {
+  [90m210 |[0m     fs.unlinkSync(full);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/backtest/backtestStore.ts:208:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m206 |[0m   }
+  [90m207 |[0m   [36mconst[0m full = path.join([33mDIR[0m(), [32m`[0m${id[32m}.json`[0m);
+[31m[1m>[0m [90m208 |[0m   [36mif[0m (!fs.existsSync(full)) [36mreturn[0m { ok: [36mfalse[0m, reason: [32m"not_found"[0m };
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m209 |[0m   [36mtry[0m {
+  [90m210 |[0m     fs.unlinkSync(full);
+  [90m211 |[0m   } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/strategyDeletionSafety.ts
+    ./app/api/rextora/strategies/route.ts
+
+  Server Component:
+    ./src/lib/rextora/backtest/backtestStore.ts
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/paper/paperSessionStore.ts:146:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m144 |[0m     [36mthrow[0m [36mnew[0m [33mPaperSessionError[0m([32m"invalid paper session id"[0m, [32m"INVALID_ID"[0m);
+  [90m145 |[0m   }
+[31m[1m>[0m [90m146 |[0m   [36mreturn[0m path.join(root, [32m`[0m${id[32m}.json`[0m);
+  [90m    |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m147 |[0m }
+  [90m148 |[0m
+  [90m149 |[0m [36mfunction[0m writeJson(filePath: string, value: unknown): [36mvoid[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./app/api/rextora/paper/session/route.ts
+
+  Server Component:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./src/lib/rextora/execution/paperStrategyResolver.ts
+    ./src/lib/rextora/execution/safePaperLoop.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./src/lib/rextora/safety.ts
+    ./src/lib/rextora/riskEngine.ts
+    ./src/lib/rextora/aiRanker.ts
+    ./app/cost-analysis/page.tsx
+
+
+./src/lib/rextora/paper/paperSessionStore.ts:452:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m450 |[0m [36mfunction[0m readSessionRaw(root: string, id: string): [33mPaperSession[0m | [36mnull[0m {
+  [90m451 |[0m   [36mconst[0m fp = sessionPath(root, id);
+[31m[1m>[0m [90m452 |[0m   [36mif[0m (!fs.existsSync(fp)) [36mreturn[0m [36mnull[0m;
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m453 |[0m   [36mlet[0m parsed: [33mRecord[0m<string, unknown>;
+  [90m454 |[0m   [36mtry[0m {
+  [90m455 |[0m     parsed = [33mJSON[0m.parse(fs.readFileSync(fp, [32m"utf8"[0m)) [36mas[0m [33mRecord[0m<string, unknown>;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./app/api/rextora/paper/session/route.ts
+
+  Server Component:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./src/lib/rextora/execution/paperStrategyResolver.ts
+    ./src/lib/rextora/execution/safePaperLoop.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./src/lib/rextora/safety.ts
+    ./src/lib/rextora/riskEngine.ts
+    ./src/lib/rextora/aiRanker.ts
+    ./app/cost-analysis/page.tsx
+
+
+./src/lib/rextora/paper/paperSessionStore.ts:455:25
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m453 |[0m   [36mlet[0m parsed: [33mRecord[0m<string, unknown>;
+  [90m454 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m455 |[0m     parsed = [33mJSON[0m.parse(fs.readFileSync(fp, [32m"utf8"[0m)) [36mas[0m [33mRecord[0m<string, unknown>;
+  [90m    |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m456 |[0m   } [36mcatch[0m {
+  [90m457 |[0m     [36mthrow[0m [36mnew[0m [33mPaperSessionError[0m(
+  [90m458 |[0m       [32m`corrupted session JSON: [0m${id[32m}`[0m,
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./app/api/rextora/paper/session/route.ts
+
+  Server Component:
+    ./src/lib/rextora/paper/paperSessionStore.ts
+    ./src/lib/rextora/execution/paperStrategyResolver.ts
+    ./src/lib/rextora/execution/safePaperLoop.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./src/lib/rextora/safety.ts
+    ./src/lib/rextora/riskEngine.ts
+    ./src/lib/rextora/aiRanker.ts
+    ./app/cost-analysis/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:260:43
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m258 |[0m   ensureDir();
+  [90m259 |[0m   [36mconst[0m file = strategyFilePath(strategy.id);
+[31m[1m>[0m [90m260 |[0m   [36mif[0m (strategy.id === [33mSAFE_STRATEGY_ID[0m && fs.existsSync(file)) {
+  [90m    |[0m                                           [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m261 |[0m     [36mthrow[0m [36mnew[0m [33mStrategyValidationError[0m(
+  [90m262 |[0m       [32m`[0m${[33mPROTECTED_STRATEGY_INTEGRITY[0m[32m}: existing SAFE strategy file must not be rewritten.`[0m
+  [90m263 |[0m     );
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:337:12
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m335 |[0m       }
+  [90m336 |[0m       [36mconst[0m full = strategyFilePath(row.id);
+[31m[1m>[0m [90m337 |[0m       [36mif[0m (!fs.existsSync(full)) [36mcontinue[0m;
+  [90m    |[0m            [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m338 |[0m       [36mif[0m (row.id === [33mSAFE_STRATEGY_ID[0m) {
+  [90m339 |[0m         [36mconst[0m safe = assertExistingSafeIntegrity(full);
+  [90m340 |[0m         out.push(overlaySafeActivationFromIndex(safe, row));
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:344:24
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m342 |[0m         out.push(
+  [90m343 |[0m           hydrateStrategyIdentity(
+[31m[1m>[0m [90m344 |[0m             [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mStoredStrategyV1[0m,
+  [90m    |[0m                        [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m345 |[0m           ),
+  [90m346 |[0m         );
+  [90m347 |[0m       }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:374:22
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m372 |[0m       out.push(
+  [90m373 |[0m         hydrateStrategyIdentity(
+[31m[1m>[0m [90m374 |[0m           [33mJSON[0m.parse(fs.readFileSync(full, [32m"utf8"[0m)) [36mas[0m [33mStoredStrategyV1[0m,
+  [90m    |[0m                      [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m375 |[0m         ),
+  [90m376 |[0m       );
+  [90m377 |[0m     }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:390:8
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m388 |[0m   [36mconst[0m safePath = strategyFilePath([33mSAFE_STRATEGY_ID[0m);
+  [90m389 |[0m
+[31m[1m>[0m [90m390 |[0m   [36mif[0m (!fs.existsSync(safePath)) {
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m391 |[0m     writeStrategyFile(buildLockedSafeStrategy());
+  [90m392 |[0m   } [36melse[0m {
+  [90m393 |[0m     assertExistingSafeIntegrity(safePath);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:442:35
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m440 |[0m [36mexport[0m [36mfunction[0m listStrategies(): [33mStoredStrategy[0m[] {
+  [90m441 |[0m   ensureDir();
+[31m[1m>[0m [90m442 |[0m   [36mif[0m (!fs.existsSync([33mINDEX[0m()) || !fs.existsSync(strategyFilePath([33mSAFE_STRATEGY_ID[0m))) {
+  [90m    |[0m                                   [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m443 |[0m     [36mreturn[0m ensureStrategyStore();
+  [90m444 |[0m   }
+  [90m445 |[0m   [90m// Validate SAFE in place without rewriting[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:766:7
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m764 |[0m   [36mconst[0m file = strategyFilePath(id);
+  [90m765 |[0m   assertDestructiveTargetAllowed(file);
+[31m[1m>[0m [90m766 |[0m   [36mif[0m (fs.existsSync(file)) fs.unlinkSync(file);
+  [90m    |[0m       [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m767 |[0m   [36mconst[0m all = listStrategies().filter((s) => s.id !== id);
+  [90m768 |[0m   writeIndex(all);
+  [90m769 |[0m }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:844:11
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m842 |[0m       [36mconst[0m file = strategyFilePath(s.id);
+  [90m843 |[0m       assertDestructiveTargetAllowed(file);
+[31m[1m>[0m [90m844 |[0m       [36mif[0m (fs.existsSync(file)) fs.unlinkSync(file);
+  [90m    |[0m           [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m845 |[0m       removed.push(s.id);
+  [90m846 |[0m     } [36melse[0m {
+  [90m847 |[0m       kept.push(s);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/strategy/strategyStore.ts:852:10
+The file pattern (<dynamic> '/' <dynamic> '.json' | <dynamic> '.json') matches 75291 files in [project]/
+  [90m850 |[0m   [36mif[0m (!kept.some((s) => s.id === [33mSAFE_STRATEGY_ID[0m)) {
+  [90m851 |[0m     [36mconst[0m safePath = strategyFilePath([33mSAFE_STRATEGY_ID[0m);
+[31m[1m>[0m [90m852 |[0m     [36mif[0m (!fs.existsSync(safePath)) {
+  [90m    |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m853 |[0m       writeStrategyFile(buildLockedSafeStrategy());
+  [90m854 |[0m     }
+  [90m855 |[0m     kept.unshift(assertExistingSafeIntegrity(strategyFilePath([33mSAFE_STRATEGY_ID[0m)));
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./app/api/rextora/backtest/run/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/agent/commandStore.ts:54:25
+The file pattern (<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>) matches 156440 files in [project]/
+  [90m52 |[0m     [36mtry[0m {
+  [90m53 |[0m       [36mconst[0m cmd = [33mJSON[0m.parse(
+[31m[1m>[0m [90m54 |[0m         fs.readFileSync(path.join(root, file), [32m"utf8"[0m),
+  [90m   |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m       ) [36mas[0m [33mTypedCommand[0m;
+  [90m56 |[0m       [36mif[0m (cmd.idempotencyKey !== idempotencyKey) [36mcontinue[0m;
+  [90m57 |[0m       [36mif[0m (
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/agent/commandStore.ts:54:9
+The file pattern (<dynamic> '/' <dynamic> | '/ROOT/data/rextora/agent-commands/' <dynamic> | <dynamic> | '/ROOT/data/rextora/agent-commands' <dynamic>) matches 78222 files in [project]/
+  [90m52 |[0m     [36mtry[0m {
+  [90m53 |[0m       [36mconst[0m cmd = [33mJSON[0m.parse(
+[31m[1m>[0m [90m54 |[0m         fs.readFileSync(path.join(root, file), [32m"utf8"[0m),
+  [90m   |[0m         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m       ) [36mas[0m [33mTypedCommand[0m;
+  [90m56 |[0m       [36mif[0m (cmd.idempotencyKey !== idempotencyKey) [36mcontinue[0m;
+  [90m57 |[0m       [36mif[0m (
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/commandStore.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:142:35
+The file pattern (<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>) matches 156364 files in [project]/
+  [90m140 |[0m     [36mconst[0m name = file.slice([35m0[0m, -[32m".json"[0m.length);
+  [90m141 |[0m     [36mtry[0m {
+[31m[1m>[0m [90m142 |[0m       [36mconst[0m raw = fs.readFileSync(path.join(dir, file), [32m"utf8"[0m);
+  [90m    |[0m                                   [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+  [90m143 |[0m       [36mconst[0m parsed = normalizeRecord(
+  [90m144 |[0m         name,
+  [90m145 |[0m         [33mJSON[0m.parse(raw) [36mas[0m [33mStrategySearchSavedConfig[0m,
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/strategySearch/searchConfigStore.ts:142:19
+The file pattern (<dynamic> '/' <dynamic> | '/ROOT/data/rextora/strategy-search/configs/' <dynamic> | <dynamic> | '/ROOT/data/rextora/strategy-search/configs' <dynamic>) matches 78203 files in [project]/
+  [90m140 |[0m     [36mconst[0m name = file.slice([35m0[0m, -[32m".json"[0m.length);
+  [90m141 |[0m     [36mtry[0m {
+[31m[1m>[0m [90m142 |[0m       [36mconst[0m raw = fs.readFileSync(path.join(dir, file), [32m"utf8"[0m);
+  [90m    |[0m                   [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m143 |[0m       [36mconst[0m parsed = normalizeRecord(
+  [90m144 |[0m         name,
+  [90m145 |[0m         [33mJSON[0m.parse(raw) [36mas[0m [33mStrategySearchSavedConfig[0m,
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/searchConfigStore.ts
+    ./app/api/rextora/strategy-search/configs/[name]/route.ts
+
+
+./src/lib/rextora/storage/runtimePaths.ts:40:10
+The file pattern (<dynamic> '/strategy-search' | '/ROOT/data/rextora/strategy-search' | <dynamic> 'strategy-search' | '/ROOT/data/rextorastrategy-search') matches 146894 files in [project]/
+  [90m38 |[0m   [36mconst[0m override = process.env.[33mREXTORA_STRATEGY_SEARCH_DIR[0m?.trim();
+  [90m39 |[0m   [36mif[0m (override) [36mreturn[0m path.resolve(override);
+[31m[1m>[0m [90m40 |[0m   [36mreturn[0m path.join(rextoraDataRoot(), [32m"strategy-search"[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m41 |[0m }
+  [90m42 |[0m
+  [90m43 |[0m [36mexport[0m [36mfunction[0m backtestsRoot(): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/storage/runtimePaths.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/storage/runtimePaths.ts
+    ./src/lib/rextora/agent/v2/tasks/taskStore.ts
+    ./app/api/rextora/agent/session/route.ts
+
+  Server Component:
+    ./src/lib/rextora/storage/runtimePaths.ts
+    ./src/lib/rextora/strategy/strategyStore.ts
+    ./src/lib/rextora/metrics/metricsEngine.ts
+    ./src/lib/rextora/metrics/riskService.ts
+    ./app/settings/page.tsx
+
+
+./src/lib/rextora/firstRun/firstRunStatus.ts:85:15
+The file pattern (<dynamic> '/strategy-search' | <dynamic> 'strategy-search') matches 73470 files in [project]/
+  [90m83 |[0m   [36mconst[0m runtimeRootExists =
+  [90m84 |[0m     dirExists(root) ||
+[31m[1m>[0m [90m85 |[0m     dirExists(path.join(root, [32m"strategy-search"[0m)) ||
+  [90m   |[0m               [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m86 |[0m     dirExists(path.join(root, [32m"strategies"[0m)) ||
+  [90m87 |[0m     dirExists(path.join(root, [32m"backtests"[0m));
+  [90m88 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/firstRun/firstRunStatus.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/firstRun/firstRunStatus.ts
+    ./app/api/rextora/first-run/dismiss/route.ts
+
+
+./src/lib/rextora/strategySearch/storageSummary.ts:87:16
+The file pattern (<dynamic> '/trials' | '/ROOT/data/rextora/strategy-search/trials' | <dynamic> 'trials' | '/ROOT/data/rextora/strategy-searchtrials') matches 145575 files in [project]/
+  [90m85 |[0m     top10Files: countTop10Files(root),
+  [90m86 |[0m     totalBytes:
+[31m[1m>[0m [90m87 |[0m       dirBytes(path.join(root, [32m"trials"[0m)) +
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m88 |[0m       dirBytes(path.join(root, [32m"jobs"[0m)),
+  [90m89 |[0m     rawTrialRetentionPolicy: getRawTrialRetentionPolicy(options),
+  [90m90 |[0m   };
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./app/api/rextora/strategy-search/storage-summary/route.ts
+
+
+./src/lib/rextora/strategySearch/jobStore.ts:93:10
+The file pattern (<dynamic> '/trials' | <dynamic> 'trials') matches 72793 files in [project]/
+  [90m91 |[0m
+  [90m92 |[0m [36mfunction[0m trialsDir(root: string): string {
+[31m[1m>[0m [90m93 |[0m   [36mreturn[0m path.join(root, [32m"trials"[0m);
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m94 |[0m }
+  [90m95 |[0m
+  [90m96 |[0m [36mfunction[0m indexPath(root: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/storageSummary.ts:52:21
+The file pattern (<dynamic> '/trials' | <dynamic> 'trials') matches 72793 files in [project]/
+  [90m50 |[0m
+  [90m51 |[0m [36mfunction[0m countTrialFiles(root: string): number {
+[31m[1m>[0m [90m52 |[0m   [36mconst[0m trialsDir = path.join(root, [32m"trials"[0m);
+  [90m   |[0m                     [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m53 |[0m   [36mif[0m (!fs.existsSync(trialsDir)) [36mreturn[0m [35m0[0m;
+  [90m54 |[0m   [36mlet[0m count = [35m0[0m;
+  [90m55 |[0m   [36mfor[0m ([36mconst[0m jobDir [36mof[0m fs.readdirSync(trialsDir)) {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./app/api/rextora/strategy-search/storage-summary/route.ts
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:193:10
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json') matches 291146 files in [project]/
+  [90m191 |[0m       [32m`[0m${[33mString[0m(iter).padStart([35m8[0m, [32m"0"[0m)[32m}.json`[0m,
+  [90m192 |[0m     );
+[31m[1m>[0m [90m193 |[0m     [36mif[0m (!fs.existsSync(fp)) [36mcontinue[0m;
+  [90m    |[0m          [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m194 |[0m     [90m// Never delete protected (double-check)[0m
+  [90m195 |[0m     [36mif[0m (preview.protectedIterations.includes(iter)) [36mcontinue[0m;
+  [90m196 |[0m     fs.unlinkSync(fp);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:187:16
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> '.json') matches 582274 files in [project]/
+  [90m185 |[0m   [36mlet[0m deleted = [35m0[0m;
+  [90m186 |[0m   [36mfor[0m ([36mconst[0m iter [36mof[0m preview.deletableIterations) {
+[31m[1m>[0m [90m187 |[0m     [36mconst[0m fp = path.join(
+  [90m    |[0m                [31m[1m^^^^^^^^^[0m
+[31m[1m>[0m [90m188 |[0m       root,
+  [90m    |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m189 |[0m       [32m"trials"[0m,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m190 |[0m       jobId,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m191 |[0m       [32m`[0m${[33mString[0m(iter).padStart([35m8[0m, [32m"0"[0m)[32m}.json`[0m,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m192 |[0m     );
+  [90m    |[0m [31m[1m^^^^^[0m
+  [90m193 |[0m     [36mif[0m (!fs.existsSync(fp)) [36mcontinue[0m;
+  [90m194 |[0m     [90m// Never delete protected (double-check)[0m
+  [90m195 |[0m     [36mif[0m (preview.protectedIterations.includes(iter)) [36mcontinue[0m;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/jobStore.ts:130:16
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json') matches 145582 files in [project]/
+  [90m128 |[0m [36mfunction[0m trialFilePath(root: string, jobId: string, iteration: number): string {
+  [90m129 |[0m   assertStrategySearchIteration(iteration);
+[31m[1m>[0m [90m130 |[0m   [36mconst[0m file = path.join(
+  [90m    |[0m                [31m[1m^^^^^^^^^[0m
+[31m[1m>[0m [90m131 |[0m     trialDirPath(root, jobId),
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m132 |[0m     [32m`[0m${[33mString[0m(iteration).padStart([35m8[0m, [32m"0"[0m)[32m}.json`[0m,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m133 |[0m   );
+  [90m    |[0m [31m[1m^^^[0m
+  [90m134 |[0m   [36mreturn[0m assertInsideRoot(root, file);
+  [90m135 |[0m }
+  [90m136 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:108:14
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json') matches 145582 files in [project]/
+  [90m106 |[0m
+  [90m107 |[0m [36mfunction[0m trialFileBytes(jobId: string, iteration: number, root: string): number {
+[31m[1m>[0m [90m108 |[0m   [36mconst[0m fp = path.join(
+  [90m    |[0m              [31m[1m^^^^^^^^^[0m
+[31m[1m>[0m [90m109 |[0m     root,
+  [90m    |[0m [31m[1m^^^^^^^^^[0m
+[31m[1m>[0m [90m110 |[0m     [32m"trials"[0m,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m111 |[0m     jobId,
+  [90m    |[0m [31m[1m^^^^^^^^^^[0m
+[31m[1m>[0m [90m112 |[0m     [32m`[0m${[33mString[0m(iteration).padStart([35m8[0m, [32m"0"[0m)[32m}.json`[0m,
+  [90m    |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m113 |[0m   );
+  [90m    |[0m [31m[1m^^^[0m
+  [90m114 |[0m   [36mtry[0m {
+  [90m115 |[0m     [36mreturn[0m fs.existsSync(fp) ? fs.statSync(fp).size : [35m0[0m;
+  [90m116 |[0m   } [36mcatch[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:115:12
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json') matches 145582 files in [project]/
+  [90m113 |[0m   );
+  [90m114 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m115 |[0m     [36mreturn[0m fs.existsSync(fp) ? fs.statSync(fp).size : [35m0[0m;
+  [90m    |[0m            [31m[1m^^^^^^^^^^^^^^^^^[0m
+  [90m116 |[0m   } [36mcatch[0m {
+  [90m117 |[0m     [36mreturn[0m [35m0[0m;
+  [90m118 |[0m   }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:115:32
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '/' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '/' <dynamic> '.json' | <dynamic> '/trials/' <dynamic> '.json' | <dynamic> 'trials/' <dynamic> '.json' | <dynamic> '/trials' <dynamic> '.json' | <dynamic> 'trials' <dynamic> '.json') matches 145582 files in [project]/
+  [90m113 |[0m   );
+  [90m114 |[0m   [36mtry[0m {
+[31m[1m>[0m [90m115 |[0m     [36mreturn[0m fs.existsSync(fp) ? fs.statSync(fp).size : [35m0[0m;
+  [90m    |[0m                                [31m[1m^^^^^^^^^^^^^^^[0m
+  [90m116 |[0m   } [36mcatch[0m {
+  [90m117 |[0m     [36mreturn[0m [35m0[0m;
+  [90m118 |[0m   }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/jobStore.ts:752:56
+The file pattern (<dynamic> '/trials/' <dynamic> '/' <dynamic> | <dynamic> 'trials/' <dynamic> '/' <dynamic> | <dynamic> '/trials' <dynamic> '/' <dynamic> | <dynamic> 'trials' <dynamic> '/' <dynamic> | <dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>) matches 291170 files in [project]/
+  [90m750 |[0m   [36mconst[0m out: [33mStrategySearchTrial[0m[] = [];
+  [90m751 |[0m   [36mfor[0m ([36mconst[0m name [36mof[0m files) {
+[31m[1m>[0m [90m752 |[0m     [36mconst[0m trial = recoverReadJson<[33mStrategySearchTrial[0m>(path.join(dir, name), {
+  [90m    |[0m                                                        [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+  [90m753 |[0m       allowMissing: [36mtrue[0m,
+  [90m754 |[0m     });
+  [90m755 |[0m     [36mif[0m (trial) out.push(trial);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/deletionSafety.ts:229:11
+The file pattern (<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic> | <dynamic> '/jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.json' | <dynamic> 'jobs/' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.json' | <dynamic> '/jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.json' | <dynamic> 'jobs' <dynamic> '.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.json' | <dynamic> '/jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.plan.json' | <dynamic> 'jobs/' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.plan.json' | <dynamic> '/jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.plan.json' | <dynamic> 'jobs' <dynamic> '.plan.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.plan.json' | <dynamic> '/jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.execution.json' | <dynamic> 'jobs/' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.execution.json' | <dynamic> '/jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.execution.json' | <dynamic> 'jobs' <dynamic> '.execution.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.execution.json' | <dynamic> '/jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.generations.json' | <dynamic> 'jobs/' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.generations.json' | <dynamic> '/jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.generations.json' | <dynamic> 'jobs' <dynamic> '.generations.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.generations.json' | <dynamic> '/jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs/' <dynamic> '.top10.json' | <dynamic> 'jobs/' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs/' <dynamic> '.top10.json' | <dynamic> '/jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-search/jobs' <dynamic> '.top10.json' | <dynamic> 'jobs' <dynamic> '.top10.json' | '/ROOT/data/rextora/strategy-searchjobs' <dynamic> '.top10.json' | <dynamic>) matches 151607 files in [project]/
+  [90m227 |[0m     classification === [32m"deletable"[0m
+  [90m228 |[0m       ? [trialsDir, jobFile, planFile, execFile, genFile, top10File].filter((p) =>
+[31m[1m>[0m [90m229 |[0m           fs.existsSync(p),
+  [90m    |[0m           [31m[1m^^^^^^^^^^^^^^^^[0m
+  [90m230 |[0m         )
+  [90m231 |[0m       : [];
+  [90m232 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/deletionSafety.ts:165:21
+The file pattern (<dynamic> '/trials/' <dynamic> | '/ROOT/data/rextora/strategy-search/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials/' <dynamic> | <dynamic> '/trials' <dynamic> | '/ROOT/data/rextora/strategy-search/trials' <dynamic> | <dynamic> 'trials' <dynamic> | '/ROOT/data/rextora/strategy-searchtrials' <dynamic>) matches 582278 files in [project]/
+  [90m163 |[0m   }
+  [90m164 |[0m
+[31m[1m>[0m [90m165 |[0m   [36mconst[0m trialsDir = path.join(root, [32m"trials"[0m, jobId);
+  [90m    |[0m                     [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m166 |[0m   [36mconst[0m jobFile = path.join(root, [32m"jobs"[0m, [32m`[0m${jobId[32m}.json`[0m);
+  [90m167 |[0m   [36mconst[0m planFile = path.join(root, [32m"jobs"[0m, [32m`[0m${jobId[32m}.plan.json`[0m);
+  [90m168 |[0m   [36mconst[0m execFile = path.join(root, [32m"jobs"[0m, [32m`[0m${jobId[32m}.execution.json`[0m);
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/jobStore.ts:124:15
+The file pattern (<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>) matches 145586 files in [project]/
+  [90m122 |[0m [36mfunction[0m trialDirPath(root: string, jobId: string): string {
+  [90m123 |[0m   assertStrategySearchJobId(jobId);
+[31m[1m>[0m [90m124 |[0m   [36mconst[0m dir = path.join(trialsDir(root), jobId);
+  [90m    |[0m               [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m125 |[0m   [36mreturn[0m assertInsideRoot(root, dir);
+  [90m126 |[0m }
+  [90m127 |[0m
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/storageSummary.ts:56:16
+The file pattern (<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>) matches 145586 files in [project]/
+  [90m54 |[0m   [36mlet[0m count = [35m0[0m;
+  [90m55 |[0m   [36mfor[0m ([36mconst[0m jobDir [36mof[0m fs.readdirSync(trialsDir)) {
+[31m[1m>[0m [90m56 |[0m     [36mconst[0m fp = path.join(trialsDir, jobDir);
+  [90m   |[0m                [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m57 |[0m     [36mif[0m (!fs.statSync(fp).isDirectory()) [36mcontinue[0m;
+  [90m58 |[0m     [36mfor[0m ([36mconst[0m name [36mof[0m fs.readdirSync(fp)) {
+  [90m59 |[0m       [36mif[0m (name.endsWith([32m".json"[0m)) count += [35m1[0m;
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./app/api/rextora/strategy-search/storage-summary/route.ts
+
+
+./src/lib/rextora/strategySearch/jobStore.ts:745:8
+The file pattern (<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>) matches 72793 files in [project]/
+  [90m743 |[0m   [36mconst[0m root = resolveRoot(options);
+  [90m744 |[0m   [36mconst[0m dir = trialDirPath(root, jobId);
+[31m[1m>[0m [90m745 |[0m   [36mif[0m (!fs.existsSync(dir)) [36mreturn[0m [];
+  [90m    |[0m        [31m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m746 |[0m   [36mconst[0m files = fs
+  [90m747 |[0m     .readdirSync(dir)
+  [90m748 |[0m     .filter((name) => [35m/^\d{8}\.json$/[0m.test(name))
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./app/api/rextora/strategy-search/[jobId]/generations/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobStore.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/storageSummary.ts:57:10
+The file pattern (<dynamic> '/trials/' <dynamic> | <dynamic> 'trials/' <dynamic> | <dynamic> '/trials' <dynamic> | <dynamic> 'trials' <dynamic>) matches 72793 files in [project]/
+  [90m55 |[0m   [36mfor[0m ([36mconst[0m jobDir [36mof[0m fs.readdirSync(trialsDir)) {
+  [90m56 |[0m     [36mconst[0m fp = path.join(trialsDir, jobDir);
+[31m[1m>[0m [90m57 |[0m     [36mif[0m (!fs.statSync(fp).isDirectory()) [36mcontinue[0m;
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^[0m
+  [90m58 |[0m     [36mfor[0m ([36mconst[0m name [36mof[0m fs.readdirSync(fp)) {
+  [90m59 |[0m       [36mif[0m (name.endsWith([32m".json"[0m)) count += [35m1[0m;
+  [90m60 |[0m     }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./app/api/rextora/strategy-search/storage-summary/route.ts
+
+
+./src/lib/rextora/live/liveDryRunEngine.ts:111:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/live-dry-run') matches 78203 files in [project]/
+  [90m109 |[0m
+  [90m110 |[0m [36mfunction[0m resolveRoot(options?: [33mLiveDryRunStoreOptions[0m): string {
+[31m[1m>[0m [90m111 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m    |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m112 |[0m }
+  [90m113 |[0m
+  [90m114 |[0m [36mfunction[0m ensureDir(dir: string): [36mvoid[0m {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/live/liveDryRunEngine.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/live/liveDryRunEngine.ts
+    ./app/api/rextora/live/dry-run/route.ts
+
+
+./src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts:24:8
+The file pattern (<dynamic> | '/ROOT/data/rextora/reasoning-shadow') matches 78203 files in [project]/
+  [90m22 |[0m [36mfunction[0m ensureAuditDir(): [36mvoid[0m {
+  [90m23 |[0m   [36mconst[0m dir = auditRoot();
+[31m[1m>[0m [90m24 |[0m   [36mif[0m (!fs.existsSync(dir)) {
+  [90m   |[0m        [31m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m25 |[0m     fs.mkdirSync(dir, { recursive: [36mtrue[0m });
+  [90m26 |[0m   }
+  [90m27 |[0m }
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts
+    ./app/api/rextora/agent/route.ts
+
+
+./src/lib/rextora/strategySearch/deletionSafety.ts:57:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m55 |[0m
+  [90m56 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m57 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m58 |[0m }
+  [90m59 |[0m
+  [90m60 |[0m [36mfunction[0m dirBytes(dir: string): number {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/deletionSafety.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/jobArchive.ts:33:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m31 |[0m
+  [90m32 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m33 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m34 |[0m }
+  [90m35 |[0m
+  [90m36 |[0m [36mfunction[0m archivePath(root: string, jobId: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobArchive.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobArchive.ts
+    ./app/api/rextora/strategy-search/[jobId]/archive/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobArchive.ts
+    ./src/lib/rextora/strategySearch/jobApiService.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/jobExecutionOwnership.ts:77:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m75 |[0m
+  [90m76 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m77 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m78 |[0m }
+  [90m79 |[0m
+  [90m80 |[0m [36mfunction[0m ownersDir(root: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobExecutionOwnership.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobExecutionOwnership.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./app/api/rextora/strategy-search/recover/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobExecutionOwnership.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/jobExecutionProfile.ts:61:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m59 |[0m
+  [90m60 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m61 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m62 |[0m }
+  [90m63 |[0m
+  [90m64 |[0m [36mfunction[0m profilePath(root: string, jobId: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobExecutionProfile.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobExecutionProfile.ts
+    ./src/lib/rextora/strategySearch/index.ts
+    ./app/api/rextora/strategy-search/recover/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobExecutionProfile.ts
+    ./src/lib/rextora/strategySearch/jobExecutionRegistry.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/jobRecordRecovery.ts:49:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m47 |[0m
+  [90m48 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m49 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m50 |[0m }
+  [90m51 |[0m
+  [90m52 |[0m [36mfunction[0m indexPath(root: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/jobRecordRecovery.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/jobRecordRecovery.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./app/api/rextora/strategy-search/recover/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/jobRecordRecovery.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/rawTrialRetention.ts:49:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m47 |[0m
+  [90m48 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m49 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m50 |[0m }
+  [90m51 |[0m
+  [90m52 |[0m [36mfunction[0m policyPath(root: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/rawTrialRetention.ts
+    ./app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts
+
+
+./src/lib/rextora/strategySearch/recoveryAudit.ts:32:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m30 |[0m
+  [90m31 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m32 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m33 |[0m }
+  [90m34 |[0m
+  [90m35 |[0m [36mfunction[0m auditPath(root: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/recoveryAudit.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/recoveryAudit.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./app/api/rextora/strategy-search/recover/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/recoveryAudit.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/researchGeneration.ts:72:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m70 |[0m
+  [90m71 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m72 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m73 |[0m }
+  [90m74 |[0m
+  [90m75 |[0m [36mfunction[0m generationsPath(root: string, jobId: string): string {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./src/lib/rextora/strategySearch/index.ts
+    ./app/api/rextora/strategy-search/recover/route.ts
+
+  Server Component:
+    ./src/lib/rextora/strategySearch/researchGeneration.ts
+    ./src/lib/rextora/strategySearch/searchOrchestrator.ts
+    ./src/lib/rextora/strategySearch/jobExecutionRegistry.ts
+    ./src/lib/rextora/strategySearch/orphanJobRecovery.ts
+    ./src/lib/rextora/botRuntime.ts
+    ./src/lib/rextora/emergencyControls.ts
+    ./src/lib/rextora/liveSafetyGate.ts
+    ./components/rextora/strategy/StrategyPanels.tsx
+    ./app/strategies/[id]/page.tsx
+
+
+./src/lib/rextora/strategySearch/storageSummary.ts:31:10
+The file pattern (<dynamic> | '/ROOT/data/rextora/strategy-search') matches 151627 files in [project]/
+  [90m29 |[0m
+  [90m30 |[0m [36mfunction[0m resolveRoot(options?: [33mStrategySearchStoreOptions[0m): string {
+[31m[1m>[0m [90m31 |[0m   [36mreturn[0m path.resolve(options?.rootDir ?? defaultRoot());
+  [90m   |[0m          [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m32 |[0m }
+  [90m33 |[0m
+  [90m34 |[0m [36mfunction[0m dirBytes(dir: string): number {
+
+Overly broad patterns can lead to build performance issues and over bundling.
+
+Import traces:
+  Instrumentation:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./instrumentation.ts
+
+  App Route:
+    ./src/lib/rextora/strategySearch/storageSummary.ts
+    ./app/api/rextora/strategy-search/storage-summary/route.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/bot/restart/route.js
+  [output]/.next/server/chunks/src_lib_rextora_0zz-skt._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/bot/status/route.js
+  [output]/.next/server/chunks/_0ub~pud._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/bot/stop/route.js
+  [output]/.next/server/chunks/_04.6bl2._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/dashboard/route.js
+  [output]/.next/server/chunks/_03ofueg._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/emergency/stop-all/route.js
+  [output]/.next/server/chunks/_02fporv._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/bot/stop/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__09oyqu8._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/cost/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0l5nw7x._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/emergency/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0pvkq.2._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/live/readiness/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0oy.r9j._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/market/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0nw4u9b._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/paper/session/route.js
+  [output]/.next/server/chunks/_0s58ugi._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/system/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__05gui~~._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/close-all/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__05xlobr._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/dashboard/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0cwd30w._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/rextora/trading/emergency-stop/route.js
+  [output]/.next/server/chunks/[root-of-the-server]__0_ctlt8._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/api/strategies/[id]/route.js
+  [output]/.next/server/chunks/_0i6nf5o._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/cost-analysis/page.js
+  [output]/.next/server/chunks/ssr/[root-of-the-server]__02.y4-c._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Output asset trace:
+  [output]/.next/server/app/strategies/[id]/page.js
+  [output]/.next/server/chunks/ssr/[root-of-the-server]__09j0_91._.js
+
+Import trace:
+  Instrumentation:
+    ./next.config.ts
+    ./instrumentation.ts
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 5 errors:
+./
+Module not found: Can't resolve './ROOT/.next/server/chunks' <dynamic>
+server relative imports are not implemented yet. Please try an import relative to the file you are importing from.
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./
+Module not found: Can't resolve './ROOT/.next/server/chunks/' <dynamic>
+server relative imports are not implemented yet. Please try an import relative to the file you are importing from.
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./
+Module not found: Can't resolve './ROOT/.next/server/chunks/ssr' <dynamic>
+server relative imports are not implemented yet. Please try an import relative to the file you are importing from.
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./
+Module not found: Can't resolve './ROOT/.next/server/chunks/ssr/' <dynamic>
+server relative imports are not implemented yet. Please try an import relative to the file you are importing from.
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./instrumentation.ts:27:12
+Module not found: Can't resolve ('/ROOT/.next/server/chunks/' <dynamic> | '/ROOT/.next/server/chunks/ssr/' <dynamic> | <dynamic> | '/ROOT/.next/server/chunks' <dynamic> | '/ROOT/.next/server/chunks/ssr' <dynamic>)
+  [90m25 |[0m       );
+  [90m26 |[0m     [36mif[0m (!match) [36mcontinue[0m;
+[31m[1m>[0m [90m27 |[0m     [36mreturn[0m require(path.join(dir, match)) [36mas[0m {
+  [90m   |[0m            [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m       recoverOrphanSearchJobs?: () => unknown;
+  [90m29 |[0m     };
+  [90m30 |[0m   }
+
+
+
+Import trace:
+  Instrumentation:
+    ./instrumentation.ts
+    ./instrumentation.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./instrumentation.ts:27:12)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

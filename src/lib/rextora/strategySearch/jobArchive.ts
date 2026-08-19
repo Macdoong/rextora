@@ -11,6 +11,7 @@ import {
   type StrategySearchStoreOptions,
 } from "./jobStore";
 import { writeDeletionAudit } from "./deletionSafety";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 export interface JobArchiveRecord {
   jobId: string;
@@ -21,12 +22,7 @@ export interface JobArchiveRecord {
 }
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

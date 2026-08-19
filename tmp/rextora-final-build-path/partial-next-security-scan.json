@@ -1,0 +1,10 @@
+{
+  "partialBuildArtifact": true,
+  "filesScanned": 10,
+  "bytesScanned": 1941824,
+  "credentialValueMatches": 0,
+  "credentialLikeTokenMatches": 0,
+  "tmpEvidencePathMatches": 0,
+  "strategyJobTrialPathMatches": 0,
+  "note": "Counts only; no secret names or values emitted."
+}

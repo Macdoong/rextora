@@ -1,0 +1,20 @@
+Using existing build...
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-3pt-GAqe5C/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbctjta_ba88ef",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbctjta_ba88ef&demo=1"
+  }
+}
+{
+  "verdict": "REXTORA INTERNAL TESTING COMPLETE",
+  "defects": []
+}

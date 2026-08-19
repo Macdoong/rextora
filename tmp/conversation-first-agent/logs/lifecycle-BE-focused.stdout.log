@@ -1,0 +1,13 @@
+B-390: PASS
+B-768: PASS
+B-1024: PASS
+B-1440: PASS
+E-390: PASS
+E-768: PASS
+E-1024: PASS
+E-1440: PASS
+{
+  "passed": true,
+  "failures": [],
+  "provider": "gemini"
+}

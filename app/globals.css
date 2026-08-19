@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 
 /* Explicit content roots so production CSS includes all App Router / component utilities */
 @source "../app";
@@ -60,6 +60,10 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 140ms;
   --duration: 220ms;
+
+  /* Shared floating-action layout: Agent FAB parks above sticky CTAs. */
+  --rextora-fab-offset: 5.5rem;
+  --rextora-fab-end-gutter: 5.25rem;
 }
 
 * {
@@ -457,6 +461,8 @@ a {
   border-radius: var(--radius-md);
   background: rgba(8, 14, 26, 0.94);
   padding: 0.75rem;
+  /* Leave an end slot so the global Agent FAB never covers primary CTAs. */
+  padding-inline-end: max(0.75rem, var(--rextora-fab-end-gutter));
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
 }
@@ -922,4 +928,3 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
-

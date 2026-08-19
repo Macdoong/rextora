@@ -1,0 +1,4687 @@
+[
+  {
+    "file": ".DS_Store",
+    "sha256": "d65165279105ca6773180500688df4bdc69a2c7b771752f0a46ef120b7fd8ec3",
+    "bytes": 6148
+  },
+  {
+    "file": ".claude/settings.local.json",
+    "sha256": "075cfca0099a62bf4bc967e5fba55dd6c874160d42ca14980dc059574a6206fe",
+    "bytes": 2187
+  },
+  {
+    "file": ".env.example",
+    "sha256": "addb4da6c877866178f8825cb76e6db29373051d427634189035762914dc31a2",
+    "bytes": 2065
+  },
+  {
+    "file": ".env.local",
+    "sha256": "a527904ab16ce68dc7cd6c31e628bebc9b520eef3343ec65a55d8699c172eb8d",
+    "bytes": 2564
+  },
+  {
+    "file": ".gitignore",
+    "sha256": "05b4dea1ae9abde206ca0e5456b2b08bab0741b8097ef58608f98acf77305916",
+    "bytes": 259
+  },
+  {
+    "file": "CLAUDE.md",
+    "sha256": "c20ace1680972228b28f68c466f9b1cdff73b44cdd1b0f96f6b5be3a5f1133a9",
+    "bytes": 23904
+  },
+  {
+    "file": "README.md",
+    "sha256": "4ddcf9a740198cbca4871b1a194ae86a9153a52626b8d7f243f98a87fcacb0d8",
+    "bytes": 5369
+  },
+  {
+    "file": "app/ai-candidates/page.tsx",
+    "sha256": "65e60d5a3b0a5db621fde25763bcaa634b5ad438cfb2c9c35230a2635077e9b7",
+    "bytes": 3430
+  },
+  {
+    "file": "app/ai-reports/page.tsx",
+    "sha256": "b8cdff71e677a420c2205ed02563ece41ddd792925335bc1cb9d7fa5fa8e9c7b",
+    "bytes": 160
+  },
+  {
+    "file": "app/alerts/history/page.tsx",
+    "sha256": "f3a97e026f48fafebf3cdb2a169786037d480176a27b49870302353c6a63a8e7",
+    "bytes": 120
+  },
+  {
+    "file": "app/alerts/page.tsx",
+    "sha256": "1ef41ff91c501dd1b762761fe8c9b3e38cc79921f74a461d799a05188afe5621",
+    "bytes": 709
+  },
+  {
+    "file": "app/alerts/rules/page.tsx",
+    "sha256": "2f3c89b7bfcbde3021c792441f70052c2c8aacdf113244c1131439bc391685dd",
+    "bytes": 118
+  },
+  {
+    "file": "app/api/alerts/history/route.ts",
+    "sha256": "ef86e20f15b17bae50618bc0988e7574a9801f211543a2910ec7c5c07a90b54e",
+    "bytes": 433
+  },
+  {
+    "file": "app/api/alerts/rules/route.ts",
+    "sha256": "f92a91552cb4bd505c543d3788f338276becf1fb5c021032268bffa07137866c",
+    "bytes": 360
+  },
+  {
+    "file": "app/api/backtests/run/route.ts",
+    "sha256": "09a3fb81a79fcb969c5141424a9c1cfb9cdda71eeca0fe489499dff5dd53ea1e",
+    "bytes": 303
+  },
+  {
+    "file": "app/api/backtests/validation/route.ts",
+    "sha256": "c0f15c5480e00af48d1cebe53e4b04f615d1032195172f029355ca22e2bba011",
+    "bytes": 261
+  },
+  {
+    "file": "app/api/binance/balance/route.ts",
+    "sha256": "a53197cc936ba20add3fe00b9f85aa2120fb23130273a80b7fdbd5b40abb063b",
+    "bytes": 240
+  },
+  {
+    "file": "app/api/binance/klines/route.ts",
+    "sha256": "ab2189b544d3ca49e30ca3df861482e12ac9ab0c8bcd32cdc491d3808641dd13",
+    "bytes": 394
+  },
+  {
+    "file": "app/api/binance/market/route.ts",
+    "sha256": "f2400e6719ccb6c60cbe664106fc2f27c18debf62a92e9ea6567b292def31c44",
+    "bytes": 310
+  },
+  {
+    "file": "app/api/binance/status/route.ts",
+    "sha256": "33538f7d76e87f2d1d2930ff482cb84f909db51513f57e7a1c54063cf9ed2c69",
+    "bytes": 210
+  },
+  {
+    "file": "app/api/bot/restart/route.ts",
+    "sha256": "1ea7afe83281127c1eea0ce1a017ec4feea70f7999c48f4336eefd9953fc4b41",
+    "bytes": 618
+  },
+  {
+    "file": "app/api/bot/start/route.ts",
+    "sha256": "d84fdeb679eed44238dea79c12e7341f4f4f42dfcd1b0c6fb4d05895ecf89930",
+    "bytes": 652
+  },
+  {
+    "file": "app/api/bot/status/route.ts",
+    "sha256": "ad0ed60fe5d667b1fff142484a9b954b8aa368d7da58b66e3ffb5a319ee5f9df",
+    "bytes": 225
+  },
+  {
+    "file": "app/api/bot/stop/route.ts",
+    "sha256": "6bd95aaafd4c1595cd1939fc60d76eda8d5537e15f9417b87952336b20d0ecb5",
+    "bytes": 373
+  },
+  {
+    "file": "app/api/dashboard/route.ts",
+    "sha256": "9b7ac8b6dfd2e5f19ca13a8c6ba7ba397706ce71e04259bcb6e8746fedbb694e",
+    "bytes": 654
+  },
+  {
+    "file": "app/api/emergency/stop-all/route.ts",
+    "sha256": "2e2f095bdb22dcfb4afe671d3c325f73b8639f348f5eece03a17a5a345340140",
+    "bytes": 355
+  },
+  {
+    "file": "app/api/orders/cancel-all/route.ts",
+    "sha256": "9328e9ea7d853724f490823e8b77fd3c83a1709d5289ffcf900213f061a5489f",
+    "bytes": 353
+  },
+  {
+    "file": "app/api/orders/close-position/route.ts",
+    "sha256": "6992c49279b0e264408ecbd65182475b870cec19c0f9705d449f76a851b8cbe5",
+    "bytes": 349
+  },
+  {
+    "file": "app/api/orders/partial-close/route.ts",
+    "sha256": "60d0119031720defe8c5ba443ef15e5801d3fe551deccce0bd9ec026ea933e1d",
+    "bytes": 368
+  },
+  {
+    "file": "app/api/rextora/agent/health/route.ts",
+    "sha256": "9c1a2699d5941907623924bedaa08c9582ad78459e11b6820399a66b9cb987c3",
+    "bytes": 634
+  },
+  {
+    "file": "app/api/rextora/agent/route.ts",
+    "sha256": "36b88165adc6b45b7fc0e9ebc126e9f197a689c5656aa6cc9eee44c4ab08690a",
+    "bytes": 56109
+  },
+  {
+    "file": "app/api/rextora/agent/session/reset/route.ts",
+    "sha256": "c70a2c9651a7ca78a282af30e51aacc4117a4480730ba2cb460d025d60c8f0cd",
+    "bytes": 985
+  },
+  {
+    "file": "app/api/rextora/agent/session/route.ts",
+    "sha256": "101f857fe67cf71a85715f47bd3ea06ce35ce5db45e4f0b130db54926bc3d70b",
+    "bytes": 2852
+  },
+  {
+    "file": "app/api/rextora/backtest/run/route.ts",
+    "sha256": "3da07d064b750955543cf6574f8e641179596f352e1007b1e92386f5ef069011",
+    "bytes": 15410
+  },
+  {
+    "file": "app/api/rextora/binance/diagnostics/route.ts",
+    "sha256": "1fb79faec519b64ac51f65ca4eee9273f8f272159b3ffd2a04229297ff78149d",
+    "bytes": 813
+  },
+  {
+    "file": "app/api/rextora/bot/start/route.ts",
+    "sha256": "65fc8ea118d952d6e5d51a2776204b2951eef4a07314eb265552beb19efb717d",
+    "bytes": 732
+  },
+  {
+    "file": "app/api/rextora/bot/status/route.ts",
+    "sha256": "4d6e4d16354c2d49b81e26e8a0178eb58fd765e7ec8fea432d77626114600c4e",
+    "bytes": 2120
+  },
+  {
+    "file": "app/api/rextora/bot/stop/route.ts",
+    "sha256": "8e9f6150a87c0a09e48a767f79343495eb0aa856e3b6dcbc32442eeaf1ec4afc",
+    "bytes": 544
+  },
+  {
+    "file": "app/api/rextora/candidates/route.ts",
+    "sha256": "5bfad797d1f8144f7a37d2c395171ac19df07351fdc6008d600679c907279e6b",
+    "bytes": 1128
+  },
+  {
+    "file": "app/api/rextora/charts/candles/route.ts",
+    "sha256": "3f6605606c529c1f250a22b2a516e8d6fa82c91319e00110e16ca2a955bae62c",
+    "bytes": 790
+  },
+  {
+    "file": "app/api/rextora/cost/route.ts",
+    "sha256": "abf74ee28b4feec4055b0aa14f40a52b6ff1262ff09d891af4063aac990acce0",
+    "bytes": 887
+  },
+  {
+    "file": "app/api/rextora/emergency/route.ts",
+    "sha256": "2c9452a59d8cb1f3e0a071d4ff9f3ed0ac2f3cba7998f10402ef51247e4cdb99",
+    "bytes": 722
+  },
+  {
+    "file": "app/api/rextora/first-run/demo/reset/route.ts",
+    "sha256": "640355753950305465bf2df99cc040d65acb35f62944890f5f7e2ee46f68b311",
+    "bytes": 1346
+  },
+  {
+    "file": "app/api/rextora/first-run/demo/route.ts",
+    "sha256": "c751279690fef707224f39402c6783060e879239a4eb18c42b8f823a9b75aace",
+    "bytes": 1484
+  },
+  {
+    "file": "app/api/rextora/first-run/dismiss/route.ts",
+    "sha256": "c82109f95e60a473ea4a362a3e4598772e649d932e90d3b39353241aa1cac2c7",
+    "bytes": 1026
+  },
+  {
+    "file": "app/api/rextora/first-run/route.ts",
+    "sha256": "50233c80cc9f4585ac9c750fd2bb51a94b7c9946cfe3c6cf216c2156e56f2577",
+    "bytes": 1008
+  },
+  {
+    "file": "app/api/rextora/internal/orphan-recovery/route.ts",
+    "sha256": "e6c27ac1b96bd58b3d422c0845438be4d0e918bd1115c1e82b6a0de78e4ebe63",
+    "bytes": 745
+  },
+  {
+    "file": "app/api/rextora/learning/route.ts",
+    "sha256": "df3d8196972104be83c4231e70b28867cdda7120e080b78c10df63fc642e678a",
+    "bytes": 1201
+  },
+  {
+    "file": "app/api/rextora/live/dry-run/route.ts",
+    "sha256": "17820fa213d1a4124d82ee4a6a1075231754915dc673481bb119a53e1af1a850",
+    "bytes": 3987
+  },
+  {
+    "file": "app/api/rextora/live/preflight/route.ts",
+    "sha256": "64bb9e49decc1b1b871f92097a6e2d9ecab4c4e763a93b5e2b92c2d29f6186ce",
+    "bytes": 682
+  },
+  {
+    "file": "app/api/rextora/live/readiness/route.ts",
+    "sha256": "2a22cf56d9ad21349455936a3efa8587773c8abadb22a1537ac663dbacdbab65",
+    "bytes": 1665
+  },
+  {
+    "file": "app/api/rextora/market/route.ts",
+    "sha256": "1bf053f33446b1d00d73cddbb069a8917ea5a231f2273f731adec147f71b49aa",
+    "bytes": 3507
+  },
+  {
+    "file": "app/api/rextora/paper/session/[id]/route.ts",
+    "sha256": "60596522806102c644a23a168530f9db1e83c2dd3b41e77d5877e4e7cb2228d6",
+    "bytes": 3481
+  },
+  {
+    "file": "app/api/rextora/paper/session/route.ts",
+    "sha256": "eb2b9f5962e48a942e2b2eb1758c7665ab56ad3b4272ea5d95000051c3bd33f0",
+    "bytes": 3898
+  },
+  {
+    "file": "app/api/rextora/risk/route.ts",
+    "sha256": "25bff3db44f49d8bde200a8b68f5717f017d33ce9f3049a8b051bc5aaad7b512",
+    "bytes": 1205
+  },
+  {
+    "file": "app/api/rextora/settings/ai-providers/credential/route.ts",
+    "sha256": "94e1fe63e5a97c735b4a2fd89377088eee9270f7c7c3a42f90705048fd6d5b4c",
+    "bytes": 1219
+  },
+  {
+    "file": "app/api/rextora/settings/ai-providers/models/route.ts",
+    "sha256": "ac0e9c6f45cc429d9bbaebdc1ab65f436319178b757ac49dc2488568e6848b77",
+    "bytes": 1197
+  },
+  {
+    "file": "app/api/rextora/settings/ai-providers/route.ts",
+    "sha256": "4adab73b2fc4001992a267254bd9b9953910ab9bbe083fe016441bf03816642a",
+    "bytes": 2678
+  },
+  {
+    "file": "app/api/rextora/settings/ai-providers/test/route.ts",
+    "sha256": "c20bec57f5f363b8d98bbfbb5147a0adbfbbc4339653651bf569f6bfd24b1c0d",
+    "bytes": 1890
+  },
+  {
+    "file": "app/api/rextora/settings/route.ts",
+    "sha256": "3802e83ce88538ca3ebf2749cf6c2e85d08889172a6f024dd89b836b6300b8b2",
+    "bytes": 1924
+  },
+  {
+    "file": "app/api/rextora/strategies/compare/route.ts",
+    "sha256": "79805d89c6965be61f1cee7193523e53845ecd1bd961251b714574ff8ea33eb9",
+    "bytes": 2538
+  },
+  {
+    "file": "app/api/rextora/strategies/preview/route.ts",
+    "sha256": "959d692afeb7df541f4252b1733a1a686a20382ca2a5b9a7292ab84138fa4c9a",
+    "bytes": 6321
+  },
+  {
+    "file": "app/api/rextora/strategies/route.ts",
+    "sha256": "7b4d023418817eeb83f2cd4b05513f68af01d7cdf1044c85c5d5291f2925dcfd",
+    "bytes": 10585
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/archive/route.ts",
+    "sha256": "41b63944e9b00c3737430f3356e6e637ddb32afdc8cfb6da51f81825eadb620f",
+    "bytes": 1400
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/best/route.ts",
+    "sha256": "bac8d3ef36f84a1d9f7e9d493b61222223b66f887199bb4121b3559c4a5028aa",
+    "bytes": 634
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/cancel/route.ts",
+    "sha256": "252e6c8ce14570d100d8d687643c56fb0c1ed39e4fcf4c7dfa75e3c929b82f83",
+    "bytes": 642
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/deletion-impact/route.ts",
+    "sha256": "8c3fb677ca2e25605e80333bd5c4cbd4674a99b6dd0316709867812ac0f23687",
+    "bytes": 650
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/generations/route.ts",
+    "sha256": "ef0f2b4fbc3f4902fb1462939e2b625c9074213eae2f3529743c7bd74f6ef341",
+    "bytes": 1296
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/pause/route.ts",
+    "sha256": "8d530772c80ebd79174233fb2be9e3d037216e21e70a31a95621c2d6e9dcbbe8",
+    "bytes": 639
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/promote/route.ts",
+    "sha256": "6505edb5c26deb697917f21e61a890212eb341b5dbb65affa8059c5f3c9be7d4",
+    "bytes": 3275
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts",
+    "sha256": "cce91d3091f58cccffcc25d5b165ffae01a8cf237e7b5a613bcfde93195bcfd3",
+    "bytes": 2604
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/restore/route.ts",
+    "sha256": "356ef0d8c5416e5109de8c1d416826a7024cb3822736f86bcf5500807edf1c02",
+    "bytes": 681
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/results-summary/route.ts",
+    "sha256": "75d1dbd7c31d75e429e3f6be8bb7fa0697d624f1cfc5b09f05cd42e897b88542",
+    "bytes": 1046
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/resume/route.ts",
+    "sha256": "7d5acb00428ad098b898665bf5c81926048e26c900a26d48b2254937ad4d4722",
+    "bytes": 642
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/route.ts",
+    "sha256": "b8986aebf02adb217dc612a7589f39d382931d351a9eefc37965f4de6f8ff8a5",
+    "bytes": 1080
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/start/route.ts",
+    "sha256": "20059330fe68a3227a98211f8bb21f76c4bfa128204765f5b2cfab93f0c369b1",
+    "bytes": 639
+  },
+  {
+    "file": "app/api/rextora/strategy-search/[jobId]/trials/route.ts",
+    "sha256": "e8a9a6bb3025b214ded99f025d0b0c3c900b925e0d7d84ca623447d7a00882ff",
+    "bytes": 961
+  },
+  {
+    "file": "app/api/rextora/strategy-search/configs/[name]/route.ts",
+    "sha256": "c813552e292623cf3d2fb5d084c3a13715a2b218a950c6b990501c51ce53c12f",
+    "bytes": 1446
+  },
+  {
+    "file": "app/api/rextora/strategy-search/configs/route.ts",
+    "sha256": "ee7ae4e466310f22edfbdd7b163927ca6e92a0367f82ddfbef84c32671c3a5b0",
+    "bytes": 3039
+  },
+  {
+    "file": "app/api/rextora/strategy-search/follow-up/route.ts",
+    "sha256": "7fb68b0c6fe1449e5668c9fe767fe9ffb69c79418027d9b77dd1e70408f53700",
+    "bytes": 1852
+  },
+  {
+    "file": "app/api/rextora/strategy-search/recover/route.ts",
+    "sha256": "ace6296efc5e716d87caa64997967405d38316b7f93eb79392a582b3b16d4db1",
+    "bytes": 698
+  },
+  {
+    "file": "app/api/rextora/strategy-search/route.ts",
+    "sha256": "be5ef9415b4d4d37b02653b42433039a7ea3ed862e6c48072dd93adcdfe0ca4c",
+    "bytes": 1594
+  },
+  {
+    "file": "app/api/rextora/strategy-search/storage-summary/route.ts",
+    "sha256": "923d341b6d12e81be5608313d9d24086db8a7678b3f520163ad3b75acaa6591e",
+    "bytes": 496
+  },
+  {
+    "file": "app/api/rextora/strategy/approve/route.ts",
+    "sha256": "a56254a5e267bf8014b5fbaaa32da7ce0d8982c1a43b31e36aa230af2894c2ef",
+    "bytes": 1457
+  },
+  {
+    "file": "app/api/rextora/system/route.ts",
+    "sha256": "6e9f743bd392997911c5a35d6ad694a28f123c941d71e3a8bbe23053d7d5a76a",
+    "bytes": 2395
+  },
+  {
+    "file": "app/api/rextora/telegram/test/route.ts",
+    "sha256": "af310a31439a5ac35cf91e9a0f91312f65522da09f38d4d640eeb38fa15e0acd",
+    "bytes": 573
+  },
+  {
+    "file": "app/api/rextora/trading/cancel-all/route.ts",
+    "sha256": "392caeb4d9c77ccba96ae9e73fad0817337447591f7de5337a3075e02b28b762",
+    "bytes": 697
+  },
+  {
+    "file": "app/api/rextora/trading/close-all/route.ts",
+    "sha256": "d295ea90d490884fef4b492a4262cd1a597e03dbe283466da67662942a0d8317",
+    "bytes": 699
+  },
+  {
+    "file": "app/api/rextora/trading/dashboard/route.ts",
+    "sha256": "e78cf46ee56456570efacb8ed3b8d2a64bd81d29f7f1df703031862eb2f48bd1",
+    "bytes": 1212
+  },
+  {
+    "file": "app/api/rextora/trading/emergency-stop/route.ts",
+    "sha256": "80ba71bf5029e4a0fb51deb3451134b601aee76152151138bb9d938e5cfe786f",
+    "bytes": 745
+  },
+  {
+    "file": "app/api/risk/route.ts",
+    "sha256": "83f4f03569b6e0435902cb1afdfea92aa28a535de9d0365e5fa9777ceccc03cb",
+    "bytes": 394
+  },
+  {
+    "file": "app/api/strategies/[id]/route.ts",
+    "sha256": "f7f0ec2f3032101fecf2fc449e2ebe69291a6eb778473049ed4e60cc632559cc",
+    "bytes": 679
+  },
+  {
+    "file": "app/api/strategies/discover/route.ts",
+    "sha256": "43006b0703781997ecbfdbcca7f192f0319b946c50ba730feabe770b5f25e759",
+    "bytes": 689
+  },
+  {
+    "file": "app/api/strategies/route.ts",
+    "sha256": "094dd7b4374fa2016024fa942fa885ec60e60d402eb6a6f5045c5db804c68680",
+    "bytes": 248
+  },
+  {
+    "file": "app/api/system/api-status/route.ts",
+    "sha256": "b876d8ff160ad6003a272e00f3cf571108e67167a81b9b65c2d33edf33e4b9b0",
+    "bytes": 197
+  },
+  {
+    "file": "app/api/telegram/test/route.ts",
+    "sha256": "ff61f2c8a02085ee9facc3da8cb4e8683421b361d77172375c09fa70e4bcd677",
+    "bytes": 200
+  },
+  {
+    "file": "app/backtest/page.tsx",
+    "sha256": "788ca1c38cc8a15d2a74026c1043630e9d2adabbab3fd93ad4a0081036c7f0f8",
+    "bytes": 2328
+  },
+  {
+    "file": "app/backtests/page.tsx",
+    "sha256": "e107bf50ff1dc229fd26d1baaf7a3cf2020f9bcbbe6f77d0d3652f1f172f4dd0",
+    "bytes": 119
+  },
+  {
+    "file": "app/cost-analysis/page.tsx",
+    "sha256": "da74b0f6d76ab1481c488a38e03ad9671eb6ea9f05b8ec6217d49d2d33290bbf",
+    "bytes": 1737
+  },
+  {
+    "file": "app/dashboard/page.tsx",
+    "sha256": "3fe0702c04e93c316c8b64434c41a487532b934376a8635750cba8da87875d5b",
+    "bytes": 1239
+  },
+  {
+    "file": "app/globals.css",
+    "sha256": "4ac7933383bce20360f82bc781d64cf07d2fdba4f6ea5c79abe9655f16f1124f",
+    "bytes": 20661
+  },
+  {
+    "file": "app/layout.tsx",
+    "sha256": "d7e1848661f8a78da33feadcd94767198064737b2b676b91f1f476bc4aa385c0",
+    "bytes": 1305
+  },
+  {
+    "file": "app/learning-log/page.tsx",
+    "sha256": "3f61dab49733b7bfd33d6143a5dc56679442b516aea010d771753ee83c75597e",
+    "bytes": 880
+  },
+  {
+    "file": "app/live-trading/page.tsx",
+    "sha256": "91aeb963accf4961f585d6211b3ba90fdf9ba650e05fe953255d78e4467e161e",
+    "bytes": 10523
+  },
+  {
+    "file": "app/market-watch/page.tsx",
+    "sha256": "c0c8e66dea45cb310baa70f406c04523ce257f6019451f85b7141e36c899ef47",
+    "bytes": 177
+  },
+  {
+    "file": "app/page.tsx",
+    "sha256": "72c4bba09586cace009ad965105687a54c8b155c47e336b70f839ff421dea34f",
+    "bytes": 110
+  },
+  {
+    "file": "app/paper-trading/page.tsx",
+    "sha256": "014c5fb734563ec29cebc1e3b5084ef1c7241d0793a0bb88c939a178028802fd",
+    "bytes": 31869
+  },
+  {
+    "file": "app/results/page.tsx",
+    "sha256": "65b42048c1d8c65575f5508ad5a7db8ad915e40151790c31d336a082eb849ab9",
+    "bytes": 867
+  },
+  {
+    "file": "app/risk/page.tsx",
+    "sha256": "f05387a4542cf174ace26effc0da12b2885af4255ef04155f390ed12ce0d5203",
+    "bytes": 167
+  },
+  {
+    "file": "app/settings/page.tsx",
+    "sha256": "5c8893e2d0889a5e083a3cccb264cb59e0a148312615b0c0e9f16522a7ebb477",
+    "bytes": 2257
+  },
+  {
+    "file": "app/strategies/[id]/page.tsx",
+    "sha256": "5bb4e4e9ec697a6aeb1591d9e4c7910c5e5ecb5058b110ccf228922b02fb8a5d",
+    "bytes": 1255
+  },
+  {
+    "file": "app/strategies/discovery/page.tsx",
+    "sha256": "58ca2c299116f41ea20d0d80b38fc1fb3d99971cde222c8ecd3ceda7dc93da6c",
+    "bytes": 130
+  },
+  {
+    "file": "app/strategies/page.tsx",
+    "sha256": "583e886eb36a8824f0efab893dfa33c11a9b31902d7f443ce922367c20c75d6f",
+    "bytes": 390
+  },
+  {
+    "file": "app/strategies/ranking/page.tsx",
+    "sha256": "9e19163640041853a8228b5504e159591fcd1c05e392af6eacc65d3c9f54927f",
+    "bytes": 129
+  },
+  {
+    "file": "app/strategy-performance/page.tsx",
+    "sha256": "eed89f6ec9c2209489c923e826a17faa1846183c3e53eb0180f494ceb5c080b0",
+    "bytes": 183
+  },
+  {
+    "file": "app/strategy-search/advanced/page.tsx",
+    "sha256": "2a677be6be37fac1a3f43fad8acfbf8f2e11e9040a812cd87137a51ffa394c6f",
+    "bytes": 240
+  },
+  {
+    "file": "app/strategy-search/page.tsx",
+    "sha256": "25603f535510e639a7f8c7c276a342774a79eb3a46f6b593a6313634a0f02f80",
+    "bytes": 1140
+  },
+  {
+    "file": "app/system-status/page.tsx",
+    "sha256": "75c10dcc4cdff8a8beacc4c8fe6a8c70bdea2c75f7855687eadc2a78c7186afe",
+    "bytes": 177
+  },
+  {
+    "file": "app/system/api-status/page.tsx",
+    "sha256": "c22a5774b6844823cfb126ca06419af6b9f4b003e29f54a86c217969a08fd717",
+    "bytes": 129
+  },
+  {
+    "file": "app/trades/page.tsx",
+    "sha256": "4b2dca332baf5649b8e1ff863f6ad90cd0b6dd0c5d0d8957fb9eed342e12ce6d",
+    "bytes": 176
+  },
+  {
+    "file": "app/trading/bot/page.tsx",
+    "sha256": "1a3236f79eab7d14280bc8b750221d49290b86220e686c21c1d89da344f91162",
+    "bytes": 118
+  },
+  {
+    "file": "app/trading/orders/page.tsx",
+    "sha256": "2747c0e768758c22075f23a2a6a1febcf4b9b37dbb6d725145916ec623fa4969",
+    "bytes": 121
+  },
+  {
+    "file": "app/trading/page.tsx",
+    "sha256": "675934c85f84f5b8c6bdab896e19d4f6f6d6789c3ed0c304c5624ad2addfcb80",
+    "bytes": 190
+  },
+  {
+    "file": "binance_direct_test.js",
+    "sha256": "7b237632a05f78227ee41a56c1bd41f6cbccc0642536dca6d6fb31f08ffa05da",
+    "bytes": 1418
+  },
+  {
+    "file": "components/rextora/AiCandidateDetailPanel.tsx",
+    "sha256": "55b7645a22b6a36515ebc7c3b3faecd847ede4b5aac4e2bd79534cbb0f50e29c",
+    "bytes": 4473
+  },
+  {
+    "file": "components/rextora/AiCandidateTopTable.tsx",
+    "sha256": "a0be098cf71629d07dd6acaaacb33ac02270becb7774fc63926bc1fdbf4525b5",
+    "bytes": 3074
+  },
+  {
+    "file": "components/rextora/AlertPanel.tsx",
+    "sha256": "fcf4b5217ff0b73a869173dfd307e8ea2d1aee812ad17135ca67b998e42a17b4",
+    "bytes": 3197
+  },
+  {
+    "file": "components/rextora/ClientHydrated.tsx",
+    "sha256": "308337536fe97a3635b871459a6cd9fd08def8657cba5f55da0380530efaaf23",
+    "bytes": 645
+  },
+  {
+    "file": "components/rextora/CostAnalysisPanel.tsx",
+    "sha256": "55202bcbae4d251fa9e50cfb32cf45e4c319666095b197e5aa2492a5250f5c9d",
+    "bytes": 2213
+  },
+  {
+    "file": "components/rextora/CurrentPositionsCard.tsx",
+    "sha256": "7f72210df728911e350d2f6d8d5f7a534dd3d52e436d48dfe8344d830c694f8a",
+    "bytes": 2947
+  },
+  {
+    "file": "components/rextora/DemoDataBadge.tsx",
+    "sha256": "372eda570e9dbbb34d6e4fd29fef62bf32fa45dd4aa563ca3a628f68bef6c9c3",
+    "bytes": 563
+  },
+  {
+    "file": "components/rextora/EmptyState.tsx",
+    "sha256": "c6765892a6ec2e182526f6c353d7cd39531b27a4ff2179fd4508e3ade45659a4",
+    "bytes": 1237
+  },
+  {
+    "file": "components/rextora/ErrorState.tsx",
+    "sha256": "9bca6d28368301e18567276e8a72bdcad893060b5f31f65ff9314bb6ceb2d561",
+    "bytes": 1500
+  },
+  {
+    "file": "components/rextora/LiveReadinessPanel.tsx",
+    "sha256": "adc837eb06bba94b3d1e9063f90a6992cedad3cd726b301e8745dc2693fcb985",
+    "bytes": 3470
+  },
+  {
+    "file": "components/rextora/LoadingState.tsx",
+    "sha256": "c7834ff1e4bfbdc2aa3a75708e1408842aaad5981a988fc5e3e07f1b5285ae8f",
+    "bytes": 1224
+  },
+  {
+    "file": "components/rextora/MarketWatcherSummary.tsx",
+    "sha256": "e2a6a3fd974699e8a7f57bbf757c4095731bc2f2a3d5e7c58ee2363cd2d37a1e",
+    "bytes": 3384
+  },
+  {
+    "file": "components/rextora/ModeBadge.tsx",
+    "sha256": "e33ea6a0b19b6b3784358e9e4655c18526eaeff80ab32c1230795b439a0496b0",
+    "bytes": 2010
+  },
+  {
+    "file": "components/rextora/PanelShell.tsx",
+    "sha256": "7123c17f7e5b172ab3b6ef15ebe3db86fda4b22e88fa022cbb4885cbe1361e6a",
+    "bytes": 2068
+  },
+  {
+    "file": "components/rextora/QuickControls.tsx",
+    "sha256": "8dd2bc59419f83bb9a2a935b05e0640a7e09ebe69a14965059d9363ab7674263",
+    "bytes": 2450
+  },
+  {
+    "file": "components/rextora/RiskPanel.tsx",
+    "sha256": "10097a60a4167463390fb30beb6432595ce54644747612c29fbae9822fe0bc59",
+    "bytes": 4727
+  },
+  {
+    "file": "components/rextora/RiskPanelEditable.tsx",
+    "sha256": "6b1f918bc721734208942e47376ee515fc36c3c105175079453f56d3a677ca26",
+    "bytes": 13038
+  },
+  {
+    "file": "components/rextora/Sidebar.tsx",
+    "sha256": "f18506f830240bf203d7445d4eac3de3b0d2e2b29e0392bba2e28390ec5bfede",
+    "bytes": 4897
+  },
+  {
+    "file": "components/rextora/StatusCards.tsx",
+    "sha256": "4ef1ef3714a53fe2697e5e52ec89475befde5f9aa9f9ea5707b13099b3955956",
+    "bytes": 5091
+  },
+  {
+    "file": "components/rextora/SystemStatusPanel.tsx",
+    "sha256": "39d0217c87866b80b10c7d94dd28fc2c2a65f0ac275cbb20b8f6f0def9c2b551",
+    "bytes": 9728
+  },
+  {
+    "file": "components/rextora/agent/ActionCard.tsx",
+    "sha256": "732e642e3fec5b6b731033ee50a2c25009162aa96e2dfa6b425c05794822b651",
+    "bytes": 6282
+  },
+  {
+    "file": "components/rextora/agent/AgentContextStrip.tsx",
+    "sha256": "68ede5c680291bf2085d075c6f4962eb77851ac0cc6afccf7af5f5625135bf3b",
+    "bytes": 4449
+  },
+  {
+    "file": "components/rextora/agent/AgentInput.tsx",
+    "sha256": "be3758d3c4e3632b015fdb54b3ffd931784d00c3bf33028e7ef2a516049cce22",
+    "bytes": 3537
+  },
+  {
+    "file": "components/rextora/agent/AgentMessage.tsx",
+    "sha256": "5c378abaa228843ebbd46d3262f0e9760e502eb3fe55bea14b985e5c086b57d5",
+    "bytes": 17657
+  },
+  {
+    "file": "components/rextora/agent/AgentModelSelector.tsx",
+    "sha256": "031dfe5e361023049ba151140a31485c4e8fcdd471c9d1fc97ea05d04251d41c",
+    "bytes": 9280
+  },
+  {
+    "file": "components/rextora/agent/AgentPanel.tsx",
+    "sha256": "f72b4958c80c9648049f690e4337737908c878be8b5d503678f292f46aaeea77",
+    "bytes": 9945
+  },
+  {
+    "file": "components/rextora/agent/AgentSessionProvider.tsx",
+    "sha256": "fb6030d65d0cff8132d0d85d748ccccb5a1ee9e6a08de97c0592da16e274b7a1",
+    "bytes": 946
+  },
+  {
+    "file": "components/rextora/agent/AgentSuggestions.tsx",
+    "sha256": "5f3e77b45c37d3fcadb74d208516e401564439ff6b483f7b885da491d3ff95be",
+    "bytes": 1140
+  },
+  {
+    "file": "components/rextora/agent/AgentWorkspacePanel.tsx",
+    "sha256": "47d9292ceccb3ccfb89476cfba307332c3102e8d55fe1037d8c3262b5da5275f",
+    "bytes": 3984
+  },
+  {
+    "file": "components/rextora/agent/AppShell.tsx",
+    "sha256": "67c3e536cb19e3b16cc2f153baeaa53990426bf0b5099f312bb295168f0c4e58",
+    "bytes": 578
+  },
+  {
+    "file": "components/rextora/agent/ApprovalCenter.tsx",
+    "sha256": "cf68a4e2e0ad49cb3efac1f573ef8610a49a1b8027e61b1f8b04d9a929a6c803",
+    "bytes": 5925
+  },
+  {
+    "file": "components/rextora/agent/GlobalAgentAssistant.tsx",
+    "sha256": "a4c0dc9b6f26e785d9993b770303aebd6319e73f9262be9e7df9cb83398343ee",
+    "bytes": 5882
+  },
+  {
+    "file": "components/rextora/agent/MissionTimeline.tsx",
+    "sha256": "0fe9a3017cf56c0d1689d1b4887f682e35516ad94c0bc16f45444ff0e5f0dfd1",
+    "bytes": 3147
+  },
+  {
+    "file": "components/rextora/agent/agentAnalytics.ts",
+    "sha256": "8a955860165a20467a20b49debd8ed746dc7620989890694b1569fa299b60d0a",
+    "bytes": 2514
+  },
+  {
+    "file": "components/rextora/agent/agentPersistence.ts",
+    "sha256": "2ae7473e640f389c78a949f3ea259feebfe4ec56fa3174de54f0b97b250835dc",
+    "bytes": 4889
+  },
+  {
+    "file": "components/rextora/agent/agentSessionSync.ts",
+    "sha256": "1258133ccddece46039f287c3a58a54660d6d69968014306f41bb34975e4d853",
+    "bytes": 7965
+  },
+  {
+    "file": "components/rextora/agent/useAgentSession.ts",
+    "sha256": "125c3e31d898f6b3def530a87dd9803bcc83b1b0c16f10f3e279b6a2a9970b9f",
+    "bytes": 25318
+  },
+  {
+    "file": "components/rextora/ai-reports/AiReportVisual.tsx",
+    "sha256": "d6161bc80ded39b3d1f55418da5364db25353e99725e01704ad54d74ed36cd1c",
+    "bytes": 1173
+  },
+  {
+    "file": "components/rextora/alerts/AlertPanels.tsx",
+    "sha256": "dec7876749e0c4e02dbed416aa425901d119fc879ca7bd7694dbc9e0a15d26c3",
+    "bytes": 2600
+  },
+  {
+    "file": "components/rextora/backtest/BacktestPanels.tsx",
+    "sha256": "d216687eba60e56e3f3359524eebbe92107e1b8cc0d5fab9ae0b47102cee8a72",
+    "bytes": 4160
+  },
+  {
+    "file": "components/rextora/backtest/BacktestReviewWorkbench.tsx",
+    "sha256": "94675550d266958b9718ea7adf387dc20e057252f8d96ba50bad4e7da6ee9254",
+    "bytes": 79007
+  },
+  {
+    "file": "components/rextora/backtest/BacktestStrategyManageDrawer.tsx",
+    "sha256": "9a3d577ddaaa6f4f2efec33f3a41602c618efe2621860056107b29cc0bb1fe14",
+    "bytes": 11438
+  },
+  {
+    "file": "components/rextora/backtest/MultiSymbolWorkspace.tsx",
+    "sha256": "ca81cc3a5baffb70beb45a0d377fd2a8dadb459c9c4dedb6abfb2d3698d2b91c",
+    "bytes": 16623
+  },
+  {
+    "file": "components/rextora/backtest/ReturnDrawdownScatter.tsx",
+    "sha256": "5a712941d0d3ca1a0ee11431b44548e4b9e125a7b8c9a0b66782f277a0456ce1",
+    "bytes": 7559
+  },
+  {
+    "file": "components/rextora/backtest/SafeBacktestPanel.tsx",
+    "sha256": "d57bc07613643b27caa7470467075cd754d7fa31f23e4cf07f81395fb4cea3a2",
+    "bytes": 19280
+  },
+  {
+    "file": "components/rextora/charts/BacktestAnalysisView.tsx",
+    "sha256": "ed0146e69aeb3bab0ae761d1094c7499a6898fe7c2a538bcab6805fdce716b7b",
+    "bytes": 125599
+  },
+  {
+    "file": "components/rextora/charts/BarChart.tsx",
+    "sha256": "d2f300b5753d05c712eaa228bd996eddcb24c4a29a3a63088b45fd486af68220",
+    "bytes": 10534
+  },
+  {
+    "file": "components/rextora/charts/CandlestickChart.tsx",
+    "sha256": "61d84f78f36611111670d82bc202b936693fac093b64b0705ea615faca502f0a",
+    "bytes": 40187
+  },
+  {
+    "file": "components/rextora/charts/ChartShell.tsx",
+    "sha256": "5136afd2c85012839ab6df634a3d65d407dda97b57b6f8e447e57724afceff31",
+    "bytes": 24619
+  },
+  {
+    "file": "components/rextora/charts/DashboardCharts.tsx",
+    "sha256": "3b8f78c0e9c068650d1b4df85ab812f94dadddb03c19e99a38c9ed05c22c0d84",
+    "bytes": 4206
+  },
+  {
+    "file": "components/rextora/charts/EquityCurveChart.tsx",
+    "sha256": "61b3460fca2aa850433c5d952c5f0d64e03a0e4dc644f985ff2f4120ec6fc60e",
+    "bytes": 6215
+  },
+  {
+    "file": "components/rextora/charts/MarketChartPanel.tsx",
+    "sha256": "cd103ac0062b29586fab63d0401adf1ba48cb50b3a538cb19f83a0d95ef43350",
+    "bytes": 629
+  },
+  {
+    "file": "components/rextora/charts/MeterChart.tsx",
+    "sha256": "1ef30c481fe1cc3016219aea6054887994c2120d95d549b8ec17eaa105bc476c",
+    "bytes": 1322
+  },
+  {
+    "file": "components/rextora/charts/TradingChartsPanel.tsx",
+    "sha256": "911ec59ae26441ff576e000e8711e11a1d852ed38623fcde9e3372d447cfaf10",
+    "bytes": 12442
+  },
+  {
+    "file": "components/rextora/charts/index.ts",
+    "sha256": "1d61d396fefc6061f2d97ba53e698847058077f1c2c6d7605f0c046922040996",
+    "bytes": 561
+  },
+  {
+    "file": "components/rextora/dashboard/DashboardCards.tsx",
+    "sha256": "d950b49c6d3e02fa1b53db3b8a56471b165826d0392d5b7ec39a2747a270758c",
+    "bytes": 45
+  },
+  {
+    "file": "components/rextora/dashboard/DashboardPanels.tsx",
+    "sha256": "40d0376950ee76f5eaa9bd17936d114d0d8e07a3918c4aebdc074802d7300e94",
+    "bytes": 7663
+  },
+  {
+    "file": "components/rextora/dashboard/LifecycleDashboard.tsx",
+    "sha256": "f3dbba2f52335d0372308182fecbb7f09810ad0cd6fed0bd2d6effe07da5e232",
+    "bytes": 16997
+  },
+  {
+    "file": "components/rextora/firstRun/FirstRunOnboarding.tsx",
+    "sha256": "560d6707509e001f00efd1d7900c01d2591c8bbe24f471dd2d41fe3bb471cd55",
+    "bytes": 11795
+  },
+  {
+    "file": "components/rextora/layout/Sidebar.tsx",
+    "sha256": "42f879634b48930efad9cedf31f24d6468b8f99255d33e04f656d49c05bbd7dd",
+    "bytes": 38
+  },
+  {
+    "file": "components/rextora/learning/LearningLogPanel.tsx",
+    "sha256": "fe9def721d20667783cf023dbc70c11f542cb6d9fbbe7975dc1c09cab694aa0a",
+    "bytes": 14123
+  },
+  {
+    "file": "components/rextora/live/LiveActivationGates.tsx",
+    "sha256": "eed1f088a852320b7e0cf85d7a4abb77642955400c0ba0d3074212bb45b94265",
+    "bytes": 13833
+  },
+  {
+    "file": "components/rextora/results/CurrentResearchResultsPanel.tsx",
+    "sha256": "13f3619b15a2b3d52326454001c8ba718ab4cb85fe6ad8761459f5f82b500e8a",
+    "bytes": 63747
+  },
+  {
+    "file": "components/rextora/results/ResultsWorkbench.tsx",
+    "sha256": "8dc39c71995b6f83479e3ae87be7189bc2d0c11b6b939cc04aae698e877e640e",
+    "bytes": 102934
+  },
+  {
+    "file": "components/rextora/results/libraryFilterUtils.ts",
+    "sha256": "de9371822a7eefa9d5061457ef8ca3f5e1b125985281eafa3f2b2f894a0bc19d",
+    "bytes": 6235
+  },
+  {
+    "file": "components/rextora/results/researchExplorerUtils.ts",
+    "sha256": "42f0999c35228a49134a4bab926c75fbaf04348d77deba9aaac481a97582ba93",
+    "bytes": 5681
+  },
+  {
+    "file": "components/rextora/results/researchHistoryBulk.ts",
+    "sha256": "8de18b4619644b6911d2135a0c4489fb6dc2141317ddd39f9ab43752411e9534",
+    "bytes": 2742
+  },
+  {
+    "file": "components/rextora/settings/AiProviderSettingsPanel.tsx",
+    "sha256": "ad4d1044b0979a93ecbebf87bb85cce474d8b3efe2e21cd1dc63e1cc35fbf5fe",
+    "bytes": 16540
+  },
+  {
+    "file": "components/rextora/settings/ExpertModeCard.tsx",
+    "sha256": "713a57f4c0fdd89d29cfc2ab5b3329e641175302ed8c8de227b7b46549f9244b",
+    "bytes": 2452
+  },
+  {
+    "file": "components/rextora/settings/ExpertRouteGuard.tsx",
+    "sha256": "c23c3a4a011a36ad5e40e3985b57e9a70de92e7cedb97e237a17f350e2a11093",
+    "bytes": 1610
+  },
+  {
+    "file": "components/rextora/settings/LifecycleSettingsShell.tsx",
+    "sha256": "370181d9ac81613e560de842991d0d8e84baedd0104804e06c44fc1593958ed4",
+    "bytes": 9208
+  },
+  {
+    "file": "components/rextora/settings/SettingsTabs.tsx",
+    "sha256": "14b7a41b54d9e9834a3f34526470ec5b1ac96c0f44c84271e6a1abad795f0a9c",
+    "bytes": 8740
+  },
+  {
+    "file": "components/rextora/settings/SystemStatusSection.tsx",
+    "sha256": "435bf817994dfbedf00eac77b0896a909905de30bfc8c05d2a768e109c9add29",
+    "bytes": 5461
+  },
+  {
+    "file": "components/rextora/strategy/ExpertStrategiesPage.tsx",
+    "sha256": "5134fe723e08fb7577eaee95639ebaf7191d7374b8ab3fa04a986782de3e69ec",
+    "bytes": 1215
+  },
+  {
+    "file": "components/rextora/strategy/StrategyManagerPanel.tsx",
+    "sha256": "2a135b5b85ab0273fd90e54b4a396d1e25a68a36392935fe90bc1b0e8b29052b",
+    "bytes": 11704
+  },
+  {
+    "file": "components/rextora/strategy/StrategyPanels.tsx",
+    "sha256": "8dc7f61b3a8a55bc7cb7907457f242c3854098765624d5f31efd90e56a235e88",
+    "bytes": 6588
+  },
+  {
+    "file": "components/rextora/strategy/builder/StrategyBuilderPanel.tsx",
+    "sha256": "f5935bc2cad3e8c191b98cdf805a0f3683bc56259678bfbc531b11359705d130",
+    "bytes": 44508
+  },
+  {
+    "file": "components/rextora/strategy/builder/saveAndNext.ts",
+    "sha256": "4e86065ef8f9564943e90b0561b88229e746b9ad37f38db0478ed9bc6c16c969",
+    "bytes": 2058
+  },
+  {
+    "file": "components/rextora/strategySearch/AdvancedSearchSettingsForm.tsx",
+    "sha256": "e471b87777928f86e1c05748ee57b14f72e2247763833f93f3febbeaae06daf9",
+    "bytes": 1126
+  },
+  {
+    "file": "components/rextora/strategySearch/AdvancedSearchSettingsWorkbench.tsx",
+    "sha256": "8bbad2d5318c81d90714c045472f020e9a16aa908165928256f99b064994985c",
+    "bytes": 277
+  },
+  {
+    "file": "components/rextora/strategySearch/ExecutionControls.tsx",
+    "sha256": "10664e2167d789449306ddd7c294286ef02eca203c97cf0d868d6d7e09971464",
+    "bytes": 3560
+  },
+  {
+    "file": "components/rextora/strategySearch/JobCreateForm.tsx",
+    "sha256": "f14cfd89666c10a81eed5523fad5715102c36b9bd00d0ba7c3a651eebaedb497",
+    "bytes": 98714
+  },
+  {
+    "file": "components/rextora/strategySearch/JobList.tsx",
+    "sha256": "b9b42701d0ab7de56ce31889e4e0e0a4b3aa4818c7dfa805cf11cdd313ad558d",
+    "bytes": 13736
+  },
+  {
+    "file": "components/rextora/strategySearch/LifecycleNextActionsPanel.tsx",
+    "sha256": "a2452648f09e88b972f816c5443f920797aaf9be93574b7c4515070ebfed1ab3",
+    "bytes": 8063
+  },
+  {
+    "file": "components/rextora/strategySearch/QualifiedResultsPanel.tsx",
+    "sha256": "0da5882a5d741fac4e34d324cfe8c205ccd4f9a884cab983e4e3144cfbd4d774",
+    "bytes": 29731
+  },
+  {
+    "file": "components/rextora/strategySearch/ResearchCompletionPanel.tsx",
+    "sha256": "34e870ca8eb994ff7326f9b65850b235ee7f613db8017a3649ac0b5eab05bf7b",
+    "bytes": 15408
+  },
+  {
+    "file": "components/rextora/strategySearch/SearchConfigManager.tsx",
+    "sha256": "f220acc43a38818d9e14d40c15573533a94be73ad229a94e8ff3c2845e52779c",
+    "bytes": 15358
+  },
+  {
+    "file": "components/rextora/strategySearch/SearchStatusCard.tsx",
+    "sha256": "de19ef158ee9803c8267da29ea04d2acd14dab9e7fc0ea52b19eabe348883d02",
+    "bytes": 41822
+  },
+  {
+    "file": "components/rextora/strategySearch/StatisticsPanel.tsx",
+    "sha256": "7773b44fd77154868d014fee36127468e2b22b65a4e06b80c691f631a1f7ffa4",
+    "bytes": 139
+  },
+  {
+    "file": "components/rextora/strategySearch/StrategySearchWorkbench.tsx",
+    "sha256": "02f2c45858c8a7193d7e79fa2f09daba0114336b6940412e0703d0624fff78ad",
+    "bytes": 38995
+  },
+  {
+    "file": "components/rextora/strategySearch/apiClient.ts",
+    "sha256": "f5373e0fa1baecd4d9c8957aa5ff28c0125ccf7d3ad8ccadc1aec118911c4fad",
+    "bytes": 7762
+  },
+  {
+    "file": "components/rextora/strategySearch/displayNames.ts",
+    "sha256": "adc9cccf7fd409a1feb145ff467e3207e97bb6ccbef0e92e128034770e5fc8e0",
+    "bytes": 3272
+  },
+  {
+    "file": "components/rextora/strategySearch/errorMessages.ts",
+    "sha256": "fcc817f878cfb26ff416d26b6b6234d90df4320043f4622b82da7724a7b259c4",
+    "bytes": 1587
+  },
+  {
+    "file": "components/rextora/strategySearch/formDefaults.ts",
+    "sha256": "ca4bd3ec13207576b0a1a2e3a3b3494f3d5a9465e7af1514f56948985c2f5e99",
+    "bytes": 32755
+  },
+  {
+    "file": "components/rextora/strategySearch/formValidation.ts",
+    "sha256": "c8a5fdb3695e738cd7a1b12d3cbe92f35c186e4cd441f6ff3f637baf33a63a1e",
+    "bytes": 19106
+  },
+  {
+    "file": "components/rextora/strategySearch/formatters.ts",
+    "sha256": "fd623c4fa5e598f774008231ca46d5e9e390f38b4f1f2738fbdd75ac9d6bf3a9",
+    "bytes": 13606
+  },
+  {
+    "file": "components/rextora/strategySearch/operatorFormSession.ts",
+    "sha256": "0e062f18e603cc15fb5cb90ab3fa9003e8d31e923ac40693abfb4caf5f29e07e",
+    "bytes": 1410
+  },
+  {
+    "file": "components/rextora/strategySearch/ruleSummary.ts",
+    "sha256": "27e771b02512bc1f351ce80f5e0f992ef2ac09fc3b016ca792276ec00bd5bf9a",
+    "bytes": 3397
+  },
+  {
+    "file": "components/rextora/strategySearch/types.ts",
+    "sha256": "6aff8206cc34bc20dfc1ffb47ea5de41bb0520708ebfae5025377cadebee33fa",
+    "bytes": 20989
+  },
+  {
+    "file": "components/rextora/strategySearch/unitMapping.ts",
+    "sha256": "1313eaa846b08b219c14d7d0f03d1b0c81efe4e59e38c79abee36299fa7672b1",
+    "bytes": 1346
+  },
+  {
+    "file": "components/rextora/system/SystemPanels.tsx",
+    "sha256": "e8d535976e147bc9fa8889dc5f0d2b13af990f70e7fef5878297f58586b155a8",
+    "bytes": 3288
+  },
+  {
+    "file": "components/rextora/trading/TradingActionClient.tsx",
+    "sha256": "8010f6145364098cae6802cd4fc10eb0c2eef1dc93cca0bf525fd7f4edce04f6",
+    "bytes": 8146
+  },
+  {
+    "file": "components/rextora/trading/TradingDashboard.tsx",
+    "sha256": "4034bc3e991f3723c81b464ad1c82f1c5b633c7515b1864dcc2a00cdfc487d52",
+    "bytes": 19798
+  },
+  {
+    "file": "components/rextora/trading/TradingPanels.tsx",
+    "sha256": "547cdfbcd6e998d7d19e54a9613c4dac1f588106756736133320855c0fefef67",
+    "bytes": 3207
+  },
+  {
+    "file": "components/ui/primitives.tsx",
+    "sha256": "8d558e0fb554f7847a8c6658064140930477eb2a767f7e3fc2617201588016ee",
+    "bytes": 23994
+  },
+  {
+    "file": "cursor_analysis.log",
+    "sha256": "247362491f4a3e43c5d31072a14801da8e88588a9809be7052f0bc38e4a1004d",
+    "bytes": 286
+  },
+  {
+    "file": "cursor_install.sh",
+    "sha256": "3dcefacb00a72c4f39958e836e2467ec74476c22d484f1879bd61fc072f72cce",
+    "bytes": 5668
+  },
+  {
+    "file": "docs/REXTORA_DEVELOPMENT_ROADMAP.md",
+    "sha256": "230384928b2b90e1e09efaf7138fc8c3b32dd4f68b956e46f91a748bafcf8e92",
+    "bytes": 11896
+  },
+  {
+    "file": "docs/REXTORA_ENV_SETUP_KR.md",
+    "sha256": "c3636b8c7450e24f26d324d6bb161bf115706f0fa025f2b6b3d615498db7beb6",
+    "bytes": 4124
+  },
+  {
+    "file": "docs/REXTORA_LIVE_ORDER_READINESS_REVIEW.md",
+    "sha256": "68f3994c3014c84d1213707b9de8b3f14e77e7ca3168006160e64084372a2d95",
+    "bytes": 3053
+  },
+  {
+    "file": "docs/REXTORA_MODULE_CLASSIFICATION.md",
+    "sha256": "a139fe3293db85d419a406dd11d8010e30615e3432f7c205812faaa1c62b87d7",
+    "bytes": 4735
+  },
+  {
+    "file": "docs/REXTORA_PRE_LIVE_CHECKLIST.md",
+    "sha256": "984485d7e29b4c506251a358e44563b69853140b7a7491c36b8be59cd253dd79",
+    "bytes": 2954
+  },
+  {
+    "file": "docs/REXTORA_SERVER_TPSL_DESIGN.md",
+    "sha256": "0e00bac51c15645a853ef5de54aaa095d88a262226e497e3c61f87fbba3ea9f4",
+    "bytes": 1681
+  },
+  {
+    "file": "docs/REXTORA_STRUCTURE_AUDIT.md",
+    "sha256": "2b9c4c18bb38c3cabe79f87ac91da1c8f93b5f3a46bb885d91af11616f8db639",
+    "bytes": 11674
+  },
+  {
+    "file": "docs/REXTORA_TARGET_SCOPE.md",
+    "sha256": "1a04acdb8802180ccca3b60ad0dce521c45fd525e3c7a7a2fdde66c336246626",
+    "bytes": 9768
+  },
+  {
+    "file": "eslint.config.mjs",
+    "sha256": "330b0f2830e8a1cf3d92e7f78f397aa193bf69065475df8b69f6c5fe0949e49f",
+    "bytes": 240
+  },
+  {
+    "file": "git_diff_before.txt",
+    "sha256": "8d5a95f4e20642c3baf57eb3bbaebfe12433ba840c0cdb7519f9fb9399c6afd0",
+    "bytes": 2403
+  },
+  {
+    "file": "git_diff_final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "file": "git_diff_full.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "file": "git_status_after.txt",
+    "sha256": "042e79386617e5a829e440d69d71ce147f2e5d6b18a58499be75d2a667889b01",
+    "bytes": 2929
+  },
+  {
+    "file": "git_status_before.txt",
+    "sha256": "f1019cef91a93bbafc610761966eba8d9e1a57265fcd61dfd0f968c7517e1a79",
+    "bytes": 2896
+  },
+  {
+    "file": "git_status_final.txt",
+    "sha256": "b1bbe3e228293c85905d2d55f767c1524c478911e650ca341f44f4f1f5bf4810",
+    "bytes": 2953
+  },
+  {
+    "file": "instrumentation.ts",
+    "sha256": "ac2aa6d68870d01827fc2a03b0062c8ef77468477d7fbeca961bb661504b1083",
+    "bytes": 1634
+  },
+  {
+    "file": "lib/mock-data.ts",
+    "sha256": "965edaec6bc2955e1cf4ab17d26f22c9c4ff0b6e03371b9ee4979850ed26f3e1",
+    "bytes": 1583
+  },
+  {
+    "file": "lib/safety.ts",
+    "sha256": "1da96028f050ada4e574fbc58ec94930ad320cbf314a6274af96560c6220453a",
+    "bytes": 42
+  },
+  {
+    "file": "lib/services/engines.ts",
+    "sha256": "0cb6fab7493f9e395b8832ac1542a9a2f7bb89a6fb7f28870d982046fd536d32",
+    "bytes": 4350
+  },
+  {
+    "file": "lib/services/index.ts",
+    "sha256": "99ff116d27f8e64a8c11c7dc8048e6ed20dce6f70d35c92f4ecb4bc2b5b57151",
+    "bytes": 295
+  },
+  {
+    "file": "lib/types.ts",
+    "sha256": "9f73615d186efcf1105cb06ff9efcc9daf34ac2fad6336bff2a43cc2aff853b7",
+    "bytes": 41
+  },
+  {
+    "file": "next-env.d.ts",
+    "sha256": "7ad303e40d4fddf44f156129e397511953a71481c5cfd86b1862649aaaf240cc",
+    "bytes": 251
+  },
+  {
+    "file": "next.config.ts",
+    "sha256": "a99cfac2a5d1fbe52f404baed2d7c6c6057ae75bbca381bc1d2551186e76b2db",
+    "bytes": 1961
+  },
+  {
+    "file": "package-lock.json",
+    "sha256": "f32ecc25c3ff0b42d5d455f02b2ae1c19cccaa097cf54691aea2a531d6e28f72",
+    "bytes": 268930
+  },
+  {
+    "file": "package.json",
+    "sha256": "747b1c2fea658f0e10b38190eaea33e0270486737901b1cde5246707e0143ad4",
+    "bytes": 1226
+  },
+  {
+    "file": "packages/rextora-runtime-paths/index.cjs",
+    "sha256": "f90255fc15368e8942ac4be1052cc8ce1dad1521232c58bbdf8d471061236279",
+    "bytes": 1391
+  },
+  {
+    "file": "packages/rextora-runtime-paths/index.d.ts",
+    "sha256": "1d1fb54f89cd568ce01daebebd4a3f8b9d1235a1b70d22b09f45e8abd500300b",
+    "bytes": 391
+  },
+  {
+    "file": "packages/rextora-runtime-paths/package.json",
+    "sha256": "1548e267389dd02a308c1c612dac2dbe84ad876e2749b220036dfb4b2f7c2358",
+    "bytes": 180
+  },
+  {
+    "file": "packages/rextora-runtime-paths/rextora-runtime-paths-1.0.0.tgz",
+    "sha256": "d13184855976604a226b19db29167063029235884a66c06605747a684f3aadf5",
+    "bytes": 726
+  },
+  {
+    "file": "packages/rextora-strategy-runtime-io/index.cjs",
+    "sha256": "e361e6f8296f71cb7fd26938d18421a09112fe4fc6c6c6deefd0dd87713d1ddf",
+    "bytes": 1345
+  },
+  {
+    "file": "packages/rextora-strategy-runtime-io/index.d.ts",
+    "sha256": "5cbba445d7e8bb314a1ce30130e51ab77c90faadd12c15a797c4c241476aa29c",
+    "bytes": 788
+  },
+  {
+    "file": "packages/rextora-strategy-runtime-io/package.json",
+    "sha256": "d99cce9bd2bb89a2dd910459d210616cbe182011eb73d8db23e4d55f6e42a30b",
+    "bytes": 186
+  },
+  {
+    "file": "packages/rextora-strategy-runtime-io/rextora-strategy-runtime-io-1.0.0.tgz",
+    "sha256": "cc22353295f5d583256912a3643446b77db6fc4a38917a29c642c41bb4cecd64",
+    "bytes": 956
+  },
+  {
+    "file": "playwright.config.ts",
+    "sha256": "138507b40e9f2cd12d018b82707a6e366b93a8195534320d56c96de428c02222",
+    "bytes": 642
+  },
+  {
+    "file": "playwright.deployment-dev.config.mjs",
+    "sha256": "75515c5de6a044beb347f207dd8d58d167a64c728db6bbae96e9141c56d61761",
+    "bytes": 1649
+  },
+  {
+    "file": "playwright.deployment-prod.config.mjs",
+    "sha256": "0e5194dd5b7ed9bd33b8fa28cced52a459287b476bad1560654d0fc1c363996a",
+    "bytes": 1234
+  },
+  {
+    "file": "playwright.dev-timeout-diagnostic.config.mjs",
+    "sha256": "653e9efbcae8c60741627336d2d0c34c576b0505e5a485d0868621fc12202f90",
+    "bytes": 1036
+  },
+  {
+    "file": "playwright.release.config.mjs",
+    "sha256": "13f3fea027baff7193eebd4df72aef1b376e1d94657307d3f048a42a6a37e5f0",
+    "bytes": 899
+  },
+  {
+    "file": "postcss.config.js",
+    "sha256": "f40c8b03dfc21c035c4af2d6d38f55818d0e4d7be7148d3cb4c8ff6410ec1c3f",
+    "bytes": 92
+  },
+  {
+    "file": "scripts/buildTesterCandidate.mjs",
+    "sha256": "8b2640dd80c9f9648f772da8141e9e963a2ae792b55b606be0ef0483463f251b",
+    "bytes": 2686
+  },
+  {
+    "file": "scripts/commandEvidence.mjs",
+    "sha256": "6b3f2d433c1f69207ac52886eda3865d82ae2d8f6a7844d400243caa2542f363",
+    "bytes": 3743
+  },
+  {
+    "file": "scripts/deploymentApprovalE2e.mjs",
+    "sha256": "7c96409edadf9bcd5cc94f9d40572dc89ab1b7b9274ca8e5764b6455a198ebe7",
+    "bytes": 4167
+  },
+  {
+    "file": "scripts/deploymentLifecycle52.mjs",
+    "sha256": "07be4dbcab6f887b2014caf9233b8be9744a8e2575394f52e679132287b072cf",
+    "bytes": 56391
+  },
+  {
+    "file": "scripts/devTimeoutDiagnostic.mjs",
+    "sha256": "aedd2f90651890e7f468ece13a3212c27dddb9de842c620b3920951704118e88",
+    "bytes": 14021
+  },
+  {
+    "file": "scripts/diagnostics/traceBuildFs.cjs",
+    "sha256": "ca4a6e907c4af61fc640f27c4ddfe887b96ad8c90b0965767f485a5d7a07bd51",
+    "bytes": 9906
+  },
+  {
+    "file": "scripts/finalGateOpenaiReproduction.mjs",
+    "sha256": "3fc6480e3332ea67b31744fd9dc2710da73efb1d29422acdd3f9e6a5e9f1f942",
+    "bytes": 4345
+  },
+  {
+    "file": "scripts/finalGateOrchestrator.mjs",
+    "sha256": "1fc5127efff7f7285429f6763bab265ef481177409c2aa6f3edd9618ade62f8e",
+    "bytes": 5227
+  },
+  {
+    "file": "scripts/finalReleaseBaseline.mjs",
+    "sha256": "7448b094be7243a8cba1dc9d536fc2e7de55deddb08a47aa934685b8f2ee9bf8",
+    "bytes": 4421
+  },
+  {
+    "file": "scripts/finalReleaseGeminiStability.mjs",
+    "sha256": "35c8960b781838b750d2cd6528d8d10bcedc1839d3819f470e7c680a4f1bfecf",
+    "bytes": 5575
+  },
+  {
+    "file": "scripts/finalReleaseOpenaiStability.mjs",
+    "sha256": "60e6b50433fb2911e25a49837dcfb9c85535a0db4ba8da5e8c44836ecd1b1f80",
+    "bytes": 5563
+  },
+  {
+    "file": "scripts/finalReleaseSecretScan.mjs",
+    "sha256": "43fb6f799dc9a819653b21c0c0917c145fb72c26bb82c36f9bf53b26a60b235c",
+    "bytes": 2255
+  },
+  {
+    "file": "scripts/finalValidationProviderSanity.mjs",
+    "sha256": "43df81b1bc77b5129986fa964f017debc3c2733543103433ca9788f5d528d18b",
+    "bytes": 3761
+  },
+  {
+    "file": "scripts/init-demo-workspace.mjs",
+    "sha256": "fdcecf8860d92ffea91a04076545907c2a5775beffbc41cff64bb7b0fd82337f",
+    "bytes": 1614
+  },
+  {
+    "file": "scripts/inspect-next-trace.mjs",
+    "sha256": "3f05ce4af577a1705a45d4e59845ddec80df314cddb0b915a60d65ae04f6c455",
+    "bytes": 4215
+  },
+  {
+    "file": "scripts/loadProjectEnv.mjs",
+    "sha256": "47d686156a3eec062a7663ef4388a2d0523dfc554fe991d0af21c848c03b6773",
+    "bytes": 883
+  },
+  {
+    "file": "scripts/perf-audit.mjs",
+    "sha256": "5301e74f4bb89525d714bc432651b802193a71c089cc7df434d6fb10b960f6a6",
+    "bytes": 8009
+  },
+  {
+    "file": "scripts/primaryLeakDetector.mjs",
+    "sha256": "93a1d0d801f532847ad0ec9636900cdf08f36980e4e32fb0fa6b918688a45e73",
+    "bytes": 4577
+  },
+  {
+    "file": "scripts/providerBackedLiveConversation.mjs",
+    "sha256": "21392819bdb8e64b471af9857fada3a8e56e8c50ef85a3efd0284baf43183dd5",
+    "bytes": 5223
+  },
+  {
+    "file": "scripts/providerCanary.mjs",
+    "sha256": "eec518465575b21e7fa5a1800b141a5ab5e97925193ac1badd59ae43232e1c8b",
+    "bytes": 3559
+  },
+  {
+    "file": "scripts/providerCanaryProbe.mjs",
+    "sha256": "e59f4c0fd5591818c6121437f2a7500c273dc2d35a5539968e0f5ebf7270e158",
+    "bytes": 12353
+  },
+  {
+    "file": "scripts/recover-stale-cancels.mjs",
+    "sha256": "eedf08211921a526281597009cd2eddad20e1595398a1446bc8c129a891ffcfe",
+    "bytes": 3841
+  },
+  {
+    "file": "scripts/repoPaths.mjs",
+    "sha256": "5510b1dab0450952d599eacc452092daf1c2f67470da2bef24d1add37806af95",
+    "bytes": 675
+  },
+  {
+    "file": "scripts/runDevelopment88.mjs",
+    "sha256": "fac8905c6270b197973ad8896634c6193da251cf222ff802a9a23e17e7e3ccba",
+    "bytes": 2033
+  },
+  {
+    "file": "scripts/runDevelopment88ByViewport.mjs",
+    "sha256": "1061f9382b37f839b9b486a0bafd60391befa45d24f2ab7a91575bed6a2e59e5",
+    "bytes": 5061
+  },
+  {
+    "file": "scripts/runFocusedKnownBlockers9.mjs",
+    "sha256": "2c9afd899ebc1d2718af1478d0a3562f6e35b2291afb0f860ad73f633afe0142",
+    "bytes": 3581
+  },
+  {
+    "file": "scripts/verify-rextora.mjs",
+    "sha256": "4b6cec19c013325904a461b1c747a02ce9d5526b71178688a2d42994b3dd6b56",
+    "bytes": 60981
+  },
+  {
+    "file": "scripts/verify-risk-persist.ts",
+    "sha256": "90dff7959b71f0d832c02c8e859477b81fe18d45faaf95fb3625d72cb5ad48b9",
+    "bytes": 848
+  },
+  {
+    "file": "scripts/warmDevRoutes.mjs",
+    "sha256": "2ec0ef2c17aa39357d6f6f4a57af5e83eeb8488521453e57e6601ef484c49eaf",
+    "bytes": 2166
+  },
+  {
+    "file": "src/lib/rextora/accountStateStore.ts",
+    "sha256": "c0165406a68b9716b39a6bc361bfb7c575d1f4a9ba902c2efaf2a33a8b203203",
+    "bytes": 3838
+  },
+  {
+    "file": "src/lib/rextora/agent/agentDataFetcher.ts",
+    "sha256": "587edb5ac20f6e802b703033a76e5b4b3aac195a850d107a91b44d21017c4ce8",
+    "bytes": 39576
+  },
+  {
+    "file": "src/lib/rextora/agent/agentLLM.ts",
+    "sha256": "6f3af1e2800e702ad007da68c9f19f00b36a32e0f01342a69b24850d5b87c4b2",
+    "bytes": 7177
+  },
+  {
+    "file": "src/lib/rextora/agent/agentResponseBuilder.ts",
+    "sha256": "f109425cffddefa626e0193ba1600f6c5e5bde78e814f97e38b444ee5ffc38f2",
+    "bytes": 38397
+  },
+  {
+    "file": "src/lib/rextora/agent/canonicalCommandPayload.ts",
+    "sha256": "33c7e0fe80509bd174cd003180fe710d025bc5c0620ca90ec421e4473c9cfebf",
+    "bytes": 4161
+  },
+  {
+    "file": "src/lib/rextora/agent/commandExecutor.ts",
+    "sha256": "0ef1e150fbc27251254b13d3bebaabd16d865196de988e863a89ab8c8a2b2645",
+    "bytes": 8936
+  },
+  {
+    "file": "src/lib/rextora/agent/commandStore.ts",
+    "sha256": "4c1556967aefb01a43ddf877973d639d3e086f7d8586cb3009e19550233a07bf",
+    "bytes": 1925
+  },
+  {
+    "file": "src/lib/rextora/agent/conversationContext.ts",
+    "sha256": "4c59b487f004961d0f28b28af16b3e959edbcab372c2b2b971b6941534939b2f",
+    "bytes": 6210
+  },
+  {
+    "file": "src/lib/rextora/agent/conversationState.ts",
+    "sha256": "feffa2ff3909747a637678c8b3eb48de6ebd31c776b6cbff7d68a1155855c62e",
+    "bytes": 5294
+  },
+  {
+    "file": "src/lib/rextora/agent/decisionContext.ts",
+    "sha256": "7e19df8af2945b3c2bdafdcdb680347bc55e9e6b12017efc3624a9c1e189eafb",
+    "bytes": 33847
+  },
+  {
+    "file": "src/lib/rextora/agent/executionRequestClassifier.ts",
+    "sha256": "eb0edeba1eec77dcb77eff216b330907f2a2623ba3638c239d78e4f8e3b35d1e",
+    "bytes": 4382
+  },
+  {
+    "file": "src/lib/rextora/agent/goalDetector.ts",
+    "sha256": "e15d6f55473140a876b9e0dc1da93bd30b19c4ce8c175d0154fc6554207c75de",
+    "bytes": 17752
+  },
+  {
+    "file": "src/lib/rextora/agent/intentParser.ts",
+    "sha256": "5074606b1d8eec53043025f69c6971b6fb09c3e71a771320d17b60df83e59c3e",
+    "bytes": 15591
+  },
+  {
+    "file": "src/lib/rextora/agent/lifecycleStage.ts",
+    "sha256": "3dabc31f2350f26dcaa70d099d729e1ffd03c8ddbc90f01c682e7026295560d6",
+    "bytes": 3383
+  },
+  {
+    "file": "src/lib/rextora/agent/llmTypes.ts",
+    "sha256": "16952da92387d76328a4ee069ad05ab509fe819a705d03ac63ce2a1c375bd58d",
+    "bytes": 2599
+  },
+  {
+    "file": "src/lib/rextora/agent/missionTimeline.ts",
+    "sha256": "1e83c759771ef332f174155ac0fada917facabe41606adf1d8bd7e6f0d5c0fed",
+    "bytes": 8384
+  },
+  {
+    "file": "src/lib/rextora/agent/planDrafts.ts",
+    "sha256": "780e96dac8920c7fb9c8dfb2c2d7e8d8ec4c3195bdfd1403a3083276869b36f5",
+    "bytes": 16413
+  },
+  {
+    "file": "src/lib/rextora/agent/proposedAction.ts",
+    "sha256": "203f760597b8070ebd703fe007ed9cdd3ef8ee999d18a8fc7bf51d22364a5632",
+    "bytes": 4866
+  },
+  {
+    "file": "src/lib/rextora/agent/providerConfig.ts",
+    "sha256": "a25ab72a516c830ee4ff6a3fbcfb668213ad0f674213fb5d6f1195c5fc7d28e8",
+    "bytes": 1718
+  },
+  {
+    "file": "src/lib/rextora/agent/providers/geminiAdapter.ts",
+    "sha256": "5697dea3626781aba7f33c2927c36657ff3fc728d95ce7953b7d467baafa9c7e",
+    "bytes": 5933
+  },
+  {
+    "file": "src/lib/rextora/agent/providers/openaiAdapter.ts",
+    "sha256": "70d5cd0bbd9caf9ac82605cb561e7c044e5b4cba179474252f9c3889f8a24697",
+    "bytes": 5305
+  },
+  {
+    "file": "src/lib/rextora/agent/providers/promptBuilder.ts",
+    "sha256": "20c259b102f92c8b80b27b02e5ff932733b0addf1109690f5d2b3a7b973900af",
+    "bytes": 3037
+  },
+  {
+    "file": "src/lib/rextora/agent/researchWorkspace.ts",
+    "sha256": "4e361c48d43b13074959394d4efe3cfa050b93fdf24d63ba3ba3f824beda578c",
+    "bytes": 3933
+  },
+  {
+    "file": "src/lib/rextora/agent/safetyGuard.ts",
+    "sha256": "d591b99aebe935347d1cd6d56e25765f298306db3ee2e5d085e04dc53553c7f0",
+    "bytes": 4195
+  },
+  {
+    "file": "src/lib/rextora/agent/searchPlanDraft.ts",
+    "sha256": "f8a5a497673e19e37c3d77e1cc8d775965316b259dafe188c8ce4f944ae3084f",
+    "bytes": 7975
+  },
+  {
+    "file": "src/lib/rextora/agent/typedCommand.ts",
+    "sha256": "9d5be79e1d73a0f02109927bfb2cd4d031c6b39443284abc6219540f20f09fc1",
+    "bytes": 5720
+  },
+  {
+    "file": "src/lib/rextora/agent/types.ts",
+    "sha256": "144f63cce523e255c7d2b1f73e0a4ad86ab99320fc542f281ef47b28d83e3f25",
+    "bytes": 11570
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/approval/approvalExecutionStore.ts",
+    "sha256": "e486db8766469535aaa2845574ecd59d3c2a3dd812e208c82f2be0c905b1f421",
+    "bytes": 4644
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/approval/approvalState.ts",
+    "sha256": "e504bdc7e9e3c6f662b362dcfbef4f8bf734171f80bdedac3533512554f94b51",
+    "bytes": 788
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/conversationContext.ts",
+    "sha256": "8f0efc9e83f2dc98373f72b2707b93e27cafc7e7c82a0fa7ce5cbbd90b3e9c18",
+    "bytes": 6380
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/conversationPolicy.ts",
+    "sha256": "9106915b498c8c174aa8f6b4d1a5e52c51d984e94e288a5d92f6799af870e95c",
+    "bytes": 1233
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/conversationRouter.ts",
+    "sha256": "32156bc61f977be54a3740433424403b055a313d3d74b36bf7f7e67a37ee1870",
+    "bytes": 27792
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/conversationTypes.ts",
+    "sha256": "dae800bf34b421d613e6360233062ddde1b20e9221e64aeb429e46915e09494c",
+    "bytes": 3126
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/domainAssistant.ts",
+    "sha256": "42f919b8292ad9b1d9fa11e291005095230be87bc90c0a82433b06d04008b629",
+    "bytes": 7167
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/index.ts",
+    "sha256": "9b912d81cf171c63d9fe983f657d48c97d0b09ee33107067344b72ea376b5704",
+    "bytes": 797
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/productKnowledge.ts",
+    "sha256": "6824aeea5748720f55e32c3fa9f07f7c276d714ce641302f5ef179cb4d26add3",
+    "bytes": 5855
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/referenceResolver.ts",
+    "sha256": "8388e7d6cf3da3293ab4e69ab160884be164a562aa8dfc7073e56b4265507c18",
+    "bytes": 4033
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/conversation/responseComposer.ts",
+    "sha256": "f34079571edb5a39ff25b14f76b75ec1766c172bed8f5fc03d75313003133e1b",
+    "bytes": 4121
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/events/eventStore.ts",
+    "sha256": "4433537972911306030021a667fc3233ab953f85405d35d8674be8cf4e53963a",
+    "bytes": 2766
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/events/eventTypes.ts",
+    "sha256": "56e66289d341c8b7e35ff6a8e16c4e5aeee0d4f8b0c70487f54bd24c08aca749",
+    "bytes": 896
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/events/index.ts",
+    "sha256": "6e3124b2840a12b23fb62df378a4e0b671f7bf73ccaa364a0dd2eaaf62eb0914",
+    "bytes": 61
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/lifecycle/boundedLifecycleWatcher.ts",
+    "sha256": "307f1c006febb0dd20847529e153ef4f8e70a3f09417df6ebb8fc0dca8e3474e",
+    "bytes": 2190
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/lifecycle/index.ts",
+    "sha256": "d04a173034e59bbbc4d99b96e8fe9d089c1ea4fd442a643221fb01f28c139a91",
+    "bytes": 115
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleReducer.ts",
+    "sha256": "749ae9d4eb5af71ee674b9e7d2605337bc4a98c400de238f252706cd76fc04ef",
+    "bytes": 1997
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/lifecycle/lifecycleService.ts",
+    "sha256": "30d07fb8944d51439f08a26161d3d4db6a6c95df6d329b8f3751e9db30e55842",
+    "bytes": 6788
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/decisionMemory.ts",
+    "sha256": "f6be8a38efdfd8ff610a158ea4517c8105fd542bc616034fa1b0af101d65d85f",
+    "bytes": 2701
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/index.ts",
+    "sha256": "b4855650313d72f7297f887038f1b55bdb27c7108cb1e26d7b9355cee2b483fa",
+    "bytes": 157
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/memoryIndex.ts",
+    "sha256": "46980a15b50e49fe2c9cb117e103eef260d624c50bb1db8019e6da4c5543c750",
+    "bytes": 1892
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/memoryStore.ts",
+    "sha256": "f3b04c612e321a845ead41f74725fcd807ab5d860478fc47ef6ae06a1f936f56",
+    "bytes": 4276
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/memoryTypes.ts",
+    "sha256": "d21848e1603a7ee263ae1e5da5a8f0f1a165fb0cb1114be69d2fbf4645757e27",
+    "bytes": 1003
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/memory/reflection.ts",
+    "sha256": "90c708a0c2cf2b37fae1648adafc446ff91db349ff6bee33395c9be0842753ce",
+    "bytes": 2120
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/orchestration/index.ts",
+    "sha256": "f0e0b37e1bb8c0b9e7c529f39398c142bcd0b62b6ac9799180acfd5c82750290",
+    "bytes": 75
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/orchestration/reasoningTaskBridge.ts",
+    "sha256": "4cc7cc13a4a37bc9871fefb303d78a657295f5503dc11aea8d41209248ca95ce",
+    "bytes": 5811
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/orchestration/taskOrchestrator.ts",
+    "sha256": "d01bc70953763d632f04eb25eb33c0fe23aa90a07d74a1fa60cbf4b10da0a5be",
+    "bytes": 4532
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/planner/index.ts",
+    "sha256": "9e8ab5c500a47dec0eb273444563447ed9307ca960421acdbe9dc97a2a6f8b25",
+    "bytes": 89
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/planner/planService.ts",
+    "sha256": "8b4ebde5402fdfbf8ce5deb34d6a9494dcf20f40af2d5244a20bb615b6a545d6",
+    "bytes": 5002
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/planner/planStore.ts",
+    "sha256": "34065f0de4a2e9bddfc1b5606a9fae6802d2fd592c69b75837ff4b59a8eeb81b",
+    "bytes": 3034
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/planner/planTypes.ts",
+    "sha256": "551aef6cf1fdc9836c4d98c4b45f981eaa0c308441e4ab2e8d54773fd9810faf",
+    "bytes": 1047
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/index.ts",
+    "sha256": "3721a2c03435347e622702b720f55e880c217ae6a5b4d544bf265d3374a573f5",
+    "bytes": 955
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/openaiRequestParams.ts",
+    "sha256": "e98375a9a1183061400ad8ade593c1ab82c0905ca72e4c8d65f03b960a4df9b0",
+    "bytes": 1482
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerCatalog.ts",
+    "sha256": "e66e55b31e8ad5e1c25af4c07cc0a45a2d29993525e7b2a89ae550145769a831",
+    "bytes": 5654
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerConnectionTest.ts",
+    "sha256": "24d4b5f88bd32c58e119e4f33a4b41e003a99297a6c21d85072c0e70ef97cd5a",
+    "bytes": 6337
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerCredentialStore.ts",
+    "sha256": "6fc719d336a0327ecd2c1cea470e4ca41fc8100b15ead8989b4ea58358725b1e",
+    "bytes": 6644
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerRequestGuard.ts",
+    "sha256": "6499be7a902c5888f8f1b1baeae7b09f3726168a48d05cb97448ee07a2c88fa0",
+    "bytes": 1421
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerRuntimeConfig.ts",
+    "sha256": "a006a1fd2b85388276b8a842ee9e92a623e35ceb4938db2c09e140c28c6d1b3f",
+    "bytes": 4555
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerSettingsService.ts",
+    "sha256": "fe9e07da670ece68e4c515805c5d93d3e83cec2f7ada5ad2cdf759d542e39199",
+    "bytes": 7995
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerSettingsStore.ts",
+    "sha256": "1eef31292c9814ad00e689f904d404145681c12eaecd77a218253047d1c2a415",
+    "bytes": 2742
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/providerTypes.ts",
+    "sha256": "0de14cc354dc276931d25781269614af4482ce9e560216fd91a93e9d57500a11",
+    "bytes": 2351
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/providers/safeUpstreamJson.ts",
+    "sha256": "82d2ae73a5abd7773d62825bf93ea3ede6ca33936881d0889747fea2eb7a8f94",
+    "bytes": 418
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/conversationalProse.ts",
+    "sha256": "c13873214df30a4b11d87c0eb6fecfcca3288bbcb590dbf8083899833417ce64",
+    "bytes": 7798
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/index.ts",
+    "sha256": "af14f713b0e5714c596515258d197e74d84c844e3c1b122c12aae804ed788868",
+    "bytes": 1746
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/primaryLeakDetector.ts",
+    "sha256": "420009ecb4d44d30f3bbccae239ed924e9a863200f37b2a41547fa0624b32762",
+    "bytes": 5453
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/providerCanary.ts",
+    "sha256": "40b3bf551b425b93f70e4e75142466e67cd84d78b17b9f599210c2aabc19d5ba",
+    "bytes": 6308
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningAudit.ts",
+    "sha256": "cf9250c56fd65f0af138989284c8e1aa418a9c32238e53e3d284ead6afa2e735",
+    "bytes": 4119
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningConfig.ts",
+    "sha256": "b8b5d75e3bcc20d5d47421f98b1a7dfca349dbc0caa35c5a31c22c87f7d6672a",
+    "bytes": 2112
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+    "sha256": "91c59607ab756d19a1e3b2c87818a2bbf7d13bcef5accbcbe55acd17862a5daf",
+    "bytes": 20419
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts",
+    "sha256": "01951110feb749499260c370ac28da3ad6b47a2d5275577738fca9ca02246518",
+    "bytes": 4990
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningFallback.ts",
+    "sha256": "83d46ee074031065fdf5b5a0134f13ce86ea755c00a0168644b976a124f74caa",
+    "bytes": 16865
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningLifecycleAudit.ts",
+    "sha256": "30613e8b23f6042d1857a84d289fce7077bd393c20f0f8e5b169e0513b69f427",
+    "bytes": 1407
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningPolicy.ts",
+    "sha256": "c417b76b4604c28ace1b39ed4086dba311fe7834fab94e38c835fb04934ba33a",
+    "bytes": 5994
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningPrompt.ts",
+    "sha256": "df1c31c0908230fb515d33c62f95e4071e165a6daec79f96919ad7b5e0cf657c",
+    "bytes": 4496
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningProvider.ts",
+    "sha256": "4d74a4e6eb6bc9efe1cf910b7bbb50ab8ba45db6ca40ddf4248b57ce8104f9de",
+    "bytes": 9379
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningRequestRegistry.ts",
+    "sha256": "4c05fdbe28116bf27ca89e9bf33bcf08dd92684af9f9d65017b52699396835c5",
+    "bytes": 1559
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningResponseBuilder.ts",
+    "sha256": "27bfc98805077c882800426f7dc655c846d54337e1be8cfaab45299755000e25",
+    "bytes": 5361
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningSchema.ts",
+    "sha256": "2848884451a42add0910f8955d195b8938a58234f7ee052b5aa126ad8023d342",
+    "bytes": 6133
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningTaskProfile.ts",
+    "sha256": "8a3e7d0f91aee3a812143f8a23fede0746fa8a95c5c75e50dcdd48b11100309d",
+    "bytes": 2493
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningTypes.ts",
+    "sha256": "5b1b27e19df5f99d0dc0090b2e91b0a582f08da34eafb82d98d9908eaffa4cca",
+    "bytes": 3828
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/reasoningValidator.ts",
+    "sha256": "c075382ceba202231a8018b148713b70bd5387a463ac15c4a1a77086745486d4",
+    "bytes": 4160
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/toolPlanBuilder.ts",
+    "sha256": "c33588b9006eeddd1e42e5c638b04a324e25e16492766ce3b381043d310b6009",
+    "bytes": 6889
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/reasoning/userVisibleSanitizer.ts",
+    "sha256": "1213c7220989d46418a41ca7ec3026153123f27c0d3e555b92e07d0ea75b9ac4",
+    "bytes": 11393
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/index.ts",
+    "sha256": "72150e534ee791abc2331e6349a410547cef222bfe3d56a5c39a26960237d874",
+    "bytes": 343
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchAudit.ts",
+    "sha256": "056151d4c010edf3052371f6023c12bca4a3110888d42a82363b4ab80a5c1795",
+    "bytes": 783
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchComparison.ts",
+    "sha256": "430bdbae932531dbd7e212e3d1aef7511a40611a209f5977a49128ac19695d61",
+    "bytes": 1436
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchEvidence.ts",
+    "sha256": "e8dbdc78626a98b48e9212c5447394de6dd9ea334ef78bdcdb526adc69d61e71",
+    "bytes": 1828
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchFailureAnalyzer.ts",
+    "sha256": "eddc94a71eeef8aa50b8737be0ea17ba82db3330fc03f432b1ca0ce657f6ce94",
+    "bytes": 936
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchGapAnalyzer.ts",
+    "sha256": "8123c920d4d0b028677cbe5f8f6427297eca3e218a0482b290f20aa2041dace7",
+    "bytes": 1301
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchPlanGenerator.ts",
+    "sha256": "197d2c3ad5800871a62c7ab159755170368dd4c300f23e214b5f3777d3a47544",
+    "bytes": 1717
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchRecommendation.ts",
+    "sha256": "a42daa5fb3575a1fa0a17bd53c179e0962cbe11d0c5a95b90eae4253ded9043f",
+    "bytes": 1220
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchTypes.ts",
+    "sha256": "4f5ab6b62dd35ccabb74f11cda5f0660f42c2da33dc39b7766ab23fead32db2e",
+    "bytes": 1390
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/research/researchValidator.ts",
+    "sha256": "391373f4153a2667daa45a03a53eb7bbbf0157dbc3a59578d82b40c40233f4db",
+    "bytes": 827
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+    "sha256": "605fad17e0bb79f0cfec0224a7e24b8e33ee9e4cb17ae96319c8126e379b29c2",
+    "bytes": 7093
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/session/sessionStore.ts",
+    "sha256": "9bf2c3d414b92e1f06044949c12ad2defb0e86796167cb8b649b694b75df7214",
+    "bytes": 2408
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/session/sessionTypes.ts",
+    "sha256": "e28cf2a68654082ee7d77b7450398badde6588fa8022354a901c53c8b3af50ca",
+    "bytes": 5936
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/session/workspaceMerge.ts",
+    "sha256": "562c13b7f22cce54c9d66acea0b6a190bc3ff087ec80fae456c5a535479c827f",
+    "bytes": 6061
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/session/workspaceStore.ts",
+    "sha256": "cc42a6c65b9ab141051cbc5be761f0b323c9a9479f3a3d5fae0d1c7387717eaa",
+    "bytes": 1703
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tasks/index.ts",
+    "sha256": "e17b0065c6736d38999f3ccc97a873277b4186d1339033f076d66de957c1fe56",
+    "bytes": 59
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tasks/taskStore.ts",
+    "sha256": "842e5b261271305f4e9f36415264528fd17d1934a724745ed2d4a7cab15e143a",
+    "bytes": 1767
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tasks/taskTypes.ts",
+    "sha256": "e085fe6f998803c04c747a028ad2a4df8fd89b914cc88da84d9417ca13cd669f",
+    "bytes": 1028
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/execHandlers.ts",
+    "sha256": "81a6c5d8ae423d4b36f4ba71eb59d4aaa909146c4c1aed02d7bbec122260eaa3",
+    "bytes": 13453
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/index.ts",
+    "sha256": "d68a442d4baf6c956784ea1f3483deca6faa84a8f1e8e60959732adcfa659cb9",
+    "bytes": 996
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+    "sha256": "f1c68bbb09c8fa6bd8dd13504284bd1811148072d460e0d4bce3a44a6fce5cf4",
+    "bytes": 11081
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/registry.ts",
+    "sha256": "ab746752f4cff0681dbd13a19782cfbffe38cf952493bd2bb1673700c81a6549",
+    "bytes": 19101
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+    "sha256": "80764e3e3c82337859d7f4c5bd223409fa5cd283280d94859c032340f96c715e",
+    "bytes": 1957
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolContext.ts",
+    "sha256": "306aea100b20038d7f6e50e2f45aeb29c2a5f3b52e3255fde159b418de8ea357",
+    "bytes": 945
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolEvents.ts",
+    "sha256": "c2e7435b4f190cafde257cadf4b5292aee64cd0705e6f99d5fbf6974983105f4",
+    "bytes": 886
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+    "sha256": "28f9e1a6a72e91b02c0690b9db5c0ada40877e05c667dfa45860b5f6e37b2132",
+    "bytes": 6948
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+    "sha256": "d96b62563c0dc4a0c97b8ddd744205c32402da3f2e7990c7772157af48a37d17",
+    "bytes": 2837
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolPolicy.ts",
+    "sha256": "b93deee6a49bc614c20df696fbc487cc11bfad5265d69931a9e925c72c83ad13",
+    "bytes": 2527
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolResult.ts",
+    "sha256": "8d44e1f5a310ffa9f12e6ec02446406d8566b51d05706b89a5e5b75c05214719",
+    "bytes": 1997
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolSchemas.ts",
+    "sha256": "257295358081780a8f5a84e5ff0b728bbd3be21f5384daa4f7d80b4bbc69eb3a",
+    "bytes": 3972
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolTypes.ts",
+    "sha256": "6a573cc06f141489bb6485db05ef4465040308217bfcc96587e99fbabe697af2",
+    "bytes": 2129
+  },
+  {
+    "file": "src/lib/rextora/agent/v2/tools/toolValidator.ts",
+    "sha256": "85fd50848876af16dbea7f5f746c1704e1b7a3e9c5e7e385f1961da072aca16a",
+    "bytes": 3402
+  },
+  {
+    "file": "src/lib/rextora/aiBriefingService.ts",
+    "sha256": "175db1421763d3df41b22ea1e54bbc5c32515c524b4834e693732eeabb019eab",
+    "bytes": 731
+  },
+  {
+    "file": "src/lib/rextora/aiExecutionBridge.ts",
+    "sha256": "765f27d374a43cb2db62cd947957e2fb7d80287ed6f73c6dab0f490eb12048a2",
+    "bytes": 5698
+  },
+  {
+    "file": "src/lib/rextora/aiRanker.ts",
+    "sha256": "ba95bbf79518bcfe9ec1d3558e9306f6621b963eea9cb4b4d8cf89b2929ba328",
+    "bytes": 2414
+  },
+  {
+    "file": "src/lib/rextora/alertRuleEngine.ts",
+    "sha256": "243fe172de82a728437d9a84439db7c04ec61ab6511bf31e262639abbb456eb3",
+    "bytes": 1376
+  },
+  {
+    "file": "src/lib/rextora/apiResponse.ts",
+    "sha256": "d7326667b59d9a9a457d3f732f616a42fdf6c5253b65fc42c6a8ef52529a28f2",
+    "bytes": 1710
+  },
+  {
+    "file": "src/lib/rextora/apiStatusService.ts",
+    "sha256": "e55da2627cd3e9f02eaf0d038bf9d482402f320a554202146fae668e5d218814",
+    "bytes": 3037
+  },
+  {
+    "file": "src/lib/rextora/backtest/availableCandleRange.ts",
+    "sha256": "1ec4bb0d595c123300f0afd0d5f97c39a36233421c2ce25ce7b2c06afcd16def",
+    "bytes": 1452
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestDateRange.ts",
+    "sha256": "66bb774bac5d9b106d02c6f756e3145a3c82a02e1827c9894dfe4f37cc4f4d31",
+    "bytes": 6513
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestEligibility.ts",
+    "sha256": "f1451a8ca58a4b79bafef6421c3c2f35e1f7eaedd72d0518e41778f748bd4104",
+    "bytes": 7628
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestEngine.ts",
+    "sha256": "8d69e2ee16a7d6a9b7e2cbd52dd56404d623e5866686439a629a09f3c0bf3aef",
+    "bytes": 12903
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestReport.ts",
+    "sha256": "512fd6f107c72c852a47bbd515edc6a6fbfe5f405c9b5ef2f6b04ff1c109fb7d",
+    "bytes": 9111
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestRunner.ts",
+    "sha256": "9c28324b44861f2116e62649c33eb9f3f84b1e80a79348527a6389d8ba228cc5",
+    "bytes": 25917
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestStore.ts",
+    "sha256": "5829b0581496829c80f26cb3716fbf233b2ad68267a4f9d24476860a5a879e7e",
+    "bytes": 7497
+  },
+  {
+    "file": "src/lib/rextora/backtest/backtestTypes.ts",
+    "sha256": "6c831c53bf9a549f84d80febac2021d99d261ba995ccc2a19fefff3944791b5e",
+    "bytes": 5844
+  },
+  {
+    "file": "src/lib/rextora/backtest/candleGeometry.ts",
+    "sha256": "27c13c6874f32d223851abf36b4558db0a80ce5575ea50fd9245005aa449558b",
+    "bytes": 6353
+  },
+  {
+    "file": "src/lib/rextora/backtest/candleSpacing.ts",
+    "sha256": "a72b82f439bd561f50c86d19f99df40ce3c2171b4df8c73d2264706cf58a0a8b",
+    "bytes": 2473
+  },
+  {
+    "file": "src/lib/rextora/backtest/chartEvidenceStore.ts",
+    "sha256": "a63985cd6bdde1ba24dcddb2f3103f0644bef952ca0c3760df485b671b1cb927",
+    "bytes": 3852
+  },
+  {
+    "file": "src/lib/rextora/backtest/costRatios.ts",
+    "sha256": "b5a49ec216dc77be316b76b785b8723e34381f77f49fc128e9f42824c7a439f9",
+    "bytes": 1947
+  },
+  {
+    "file": "src/lib/rextora/backtest/equityBasis.ts",
+    "sha256": "dae2870dad9f150fa32ea21ff21dc98e7f829c9615b5959e9d75870afcf844ce",
+    "bytes": 928
+  },
+  {
+    "file": "src/lib/rextora/backtest/monthlyCoverage.ts",
+    "sha256": "7c0aba7280834039ee16b684b61a7ab5fbe803f2cc4bd79cea27d694d9209674",
+    "bytes": 5582
+  },
+  {
+    "file": "src/lib/rextora/backtest/patternExplainability.ts",
+    "sha256": "4e127aeb99da60ec37579cc8008eedca3de955202016fdb94e03295cf8f68c50",
+    "bytes": 13988
+  },
+  {
+    "file": "src/lib/rextora/backtest/patternOverlayAvailability.ts",
+    "sha256": "ff79d41e9e89162f16df3f74167d95f4f5cf9c0b34cdad946114f5d1fb6ca5b6",
+    "bytes": 6482
+  },
+  {
+    "file": "src/lib/rextora/backtest/savedRunLabels.ts",
+    "sha256": "eedff3ddb8a2e5eb4835f1b5191cd2042c77a0c03a792c56b5d9f9c6633001b8",
+    "bytes": 2941
+  },
+  {
+    "file": "src/lib/rextora/backtest/scatterDomain.ts",
+    "sha256": "53f071e9d415b0a015fc5bbddd4762d662a463447f382bdc692f9d4152d51f90",
+    "bytes": 4065
+  },
+  {
+    "file": "src/lib/rextora/backtest/statusThresholds.ts",
+    "sha256": "f04f345b87d4210ce8b0fbdc824f997e4eac176891d2c4e0cd783b7592356ef3",
+    "bytes": 3082
+  },
+  {
+    "file": "src/lib/rextora/backtest/strategySymbolCompatibility.ts",
+    "sha256": "d6881c608e5777bba1144b687414cc83db9d73cdfe938a2ac25f182b440d658c",
+    "bytes": 5276
+  },
+  {
+    "file": "src/lib/rextora/backtest/strategyVerdict.ts",
+    "sha256": "7d4cd7f4bdc4265631fb4cb131b1bdea71bc67f6c10c935972332b8fc7f850e7",
+    "bytes": 3813
+  },
+  {
+    "file": "src/lib/rextora/backtest/tradeEventTrace.ts",
+    "sha256": "428d2f958b5fd8c157fceb410bcb3e7045601dc54f18cd82e8779ea0e1875b0b",
+    "bytes": 13900
+  },
+  {
+    "file": "src/lib/rextora/backtest/tradeLossSemantics.ts",
+    "sha256": "f1eeb9dc06279379c0c5b8a46523ac85d6f1658167b78b86cb0e87ee4d0e5b2c",
+    "bytes": 2119
+  },
+  {
+    "file": "src/lib/rextora/backtest/tradeTime.ts",
+    "sha256": "e82b4e1002e66d5c533868b3b1be2f6b13d218750379db6492d85e26016efa42",
+    "bytes": 900
+  },
+  {
+    "file": "src/lib/rextora/backtest/visualAnalysis.ts",
+    "sha256": "4c6a1951f6043e9376e12b3dee435fdd4d8bea1d51002c332c42765063e09d67",
+    "bytes": 26638
+  },
+  {
+    "file": "src/lib/rextora/backtest/workspaceTabState.ts",
+    "sha256": "07b84c5b6800ef5465ab0191b2480896a2126b50425e7e3caf66c2e92ea941bb",
+    "bytes": 2051
+  },
+  {
+    "file": "src/lib/rextora/backtestEngine.ts",
+    "sha256": "cc506823f5fac1bdb28d698de68a27c2e934936ff5b98ebff51ab6390a0b9001",
+    "bytes": 1376
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceDiagnosticsService.ts",
+    "sha256": "4e306296147a1dc0f3379d8f32cba4e1f1c0aaab9564907ceb999f6e99376f3a",
+    "bytes": 14413
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceExchangeFilters.ts",
+    "sha256": "fe31a40ef90e22630e1da7153c3c05c6027f7aeff39a38fdf4f9090db25361a4",
+    "bytes": 2147
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceHttpClient.ts",
+    "sha256": "e1015c6cdfdc12fcc79c2850206ed23e349dc9b8d9c52ff47812db8184ed7cd9",
+    "bytes": 5183
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceReadOnlyService.ts",
+    "sha256": "04bbed61c5e42649f03c357ba19e439fb46a61b123b6161422cab5c026b20e9f",
+    "bytes": 11075
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceSigner.ts",
+    "sha256": "5a51d35f798dcaf98928682915017a188f8d6b2e555ba7d9275da8324fa57285",
+    "bytes": 1521
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceTradeService.ts",
+    "sha256": "db9cc2d86f34bf5d4c627a18b532f58c4171b79ec156f5c4e0ae277ead594393",
+    "bytes": 6309
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceTypes.ts",
+    "sha256": "28f82460852c41782d1b988184e5eb5d7da2cf79027df30f6208a30f256718df",
+    "bytes": 2609
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceUserStreamManager.ts",
+    "sha256": "97fd984022edf48314837ffc9f3664bcd7b7198a02fa587c8861085ca739b25b",
+    "bytes": 4998
+  },
+  {
+    "file": "src/lib/rextora/binance/binanceUserStreamService.ts",
+    "sha256": "d8ea52d6eaf946f9df54974e62cea66520f9e61fcc4870f517b63aaa5cbaccae",
+    "bytes": 1189
+  },
+  {
+    "file": "src/lib/rextora/binanceDiagnosticsTypes.ts",
+    "sha256": "84cbc8df039ff27f730ca63f21addf470b2fa57315eb1ad4d4fb3459d7d25952",
+    "bytes": 1007
+  },
+  {
+    "file": "src/lib/rextora/binanceReadOnlyService.ts",
+    "sha256": "01547706f3d856e3b1c36096afc6ac37d0c99e5a5cc09520d01440d97ee3523a",
+    "bytes": 146
+  },
+  {
+    "file": "src/lib/rextora/botRuntime.ts",
+    "sha256": "6b5495b34b3be20eff87cd897a3581194d707a262d284b9b45860318d88f99e8",
+    "bytes": 14922
+  },
+  {
+    "file": "src/lib/rextora/charts/adapters.ts",
+    "sha256": "e6420a1f4667bdb3964e204eeac4a40c9afd344419db3956d8574f49a42b1d05",
+    "bytes": 17346
+  },
+  {
+    "file": "src/lib/rextora/charts/index.ts",
+    "sha256": "1dd97f345cfc478ba92c5564e82d095ad300ca27e34644ad2d5ce49ae5c94b5b",
+    "bytes": 104
+  },
+  {
+    "file": "src/lib/rextora/charts/scales.ts",
+    "sha256": "afc8ceae827ed5d8b1b612e938336eda599725994507a1a9564b454a354e2732",
+    "bytes": 1653
+  },
+  {
+    "file": "src/lib/rextora/charts/theme.ts",
+    "sha256": "ed06e3aa91b6a3a972b342d9f324ce8c94415bdf17488d202776147aa6168136",
+    "bytes": 1373
+  },
+  {
+    "file": "src/lib/rextora/charts/types.ts",
+    "sha256": "3aece244f52afca8183642d53d65ee47dc4e6874641f35d215d4f08add82cb9e",
+    "bytes": 2853
+  },
+  {
+    "file": "src/lib/rextora/client/requestCache.ts",
+    "sha256": "a5b581a79d2c1b769075bab777406833a0306675aa55964b470007edfaa72fef",
+    "bytes": 1666
+  },
+  {
+    "file": "src/lib/rextora/client/safeFetchJson.ts",
+    "sha256": "d32656a3873d5cb8b2e33d1ed6784fda5641e9af91f596dcc083864414e01fc0",
+    "bytes": 1879
+  },
+  {
+    "file": "src/lib/rextora/config.ts",
+    "sha256": "4f0692ad96f5e184c0aa3ca521bd076dfa4df5db3448b21625a0c71214127834",
+    "bytes": 2866
+  },
+  {
+    "file": "src/lib/rextora/cost/costGuard.ts",
+    "sha256": "40d778eef264944029ad4e59767e4ef831d22b94e6cd6e9a8477bc8a3899ba02",
+    "bytes": 1818
+  },
+  {
+    "file": "src/lib/rextora/costEngine.ts",
+    "sha256": "a421672a3ab33e1b669cfced12ab5a236c625885e8398cec6fcd66c17d7c4acc",
+    "bytes": 3366
+  },
+  {
+    "file": "src/lib/rextora/data/candleLoader.ts",
+    "sha256": "af4e55a6a90f00b1c18443f30ec225256d2cb32603e72f130421903782a8c3d4",
+    "bytes": 1248
+  },
+  {
+    "file": "src/lib/rextora/data/historicalCandleLoader.ts",
+    "sha256": "bb4665f6c93ea5d46193f18d93797b4ca1dabe00adb8951bdc51e4ba784a6335",
+    "bytes": 7986
+  },
+  {
+    "file": "src/lib/rextora/data/ohlcvTypes.ts",
+    "sha256": "17365b62ae775953116c86bb6c26f6f2509376cbff255556e74af918feb123b6",
+    "bytes": 2477
+  },
+  {
+    "file": "src/lib/rextora/data/timeframes.ts",
+    "sha256": "02a90fef75fc2b93de202fc01898c24593f0f97b09923ce6ce24bc8a416714fe",
+    "bytes": 2533
+  },
+  {
+    "file": "src/lib/rextora/dataFilters.ts",
+    "sha256": "d8b1f0a17277d78a0f72b9816d6b76f6f65e51af97f7c83deed1318b11f6f463",
+    "bytes": 831
+  },
+  {
+    "file": "src/lib/rextora/displayFormat.ts",
+    "sha256": "51c77a15ab20583467b8e6add8b911791d4b5a0c13963ebf1bfed98bef07cc40",
+    "bytes": 1716
+  },
+  {
+    "file": "src/lib/rextora/displayLabels.ts",
+    "sha256": "692e37caf278792b6f49ea504de073e8eba72d7924e73336af0e0d584d853daf",
+    "bytes": 25351
+  },
+  {
+    "file": "src/lib/rextora/emergencyControls.ts",
+    "sha256": "5cd82c94f383bd8efb177208aa831df34adf1eb0b6906a4432315533b1eb8de2",
+    "bytes": 3820
+  },
+  {
+    "file": "src/lib/rextora/env.ts",
+    "sha256": "ee6bcb148dd9d7fa820f00fba1619ea8e50cc43b53042708e957884d3dbd01b5",
+    "bytes": 4147
+  },
+  {
+    "file": "src/lib/rextora/execution/paperStrategyResolver.ts",
+    "sha256": "38e5182a3d3eaf6c474800043f26c7b158149b2a2b33e9de809c451acc7ba258",
+    "bytes": 4227
+  },
+  {
+    "file": "src/lib/rextora/execution/safePaperExecution.ts",
+    "sha256": "52d7b4d20aa607a4f7d6a47a386d1c61bcfe1e38b7e648ff2cff18de7c2c324c",
+    "bytes": 1496
+  },
+  {
+    "file": "src/lib/rextora/execution/safePaperLoop.ts",
+    "sha256": "e9382c213a3ce68fe5eec1bbc93af5ee405bc32694cd87e37ef56cf1ed7dce35",
+    "bytes": 9191
+  },
+  {
+    "file": "src/lib/rextora/executionCandidateTypes.ts",
+    "sha256": "eca2f12599dd2fa3957882021f8f80865948f3a7d4a3dd0817125089af5fc3ae",
+    "bytes": 2154
+  },
+  {
+    "file": "src/lib/rextora/executionEngine.ts",
+    "sha256": "3627caca2b76fd2a5230d2733bd5d49ea679e796479706825b35b5ab9bd4829b",
+    "bytes": 1550
+  },
+  {
+    "file": "src/lib/rextora/executionQueue.ts",
+    "sha256": "e88f4d6e6835a2468ddb78b478b6f19ba162924e55bf440293bfda3c3395ed73",
+    "bytes": 11276
+  },
+  {
+    "file": "src/lib/rextora/feeModel.ts",
+    "sha256": "9c51ea07e60ecf007604be0bda97add4b7fc090474b33effbb859ec87c06909a",
+    "bytes": 1000
+  },
+  {
+    "file": "src/lib/rextora/firstRun/demoFixture.ts",
+    "sha256": "147928da830dce35fded99040284e37647de05570554075875cf2a891b84f440",
+    "bytes": 15872
+  },
+  {
+    "file": "src/lib/rextora/firstRun/demoIdentity.ts",
+    "sha256": "b536778758a1b79bef965577b75fc5caace5c0bc37d0ffb53103408a4d6974a4",
+    "bytes": 2549
+  },
+  {
+    "file": "src/lib/rextora/firstRun/firstRunStateStore.ts",
+    "sha256": "8b259f2ac5f2e1b20aa3756490751827f486bcfdffff2ad33c5885a3e0661422",
+    "bytes": 2094
+  },
+  {
+    "file": "src/lib/rextora/firstRun/firstRunStatus.ts",
+    "sha256": "e6434ffdfd531544e519226c234283badd33b310c7d38bb3673d232dbd794398",
+    "bytes": 6537
+  },
+  {
+    "file": "src/lib/rextora/index.ts",
+    "sha256": "239a54ee898f03b25af7abdbfb18bad829bdb9be14a41275b02215e1f3836c61",
+    "bytes": 2085
+  },
+  {
+    "file": "src/lib/rextora/indicator/indicatorEngine.ts",
+    "sha256": "01508ea116717a97e90e90e75d9c86f2681a933d48757ac920a4bf6bbad209ab",
+    "bytes": 6326
+  },
+  {
+    "file": "src/lib/rextora/indicators.ts",
+    "sha256": "1f0e82a1836e5bf3af3be178601b4dedd2ec5dda0d6bc055ddc9b90dacb62bdf",
+    "bytes": 2084
+  },
+  {
+    "file": "src/lib/rextora/learningEngine.ts",
+    "sha256": "284905cfebd2439d5707fc06a411ba092d1ce99465083fbac82f99aae1be8360",
+    "bytes": 10040
+  },
+  {
+    "file": "src/lib/rextora/learningLogCategories.ts",
+    "sha256": "9c786851fcb632f3abc2485af9c989f9aecc0652a6ef11931814b072270db141",
+    "bytes": 540
+  },
+  {
+    "file": "src/lib/rextora/learningLogger.ts",
+    "sha256": "abdf71cad498edd25869150a32d94c0ee136e9095f80e6e69b25a945190c759a",
+    "bytes": 12953
+  },
+  {
+    "file": "src/lib/rextora/learningStore.ts",
+    "sha256": "2ff8c4c5067c04e0fa064f8b291a8693d28b7d1003c4be8609da0328ef6c1be0",
+    "bytes": 2740
+  },
+  {
+    "file": "src/lib/rextora/learningTypes.ts",
+    "sha256": "940231a426a17e67914c5635118785885749bb15dbb31bcefded79740fc62eaa",
+    "bytes": 2083
+  },
+  {
+    "file": "src/lib/rextora/leverageEngine.ts",
+    "sha256": "83e96c2698af9513fc556761e69ef480a79d42929cebee6ffb2960d45ba39832",
+    "bytes": 4322
+  },
+  {
+    "file": "src/lib/rextora/leverageTypes.ts",
+    "sha256": "0feed18f8e189866f9b38e4af41c2a1bb13e11896bdffb45b57f57c22d82df03",
+    "bytes": 505
+  },
+  {
+    "file": "src/lib/rextora/live/liveDryRunEngine.ts",
+    "sha256": "441459a343524956699c12b358d5986e1f3201e8518069dba71fcfdc36164e28",
+    "bytes": 12025
+  },
+  {
+    "file": "src/lib/rextora/liveChecklistDisplay.ts",
+    "sha256": "cc8159f11addc7481ccbd68a8b636d5d563aa78ec5c629b0662aaae351002b53",
+    "bytes": 4272
+  },
+  {
+    "file": "src/lib/rextora/liveExecutionEngine.ts",
+    "sha256": "416b67058a916b5ffb047c9845f14d616cea4aa58247d6c6f83d9ac843d9b569",
+    "bytes": 11860
+  },
+  {
+    "file": "src/lib/rextora/liveReadinessChecklist.ts",
+    "sha256": "8ee45fccc19dca98bcda27c4c7d964dbfdad524c084e31b1a891e0ed83e5e474",
+    "bytes": 6627
+  },
+  {
+    "file": "src/lib/rextora/liveSafetyGate.ts",
+    "sha256": "bde20020ef4f684ae2f0bd74e7f01b0352cfb7c9ca56cf088c929f45db45b7f7",
+    "bytes": 11086
+  },
+  {
+    "file": "src/lib/rextora/liveTradingEngine.ts",
+    "sha256": "54632a312d7403c60b36f346a4f496893bd613a3b958703522fac3801a9e69a7",
+    "bytes": 473
+  },
+  {
+    "file": "src/lib/rextora/localStore.ts",
+    "sha256": "06d5f7646106d94850b84ce659b6fa3b82c83d147b06a0c257f61d8ae332400f",
+    "bytes": 2122
+  },
+  {
+    "file": "src/lib/rextora/marketDataStore.ts",
+    "sha256": "294fed5e01af6a5a44f99ccd25fa5774da1d77f3c91ab8cdc546c7b87cc994b7",
+    "bytes": 4553
+  },
+  {
+    "file": "src/lib/rextora/marketMetrics.ts",
+    "sha256": "ac61e97fe6d667c8709deb983c141e67f167c51c4ae67ce3f9e5c2e39fd2b634",
+    "bytes": 2213
+  },
+  {
+    "file": "src/lib/rextora/marketWatcherService.ts",
+    "sha256": "72941d1b95279fdd4c8face7450498c9cc2b71a9ef4a3d021628fce6a9950260",
+    "bytes": 1915
+  },
+  {
+    "file": "src/lib/rextora/marketWatcherUtils.ts",
+    "sha256": "f287517446e1badde384424108ba27e6b271072ffc7501995cc3dff53f7ee05f",
+    "bytes": 1823
+  },
+  {
+    "file": "src/lib/rextora/metrics/index.ts",
+    "sha256": "75a8c697dfc61a7e605ff3bf3a1d53af0ca64b2c0dd48fb64a62a42bc325cbbb",
+    "bytes": 219
+  },
+  {
+    "file": "src/lib/rextora/metrics/metricsEngine.ts",
+    "sha256": "0192a5f7e7398fbf37a74ae342875c9a9c310f8577ab820083852c706e89822e",
+    "bytes": 6575
+  },
+  {
+    "file": "src/lib/rextora/metrics/riskFormulas.ts",
+    "sha256": "beb0f15f883941e633f3d54263eea5856a87c55f4239360af8da27f01033a61b",
+    "bytes": 1250
+  },
+  {
+    "file": "src/lib/rextora/metrics/riskService.ts",
+    "sha256": "cb498afdf31d8bcac70ca9089c2d978c1848d90e0523bda2165d7bb9fa26d6d6",
+    "bytes": 3644
+  },
+  {
+    "file": "src/lib/rextora/metrics/tradeResult.ts",
+    "sha256": "c6e0d92999f2b1cdc06d7000272541cfda013a765cf05e186fbbc292d8ac2599",
+    "bytes": 4139
+  },
+  {
+    "file": "src/lib/rextora/metrics/tradeResultStore.ts",
+    "sha256": "1ace9971ba4a0d94ca8934949876d6bcf0c1e4fa5a16ee223c44c72271edca85",
+    "bytes": 1308
+  },
+  {
+    "file": "src/lib/rextora/metrics/types.ts",
+    "sha256": "b72cede146d09a8c91d012e2ee2f21ee4745ba7552046f51b97fa7526f905d3d",
+    "bytes": 2930
+  },
+  {
+    "file": "src/lib/rextora/metrics/unifiedCost.ts",
+    "sha256": "a27dba54792ae725207eafa0464a0330e113818714b588e2b6e26c4ddf92439e",
+    "bytes": 5803
+  },
+  {
+    "file": "src/lib/rextora/orderManager.ts",
+    "sha256": "fec04bfbee88a3d31c3855e7c50b68e935c9d1fb92e0b02c4b13efcac86713dc",
+    "bytes": 3638
+  },
+  {
+    "file": "src/lib/rextora/orderSyncService.ts",
+    "sha256": "f25bbe6107e62ceef7fc91ebc901c18e468d74b76b0a99c86aae225c307a91f9",
+    "bytes": 1730
+  },
+  {
+    "file": "src/lib/rextora/paper/botRestartGate.ts",
+    "sha256": "5be4a7ce7efec8cef01177650b405a2dd516f47753f8ba2f7318e06b02bd0476",
+    "bytes": 3225
+  },
+  {
+    "file": "src/lib/rextora/paper/paperBacktestComparison.ts",
+    "sha256": "ceb5ded3188a24c7879b5e9161233dff3b83427470511d2b48fd2eeeabe25cd6",
+    "bytes": 5198
+  },
+  {
+    "file": "src/lib/rextora/paper/paperSessionService.ts",
+    "sha256": "2c2188de68a8a32d7cb3fae74d72c949916a7569d3a0e0d69f2a52c497002116",
+    "bytes": 17952
+  },
+  {
+    "file": "src/lib/rextora/paper/paperSessionStore.ts",
+    "sha256": "8d7c57c0f1d1685b70134d1ed39e05265791d8875854a231fd7b8f47a449db0b",
+    "bytes": 28403
+  },
+  {
+    "file": "src/lib/rextora/paperEndToEndVerifier.ts",
+    "sha256": "444eba16fe9bd5c7879373ab9f96a619cf9d720b9bd0c33e0f62166d3074a204",
+    "bytes": 6830
+  },
+  {
+    "file": "src/lib/rextora/paperExecutionEngine.ts",
+    "sha256": "c8d6b8c1f33ca0ffc33e2dae5f75980eb571b51d4ef6bff3ae43771996783799",
+    "bytes": 7044
+  },
+  {
+    "file": "src/lib/rextora/paperTradingEngine.ts",
+    "sha256": "3d3e4d241ccd850d60e7cab2686d3bfcfc973c9ba6e256a74bed1db09e8a60bd",
+    "bytes": 120
+  },
+  {
+    "file": "src/lib/rextora/patternParameterCatalog.ts",
+    "sha256": "873eed95e01ad2b286e7b6bc3daa3cd42430b8c74e912f12922eb3991fa59a32",
+    "bytes": 545
+  },
+  {
+    "file": "src/lib/rextora/patternSelectionMode.ts",
+    "sha256": "7ebb2d5dec331b46d97f43332e5ef088c145e1a11df7d1e06fc8bacc616791fb",
+    "bytes": 1961
+  },
+  {
+    "file": "src/lib/rextora/positionManager.ts",
+    "sha256": "0327b38382d4147fc6951d0d21e807ac2fc74acb7280824c0d77d1962d925726",
+    "bytes": 2120
+  },
+  {
+    "file": "src/lib/rextora/positionSyncService.ts",
+    "sha256": "1f71fe838778f2a6d81ce790f1439fdf874421a680d352e0ad701cb42f048c4f",
+    "bytes": 2907
+  },
+  {
+    "file": "src/lib/rextora/rankingModel.ts",
+    "sha256": "1c9605b030297568659c164c93c65c6c6b13954d67090bddcf554be43b86c1b4",
+    "bytes": 2425
+  },
+  {
+    "file": "src/lib/rextora/report/aiTradeReport.ts",
+    "sha256": "f8a002cb6d5098038368b8b0e8befd2400d15cd463996900135ee5483cb143e1",
+    "bytes": 7679
+  },
+  {
+    "file": "src/lib/rextora/results/eligibility.ts",
+    "sha256": "e50b8e7450d0b25fef6588cc1c5bbbdb286dd71b2de8edd8a6beb628bbab22f2",
+    "bytes": 4775
+  },
+  {
+    "file": "src/lib/rextora/results/liveCandidateEligibility.ts",
+    "sha256": "acb58877ea672393bc1613fbaeee1934efde9cc5db839b7763f1933659f33506",
+    "bytes": 1950
+  },
+  {
+    "file": "src/lib/rextora/results/recommendation.ts",
+    "sha256": "b27bc0c43983e72cc36f93f4681b5a6a6c4f5f7f6b9110f00bccf53265c0d4ae",
+    "bytes": 2542
+  },
+  {
+    "file": "src/lib/rextora/results/researchDisplay.ts",
+    "sha256": "e9f898b7dd1d839fd3af4547275e360be7cb6f34cefac30a58a1ade86dbac078",
+    "bytes": 5220
+  },
+  {
+    "file": "src/lib/rextora/risk/safeV44RiskEngine.ts",
+    "sha256": "a1b72cae10c53da8e789bc6142260f9ba60e88906a0f14190dfa767d752fc511",
+    "bytes": 3765
+  },
+  {
+    "file": "src/lib/rextora/riskEngine.ts",
+    "sha256": "eb6ed0b91b2626424dac26e420a411f13261ebfa083ca57dac195fc7295d9346",
+    "bytes": 1238
+  },
+  {
+    "file": "src/lib/rextora/riskManager.ts",
+    "sha256": "12b3a8ca0be061eccd320133edd0f712e9177b7fdb2161d540015fd677b0c248",
+    "bytes": 3202
+  },
+  {
+    "file": "src/lib/rextora/riskRules.ts",
+    "sha256": "d177a31793f84939ea36182f1291fc2da5104457b222a83b43beaca0747a4ca9",
+    "bytes": 2867
+  },
+  {
+    "file": "src/lib/rextora/riskStateStore.ts",
+    "sha256": "eab6013bf00f9344b234fce9b10a1f173101f6cbc775d4b6b93f3c11e43aa529",
+    "bytes": 4676
+  },
+  {
+    "file": "src/lib/rextora/runtimeState.ts",
+    "sha256": "71b5bb11fcb69b60b2df7c77597347d65f1b134342ec57fb21cefacc333a68eb",
+    "bytes": 2576
+  },
+  {
+    "file": "src/lib/rextora/safety.ts",
+    "sha256": "6e901f7e7acc0a3cc1809d83eb092342af68fe487d27e96c29532552d6a63f54",
+    "bytes": 1841
+  },
+  {
+    "file": "src/lib/rextora/scalpingPipeline.ts",
+    "sha256": "286937480ee904bea9f4c42486be355517452b8fd69e85033da2feb243bd073d",
+    "bytes": 266
+  },
+  {
+    "file": "src/lib/rextora/scheduler.ts",
+    "sha256": "82671a5da41c7c25e7f55b533ed53d98a806d89153a7093c7446f2ce7faef06f",
+    "bytes": 820
+  },
+  {
+    "file": "src/lib/rextora/security.ts",
+    "sha256": "2df3e4f38f020755669fb20bd3dcf19dbe5155df2f29f665e1df5e1f9aaea857",
+    "bytes": 3174
+  },
+  {
+    "file": "src/lib/rextora/seedData.ts",
+    "sha256": "825e98759e86977afb208288abb3a9b49e73f2afaaf42d76fb1a5001b0bf96cb",
+    "bytes": 20660
+  },
+  {
+    "file": "src/lib/rextora/serverTpSlManager.ts",
+    "sha256": "3f8c8d1f5223306c2e6db481bc90d559f7f5516190a7ad291808df4133c8633a",
+    "bytes": 4711
+  },
+  {
+    "file": "src/lib/rextora/serverTpSlReadiness.ts",
+    "sha256": "81c9e8df0fb9b25cc07110ae60cb3a64a52bc29625be7f7a8c607d7127a0f074",
+    "bytes": 4505
+  },
+  {
+    "file": "src/lib/rextora/settings/defaultSettings.ts",
+    "sha256": "75903554610664c65275d55110799e755a105b28dbb2d4bcd4e90deddb269c02",
+    "bytes": 4236
+  },
+  {
+    "file": "src/lib/rextora/settings/settingsService.ts",
+    "sha256": "7c6ab0480686d66e3d5de8c485ec0cb091363b83fb0d8cfa456fa935cd721ccf",
+    "bytes": 2924
+  },
+  {
+    "file": "src/lib/rextora/settings/settingsStore.ts",
+    "sha256": "7ab2272b9adb576b2509d0aece4fa17c5d024892f9149b8f48c16a3e6728777b",
+    "bytes": 2096
+  },
+  {
+    "file": "src/lib/rextora/settings/settingsTypes.ts",
+    "sha256": "6d497ccf0af426b1283aa750f7d8f93adee56bec4bf687c5f30bc64e78dc5bbc",
+    "bytes": 4939
+  },
+  {
+    "file": "src/lib/rextora/settings/settingsValidation.ts",
+    "sha256": "724bf552ed8b66fbfc9216cd49a7631d4c8dba46fb86855e8c6ea9e7e09d67a7",
+    "bytes": 4564
+  },
+  {
+    "file": "src/lib/rextora/signal/safeV44SignalEngine.ts",
+    "sha256": "2c00975cf596e473ad2017e8ca64ecfe9244e97cc875c1d07c32b532b2edf229",
+    "bytes": 6632
+  },
+  {
+    "file": "src/lib/rextora/signalEngine.ts",
+    "sha256": "6e460d7c5f759014d673a4cdea5a7d69bd1f274d3cd371366edc8761de96d847",
+    "bytes": 2925
+  },
+  {
+    "file": "src/lib/rextora/signalRules.ts",
+    "sha256": "e344c39c3d51d1edfdbbe2166da4deb6e98f150e7817c17e1ec8211fd6012acc",
+    "bytes": 3119
+  },
+  {
+    "file": "src/lib/rextora/slippageModel.ts",
+    "sha256": "fa4e45def94c621b63d6c77f717dce5fe194e74fce7a06df00cdee65aa166718",
+    "bytes": 927
+  },
+  {
+    "file": "src/lib/rextora/storage/auditStore.ts",
+    "sha256": "6c46f8872e74cc2de71e070852a1d8a30053205c2b9fba972ee31be0cdfb30a9",
+    "bytes": 1951
+  },
+  {
+    "file": "src/lib/rextora/storage/jsonStore.ts",
+    "sha256": "fdb38fbd8890c072430995072f8b1934b71bb92a39c692f33d10844553c0da7c",
+    "bytes": 2598
+  },
+  {
+    "file": "src/lib/rextora/storage/runtimePaths.ts",
+    "sha256": "8e67d809a71733e788db19261c6bfba094b8d8bd883661a112732eba93e419a0",
+    "bytes": 1481
+  },
+  {
+    "file": "src/lib/rextora/storage/tradeStore.ts",
+    "sha256": "87183859a89b73d724b0cfcaf2e7e97c9031da1875e811886773fd573a4299c7",
+    "bytes": 1193
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditionBacktest.ts",
+    "sha256": "807464007e33c6e10d07f8c9972bf183cb15026417f282bece22004cd1238787",
+    "bytes": 4512
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/evaluator.ts",
+    "sha256": "eed51d8145e52b03bf086285f6f3dce2f5f25e6e89b1200eea8bf722ebf56e58",
+    "bytes": 10476
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/fvg.ts",
+    "sha256": "bb8c32cc6c5ea3e0f58709f0cef24814165c59035091aa2fe797161b6651e94c",
+    "bytes": 3578
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/index.ts",
+    "sha256": "b82a0bf5e8ecde8f40216e47c5e3034654547f9ad16032face9973e68da34323",
+    "bytes": 239
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/indicators.ts",
+    "sha256": "afe8d5cd877dc856d36a67b76b51de9da301bbe146fa5891326f232f030becb6",
+    "bytes": 3506
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/orderBlock.ts",
+    "sha256": "d547c3a06dbbdd282d1fb0be9798a8116942b6803c7ea15716fff9f6086bbf7a",
+    "bytes": 14635
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/orderBlockZoneBasis.ts",
+    "sha256": "4b1b4414dbcbcf6d99483f5f5c0342e584667408c7ec7b0bbe588ee52376d889",
+    "bytes": 1856
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/structure.ts",
+    "sha256": "686be1b13acfac222c18dfe5ba2856aa9f14b74c7035dbbb8ea857d5e51dcd39",
+    "bytes": 4239
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/supplyDemand.ts",
+    "sha256": "542f0290f5371162bee9e8933e1f58e185c33390283a30f03891e4a97aea280b",
+    "bytes": 3582
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/supportResistance.ts",
+    "sha256": "a02c88ae70c6b5e91949988da496d09ff4e6a57353f3c6c023e7bd0e0483233b",
+    "bytes": 4162
+  },
+  {
+    "file": "src/lib/rextora/strategy/conditions/trendLine.ts",
+    "sha256": "c900fc70e84fdab913d5e5840e55ca255126de2a9aadf7b4c811d4d40b70f2c1",
+    "bytes": 4912
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/bridge.ts",
+    "sha256": "f19451da87928ae2c4620f74ae886a1e50486e9bde0777d285f134490b422bbf",
+    "bytes": 5422
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/entryTrigger.ts",
+    "sha256": "1ec8f7c5bb1a7546288bad91e9cdd1ad70e781585173286957b84a6d7e3013cf",
+    "bytes": 13056
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/eventSequence.ts",
+    "sha256": "f8dcf9d340111002dc569c2c4b2378be2174581d0298992d16b45573850ceac2",
+    "bytes": 32229
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/index.ts",
+    "sha256": "fae422dfa1557fd0a156f8921f2ec2a8ebcb2fe377b29167cf49a2712de54259",
+    "bytes": 116
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/safeParamCatalog.ts",
+    "sha256": "8df130a2cba75a355c84a6e390ac3a028c0eb0ef47b86e6c8c0832312f35bed5",
+    "bytes": 16327
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/types.ts",
+    "sha256": "319c724100c79b34dd743718528eee28f3d90624fbcbe1d00518b3594d5e9a15",
+    "bytes": 4717
+  },
+  {
+    "file": "src/lib/rextora/strategy/definition/validator.ts",
+    "sha256": "992364abcbd28f777005d114aad26f2e123ffad28afe05b2014018d3a8ebd834",
+    "bytes": 7314
+  },
+  {
+    "file": "src/lib/rextora/strategy/eventSequenceBacktest.ts",
+    "sha256": "d5e7afdef485d384249b3fa8d79de8f925d785c028b5e29fd8a2bdecf6a40f87",
+    "bytes": 89181
+  },
+  {
+    "file": "src/lib/rextora/strategy/libraryArchive.ts",
+    "sha256": "36e2b58701afb8d7e45d0f1f5b49c6a78dcec3052cdcf726b25c542863a1476f",
+    "bytes": 729
+  },
+  {
+    "file": "src/lib/rextora/strategy/safeV44Params.ts",
+    "sha256": "721d30c59365f5f566922450ce55d4186ecf61357c848bea371ab60afa17daf5",
+    "bytes": 2057
+  },
+  {
+    "file": "src/lib/rextora/strategy/safeV44Strategy.ts",
+    "sha256": "58cb34ba1013b7ffa9ec26bdba923902de2abc1c84867f17e5438578e0439111",
+    "bytes": 6183
+  },
+  {
+    "file": "src/lib/rextora/strategy/strategyHash.ts",
+    "sha256": "9d9d71935d79ba74614fb6d83b6335fec55444fea2d1d975c3955fd6792380e7",
+    "bytes": 5068
+  },
+  {
+    "file": "src/lib/rextora/strategy/strategyMetadata.ts",
+    "sha256": "412195fc248f3dc79614f3836d987e7ef2b5238651bb15e55f12954d69467ed7",
+    "bytes": 2272
+  },
+  {
+    "file": "src/lib/rextora/strategy/strategyStore.ts",
+    "sha256": "1fc226a7cfee0714ccfe4c24b302cba0a8b5e0b81a66bbda8205cdb9df7b7c99",
+    "bytes": 31139
+  },
+  {
+    "file": "src/lib/rextora/strategy/strategyTestFilter.ts",
+    "sha256": "21f7f608e3cca8428be7123939fa1e3cbe84b20845fe515aa14e80888a17261f",
+    "bytes": 1024
+  },
+  {
+    "file": "src/lib/rextora/strategy/strategyTypes.ts",
+    "sha256": "0079f55231291316a492184af4f585f52a7c38fabd749bee97c81caa0f9cebae",
+    "bytes": 3522
+  },
+  {
+    "file": "src/lib/rextora/strategyDiscoveryEngine.ts",
+    "sha256": "44736478df61bcd8c92d116fa15de34e75e5a6e13baa3517a07d92b8c257668b",
+    "bytes": 2473
+  },
+  {
+    "file": "src/lib/rextora/strategyLiveApproval.ts",
+    "sha256": "9450a83fe5467a409b218b196cf30c1ce6eb071bd52214e08bfffbedce20fc32",
+    "bytes": 3772
+  },
+  {
+    "file": "src/lib/rextora/strategyRepository.ts",
+    "sha256": "df4166bb36539808c56b8449d6097b2e8e66be524641b8868c76b3529fb3f7a7",
+    "bytes": 2131
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/backtestAdapter.ts",
+    "sha256": "3e2f315518b605188eedd615660ff5fa9585689e1c628678e3ab6488149004c6",
+    "bytes": 26212
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/calculationErrorBreakdown.ts",
+    "sha256": "c47861aadad0899001bf323647cc30d46dba299eb237da3f5103194247e73586",
+    "bytes": 6313
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/cancellationLifecycle.ts",
+    "sha256": "e2bdadb41dea388cbee1a52d58df3efdf3e259bf62bba41d444f0ba7bf3fcfeb",
+    "bytes": 10332
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/candidateEvaluator.ts",
+    "sha256": "dcea9b765a9bdc707b24d742605efefd0e26528b425cabd991ca0ac2bbf3683a",
+    "bytes": 7308
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/candidateGenerator.ts",
+    "sha256": "e8315bd1bf06b8210d39eebc9d6dc2a6eadb2bcbacc848734afe169e5151c316",
+    "bytes": 11441
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/costStress.ts",
+    "sha256": "d05f68d09a96f403f8c5daa051d8a52fdd8d65af13cc8ca6b62572a6741a61bf",
+    "bytes": 10216
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/deletionSafety.ts",
+    "sha256": "9fd8e63f68795d5b618475c61b5f44d70cd1affbb9fcac16298132e67b0022f1",
+    "bytes": 9078
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/engineErrorClassification.ts",
+    "sha256": "3cca0f07d4f944e1a68b1fd0f58a93d658d7b45c960fbde0d5e1212ede75778b",
+    "bytes": 5223
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/evaluationPolicy.ts",
+    "sha256": "594c153b802f9860c620a8fddf99100838a61447c78cb50f5b04acf17718f3ec",
+    "bytes": 17444
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/followUpResearch.ts",
+    "sha256": "8759e5e4eb6782af9f5ab6bda2c0e2967e3d457ce3cf396fd2ebfca11d57a1a2",
+    "bytes": 10208
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/historyRetention.ts",
+    "sha256": "93ca0dfd463b671e2c8fa702b7d7ee1bf5f7c47e0c37475439d076a73ced4aaa",
+    "bytes": 13861
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/index.ts",
+    "sha256": "834f0ef06d8bf55e763a61e26f6e7cdd0699f2314be71fdd13822980c5f9f84b",
+    "bytes": 16027
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jitterEvaluator.ts",
+    "sha256": "915fae3834eb7af43607aaecce2194cb7407ff08fa9785976b69da40d3d27fe0",
+    "bytes": 12393
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobApiHttp.ts",
+    "sha256": "abc04a9b91985f20cfa75447b3b07354a99bade281bc1bc0303ed3f8da79c636",
+    "bytes": 1586
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobApiService.ts",
+    "sha256": "4b223d56fc7a0d5a75025a0f53d4c5e3d0ef27664cce936d8ca7231f4f22748f",
+    "bytes": 58329
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobApiValidation.ts",
+    "sha256": "84da573b2a3365f263751e9ed0df9dc4508fad06fa090d0d149463996b4290f8",
+    "bytes": 31864
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobArchive.ts",
+    "sha256": "baae4f3da4eb5a8bc82cb3c791a57be9aa84ab5afb94752374ad470fc25bc114",
+    "bytes": 3658
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobCheckpoint.ts",
+    "sha256": "196bec7ed182fc1fced1f0536628d11542f806a63dc907415a17233398c8e07d",
+    "bytes": 9265
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobExecutionOwnership.ts",
+    "sha256": "d63071021f64bd8e44b350c915f91c78c4f9611b554b0d324aac6179dbd26db3",
+    "bytes": 10823
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobExecutionProfile.ts",
+    "sha256": "8710a6dbb1be1f6adb06edb0a16306103c6d47060c60d6a6b8db93b823ae764f",
+    "bytes": 4243
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobExecutionRegistry.ts",
+    "sha256": "082f15541bf53db2f6d60869dbcd6054a5e4d862b7973bee3ccf6b3e0fcb9f44",
+    "bytes": 10670
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobRecordRecovery.ts",
+    "sha256": "803a528ce7ae188a8750009329d02d60e864dc707f50024ac47657aea3dee996",
+    "bytes": 9624
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobRunner.ts",
+    "sha256": "82af594edf8197d622553604b3564f1b49864fb6f7ed440132bb3a632e521eeb",
+    "bytes": 32557
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobState.ts",
+    "sha256": "a4ad152b853ad1fda03182c4e51a9890f0b8d1b366f388a67ff17326b9db6d01",
+    "bytes": 7072
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobStatistics.ts",
+    "sha256": "2c55f5445dba68589a439869cf21f0b8650e76133fe1988ce96ae61c1448b26a",
+    "bytes": 5687
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/jobStore.ts",
+    "sha256": "361738f10bf2324f9ddeef7259b36a2369b1cb9c78ec7f5ad68eea5ea9ddb7fb",
+    "bytes": 23965
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/leverageMode.ts",
+    "sha256": "f2ede738986536641e6b336378c66e35d0918bb5365e23d5e92f58f60591e26f",
+    "bytes": 7171
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/operatorProfiles.ts",
+    "sha256": "8ab3dda320862ed4c630c8aafb687120a478c27761b7e5f6fa499c7dc64df9d9",
+    "bytes": 7491
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/orphanJobRecovery.ts",
+    "sha256": "58c84c33d905a7701d997c3e9423f2ab80e0f25bca92b0082bd94ffe58e4eeea",
+    "bytes": 6689
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/orphanJobRecoveryLoader.ts",
+    "sha256": "bc1e9d8594a915565c096e5769d4a9cb4f72be4a2c74c83e57fe3c311dad4d0e",
+    "bytes": 1329
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/overfittingEvidence.ts",
+    "sha256": "0b818c9967419ff88c272822958620ebb8f9bd20c0b61e1f46c95e3b3ae6b8c5",
+    "bytes": 4823
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/paperFeedback.ts",
+    "sha256": "765d645bd4bc8fd1883e624a07558efc35fbc39c601cb9355d6e709a480a1099",
+    "bytes": 7307
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/paramSpace.ts",
+    "sha256": "80707b0febc5d8b599f1943ffaafcb94c7de7a5c6372fec20e0770ace7e3236a",
+    "bytes": 33626
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternCombination.ts",
+    "sha256": "1a3d6136f0237fd3bddbaea2ac18ff23ce64ec4be72b956231c8e9b51c6a1f21",
+    "bytes": 31909
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternConfirmation.ts",
+    "sha256": "0162d4cfdddbcc208635e8a369df950427ad82a95dd990f4013e1b06e5306916",
+    "bytes": 4043
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternEventSequence.ts",
+    "sha256": "48440eb7bff2af6c8f993eda9b4e2914bb42429d9d220bfa6c378ed6551a6265",
+    "bytes": 4726
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternParameterCatalog.ts",
+    "sha256": "0d025aa9cdcb030762057916057c350660c8c089162557e41e613708f59adfcd",
+    "bytes": 19444
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternSearchConfig.ts",
+    "sha256": "be069a4c86631ce089f07aad52e215901e723940f081a6c32bd9a09eb6ee9bdd",
+    "bytes": 14737
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternSearchSpaces.ts",
+    "sha256": "930327553c7c74dbd4f3206ccc61863d1d1054a81902916334abfe8c4dd857f8",
+    "bytes": 21773
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternSelectionMode.ts",
+    "sha256": "d2228ce407cdd99ba674238a70d414dee3d8c8f52511b9365b8ecec220b9190d",
+    "bytes": 275
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/patternSupportMatrix.ts",
+    "sha256": "b3995be543801321c1ceee5f5c73fdeddf0fd9862674d85fb4c68231b7b97759",
+    "bytes": 5969
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/performanceSummary.ts",
+    "sha256": "25113e3ecba01b53c90b93914cb1466aacc1e810d43bf862311107459796ef57",
+    "bytes": 2313
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/persistedSearchSummary.ts",
+    "sha256": "5e9da83583ea7954160a2d39175876a6bcdd3313a0409c439945bfaf007beb89",
+    "bytes": 15630
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/promoteFromSearch.ts",
+    "sha256": "2eb0c1f1be1117ba38e6164cec3aabba989c416c0ba6ab9b301eef67a0c6a779",
+    "bytes": 15679
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/random.ts",
+    "sha256": "d7b04a0a8d56de765d319c78ad49b18ff17bd5e43f242c73e3a5a7458f3084ec",
+    "bytes": 3570
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+    "sha256": "554e85029aad29f4092274b0c61397b9244851f27f6ef0b3c7ffc848c1cbaf53",
+    "bytes": 6229
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/readableStrategyName.ts",
+    "sha256": "defee782b317956dcbf653aa0b8eca49e80c0684e58bbdbd13cda5b41b338058",
+    "bytes": 8529
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/recoveryAudit.ts",
+    "sha256": "984111e2b485088dbcfe801065a0d4f54ae2b2bdf8c4f67a82155aeba5026353",
+    "bytes": 1913
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/researchGeneration.ts",
+    "sha256": "2f6bd091d04d126159aac0c409100401c3a3bbbd7b61da049361536e3a130111",
+    "bytes": 3942
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/researchOutcome.ts",
+    "sha256": "f991556f0284e94ff51122687ca655bd3c43386e217483bce98a712f994320f2",
+    "bytes": 4712
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/researchProvenance.ts",
+    "sha256": "9e878138a71849d561de1380d386e164406a8209997b42ea815081ac4ce08815",
+    "bytes": 475
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/researchResultsSummary.ts",
+    "sha256": "f05808effb32d4b9dab9bd411fc5331f0402ec6b6151b52e30cc13374f7e6609",
+    "bytes": 43213
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/researchTop10.ts",
+    "sha256": "312f113cf1605a9e1c75c89dae7b53574b2dd498fc480885d03d369eb95ef710",
+    "bytes": 21698
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchConfigStore.ts",
+    "sha256": "0294fc23239d802a0e728d84fe0e1c129794450ecfb267eeda67a56381a8fcfb",
+    "bytes": 9735
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchId.ts",
+    "sha256": "dccabff58d8b2ee001158952aed4517142718761175f629ac631a1c9b301e087",
+    "bytes": 1661
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchOrchestrator.ts",
+    "sha256": "ba9f69b69a91d2169313a71be4b5fda0b61157e5a7e54b81dd6a364777570b06",
+    "bytes": 28681
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchPlan.ts",
+    "sha256": "2a79637af2f57c2e2ebaafb1a209465106af9e6fdb0b5c5c1771d2d996ab31f6",
+    "bytes": 23754
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchSpaceMutation.ts",
+    "sha256": "2bd632637d3d195c601a51a75dc15eef7c64f184412ec14f03eca5166e7a9bba",
+    "bytes": 12361
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/searchSpaces.ts",
+    "sha256": "fe38a9a3601b9b4fcbe2a57c3f533b54ee425deea7fa156aaf033b440f9007b8",
+    "bytes": 3273
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/storageSummary.ts",
+    "sha256": "67538da2fd2f7ffd7e419d539dc78302426100fb6bba39a3dabe122d0d028073",
+    "bytes": 2537
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/strategyDeletionSafety.ts",
+    "sha256": "e6b8547a415d093fb0f0b4878d017aeffce6f5839f3c3a38f40b6f18e35ce673",
+    "bytes": 9950
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/symbolSelection.ts",
+    "sha256": "d342c25d37b355fb8ca39f0f137ca961c38c2b112fe64183c588bac6c67c6164",
+    "bytes": 1975
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/terminationReason.ts",
+    "sha256": "943fdc1b24f12a8f46340381910f962b8180ff7ca200db47d19299d3103959db",
+    "bytes": 4359
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/testJobFilter.ts",
+    "sha256": "ef955842c668420311430d94b28c36202c907f6e947b19b38287e634a9da4cd5",
+    "bytes": 566
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/types.ts",
+    "sha256": "2179c5ba48176f0e1fd4471f4053ec4670520f7ac4ddfcfbb7ebff061d64b1c1",
+    "bytes": 13333
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/weaknessAnalysis.ts",
+    "sha256": "3177ee58285290ec0fc6395a75e984b1039856ca2bea6514f1569dd6f83666eb",
+    "bytes": 11405
+  },
+  {
+    "file": "src/lib/rextora/strategySearch/windowPlanner.ts",
+    "sha256": "56d21b2d1b172f61c86f0357f96c439fdad6ea53cdbd5b4e2d4b7248e4e85d27",
+    "bytes": 8019
+  },
+  {
+    "file": "src/lib/rextora/systemStatusSyncService.ts",
+    "sha256": "305c3b1c0bf787b998513c64485c86fa3444a67bbb762b47ddb2aa276855e470",
+    "bytes": 11341
+  },
+  {
+    "file": "src/lib/rextora/telegram/telegramMessages.ts",
+    "sha256": "590c951b03d0ab270f273482697bccf6ed5506e9e05e8eb4be19dde06c6c7405",
+    "bytes": 18630
+  },
+  {
+    "file": "src/lib/rextora/telegram/telegramRateLimiter.ts",
+    "sha256": "d67f3f8d34570cd2f0811ad79c5ce6eaec27fb30018a0d8fc57a4020854facca",
+    "bytes": 2219
+  },
+  {
+    "file": "src/lib/rextora/telegramAssistant.ts",
+    "sha256": "cbfc62370e02a870e47f9ba6d6f094fc4cfd726d5d9876c32c4128092c6a3009",
+    "bytes": 3638
+  },
+  {
+    "file": "src/lib/rextora/telegramNotifier.ts",
+    "sha256": "7c702804ba054d598c9896311541819d36bc32e5c5c56e50f8144758325f4dc9",
+    "bytes": 5241
+  },
+  {
+    "file": "src/lib/rextora/telegramOperation.ts",
+    "sha256": "864d190c04a93c044a2160ce4c658e0704dee280036f7a5d878690039d366ca4",
+    "bytes": 12012
+  },
+  {
+    "file": "src/lib/rextora/telegramService.ts",
+    "sha256": "3a51bc75c39013120f61e52d1cd21ba4933452b28546703479463e1ea2d7f9d6",
+    "bytes": 3590
+  },
+  {
+    "file": "src/lib/rextora/telegramTemplates.ts",
+    "sha256": "6e82463828570db5a41b8cd4856775a0b91c2fc9d9a3357a61d4d1e4da0bdc3e",
+    "bytes": 3134
+  },
+  {
+    "file": "src/lib/rextora/tpSlManager.ts",
+    "sha256": "4c0e3e2254d1b525285215be327d70afdeb647c0382ce8f337fb568cf50e7974",
+    "bytes": 3231
+  },
+  {
+    "file": "src/lib/rextora/tpSlPlacement.ts",
+    "sha256": "2e98f4423e32968cccd04347f3b7de114e7a7ff42d907f17a31ad5070952306d",
+    "bytes": 5200
+  },
+  {
+    "file": "src/lib/rextora/tpSlTypes.ts",
+    "sha256": "d7f975b26cdfa8c0f0461b1f752fdd56cf56f45ac4ff46193b1b0305bfbfeabb",
+    "bytes": 691
+  },
+  {
+    "file": "src/lib/rextora/tradeLifecycle.ts",
+    "sha256": "fe955f80465abad6b93140e3f84a930da972513e165c8f6fb61b9a26b7d19dc5",
+    "bytes": 6678
+  },
+  {
+    "file": "src/lib/rextora/tradingDashboardStatus.ts",
+    "sha256": "be43913d327699663893285b87d837175bd262ddc21bc399a2a37ea4eb4df581",
+    "bytes": 21563
+  },
+  {
+    "file": "src/lib/rextora/tradingFlowVerifier.ts",
+    "sha256": "de32111c7909d617347acdf076b1ce7f10990e7beaf61d778da61ada2535ddfb",
+    "bytes": 5162
+  },
+  {
+    "file": "src/lib/rextora/types.ts",
+    "sha256": "093e0fafcfe38f935f53f7f343bda605e2d8a6a25d2a617980ffcfebfa02347b",
+    "bytes": 10852
+  },
+  {
+    "file": "tailwind.config.ts",
+    "sha256": "49cd41a230180ffe669751f0bfd4e9f345ad0308f699fec207044bc80c9e0c9c",
+    "bytes": 1221
+  },
+  {
+    "file": "tests/AgentConversationApprovalValidation.test.ts",
+    "sha256": "4e0a33a2ab7e9a75db23644738bf00c0c3372893b4612ac1bbf4160ad426d33b",
+    "bytes": 2819
+  },
+  {
+    "file": "tests/AgentConversationFirstApi.test.ts",
+    "sha256": "8324242ade5f047a65ea7d0cd6cbccc75aa00af80793ed7a1ce3e1f62129461a",
+    "bytes": 7710
+  },
+  {
+    "file": "tests/AgentConversationProviderFallback.test.ts",
+    "sha256": "d8e8b5b4baeb34fddbcbae86880dec3034a9641552c0cb010ce30a564f401c9a",
+    "bytes": 4753
+  },
+  {
+    "file": "tests/AgentConversationRandomized.test.ts",
+    "sha256": "b78d1b1bfe58701542830af37ea0e6430656faecab87209ed5a4f73ba200fd47",
+    "bytes": 8837
+  },
+  {
+    "file": "tests/AgentConversationRoutingMatrix.test.ts",
+    "sha256": "5a351647157004769722f233f1b20cf3b30ed8ceecfe35f14bc2fa14cfedb891",
+    "bytes": 16227
+  },
+  {
+    "file": "tests/AgentGeminiResponse.test.ts",
+    "sha256": "33ba408ac851adc496849791f5f36967456cb1b2593e48d8ab3eef14996ae55f",
+    "bytes": 2950
+  },
+  {
+    "file": "tests/AgentSessionPersistence.test.ts",
+    "sha256": "fc7eabba723cb7d16271a09e81fe14cd14281f65154c70a236814e05a007274b",
+    "bytes": 3805
+  },
+  {
+    "file": "tests/AgentV2ApprovalFastPath.test.ts",
+    "sha256": "2648dc5546fcd5baa1a5a831925815943fd00bf1650124079e9d6d0636eaa04d",
+    "bytes": 2877
+  },
+  {
+    "file": "tests/AgentV2CancelReplace.test.ts",
+    "sha256": "c65fac9a229edd5e3fe86bc3a5a3d53d32db5660cee18e335b4a5114256e4cfd",
+    "bytes": 1157
+  },
+  {
+    "file": "tests/AgentV2ConversationalProse.test.ts",
+    "sha256": "3a52df0220cb65e014634d76d48dda5b2871af8f04f1d665dbef8b7bf065dcf9",
+    "bytes": 1118
+  },
+  {
+    "file": "tests/AgentV2EventLifecycle.test.ts",
+    "sha256": "1a5014dd162d6aa37857b21490f3afdde0deafe6a7273badc6ae156745f431e0",
+    "bytes": 5485
+  },
+  {
+    "file": "tests/AgentV2ExecutionFlow.test.ts",
+    "sha256": "77a483c3911baaacf73ac2faee47510ab52e1c3f0fa76c1eb69459aa111c89cc",
+    "bytes": 2388
+  },
+  {
+    "file": "tests/AgentV2ExpandedSafeTools.test.ts",
+    "sha256": "fbdadcf166443453836799fe9ab2fc3a48aef6fc58ba2e0be4ae61e976ecc704",
+    "bytes": 7180
+  },
+  {
+    "file": "tests/AgentV2GateEvidence.test.ts",
+    "sha256": "e10a687e6038384bbed2863989289c8e50b97e6ba5fbaecc2f0ddceea389028b",
+    "bytes": 1711
+  },
+  {
+    "file": "tests/AgentV2LeakageDJK.test.ts",
+    "sha256": "7e1e0a46452edf87b344bdffcb8ca133d37bc1de6545be3be89878a047e1581b",
+    "bytes": 4171
+  },
+  {
+    "file": "tests/AgentV2LongTermMemory.test.ts",
+    "sha256": "ea0f39464acb59ea8834876d3904eddbf334186f56e8a2938608a0fe7022e8a0",
+    "bytes": 5495
+  },
+  {
+    "file": "tests/AgentV2NextTraceInspect.test.ts",
+    "sha256": "6936ea65ed64bd3269149f0f37831c17946d352c209cc21f0caa822f58765e5f",
+    "bytes": 1454
+  },
+  {
+    "file": "tests/AgentV2NoFabrication.test.ts",
+    "sha256": "056ff004268a98da9cd98d4ed9d242d8d8777569e0098226f383b2df6593751b",
+    "bytes": 2557
+  },
+  {
+    "file": "tests/AgentV2PlanDiff.test.ts",
+    "sha256": "433d81ef453c127816cbea2f5d61252b0b217d98cd2e592fa42f6deb5719fcbd",
+    "bytes": 1201
+  },
+  {
+    "file": "tests/AgentV2PlanModification.test.ts",
+    "sha256": "d1515582bc8226f7d6d4703b92fed021a33275d0f557357efe59d86793207c45",
+    "bytes": 1101
+  },
+  {
+    "file": "tests/AgentV2PlannerOrchestration.test.ts",
+    "sha256": "48c219d4cf4040f1a9e5033f6e00629e192daba70e88ca9cfddf5a9fb718e481",
+    "bytes": 6085
+  },
+  {
+    "file": "tests/AgentV2PostExecutionApprovalClear.test.ts",
+    "sha256": "a71f9458680fcdefa76cedb9d2c270c623fa2be0660445efedf3374e93813271",
+    "bytes": 4313
+  },
+  {
+    "file": "tests/AgentV2ProviderBackedConversation.test.ts",
+    "sha256": "e7460131a68e106b32524fd8c0565faf152f65c0aa1b264d9ca570802b8f8781",
+    "bytes": 4660
+  },
+  {
+    "file": "tests/AgentV2ProviderCanary.test.ts",
+    "sha256": "e0f5bdc6f8e1cb75538b01f7781e4351c55ac90b8404af898cafedf98340fef3",
+    "bytes": 5637
+  },
+  {
+    "file": "tests/AgentV2ProviderCredentials.test.ts",
+    "sha256": "db4c394b659c27f20ba6ddcf1eede810df0262da2e2713353d5c5bb0d5840a26",
+    "bytes": 5270
+  },
+  {
+    "file": "tests/AgentV2ProviderFallback.test.ts",
+    "sha256": "3c4c708b41a248e0fa1597da41a669a90b2b4689a02d3158fee58f7e4e87fd95",
+    "bytes": 7648
+  },
+  {
+    "file": "tests/AgentV2ProviderRequestGuard.test.ts",
+    "sha256": "1f043fce2729eda7171343f365af07e87f1a30330e7ea02dacd532f32dc79a99",
+    "bytes": 1482
+  },
+  {
+    "file": "tests/AgentV2ReasoningPolicy.test.ts",
+    "sha256": "b125867fe39c21e8233dea0ed0546e68d35fca959587934783016b563c143c6d",
+    "bytes": 7423
+  },
+  {
+    "file": "tests/AgentV2ReasoningRequestDedup.test.ts",
+    "sha256": "ef2154bcd8b76991c858d321dba08c1d438bb5ebe9d1c7f8f3a8022a2a4413e0",
+    "bytes": 1441
+  },
+  {
+    "file": "tests/AgentV2ReasoningSchema.test.ts",
+    "sha256": "0078ded0cd82b5e16488d8443479ef7a5793a44cac3b0ad540dd8ffa645bd578",
+    "bytes": 2304
+  },
+  {
+    "file": "tests/AgentV2ReasoningTaskProfile.test.ts",
+    "sha256": "8855293072d9c81d15d15227f2820911489e92e7b73b997d823b2af898fa1fee",
+    "bytes": 2242
+  },
+  {
+    "file": "tests/AgentV2ResearchBrain.test.ts",
+    "sha256": "2142469f4ddf28f297c71e04f7d2fbb118570179226b0e3878d66a761b64a18d",
+    "bytes": 4230
+  },
+  {
+    "file": "tests/AgentV2ShadowMode.test.ts",
+    "sha256": "75d1c0a62044f61d1de5badc7c1b7152de98d210e0f69d45d662102ab4a419fd",
+    "bytes": 2112
+  },
+  {
+    "file": "tests/AgentV2ShadowModeMatrix.test.ts",
+    "sha256": "1e21667454ad56d4e5616c5aa783f037fdcbcb22387970098d5dd1bcb63f9899",
+    "bytes": 3497
+  },
+  {
+    "file": "tests/AgentV2SkippedWriteApproval.test.ts",
+    "sha256": "c6ba1646b68a9e93ca3bcd601c02a18e2e1aa704278e8624c7e1012982766bd8",
+    "bytes": 2773
+  },
+  {
+    "file": "tests/AgentV2TerminalApprovalIdempotency.test.ts",
+    "sha256": "e1d296139455fed31106e01a118b9b54e459f442dd72051c0f6b6205baebe98a",
+    "bytes": 8900
+  },
+  {
+    "file": "tests/AgentV2ToolSelection.test.ts",
+    "sha256": "84f21466af2114b2c15446feb97750a95851173cae2f6b1443ddd3abb9abd7f3",
+    "bytes": 2984
+  },
+  {
+    "file": "tests/AgentV2UserVisibleSanitizer.test.ts",
+    "sha256": "e68d723187ea3b411edb0d05ca7139152f058ca1840e6cd36a5192496b22d3b9",
+    "bytes": 3918
+  },
+  {
+    "file": "tests/ConversationRefresh.test.ts",
+    "sha256": "fc1c1778f16d5bb1828fc9d4968f6d60e792ee50b109c48f6d34b8b98611f043",
+    "bytes": 3082
+  },
+  {
+    "file": "tests/SessionRecovery.test.ts",
+    "sha256": "2d4bf21e4e3d09301181d03ae8e4ee2345c89d857eb3d6265ecd3d9a0b0e659f",
+    "bytes": 2477
+  },
+  {
+    "file": "tests/ToolAudit.test.ts",
+    "sha256": "1f598f225cb76e6d405fe13ef7f3260f2873257a2e62ae3002614ddbff59259f",
+    "bytes": 3031
+  },
+  {
+    "file": "tests/ToolEvents.test.ts",
+    "sha256": "cca20af942f1bf8eb21702035c2c632d21149a87862359c1db45b28ad49830f5",
+    "bytes": 2452
+  },
+  {
+    "file": "tests/ToolExecution.test.ts",
+    "sha256": "e85af24c6db23153fc9687eb5ebca7f6747c203b024f2f035db8b87c769e4b65",
+    "bytes": 4112
+  },
+  {
+    "file": "tests/ToolPolicy.test.ts",
+    "sha256": "1791f1cdfe4cc88cf3403fbd273b8ac766bdb03085555b0a1ec6f2bafe26cadf",
+    "bytes": 2066
+  },
+  {
+    "file": "tests/ToolRegistry.test.ts",
+    "sha256": "a13be855d734fae2d28748704568b60d27de6e3c3befd3af165c57ef888f07a1",
+    "bytes": 3024
+  },
+  {
+    "file": "tests/ToolValidation.test.ts",
+    "sha256": "3949837bcc5306b9d77a3d8a988f59f257b40ee91d1991b53e864170b5e7cdf0",
+    "bytes": 1634
+  },
+  {
+    "file": "tests/WorkspaceMerge.test.ts",
+    "sha256": "3bb574f17b500d32f95493c5f05ab75bbc2f0f558de3a90af91a98ae0ca420b6",
+    "bytes": 3551
+  },
+  {
+    "file": "tests/__pycache__/test_todo.cpython-314-pytest-9.1.1.pyc",
+    "sha256": "fff27d9017d7c7c7f4ecedb8141c2bdfcf33a2b2bf7bbcfb417ccf2d5263c73a",
+    "bytes": 3856
+  },
+  {
+    "file": "tests/agentCommercialUx.test.ts",
+    "sha256": "956a51f4fff685ecb4469aae0299e53b7e49c735d2cf07627897a87a30b83d02",
+    "bytes": 1456
+  },
+  {
+    "file": "tests/agentConversationalEmployee.test.ts",
+    "sha256": "a374608f1fb2580597d34141ac9cfd342adb17ae44a8fdffecc75a2ac656b311",
+    "bytes": 13486
+  },
+  {
+    "file": "tests/agentConversationalIntelligence.test.ts",
+    "sha256": "4a728572a13158d08623974c079057ce9100493500f790843606305e0b62e38c",
+    "bytes": 7868
+  },
+  {
+    "file": "tests/agentExecutionSafety.test.ts",
+    "sha256": "f07d696331bcfc8dfbbd91546694eb4a9cde52d0ee4481de9333697441f40877",
+    "bytes": 7499
+  },
+  {
+    "file": "tests/agentIntentParser.test.ts",
+    "sha256": "cf7ee6bae85368f940441917d7ded78359cf7b5b24f2990822a0effacb793f04",
+    "bytes": 7968
+  },
+  {
+    "file": "tests/agentProductCompletion.test.ts",
+    "sha256": "b53cc01a7fbc1ed8e7240144588fdfcbf874d736c500ecc8785d8bc8797dccc5",
+    "bytes": 8506
+  },
+  {
+    "file": "tests/agentProvider.test.ts",
+    "sha256": "da0deb79267190f23d34509681ba4355a5b3ebbf40695e2623c9fbcd596b8a7e",
+    "bytes": 13674
+  },
+  {
+    "file": "tests/agentTradingEmployeeCommercial.test.ts",
+    "sha256": "907b5125119c76737b79e7dc8b310bbf56a3502ee3da9dedcab1650d6dc26e99",
+    "bytes": 9641
+  },
+  {
+    "file": "tests/agentTypedCommand.test.ts",
+    "sha256": "9fd82426002cd59310fd5d227289ee07e5627f46ea953a0af480dd7ba7d68e1b",
+    "bytes": 7368
+  },
+  {
+    "file": "tests/aiExecutionBridge.test.ts",
+    "sha256": "b83712678055a3a072de36b4fae18363f4642ec6055cd046e237f2661e794684",
+    "bytes": 3196
+  },
+  {
+    "file": "tests/assetIntegrity.test.ts",
+    "sha256": "f90e5ea6fc1e92e92667a521d29ce8d746e14b0ca53c9f10ad4df227ffbad456",
+    "bytes": 1479
+  },
+  {
+    "file": "tests/backtestDataPipeline.test.ts",
+    "sha256": "8b9728f631a274618ffab4a0cba7ab92975639d75d92a7a11908124339b10a05",
+    "bytes": 16543
+  },
+  {
+    "file": "tests/backtestDateRange.test.ts",
+    "sha256": "c09b29d4f735b475a686212a75da56271794974f6cf3d5363a668783ad2eb01b",
+    "bytes": 3350
+  },
+  {
+    "file": "tests/backtestEligibilityUx.test.ts",
+    "sha256": "f0ce897c110a6c390e59aabda7a9c39234fab7763600d22bffa73a4dbe018daf",
+    "bytes": 9678
+  },
+  {
+    "file": "tests/backtestExecutionIdentity.test.ts",
+    "sha256": "2851777a2372e8b95972b5e83b888a8ce775062697bc186481ed6639e5eb3e87",
+    "bytes": 11871
+  },
+  {
+    "file": "tests/backtestMultiSymbol.test.ts",
+    "sha256": "85f676526f4f41c15f80480503dc43e0b69cb76c3b9e5a3092dcbb06a47019b3",
+    "bytes": 11887
+  },
+  {
+    "file": "tests/backtestPersistenceAndDelete.test.ts",
+    "sha256": "6bd2d6c6bd9a64be1ba5fa9c055b01888c21799e0eca4cf596cdc360ce59858c",
+    "bytes": 2937
+  },
+  {
+    "file": "tests/backtestSymbolSelector.test.ts",
+    "sha256": "e6b4ce626910f3d485fe1dc1962453b0252c4af9045d8accdec42ed113a7eb0b",
+    "bytes": 9980
+  },
+  {
+    "file": "tests/backtestTimelineCoverage.test.ts",
+    "sha256": "d2bbd5d1e01a1f7531c6f880f87ca39194dfc89537badf68e953e09bfe2c017a",
+    "bytes": 7253
+  },
+  {
+    "file": "tests/backtestUsabilityPass.test.ts",
+    "sha256": "43ee2e0613a8f659c93f495988087a3b3c69c80f682986983af598b795ecbaa1",
+    "bytes": 5564
+  },
+  {
+    "file": "tests/backtestUxFinal.test.ts",
+    "sha256": "7bf00036c078c642c03852619db49f61424e47f0a365858a872f80aa09670393",
+    "bytes": 10552
+  },
+  {
+    "file": "tests/backtestVisualAnalysis.test.ts",
+    "sha256": "3d88475d0cb5c0180fb20d61b84262da435aa75948d730ab5413a5c7b699cf26",
+    "bytes": 9427
+  },
+  {
+    "file": "tests/backtestWorkspaceTabStability.test.ts",
+    "sha256": "fb0de128dcd7d9f1c1b0a13b83a693c2733d78ae69a36efad251b670632b26aa",
+    "bytes": 2437
+  },
+  {
+    "file": "tests/binanceBoundary.test.ts",
+    "sha256": "3f676daf0a0806df73037c305d490b9f489cee2ed0497941e8b49acbe01b918b",
+    "bytes": 844
+  },
+  {
+    "file": "tests/binanceDiagnostics.test.ts",
+    "sha256": "e9e26b26185eb114ba09b2d6f9e1e675ea0f47b3fc5682685c9a63236c31c01e",
+    "bytes": 1012
+  },
+  {
+    "file": "tests/cancellationLifecycle.test.ts",
+    "sha256": "a0f635844de6d52a69b937222bfd1318202bdbcd5ec00219fe63b5c2bacd29f6",
+    "bytes": 16458
+  },
+  {
+    "file": "tests/candleGeometry.test.ts",
+    "sha256": "3a63b44bcbe6392c8ce62e9bf58f7367b02cf8cb18d2655771da5c3913ba6e67",
+    "bytes": 5411
+  },
+  {
+    "file": "tests/chartOverlayDefaults.test.ts",
+    "sha256": "a01fe33cb759cc6147e460180ad16fd654a717da62ad7cf53fce517726fa834e",
+    "bytes": 1663
+  },
+  {
+    "file": "tests/commercialLifecycleFixes.test.ts",
+    "sha256": "7fac4c2c1fc8e2e43464e142673e3ce74d37e0ee18e0c410f1328d4c89a7faf9",
+    "bytes": 4624
+  },
+  {
+    "file": "tests/commercialOverlayHydration.test.ts",
+    "sha256": "2837db626b79491beb02bce23153717e979416cc1b0b7f9edf5222aee72857d8",
+    "bytes": 3486
+  },
+  {
+    "file": "tests/dataFilters.test.ts",
+    "sha256": "cdb4babfc2abdabf72ee396ad97e6ebefbfd72ed3bebbb58ebbef3af59af9998",
+    "bytes": 1353
+  },
+  {
+    "file": "tests/e2e/release/deployment-matrix.spec.ts",
+    "sha256": "a8ee5e8d2c6adb0e97be53f0b952c87f71c33bd5d24107fc8c5c2c9cfedd759e",
+    "bytes": 2517
+  },
+  {
+    "file": "tests/e2e/release/dev-timeout-diagnostic.spec.ts",
+    "sha256": "6d4006c2c59de9c53d31d0c51ecdfeb0c7f39f2fc43147fc766f8f3b73fbc8cd",
+    "bytes": 1744
+  },
+  {
+    "file": "tests/e2e/release/global-setup.dev.mjs",
+    "sha256": "a2f6eeeacffa345e601c1fadb3cc9fc62fda44338c9f429388080dcf1b4b27d5",
+    "bytes": 384
+  },
+  {
+    "file": "tests/e2e/release/helpers.ts",
+    "sha256": "33bc6327d1657e403333cbb7194d10606daae1f5e134ff722a52bb30ef034a65",
+    "bytes": 24484
+  },
+  {
+    "file": "tests/e2e/release/model-switch-390.spec.ts",
+    "sha256": "43703e762db8daa1eab8f98f34367aac3f8c93e14d4463493ad288685c077bf5",
+    "bytes": 1087
+  },
+  {
+    "file": "tests/e2e/release/model-switching.spec.ts",
+    "sha256": "1688c35b160d32350e29b0b325536f6b9e613ee87eb3461f93a4b7ae5a09e406",
+    "bytes": 2056
+  },
+  {
+    "file": "tests/e2e/release/production-matrix.spec.ts",
+    "sha256": "b9cf7d417a4fcd70b6a866f98570b91a4cb78b9d7d7ad00487fa26e13d200115",
+    "bytes": 3064
+  },
+  {
+    "file": "tests/e2e/release/scenarioRegistry.ts",
+    "sha256": "50c87cb8175b28eb3d35d1efb96c5bf831b1e685684ef195c2eac85a012f7a98",
+    "bytes": 18038
+  },
+  {
+    "file": "tests/e2e/release/settings-browser.spec.ts",
+    "sha256": "e3fab19f7d54d1f31d2b2bc8a3f67e1b3d420852db70fd5d29947aaf6c789a72",
+    "bytes": 3603
+  },
+  {
+    "file": "tests/e2e/rextora-shell-styles.spec.ts",
+    "sha256": "cc059d04e836f34d05a4a189dfb959af3ac10038aa04b35fb52b15fdd6a2d395",
+    "bytes": 4068
+  },
+  {
+    "file": "tests/e2e/rextora-smoke.spec.ts",
+    "sha256": "9ace43d073ad2df6881e213b7797a59d1a2e99d7ea2385c535442c9fe37ee650",
+    "bytes": 7480
+  },
+  {
+    "file": "tests/e2e/strategy-search-flow.spec.ts",
+    "sha256": "5006ad4487a22c2a88ec6ee7aa536db15b9b10eba6f95ed0ac6dd9d078b36a6e",
+    "bytes": 20884
+  },
+  {
+    "file": "tests/e2e/teardown.ts",
+    "sha256": "899c0020f8df23085f81f12dddd63d062a5fc991621f9e46da925dfdee1f7ec4",
+    "bytes": 659
+  },
+  {
+    "file": "tests/emergencyControls.test.ts",
+    "sha256": "002f5f6853cc15fb6200cd8f475ca305b85685acb114e8b8c3650a3126269359",
+    "bytes": 373
+  },
+  {
+    "file": "tests/entryTriggerRevalidation.test.ts",
+    "sha256": "5e617ca55002b4e7a3465953ec09d0872d5d13d880645c11b69017797ebea900",
+    "bytes": 10177
+  },
+  {
+    "file": "tests/eventSequenceBacktest.test.ts",
+    "sha256": "5361ab85d4b18401db05171b8ef98838d49bcccba5513316dd5a115feb59f032",
+    "bytes": 9429
+  },
+  {
+    "file": "tests/eventSequenceLeverage.test.ts",
+    "sha256": "f43808b04b420bb460ed7d25cfe8ae30ae80adb06970395f3a882091ca7985a9",
+    "bytes": 2799
+  },
+  {
+    "file": "tests/executionQueue.test.ts",
+    "sha256": "96dd3b1857557752e441d62dd2de655dfbb86f4941733fb74b67117c50fc45f7",
+    "bytes": 6596
+  },
+  {
+    "file": "tests/finalReadyVerifyMatrix.test.ts",
+    "sha256": "18360d2373c81ba025005d4136167ecb6db0af175b1ff8eb970e39e6653f5117",
+    "bytes": 9398
+  },
+  {
+    "file": "tests/firstRunApiConfirm.test.ts",
+    "sha256": "e1eaa43c18d0e15ddca910352d712714c714a14e422927e1f0357c7692b1d91a",
+    "bytes": 1211
+  },
+  {
+    "file": "tests/firstRunEmptyRuntime.test.ts",
+    "sha256": "a38d898c88d1625461cc8aca535949c5c984851f3d34fead7fe131587dbea58c",
+    "bytes": 10233
+  },
+  {
+    "file": "tests/firstRunStatus.test.ts",
+    "sha256": "73be67cca3cb13829dc5d89cec7b168513ff9cd37d134a595e3086da8d9dea65",
+    "bytes": 3217
+  },
+  {
+    "file": "tests/fixtures/overlay/bt_ms31dmrw_637c6a.json",
+    "sha256": "06067c9576447993778b1eab8e6c1d064e08fd80b183e0022900ebdf24629ff2",
+    "bytes": 920
+  },
+  {
+    "file": "tests/fixtures/overlay/bt_ms31dync_01317b.json",
+    "sha256": "0157fa2a784accd054633f1862bf42d9bca0804ff8ca97910d4bd8bd881b3ed6",
+    "bytes": 1402
+  },
+  {
+    "file": "tests/fixtures/overlay/bt_ms31e01l_5d6b9f.json",
+    "sha256": "000e83dda11e224077aa30ee0e55935eabffff2b22585386e24a3951afc3d65a",
+    "bytes": 995
+  },
+  {
+    "file": "tests/fixtures/overlay/bt_ms31e199_1dae4f.json",
+    "sha256": "f7b0714274c915077e91627faaaae7cb75f648ea6a940f55b155b566e85ac84f",
+    "bytes": 958
+  },
+  {
+    "file": "tests/harnessDependencyResolution.test.ts",
+    "sha256": "2325f59626966d1e57ee0fd1468aaf122a2d1212529fe4aa0b54931260090871",
+    "bytes": 917
+  },
+  {
+    "file": "tests/helpers/isolatedStrategyStore.ts",
+    "sha256": "8c4d7d2bced46ee59fae670b323533419e8e6ce19a72ed21cc353928fbe08d98",
+    "bytes": 1208
+  },
+  {
+    "file": "tests/instrumentationBoot.test.ts",
+    "sha256": "9ae88c6c346d293e06eb7ae483f732ec07e85affa301af7cfb9f04956c0ce037",
+    "bytes": 855
+  },
+  {
+    "file": "tests/jobExecutionOwnership.test.ts",
+    "sha256": "c369d9c7c4418847b1aa9c65f29f236c2b339307fc6a08bb0a2a5ac8c1b03334",
+    "bytes": 6752
+  },
+  {
+    "file": "tests/jobRecordRecoveryAndErrors.test.ts",
+    "sha256": "9e1efd43eed054181b6b9660f14021b096974c184eabd836add10521f25b01df",
+    "bytes": 7563
+  },
+  {
+    "file": "tests/learningEngine.test.ts",
+    "sha256": "1e6f7899dbd421a1659fe553ada576fec4720607b34ff057b197d1a8d2b49a2f",
+    "bytes": 3080
+  },
+  {
+    "file": "tests/learningLogger.test.ts",
+    "sha256": "5e262a5b4e171068495dfda97d33f8dfb39f4b3ad19415d5ee53ce70f6444276",
+    "bytes": 10055
+  },
+  {
+    "file": "tests/learningStore.test.ts",
+    "sha256": "7287bd7af509ff1fc6c1037fc8347924298054712daea4de8032b72153aee7e4",
+    "bytes": 1025
+  },
+  {
+    "file": "tests/leverageEngine.test.ts",
+    "sha256": "d101cb4744ccbf484751f33c796c8e130531afb6156e2bc221815e0049b24d44",
+    "bytes": 3564
+  },
+  {
+    "file": "tests/leverageModeSearch.test.ts",
+    "sha256": "b2f8968ea629fcf8942a940fe9fbcd7ff028a4accf65728679a9b556d6eec796",
+    "bytes": 3846
+  },
+  {
+    "file": "tests/libraryArchiveManagement.test.ts",
+    "sha256": "300de53ba801789d476dfa30172801bee03c21e3d2e7d5c71fe96835cb757b46",
+    "bytes": 896
+  },
+  {
+    "file": "tests/lifecycleNavigation.test.ts",
+    "sha256": "ea4ec75f661969afab5f9a43c19f57a58bb09764c26862e1e7d0f284a2fbcea9",
+    "bytes": 4825
+  },
+  {
+    "file": "tests/lifecycleRedesignFixes.test.ts",
+    "sha256": "24e0d8879d2c3fccb8ba6874e3ca8c7096548556fbfe5c1875da1d60f4cf69ea",
+    "bytes": 6951
+  },
+  {
+    "file": "tests/liveChecklistDisplay.test.ts",
+    "sha256": "ba45132954025342df519a5613e451847fd87b8a4f03813ed8fab09b705e5bff",
+    "bytes": 1850
+  },
+  {
+    "file": "tests/liveDryRunEngine.test.ts",
+    "sha256": "c4f05d414702250bf37cdc3192c9881832d9c34b47aaac0ce94eb2c645c9734f",
+    "bytes": 3120
+  },
+  {
+    "file": "tests/liveExecutionEngine.test.ts",
+    "sha256": "f4781f72dd505126d6b23000892c06e4af83cf9a61e9720401bc5f88d098668c",
+    "bytes": 818
+  },
+  {
+    "file": "tests/liveReadinessChecklist.test.ts",
+    "sha256": "15ff64c89becb7af08e54eca4ede4f4ffb463e86590c4e9d8bb873e676b16f69",
+    "bytes": 5506
+  },
+  {
+    "file": "tests/liveSafetyGate.test.ts",
+    "sha256": "84dd4a333f4271c4f22777f04500a68f72bfb27a9a24423ea830617c220f68ab",
+    "bytes": 3957
+  },
+  {
+    "file": "tests/multiPatternBlockPersistence.test.ts",
+    "sha256": "892fa5045ee2654f35301f3799c501e0581138f4338b5145f86810f211feae16",
+    "bytes": 6705
+  },
+  {
+    "file": "tests/multiPatternUiVerifyRegression.test.ts",
+    "sha256": "0f47a2205daa851371c863a7faa34cdd8dc05575d97062d4747a3dfc9279a14b",
+    "bytes": 11012
+  },
+  {
+    "file": "tests/orderBlockInstitutional.test.ts",
+    "sha256": "30881eb16f6dad33155609a3a072d1dd832c72020dd2f7ab85aa8fc09cf30f54",
+    "bytes": 5194
+  },
+  {
+    "file": "tests/orderBlockSearchEngine.test.ts",
+    "sha256": "b59c78dceaf07e789f9ea17f9d407092da0c5fc4e8cc51fb8f82c48d3d8d9fe4",
+    "bytes": 7993
+  },
+  {
+    "file": "tests/orderBlockZoneBasis.test.ts",
+    "sha256": "638c94f13f902aed9250d37e7ca3f6368ec51ea13bda4817d492cc31b2df0cee",
+    "bytes": 5106
+  },
+  {
+    "file": "tests/orphanJobRecovery.test.ts",
+    "sha256": "b070ff1e960b4791209b5cb5f0092d6e4ff6e308f5bd110f9079fbd728cba875",
+    "bytes": 4866
+  },
+  {
+    "file": "tests/orphanRecoveryRoute.test.ts",
+    "sha256": "bf42d687be2d8856a2187b4b0d45bfbe1214a476bcda22dbef880d2436b95527",
+    "bytes": 1073
+  },
+  {
+    "file": "tests/paperBacktestComparison.test.ts",
+    "sha256": "df9f6ee344f9eed0e27316c1e2e0d4f46670e0537a1209ff70bef7dee34cc1c0",
+    "bytes": 1724
+  },
+  {
+    "file": "tests/paperBotRestartGate.test.ts",
+    "sha256": "f5f6e8808738e51e6044001a2c6b93a386cb50ee5ab3b8e986f190878bb98c1a",
+    "bytes": 5513
+  },
+  {
+    "file": "tests/paperEndToEndVerifier.test.ts",
+    "sha256": "6fa9223420b1d63908de9832cb3c1f00a7c9da345041f5f54533bfa9fab1724c",
+    "bytes": 1202
+  },
+  {
+    "file": "tests/paperExecutionIdentity.test.ts",
+    "sha256": "336e8f6065e5108472e2f2f3ac30d975bc632cf5392d8514fce58fecb8b23c35",
+    "bytes": 2275
+  },
+  {
+    "file": "tests/paperIdentityConsistency.test.ts",
+    "sha256": "b20269bea7b5f2048509987e66982736ca2547bf9b3aa44dbb7cde3ac9f1aed6",
+    "bytes": 3172
+  },
+  {
+    "file": "tests/paperRiskReadiness.test.ts",
+    "sha256": "ef5ca7e54b530624f54fa8dd000014215db27dbd757c327cbc75777ac3a78060",
+    "bytes": 3972
+  },
+  {
+    "file": "tests/paperSessionStore.test.ts",
+    "sha256": "4f605aaf545faff0fb21f1bf63c24236a73c20005f05c4abb9b65d5f130ec3d7",
+    "bytes": 3473
+  },
+  {
+    "file": "tests/paperSingleSource.test.ts",
+    "sha256": "47da621402a7f7a9f43e6d5e82860cb9b86b84bb10ab6ed93e6c67095ed93afb",
+    "bytes": 11332
+  },
+  {
+    "file": "tests/paperStrategyResolver.test.ts",
+    "sha256": "b7c36532eaebb85360d7fa968c36bd30d208170edac404e8b58b53e0d9f4ce14",
+    "bytes": 4434
+  },
+  {
+    "file": "tests/patternCatalogSupplyDemandPlan.test.ts",
+    "sha256": "7a70a629568d1e9ba3171d396bc0b2fcb85f1f8c4b8a5cd8db6d0313d8ff1cb3",
+    "bytes": 7367
+  },
+  {
+    "file": "tests/patternCombinationEngine.test.ts",
+    "sha256": "b8ec4fe8dbc0d61d008464077c96768fa41fe044666bfaacd1d6fdfae6faba29",
+    "bytes": 10355
+  },
+  {
+    "file": "tests/patternCombinationEval.test.ts",
+    "sha256": "41fec55f93a2fd7148b15ce0d2644e99f9d2b82447a8e5685bdf777bd7103c14",
+    "bytes": 9817
+  },
+  {
+    "file": "tests/patternExplainabilityEvidence.test.tsx",
+    "sha256": "555a42c6b6a1a254d8a9042f76443e30a3f67fb798de81e228813d4943090494",
+    "bytes": 6188
+  },
+  {
+    "file": "tests/patternSearchAllFamilies.test.ts",
+    "sha256": "b407a44bf135fcedba243e2ee66d723e9e056b843f347ed3941820993136666c",
+    "bytes": 14575
+  },
+  {
+    "file": "tests/patternSearchCompletionExtras.test.ts",
+    "sha256": "7107534c544ca63272c030657063a39ff58648a4b0b6c9edd6992a772dd4e0aa",
+    "bytes": 4680
+  },
+  {
+    "file": "tests/patternSearchCompletionFinal.test.ts",
+    "sha256": "81de12ce6214005e971e47bd147e67652f056ef7ee727a26b80254f7fb720e30",
+    "bytes": 12080
+  },
+  {
+    "file": "tests/patternSearchConfigWire.test.ts",
+    "sha256": "a49db4617ebe92bbdfde0d359883ac155f10d43d7f940189b366b713f2045440",
+    "bytes": 9875
+  },
+  {
+    "file": "tests/patternSummaryKorean.test.ts",
+    "sha256": "44aedda5b89d5863c4e70a37a47a1dfd2eb6d80591b8862abfbe538bc264a492",
+    "bytes": 2379
+  },
+  {
+    "file": "tests/patternTraceabilityMatrix.test.ts",
+    "sha256": "9d39d2eb371b71b747c9e590a865cacbd06d731aa8ab661b95e6dd52c4517156",
+    "bytes": 24087
+  },
+  {
+    "file": "tests/providerRuntimePathIsolation.test.ts",
+    "sha256": "1a5b7734a53629e2c488327798e55dfd15e1e26e870e80ba8620135e08a17f6e",
+    "bytes": 2470
+  },
+  {
+    "file": "tests/rejectionReasonDisplay.test.ts",
+    "sha256": "f8e9db3894756ad34e1b68b52615387e3b8c888c61c74b025e1b4939538f9803",
+    "bytes": 2028
+  },
+  {
+    "file": "tests/requestCache.test.ts",
+    "sha256": "08f18f58dbfc5f24ba01286f552e948252c9b3e36f3fa4d80dc687e4a1d3b29c",
+    "bytes": 1706
+  },
+  {
+    "file": "tests/researchHistoryManagement.test.ts",
+    "sha256": "615d0adac1d12127cc50374143e78791acf5095ba8ef98a6e1d540d7f1d07c6e",
+    "bytes": 12441
+  },
+  {
+    "file": "tests/researchOutcomeAndClustering.test.ts",
+    "sha256": "c313b2746a0367d9ded0f8918de7a4198393f0f9206d655885bc2cb14694db1a",
+    "bytes": 9036
+  },
+  {
+    "file": "tests/researchResultsCompletion.test.ts",
+    "sha256": "e55562dba0ba6d0b6023c84d5a60ac3e44dd7f5e79a5c9d90536cd872acc926c",
+    "bytes": 13706
+  },
+  {
+    "file": "tests/researchResultsUx.test.ts",
+    "sha256": "9cd0dd04d3a0e50ffc1fd58f61b7d2debdbc2bc7d9e7443e239e88aa620f3602",
+    "bytes": 19041
+  },
+  {
+    "file": "tests/researchTop10AndConfigMgmt.test.ts",
+    "sha256": "3628c7d9a1ac8c1479f195cc61d320bed9afc27130961f0571f31713d4a9b10f",
+    "bytes": 14216
+  },
+  {
+    "file": "tests/resultsLibraryPreview.test.ts",
+    "sha256": "cf9d2899f4373e928cd1d394bab0b44c789ecd9537cc69de6ad9e7b3846251f9",
+    "bytes": 935
+  },
+  {
+    "file": "tests/runtimePathsNftBoundary.test.ts",
+    "sha256": "061c924ab0a3c4d3c62cc5af44b0003678c2750b4e914f2110d807a322f6bbff",
+    "bytes": 4909
+  },
+  {
+    "file": "tests/safeQuantStack.test.ts",
+    "sha256": "ac8b647a9f93bc9cdce1d233653b95cb0ed4bd68faa64ad820bebddc8dafd7e6",
+    "bytes": 5733
+  },
+  {
+    "file": "tests/safety.test.ts",
+    "sha256": "89bddd34aac4c43b861aca4af12932f3cb3e93cc08085a590ab9d680ecc2615f",
+    "bytes": 5309
+  },
+  {
+    "file": "tests/searchLiveTop10AndConfig.test.ts",
+    "sha256": "6223b9796d1615468db072fb91b427c1ceba214f0820375faff36b5818bd1abb",
+    "bytes": 10823
+  },
+  {
+    "file": "tests/searchSpaceMutation.test.ts",
+    "sha256": "3bf2a373147e4102bf829ce31fe89f89cca80affea82ddbd88cca6bafdede0f4",
+    "bytes": 4308
+  },
+  {
+    "file": "tests/serverTpSlManager.test.ts",
+    "sha256": "51e6b604ee2a6b2d75a8ea3889b0b4d2b82bce9ae833bb6bdbe773c3dd3539cb",
+    "bytes": 495
+  },
+  {
+    "file": "tests/serverTpSlReadiness.test.ts",
+    "sha256": "159d2cbb13e28bef898c20192db23f98beaaecd4036536d9b4a4d491a560f163",
+    "bytes": 1904
+  },
+  {
+    "file": "tests/settingsMerge.test.ts",
+    "sha256": "b1a064c1d1cc870878eb7a37b7deb6b497191b5ce22ed70f7d342cdfd13d99db",
+    "bytes": 1204
+  },
+  {
+    "file": "tests/settingsStore.test.ts",
+    "sha256": "0ec9aa3b79d9981d1e10c6aa38e8466bb63d54d4a26c389ade543627c3f2ab6d",
+    "bytes": 1206
+  },
+  {
+    "file": "tests/setup/strategyStoreIsolation.setup.ts",
+    "sha256": "f176c06049d1d13f3caa65d113557f032ef0a2599df2ef2c01b818ab1225a4a6",
+    "bytes": 720
+  },
+  {
+    "file": "tests/stabilizationPass.test.ts",
+    "sha256": "2f7df560476648cb04f6e8f542519d98688b284ab7d8b64f60a338e88f7881b0",
+    "bytes": 6333
+  },
+  {
+    "file": "tests/strategyBuilder.test.ts",
+    "sha256": "73b9a5fc35d92142c3f3148aec39562d6a1c1c87ada5adc03b9f180c87932601",
+    "bytes": 11662
+  },
+  {
+    "file": "tests/strategyBuilderSaveNext.test.ts",
+    "sha256": "fb3684c86e8b8fc1aef35f4c157626f88621b52ba718aca7ea1c3572bf24a42a",
+    "bytes": 5355
+  },
+  {
+    "file": "tests/strategyDisplayRename.test.ts",
+    "sha256": "513b2d2ddbc1a8babc3f3bacff70dfeba219c0cba2a0870da36fdf1f005aeb62",
+    "bytes": 2173
+  },
+  {
+    "file": "tests/strategyHashIdentity.test.ts",
+    "sha256": "cb86611db7ae8393f0e6f3994b1400e86f6970d82e6b4a7746ac9cca9602cb55",
+    "bytes": 3265
+  },
+  {
+    "file": "tests/strategyLiveApproval.test.ts",
+    "sha256": "fe18b97148dd68b56ac186915324f2b886952792993757e3580bc5a54d316c62",
+    "bytes": 1401
+  },
+  {
+    "file": "tests/strategyPersistence.test.ts",
+    "sha256": "620e98374d91384b85c2b7f121fededa5dec703f535f0712156e5a7add14e350",
+    "bytes": 9868
+  },
+  {
+    "file": "tests/strategySafeImmutability.test.ts",
+    "sha256": "267f52d6cc7de245a77689ea8ee20e964a1313a2b6e9beee702507d2f5e257ad",
+    "bytes": 4954
+  },
+  {
+    "file": "tests/strategySearchAdvancedSettings.test.ts",
+    "sha256": "1e5a5faf93280476b60d28e1e9e0f8ca6279ee77f75632c1eabeac41873ff6b4",
+    "bytes": 2630
+  },
+  {
+    "file": "tests/strategySearchApi.test.ts",
+    "sha256": "33148a0d7e99050d73f60f44a33b6f84f20a95f89feb13d16c5fadd6ab6cc9de",
+    "bytes": 20908
+  },
+  {
+    "file": "tests/strategySearchBacktestAdapter.test.ts",
+    "sha256": "2bd16fdb0acef4cfd13e48e6f049214c671a32eca1a85f965dbed903334e81f9",
+    "bytes": 17146
+  },
+  {
+    "file": "tests/strategySearchBudgetScheduler.test.ts",
+    "sha256": "e22442d48346dc4f76baacc96a876f82a4b6985621b321e74937aceb53a6202e",
+    "bytes": 4487
+  },
+  {
+    "file": "tests/strategySearchCandidateEvaluator.test.ts",
+    "sha256": "e48c8688d6011976d0daf42d05fd230aef07bd61f89ad781be290cb73ae2817d",
+    "bytes": 19326
+  },
+  {
+    "file": "tests/strategySearchCandidateGenerator.test.ts",
+    "sha256": "27d4fc23ef9d44c5d1dc06ad0864dbd820c2bed54fe57cd4c421f3ae0f472c7b",
+    "bytes": 10103
+  },
+  {
+    "file": "tests/strategySearchCheckpoint.test.ts",
+    "sha256": "74f9687e322d1a464c6a800f042fda8f63ac6699712753a50df8e6c8c44eac4e",
+    "bytes": 3926
+  },
+  {
+    "file": "tests/strategySearchCheckpointCorruption.test.ts",
+    "sha256": "cfa5e2383708f46a63b493d07e444446ffbc419012a1e662c77b17dcdcb7ae4c",
+    "bytes": 10603
+  },
+  {
+    "file": "tests/strategySearchCheckpointVersion.test.ts",
+    "sha256": "86bf7d11b4d70b03c94f94e15af1a4aeae0c9a5ca87f6c1b3b53d85fff5dee81",
+    "bytes": 3706
+  },
+  {
+    "file": "tests/strategySearchCostStress.test.ts",
+    "sha256": "5b23192d05a70ce35a9eb417d66b3da53e7fc2e3cc98081699bd342d285e0b32",
+    "bytes": 10362
+  },
+  {
+    "file": "tests/strategySearchDeadline.test.ts",
+    "sha256": "44f0f3e08c2559af3db2438209cf4e8730e2719b3467ff95df3bdb8ed3fc0e06",
+    "bytes": 6236
+  },
+  {
+    "file": "tests/strategySearchDefaultRoot.test.ts",
+    "sha256": "187c15a95f3d45d92ad7a96053eedc86567cee2b0142fed99207e3d327d2c6f9",
+    "bytes": 6460
+  },
+  {
+    "file": "tests/strategySearchEvaluationPolicy.test.ts",
+    "sha256": "94556166aeded9119030b16763e433eba434cfcaf4a9fb2a9737407505e69a41",
+    "bytes": 14857
+  },
+  {
+    "file": "tests/strategySearchFollowUp.test.ts",
+    "sha256": "6906c79aa54bcaf33c14ecc19e37040a49b3dbcbed007e331e17efec3e349c55",
+    "bytes": 1900
+  },
+  {
+    "file": "tests/strategySearchHistoryRetention.test.ts",
+    "sha256": "ce175b523318d203cae5e0280e6f45fcde74dbec1b2468873a6da6e3c80a640a",
+    "bytes": 24428
+  },
+  {
+    "file": "tests/strategySearchJitterEvaluator.test.ts",
+    "sha256": "27237e528d143c50a22fa2b41ec4621bc0ac5965ff4c4434cd8520c40349ff0e",
+    "bytes": 13319
+  },
+  {
+    "file": "tests/strategySearchJobRunner.test.ts",
+    "sha256": "70d8dea393da8154ff5a29e0a94b08cc42623ec4ec36b39a64d37ef03032a2fc",
+    "bytes": 12883
+  },
+  {
+    "file": "tests/strategySearchJobStore.test.ts",
+    "sha256": "f9f34d0f32f1e4d0a3d282a5205c822ba57753c68cca80f7e7ffb2668b7e0a01",
+    "bytes": 13996
+  },
+  {
+    "file": "tests/strategySearchLocalization.test.ts",
+    "sha256": "214436dd8fb1d51b7fdfa435e0698844b4f341d174988d8b327ae15894822457",
+    "bytes": 7196
+  },
+  {
+    "file": "tests/strategySearchNoAutoPromote.test.ts",
+    "sha256": "b2b0496803b040ff3ceb6fa7944c3a514d4ed3a8380e61272729283dfa36ca29",
+    "bytes": 5286
+  },
+  {
+    "file": "tests/strategySearchOperatorProfiles.test.ts",
+    "sha256": "f6cd8e730c126a297bd4d2757e2d23c2c41045b89ff894559da76ec9697f593e",
+    "bytes": 3226
+  },
+  {
+    "file": "tests/strategySearchOrchestratorHandoff.test.ts",
+    "sha256": "deefebb7d1aa70fbf1f5563ba99f723ed5497c47ceaa8cb6a59991ba2d94a7b7",
+    "bytes": 4968
+  },
+  {
+    "file": "tests/strategySearchParamSpace.test.ts",
+    "sha256": "b3c02bb8fe9677910e72da90d3aa968f08e483422be55706a84ac4310e1330b8",
+    "bytes": 5363
+  },
+  {
+    "file": "tests/strategySearchProgressUx.test.ts",
+    "sha256": "94e88936b9a4fea2ed7b36a48217d163d318b227e2612d69caabd4b17c0e0875",
+    "bytes": 2488
+  },
+  {
+    "file": "tests/strategySearchProgressiveDisclosure.test.ts",
+    "sha256": "9464751e79c094625a040f4e2240f7e347eeaf9817c137f1b54b24aab690b269",
+    "bytes": 1422
+  },
+  {
+    "file": "tests/strategySearchPromote.test.ts",
+    "sha256": "48b41788aef2d2990579355a43fd186de20d2ce0c378d8b2d9c91815fcca9b6b",
+    "bytes": 10623
+  },
+  {
+    "file": "tests/strategySearchResearchLoop.test.ts",
+    "sha256": "00ce1154c610ca006f5887a85ffceb3f4e8f060097a8fd46da4f2a3e0cc329c0",
+    "bytes": 4330
+  },
+  {
+    "file": "tests/strategySearchResume.test.ts",
+    "sha256": "28a772bf4a5cfb7a3f15604737106d2dbea3904c161e46d456d678be6acf1b5b",
+    "bytes": 11598
+  },
+  {
+    "file": "tests/strategySearchResumeIntegration.test.ts",
+    "sha256": "2df319f205acd9bac971c626b0a1260700261224195b2b5b0514852db16e236f",
+    "bytes": 13210
+  },
+  {
+    "file": "tests/strategySearchRuntimeCorrection.test.ts",
+    "sha256": "8e078881069802bc7828e2b5a65df83d1cabfc8190bb3fbf061b12fb7d4a408d",
+    "bytes": 12116
+  },
+  {
+    "file": "tests/strategySearchSafety.test.ts",
+    "sha256": "f54686e37d0f015d271cfc554ae8cc6ac00d1c5428c87e1a2f643b20ae544c4f",
+    "bytes": 4833
+  },
+  {
+    "file": "tests/strategySearchStatistics.test.ts",
+    "sha256": "55fa422c1565c02a142aa46eb0bfb38b00bfa4a4eebd032656ba38d2d1365800",
+    "bytes": 3316
+  },
+  {
+    "file": "tests/strategySearchUi.test.ts",
+    "sha256": "dd9092335e592c4187381a2e05670f052486c7861ee94862709a9ff0e1cc3daa",
+    "bytes": 9872
+  },
+  {
+    "file": "tests/strategySearchUpgradeFinal.test.ts",
+    "sha256": "65d5993198b3f6dd8a4db5474e3797cb3fd8568306685168cbfbff3da901c8a7",
+    "bytes": 10351
+  },
+  {
+    "file": "tests/strategySearchUxExtensions.test.ts",
+    "sha256": "acf8f36204a25bad142e66480ea1db6e360e27295ff081691f4ab90e4797055e",
+    "bytes": 6564
+  },
+  {
+    "file": "tests/strategySearchWindowPlanner.test.ts",
+    "sha256": "eb072511ccc7f672af17859ad8f0912c9e5d7af957075c6a2bc2048fa73a2fbd",
+    "bytes": 7299
+  },
+  {
+    "file": "tests/strategyStore.test.ts",
+    "sha256": "a37da238311cac7734cc3728aafecbab8336683fe425b538d03a97f97c06f3a4",
+    "bytes": 4269
+  },
+  {
+    "file": "tests/strategyStoreNftBoundary.test.ts",
+    "sha256": "308432237ca3ce76310419928450daaf4f5db032a091384b41c19eddef7d7106",
+    "bytes": 2970
+  },
+  {
+    "file": "tests/strategyStoreSafety.test.ts",
+    "sha256": "849fb0dc38cc820eb1a2a27e41348d8d91ae10270922470105a567fc2cb8a7a9",
+    "bytes": 4767
+  },
+  {
+    "file": "tests/systemStatusSync.test.ts",
+    "sha256": "39847baea8db9b321a6e50a821e0def5d34682ee06d80866cc330c6452a08d8f",
+    "bytes": 2735
+  },
+  {
+    "file": "tests/telegramAssistant.test.ts",
+    "sha256": "962b9ab119f187530e35c9f96d8d23a4dde5caceea3328bcf1ddc1b0ed7bf18e",
+    "bytes": 629
+  },
+  {
+    "file": "tests/telegramMessages.test.ts",
+    "sha256": "626edbcdc7afaa2a256a93ae1560e45d9c08ff72b0c6da148076ca02e07ee991",
+    "bytes": 9875
+  },
+  {
+    "file": "tests/telegramNotifier.test.ts",
+    "sha256": "1819b1054bb9d54923b15fd96022d0eadbf4808255f334f8267a97ee377c2801",
+    "bytes": 6539
+  },
+  {
+    "file": "tests/telegramRateLimiter.test.ts",
+    "sha256": "de70f13fb5472c9fcb2f067a2beae3b31af32de8f2832b33da77ae0c0223415e",
+    "bytes": 4156
+  },
+  {
+    "file": "tests/test_todo.py",
+    "sha256": "a80254d704acbd5d0d387f6290a2d39d7dc49012ba9de940262990085daed6c6",
+    "bytes": 607
+  },
+  {
+    "file": "tests/todo5CatalogLifecycle.test.ts",
+    "sha256": "1714bf02ca9f22951d38953a209a5f026e494c917d78e1f5086d8535bc4d1ee0",
+    "bytes": 6334
+  },
+  {
+    "file": "tests/tradingDashboardStatus.test.ts",
+    "sha256": "6805cdfe713986130dfb7599118cd4f6e1cda5da8e8fa2d7a855057d80e6fc57",
+    "bytes": 4774
+  },
+  {
+    "file": "tests/tradingFlowVerifier.test.ts",
+    "sha256": "5b206b51de826618405b92b16ab009f8e4a604b8de4e49be022470e94a16a232",
+    "bytes": 726
+  },
+  {
+    "file": "tests/unifiedCharts.test.ts",
+    "sha256": "819313c6648fb7615584e2c43795b9287d9e3e3566a85023770690e4336e6869",
+    "bytes": 2160
+  },
+  {
+    "file": "tests/unifiedMetrics.test.ts",
+    "sha256": "a2a13b6a11bcbb3b8b74b7b24280c32ecdaeb2aa09cd8c2836dec546e0c4c8a0",
+    "bytes": 4424
+  },
+  {
+    "file": "tests/userBacktestRun.test.ts",
+    "sha256": "6e647ba36ad723f119e0e24ccc223a77f9693c0fba6dbcbfe1ff3a93da074ea2",
+    "bytes": 9076
+  },
+  {
+    "file": "tmp-audit-leverage.mts",
+    "sha256": "7d41560fd310ea241249160b82369394fd17dd2b7d976599b95f4d73ceaf92c3",
+    "bytes": 1094
+  },
+  {
+    "file": "tmp-audit-notes.md",
+    "sha256": "fc5aeb0001deee625998c678c9b4d46a858ee63449e95e9fe84df23ba150320c",
+    "bytes": 3045
+  },
+  {
+    "file": "tmp-collect-final-evidence.mts",
+    "sha256": "6d5b4f87c9b4327df109e72e911de3aea248e7adf3da09090cf313926718724e",
+    "bytes": 5519
+  },
+  {
+    "file": "tmp-create-commercial-jobs-v2.mts",
+    "sha256": "67e24beffddaaf0ee100636423189ee1118ca05473b573ad3e6b3964a2844ccf",
+    "bytes": 6623
+  },
+  {
+    "file": "tmp-create-commercial-jobs.mts",
+    "sha256": "65170a85a9f8d05adb3986b305decd96e08f5cd1d3b24c56182b5c3bbc842e72",
+    "bytes": 6565
+  },
+  {
+    "file": "tmp-create-lev-cfg-v2.mts",
+    "sha256": "5b0cb24ae73dc99465fbacc4b731f121aa2e139334198bcb7469392fb7cc4625",
+    "bytes": 3351
+  },
+  {
+    "file": "tmp-e2e-final.txt",
+    "sha256": "75b4c96bb126cfb175e5fa780269935f667c3a144ff84fc098cae40356a90792",
+    "bytes": 12390
+  },
+  {
+    "file": "tmp-e2e-out.txt",
+    "sha256": "013e44ba76c7f512b407833eca2be02a29bec5d35137440241963b000f907b41",
+    "bytes": 12374
+  },
+  {
+    "file": "tmp-elig.mts",
+    "sha256": "cb358b91c0d475c48f80d281c0d0da1205f874fa5aaf85bf6bbf85391fb3aff3",
+    "bytes": 1562
+  },
+  {
+    "file": "tmp-engine-proof-job.json",
+    "sha256": "4065c6264a67ddd6a15b855f3657d9ee4b96cb4e8df22b86291296e0c70cfe8b",
+    "bytes": 2471
+  },
+  {
+    "file": "tmp-final-matrix-run.log",
+    "sha256": "e6afd8a3d93ed4107372e0f2e646e0d0703e25fffae863ff1087b7f704d029b2",
+    "bytes": 908
+  },
+  {
+    "file": "tmp-final-release-matrix.mts",
+    "sha256": "b922757c7dc00bb1da2286f60287eb2e093962f64eac90914ff2e0804b9a8171",
+    "bytes": 8640
+  },
+  {
+    "file": "tmp-find-eligible.mts",
+    "sha256": "b3209cc2253cbf7e60357f45913fb3c010ddc9bbb60dc2b86688ff65b07cc328",
+    "bytes": 2523
+  },
+  {
+    "file": "tmp-lev-4mode-proof.json",
+    "sha256": "39ed036609db9c7961c5b93f2bcce6648adabdb291e74c81d107434a4d6be115",
+    "bytes": 11273519
+  },
+  {
+    "file": "tmp-lev-fix-bt.json",
+    "sha256": "2a9b4788a763e87f1d054cc1b17b96870c6b1ed43b08b0618cea0a246ba7b6cb",
+    "bytes": 552826
+  },
+  {
+    "file": "tmp-lint-final.txt",
+    "sha256": "d3dc2eb2f2c45426fe3e3492c5c70304bcfb885b41cab323e9bcda3258ab625e",
+    "bytes": 112
+  },
+  {
+    "file": "tmp-lint-out.txt",
+    "sha256": "d3dc2eb2f2c45426fe3e3492c5c70304bcfb885b41cab323e9bcda3258ab625e",
+    "bytes": 112
+  },
+  {
+    "file": "tmp-test-final.txt",
+    "sha256": "64ba2635d3a2ea42bd32d6ce7c235c0b3adb5b83bb825ee40ab4a38e8908ec67",
+    "bytes": 516
+  },
+  {
+    "file": "tmp-test-out.txt",
+    "sha256": "529572d84bae85955b42c3d1bab1439890467e7a9565dc565aee1f3130decd68",
+    "bytes": 4574
+  },
+  {
+    "file": "tmp-test-out2.txt",
+    "sha256": "453d1f995cd7a8525abc47a0001380324dc555f73a66e20bf9131d9d89ca221e",
+    "bytes": 516
+  },
+  {
+    "file": "todo_app/__init__.py",
+    "sha256": "e3998da573d8134465c2984516429fa5f920a389f8d1a929badfdcbff64ec0af",
+    "bytes": 32
+  },
+  {
+    "file": "todo_app/__pycache__/__init__.cpython-314.pyc",
+    "sha256": "de22789d4b9234c8d77edb06de9b59d04d1d9d5463c5728dc6c6d91f734ea0e0",
+    "bytes": 170
+  },
+  {
+    "file": "todo_app/__pycache__/todo.cpython-314.pyc",
+    "sha256": "de1627c226d5e8ba6e83279209e6d5fba42769c8b436db9e0aa8c092fe62fd10",
+    "bytes": 3513
+  },
+  {
+    "file": "todo_app/todo.py",
+    "sha256": "ace33bd8917aebcd9f3b4355195702d9e1e41a4ef3f8ad462df5804add7325b0",
+    "bytes": 1220
+  },
+  {
+    "file": "tsconfig.json",
+    "sha256": "3c56c44efc5ae31e20afe1f7afb8464a30976309a1f41e359a84087a95579a34",
+    "bytes": 838
+  },
+  {
+    "file": "tsconfig.tsbuildinfo",
+    "sha256": "a7b7053da52471b779e3b8f19d67e478e4c10f7a6b12f0a2a31043af4d6e73aa",
+    "bytes": 319229
+  },
+  {
+    "file": "vitest.config.ts",
+    "sha256": "a37ec83404eda23cb96b569ad61afc8e5a1a70801db1893e08d1853a16fec749",
+    "bytes": 371
+  }
+]

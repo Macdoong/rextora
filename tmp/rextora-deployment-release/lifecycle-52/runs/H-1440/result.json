@@ -1,0 +1,982 @@
+{
+  "scenario": "H",
+  "width": 1440,
+  "startedAt": "2026-08-14T08:52:12.194Z",
+  "finishedAt": "2026-08-14T08:55:08.183Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-H-1440-5859c5-LZJ9e2",
+  "port": 60828,
+  "provider": "openai",
+  "consoleErrorCount": 2,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:60828/api/rextora/settings/ai-providers/models?provider=openai:0:0",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:60828/api/rextora/settings/ai-providers/models?provider=openai:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T08:52:13.369Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspkvy1_2otsga",
+      "turnId": "turn-1786697533349",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:13.377Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspkvy1_2otsga",
+      "turnId": "turn-1786697533349",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:14.351Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspkwpb_9udv67",
+      "turnId": "turn-1786697534341",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:29.083Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspkwpb_9udv67",
+      "turnId": "turn-1786697534341",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 14729,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:30.034Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspl8sy_inkebl",
+      "turnId": "turn-1786697550026",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:30.035Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspl8sy_inkebl",
+      "turnId": "turn-1786697550026",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:31.012Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspl9k4_1d7tki",
+      "turnId": "turn-1786697551003",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:49.370Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspl9k4_1d7tki",
+      "turnId": "turn-1786697551003",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 18357,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:52:50.323Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssplogj_xani5w",
+      "turnId": "turn-1786697570314",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:53:11.810Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssplogj_xani5w",
+      "turnId": "turn-1786697570314",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 21485,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T08:53:12.768Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspm5s0_vpgvbj",
+      "turnId": "turn-1786697592759",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:53:36.033Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspm5s0_vpgvbj",
+      "turnId": "turn-1786697592759",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 23257,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T08:53:37.000Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msspmoh4_6kxjk2",
+      "turnId": "turn-1786697616993",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:53:37.001Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msspmoh4_6kxjk2",
+      "turnId": "turn-1786697616993",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "responses": [
+      {
+        "query": "이전 탐색과 겹치지 않는 연구를 해줘",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:13.369Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:13.369Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:13.369Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:13.369Z"
+          }
+        ],
+        "plan": {
+          "steps": [
+            {
+              "stepId": "create_search",
+              "toolId": "search.create",
+              "arguments": {
+                "createBody": {
+                  "searchVersion": "1",
+                  "strategyTemplateId": "agent_draft_ETHUSDT_15m",
+                  "symbols": [
+                    "ETHUSDT"
+                  ],
+                  "timeframe": "15m",
+                  "dataVersion": "binance-v1",
+                  "seed": 42,
+                  "generatorType": "random",
+                  "maxIterations": 40,
+                  "parameterRanges": [
+                    {
+                      "key": "ema_fast",
+                      "min": 8,
+                      "max": 40,
+                      "step": 1,
+                      "valueType": "integer"
+                    }
+                  ],
+                  "evaluationWindows": [
+                    {
+                      "id": "full",
+                      "label": "전체 구간",
+                      "fromOpenTime": 1781481600000,
+                      "toOpenTime": 1786751999999,
+                      "requiredForPass": true
+                    }
+                  ],
+                  "balance": 10000,
+                  "baseCostConfig": {
+                    "feeRate": 0.0004,
+                    "slippageRate": 0.0002,
+                    "fundingRate": 0.0001,
+                    "applyFunding": false,
+                    "applySpread": true,
+                    "spreadRate": 0.0001
+                  },
+                  "passPolicy": {
+                    "thresholds": {
+                      "minTradeCount": 10,
+                      "minTotalReturn": 0,
+                      "maxMdd": -0.25,
+                      "minWinRate": null
+                    }
+                  },
+                  "scoreWeights": {
+                    "returnWeight": 1,
+                    "mddWeight": 0.5,
+                    "profitFactorWeight": 0.25,
+                    "winRateWeight": 0.25,
+                    "tradeAdequacyWeight": 0.25,
+                    "negativeMonthWeight": 0.1,
+                    "consistencyWeight": 0.1
+                  },
+                  "costStressScenarios": [
+                    {
+                      "id": "stress_1_5x",
+                      "label": "비용 1.5배",
+                      "requiredForPass": false,
+                      "feeMultiplier": 1.5,
+                      "slippageMultiplier": 1.5,
+                      "fundingMultiplier": 1,
+                      "spreadMultiplier": 1.5,
+                      "costGuardKMultiplier": 1
+                    }
+                  ],
+                  "jitterConfig": {
+                    "enabled": true,
+                    "sampleCount": 2,
+                    "mutationScale": 0.2,
+                    "seed": 7,
+                    "minimumPassRate": 0,
+                    "maximumScoreDropRatio": 1,
+                    "parameterRanges": [
+                      {
+                        "key": "ema_fast",
+                        "min": 8,
+                        "max": 40,
+                        "step": 1,
+                        "valueType": "integer"
+                      }
+                    ]
+                  },
+                  "dataRef": {
+                    "source": "binance_historical",
+                    "availableFrom": 1781481600000,
+                    "availableTo": 1786751999999
+                  },
+                  "operatorPlan": {
+                    "depthProfile": "standard",
+                    "qualificationProfile": "balanced",
+                    "qualifiedTarget": 3,
+                    "stopWhenQualifiedTarget": false,
+                    "candidateBudget": 200,
+                    "stageBatchSize": 40,
+                    "maxRuntimeMs": 10800000,
+                    "minScore": null,
+                    "searchName": "agent_draft_ETHUSDT_15m",
+                    "errorWarningRate": 0.35,
+                    "errorAutoPauseRate": 0.55,
+                    "repeatedSignatureThreshold": 25,
+                    "patternSelectionMode": "manual",
+                    "selectedSpaceIds": [
+                      "trendline",
+                      "support_resistance"
+                    ],
+                    "leverageMode": "automatic",
+                    "leverageFixed": null,
+                    "leverageMin": 1,
+                    "leverageMax": 5,
+                    "adaptiveLeverageEnabled": true,
+                    "patternConfigLevel": "basic",
+                    "patternDirection": "both",
+                    "patternRetestMode": "required",
+                    "patternConfirmStrength": "standard",
+                    "patternConfirmClose": "required",
+                    "patternConfirmationMode": "single_close",
+                    "patternConfirmationCandleCount": 2,
+                    "patternConfirmationWindow": 4,
+                    "patternExpiryBars": 48,
+                    "patternRiskStyle": "balanced",
+                    "patternStrength": "standard",
+                    "patternSrSensitivity": "standard",
+                    "patternCombinationTemplate": "single",
+                    "patternCombinationOperator": "and",
+                    "patternCombinationInvalidationMode": "any",
+                    "patternCombinationFailurePolicy": "any",
+                    "patternCombinationWeightedThreshold": null,
+                    "patternCombinationFamilies": null,
+                    "patternCombinationSpec": null
+                  },
+                  "marketMode": "manual"
+                }
+              },
+              "dependsOn": [],
+              "purpose": "새 전략 탐색 작업 생성",
+              "expectedResult": "jobId 반환",
+              "requiresApproval": true,
+              "executionOrder": 1,
+              "onFailure": "abort",
+              "status": "pending"
+            },
+            {
+              "stepId": "start_search",
+              "toolId": "search.start",
+              "arguments": {
+                "jobId": "$create_search.jobId"
+              },
+              "dependsOn": [
+                "create_search"
+              ],
+              "purpose": "생성된 탐색 작업 시작",
+              "expectedResult": "running 상태",
+              "requiresApproval": true,
+              "executionOrder": 2,
+              "onFailure": "abort",
+              "status": "pending"
+            }
+          ],
+          "toolIds": [
+            "search.create",
+            "search.start"
+          ],
+          "requestHash": "051c7e53290c477961f56a6e",
+          "patterns": [
+            "trendline",
+            "support_resistance"
+          ],
+          "timeframe": "15m"
+        }
+      },
+      {
+        "query": "왜 이 조합을 추천해?",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거로는 해당 조합을 실행(권장)할 수 없습니다. 누락된 증거를 먼저 확인해 보강한 뒤에 다시 권장 여부를 판단하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:14.351Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:14.351Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:14.351Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:14.351Z"
+          }
+        ],
+        "plan": {
+          "steps": [],
+          "toolIds": [],
+          "requestHash": "reqhash_9f3a2b0c",
+          "patterns": [],
+          "timeframe": null
+        }
+      },
+      {
+        "query": "실패 원인을 분석하고 다른 설정으로 다시 해",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:30.033Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:30.033Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:30.033Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:30.033Z"
+          }
+        ],
+        "plan": {
+          "steps": [
+            {
+              "stepId": "create_search",
+              "toolId": "search.create",
+              "arguments": {
+                "createBody": {
+                  "searchVersion": "1",
+                  "strategyTemplateId": "agent_draft_ETHUSDT_15m",
+                  "symbols": [
+                    "ETHUSDT"
+                  ],
+                  "timeframe": "15m",
+                  "dataVersion": "binance-v1",
+                  "seed": 42,
+                  "generatorType": "random",
+                  "maxIterations": 40,
+                  "parameterRanges": [
+                    {
+                      "key": "ema_fast",
+                      "min": 8,
+                      "max": 40,
+                      "step": 1,
+                      "valueType": "integer"
+                    }
+                  ],
+                  "evaluationWindows": [
+                    {
+                      "id": "full",
+                      "label": "전체 구간",
+                      "fromOpenTime": 1781481600000,
+                      "toOpenTime": 1786751999999,
+                      "requiredForPass": true
+                    }
+                  ],
+                  "balance": 10000,
+                  "baseCostConfig": {
+                    "feeRate": 0.0004,
+                    "slippageRate": 0.0002,
+                    "fundingRate": 0.0001,
+                    "applyFunding": false,
+                    "applySpread": true,
+                    "spreadRate": 0.0001
+                  },
+                  "passPolicy": {
+                    "thresholds": {
+                      "minTradeCount": 10,
+                      "minTotalReturn": 0,
+                      "maxMdd": -0.25,
+                      "minWinRate": null
+                    }
+                  },
+                  "scoreWeights": {
+                    "returnWeight": 1,
+                    "mddWeight": 0.5,
+                    "profitFactorWeight": 0.25,
+                    "winRateWeight": 0.25,
+                    "tradeAdequacyWeight": 0.25,
+                    "negativeMonthWeight": 0.1,
+                    "consistencyWeight": 0.1
+                  },
+                  "costStressScenarios": [
+                    {
+                      "id": "stress_1_5x",
+                      "label": "비용 1.5배",
+                      "requiredForPass": false,
+                      "feeMultiplier": 1.5,
+                      "slippageMultiplier": 1.5,
+                      "fundingMultiplier": 1,
+                      "spreadMultiplier": 1.5,
+                      "costGuardKMultiplier": 1
+                    }
+                  ],
+                  "jitterConfig": {
+                    "enabled": true,
+                    "sampleCount": 2,
+                    "mutationScale": 0.2,
+                    "seed": 7,
+                    "minimumPassRate": 0,
+                    "maximumScoreDropRatio": 1,
+                    "parameterRanges": [
+                      {
+                        "key": "ema_fast",
+                        "min": 8,
+                        "max": 40,
+                        "step": 1,
+                        "valueType": "integer"
+                      }
+                    ]
+                  },
+                  "dataRef": {
+                    "source": "binance_historical",
+                    "availableFrom": 1781481600000,
+                    "availableTo": 1786751999999
+                  },
+                  "operatorPlan": {
+                    "depthProfile": "standard",
+                    "qualificationProfile": "balanced",
+                    "qualifiedTarget": 3,
+                    "stopWhenQualifiedTarget": false,
+                    "candidateBudget": 200,
+                    "stageBatchSize": 40,
+                    "maxRuntimeMs": 10800000,
+                    "minScore": null,
+                    "searchName": "agent_draft_ETHUSDT_15m",
+                    "errorWarningRate": 0.35,
+                    "errorAutoPauseRate": 0.55,
+                    "repeatedSignatureThreshold": 25,
+                    "patternSelectionMode": "manual",
+                    "selectedSpaceIds": [
+                      "trendline",
+                      "support_resistance"
+                    ],
+                    "leverageMode": "automatic",
+                    "leverageFixed": null,
+                    "leverageMin": 1,
+                    "leverageMax": 5,
+                    "adaptiveLeverageEnabled": true,
+                    "patternConfigLevel": "basic",
+                    "patternDirection": "both",
+                    "patternRetestMode": "required",
+                    "patternConfirmStrength": "standard",
+                    "patternConfirmClose": "required",
+                    "patternConfirmationMode": "single_close",
+                    "patternConfirmationCandleCount": 2,
+                    "patternConfirmationWindow": 4,
+                    "patternExpiryBars": 48,
+                    "patternRiskStyle": "balanced",
+                    "patternStrength": "standard",
+                    "patternSrSensitivity": "standard",
+                    "patternCombinationTemplate": "single",
+                    "patternCombinationOperator": "and",
+                    "patternCombinationInvalidationMode": "any",
+                    "patternCombinationFailurePolicy": "any",
+                    "patternCombinationWeightedThreshold": null,
+                    "patternCombinationFamilies": null,
+                    "patternCombinationSpec": null
+                  },
+                  "marketMode": "manual"
+                }
+              },
+              "dependsOn": [],
+              "purpose": "새 전략 탐색 작업 생성",
+              "expectedResult": "jobId 반환",
+              "requiresApproval": true,
+              "executionOrder": 1,
+              "onFailure": "abort",
+              "status": "pending"
+            },
+            {
+              "stepId": "start_search",
+              "toolId": "search.start",
+              "arguments": {
+                "jobId": "$create_search.jobId"
+              },
+              "dependsOn": [
+                "create_search"
+              ],
+              "purpose": "생성된 탐색 작업 시작",
+              "expectedResult": "running 상태",
+              "requiresApproval": true,
+              "executionOrder": 2,
+              "onFailure": "abort",
+              "status": "pending"
+            }
+          ],
+          "toolIds": [
+            "search.create",
+            "search.start"
+          ],
+          "requestHash": "051c7e53290c477961f56a6e",
+          "patterns": [
+            "trendline",
+            "support_resistance"
+          ],
+          "timeframe": "15m"
+        }
+      },
+      {
+        "query": "두 전략 중 무엇을 먼저 백테스트해야 해?",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재로서는 어떤 전략을 먼저 백테스트해야 할지 결정할 수 없습니다. 두 전략에 대한 상세 사양과 테스트 조건(심볼·시간프레임·기간), 데이터·거래비용 정보가 필요합니다.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:31.011Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:31.011Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:31.011Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:31.011Z"
+          }
+        ],
+        "plan": {
+          "steps": [],
+          "toolIds": [],
+          "requestHash": "h-0a1b2c3d4e5f6g7h",
+          "patterns": [],
+          "timeframe": null
+        }
+      },
+      {
+        "query": "수수료 때문에 실패한 건지 분석해",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:50.322Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:50.322Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:50.322Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:52:50.322Z"
+          }
+        ],
+        "plan": {
+          "steps": [],
+          "toolIds": [],
+          "requestHash": null,
+          "patterns": [],
+          "timeframe": null
+        }
+      },
+      {
+        "query": "MDD가 높아진 원인을 근거로 설명해",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:12.768Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:12.768Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:12.768Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:12.768Z"
+          }
+        ],
+        "plan": {
+          "steps": [],
+          "toolIds": [],
+          "requestHash": null,
+          "patterns": [],
+          "timeframe": null
+        }
+      },
+      {
+        "query": "아직 검증하지 않은 패턴 조합을 찾아줘",
+        "intentType": "research_analysis",
+        "conclusionKo": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+        "facts": [
+          {
+            "labelKo": "연구 분석",
+            "value": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:36.999Z"
+          },
+          {
+            "labelKo": "연구 근거",
+            "value": "저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:36.999Z"
+          },
+          {
+            "labelKo": "권장 다음 작업",
+            "value": "추가 탐색 증거 준비",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:36.999Z"
+          },
+          {
+            "labelKo": "증거 참조",
+            "value": "evidence_3ca92a4ee918092e, evidence_3ca92a4ee918092e",
+            "source": "strategy_search_jobs",
+            "fetchedAt": "2026-08-14T08:53:36.999Z"
+          }
+        ],
+        "plan": {
+          "steps": [
+            {
+              "stepId": "create_search",
+              "toolId": "search.create",
+              "arguments": {
+                "createBody": {
+                  "searchVersion": "1",
+                  "strategyTemplateId": "agent_draft_ETHUSDT_15m",
+                  "symbols": [
+                    "ETHUSDT"
+                  ],
+                  "timeframe": "15m",
+                  "dataVersion": "binance-v1",
+                  "seed": 42,
+                  "generatorType": "random",
+                  "maxIterations": 40,
+                  "parameterRanges": [
+                    {
+                      "key": "ema_fast",
+                      "min": 8,
+                      "max": 40,
+                      "step": 1,
+                      "valueType": "integer"
+                    }
+                  ],
+                  "evaluationWindows": [
+                    {
+                      "id": "full",
+                      "label": "전체 구간",
+                      "fromOpenTime": 1781481600000,
+                      "toOpenTime": 1786751999999,
+                      "requiredForPass": true
+                    }
+                  ],
+                  "balance": 10000,
+                  "baseCostConfig": {
+                    "feeRate": 0.0004,
+                    "slippageRate": 0.0002,
+                    "fundingRate": 0.0001,
+                    "applyFunding": false,
+                    "applySpread": true,
+                    "spreadRate": 0.0001
+                  },
+                  "passPolicy": {
+                    "thresholds": {
+                      "minTradeCount": 10,
+                      "minTotalReturn": 0,
+                      "maxMdd": -0.25,
+                      "minWinRate": null
+                    }
+                  },
+                  "scoreWeights": {
+                    "returnWeight": 1,
+                    "mddWeight": 0.5,
+                    "profitFactorWeight": 0.25,
+                    "winRateWeight": 0.25,
+                    "tradeAdequacyWeight": 0.25,
+                    "negativeMonthWeight": 0.1,
+                    "consistencyWeight": 0.1
+                  },
+                  "costStressScenarios": [
+                    {
+                      "id": "stress_1_5x",
+                      "label": "비용 1.5배",
+                      "requiredForPass": false,
+                      "feeMultiplier": 1.5,
+                      "slippageMultiplier": 1.5,
+                      "fundingMultiplier": 1,
+                      "spreadMultiplier": 1.5,
+                      "costGuardKMultiplier": 1
+                    }
+                  ],
+                  "jitterConfig": {
+                    "enabled": true,
+                    "sampleCount": 2,
+                    "mutationScale": 0.2,
+                    "seed": 7,
+                    "minimumPassRate": 0,
+                    "maximumScoreDropRatio": 1,
+                    "parameterRanges": [
+                      {
+                        "key": "ema_fast",
+                        "min": 8,
+                        "max": 40,
+                        "step": 1,
+                        "valueType": "integer"
+                      }
+                    ]
+                  },
+                  "dataRef": {
+                    "source": "binance_historical",
+                    "availableFrom": 1781481600000,
+                    "availableTo": 1786751999999
+                  },
+                  "operatorPlan": {
+                    "depthProfile": "standard",
+                    "qualificationProfile": "balanced",
+                    "qualifiedTarget": 3,
+                    "stopWhenQualifiedTarget": false,
+                    "candidateBudget": 200,
+                    "stageBatchSize": 40,
+                    "maxRuntimeMs": 10800000,
+                    "minScore": null,
+                    "searchName": "agent_draft_ETHUSDT_15m",
+                    "errorWarningRate": 0.35,
+                    "errorAutoPauseRate": 0.55,
+                    "repeatedSignatureThreshold": 25,
+                    "patternSelectionMode": "manual",
+                    "selectedSpaceIds": [
+                      "trendline",
+                      "support_resistance"
+                    ],
+                    "leverageMode": "automatic",
+                    "leverageFixed": null,
+                    "leverageMin": 1,
+                    "leverageMax": 5,
+                    "adaptiveLeverageEnabled": true,
+                    "patternConfigLevel": "basic",
+                    "patternDirection": "both",
+                    "patternRetestMode": "required",
+                    "patternConfirmStrength": "standard",
+                    "patternConfirmClose": "required",
+                    "patternConfirmationMode": "single_close",
+                    "patternConfirmationCandleCount": 2,
+                    "patternConfirmationWindow": 4,
+                    "patternExpiryBars": 48,
+                    "patternRiskStyle": "balanced",
+                    "patternStrength": "standard",
+                    "patternSrSensitivity": "standard",
+                    "patternCombinationTemplate": "single",
+                    "patternCombinationOperator": "and",
+                    "patternCombinationInvalidationMode": "any",
+                    "patternCombinationFailurePolicy": "any",
+                    "patternCombinationWeightedThreshold": null,
+                    "patternCombinationFamilies": null,
+                    "patternCombinationSpec": null
+                  },
+                  "marketMode": "manual"
+                }
+              },
+              "dependsOn": [],
+              "purpose": "새 전략 탐색 작업 생성",
+              "expectedResult": "jobId 반환",
+              "requiresApproval": true,
+              "executionOrder": 1,
+              "onFailure": "abort",
+              "status": "pending"
+            },
+            {
+              "stepId": "start_search",
+              "toolId": "search.start",
+              "arguments": {
+                "jobId": "$create_search.jobId"
+              },
+              "dependsOn": [
+                "create_search"
+              ],
+              "purpose": "생성된 탐색 작업 시작",
+              "expectedResult": "running 상태",
+              "requiresApproval": true,
+              "executionOrder": 2,
+              "onFailure": "abort",
+              "status": "pending"
+            }
+          ],
+          "toolIds": [
+            "search.create",
+            "search.start"
+          ],
+          "requestHash": "051c7e53290c477961f56a6e",
+          "patterns": [
+            "trendline",
+            "support_resistance"
+          ],
+          "timeframe": "15m"
+        }
+      }
+    ],
+    "allResearchIntent": true,
+    "allResponsesReceived": true,
+    "allEvidenceLinked": true,
+    "untestedPlanCreated": true,
+    "noUnapprovedWrite": true,
+    "noFalseImprovement": true,
+    "noUnsupportedRanking": true,
+    "noDuplicateActiveTask": true,
+    "primaryText": "현재 증거만으로 새 실행을 권장하지 않습니다. 누락된 증거를 먼저 확인하세요.\n\n저장된 상위 결과 1개와 누락 증거 2개를 확인했습니다.\n추가 탐색 증거 준비\n승인 센터추가 탐색 증거 준비승인하면 표시된 계획을 한 번 실행합니다.왜 대기?승인하고 실행계획 검토화면 열기취소",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": true,
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

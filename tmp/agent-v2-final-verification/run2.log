@@ -1,0 +1,81 @@
+Building production server...
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-QL62Uy",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-QL62Uy/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbhryyx_914dfd",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbhryyx_914dfd&demo=1"
+  }
+}
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-vbj7ne",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-vbj7ne/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbhturc_8a5c38",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbhturc_8a5c38&demo=1"
+  }
+}
+Running browser acceptance...
+Browser acceptance failed: locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('[data-testid="global-agent-drawer"]') to be visible
+
+    at openAgentDrawer (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:319:61)
+    at async runBrowserConversations (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:330:5)
+    at async main (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:698:5) {
+  name: 'TimeoutError'
+}
+Running quality gates...
+{
+  "verdict": "AGENT V2 REASONING NOT VERIFIED",
+  "defects": [
+    "section1_cancel_wrong_job",
+    "section1_wrong_tf:null",
+    "shadow_count=45",
+    "shadow_unknown_tools",
+    "browser_error:locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"global-agent-drawer\"]') to be visible\n"
+  ],
+  "section1": {
+    "originalJobId": "search_eee84f5a-b61c-465e-9023-a8fd1e0b6cb2",
+    "newJobId": "search_3ea2db42-2cf3-4495-b297-6c5752170a74",
+    "planTools": [
+      "search.cancel",
+      "search.create",
+      "search.start"
+    ],
+    "oldStatus": null
+  },
+  "gates": {
+    "lint": 0,
+    "unit": 0,
+    "build": 0,
+    "e2e": [
+      {
+        "run": 1,
+        "exitCode": 0
+      },
+      {
+        "run": 2,
+        "exitCode": 0
+      },
+      {
+        "run": 3,
+        "exitCode": 0
+      }
+    ]
+  }
+}

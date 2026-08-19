@@ -8,12 +8,10 @@ import {
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 
 /** GET /api/rextora/strategy-search — list newest jobs (default limit 20) */
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   const start = Date.now();
   try {
-    const url = new URL(
-      request?.url ?? "http://localhost/api/rextora/strategy-search",
-    );
+    const url = new URL(request.url);
     const limitParam = url.searchParams.get("limit");
     const offsetParam = url.searchParams.get("offset");
     const limit =

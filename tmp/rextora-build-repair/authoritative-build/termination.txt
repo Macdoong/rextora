@@ -1,0 +1,2 @@
+terminated_pid=63192
+reason=authoritative build stalled after PostCSS completion with severe memory/swap pressure

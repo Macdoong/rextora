@@ -1,0 +1,2 @@
+{"at":"2026-08-12T05:35:06.308Z","phase":"started","reasoningRequestId":"rr_mspnnosk_mlrvof","turnId":"provider-canary-1786512906285-openai","providerAttempt":1,"provider":null,"model":null,"fallbackUsed":null,"latencyMs":null,"errorCategory":null}
+{"at":"2026-08-12T05:35:38.356Z","phase":"completed","reasoningRequestId":"rr_mspnnosk_mlrvof","turnId":"provider-canary-1786512906285-openai","providerAttempt":1,"provider":"openai","model":"gpt-5-mini","fallbackUsed":false,"latencyMs":32043,"errorCategory":null}

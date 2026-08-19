@@ -1,0 +1,19 @@
+{
+  "command": "node scripts/inspect-next-trace.mjs",
+  "startedAt": "2026-08-05T14:43:44Z",
+  "finishedAt": "2026-08-05T14:43:48Z",
+  "durationMs": 4168,
+  "exitCode": 0,
+  "stdout": "tmp/conversation-first-agent/quality-gates/trace.stdout.log",
+  "stderr": "tmp/conversation-first-agent/quality-gates/trace.stderr.log",
+  "BUILD_ID": "a0jdDmcIxl_8oa5KRn2Fl",
+  "parsed": {
+    "outPath": "/Users/macdoong/Documents/Rextora/tmp/cursor-tester-ready-fix/trace-inspection.json",
+    "totalSizeHuman": "659.0MB",
+    "tracedTmp": 0,
+    "tracedScreenshots": 0,
+    "tracedEnv": 0,
+    "secretTraceFailure": false,
+    "pass": true
+  }
+}

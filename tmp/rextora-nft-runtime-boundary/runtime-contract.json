@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "boundary": "src/lib/rextora/storage/runtimePaths.ts",
+  "contract": {
+    "rextoraDataRoot": {
+      "default": "path.join(process.cwd(), 'data', 'rextora')",
+      "override": "trimmed REXTORA_DATA_DIR resolved with path.resolve",
+      "blankOverride": "ignored"
+    },
+    "productionRextoraDataRootCanonical": {
+      "default": "path.join(process.cwd(), 'data', 'rextora')",
+      "environmentOverrides": "ignored"
+    },
+    "strategySearchRoot": {
+      "default": "path.join(rextoraDataRoot(), 'strategy-search')",
+      "override": "trimmed REXTORA_STRATEGY_SEARCH_DIR resolved with path.resolve",
+      "precedence": "specific override before REXTORA_DATA_DIR-derived default"
+    },
+    "backtestsRoot": {
+      "default": "path.join(rextoraDataRoot(), 'backtests')",
+      "override": "trimmed REXTORA_BACKTESTS_DIR resolved with path.resolve"
+    },
+    "strategiesRootDefault": {
+      "default": "path.join(rextoraDataRoot(), 'strategies')"
+    },
+    "productionStrategiesRootCanonical": {
+      "default": "path.join(process.cwd(), 'data', 'rextora', 'strategies')",
+      "environmentOverrides": "ignored"
+    },
+    "paperSessionsRootDefault": {
+      "default": "path.join(rextoraDataRoot(), 'paper-sessions')"
+    },
+    "firstRunStatePath": {
+      "default": "path.join(rextoraDataRoot(), 'first-run.json')"
+    }
+  },
+  "storeBehaviorInvariants": {
+    "exactFilenames": "unchanged because consumers remain unchanged",
+    "exactDirectoryStructure": "unchanged",
+    "readSemantics": "unchanged",
+    "writeSemantics": "unchanged",
+    "atomicWriteAndFsync": "unchanged in jobStore",
+    "missingFileBehavior": "unchanged",
+    "malformedFileBehavior": "unchanged",
+    "lockingAndOwnership": "unchanged",
+    "deletionBehavior": "unchanged",
+    "timestamps": "unchanged",
+    "errorPropagation": "unchanged",
+    "importTimeFilesystemAccess": "none in the path boundary; all recorded filesystem operations execute inside functions"
+  },
+  "safetyInvariants": {
+    "safeProtection": "unchanged",
+    "paperBehavior": "unchanged",
+    "agentBehavior": "unchanged",
+    "approvalBehavior": "unchanged",
+    "liveBehavior": "unchanged"
+  }
+}

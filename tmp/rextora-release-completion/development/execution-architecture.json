@@ -1,0 +1,15 @@
+{
+  "architecture": "viewport-segment-half-batch-restart",
+  "evidence": "NEXT_DEV_RESOURCE_DEGRADATION after ~15-25 sequential scenarios on single webpack dev process",
+  "viewports": ["390", "768", "1024", "1440"],
+  "batchesPerViewport": 2,
+  "freshDevServerPerBatch": true,
+  "workers": 1,
+  "scenarioRegistry": "tests/e2e/release/scenarioRegistry.ts",
+  "orchestrator": "scripts/runDevelopment88ByViewport.mjs",
+  "verified390": {
+    "s01-11": { "exitCode": 0, "evidence": "matrix-segments.json v6" },
+    "s12-22": { "exitCode": 0, "evidence": "matrix-segments.json v6" },
+    "scenarioRows": "22/22"
+  }
+}

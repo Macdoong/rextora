@@ -1,0 +1,697 @@
+{
+  "startedAt": "2026-08-02T05:03:32.674Z",
+  "git": {
+    "branch": "main",
+    "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "statusShort": "M app/api/rextora/agent/route.ts\n M app/backtest/page.tsx\n M app/dashboard/page.tsx\n M app/globals.css\n M app/layout.tsx\n M app/live-trading/page.tsx\n M app/paper-trading/page.tsx\n M app/results/page.tsx\n M app/strategy-search/page.tsx\n M components/rextora/agent/ActionCard.tsx\n M components/rextora/agent/AgentMessage.tsx\n M components/rextora/agent/AgentPanel.tsx\n M components/rextora/agent/AgentSuggestions.tsx\n M components/rextora/agent/useAgentSession.ts\n M components/rextora/backtest/BacktestReviewWorkbench.tsx\n M components/rextora/charts/BacktestAnalysisView.tsx\n M src/lib/rextora/agent/agentDataFetcher.ts\n M src/lib/rextora/agent/agentResponseBuilder.ts\n M src/lib/rextora/agent/intentParser.ts\n M src/lib/rextora/agent/llmTypes.ts\n M src/lib/rextora/agent/providers/promptBuilder.ts\n M src/lib/rextora/agent/safetyGuard.ts\n M src/lib/rextora/agent/types.ts\n M tests/agentCommercialUx.test.ts\n M tests/agentIntentParser.test.ts\n M tests/agentProvider.test.ts\n M tests/backtestExecutionIdentity.test.ts\n M tests/backtestSymbolSelector.test.ts\n M tests/commercialOverlayHydration.test.ts\n M tests/firstRunEmptyRuntime.test.ts\n M tsconfig.tsbuildinfo\n?? .DS_Store\n?? components/rextora/agent/AgentContextStrip.tsx\n?? components/rextora/agent/AgentSessionProvider.tsx\n?? components/rextora/agent/AgentWorkspacePanel.tsx\n?? components/rextora/agent/AppShell.tsx\n?? components/rextora/agent/ApprovalCenter.tsx\n?? components/rextora/agent/GlobalAgentAssistant.tsx\n?? components/rextora/agent/MissionTimeline.tsx\n?? components/rextora/agent/agentPersistence.ts\n?? components/rextora/backtest/BacktestStrategyManageDrawer.tsx\n?? src/lib/rextora/agent/canonicalCommandPayload.ts\n?? src/lib/rextora/agent/commandExecutor.ts\n?? src/lib/rextora/agent/commandStore.ts\n?? src/lib/rextora/agent/conversationContext.ts\n?? src/lib/rextora/agent/conversationState.ts\n?? src/lib/rextora/agent/decisionContext.ts\n?? src/lib/rextora/agent/executionRequestClassifier.ts\n?? src/lib/rextora/agent/goalDetector.ts\n?? src/lib/rextora/agent/lifecycleStage.ts\n?? src/lib/rextora/agent/missionTimeline.ts\n?? src/lib/rextora/agent/planDrafts.ts\n?? src/lib/rextora/agent/proposedAction.ts\n?? src/lib/rextora/agent/researchWorkspace.ts\n?? src/lib/rextora/agent/searchPlanDraft.ts\n?? src/lib/rextora/agent/typedCommand.ts\n?? src/lib/rextora/backtest/workspaceTabState.ts\n?? tests/agentConversationalEmployee.test.ts\n?? tests/agentConversationalIntelligence.test.ts\n?? tests/agentExecutionSafety.test.ts\n?? tests/agentProductCompletion.test.ts\n?? tests/agentTradingEmployeeCommercial.test.ts\n?? tests/agentTypedCommand.test.ts\n?? tests/backtestWorkspaceTabStability.test.ts\n?? tests/fixtures/\n?? tmp/agent-conversational-screens/\n?? tmp/agent-employee-screens/\n?? tmp/final-safety-api-verify.mjs\n?? tmp/final-safety-api-verify.ts\n?? tmp/operator-fix/\n?? tmp/step6-audit/\n?? tmp/step7-audit/\n?? tmp/step8-audit/\n?? tmp/tester-readiness-verification.mjs\n?? tmp/tester-readiness/",
+    "diffStat": "app/api/rextora/agent/route.ts                     | 635 +++++++++++++++++++--\n app/backtest/page.tsx                              |   2 +\n app/dashboard/page.tsx                             |   2 +-\n app/globals.css                                    |   6 +\n app/layout.tsx                                     |   5 +-\n app/live-trading/page.tsx                          |   2 +\n app/paper-trading/page.tsx                         |   2 +\n app/results/page.tsx                               |   2 +\n app/strategy-search/page.tsx                       |   2 +\n components/rextora/agent/ActionCard.tsx            | 138 ++++-\n components/rextora/agent/AgentMessage.tsx          | 505 +++++++++++-----\n components/rextora/agent/AgentPanel.tsx            | 263 +++++++--\n components/rextora/agent/AgentSuggestions.tsx      |  22 +-\n components/rextora/agent/useAgentSession.ts        | 267 +++++++--\n .../rextora/backtest/BacktestReviewWorkbench.tsx   | 117 ++--\n components/rextora/charts/BacktestAnalysisView.tsx |  87 ++-\n src/lib/rextora/agent/agentDataFetcher.ts          |  25 +\n src/lib/rextora/agent/agentResponseBuilder.ts      | 429 ++++++++++++--\n src/lib/rextora/agent/intentParser.ts              | 147 ++++-\n src/lib/rextora/agent/llmTypes.ts                  |  21 +\n src/lib/rextora/agent/providers/promptBuilder.ts   |  47 +-\n src/lib/rextora/agent/safetyGuard.ts               |  10 +\n src/lib/rextora/agent/types.ts                     | 132 ++++-\n tests/agentCommercialUx.test.ts                    |  19 +-\n tests/agentIntentParser.test.ts                    |   4 +-\n tests/agentProvider.test.ts                        |  22 +-\n tests/backtestExecutionIdentity.test.ts            |  18 +-\n tests/backtestSymbolSelector.test.ts               |  11 +-\n tests/commercialOverlayHydration.test.ts           |  20 +-\n tests/firstRunEmptyRuntime.test.ts                 |  10 +-\n tsconfig.tsbuildinfo                               |   2 +-\n 31 files changed, 2425 insertions(+), 549 deletions(-)"
+  },
+  "safeBefore": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": ""
+  },
+  "isolated": {
+    "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-tester-4lXHY8",
+    "port": 3104,
+    "pid": 47944,
+    "BUILD_ID": "QXrln_z0Sresdx4AqPkT6",
+    "envOverrides": [
+      "REXTORA_DATA_DIR",
+      "REXTORA_STRATEGIES_DIR",
+      "REXTORA_STRATEGY_SEARCH_DIR",
+      "REXTORA_BACKTESTS_DIR",
+      "REXTORA_PAPER_SESSIONS_DIR",
+      "REXTORA_AGENT_COMMANDS_DIR",
+      "PORT"
+    ]
+  },
+  "searchAb": {
+    "planA": {
+      "label": "A",
+      "userMessage": "BTCUSDT 15m Order Block FVG 탐색 계획 준비해",
+      "intentType": "prepare_search_plan",
+      "goal": "prepare_search",
+      "context": {
+        "symbol": "BTCUSDT",
+        "timeframe": "15m"
+      },
+      "planTitle": "승인 초안",
+      "typedCommand": {
+        "commandId": "cmd_f407649c188914e4",
+        "commandType": "create_strategy_search_job",
+        "requestHash": "aebd38036ddde4e44e3eb780",
+        "idempotencyKey": "create_strategy_search_job:aebd38036ddde4e44e3eb780",
+        "timeframe": "15m",
+        "symbol": "BTCUSDT"
+      },
+      "createBodyTimeframe": "15m",
+      "createBodySymbols": [
+        "BTCUSDT"
+      ],
+      "selectedSpaceIds": [
+        "order_block",
+        "fvg"
+      ],
+      "patternSelectionMode": "manual",
+      "depthProfile": "standard",
+      "requestHash": "aebd38036ddde4e44e3eb780",
+      "approval": {
+        "executionStatus": "succeeded",
+        "jobId": "search_ffbc9483-2e6d-4a95-ab5e-4a879f403553",
+        "alreadyExecuted": false
+      },
+      "persistedJob": {
+        "id": "search_ffbc9483-2e6d-4a95-ab5e-4a879f403553",
+        "status": "queued",
+        "timeframe": "15m"
+      },
+      "operatorPlan": null
+    },
+    "planB": {
+      "label": "B",
+      "userMessage": "BTCUSDT 1h Order Block FVG 탐색 계획 준비해",
+      "intentType": "prepare_search_plan",
+      "goal": "prepare_search",
+      "context": {
+        "symbol": "BTCUSDT",
+        "timeframe": "1h"
+      },
+      "planTitle": "승인 초안",
+      "typedCommand": {
+        "commandId": "cmd_cc853711d2bde3e5",
+        "commandType": "create_strategy_search_job",
+        "requestHash": "313dbafe15d294c9bc0fabcd",
+        "idempotencyKey": "create_strategy_search_job:313dbafe15d294c9bc0fabcd",
+        "timeframe": "1h",
+        "symbol": "BTCUSDT"
+      },
+      "createBodyTimeframe": "1h",
+      "createBodySymbols": [
+        "BTCUSDT"
+      ],
+      "selectedSpaceIds": [
+        "order_block",
+        "fvg"
+      ],
+      "patternSelectionMode": "manual",
+      "depthProfile": "standard",
+      "requestHash": "313dbafe15d294c9bc0fabcd",
+      "approval": {
+        "executionStatus": "succeeded",
+        "jobId": "search_bfababf2-ffc3-4471-afd7-4eed3cf87494",
+        "alreadyExecuted": false
+      },
+      "persistedJob": {
+        "id": "search_bfababf2-ffc3-4471-afd7-4eed3cf87494",
+        "status": "queued",
+        "timeframe": "1h"
+      }
+    },
+    "hashesDiffer": true,
+    "jobIdsDiffer": true,
+    "jobFileCount": 3,
+    "approvalACannotExecuteB": true
+  },
+  "searchIdempotency": {
+    "replayStatus": "skipped_idempotent",
+    "replayAlreadyExecuted": true,
+    "replayJobId": "search_ffbc9483-2e6d-4a95-ab5e-4a879f403553",
+    "sameJobIdAsFirst": true,
+    "jobsBeforeReplay": 3,
+    "jobsAfterReplay": 3,
+    "noDuplicateJobFile": true,
+    "displayOnlyHashUnchanged": true,
+    "changedTimeframeRequiresNewHash": true
+  },
+  "searchRunner": {
+    "ok": true,
+    "finalStatus": "running",
+    "progressChanged": true,
+    "trialCount": 0,
+    "limitation": "Full search did not complete within 90s; verified runner ownership, status transitions, safe cancel."
+  },
+  "backtest": {
+    "strategyId": "demo_strategy_btc_v1",
+    "strategyHash": "a8532604fb8fbbe541a8968ed1ad30425ae03599018717e8e99af1d12bdcd44e",
+    "paramsHash": "df0d78616614",
+    "planIntent": "prepare_backtest_plan",
+    "requestHash": "03685099f56fef9d458c2ad6",
+    "runId": "bt_msbc7qxm_e98242",
+    "executionStatus": "succeeded",
+    "replayStatus": "skipped_idempotent",
+    "replaySameRunId": true,
+    "backtestUrl": "http://127.0.0.1:3104/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbc7qxm_e98242"
+  },
+  "backtestTabs": {
+    "oscCount": 0,
+    "tabOscillation": [
+      {
+        "label": "차트",
+        "before": "price",
+        "after": "price",
+        "flipped": false
+      },
+      {
+        "label": "거래",
+        "before": "trades",
+        "after": "trades",
+        "flipped": false
+      },
+      {
+        "label": "월별",
+        "before": "monthly",
+        "after": "monthly",
+        "flipped": false
+      },
+      {
+        "label": "비용",
+        "before": "cost",
+        "after": "cost",
+        "flipped": false
+      },
+      {
+        "label": "자산·낙폭",
+        "before": "equity",
+        "after": "equity",
+        "flipped": false
+      },
+      {
+        "label": "타임라인",
+        "before": "timeline",
+        "after": "timeline",
+        "flipped": false
+      },
+      {
+        "label": "상세 분석",
+        "before": "advanced",
+        "after": "advanced",
+        "flipped": false
+      },
+      {
+        "label": "검증",
+        "before": "validation",
+        "after": "validation",
+        "flipped": false
+      }
+    ],
+    "ok": true
+  },
+  "strategyManagement": {
+    "ok": true,
+    "cases": [
+      {
+        "case": "rename",
+        "ok": true
+      },
+      {
+        "case": "archive",
+        "ok": true
+      },
+      {
+        "case": "restore",
+        "ok": true
+      },
+      {
+        "case": "safe_rename_blocked",
+        "ok": true
+      },
+      {
+        "case": "delete_disposable",
+        "ok": true
+      }
+    ]
+  },
+  "paper": {
+    "planIntent": "prepare_paper_plan",
+    "executionStatus": "succeeded",
+    "paperStatus": "pending_approval",
+    "exchangeCalled": false,
+    "ok": true
+  },
+  "liveSafety": [
+    {
+      "query": "지금 Live 시작해",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "실전 매매 시작해",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "라이브로 돌려",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "바로 실전 진입해",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "이 전략 실전으로 시작해",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "BTC 매수해",
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "BTC 매도해",
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "실전 주문 넣어줘",
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "place a real BTC order",
+      "intentType": "execute_trade",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    },
+    {
+      "query": "start live trading",
+      "intentType": "start_live",
+      "safetyBlocked": true,
+      "actionsLen": 0,
+      "hasTypedCommand": false,
+      "hasExecutionResult": false,
+      "ok": true
+    }
+  ],
+  "explanatory": [
+    {
+      "query": "Live 승인을 받으면 어떻게 돼?",
+      "intentType": "explain_approval",
+      "safetyBlocked": false,
+      "ok": true
+    },
+    {
+      "query": "실전 매매 위험을 설명해줘.",
+      "intentType": "risk_summary",
+      "safetyBlocked": false,
+      "ok": true
+    },
+    {
+      "query": "Live 조건을 보여줘.",
+      "intentType": "recommend_next",
+      "safetyBlocked": false,
+      "ok": true
+    },
+    {
+      "query": "왜 실전 매매가 차단돼 있어?",
+      "intentType": "explain_rejection",
+      "safetyBlocked": false,
+      "ok": true
+    }
+  ],
+  "agentUx": [
+    {
+      "viewport": 390,
+      "route": "/dashboard",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 390,
+      "route": "/strategy-search",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 390,
+      "route": "/results",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 390,
+      "route": "/backtest",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 390,
+      "route": "/paper-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 390,
+      "route": "/live-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/dashboard",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/strategy-search",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/results",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/backtest",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/paper-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 768,
+      "route": "/live-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/dashboard",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/strategy-search",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/results",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/backtest",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/paper-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1024,
+      "route": "/live-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/dashboard",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/strategy-search",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/results",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/backtest",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/paper-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    },
+    {
+      "viewport": 1440,
+      "route": "/live-trading",
+      "overlap": false,
+      "overflowX": false,
+      "fabVisible": true,
+      "ok": true
+    }
+  ],
+  "nlWorkflow": [
+    {
+      "query": "오늘 무엇을 해야 하지?",
+      "intentType": "recommend_next",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "좋은 전략을 찾아줘.",
+      "intentType": "prepare_search_plan",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "왜 이 설정이야?",
+      "intentType": "follow_up_why",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "진행해.",
+      "intentType": "approve_pending",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": true
+    },
+    {
+      "query": "탐색 상태 알려줘.",
+      "intentType": "search_status",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "결과를 검토해줘.",
+      "intentType": "recommend_next",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "이 전략 백테스트 해볼까?",
+      "intentType": "prepare_backtest_plan",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "진행해.",
+      "intentType": "approve_pending",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": true
+    },
+    {
+      "query": "왜 이 전략을 추천했어?",
+      "intentType": "follow_up_why",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "Paper로 준비해.",
+      "intentType": "prepare_paper_plan",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "진행해.",
+      "intentType": "approve_pending",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": true
+    },
+    {
+      "query": "지금 승인하면 어떤 일이 일어나?",
+      "intentType": "explain_approval",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "현재 가장 위험한 부분은?",
+      "intentType": "risk_summary",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "다음 단계는?",
+      "intentType": "recommend_next",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    },
+    {
+      "query": "우리가 어디까지 했지?",
+      "intentType": "search_status",
+      "unknown": false,
+      "safetyBlocked": false,
+      "hasExecution": false
+    }
+  ],
+  "qualityGates": {
+    "lint": {
+      "exitCode": 0
+    },
+    "unit": {
+      "exitCode": 0,
+      "passed": "1204"
+    },
+    "build": {
+      "exitCode": 0,
+      "BUILD_ID": "QXrln_z0Sresdx4AqPkT6"
+    },
+    "e2e": [
+      {
+        "run": 1,
+        "exitCode": 0
+      },
+      {
+        "run": 2,
+        "exitCode": 0
+      },
+      {
+        "run": 3,
+        "exitCode": 0
+      }
+    ]
+  },
+  "safeAfter": {
+    "params_hash": "7893ca3f0e30",
+    "sha256": "FB3F19169C8911FE041F3F8CB1D9E654F9166078F0C5CD8E29F04EC02A56DFC0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiff": ""
+  },
+  "defects": [],
+  "verdict": "REXTORA INTERNAL TESTING COMPLETE",
+  "strategyManagementBrowser": {
+    "ok": true,
+    "rowCount": 2,
+    "apiCount": 2,
+    "safeDeleteBlocked": true
+  },
+  "agentUxDrawer": {
+    "consoleErrors": []
+  },
+  "finishedAt": "2026-08-02T05:09:19.622Z"
+}

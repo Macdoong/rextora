@@ -1,0 +1,19 @@
+{"command":"npx next build --webpack","parkedPaths":["data/rextora/strategy-search/jobs","data/rextora/strategy-search/trials","data/rextora/strategy-search/owners"],"exitCode":0,"durationMs":26847,"BUILD_ID":"j4lAiIKoy4ofnQNdt2mFF","finishedAt":"2026-08-14T05:22:14.255Z"}
+       26.92 real        40.51 user         5.37 sys
+          1405616128  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              253400  page reclaims
+                2829  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                 424  messages sent
+                 317  messages received
+                  10  signals received
+               11554  voluntary context switches
+              300144  involuntary context switches
+           686478807  instructions retired
+           262024944  cycles elapsed
+            16877440  peak memory footprint

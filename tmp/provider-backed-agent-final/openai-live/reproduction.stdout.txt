@@ -1,0 +1,16 @@
+{"query":"지금 난 뭘해야하지?","mode":"READ_AND_ANSWER","providerSucceeded":true,"fallbackUsed":false,"latencyMs":32707}
+{"query":"현재 상태에서 다음으로 뭘 하면 돼?","mode":"READ_AND_ANSWER","providerSucceeded":true,"fallbackUsed":false,"latencyMs":41099}
+{"query":"현재 돌아가는 탐색을 근거로 설명해.","mode":"READ_AND_ANSWER","providerSucceeded":false,"fallbackUsed":true,"latencyMs":21}
+{"query":"최근 전략의 위험한 점을 실제 결과로 분석해","mode":"READ_AND_ANSWER","providerSucceeded":false,"fallbackUsed":true,"latencyMs":45197}
+{"query":"왜 그게 다음 단계야?","mode":"CLARIFY_REFERENCE","providerSucceeded":false,"fallbackUsed":true,"latencyMs":8}
+{"query":"방금 보고한 수치가 어디서 나온 거야?","mode":"DIRECT_ANSWER","providerSucceeded":false,"fallbackUsed":true,"latencyMs":17495}
+{"query":"현재 상태 말고 앱 기능을 설명해.","mode":"READ_AND_ANSWER","providerSucceeded":true,"fallbackUsed":false,"latencyMs":45383}
+{"query":"백태스트가 뭐야?","mode":"DIRECT_ANSWER","providerSucceeded":true,"fallbackUsed":false,"latencyMs":12573}
+{"query":"너는 지금 나한테 뭘 해줄 수 있지?","mode":"DIRECT_ANSWER","providerSucceeded":true,"fallbackUsed":false,"latencyMs":16241}
+{
+  "total": 9,
+  "providerSucceeded": 5,
+  "fallbackUsed": 4,
+  "readAndAnswer": 5,
+  "passed": false
+}

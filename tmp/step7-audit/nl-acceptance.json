@@ -1,0 +1,100 @@
+{
+  "buildId": "tcAlAAcGtsOEwONHYH30z",
+  "prompts": 9,
+  "unknownishGeneric": 0,
+  "unknownRate": "0/9",
+  "withAction": 9,
+  "actionRate": "9/9",
+  "workflowCompletion": "PASS",
+  "strips": {
+    "search": 1,
+    "results": 1,
+    "backtest": 1,
+    "paper": 1,
+    "live": 1
+  },
+  "results": [
+    {
+      "q": "오늘 무엇을 해야 하지?",
+      "answer": "현재 연구를 확인했습니다. 권장 다음 단계는 실패 탐색 원인 확인입니다.\n\n오늘 완료된 탐색이 확인되지 않았습니다.\n최근 검증·주목 전략은 custom_ms1y7u04입니다.\n활성 모의매매 세션은 없습니다.\n실패 탐색이 있어 원인 확인 후 재실행이 필요합니다.\n탐색 계획을 준비해 드릴까요?\n\n실패 탐색 원인 확인.",
+      "situation": "현재 상황 · 라이프사이클 권장 상태",
+      "actionCount": 1,
+      "approvalTrio": 0,
+      "approvalReq": 0,
+      "isGeneric": false
+    },
+    {
+      "q": "좋은 전략을 찾아줘.",
+      "answer": "ETHUSDT 15m · Order Block + Fair Value Gap 설정으로 탐색 계획을 준비하는 것을 권장합니다.\n\nsymbol=ETHUSDT · timeframe=15m · patterns=Order Block + Fair Value Gap · patternConfigLevel=automatic · leverageMode=automatic\n\n탐색 계획 검토.",
+      "situation": "현재 상황 · 탐색 계획 초안",
+      "actionCount": 1,
+      "approvalTrio": 1,
+      "approvalReq": 1,
+      "isGeneric": false
+    },
+    {
+      "q": "왜 이 전략이 좋은 거야?",
+      "answer": "symbol=ETHUSDT · timeframe=15m · patterns=Order Block + Fair Value Gap · patternConfigLevel=automatic · leverageMode=automatic\n\n이전 결론: ETHUSDT 15m · Order Block + Fair Value Gap 설정으로 탐색 계획을 준비하는 것을 권장합니다. symbol=ETHUSDT ",
+      "situation": "현재 상황 · 직전 권장 사유 설명",
+      "actionCount": 1,
+      "approvalTrio": 1,
+      "approvalReq": 2,
+      "isGeneric": false
+    },
+    {
+      "q": "백테스트 해볼까?",
+      "answer": "선택 전략 · BTCUSDT 백테스트 계획을 준비했습니다. 아직 실행되지 않았습니다.\n\n심볼·전략 범위만 초안으로 잡았습니다. 승인 후 백테스트 화면에서 직접 실행하세요.\n\n백테스트 계획 검토.",
+      "situation": "현재 상황 · 백테스트 계획 초안",
+      "actionCount": 1,
+      "approvalTrio": 1,
+      "approvalReq": 3,
+      "isGeneric": false
+    },
+    {
+      "q": "Paper로 돌려볼까?",
+      "answer": "\"SAFE_v44_i4060\"를 Paper로 검토할 준비가 되었습니다. 에이전트는 자동 시작하지 않습니다.\n\n화면만 열리며, 세션 시작은 사용자가 승인해야 합니다. 자동 시작하지 않습니다.\n\n모의매매 화면을 열고 승인하세요.",
+      "situation": "현재 상황 · 후보 SAFE_v44_i4060",
+      "actionCount": 1,
+      "approvalTrio": 1,
+      "approvalReq": 4,
+      "isGeneric": false
+    },
+    {
+      "q": "현재 가장 위험한 부분은?",
+      "answer": "저장된 백테스트 증거를 먼저 상세 검토하세요.\n\n상세 지표는 백테스트 화면에서 확인하세요.\n\n백테스트 페이지에서 증거를 상세 검토하세요.",
+      "situation": "현재 상황 · 백테스트 요약",
+      "actionCount": 1,
+      "approvalTrio": 0,
+      "approvalReq": 5,
+      "isGeneric": false
+    },
+    {
+      "q": "다음 단계는?",
+      "answer": "이어서 리스크 검토 열기를 진행하는 것이 좋습니다.\n\n상세 지표는 백테스트 화면에서 확인하세요.\n\n실패 탐색 원인 확인.",
+      "situation": "현재 상황 · 라이프사이클 권장 상태",
+      "actionCount": 1,
+      "approvalTrio": 0,
+      "approvalReq": 5,
+      "isGeneric": false
+    },
+    {
+      "q": "이 전략을 왜 추천했어?",
+      "answer": "상세 지표는 백테스트 화면에서 확인하세요\n\n이전 결론: 이어서 리스크 검토 열기를 진행하는 것이 좋습니다. 상세 지표는 백테스트 화면에서 확인하세요.\n\n실패 탐색 원인 확인.",
+      "situation": "현재 상황 · 직전 권장 사유 설명",
+      "actionCount": 1,
+      "approvalTrio": 0,
+      "approvalReq": 5,
+      "isGeneric": false
+    },
+    {
+      "q": "지금 승인하면 어떤 일이 일어나?",
+      "answer": "「리스크 리뷰」을 승인하면 관련 화면이 열립니다. 아직 실행되지 않습니다.\n\n대화에서 승인하면 관련 화면으로 이동합니다.\n엔진(탐색·백테스트·모의매매·실전)은 자동으로 시작되지 않습니다.\n실제 시작·실행은 해당 화면의 승인 게이트에서 사용자가 직접 결정합니다.\n이동 경로: 전문가 화면\n\n실패 탐색 원인 확인.",
+      "situation": "현재 상황 · 승인 대기: 리스크 리뷰",
+      "actionCount": 1,
+      "approvalTrio": 0,
+      "approvalReq": 5,
+      "isGeneric": false
+    }
+  ],
+  "mobilePreview": "현재 연구를 확인했습니다. 권장 다음 단계는 실패 탐색 원인 확인입니다.\n\n오늘 완료된 탐색이 확인되지 않았습니다.\n최근 검증·주목 전략은 custom_ms1y7u04입니다.\n활성 모의매매 세션은 없습니다.\n실패 탐색이 있어 원인 확인 후 재실행이 필요합니다.\n탐색 계획을 준비해 드릴까요?\n\n실패 탐색 원인 확인."
+}

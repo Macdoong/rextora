@@ -1,0 +1,7 @@
+{
+  "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+  "fileCount": 930,
+  "sourceTreeSha256": "9ed865766875be59e28bbe7afc3b437fad21a8d5ac95e3fd635b39cae1dd99b8",
+  "capturedAt": "2026-08-13T04:01:14.647Z",
+  "buildCommand": "next build --webpack"
+}

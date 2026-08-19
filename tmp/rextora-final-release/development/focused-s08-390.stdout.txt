@@ -1,0 +1,43 @@
+
+Running 1 test using 1 worker
+
+(node:68311) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68311) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (1.6m)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 
+
+    TimeoutError: page.waitForResponse: Timeout 90000ms exceeded while waiting for event "response"
+
+       at helpers.ts:332
+
+      330 |     }
+      331 |   };
+    > 332 |   const responsePromise = page.waitForResponse(
+          |                                ^
+      333 |     (r) => {
+      334 |       if (!r.url().includes("/api/rextora/agent") || r.request().method() !== "POST") {
+      335 |         return false;
+        at sendAgentQueryAwaitResponse (/Users/macdoong/Documents/Rextora/tests/e2e/release/helpers.ts:332:32)
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:200:33)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:37:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-70a2c-nAI-capability-conversation-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:30:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation 

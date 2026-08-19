@@ -1,0 +1,36 @@
+=== pwd ===
+/Users/macdoong/Documents/Rextora
+=== branch ===
+main
+=== HEAD ===
+5e0f089e5b2e02761705944710e6f6156c5d7663
+=== node/npm ===
+v25.8.0
+11.11.0
+=== BUILD_ID ===
+Dgq7olffIETFHSPoBQtsv=== SAFE ===
+params_hash 7893ca3f0e30
+sha256 fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0
+git_hash 4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32
+diff_bytes 0
+=== git status --short (count) ===
+     154
+=== git diff --stat (summary) ===
+ tests/firstRunEmptyRuntime.test.ts                 |  10 +-
+ tests/liveReadinessChecklist.test.ts               |  85 +-
+ tsconfig.json                                      |   3 +-
+ tsconfig.tsbuildinfo                               |   2 +-
+ 43 files changed, 3312 insertions(+), 588 deletions(-)
+=== ports 3000,3100-3199 ===
+COMMAND   PID     USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    24263 macdoong   17u  IPv6 0x52055e6855d10642      0t0  TCP *:3000 (LISTEN)
+COMMAND   PID     USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    72708 macdoong   12u  IPv6 0x85fd71ece2320ba1      0t0  TCP *:3110 (LISTEN)
+=== related node/next/playwright processes ===
+macdoong         18054   0.4  2.0 1892328000 658688   ??  S    Sat07PM  25:57.95 Cursor Helper (Plugin): extension-host Rextora [1-2]                      
+macdoong         24312   0.0  0.5 436595632 161248 s005  S+   10:37PM   0:02.67 node /Users/macdoong/Documents/Rextora/.next/dev/build/postcss.js 60362
+macdoong         24262   0.0  0.2 444640032  67824 s005  S+   10:37PM   0:00.25 node /Users/macdoong/Documents/Rextora/node_modules/.bin/next dev
+macdoong         72683   0.0  0.0 436293920    192   ??  S    Sun04PM   0:00.32 npm exec next start -p 3110     
+=== kill recorded ===
+killed stale next start PIDs 72683,72708 on port 3110
+left user next-dev PID 24262 on port 3000

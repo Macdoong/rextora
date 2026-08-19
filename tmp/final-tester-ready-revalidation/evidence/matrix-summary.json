@@ -1,0 +1,78 @@
+{
+  "passedRows": 52,
+  "totalRows": 52,
+  "buildId": "mwEjoK4ic1cyT-pd5_Omz",
+  "conversationB": [
+    {
+      "row": "B-390",
+      "passed": true
+    },
+    {
+      "row": "B-768",
+      "passed": true
+    },
+    {
+      "row": "B-1024",
+      "passed": true
+    },
+    {
+      "row": "B-1440",
+      "passed": true
+    }
+  ],
+  "rawLeakCountTotal": 0,
+  "consoleErrorCountTotal": 0,
+  "matrixHarnessProvider": {
+    "provider": "gemini",
+    "canary": {
+      "status": 200,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "validationOk": true,
+      "toolIds": [
+        "lifecycle.current",
+        "workspace.current",
+        "paper.status",
+        "search.list",
+        "backtest.list"
+      ],
+      "writeToolExecuted": false,
+      "conclusionKo": "현재 시스템의 전반적인 상태를 확인하기 위해 라이프사이클, 작업 공간, 페이퍼 트레이딩 세션, 전략 탐색 작업 및 백테스트 실행 목록을 조회할 예정입니다.",
+      "latencyMs": 9498,
+      "errorKo": null
+    },
+    "verification": {
+      "requestedProvider": "gemini",
+      "selectedProvider": "gemini",
+      "providerAttempted": true,
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "canaryPassed": true,
+      "healthyMarked": true,
+      "checksEmpty": false,
+      "canaryNull": false,
+      "writeToolsBlocked": true,
+      "plannedWriteTools": []
+    },
+    "health": {
+      "activeProvider": "gemini",
+      "checks": [
+        {
+          "provider": "openai",
+          "model": "gpt-4o-mini",
+          "configured": false
+        },
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "configured": true,
+          "ok": false,
+          "latencyMs": 896,
+          "errorKo": "Gemini 응답 오류 (200)"
+        }
+      ]
+    }
+  }
+}

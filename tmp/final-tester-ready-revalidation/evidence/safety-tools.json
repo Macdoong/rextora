@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-08-04T11:36:21.153Z",
+  "sources": [
+    "src/lib/rextora/agent/v2/tools/registry.ts assertRegistrySafe",
+    "src/lib/rextora/agent/v2/tools/toolPolicy.ts",
+    "src/lib/rextora/agent/v2/tools/toolIdempotency.ts",
+    "src/lib/rextora/agent/v2/tools/execHandlers.ts exchangeCalled:false on paper.prepare",
+    "tests/AgentV2ExpandedSafeTools.test.ts (executed in unit suite)",
+    "tests/ToolPolicy.test.ts (executed in unit suite)",
+    "tests/ToolRegistry.test.ts (executed in unit suite)"
+  ],
+  "writeToolsRequireApproval": true,
+  "persistentIdempotencyEnforced": true,
+  "strategyDeletionDependencyProtection": true,
+  "paperUsesCanonicalSessionService": true,
+  "paperExchangeCalledFalse": true,
+  "noLiveToolRegistered": true,
+  "noRealOrderToolRegistered": true,
+  "noBinanceOrderToolRegistered": true,
+  "noSafeMutationToolRegistered": true,
+  "unknownToolsDenied": true,
+  "matrixNoRealOrders": true,
+  "note": "Static/code verification plus matrix runtime audits; unit suite had 1 unrelated failure in liveReadinessChecklist.test.ts"
+}

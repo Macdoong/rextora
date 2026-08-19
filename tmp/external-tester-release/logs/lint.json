@@ -1,0 +1,13 @@
+{
+  "command": "npm run lint",
+  "startedAt": "2026-08-05T11:00:19Z",
+  "finishedAt": "2026-08-05T11:00:36Z",
+  "durationMs": 16534,
+  "exitCode": 0,
+  "stdout": "tmp/external-tester-release/logs/lint.stdout.log",
+  "stderr": "tmp/external-tester-release/logs/lint.stderr.log",
+  "BUILD_ID": "-Cxu4VyOHFfrQb9h3COOq",
+  "parsed": {
+    "ok": true
+  }
+}

@@ -1,0 +1,529 @@
+{
+  "scenario": "B",
+  "width": 768,
+  "startedAt": "2026-08-05T11:18:41.141Z",
+  "finishedAt": "2026-08-05T11:22:34.045Z",
+  "buildId": "-Cxu4VyOHFfrQb9h3COOq",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-B-768-333516-SQHu4F",
+  "port": 57484,
+  "provider": "gemini",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-05T11:18:42.318Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msfzulji_0vy2v8",
+      "turnId": "turn-1785928722302",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:18:57.154Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msfzulji_0vy2v8",
+      "turnId": "turn-1785928722302",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 14828,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-05T11:18:58.649Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msfzuy55_7xdje7",
+      "turnId": "turn-1785928738598",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:18:58.650Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msfzuy55_7xdje7",
+      "turnId": "turn-1785928738598",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:18:59.734Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msfzuyza_25icm8",
+      "turnId": "turn-1785928739622",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:18:59.737Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msfzuyza_25icm8",
+      "turnId": "turn-1785928739622",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:20:31.141Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msfzwxid_f351wt",
+      "turnId": "turn-1785928830892",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-05T11:20:31.141Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msfzwxid_f351wt",
+      "turnId": "turn-1785928830892",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "oldJobId": "search_5cc675e8-18a6-4b25-9beb-5f03587070aa",
+    "newJobId": "search_ccdeb75b-6d90-46ab-93c2-bb654ab2448c",
+    "beforeApproval": {
+      "primaryText": "지금 실행 중인 탐색을 먼저 확인하세요.\n\n1개 작업이 실행 중입니다.\n탐색 상태·결과를 확인하세요.\n승인 센터탐색 상태·결과를 확인하세요.승인하면 표시된 계획을 한 번 실행합니다.왜 대기?승인하고 실행계획 검토화면 열기취소",
+      "rawLeakCount": 0,
+      "rawLeaks": [],
+      "leakHits": [],
+      "hasApproval": true,
+      "hasExecutionResult": false,
+      "thinkingCleared": true,
+      "horizontalOverflow": false,
+      "exactOldJobIdentified": true,
+      "noToolExecuted": true,
+      "noReplacementJobExists": true,
+      "oldJobStillActive": true,
+      "oldJobStatusAtCreate": "running",
+      "oldJobStatusPreApproval": "running",
+      "replacementTimeframe": "1h",
+      "replacementPatterns": [
+        "trendline",
+        "support_resistance"
+      ]
+    },
+    "afterApproval": {
+      "primaryText": "기존 탐색을 취소하고 새 1시간 탐색을 시작했습니다. ETH 탐색은 추세선·지지·저항 조합을 사용합니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다.\n\n진행 상황을 확인하세요\n기존 탐색을 취소하고 새 1시간 탐색을 시작했습니다. ETH 탐색은 추세선·지지·저항 조합을 사용합니다. 현재 연구가 진행 중이며, 완료 전까지 결과를 확정해서 말하지 않겠습니다.",
+      "rawLeakCount": 0,
+      "rawLeaks": [],
+      "leakHits": [],
+      "hasApproval": false,
+      "hasExecutionResult": true,
+      "thinkingCleared": true,
+      "horizontalOverflow": false,
+      "approvalCleared": true,
+      "monitoringVisible": true,
+      "persistedStateMatch": true,
+      "duplicateExecutionCount": 0,
+      "providerCallCount": 0,
+      "oldJobStatus": "cancelled",
+      "newJob": {
+        "id": "search_ccdeb75b-6d90-46ab-93c2-bb654ab2448c",
+        "status": "running",
+        "progress": 1087,
+        "timeframe": "1h",
+        "symbols": [
+          "ETHUSDT"
+        ],
+        "patterns": [
+          "trendline",
+          "support_resistance"
+        ]
+      }
+    },
+    "repeatApprovalCreatedNothing": true,
+    "repeatEvidence": {
+      "alreadyExecuted": false,
+      "executionStatus": null,
+      "writeAuditDelta": 0,
+      "jobCountDelta": 0,
+      "providerCallDelta": 0,
+      "auditsBeforeApprove": 2,
+      "provider": "local",
+      "fallbackUsed": false
+    },
+    "toolAudit": [
+      {
+        "toolId": "search.create",
+        "sessionId": "agent_455bb73e59b24b1f",
+        "arguments": {
+          "createBody": {
+            "searchVersion": "1",
+            "strategyTemplateId": "agent_draft_BTCUSDT_15m",
+            "symbols": [
+              "BTCUSDT"
+            ],
+            "timeframe": "15m",
+            "dataVersion": "binance-v1",
+            "seed": 42,
+            "generatorType": "random",
+            "maxIterations": 40,
+            "parameterRanges": [
+              {
+                "key": "ema_fast",
+                "min": 8,
+                "max": 40,
+                "step": 1,
+                "valueType": "integer"
+              }
+            ],
+            "evaluationWindows": [
+              {
+                "id": "full",
+                "label": "전체 구간",
+                "fromOpenTime": 1780704000000,
+                "toOpenTime": 1785974399999,
+                "requiredForPass": true
+              }
+            ],
+            "balance": 10000,
+            "baseCostConfig": {
+              "feeRate": 0.0004,
+              "slippageRate": 0.0002,
+              "fundingRate": 0.0001,
+              "applyFunding": false,
+              "applySpread": true,
+              "spreadRate": 0.0001
+            },
+            "passPolicy": {
+              "thresholds": {
+                "minTradeCount": 10,
+                "minTotalReturn": 0,
+                "maxMdd": -0.25,
+                "minWinRate": null
+              }
+            },
+            "scoreWeights": {
+              "returnWeight": 1,
+              "mddWeight": 0.5,
+              "profitFactorWeight": 0.25,
+              "winRateWeight": 0.25,
+              "tradeAdequacyWeight": 0.25,
+              "negativeMonthWeight": 0.1,
+              "consistencyWeight": 0.1
+            },
+            "costStressScenarios": [
+              {
+                "id": "stress_1_5x",
+                "label": "비용 1.5배",
+                "requiredForPass": false,
+                "feeMultiplier": 1.5,
+                "slippageMultiplier": 1.5,
+                "fundingMultiplier": 1,
+                "spreadMultiplier": 1.5,
+                "costGuardKMultiplier": 1
+              }
+            ],
+            "jitterConfig": {
+              "enabled": true,
+              "sampleCount": 2,
+              "mutationScale": 0.2,
+              "seed": 7,
+              "minimumPassRate": 0,
+              "maximumScoreDropRatio": 1,
+              "parameterRanges": [
+                {
+                  "key": "ema_fast",
+                  "min": 8,
+                  "max": 40,
+                  "step": 1,
+                  "valueType": "integer"
+                }
+              ]
+            },
+            "dataRef": {
+              "source": "binance_historical",
+              "availableFrom": 1780704000000,
+              "availableTo": 1785974399999
+            },
+            "operatorPlan": {
+              "depthProfile": "standard",
+              "qualificationProfile": "balanced",
+              "qualifiedTarget": 3,
+              "stopWhenQualifiedTarget": false,
+              "candidateBudget": 200,
+              "stageBatchSize": 40,
+              "maxRuntimeMs": 10800000,
+              "minScore": null,
+              "searchName": "agent_draft_BTCUSDT_15m",
+              "errorWarningRate": 0.35,
+              "errorAutoPauseRate": 0.55,
+              "repeatedSignatureThreshold": 25,
+              "patternSelectionMode": "manual",
+              "selectedSpaceIds": [
+                "order_block",
+                "fvg"
+              ],
+              "leverageMode": "automatic",
+              "leverageFixed": null,
+              "leverageMin": 1,
+              "leverageMax": 5,
+              "adaptiveLeverageEnabled": true,
+              "patternConfigLevel": "basic",
+              "patternDirection": "both",
+              "patternRetestMode": "required",
+              "patternConfirmStrength": "standard",
+              "patternConfirmClose": "required",
+              "patternConfirmationMode": "single_close",
+              "patternConfirmationCandleCount": 2,
+              "patternConfirmationWindow": 4,
+              "patternExpiryBars": 48,
+              "patternRiskStyle": "balanced",
+              "patternStrength": "standard",
+              "patternSrSensitivity": "standard",
+              "patternCombinationTemplate": "single",
+              "patternCombinationOperator": "and",
+              "patternCombinationInvalidationMode": "any",
+              "patternCombinationFailurePolicy": "any",
+              "patternCombinationWeightedThreshold": null,
+              "patternCombinationFamilies": null,
+              "patternCombinationSpec": null
+            },
+            "marketMode": "manual"
+          }
+        },
+        "result": {
+          "ok": true,
+          "status": "ok",
+          "errorCode": null,
+          "summary": "queued"
+        },
+        "durationMs": 32,
+        "approved": true,
+        "timestamp": "2026-08-05T11:18:58.634Z",
+        "approvalId": "pa_6138396f9f884eb6"
+      },
+      {
+        "toolId": "search.start",
+        "sessionId": "agent_455bb73e59b24b1f",
+        "arguments": {
+          "jobId": "search_5cc675e8-18a6-4b25-9beb-5f03587070aa"
+        },
+        "result": {
+          "ok": true,
+          "status": "ok",
+          "errorCode": null,
+          "summary": "queued"
+        },
+        "durationMs": 9,
+        "approved": true,
+        "timestamp": "2026-08-05T11:18:58.645Z",
+        "approvalId": "pa_6138396f9f884eb6"
+      },
+      {
+        "toolId": "search.cancel",
+        "sessionId": "agent_455bb73e59b24b1f",
+        "arguments": {
+          "jobId": "search_5cc675e8-18a6-4b25-9beb-5f03587070aa"
+        },
+        "result": {
+          "ok": true,
+          "status": "ok",
+          "errorCode": null,
+          "summary": "cancel_requested"
+        },
+        "durationMs": 130,
+        "approved": true,
+        "timestamp": "2026-08-05T11:20:31.034Z",
+        "approvalId": "pa_4e4208e0f7373158"
+      },
+      {
+        "toolId": "search.create",
+        "sessionId": "agent_455bb73e59b24b1f",
+        "arguments": {
+          "createBody": {
+            "searchVersion": "1",
+            "strategyTemplateId": "agent_draft_ETHUSDT_1h",
+            "symbols": [
+              "ETHUSDT"
+            ],
+            "timeframe": "1h",
+            "dataVersion": "binance-v1",
+            "seed": 42,
+            "generatorType": "random",
+            "maxIterations": 40,
+            "parameterRanges": [
+              {
+                "key": "ema_fast",
+                "min": 8,
+                "max": 40,
+                "step": 1,
+                "valueType": "integer"
+              }
+            ],
+            "evaluationWindows": [
+              {
+                "id": "full",
+                "label": "전체 구간",
+                "fromOpenTime": 1780704000000,
+                "toOpenTime": 1785974399999,
+                "requiredForPass": true
+              }
+            ],
+            "balance": 10000,
+            "baseCostConfig": {
+              "feeRate": 0.0004,
+              "slippageRate": 0.0002,
+              "fundingRate": 0.0001,
+              "applyFunding": false,
+              "applySpread": true,
+              "spreadRate": 0.0001
+            },
+            "passPolicy": {
+              "thresholds": {
+                "minTradeCount": 10,
+                "minTotalReturn": 0,
+                "maxMdd": -0.25,
+                "minWinRate": null
+              }
+            },
+            "scoreWeights": {
+              "returnWeight": 1,
+              "mddWeight": 0.5,
+              "profitFactorWeight": 0.25,
+              "winRateWeight": 0.25,
+              "tradeAdequacyWeight": 0.25,
+              "negativeMonthWeight": 0.1,
+              "consistencyWeight": 0.1
+            },
+            "costStressScenarios": [
+              {
+                "id": "stress_1_5x",
+                "label": "비용 1.5배",
+                "requiredForPass": false,
+                "feeMultiplier": 1.5,
+                "slippageMultiplier": 1.5,
+                "fundingMultiplier": 1,
+                "spreadMultiplier": 1.5,
+                "costGuardKMultiplier": 1
+              }
+            ],
+            "jitterConfig": {
+              "enabled": true,
+              "sampleCount": 2,
+              "mutationScale": 0.2,
+              "seed": 7,
+              "minimumPassRate": 0,
+              "maximumScoreDropRatio": 1,
+              "parameterRanges": [
+                {
+                  "key": "ema_fast",
+                  "min": 8,
+                  "max": 40,
+                  "step": 1,
+                  "valueType": "integer"
+                }
+              ]
+            },
+            "dataRef": {
+              "source": "binance_historical",
+              "availableFrom": 1780704000000,
+              "availableTo": 1785974399999
+            },
+            "operatorPlan": {
+              "depthProfile": "standard",
+              "qualificationProfile": "balanced",
+              "qualifiedTarget": 3,
+              "stopWhenQualifiedTarget": false,
+              "candidateBudget": 200,
+              "stageBatchSize": 40,
+              "maxRuntimeMs": 10800000,
+              "minScore": null,
+              "searchName": "agent_draft_ETHUSDT_1h",
+              "errorWarningRate": 0.35,
+              "errorAutoPauseRate": 0.55,
+              "repeatedSignatureThreshold": 25,
+              "patternSelectionMode": "manual",
+              "selectedSpaceIds": [
+                "trendline",
+                "support_resistance"
+              ],
+              "leverageMode": "automatic",
+              "leverageFixed": null,
+              "leverageMin": 1,
+              "leverageMax": 5,
+              "adaptiveLeverageEnabled": true,
+              "patternConfigLevel": "basic",
+              "patternDirection": "both",
+              "patternRetestMode": "required",
+              "patternConfirmStrength": "standard",
+              "patternConfirmClose": "required",
+              "patternConfirmationMode": "single_close",
+              "patternConfirmationCandleCount": 2,
+              "patternConfirmationWindow": 4,
+              "patternExpiryBars": 48,
+              "patternRiskStyle": "balanced",
+              "patternStrength": "standard",
+              "patternSrSensitivity": "standard",
+              "patternCombinationTemplate": "single",
+              "patternCombinationOperator": "and",
+              "patternCombinationInvalidationMode": "any",
+              "patternCombinationFailurePolicy": "any",
+              "patternCombinationWeightedThreshold": null,
+              "patternCombinationFamilies": null,
+              "patternCombinationSpec": null
+            },
+            "marketMode": "manual"
+          }
+        },
+        "result": {
+          "ok": true,
+          "status": "ok",
+          "errorCode": null,
+          "summary": "queued"
+        },
+        "durationMs": 59,
+        "approved": true,
+        "timestamp": "2026-08-05T11:20:31.101Z",
+        "approvalId": "pa_4e4208e0f7373158"
+      },
+      {
+        "toolId": "search.start",
+        "sessionId": "agent_455bb73e59b24b1f",
+        "arguments": {
+          "jobId": "search_ccdeb75b-6d90-46ab-93c2-bb654ab2448c"
+        },
+        "result": {
+          "ok": true,
+          "status": "ok",
+          "errorCode": null,
+          "summary": "queued"
+        },
+        "durationMs": 17,
+        "approved": true,
+        "timestamp": "2026-08-05T11:20:31.125Z",
+        "approvalId": "pa_4e4208e0f7373158"
+      }
+    ]
+  },
+  "passed": true
+}

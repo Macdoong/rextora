@@ -1,0 +1,62 @@
+Building production server...
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-yzirSc",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-final-yzirSc/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbijs1f_1ad8f1",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbijs1f_1ad8f1&demo=1"
+  }
+}
+{
+  "ok": true,
+  "dataDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-EdUlRd",
+  "strategiesDir": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-v2-shadow-EdUlRd/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_msbilg5j_e773bd",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_msbilg5j_e773bd&demo=1"
+  }
+}
+Running browser acceptance...
+Browser acceptance failed: locator.textContent: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('[data-testid="global-agent-drawer"]').locator('[data-testid="agent-conversational-answer"]').last()
+
+    at drawerAnswer (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:313:79)
+    at runBrowserConversations (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:364:27)
+    at async main (/Users/macdoong/Documents/Rextora/tmp/agent-v2-final-verification.mjs:727:5) {
+  name: 'TimeoutError'
+}
+Running quality gates...
+{
+  "verdict": "AGENT V2 REASONING VERIFIED",
+  "defects": [
+    "section1_wrong_tf:null",
+    "browser_error:locator.textContent: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"global-agent-drawer\"]').locator('[data-testid=\"agent-conversational-answer\"]').last()\n"
+  ],
+  "section1": {
+    "originalJobId": "search_baa3a02c-70b2-420f-9fd5-74977b0a57b9",
+    "newJobId": "search_6a140f71-f75a-49a9-b41f-13fb112b4002",
+    "planTools": [
+      "search.cancel",
+      "search.create",
+      "search.start"
+    ],
+    "oldStatus": "cancelled"
+  },
+  "gates": {
+    "skipped": true
+  }
+}

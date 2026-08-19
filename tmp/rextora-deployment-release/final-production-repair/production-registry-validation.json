@@ -1,0 +1,21 @@
+{
+  "buildId": "1XWJaOd-qF4VMUWBKK157",
+  "scenarioCount": 22,
+  "viewportCount": 4,
+  "expectedRows": 88,
+  "executedRows": 88,
+  "passedRows": 88,
+  "failedRows": 0,
+  "missingRows": 0,
+  "missingScenarioIds": [],
+  "duplicateScenarioIds": [],
+  "missingViewports": [],
+  "secretLeakCount": 0,
+  "rawLeakCount": 0,
+  "duplicateExecutionCount": 0,
+  "unintendedWriteCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "evidence": "tmp/rextora-deployment-release/final-production-repair/browser-production-matrix-88-verified.stdout.txt",
+  "verifiedAt": "2026-08-10T01:59:44.066Z"
+}

@@ -1,0 +1,90 @@
+{
+  "experiment": "B",
+  "startup": {
+    "pid": 75125,
+    "startupMs": 21,
+    "metrics": {
+      "pid": 75125,
+      "etime": "00:00",
+      "cpu_pct": "0.0",
+      "mem_pct": "0.0",
+      "rss_kb": "2368",
+      "state": "R",
+      "open_files": "36"
+    },
+    "readiness": "ai-providers-api",
+    "dashboardProbe": {
+      "ok": true,
+      "status": 200,
+      "ms": 30,
+      "bytes": 25021
+    },
+    "settingsProbe": {
+      "ok": true,
+      "status": 200,
+      "ms": 29,
+      "bytes": 22924
+    },
+    "aiApiProbe": {
+      "ms": 17,
+      "status": 200,
+      "openai": {
+        "stored": true,
+        "configured": true,
+        "envFallback": false,
+        "enabled": true,
+        "selectedModel": "gpt-5-mini"
+      },
+      "gemini": {
+        "stored": true,
+        "configured": true,
+        "envFallback": false,
+        "enabled": true,
+        "selectedModel": "gemini-2.5-flash"
+      },
+      "reasoningActive": true
+    }
+  },
+  "postS01": {
+    "api": {
+      "ms": 189,
+      "status": 200,
+      "openai": {
+        "stored": true,
+        "configured": true,
+        "envFallback": false,
+        "enabled": true,
+        "selectedModel": "gpt-5-mini"
+      },
+      "gemini": {
+        "stored": true,
+        "configured": true,
+        "envFallback": false,
+        "enabled": true,
+        "selectedModel": "gemini-2.5-flash"
+      },
+      "reasoningActive": true
+    },
+    "files": {
+      "aiProviderSettings": {
+        "exists": false
+      },
+      "credentialEnc": {
+        "exists": false
+      }
+    },
+    "server": {
+      "pid": 75125,
+      "error": "process_gone"
+    }
+  },
+  "scenario02": {
+    "passed": true,
+    "failure": null,
+    "lastCheckpoint": "T10"
+  },
+  "serverAfter": {
+    "pid": 75125,
+    "error": "process_gone"
+  }
+}

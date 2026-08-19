@@ -1,6 +1,9 @@
 /**
  * Commercial blocker regressions: overlay geometry from persisted trades,
  * saved-run deep-link hydration wiring, library authoritative loading.
+ *
+ * Fixtures are committed under tests/fixtures/overlay — never depend on
+ * gitignored data/rextora runtime files.
  */
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
@@ -10,15 +13,17 @@ import { buildTradeEventTrace } from "../src/lib/rextora/backtest/tradeEventTrac
 import type { BacktestTrade } from "../src/lib/rextora/backtest/backtestEngine";
 
 const ROOT = path.resolve(__dirname, "..");
-const BACKTESTS = path.join(ROOT, "data/rextora/backtests");
+const FIXTURES = path.join(ROOT, "tests/fixtures/overlay");
 
 function firstTradeWithFamily(
   runId: string,
   family: string,
 ): BacktestTrade | null {
-  const raw = JSON.parse(
-    fs.readFileSync(path.join(BACKTESTS, `${runId}.json`), "utf8"),
-  );
+  const fixturePath = path.join(FIXTURES, `${runId}.json`);
+  if (!fs.existsSync(fixturePath)) {
+    expect.fail(`missing committed fixture ${runId} at ${fixturePath}`);
+  }
+  const raw = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
   const trades = (raw.trades ?? []) as BacktestTrade[];
   return (
     trades.find(
@@ -31,7 +36,7 @@ function firstTradeWithFamily(
   );
 }
 
-describe("persisted overlay geometry (production backtest runs)", () => {
+describe("persisted overlay geometry (committed fixtures)", () => {
   const cases = [
     { runId: "bt_ms31e199_1dae4f", family: "order_block", label: "OB" },
     { runId: "bt_ms31dmrw_637c6a", family: "fvg", label: "FVG" },
@@ -45,9 +50,6 @@ describe("persisted overlay geometry (production backtest runs)", () => {
 
   for (const { runId, family, label } of cases) {
     it(`${label}: persisted trade trace enables overlay toggle`, () => {
-      if (!fs.existsSync(path.join(BACKTESTS, `${runId}.json`))) {
-        expect.fail(`missing fixture ${runId}`);
-      }
       const trade = firstTradeWithFamily(runId, family);
       expect(trade).not.toBeNull();
       const trace = buildTradeEventTrace(trade!, {
@@ -90,6 +92,6 @@ describe("saved-run deep-link hydration wiring", () => {
     expect(src).toContain("missing_run");
     expect(src).toContain("loading_run");
     expect(src).toContain("fetchAndApplyRunById");
-    expect(src).toContain('runId=${encodeURIComponent(runId)}');
+    expect(src).toContain("runId=${encodeURIComponent(runId)}");
   });
 });

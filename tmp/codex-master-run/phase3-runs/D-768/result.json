@@ -1,0 +1,99 @@
+{
+  "scenario": "D",
+  "width": 768,
+  "startedAt": "2026-08-06T08:42:20.851Z",
+  "finishedAt": "2026-08-06T08:44:59.796Z",
+  "buildId": "8MIVgd66wyBLFLu7IpbHY",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-D-768-2b5297-OVAVyR",
+  "port": 55680,
+  "provider": "gemini",
+  "consoleErrorCount": 0,
+  "consoleErrors": [],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-06T08:42:22.054Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh9pecm_qmsy43",
+      "turnId": "turn-1786005742032",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:42:26.263Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh9pecm_qmsy43",
+      "turnId": "turn-1786005742032",
+      "providerAttempt": 1,
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "fallbackUsed": false,
+      "latencyMs": 4204,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:42:27.743Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_msh9piqn_4jmm7h",
+      "turnId": "turn-1786005747208",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-06T08:42:27.743Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_msh9piqn_4jmm7h",
+      "turnId": "turn-1786005747208",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "plannedTools": [
+      "backtest.run"
+    ],
+    "runId": "bt_msh9piqf_32f239",
+    "counts": {
+      "before": 1,
+      "after": 2,
+      "finalCount": 2
+    },
+    "executed": {
+      "intentType": "approve_pending",
+      "executionResult": {
+        "commandId": "rr_msh9piqn_4jmm7h",
+        "commandType": "tool_plan",
+        "executionStatus": "succeeded",
+        "resultReference": null,
+        "jobId": null,
+        "runId": "bt_msh9piqf_32f239",
+        "alreadyExecuted": false,
+        "summaryKo": "백테스트를 실행하고 결과를 저장했습니다. 저장된 지표는 아래에서 확인할 수 있습니다."
+      }
+    },
+    "repeatExecutionResult": null,
+    "persistedRunCreated": true,
+    "repeatedApprovalNoDuplicate": true,
+    "actualMetricsOnly": true,
+    "primaryText": "어떤 승인 계획을 진행할지 선택해 주세요.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

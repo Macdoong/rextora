@@ -66,7 +66,7 @@ export { isProvenanceDetached };
 function liveRefsForStrategy(strategyId: string): string[] {
   try {
     const liveSession = path.join(
-      process.cwd(),
+      /* turbopackIgnore: true */ process.cwd(),
       "data",
       "rextora",
       "live-dry-run",

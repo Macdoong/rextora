@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { rextoraDataRoot } from "./runtimePaths";
 
-const DATA_DIR = path.join(process.cwd(), "data", "rextora");
 const DEFAULT_TTL_MS = 5_000;
 
 type CacheEntry<T> = {
@@ -12,12 +12,19 @@ type CacheEntry<T> = {
 
 const storeCache = new Map<string, CacheEntry<unknown>>();
 
+function dataDir(): string {
+  // Must follow rextoraDataRoot() so isolated runtimes (REXTORA_DATA_DIR)
+  // cannot silently inherit operator AI settings from process.cwd().
+  return rextoraDataRoot();
+}
+
 function ensureDir(): void {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  const dir = dataDir();
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 function filePath(filename: string): string {
-  return path.join(DATA_DIR, filename);
+  return path.join(dataDir(), filename);
 }
 
 function getFileMtimeMs(filename: string): number {
@@ -79,5 +86,5 @@ export function appendJsonStore<T>(filename: string, item: T, maxItems = 500): T
 
 export function getDataDir(): string {
   ensureDir();
-  return DATA_DIR;
+  return dataDir();
 }

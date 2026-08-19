@@ -1,0 +1,39 @@
+{
+  "id": "bt_ms31dmrw_637c6a",
+  "trades": [
+    {
+      "id": "t_fvg",
+      "side": "LONG",
+      "entryTime": "2026-06-01T00:00:00.000Z",
+      "exitTime": "2026-06-01T01:00:00.000Z",
+      "entryPrice": 100.0,
+      "exitPrice": 101.0,
+      "netPnlUsdt": 1.0,
+      "feeUsdt": 0.04,
+      "slippageUsdt": 0.02,
+      "patternType": "fvg",
+      "patternBlocks": [
+        {
+          "blockId": "fvg_0",
+          "family": "fvg",
+          "role": "entry_zone",
+          "order": 0,
+          "status": "detected",
+          "patternType": "fvg",
+          "required": true,
+          "weight": 1,
+          "priority": 0,
+          "operatorPassed": true,
+          "detectorParams": {},
+          "measuredValues": {},
+          "thresholds": {},
+          "zoneHigh": 102.0,
+          "zoneLow": 100.5,
+          "creationBar": 2
+        }
+      ],
+      "zoneHigh": 102.0,
+      "zoneLow": 100.5
+    }
+  ]
+}

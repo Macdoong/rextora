@@ -1,0 +1,15 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/liveReadinessChecklist.test.ts (3 tests | 1 failed) 9ms
+     × includes expected LIVE block reasons when setting is off 4ms
+
+ Test Files  1 failed | 186 passed (187)
+      Tests  1 failed | 1350 passed (1351)
+   Start at  19:51:00
+   Duration  83.15s (transform 2.28s, setup 1.21s, import 10.31s, tests 47.16s, environment 11ms)
+

@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "dataDir": "/tmp/rextora-production-88-final-zfJ26y",
+  "strategiesDir": "/tmp/rextora-production-88-final-zfJ26y/strategies",
+  "result": {
+    "created": true,
+    "alreadyPresent": false,
+    "jobId": "search_d0000001-0000-4000-8000-000000000001",
+    "strategyId": "demo_strategy_btc_v1",
+    "runId": "bt_mszwkc6i_7de22e",
+    "paperDeepLink": "/paper-trading?strategyId=demo_strategy_btc_v1&demo=1",
+    "resultsDeepLink": "/results?jobId=search_d0000001-0000-4000-8000-000000000001&demo=1",
+    "backtestDeepLink": "/backtest?strategyId=demo_strategy_btc_v1&runId=bt_mszwkc6i_7de22e&demo=1"
+  }
+}
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.19.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.19.0
+npm notice To update run: npm install -g npm@11.19.0
+npm notice

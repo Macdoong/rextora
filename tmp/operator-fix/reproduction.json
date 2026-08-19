@@ -1,0 +1,399 @@
+{
+  "startedAt": "2026-08-01T13:21:08.352Z",
+  "defects": {
+    "backtestLoad": {
+      "url": "http://127.0.0.1:3000/backtest?strategyId=custom_ms1y81v1&runId=bt_ms1y825e_8b8b5c&symbol=BTCUSDT",
+      "hasNav": 1,
+      "hasAnalysis": 1,
+      "emptyState": 0,
+      "consoleErrors": []
+    },
+    "tabOscillation": {
+      "url": "http://127.0.0.1:3000/backtest?strategyId=custom_ms1y81v1&runId=bt_ms1y825e_8b8b5c&symbol=BTCUSDT",
+      "viewport": {
+        "w": 1440,
+        "h": 900
+      },
+      "tabLabels": [
+        "차트",
+        "거래",
+        "월별",
+        "비용",
+        "자산·낙폭",
+        "타임라인",
+        "상세 분석",
+        "검증"
+      ],
+      "clickTransitions": [
+        {
+          "clicked": "차트",
+          "active": "차트",
+          "analysisSection": "price",
+          "chartVisible": true,
+          "tradesVisible": false,
+          "scrollY": 2159
+        },
+        {
+          "clicked": "거래",
+          "active": "거래",
+          "analysisSection": "trades",
+          "chartVisible": false,
+          "tradesVisible": true,
+          "scrollY": 2159
+        },
+        {
+          "clicked": "월별",
+          "active": "월별",
+          "analysisSection": "monthly",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 2159
+        },
+        {
+          "clicked": "비용",
+          "active": "비용",
+          "analysisSection": "cost",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 1990
+        },
+        {
+          "clicked": "자산·낙폭",
+          "active": "자산·낙폭",
+          "analysisSection": "equity",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 1990
+        },
+        {
+          "clicked": "타임라인",
+          "active": "타임라인",
+          "analysisSection": "timeline",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 1990
+        },
+        {
+          "clicked": "상세 분석",
+          "active": "상세 분석",
+          "analysisSection": "advanced",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 2019
+        },
+        {
+          "clicked": "검증",
+          "active": "검증",
+          "analysisSection": "validation",
+          "chartVisible": false,
+          "tradesVisible": false,
+          "scrollY": 2019
+        }
+      ],
+      "oscillationSamples": [
+        {
+          "step": 0,
+          "active": "상세 분석",
+          "scrollY": 2531,
+          "gap": 462
+        },
+        {
+          "step": 1,
+          "active": "상세 분석",
+          "scrollY": 2734,
+          "gap": 367
+        },
+        {
+          "step": 2,
+          "active": "검증",
+          "scrollY": 2774,
+          "gap": 120
+        },
+        {
+          "step": 3,
+          "active": "검증",
+          "scrollY": 2894,
+          "gap": 0
+        },
+        {
+          "step": 4,
+          "active": "검증",
+          "scrollY": 2854,
+          "gap": 40
+        },
+        {
+          "step": 5,
+          "active": "검증",
+          "scrollY": 2710,
+          "gap": 190
+        },
+        {
+          "step": 6,
+          "active": "검증",
+          "scrollY": 2888,
+          "gap": 6
+        },
+        {
+          "step": 7,
+          "active": "상세 분석",
+          "scrollY": 2781,
+          "gap": 323
+        },
+        {
+          "step": 8,
+          "active": "상세 분석",
+          "scrollY": 2814,
+          "gap": 287
+        },
+        {
+          "step": 9,
+          "active": "검증",
+          "scrollY": 2854,
+          "gap": 40
+        },
+        {
+          "step": 10,
+          "active": "검증",
+          "scrollY": 2710,
+          "gap": 190
+        },
+        {
+          "step": 11,
+          "active": "검증",
+          "scrollY": 2888,
+          "gap": 6
+        },
+        {
+          "step": 12,
+          "active": "상세 분석",
+          "scrollY": 2779,
+          "gap": 323
+        },
+        {
+          "step": 13,
+          "active": "상세 분석",
+          "scrollY": 2814,
+          "gap": 287
+        },
+        {
+          "step": 14,
+          "active": "검증",
+          "scrollY": 2854,
+          "gap": 40
+        },
+        {
+          "step": 15,
+          "active": "상세 분석",
+          "scrollY": 2720,
+          "gap": 394
+        },
+        {
+          "step": 16,
+          "active": "검증",
+          "scrollY": 2734,
+          "gap": 367
+        },
+        {
+          "step": 17,
+          "active": "상세 분석",
+          "scrollY": 2774,
+          "gap": 327
+        },
+        {
+          "step": 18,
+          "active": "상세 분석",
+          "scrollY": 2814,
+          "gap": 287
+        },
+        {
+          "step": 19,
+          "active": "검증",
+          "scrollY": 2854,
+          "gap": 40
+        },
+        {
+          "step": 20,
+          "active": "검증",
+          "scrollY": 2707,
+          "gap": 192
+        },
+        {
+          "step": 21,
+          "active": "검증",
+          "scrollY": 2888,
+          "gap": 6
+        },
+        {
+          "step": 22,
+          "active": "상세 분석",
+          "scrollY": 2781,
+          "gap": 323
+        },
+        {
+          "step": 23,
+          "active": "상세 분석",
+          "scrollY": 2814,
+          "gap": 287
+        },
+        {
+          "step": 24,
+          "active": "검증",
+          "scrollY": 2854,
+          "gap": 40
+        }
+      ],
+      "uniqueActivesDuringScroll": [
+        "상세 분석",
+        "검증"
+      ],
+      "flipCount": 11,
+      "reproduced": true
+    },
+    "contentDisappear": {
+      "tradeRowsBefore": 66,
+      "tradeRowsAfter": 66,
+      "activeAfterScroll": "상세 분석",
+      "activeChangedByScroll": true
+    },
+    "strategyMgmtDiscoverability": {
+      "url": "http://127.0.0.1:3000/backtest?strategyId=copy_mrtdopgm&symbol=BTCUSDT",
+      "hasStrategyManageLabel": false,
+      "hasRename": false,
+      "hasArchive": false,
+      "hasDelete": false,
+      "hasLibraryLink": true,
+      "nearSelector": "백테스트 실행\n\n탐색으로 확정된 전략의 불변 ID·해시를 유지한 채, 선택한 기간으로 새 백테스트를 실행합니다.\n\n전략 선택\n전체 그룹\n패턴 조합\n단일 패턴\n일반\nSAFE\nResearch 등록\n등록 전략\nSAFE_v44_i4060 · 15m · 7893ca…\nOrder Block · 공격형 · 15m · 79c53d…\nFair Value Gap · 공격형 · 15m · d74236…\nTrendline · 공격형 · 15m · 207f81…\nSupport / Resistance · 공격형 · 15m · 79c53d…\nOrder Block · 공격형 · 15m · e47905…\nFair Value Gap · 공격형 · 15m · 46fc62…\nTrendline · 공격형 · 15m · ebe622…\nSupport / Resistance · 공격형 · 15m · 96bba3…\nSAFE_v44_i4060 복사본 1 · 15m · fb49a5…\n변동성 돌파 · 공격형 · 15m · 7fc3cd…\nBTCUSDT 15m · 변동성 돌파 · 단일 역할 · 공격형 · 자동 1.0–5.0x · K96 · 15m · 66b8f2…\n전략 ID\ncopy_mrtdopgm\n전략 해시\nf8148ef9e739…\n개발자 정보\n타임프레임\n15분봉\n심볼/시장\nBTCUSDT\nETHUSDT\nSOLUSDT\nBNBUSDT\nXRPUSDT\nADAUSDT\nDOGEUSDT\nAVAXUSDT\nLINKUSDT\nDOTUSDT\n\n전략 로직은 유지하고 선택한 시장 데이터로 새 백테스트를 실행합니다.\n\n시작일\n종료일\n비용 프로필\n수수료 — · 슬리피지 — (시스템 설정)\n최근 1개월\n최근 3개월\n최근 6개월\n최근 1년\n전체 기간\n백테스트 실행"
+    },
+    "agentDrawer": {
+      "open": 1,
+      "width": 672,
+      "viewportWidth": 1440,
+      "widthRatio": 0.4666666666666667,
+      "approvalCenter": 2,
+      "workspacePanel": 2,
+      "missionTimeline": 2,
+      "primaryActions": 0,
+      "approvalActions": 0,
+      "approvalRequirement": 2
+    },
+    "fabCollision_390": {
+      "fabBox": {
+        "x": 320,
+        "y": 780,
+        "width": 50,
+        "height": 44
+      },
+      "startBox": {
+        "x": 255.796875,
+        "y": 709.859375,
+        "width": 84.203125,
+        "height": 44
+      },
+      "stickyBox": null,
+      "overlapsStart": false,
+      "overlapsSticky": false,
+      "startText": "연구 시작"
+    },
+    "fabCollision_768": {
+      "fabBox": {
+        "x": 650.578125,
+        "y": 832,
+        "width": 97.421875,
+        "height": 48
+      },
+      "startBox": {
+        "x": 633.796875,
+        "y": 628.140625,
+        "width": 84.203125,
+        "height": 40.890625
+      },
+      "stickyBox": null,
+      "overlapsStart": false,
+      "overlapsSticky": false,
+      "startText": "연구 시작"
+    },
+    "fabCollision_1024": {
+      "fabBox": {
+        "x": 906.578125,
+        "y": 832,
+        "width": 97.421875,
+        "height": 48
+      },
+      "startBox": {
+        "x": 889.796875,
+        "y": 632.28125,
+        "width": 84.203125,
+        "height": 40.890625
+      },
+      "stickyBox": null,
+      "overlapsStart": false,
+      "overlapsSticky": false,
+      "startText": "연구 시작"
+    },
+    "fabCollision_1440": {
+      "fabBox": {
+        "x": 1322.578125,
+        "y": 832,
+        "width": 97.421875,
+        "height": 48
+      },
+      "startBox": {
+        "x": 1293.796875,
+        "y": 585.3125,
+        "width": 84.203125,
+        "height": 40.890625
+      },
+      "stickyBox": {
+        "x": 0,
+        "y": 0,
+        "width": 252,
+        "height": 900
+      },
+      "overlapsStart": false,
+      "overlapsSticky": false,
+      "startText": "연구 시작"
+    },
+    "aiDoesNotInvokeEngine": {
+      "answerSnippet": "「탐색 계획 검토」을 진행합니다. 화면만 열리며 엔진은 자동 실행되지 않습니다.\n\nETHUSDT 15m 초안을 전략 탐색 화면에서 검토하세요. 에이전트는 탐색을 자동 시작하지 않습니다.\n\n탐색 계획 검토.",
+      "searchJobPosts": [],
+      "backtestRunPosts": [],
+      "invokedSearchApi": false,
+      "allAgentApiOnly": 2,
+      "requestSample": [
+        {
+          "method": "GET",
+          "url": "/api/rextora/trading/dashboard"
+        },
+        {
+          "method": "GET",
+          "url": "/api/rextora/first-run"
+        },
+        {
+          "method": "GET",
+          "url": "/api/rextora/strategy-search"
+        },
+        {
+          "method": "GET",
+          "url": "/api/rextora/strategies"
+        },
+        {
+          "method": "GET",
+          "url": "/api/rextora/paper/session?active=1"
+        },
+        {
+          "method": "GET",
+          "url": "/api/rextora/first-run"
+        },
+        {
+          "method": "POST",
+          "url": "/api/rextora/agent"
+        },
+        {
+          "method": "POST",
+          "url": "/api/rextora/agent"
+        }
+      ]
+    }
+  },
+  "finishedAt": "2026-08-01T13:21:44.812Z"
+}

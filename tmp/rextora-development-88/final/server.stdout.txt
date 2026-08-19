@@ -1,0 +1,24 @@
+
+> rextora@0.1.0 dev
+> next dev --port 3101 --hostname 127.0.0.1 --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://127.0.0.1:3101
+- Network:       http://127.0.0.1:3101
+- Environments: .env.local
+✓ Ready in 460ms
+
+
+> rextora@0.1.0 dev
+> next dev --port 3101 --hostname 127.0.0.1 --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://127.0.0.1:3101
+- Network:       http://127.0.0.1:3101
+- Environments: .env.local
+✓ Ready in 369ms
+
+○ Compiling /settings ...
+ GET /settings 200 in 117s (next.js: 116s, application-code: 607ms)
+ GET /api/rextora/settings/ai-providers 200 in 920ms (next.js: 895ms, application-code: 25ms)
+ GET /dashboard 200 in 683ms (next.js: 570ms, application-code: 113ms)

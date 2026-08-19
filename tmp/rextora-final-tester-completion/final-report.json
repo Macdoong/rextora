@@ -1,0 +1,176 @@
+{
+  "title": "REXTORA FINAL 37%-BUDGET TESTER REPORT",
+  "finalVerdict": "REXTORA TESTER READY",
+  "testerReady": true,
+  "git": {
+    "branch": "main",
+    "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "commitPerformed": false,
+    "pushPerformed": false,
+    "workingTreeClean": false,
+    "statusEvidence": "git-status-final.txt",
+    "diffStatEvidence": "git-diff-stat-final.txt"
+  },
+  "source": {
+    "startingFileCount": 937,
+    "startingFingerprint": "209ae0043c0f6538283c9783d764b769a4944659e23569700db316d28790e631",
+    "finalFileCount": 937,
+    "finalFingerprint": "25edc3c17daced6497136d6479156c9569f5fc1851de4f214119102315bb3d6c",
+    "sourceBuildMatch": true,
+    "generatedPostBuildDrift": ["next-env.d.ts"],
+    "applicationSourceNewerThanBuild": []
+  },
+  "build": {
+    "buildId": "-6CTCAJcZAMY02xezkvRO",
+    "webpack": true,
+    "exitCode": 0,
+    "durationMs": 23936,
+    "peakRssBytes": 1335820288,
+    "swapCount": 0,
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "quality": {
+    "focusedEslintPassed": true,
+    "unit": { "files": 207, "passed": 1560, "failed": 0 },
+    "lifecycle": { "expected": 52, "passed": 52, "failed": 0, "viewports": [390, 768, 1024, 1440] },
+    "standardE2e": { "discovered": 31, "passed": 31, "failed": 0, "skipped": 0, "exitCode": 0 }
+  },
+  "production": {
+    "scenarioCount": 22,
+    "viewportCount": 4,
+    "viewports": [390, 768, 1024, 1440],
+    "perViewportPassed": { "390": 22, "768": 22, "1024": 22, "1440": 22 },
+    "expectedRows": 88,
+    "executedRows": 88,
+    "passedRows": 88,
+    "failedRows": 0,
+    "skippedRows": 0,
+    "retryCount": 0,
+    "flakyRows": 0,
+    "workers": 1,
+    "durationMs": 2607427.903,
+    "runtimeHealth": {
+      "malformedJsonCount": 0,
+      "ChunkLoadErrorCount": 0,
+      "hydrationErrorCount": 0,
+      "HTTP5xxCount": 0,
+      "unexpectedCriticalConsoleErrorCount": 0
+    }
+  },
+  "providers": {
+    "openai": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "providerAttempted": true,
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "structuredOutputValid": true,
+      "writeToolCount": 0,
+      "billingOrQuotaError": false,
+      "credentialError": false,
+      "secretExposureCount": 0,
+      "passed": true,
+      "precedingTransientValidationFallbackRecorded": true
+    },
+    "gemini": {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "providerAttempted": true,
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "structuredOutputValid": true,
+      "contextPreserved": true,
+      "writeToolCount": 0,
+      "passed": true
+    }
+  },
+  "approval": {
+    "exactlyOncePassed": true,
+    "modeBeforeApproval": "PLAN_AND_APPROVE",
+    "pendingApprovalCountBefore": 1,
+    "writeCountBefore": 0,
+    "providerCallCountDuringExecution": 0,
+    "firstExecutionWriteOccurred": true,
+    "additionalWriteCountOnRepeat": 0,
+    "duplicateExecutionCount": 0,
+    "staleApprovalResurrectionFixed": true,
+    "executionReportingPassed": true,
+    "ambiguousApprovalClarifies": true,
+    "ambiguousApprovalWriteCount": 0
+  },
+  "paperAndRisk": {
+    "paperTradingPassed": true,
+    "statuses": ["active", "paused", "active", "stopped"],
+    "exchangeCalled": false,
+    "paperConsecutiveLossLimit": 6,
+    "fourLossStops": false,
+    "sixLossStops": true,
+    "staleStateResetPassed": true,
+    "liveConsecutiveLossLimit": 3,
+    "liveRiskUnchanged": true
+  },
+  "telegram": {
+    "mockTransport": true,
+    "normalToBlockedNotifications": 1,
+    "repeatBlockedAdditionalNotifications": 0,
+    "recoveredThenBlockedNewNotifications": 1,
+    "distinctBreachIndependentlyAlertable": true,
+    "passed": true
+  },
+  "testerJourney": {
+    "passed": true,
+    "chainedPersistedContinuation": true,
+    "staleApprovalAfterReload": false,
+    "duplicateAction": false,
+    "fabricatedCompletion": false,
+    "resultsPage": true,
+    "backtestPage": true,
+    "paperLifecycle": true,
+    "liveRefused": true,
+    "safeMutationRefused": true,
+    "HTTP5xxCount": 0,
+    "consoleErrorCount": 0,
+    "horizontalOverflow": false
+  },
+  "safety": {
+    "secretLeakCount": 0,
+    "rawLeakCount": 0,
+    "realOrderCount": 0,
+    "liveActivationCount": 0,
+    "safeMutationCount": 0,
+    "binanceOrderCallCountDuringAcceptance": 0
+  },
+  "safe": {
+    "path": "data/strategies/SAFE_v44_i4060.json",
+    "paramsHash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitHashObject": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedDiffEmpty": true,
+    "unchanged": true
+  },
+  "sourceRepair": {
+    "made": true,
+    "classification": "P1 stale approval resurrection",
+    "summary": "Successful execution or cancel is now a history barrier when recovering pending approvals; older proposals cannot be repersisted by later read-only turns.",
+    "applicationFiles": [
+      "components/rextora/agent/agentSessionSync.ts",
+      "components/rextora/agent/useAgentSession.ts"
+    ],
+    "regressionTest": "tests/AgentV2PostExecutionApprovalClear.test.ts",
+    "rebuildPerformed": true
+  },
+  "remainingP0Blockers": [],
+  "remainingP1Blockers": [],
+  "artifacts": {
+    "readiness": "tester-readiness.json",
+    "production": "production-88-after-fix-results.json",
+    "productionStdout": "production-88-after-fix.stdout",
+    "lifecycle": "lifecycle-52-after-fix-summary.json",
+    "e2e": "standard-e2e-after-fix.stdout",
+    "unit": "unit-after-stale-approval-fix-rerun.stdout",
+    "providers": "final-provider-sanity.json",
+    "riskTelegram": "paper-risk-telegram-final.stdout",
+    "sourceFreeze": "source-freeze-repaired.json"
+  }
+}

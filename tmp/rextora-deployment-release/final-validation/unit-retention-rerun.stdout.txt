@@ -1,0 +1,55 @@
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tests/strategySearchHistoryRetention.test.ts (19 tests | 3 failed) 60384ms
+     × does nothing when exactly 20 eligible jobs 5906ms
+     × retains newest 20 eligible jobs 5875ms
+     × history API returns newest first and defaults to visible limit 20 5389ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/strategySearchHistoryRetention.test.ts > strategy search history retention > does nothing when exactly 20 eligible jobs
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/strategySearchHistoryRetention.test.ts:339:3
+    337|   });
+    338|
+    339|   it("does nothing when exactly 20 eligible jobs", () => {
+       |   ^
+    340|     const root = makeTempRoot();
+    341|     for (let i = 0; i < 20; i++) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/strategySearchHistoryRetention.test.ts > strategy search history retention > retains newest 20 eligible jobs
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/strategySearchHistoryRetention.test.ts:372:3
+    370|   });
+    371|
+    372|   it("retains newest 20 eligible jobs", () => {
+       |   ^
+    373|     const root = makeTempRoot();
+    374|     const ids: string[] = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/strategySearchHistoryRetention.test.ts > strategy search history retention > history API returns newest first and defaults to visible limit 20
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/strategySearchHistoryRetention.test.ts:581:3
+    579|   });
+    580|
+    581|   it("history API returns newest first and defaults to visible limit 2…
+       |   ^
+    582|     const root = makeTempRoot();
+    583|     const ids: string[] = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 16 passed (19)
+   Start at  14:13:24
+   Duration  62.60s (transform 1.54s, setup 77ms, import 1.64s, tests 60.38s, environment 0ms)
+

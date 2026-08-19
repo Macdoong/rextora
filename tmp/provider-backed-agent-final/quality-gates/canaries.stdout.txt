@@ -1,0 +1,10 @@
+{
+  "openai": {
+    "passed": true,
+    "provider": "openai"
+  },
+  "gemini": {
+    "passed": true,
+    "provider": "gemini"
+  }
+}

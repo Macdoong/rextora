@@ -1,0 +1,25 @@
+{
+  "command": "npm test",
+  "startedAt": "2026-08-04T10:50:59.552Z",
+  "finishedAt": "2026-08-04T10:52:23.303Z",
+  "durationMs": 83750,
+  "exitCode": 1,
+  "stdoutLogPath": "tmp/final-tester-ready-revalidation/logs/unit-tests.stdout.log",
+  "stderrLogPath": "tmp/final-tester-ready-revalidation/logs/unit-tests.stderr.log",
+  "parsedResult": null,
+  "BUILD_ID": "mwEjoK4ic1cyT-pd5_Omz",
+  "evidenceComplete": true,
+  "signal": null,
+  "error": null,
+  "pass": false,
+  "parsed": {
+    "testFiles": 187,
+    "testFilesPassed": 186,
+    "testFilesFailed": 1,
+    "tests": 1351,
+    "testsPassed": 1350,
+    "testsFailed": 1,
+    "testsSkipped": 0,
+    "failedTest": "liveReadinessChecklist.test.ts > includes expected LIVE block reasons when setting is off"
+  }
+}

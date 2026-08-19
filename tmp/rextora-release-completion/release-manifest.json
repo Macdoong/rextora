@@ -1,0 +1,31 @@
+{
+  "developmentBrowser": {
+    "expected": 88,
+    "passed": 22,
+    "executed": 44,
+    "note": "390 viewport 22/22 verified (v6 half-batch); 768 partial 11+fail; 1024/1440 not completed"
+  },
+  "lifecycle": {
+    "expected": 52,
+    "passed": 0
+  },
+  "lintPassed": false,
+  "unitPassed": false,
+  "e2eRunsPassed": 0,
+  "productionBrowser": {
+    "expected": 88,
+    "passed": 0
+  },
+  "openaiPassed": false,
+  "geminiPassed": false,
+  "approvalE2E": false,
+  "repeatedApprovalAdditionalWrites": null,
+  "deploymentSmokePassed": false,
+  "secretLeakCount": null,
+  "rawLeakCount": null,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "safeMutationCount": 0,
+  "safeUnchanged": true,
+  "releaseReady": false
+}

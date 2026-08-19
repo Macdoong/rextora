@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "completedAt": "2026-08-03T09:49:24Z",
+  "repository": {
+    "root": "/Users/macdoong/Documents/Rextora",
+    "packageName": "rextora",
+    "branch": "main",
+    "head": "5e0f089e5b2e02761705944710e6f6156c5d7663",
+    "dirty": true,
+    "trackedFilesModified": 33,
+    "trackedDiff": {
+      "insertions": 2837,
+      "deletions": 562
+    },
+    "baselineArtifacts": [
+      "tmp/codex-baseline/git-status.txt",
+      "tmp/codex-baseline/git-diff-stat.txt",
+      "tmp/codex-baseline/tracked-diff.patch",
+      "tmp/codex-baseline/untracked-files.txt",
+      "tmp/codex-baseline/environment-capability-summary.json",
+      "tmp/codex-baseline/safe-before.json"
+    ]
+  },
+  "runtime": {
+    "node": "v25.8.0",
+    "npm": "11.11.0",
+    "packageScripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "eslint . --max-warnings=0",
+      "test": "vitest run",
+      "test:e2e": "playwright test"
+    },
+    "baselineUnitTests": {
+      "exitCode": 0,
+      "testFilesPassed": 177,
+      "testsPassed": 1276,
+      "durationSeconds": 74.82
+    },
+    "providerSelection": {
+      "authoritativeModule": "src/lib/rextora/agent/providerConfig.ts",
+      "behavior": "An explicitly requested configured provider wins; otherwise configured OpenAI wins, then configured Gemini, then local.",
+      "currentCredentialPresence": {
+        "openai": true,
+        "gemini": false
+      },
+      "secretsRecorded": false
+    },
+    "featureFlags": {
+      "authoritativeModule": "src/lib/rextora/agent/v2/reasoning/reasoningConfig.ts",
+      "AGENT_V2_REASONING_ENABLED": "primary/shadow activation gate",
+      "AGENT_V2_REASONING_SHADOW": "shadow-only comparison gate",
+      "currentShellValuesConfigured": false
+    }
+  },
+  "safe": {
+    "path": "data/strategies/SAFE_v44_i4060.json",
+    "params_hash": "7893ca3f0e30",
+    "sha256": "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
+    "gitBlob": "4f4876335b2e6fae5d1f3aec20e3fd39c78b1c32",
+    "protectedPathDiff": "",
+    "verified": true
+  },
+  "architecture": {
+    "controlPlane": {
+      "classification": "conflicting",
+      "paths": [
+        "app/api/rextora/agent/route.ts"
+      ],
+      "finding": "One route currently owns V1 intent/plans/typed commands, V2 reasoning, approval execution, provider invocation, response composition, and lifecycle projection. Both V1 and V2 execution paths are active."
+    },
+    "agentV1": {
+      "classification": "legacy-active",
+      "paths": [
+        "src/lib/rextora/agent/agentDataFetcher.ts",
+        "src/lib/rextora/agent/agentResponseBuilder.ts",
+        "src/lib/rextora/agent/intentParser.ts",
+        "src/lib/rextora/agent/goalDetector.ts",
+        "src/lib/rextora/agent/planDrafts.ts",
+        "src/lib/rextora/agent/searchPlanDraft.ts",
+        "src/lib/rextora/agent/typedCommand.ts",
+        "src/lib/rextora/agent/commandExecutor.ts",
+        "src/lib/rextora/agent/commandStore.ts"
+      ],
+      "finding": "Still authoritative whenever V2 primary mode is disabled and as deterministic/fact fallback while V2 is active."
+    },
+    "agentV2Session": {
+      "classification": "authoritative",
+      "paths": [
+        "src/lib/rextora/agent/v2/session/sessionTypes.ts",
+        "src/lib/rextora/agent/v2/session/sessionPersistence.ts",
+        "src/lib/rextora/agent/v2/session/sessionStore.ts",
+        "src/lib/rextora/agent/v2/session/workspaceMerge.ts",
+        "src/lib/rextora/agent/v2/session/workspaceStore.ts",
+        "app/api/rextora/agent/session/route.ts",
+        "app/api/rextora/agent/session/reset/route.ts"
+      ],
+      "finding": "Server-side session snapshots, bounded turns, pending-plan files, and JSONL session events are persisted. Timestamp bootstrap/server-wins conflict logic is active but is not yet a Planner V2 task authority."
+    },
+    "agentV2Tools": {
+      "classification": "authoritative",
+      "paths": [
+        "src/lib/rextora/agent/v2/tools/registry.ts",
+        "src/lib/rextora/agent/v2/tools/toolExecutor.ts",
+        "src/lib/rextora/agent/v2/tools/toolPolicy.ts",
+        "src/lib/rextora/agent/v2/tools/toolValidator.ts",
+        "src/lib/rextora/agent/v2/tools/toolAudit.ts",
+        "src/lib/rextora/agent/v2/tools/toolEvents.ts",
+        "src/lib/rextora/agent/v2/tools/readHandlers.ts",
+        "src/lib/rextora/agent/v2/tools/execHandlers.ts"
+      ],
+      "finding": "Registry adapters call existing Search, Results, Backtest, Paper, strategy, settings, workspace, and lifecycle services. Write tools are policy classified, validated, audited, and executed through the registry. Tool events are process-memory only."
+    },
+    "agentV2Reasoning": {
+      "classification": "incomplete",
+      "paths": [
+        "src/lib/rextora/agent/v2/reasoning/reasoningEngine.ts",
+        "src/lib/rextora/agent/v2/reasoning/reasoningProvider.ts",
+        "src/lib/rextora/agent/v2/reasoning/reasoningRequestRegistry.ts",
+        "src/lib/rextora/agent/v2/reasoning/reasoningExecution.ts",
+        "src/lib/rextora/agent/v2/reasoning/userVisibleSanitizer.ts",
+        "src/lib/rextora/agent/v2/reasoning/conversationalProse.ts",
+        "src/lib/rextora/agent/v2/reasoning/toolPlanBuilder.ts"
+      ],
+      "finding": "Primary/shadow mode, provider timeout, validation fallback, in-flight turn dedupe, approval fast path, canonical search hashes, cancel-replace planning, and primary-text sanitizer exist. Persisted reports prove browser and language acceptance remain incomplete."
+    },
+    "clientAgent": {
+      "classification": "authoritative",
+      "paths": [
+        "components/rextora/agent/AgentSessionProvider.tsx",
+        "components/rextora/agent/useAgentSession.ts",
+        "components/rextora/agent/AgentPanel.tsx",
+        "components/rextora/agent/AgentMessage.tsx",
+        "components/rextora/agent/ApprovalCenter.tsx",
+        "components/rextora/agent/GlobalAgentAssistant.tsx"
+      ],
+      "finding": "Global shared drawer/session UI is active across lifecycle pages. Client pending action state remains able to influence requests and therefore must be reconciled against server authority."
+    },
+    "searchEngine": {
+      "classification": "authoritative",
+      "path": "src/lib/rextora/strategySearch/",
+      "finding": "Existing job store, runner, ownership audit, pause/cancel/resume, results, promotion, research loop, and evaluation policies remain the authoritative engine state machine."
+    },
+    "backtestEngine": {
+      "classification": "authoritative",
+      "path": "src/lib/rextora/backtest/",
+      "finding": "Existing run service/store and metrics pipeline remain authoritative and are used by the tool adapter."
+    },
+    "paperEngine": {
+      "classification": "authoritative",
+      "path": "src/lib/rextora/paper/",
+      "finding": "Canonical Paper session service/store and executor gate remain authoritative. Agent tool coverage currently prepares only; it does not activate Paper."
+    },
+    "liveEngine": {
+      "classification": "authoritative",
+      "path": "src/lib/rextora/live/",
+      "finding": "Existing Live engine remains outside Agent execution. Direct Live, real-order, and SAFE mutation intents are locally blocked before planning."
+    },
+    "browserHarnesses": {
+      "classification": "test-only",
+      "paths": [
+        "tmp/agent-v2-final-verification.mjs",
+        "tmp/agent-v2-live-acceptance.mjs",
+        "tmp/agent-v2-browser-only.mjs",
+        "tmp/tester-readiness-verification.mjs"
+      ],
+      "finding": "Existing V2 final harness reuses one stateful production server and fixed ports across viewports. Its browser records do not implement the required isolated runtime lifecycle or complete machine-verifiable field set."
+    },
+    "persistedReports": {
+      "classification": "derived",
+      "paths": [
+        "tmp/agent-v2-final-verification/report.json",
+        "tmp/agent-v2-live-acceptance/report.json",
+        "tmp/tester-readiness/report.json"
+      ],
+      "finding": "Historical reports conflict. The newest dedicated final V2 report says NOT VERIFIED and skipped quality gates; older reports claim narrower success. No previous completion claim is accepted as current evidence."
+    },
+    "plannerV2": {
+      "classification": "incomplete",
+      "path": "src/lib/rextora/agent/v2/planner/",
+      "finding": "Required directory and versioned PlanV2 authority do not exist. Some draft/hash/diff helpers exist inside reasoning and V1 modules only."
+    },
+    "tasksApprovalOrchestration": {
+      "classification": "incomplete",
+      "paths": [
+        "src/lib/rextora/agent/v2/tasks/",
+        "src/lib/rextora/agent/v2/approval/",
+        "src/lib/rextora/agent/v2/orchestration/"
+      ],
+      "finding": "Required task authority, approval invalidation, dependency ordering, restart reconciliation, and multi-tab conflict model do not yet exist as focused modules."
+    },
+    "researchBrain": {
+      "classification": "incomplete",
+      "path": "src/lib/rextora/agent/v2/research/",
+      "finding": "Required dedicated evidence/gap/failure/comparison/recommendation/validation/audit modules do not exist. V1 researchWorkspace is a summary builder only."
+    },
+    "eventLifecycle": {
+      "classification": "incomplete",
+      "finding": "Tool events are in-memory; the required persisted, replayable cross-engine event layer and autonomous reconciliation are absent."
+    },
+    "memoryReflection": {
+      "classification": "incomplete",
+      "finding": "No server-authoritative bounded long-term decision/outcome memory or post-outcome reflection subsystem exists."
+    },
+    "deadModules": {
+      "classification": "dead",
+      "paths": [],
+      "finding": "No module was proven dead strongly enough to remove during this audit; preservation rules forbid speculative cleanup."
+    },
+    "fallbackModules": {
+      "classification": "fallback",
+      "paths": [
+        "src/lib/rextora/agent/v2/reasoning/reasoningFallback.ts",
+        "src/lib/rextora/agent/agentLLM.ts",
+        "src/lib/rextora/agent/agentResponseBuilder.ts"
+      ],
+      "finding": "These remain active deterministic/provider or V1 response fallbacks and cannot be classified as dead."
+    }
+  },
+  "verifiedBlockers": [
+    {
+      "id": "browser-runtime-isolation",
+      "status": "confirmed",
+      "evidence": "tmp/agent-v2-final-verification.mjs uses fixed ports and one runtime/server for the browser matrix."
+    },
+    {
+      "id": "cancel-replace-state-pollution",
+      "status": "confirmed",
+      "evidence": "Newest browser report timed out at 390 during cancel-replace and reused ETH/running state at other viewports."
+    },
+    {
+      "id": "stale-proposal-resurrection",
+      "status": "confirmed-risk",
+      "evidence": "Client-provided pending action is accepted into entity memory; historical Conversation E reused an already prepared proposal and produced inconsistent approval prose."
+    },
+    {
+      "id": "duplicate-provider-on-approval",
+      "status": "fixed-in-current-code-needs-browser-proof",
+      "evidence": "Route approval fast path sets skipProvider and unit test AgentV2ApprovalFastPath passes, but the required isolated browser/provider audit proof is missing."
+    },
+    {
+      "id": "technical-primary-text-leakage",
+      "status": "confirmed",
+      "evidence": "Historical live report contains primary prose with 15m, pending_approval, and exchangeCalled=false; fallback plan prose still embeds raw enum text in source."
+    },
+    {
+      "id": "semi-technical-provider-prose",
+      "status": "confirmed",
+      "evidence": "Persisted provider responses include English pattern names, strategy IDs, 15m, and report-like wording."
+    },
+    {
+      "id": "provider-timeout-fallback",
+      "status": "implemented-needs-current-acceptance",
+      "evidence": "Bounded provider calls and deterministic fallback exist and unit tests pass; historical provider health and fallback evidence conflict and are not a current clean-runtime proof."
+    },
+    {
+      "id": "browser-assertion-strength",
+      "status": "confirmed",
+      "evidence": "Existing browserMatrix records only answer/approval/rawLeak fields and conflates before-approval and after-execution evidence; required persistedStateMatch, thinkingCleared, duplicateExecutionCount, overflow, and console fields are absent."
+    },
+    {
+      "id": "phase3-viewport-acceptance",
+      "status": "confirmed-failing",
+      "evidence": "Newest report has 390 cancel-replace timeout, 1440 navigation timeout, incomplete E proof, skipped quality gates, and NOT VERIFIED verdict."
+    },
+    {
+      "id": "later-agent-v2-phases",
+      "status": "confirmed-missing",
+      "evidence": "Planner/task/orchestration, dedicated Research Brain, persisted lifecycle events, long-term memory/reflection, and expanded safe tool coverage are absent."
+    }
+  ],
+  "phase0Verdict": "COMPLETE",
+  "nextGate": "Finalize isolated Agent V2 Phase 3 acceptance before beginning Planner V2."
+}

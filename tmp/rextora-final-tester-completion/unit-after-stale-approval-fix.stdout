@@ -1,0 +1,8 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+ ❯ tmp/rextora-final-tester-completion/tester-journey.spec.ts (0 test)

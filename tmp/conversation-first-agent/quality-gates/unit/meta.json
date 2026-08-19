@@ -1,0 +1,9 @@
+{
+  "command": "npm test",
+  "BUILD_ID": "njqJD7SYb5n_Cj5ObL9a4",
+  "parsed": {
+    "filesPassed": "198",
+    "testsPassed": "1512"
+  },
+  "tail": "\n RUN  v4.1.8 /Users/macdoong/Documents/Rextora\n\n\n Test Files  198 passed (198)\n      Tests  1512 passed (1512)\n   Start at  11:48:23\n   Duration  84.21s (transform 2.31s, setup 1.18s, import 9.91s, tests 48.13s, environment 12ms)"
+}

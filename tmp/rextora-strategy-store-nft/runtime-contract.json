@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "store": "src/lib/rextora/strategy/strategyStore.ts",
+  "root": {
+    "productionDefault": "path.resolve(path.join(process.cwd(), 'data', 'rextora', 'strategies'))",
+    "runtimeOverride": "trimmed REXTORA_STRATEGIES_DIR resolved with path.resolve",
+    "testBehavior": "REXTORA_STRATEGIES_DIR is mandatory and must not equal, contain, or be inside protected production strategy roots",
+    "rextoraDataDirBehavior": "No effective behavior in strategyStore production root; productionStrategiesRootCanonical intentionally ignores REXTORA_DATA_DIR"
+  },
+  "files": {
+    "strategy": "<validated strategy id>.json",
+    "index": "index.json",
+    "acceptedDiscoveryExtension": ".json excluding index.json",
+    "canonicalSafeSource": "data/strategies/SAFE_v44_i4060.json",
+    "managedSafeCopy": "data/rextora/strategies/SAFE_v44_i4060.json or the isolated override root"
+  },
+  "behavior": {
+    "list": "Index order is preserved; invalid IDs and missing files are skipped; SAFE is validated and overlaid with activation flags from the index.",
+    "get": "Validates the ID and returns the first matching list entry or undefined.",
+    "write": "Pretty JSON via synchronous writeFileSync; index rewritten after mutations unless unchanged by indexStrategiesEqual.",
+    "delete": "Only unlocked non-SAFE strategies inside ROOT may be synchronously unlinked; index is then rewritten.",
+    "missing": "Missing store or SAFE causes ensureStrategyStore to seed SAFE and repair the index; missing requested ID returns undefined.",
+    "malformed": "Malformed SAFE throws PROTECTED_STRATEGY_INTEGRITY; malformed index or ordinary rows may yield empty discovery/repair behavior as currently implemented.",
+    "duplicate": "Existing promotion/idempotency semantics are unchanged; generated copy/custom IDs remain unique and duplicate promotion returns the existing record.",
+    "sorting": "No additional sort is applied; index and readdir order are retained.",
+    "atomicity": "Writes are synchronous direct writes, not temporary-file rename transactions.",
+    "errors": "Native fs errors and StrategyValidationError behavior propagate exactly as before except where existing catch blocks intentionally return [] or repair the index.",
+    "userGeneratedData": "Remains runtime JSON under ROOT and must not become a static application import."
+  },
+  "safeInvariants": {
+    "canonicalSourceMustNotChange": true,
+    "managedSafeCannotBeDeleted": true,
+    "existingManagedSafeCannotBeRewritten": true,
+    "expectedParamsHash": "7893ca3f0e30"
+  }
+}

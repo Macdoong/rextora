@@ -4,6 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { SettingsTabs } from "@/components/rextora/settings/SettingsTabs";
 import { SystemStatusSection } from "@/components/rextora/settings/SystemStatusSection";
 import { ExpertModeCard } from "@/components/rextora/settings/ExpertModeCard";
+import { AiProviderSettingsPanel } from "@/components/rextora/settings/AiProviderSettingsPanel";
 import { RiskPanelEditable } from "@/components/rextora/RiskPanelEditable";
 import { Badge, Card, Metric, StatusBadge } from "@/components/ui/primitives";
 import { displayLabel } from "@/src/lib/rextora/displayLabels";
@@ -13,6 +14,7 @@ export type LifecycleSettingsTabId =
   | "cost"
   | "research"
   | "exchange"
+  | "ai"
   | "risk"
   | "alerts"
   | "system"
@@ -23,6 +25,7 @@ const TABS: Array<{ id: LifecycleSettingsTabId; label: string }> = [
   { id: "cost", label: "거래 비용" },
   { id: "research", label: "탐색 엔진" },
   { id: "exchange", label: "거래소 연결" },
+  { id: "ai", label: "AI 공급자" },
   { id: "risk", label: "위험 제한" },
   { id: "alerts", label: "알림" },
   { id: "system", label: "시스템 상태" },
@@ -147,6 +150,11 @@ export function LifecycleSettingsShell(props: {
           </div>
         </Card>
       ),
+      ai: (
+        <div data-testid="settings-tab-ai">
+          <AiProviderSettingsPanel />
+        </div>
+      ),
       risk: (
         <div data-testid="settings-tab-risk">
           <h2 className="rextora-card-title mb-2 text-white">위험 제한</h2>
@@ -207,7 +215,11 @@ export function LifecycleSettingsShell(props: {
   );
 
   return (
-    <div className="space-y-4" data-testid="lifecycle-settings-shell">
+    <div
+      className="space-y-4"
+      data-testid="lifecycle-settings-shell"
+      data-settings-shell-ready="true"
+    >
       <nav
         className="flex flex-wrap gap-2"
         aria-label="시스템 설정 탭"

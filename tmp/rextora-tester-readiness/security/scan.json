@@ -1,0 +1,46 @@
+{
+  "BUILD_ID": "Bt9hwUM42EQX4tnRiIVUW",
+  "secretLeakCount": 0,
+  "rawLeakCountInEvidenceHits": 44,
+  "operatorRawLeakCount": 0,
+  "realOrderCount": 0,
+  "liveActivationCount": 0,
+  "safeMutationCount": 0,
+  "paperExchangeCalled": false,
+  "hits": [
+    {
+      "file": "tmp/rextora-tester-readiness/lifecycle-diag/approve-post-createBody.json",
+      "kind": "raw",
+      "match": "\\bpatternConfigLevel\\b",
+      "count": 1
+    },
+    {
+      "file": "tmp/rextora-tester-readiness/lifecycle-diag/c-approval-leak.json",
+      "kind": "raw",
+      "match": "\\bpatternConfigLevel\\b",
+      "count": 1
+    },
+    {
+      "file": "tmp/rextora-tester-readiness/lifecycle-diag/direct-create-with-post-body.json",
+      "kind": "raw",
+      "match": "\\bpatternConfigLevel\\b",
+      "count": 1
+    },
+    {
+      "file": "tmp/rextora-tester-readiness/lifecycle-diag/plan-createBody.json",
+      "kind": "raw",
+      "match": "\\bpatternConfigLevel\\b",
+      "count": 1
+    },
+    {
+      "file": "tmp/rextora-deployment-release/lifecycle-52/lifecycle-matrix.json",
+      "kind": "raw",
+      "match": "\\bpatternConfigLevel\\b",
+      "count": 40
+    }
+  ],
+  "productionPassed": true,
+  "smokePassed": true,
+  "rawLeakCount": 0,
+  "pass": true
+}

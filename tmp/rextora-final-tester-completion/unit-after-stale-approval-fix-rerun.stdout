@@ -1,0 +1,33 @@
+
+> rextora@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  207 passed (207)
+      Tests  1560 passed (1560)
+   Start at  21:35:36
+   Duration  151.33s (transform 3.13s, setup 1.41s, import 12.30s, tests 110.78s, environment 12ms)
+
+real 154.05
+user 50.98
+sys 15.15
+           369098752  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1244032  page reclaims
+               18741  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+               30426  messages sent
+               30067  messages received
+                 207  signals received
+               75510  voluntary context switches
+              315795  involuntary context switches
+          1195590215  instructions retired
+           505323487  cycles elapsed
+            26397432  peak memory footprint

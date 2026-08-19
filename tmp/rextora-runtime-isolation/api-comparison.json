@@ -1,0 +1,75 @@
+{
+  "comparison": {
+    "production": {
+      "base": "http://127.0.0.1:3000",
+      "note": "Control case from pre-fix capture; BUILD_ID later rebuilt to XqaW0-NPmj__QhJfwcwai",
+      "settings": {
+        "status": 200,
+        "latencyMs": 22,
+        "openai": {
+          "configured": true,
+          "stored": true,
+          "enabled": true,
+          "selectedModel": "gpt-5-mini",
+          "envFallback": false
+        },
+        "gemini": {
+          "configured": true,
+          "stored": true,
+          "enabled": true,
+          "selectedModel": "gemini-2.5-flash",
+          "envFallback": false
+        }
+      }
+    },
+    "development_postFix": {
+      "base": "http://127.0.0.1:3101",
+      "settings": {
+        "status": 200,
+        "latencyMs": 120,
+        "openai": {
+          "configured": true,
+          "stored": true,
+          "enabled": true,
+          "selectedModel": "gpt-5-mini",
+          "envFallback": false
+        },
+        "gemini": {
+          "configured": true,
+          "stored": true,
+          "enabled": true,
+          "selectedModel": "gemini-2.5-flash",
+          "envFallback": false
+        }
+      },
+      "settingsUiScenario01": "PASS",
+      "note": "Requires orphan recovery disabled/capped in development and jobs/trials not starving Turbopack compile"
+    }
+  },
+  "canaries_against_next_dev": {
+    "openai": {
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "model": "gpt-5-mini",
+      "secretLeakCount": 0
+    },
+    "gemini": {
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "model": "gemini-2.5-flash",
+      "secretLeakCount": 0
+    }
+  },
+  "canaries_structured_probe_next_start": {
+    "openai": {
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "canaryPassed": true
+    },
+    "gemini": {
+      "providerSucceeded": true,
+      "fallbackUsed": false,
+      "canaryPassed": true
+    }
+  }
+}

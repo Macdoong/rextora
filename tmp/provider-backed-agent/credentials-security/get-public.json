@@ -1,0 +1,8 @@
+{
+  "reasoningActive": true,
+  "openaiConfigured": true,
+  "geminiConfigured": true,
+  "hasSk": false,
+  "hasAiza": false,
+  "hasApiKeyField": false
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "scanBehavior": "FINITE_HIGH_MEMORY_SCAN",
+  "classification": "MULTIPLE_PROVEN_DEFECTS",
+  "componentClassifications": [
+    "DYNAMIC_PATH_TRACE_EXPANSION",
+    "NEXT_OUTPUT_TRACING_SCOPE_DEFECT"
+  ],
+  "exactScanOwner": "Next.js production Node-server Webpack compilation",
+  "exactPackage": "next@16.2.6 bundled @vercel/nft and bundled glob",
+  "exactResponsibleCaller": "TraceEntryPointsPlugin.tapfinishModules -> nodeFileTrace -> analyze/emitAssetDirectory -> Glob._readdir",
+  "ownerFiles": [
+    "node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js",
+    "node_modules/next/dist/compiled/@vercel/nft/index.js",
+    "node_modules/next/dist/compiled/glob/glob.js"
+  ],
+  "responsibleApplicationExpressions": {
+    "kind": "dynamic filesystem paths analyzed as broad asset globs",
+    "representativeFiles": [
+      "src/lib/rextora/strategySearch/rawTrialRetention.ts",
+      "src/lib/rextora/strategySearch/deletionSafety.ts",
+      "src/lib/rextora/strategySearch/jobStore.ts",
+      "src/lib/rextora/storage/jsonStore.ts"
+    ],
+    "historicalAggregateMatchedFiles": 9238706,
+    "historicalMaximumSinglePatternMatchedFiles": 582350
+  },
+  "actualRuntimeDirectories": {
+    "primary": "data/rextora/strategy-search/trials",
+    "currentFiles": 2088621,
+    "currentDirectories": 255,
+    "otherObserved": [
+      "data/rextora/strategy-search/jobs",
+      "data/rextora/agent-sessions",
+      "data/rextora/agent-tasks",
+      "data/rextora/agent-plans-v2",
+      "data/rextora/agent-approval-receipts",
+      "data/rextora/agent-events",
+      "data/rextora/agent-memory-v2"
+    ]
+  },
+  "whyDefaultHeapFailed": "NFT's glob analysis accumulates matches from broad dynamic filesystem expressions over the multi-million-file runtime tree. V8 reached its approximately 4 GiB old-space ceiling while resolving an asynchronous readdir result.",
+  "eightGiBExperiment": {
+    "command": "NODE_OPTIONS=\"--max-old-space-size=8192 --require=<REPO>/scripts/diagnostics/traceBuildFs.cjs\" npx next build --webpack",
+    "exitCode": 134,
+    "durationSeconds": 57.37,
+    "peakRssBytes": 9678897152,
+    "terminalResult": "V8 heap OOM",
+    "terminalFrame": "node::fs::AfterScanDir",
+    "buildId": null,
+    "conclusion": "The default heap is not the sole blocker; doubling old space only lets the same expansion consume more memory."
+  },
+  "finiteEvidence": {
+    "filesystemSetFinite": true,
+    "streamingInventoryCompleted": true,
+    "streamingInventorySeconds": 5.812,
+    "pathologicalSameDirectoryLoopObserved": false,
+    "graphOrPatternMultiplicationObserved": true,
+    "buildScanConvergedBeforeOom": false
+  },
+  "nextScopeDefectEvidence": {
+    "configuredOutputFileTracingExcludesContainRuntimeTrees": true,
+    "traceEntryPointsPluginReceivesTraceIgnores": [],
+    "outputFileTracingExcludesAppliedBy": "collect-build-traces.js after the entrypoint NFT phase",
+    "conclusion": "The documented final-trace exclusions do not protect the earlier TraceEntryPointsPlugin NFT scan that OOMs."
+  },
+  "runtimeDataInvolved": true,
+  "runtimeDataInFinalBundle": "not established; the build dies before trace assets/final bundle are produced, while configured later exclusions are intended to remove these paths",
+  "applicationRuntimeSemanticsAtFault": false,
+  "applicationBuildTimeAnalyzabilityContributes": true,
+  "minimumRepair": {
+    "status": "not proven in this stage",
+    "reason": "The only allowed full build disproved the 8 GiB-only repair. Changing trace scope or application path analyzability now would require a new qualified build, which is outside the one-build limit and must not be guessed."
+  }
+}

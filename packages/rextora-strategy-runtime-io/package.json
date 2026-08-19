@@ -1,0 +1,11 @@
+{
+  "name": "@rextora/strategy-runtime-io",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.cjs",
+  "types": "index.d.ts",
+  "files": [
+    "index.cjs",
+    "index.d.ts"
+  ]
+}

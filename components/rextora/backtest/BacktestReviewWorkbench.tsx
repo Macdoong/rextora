@@ -13,6 +13,7 @@ import type {
 } from "@/src/lib/rextora/backtest/backtestTypes";
 import type { BacktestTrade } from "@/src/lib/rextora/backtest/backtestEngine";
 import { BacktestAnalysisView } from "@/components/rextora/charts/BacktestAnalysisView";
+import { BacktestStrategyManageDrawer } from "@/components/rextora/backtest/BacktestStrategyManageDrawer";
 import type { OhlcvCandle } from "@/src/lib/rextora/data/ohlcvTypes";
 import {
   displayParamsHashLabel,
@@ -321,6 +322,7 @@ export function BacktestReviewWorkbench() {
   const [runInFlight, setRunInFlight] = useState(false);
   const runLock = useRef(false);
   const [activeNavSection, setActiveNavSection] = useState("price");
+  const [strategyManageOpen, setStrategyManageOpen] = useState(false);
   const [runErrorDetail, setRunErrorDetail] = useState<string | null>(null);
   const [lastDeduped, setLastDeduped] = useState(false);
   const [hydrationState, setHydrationState] = useState<SavedRunHydrationState>(
@@ -1166,94 +1168,21 @@ export function BacktestReviewWorkbench() {
     { id: "validation", label: "검증" },
   ] as const;
 
-  const navClickLocked = useRef(false);
-
-  const scrollWorkbenchSection = (id: string) => {
-    navClickLocked.current = true;
-    window.setTimeout(() => {
-      navClickLocked.current = false;
-    }, 700);
+  /**
+   * Workspace tabs are click-owned exclusive panels.
+   * Scrolling MUST NOT mutate the selected tab (operator defect: 상세 분석 ↔ 검증 oscillation).
+   */
+  const selectWorkbenchSection = (id: string) => {
     setActiveNavSection(id);
     window.requestAnimationFrame(() => {
       const el = document.getElementById(`bt-${id}`);
       if (!el) return;
       el.setAttribute("data-force-expand", "1");
       el.dispatchEvent(new CustomEvent("bt-force-expand", { bubbles: true }));
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Keep sticky nav in view; do not scroll-spy other sections.
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   };
-
-  useEffect(() => {
-    if (!report) return;
-    const ids = workbenchSections.map((s) => s.id);
-    const nav = document.querySelector(
-      '[data-testid="analysis-section-nav"]',
-    ) as HTMLElement | null;
-
-    const pickActive = () => {
-      if (navClickLocked.current) return;
-      const headerH = Math.max(48, nav?.offsetHeight ?? 56);
-      const threshold = headerH + 24;
-      const scrollBottomGap =
-        document.documentElement.scrollHeight -
-        (window.scrollY + window.innerHeight);
-      // Last sections often cannot reach the sticky band; pin to the final
-      // section when the viewport is at (or near) document end.
-      if (scrollBottomGap <= 64) {
-        const last = ids[ids.length - 1] ?? "run";
-        setActiveNavSection((prev) => (prev === last ? prev : last));
-        return;
-      }
-      let active = ids[0] ?? "run";
-      let bestDist = Number.POSITIVE_INFINITY;
-      for (const id of ids) {
-        const el = document.getElementById(`bt-${id}`);
-        if (!el) continue;
-        const top = el.getBoundingClientRect().top;
-        if (top <= threshold) {
-          // Prefer the section nearest the sticky threshold among those that
-          // have reached/passed it (stable when several overlap the band).
-          const dist = threshold - top;
-          if (dist <= bestDist) {
-            bestDist = dist;
-            active = id;
-          }
-        }
-      }
-      setActiveNavSection((prev) => (prev === active ? prev : active));
-    };
-
-    const headerH = Math.max(48, nav?.offsetHeight ?? 56);
-    const observer = new IntersectionObserver(
-      () => {
-        pickActive();
-      },
-      {
-        root: null,
-        rootMargin: `-${headerH}px 0px -55% 0px`,
-        threshold: [0, 0.1, 0.25, 0.5, 1],
-      },
-    );
-    for (const id of ids) {
-      const el = document.getElementById(`bt-${id}`);
-      if (el) observer.observe(el);
-    }
-    const onScroll = () => {
-      window.requestAnimationFrame(pickActive);
-    };
-    pickActive();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    const onExpand = () => {
-      window.requestAnimationFrame(pickActive);
-    };
-    document.addEventListener("bt-force-expand", onExpand);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("bt-force-expand", onExpand);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- section ids are stable
-  }, [report, selectedRunId, eligibility?.eligible]);
 
   const costBurdenPct =
     costRatios?.totalCostPctOfGrossProfit != null
@@ -1298,7 +1227,18 @@ export function BacktestReviewWorkbench() {
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="text-sm text-slate-300 md:col-span-2 xl:col-span-4">
-            전략 선택
+            <span className="flex flex-wrap items-center justify-between gap-2">
+              <span>전략 선택</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setStrategyManageOpen(true)}
+                data-testid="backtest-strategy-manage-open"
+              >
+                전략 관리
+              </Button>
+            </span>
             <div className="mt-1 flex flex-wrap gap-2">
               <input
                 type="search"
@@ -1824,7 +1764,8 @@ export function BacktestReviewWorkbench() {
                   }`}
                   aria-current={active ? "true" : undefined}
                   data-active={active ? "true" : "false"}
-                  onClick={() => scrollWorkbenchSection(s.id)}
+                  onClick={() => selectWorkbenchSection(s.id)}
+                  data-testid={`backtest-workspace-tab-${s.id}`}
                 >
                   {s.label}
                 </button>
@@ -2127,8 +2068,6 @@ export function BacktestReviewWorkbench() {
             chartReproWarning={chartReproWarning}
             chartSource={chartSource}
           />
-          {/* Spacer so the final sticky-nav sections can reach the header band. */}
-          <div className="h-[45vh]" aria-hidden="true" data-testid="backtest-nav-scroll-spacer" />
         </>
       ) : (
         <EmptyState
@@ -2136,6 +2075,16 @@ export function BacktestReviewWorkbench() {
           hint="기간을 설정한 뒤 백테스트 실행을 누르거나, 저장된 실행을 불러오세요."
         />
       )}
+
+      <BacktestStrategyManageDrawer
+        open={strategyManageOpen}
+        onClose={() => setStrategyManageOpen(false)}
+        selectedStrategyId={strategyId}
+        onSelectStrategy={(id) => {
+          setStrategyId(id);
+          setStrategyManageOpen(false);
+        }}
+      />
     </div>
   );
 }

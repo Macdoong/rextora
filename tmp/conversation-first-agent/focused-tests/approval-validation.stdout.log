@@ -1,0 +1,13 @@
+
+> rextora@0.1.0 test
+> vitest run tests/AgentConversationApprovalValidation.test.ts tests/AgentV2ReasoningPolicy.test.ts tests/AgentConversationRoutingMatrix.test.ts
+
+
+ RUN  v4.1.8 /Users/macdoong/Documents/Rextora
+
+
+ Test Files  3 passed (3)
+      Tests  102 passed (102)
+   Start at  00:53:47
+   Duration  1.38s (transform 669ms, setup 36ms, import 908ms, tests 38ms, environment 0ms)
+

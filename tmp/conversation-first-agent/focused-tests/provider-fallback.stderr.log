@@ -1,0 +1,53 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationProviderFallback.test.ts > conversation provider failure preserves route mode > keeps state question READ_AND_ANSWER after provider timeout
+AssertionError: expected { …(16) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "actionId": "pa_9846388f0612774b",
+  "actionType": "navigate",
+  "blockedReason": null,
+  "createdAt": "2026-08-05T13:32:43.934Z",
+  "expiresAt": "2026-08-05T13:47:43.934Z",
+  "jobId": null,
+  "parameters": {
+    "recommendedActionKo": "데모로 둘러보기",
+  },
+  "reason": "런타임이 비어 있습니다. 데모로 워크플로를 확인하거나 실제 탐색을 시작하세요.",
+  "requiresApproval": false,
+  "riskLevel": "low",
+  "runId": null,
+  "strategyId": null,
+  "summary": "데모로 둘러보기",
+  "symbol": null,
+  "targetRoute": "/dashboard?firstRun=demo",
+  "timeframe": null,
+}
+
+ ❯ tests/AgentConversationProviderFallback.test.ts:86:37
+     84|     expect(response.conversationRoute?.mode).toBe("READ_AND_ANSWER");
+     85|     expect(response.conversationRoute?.requestedWriteTools).toEqual([]…
+     86|     expect(response.proposedAction).toBeNull();
+       |                                     ^
+     87|     expect(response.reasoningMeta?.fallbackUsed).toBe(true);
+     88|     expect(callReasoningProvider).toHaveBeenCalledTimes(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/AgentConversationProviderFallback.test.ts > conversation provider failure preserves route mode > keeps action PLAN_AND_APPROVE and performs no write after timeout
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ tests/AgentConversationProviderFallback.test.ts:100:35
+     98|     expect(response.proposedAction?.requiresApproval).toBe(true);
+     99|     expect(response.executionResult).toBeUndefined();
+    100|     expect(callReasoningProvider).toHaveBeenCalledTimes(1);
+       |                                   ^
+    101|
+    102|     const auditRoot = path.join(root, "tool-audit");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

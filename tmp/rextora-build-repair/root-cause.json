@@ -1,0 +1,67 @@
+{
+  "classification": "BUILD_INPUT_SCOPE_DEFECT",
+  "exactBoundary": "Tailwind CSS v4 automatic source discovery inside @tailwindcss/postcss, invoked for app/globals.css",
+  "responsibleFiles": [
+    "app/globals.css",
+    "postcss.config.js"
+  ],
+  "responsiblePackages": [
+    "@tailwindcss/postcss@4.3.0",
+    "@tailwindcss/oxide@4.3.0"
+  ],
+  "mechanism": {
+    "compiledTailwindRootBeforeFix": null,
+    "postcssResolvedRootSource": {
+      "base": "/Users/macdoong/Documents/Rextora",
+      "pattern": "**/*"
+    },
+    "explicitSourcesWereAdditive": [
+      "app",
+      "components",
+      "src"
+    ],
+    "explanation": "@import tailwindcss enabled automatic project-root discovery. The three @source directives added roots but did not disable that automatic **/* root. Tailwind Oxide therefore performed a pathological repository-wide glob walk before it could scan the intended application files."
+  },
+  "evidence": {
+    "diagnosticBuildExitCode": 1,
+    "diagnosticBuildDurationSeconds": 1067,
+    "diagnosticBuildPeakRssBytes": 21891055616,
+    "diagnosticBuildSwapCount": 0,
+    "postcssWorkerState": "alive until parent IPC deadline; sampled in Tailwind Scanner::get_globs and filesystem is_file",
+    "standaloneOriginalDurationSecondsBeforeIntervention": 169.35,
+    "standaloneOriginalOutputProduced": false,
+    "standaloneOriginalStack": "Tailwind Scanner::get_globs / filesystem is_file",
+    "sourceNoneInMemoryProbeDurationMs": 213,
+    "sourceNoneInMemoryProbeOutputBytes": 130067,
+    "sourceNoneInMemoryProbeWarnings": 0,
+    "intendedSourceSize": "approximately 5.4 MiB / 604 files",
+    "repositoryRuntimeDataSize": "12 GiB",
+    "strategyTrialFileCount": 2088621,
+    "tmpSize": "176 MiB",
+    "tmpFileCount": 4620
+  },
+  "whyRepeated": "Every normal build compiled the same globals.css import, reconstructed the same automatic project-root **/* source, and entered the same Tailwind filesystem discovery path until Turbopack's PostCSS IPC deadline elapsed.",
+  "applicationSourceInvalid": false,
+  "cssSyntaxInvalid": false,
+  "postcssPluginException": false,
+  "dependencyVersionDefect": false,
+  "deterministic": true,
+  "resourcePressureContributed": true,
+  "resourcePressureRole": "consequence of excessive input discovery; not the initiating defect",
+  "nextTurbopackRole": "reported the downstream IPC timeout after the PostCSS worker failed to return; not the initiating defect",
+  "minimumRepair": "Change the Tailwind import to source(none) and retain the existing explicit app/components/src @source directives.",
+  "postFixValidation": {
+    "standalonePostcssPassed": true,
+    "standalonePostcssDurationMs": 175,
+    "standalonePostcssOutputBytes": 130066,
+    "standalonePostcssWarnings": 0,
+    "focusedTestsPassed": "9/9",
+    "authoritativeBuildExitCode": 143,
+    "authoritativeBuildDurationSeconds": 2346,
+    "authoritativeBuildPeakRssBytes": 19776192512,
+    "authoritativeBuildId": null,
+    "termination": "Deliberate SIGTERM after the build remained in Creating an optimized production build with severe memory/swap pressure and no output progress.",
+    "postcssBoundaryStatus": "The repaired PostCSS worker returned quickly and was idle; process samples contained no Tailwind Scanner/get_globs frames.",
+    "remainingBoundary": "A distinct later Turbopack graph/build resource stall remains. Its initiating file or package is not yet proven, so no speculative third build was run."
+  }
+}

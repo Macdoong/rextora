@@ -11,6 +11,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { StrategySearchStoreOptions } from "./jobStore";
+import { strategySearchRoot } from "../storage/runtimePaths";
 
 /** Heartbeat interval while a job is actively running in this process. */
 export const EXECUTION_OWNERSHIP_HEARTBEAT_MS = 15_000;
@@ -65,12 +66,7 @@ export class JobExecutionOwnershipError extends Error {
 const PROCESS_OWNER_ID = `owner_${process.pid}_${Date.now().toString(36)}_${crypto.randomBytes(4).toString("hex")}`;
 
 function defaultRoot(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-    "strategy-search",
-  );
+  return strategySearchRoot();
 }
 
 function resolveRoot(options?: StrategySearchStoreOptions): string {

@@ -1,0 +1,137 @@
+{
+  "scenario": "J",
+  "width": 768,
+  "startedAt": "2026-08-14T07:15:10.199Z",
+  "finishedAt": "2026-08-14T07:23:08.980Z",
+  "buildId": "j4lAiIKoy4ofnQNdt2mFF",
+  "runtimeRoot": "/var/folders/1x/6vnvb79129zchm1zgpqbgssm0000gn/T/rextora-p3-J-768-e7c79b-KzFL5m",
+  "port": 56970,
+  "provider": "openai",
+  "consoleErrorCount": 1,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:56970/api/rextora/settings/ai-providers/models?provider=openai:0:0"
+  ],
+  "reasoningRequests": [
+    {
+      "at": "2026-08-14T07:15:12.289Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssm44dd_n1lram",
+      "turnId": "turn-1786691711997",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:15:40.356Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssm44dd_n1lram",
+      "turnId": "turn-1786691711997",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 28047,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T07:15:41.940Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssm4r90_4wob2w",
+      "turnId": "turn-1786691741295",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:15:41.940Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssm4r90_4wob2w",
+      "turnId": "turn-1786691741295",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:17:44.099Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssm7dib_3xb5p8",
+      "turnId": "turn-1786691864081",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:17:53.628Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssm7dib_3xb5p8",
+      "turnId": "turn-1786691864081",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 9513,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:20:25.216Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssmatts_zkikg2",
+      "turnId": "turn-1786692025206",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T07:20:37.864Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssmatts_zkikg2",
+      "turnId": "turn-1786692025206",
+      "providerAttempt": 1,
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "fallbackUsed": false,
+      "latencyMs": 12644,
+      "errorCategory": null
+    }
+  ],
+  "result": {
+    "backtestRunId": "bt_mssm4r8p_1d0d9e",
+    "memoryKinds": [
+      "actual_result",
+      "approved_goal",
+      "approved_plan"
+    ],
+    "terminalMemoryPersisted": true,
+    "approvedPlanRemembered": true,
+    "recallIntent": "memory_recall",
+    "recalledEvidenceLinked": true,
+    "recallHasNoApproval": true,
+    "refreshRecallIntent": "memory_recall",
+    "memoryStableAcrossRefresh": true,
+    "noAutonomousWrite": true,
+    "primaryText": "요약: 사용자가 승인한 '백테스트 준비' 계획을 실행해 백테스트를 완료했고, 결과는 저장소 이벤트로 확인되었습니다. 다음으로 저장된 백테스트 결과의 핵심 지표를 불러와 검토하고 개선 포인트를 도출하는 것을 권장합니다.\n\n근거: 시스템 기록에 따르면 사용자는 plan_edcc7f0e412f4b69af5b(백테스트 준비)를 명시적으로 승인했고, 해당 백테스트는 run:해당 백테스트에 대한 저장소 이벤트(event_e82d26e76056ae4cadde)로 정상 종료가 확인되어 있습니다. 하지만 현재 제공된 정보에는 구체적 성과 수치가 포함되어 있지 않으므로, 상세한 성과 지표를 불러와 검토해야 개선 포인트(예: 파라미터 튜닝, 리스크 관리, 시간대별 성과 최적화)를 제시할 수 있습니다. 원하시면 지금 바로 저장된 지표를 불러와 요약해 드리겠습니다.\n\n1) 저장된 백테스트 결과의 핵심 성과 지표(총수익률, 연환산수익, 샤프, 최대낙폭, 승률, 평균손익 등)를 불러와 요약합니다. 2) 시간대·심볼·전략 파라미터별로 성과 편차를 확인하고 개선 포인트를 제시합니다. 3) 사용자가 우선순위를 지정하면 해당 항목 중심 상세 리포트를 제공합니다.",
+    "rawLeakCount": 0,
+    "rawLeaks": [],
+    "leakHits": [],
+    "hasApproval": false,
+    "hasExecutionResult": false,
+    "thinkingCleared": true,
+    "horizontalOverflow": false
+  },
+  "passed": true
+}

@@ -13,6 +13,14 @@ export interface EvidencePackage {
   facts: FactItem[];
   /** Bounded prior conversation turns (max 3). */
   history: AgentTurn[];
+  /** Deterministic decision inputs — LLM must not invent these. */
+  decisionContext?: {
+    conclusionKo: string;
+    explanationKo: string;
+    recommendedActionKo: string;
+    whyBetterThanAlternativesKo: string;
+    uncertaintyKo: string | null;
+  };
 }
 
 /** Successful LLM interpretation result. */
@@ -54,6 +62,19 @@ export const LOCAL_ONLY_INTENTS: AgentIntentType[] = [
   "market_status", // no real-time data available to give LLM
   "first_run_help",
   "demo_overview",
+  "follow_up_why",
+  "explain_approval",
+  "explain_waiting",
+  "continue_session",
+  "approve_pending",
+  "cancel_pending",
+  "prepare_search_plan",
+  "prepare_backtest_plan",
+  "prepare_paper_plan",
+  "research_workspace",
+  "execute_trade",
+  "modify_safe",
+  "start_live",
 ];
 
 /** Intent types that are write operations and must be blocked. */

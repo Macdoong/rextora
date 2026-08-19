@@ -1,0 +1,162 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "backtest.run",
+      "sessionId": "agent_8448559ce8944e9e",
+      "arguments": {
+        "strategyId": "demo_strategy_btc_v1",
+        "symbols": [
+          "BTCUSDT"
+        ],
+        "timeframe": "15m",
+        "save": true
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "completed"
+      },
+      "durationMs": 442,
+      "approved": true,
+      "timestamp": "2026-08-14T08:35:04.298Z",
+      "approvalId": "pa_9ba2114c351e44a0"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T08:34:30.227Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssoy3mb_t9hzzg",
+      "turnId": "turn-1786696470209",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:35:02.911Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssoy3mb_t9hzzg",
+      "turnId": "turn-1786696470209",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 32677,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T08:35:04.302Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssoytwu_s41k2y",
+      "turnId": "turn-1786696503849",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T08:35:04.303Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssoytwu_s41k2y",
+      "turnId": "turn-1786696503849",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssoy2pn_29da93.chart.json",
+    "bt_mssoy2pn_29da93.json",
+    "bt_mssoytwm_5d8cad.chart.json",
+    "bt_mssoytwm_5d8cad.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [
+    {
+      "sessionId": "agent_8448559ce8944e9e",
+      "kind": "actual_result",
+      "statementKo": "백테스트의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "run",
+          "id": "bt_mssoytwm_5d8cad"
+        },
+        {
+          "type": "event",
+          "id": "event_dce169d492bd040f2263"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:35:04.298Z",
+      "sourceEventId": "event_dce169d492bd040f2263",
+      "metadata": {
+        "eventType": "backtest.completed",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_5da909f30d03a5f978ba"
+    },
+    {
+      "sessionId": "agent_8448559ce8944e9e",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 백테스트 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_b44823ee3fe140bd822f"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:35:04.300Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_9ba2114c351e44a0",
+        "meaningfulHash": "c0d1ee97de4056db59fcdff1"
+      },
+      "memoryId": "memory_367c7b9ba1295c103dd8"
+    },
+    {
+      "sessionId": "agent_8448559ce8944e9e",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_b44823ee3fe140bd822f"
+        }
+      ],
+      "verifiedAt": "2026-08-14T08:35:04.300Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_9ba2114c351e44a0",
+        "meaningfulHash": "c0d1ee97de4056db59fcdff1"
+      },
+      "memoryId": "memory_e6ac5ee4cafb706bc37d"
+    }
+  ],
+  "sessionFiles": [
+    "agent_8448559ce8944e9e"
+  ]
+}

@@ -1,0 +1,19 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/AgentConversationRoutingMatrix.test.ts > conversation-first semantic routing matrix > keeps the research-brain conversation grounded while separating reads and plans
+AssertionError: 두 전략 중 무엇을 먼저 백테스트해야 해?: expected 'PLAN_AND_APPROVE' to be 'READ_AND_ANSWER' // Object.is equality
+
+Expected: "READ_AND_ANSWER"
+Received: "PLAN_AND_APPROVE"
+
+ ❯ tests/AgentConversationRoutingMatrix.test.ts:476:33
+    474|         pendingApprovals: [],
+    475|       });
+    476|       expect(route.mode, query).toBe(expectedMode);
+       |                                 ^
+    477|       expect(route.legacyIntent, query).toBe("research_analysis");
+    478|       expect(route.needsWorkspaceFacts).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

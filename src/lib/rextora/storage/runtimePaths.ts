@@ -13,52 +13,38 @@
  * fail-closed isolation checks against the real checkout paths.
  */
 
-import path from "node:path";
+import runtimePaths from "@rextora/runtime-paths";
 
 export function rextoraDataRoot(): string {
-  const override = process.env.REXTORA_DATA_DIR?.trim();
-  if (override) return path.resolve(override);
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-  );
+  return runtimePaths.rextoraDataRoot();
 }
 
 /** Real checkout runtime root — ignores REXTORA_DATA_DIR. */
 export function productionRextoraDataRootCanonical(): string {
-  return path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "data",
-    "rextora",
-  );
+  return runtimePaths.productionRextoraDataRootCanonical();
 }
 
 export function strategySearchRoot(): string {
-  const override = process.env.REXTORA_STRATEGY_SEARCH_DIR?.trim();
-  if (override) return path.resolve(override);
-  return path.join(rextoraDataRoot(), "strategy-search");
+  return runtimePaths.strategySearchRoot();
 }
 
 export function backtestsRoot(): string {
-  const override = process.env.REXTORA_BACKTESTS_DIR?.trim();
-  if (override) return path.resolve(override);
-  return path.join(rextoraDataRoot(), "backtests");
+  return runtimePaths.backtestsRoot();
 }
 
 export function strategiesRootDefault(): string {
-  return path.join(rextoraDataRoot(), "strategies");
+  return runtimePaths.strategiesRootDefault();
 }
 
 /** Real checkout strategies dir — ignores env overrides. */
 export function productionStrategiesRootCanonical(): string {
-  return path.join(productionRextoraDataRootCanonical(), "strategies");
+  return runtimePaths.productionStrategiesRootCanonical();
 }
 
 export function paperSessionsRootDefault(): string {
-  return path.join(rextoraDataRoot(), "paper-sessions");
+  return runtimePaths.paperSessionsRootDefault();
 }
 
 export function firstRunStatePath(): string {
-  return path.join(rextoraDataRoot(), "first-run.json");
+  return runtimePaths.firstRunStatePath();
 }

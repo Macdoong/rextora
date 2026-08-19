@@ -1,0 +1,1068 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "paper.prepare",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "symbol": null
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "pending_approval"
+      },
+      "durationMs": 5,
+      "approved": true,
+      "timestamp": "2026-08-14T09:07:24.015Z",
+      "approvalId": "pa_b01c542221746e09"
+    },
+    {
+      "toolId": "paper.approve_start",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "sessionId": "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c",
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "paper:paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c:approve_start"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "active"
+      },
+      "durationMs": 1057,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:27.188Z",
+      "approvalId": "pa_423f07ffaa24533d"
+    },
+    {
+      "toolId": "paper.pause",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "sessionId": "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c",
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "paper:paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c:pause"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "paused"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:29.099Z",
+      "approvalId": "pa_fb25bf5e868f765b"
+    },
+    {
+      "toolId": "paper.resume",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "sessionId": "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c",
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "paper:paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c:resume"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "active"
+      },
+      "durationMs": 6,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:31.035Z",
+      "approvalId": "pa_86587c1721c16ea2"
+    },
+    {
+      "toolId": "paper.stop",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "sessionId": "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c",
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "paper:paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c:stop"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "stopped"
+      },
+      "durationMs": 2,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:32.956Z",
+      "approvalId": "pa_86e9d9a1d115df77"
+    },
+    {
+      "toolId": "strategy.rename",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "name": "Employee QA",
+        "idempotencyKey": "strategy:copy_mssq3hdr_75aa38:rename:Employee QA"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "renamed"
+      },
+      "durationMs": 3,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:34.874Z",
+      "approvalId": "pa_0f6d4f161531c84e"
+    },
+    {
+      "toolId": "strategy.archive",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "strategy:copy_mssq3hdr_75aa38:archive:default"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "archived"
+      },
+      "durationMs": 2,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:36.798Z",
+      "approvalId": "pa_838fa82251877d68"
+    },
+    {
+      "toolId": "strategy.restore",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "strategy:copy_mssq3hdr_75aa38:restore:default"
+      },
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "restored"
+      },
+      "durationMs": 2,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:38.724Z",
+      "approvalId": "pa_897d9cd402f6e59e"
+    },
+    {
+      "toolId": "strategy.delete",
+      "sessionId": "agent_dc9028576cb94845",
+      "arguments": {
+        "strategyId": "copy_mssq3hdr_75aa38",
+        "idempotencyKey": "strategy:copy_mssq3hdr_75aa38:delete:default"
+      },
+      "result": {
+        "ok": false,
+        "status": "execution_error",
+        "errorCode": "HANDLER_ERROR",
+        "summary": "STRATEGY_DEPENDENCIES_REQUIRE_DETACH:paper:paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c"
+      },
+      "durationMs": 1,
+      "approved": true,
+      "timestamp": "2026-08-14T09:09:40.649Z",
+      "approvalId": "pa_575c6bc38c102dd1"
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T09:06:41.612Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq3hvw_60pf7z",
+      "turnId": "turn-1786698401598",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:07:23.059Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq3hvw_60pf7z",
+      "turnId": "turn-1786698401598",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 41440,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T09:07:24.019Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq4elv_qhkn05",
+      "turnId": "turn-1786698443998",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:07:24.020Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq4elv_qhkn05",
+      "turnId": "turn-1786698443998",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:25.189Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq703p_bsknxe",
+      "turnId": "turn-1786698565180",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:25.190Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq703p_bsknxe",
+      "turnId": "turn-1786698565180",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:27.190Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq71na_yj50lv",
+      "turnId": "turn-1786698566124",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:27.191Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq71na_yj50lv",
+      "turnId": "turn-1786698566124",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:28.144Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq72ds_jmjseo",
+      "turnId": "turn-1786698568140",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:28.144Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq72ds_jmjseo",
+      "turnId": "turn-1786698568140",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:29.102Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq734e_vf1z98",
+      "turnId": "turn-1786698569090",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:29.102Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq734e_vf1z98",
+      "turnId": "turn-1786698569090",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:30.070Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq73va_af9o8x",
+      "turnId": "turn-1786698570065",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:30.070Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq73va_af9o8x",
+      "turnId": "turn-1786698570065",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:31.038Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq74m6_oqclc6",
+      "turnId": "turn-1786698571023",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:31.039Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq74m6_oqclc6",
+      "turnId": "turn-1786698571023",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:31.997Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq75ct_ylmrfv",
+      "turnId": "turn-1786698571993",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:31.997Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq75ct_ylmrfv",
+      "turnId": "turn-1786698571993",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:32.960Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq763k_e3uv73",
+      "turnId": "turn-1786698572948",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:32.960Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq763k_e3uv73",
+      "turnId": "turn-1786698572948",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:33.911Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq76tz_225fm9",
+      "turnId": "turn-1786698573906",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:33.912Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq76tz_225fm9",
+      "turnId": "turn-1786698573906",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:34.878Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq77ku_urfjxi",
+      "turnId": "turn-1786698574864",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:34.879Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq77ku_urfjxi",
+      "turnId": "turn-1786698574864",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:35.842Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq78bm_ux6ja2",
+      "turnId": "turn-1786698575838",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:35.843Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq78bm_ux6ja2",
+      "turnId": "turn-1786698575838",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:36.801Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq7929_a5kqbc",
+      "turnId": "turn-1786698576788",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:36.801Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq7929_a5kqbc",
+      "turnId": "turn-1786698576788",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:37.766Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq79t2_ji9fsg",
+      "turnId": "turn-1786698577761",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:37.766Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq79t2_ji9fsg",
+      "turnId": "turn-1786698577761",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:38.727Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq7ajr_ixaww9",
+      "turnId": "turn-1786698578715",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:38.728Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq7ajr_ixaww9",
+      "turnId": "turn-1786698578715",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:39.691Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq7baj_s355u2",
+      "turnId": "turn-1786698579687",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:39.691Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq7baj_s355u2",
+      "turnId": "turn-1786698579687",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:40.653Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssq7c19_txn40v",
+      "turnId": "turn-1786698580640",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T09:09:40.653Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssq7c19_txn40v",
+      "turnId": "turn-1786698580640",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "approval_fast_path",
+      "fallbackUsed": false,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssq3gid_0ab392.chart.json",
+    "bt_mssq3gid_0ab392.json",
+    "index.json"
+  ],
+  "paperFiles": [
+    "index.json",
+    "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c.json"
+  ],
+  "memory": [
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 모의매매 준비",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_c6425f304577449a9fb5"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:07:24.016Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_b01c542221746e09",
+        "meaningfulHash": "010cb0ac915cc6d60729a44e"
+      },
+      "memoryId": "memory_52f310dbab1f9f1b18b8"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_c6425f304577449a9fb5"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:07:24.016Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_b01c542221746e09",
+        "meaningfulHash": "010cb0ac915cc6d60729a44e"
+      },
+      "memoryId": "memory_781c2f593bc1dced8b49"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 모의매매 시작",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_0eb675a0d9fb47bd9afa"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:27.189Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_423f07ffaa24533d",
+        "meaningfulHash": "26517243ae4cc33597725d99"
+      },
+      "memoryId": "memory_5236c75a2117d933e6a5"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_0eb675a0d9fb47bd9afa"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:27.189Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_423f07ffaa24533d",
+        "meaningfulHash": "26517243ae4cc33597725d99"
+      },
+      "memoryId": "memory_9766a6e7bdbb3b0539ea"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "plan_diff",
+      "statementKo": "이전 계획과 실제 실행 조건이 달라져 새 승인이 적용되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_c6425f304577449a9fb5"
+        },
+        {
+          "type": "plan",
+          "id": "plan_0eb675a0d9fb47bd9afa"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:27.189Z",
+      "sourceEventId": null,
+      "metadata": {
+        "meaningfulChanged": true,
+        "approvalInvalidated": false
+      },
+      "memoryId": "memory_9f6518265e708d9e85be"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_dc9f5ac37e744bdaabe2"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:29.100Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_fb25bf5e868f765b",
+        "meaningfulHash": "59acf4f116e7f9b6fa6740cf"
+      },
+      "memoryId": "memory_c50ad59fbf56a0df4d42"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_dc9f5ac37e744bdaabe2"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:29.100Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_fb25bf5e868f765b",
+        "meaningfulHash": "59acf4f116e7f9b6fa6740cf"
+      },
+      "memoryId": "memory_1b54cdd29b9727acae61"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "plan_diff",
+      "statementKo": "이전 계획과 실제 실행 조건이 달라져 새 승인이 적용되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_0eb675a0d9fb47bd9afa"
+        },
+        {
+          "type": "plan",
+          "id": "plan_dc9f5ac37e744bdaabe2"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:29.100Z",
+      "sourceEventId": null,
+      "metadata": {
+        "meaningfulChanged": true,
+        "approvalInvalidated": false
+      },
+      "memoryId": "memory_ca5f6396a03ff7bcdd03"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_a91ef0aaa0c84150821b"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:31.036Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_86587c1721c16ea2",
+        "meaningfulHash": "5c596ac0bc10e1423a5025cd"
+      },
+      "memoryId": "memory_9c3ca8900545396e77a3"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_a91ef0aaa0c84150821b"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:31.036Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_86587c1721c16ea2",
+        "meaningfulHash": "5c596ac0bc10e1423a5025cd"
+      },
+      "memoryId": "memory_dc0b7d881b9bb04e65b7"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "plan_diff",
+      "statementKo": "이전 계획과 실제 실행 조건이 달라져 새 승인이 적용되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_dc9f5ac37e744bdaabe2"
+        },
+        {
+          "type": "plan",
+          "id": "plan_a91ef0aaa0c84150821b"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:31.036Z",
+      "sourceEventId": null,
+      "metadata": {
+        "meaningfulChanged": true,
+        "approvalInvalidated": false
+      },
+      "memoryId": "memory_26c89989f6fda304332f"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "actual_result",
+      "statementKo": "모의매매의 실제 종료 결과가 저장소 이벤트로 확인되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "paper_session",
+          "id": "paper_2556bb75-909d-4a16-acb6-6ca9a7c73b4c"
+        },
+        {
+          "type": "event",
+          "id": "event_0a50840a381a8cb9502f"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:32.956Z",
+      "sourceEventId": "event_0a50840a381a8cb9502f",
+      "metadata": {
+        "eventType": "paper.stopped",
+        "outcome": "completed",
+        "configurationHash": null
+      },
+      "memoryId": "memory_47165e4d2b6fa2512b9f"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_6f6295844c8745a9a14a"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:32.958Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_86e9d9a1d115df77",
+        "meaningfulHash": "d4e2af834a1bb2759d60558c"
+      },
+      "memoryId": "memory_ed41f9c675760f1e265f"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_6f6295844c8745a9a14a"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:32.958Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_86e9d9a1d115df77",
+        "meaningfulHash": "d4e2af834a1bb2759d60558c"
+      },
+      "memoryId": "memory_678d4ff552a0a8c31d85"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "plan_diff",
+      "statementKo": "이전 계획과 실제 실행 조건이 달라져 새 승인이 적용되었습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_a91ef0aaa0c84150821b"
+        },
+        {
+          "type": "plan",
+          "id": "plan_6f6295844c8745a9a14a"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:32.958Z",
+      "sourceEventId": null,
+      "metadata": {
+        "meaningfulChanged": true,
+        "approvalInvalidated": false
+      },
+      "memoryId": "memory_405820d32756fd334ac7"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_de8d375047204dfa8cc8"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:34.876Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_0f6d4f161531c84e",
+        "meaningfulHash": "cf4cc07b55393179afc18fef"
+      },
+      "memoryId": "memory_652a05e2364aa0b6bf72"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_de8d375047204dfa8cc8"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:34.876Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_0f6d4f161531c84e",
+        "meaningfulHash": "cf4cc07b55393179afc18fef"
+      },
+      "memoryId": "memory_1d4f587542ff68012519"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_c1acacd7b6ae455d985c"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:36.799Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_838fa82251877d68",
+        "meaningfulHash": "c4de838dcb2e2bbac54eecee"
+      },
+      "memoryId": "memory_d11b937225305911a5f1"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_c1acacd7b6ae455d985c"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:36.799Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_838fa82251877d68",
+        "meaningfulHash": "c4de838dcb2e2bbac54eecee"
+      },
+      "memoryId": "memory_6a1574ff103244869eff"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_9357e95a22b1461f9426"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:38.725Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_897d9cd402f6e59e",
+        "meaningfulHash": "5000ca733e4fa609233947d1"
+      },
+      "memoryId": "memory_14cee5d05dacaaf0a66a"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_9357e95a22b1461f9426"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:38.725Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_897d9cd402f6e59e",
+        "meaningfulHash": "5000ca733e4fa609233947d1"
+      },
+      "memoryId": "memory_ae97f8678d58c249e19c"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_goal",
+      "statementKo": "사용자가 승인한 목표: 다음 단계 안내",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_6cfddd3b5d2c41538ff0"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:40.651Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_575c6bc38c102dd1",
+        "meaningfulHash": "15150ae53230c04f8bd8d01b"
+      },
+      "memoryId": "memory_e1ab9d01b64bfc5620d4"
+    },
+    {
+      "sessionId": "agent_dc9028576cb94845",
+      "kind": "approved_plan",
+      "statementKo": "사용자가 이 실행 계획을 명시적으로 승인했습니다.",
+      "evidenceRefs": [
+        {
+          "type": "plan",
+          "id": "plan_6cfddd3b5d2c41538ff0"
+        }
+      ],
+      "verifiedAt": "2026-08-14T09:09:40.651Z",
+      "sourceEventId": null,
+      "metadata": {
+        "approvalId": "pa_575c6bc38c102dd1",
+        "meaningfulHash": "15150ae53230c04f8bd8d01b"
+      },
+      "memoryId": "memory_530d0360dacabf014bf4"
+    }
+  ],
+  "sessionFiles": [
+    "agent_dc9028576cb94845"
+  ]
+}

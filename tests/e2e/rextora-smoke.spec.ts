@@ -173,7 +173,9 @@ test.describe("Rextora lifecycle smoke", () => {
     await expect(page.getByTestId("backtest-page")).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.getByTestId("backtest-review-workbench")).toBeVisible({
+    await expect(
+      page.getByTestId("backtest-page").getByTestId("backtest-review-workbench"),
+    ).toBeVisible({
       timeout: 15_000,
     });
   });

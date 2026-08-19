@@ -1,0 +1,137 @@
+{
+  "warmed": true,
+  "results": [
+    {
+      "path": "/settings",
+      "status": 200,
+      "ms": 89774
+    },
+    {
+      "path": "/api/rextora/settings/ai-providers",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "ms": 1016
+    }
+  ]
+}
+
+Running 24 tests using 1 worker
+
+(node:20871) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20871) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:12:7 › Deployment scenario registry › contains exactly 22 unique scenario IDs (3ms)
+  ✓   2 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 01: OpenAI settings configured state (2.3s)
+  ✓   3 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 02: Gemini settings configured state (2.0s)
+  ✓   4 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 03: OpenAI model catalog (1.7s)
+  ✓   5 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 04: Gemini model catalog (143ms)
+  ✓   6 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 05: Global default provider/model (1.5s)
+  ✓   7 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 06: Per-chat model selector (3.0s)
+  ✓   8 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 07: OpenAI typo/free-form conversation (22.0s)
+  ✓   9 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 08: OpenAI capability conversation (15.4s)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/settings/ai-providers/models'
+[WebServer] }
+  ✓  10 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 09: OpenAI next-action guidance (2.3m)
+  ✓  11 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 10: OpenAI current-workspace analysis (2.9m)
+  ✓  12 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 11: Gemini model switch + contextual follow-up (39.8s)
+  ✓  13 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 12: Session provider/model persistence after refresh (2.1m)
+  ✓  14 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 13: New-chat global default behavior (19.9s)
+  ✓  15 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 14: Explicit safe action → typed plan (52.0s)
+  ✓  16 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 15: Approval → actual safe execution (43.4s)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/strategies'
+[WebServer] }
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/paper/session'
+[WebServer] }
+  ✓  17 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 16: Repeated approval → exactly zero additional execution (1.8m)
+[WebServer] ⨯ SyntaxError: Unexpected end of JSON input
+[WebServer]     at JSON.parse (<anonymous>) {
+[WebServer]   page: '/api/rextora/strategy-search'
+[WebServer] }
+  ✘  18 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting (5.0m)
+(node:22288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  19 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled (0ms)
+  -  20 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 19: Provider failure with fallback enabled
+  -  21 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 20: Live/real-order refusal
+  -  22 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 21: SAFE mutation refusal
+  -  23 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 22: Full secret/raw-enum leak inspection
+(node:22424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  24 [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:53:7 › Deployment viewport coverage metadata › playwright project defines all required viewports (2ms)
+
+
+  1) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+
+    [31mTest timeout of 300000ms exceeded.[39m
+
+    Error: page.waitForResponse: Test timeout of 300000ms exceeded.
+
+       at scenarioRegistry.ts:380
+
+      378 |       await waitForAgentAnswer(page);
+      379 |       await expect(page.getByTestId("agent-approval-center")).toBeVisible({ timeout: 30_000 });
+    > 380 |       const approvePromise = page.waitForResponse(
+          |                                   ^
+      381 |         (r) => r.url().includes("/api/rextora/agent") && r.request().method() === "POST",
+      382 |       );
+      383 |       await page.getByTestId("agent-approval-approve").click();
+        at Object.run (/Users/macdoong/Documents/Rextora/tests/e2e/release/scenarioRegistry.ts:380:35)
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:47:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-44244--Execution-result-reporting-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+
+    Error: dev_warm_gate_failed
+
+      34 |       await new Promise((resolve) => setTimeout(resolve, 2000));
+      35 |     }
+    > 36 |     throw new Error("dev_warm_gate_failed");
+         |           ^
+      37 |   });
+      38 |
+      39 |   for (const scenario of DEPLOYMENT_SCENARIOS) {
+        at /Users/macdoong/Documents/Rextora/tests/e2e/release/deployment-matrix.spec.ts:36:11
+
+    Error Context: test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/deployment-matrix-Deployme-803b9-lure-with-fallback-disabled-dev-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 17: Execution-result reporting 
+    [dev-390] › tests/e2e/release/deployment-matrix.spec.ts:40:9 › Deployment provider-backed matrix › scenario 18: Provider failure with fallback disabled 
+  4 did not run
+  18 passed (23.1m)

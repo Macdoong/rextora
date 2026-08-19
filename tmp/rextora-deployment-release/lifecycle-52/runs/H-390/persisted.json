@@ -1,0 +1,258 @@
+{
+  "jobs": [
+    {
+      "id": "search_d0000001-0000-4000-8000-000000000001",
+      "status": "completed",
+      "progress": 0,
+      "timeframe": "15m",
+      "symbols": [
+        "BTCUSDT"
+      ],
+      "patterns": [
+        "ema_core"
+      ]
+    }
+  ],
+  "toolAudit": [
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_80d692aa8ab242ae",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 6,
+      "approved": true,
+      "timestamp": "2026-08-14T06:18:37.059Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_80d692aa8ab242ae",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 5,
+      "approved": true,
+      "timestamp": "2026-08-14T06:18:49.802Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_80d692aa8ab242ae",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 4,
+      "approved": true,
+      "timestamp": "2026-08-14T06:19:01.602Z",
+      "approvalId": null
+    },
+    {
+      "toolId": "research.summary",
+      "sessionId": "agent_80d692aa8ab242ae",
+      "arguments": {},
+      "result": {
+        "ok": true,
+        "status": "ok",
+        "errorCode": null,
+        "summary": "ok"
+      },
+      "durationMs": 4,
+      "approved": true,
+      "timestamp": "2026-08-14T06:19:18.286Z",
+      "approvalId": null
+    }
+  ],
+  "reasoningAudit": [
+    {
+      "at": "2026-08-14T06:18:36.092Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk3buk_7am5r5",
+      "turnId": "turn-1786688316074",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:18:36.099Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk3buk_7am5r5",
+      "turnId": "turn-1786688316074",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:18:37.062Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk3cli_egepdc",
+      "turnId": "turn-1786688317048",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:18:47.900Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk3cli_egepdc",
+      "turnId": "turn-1786688317048",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 10835,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T06:18:48.848Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk3low_n0pbp9",
+      "turnId": "turn-1786688328839",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:18:48.850Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk3low_n0pbp9",
+      "turnId": "turn-1786688328839",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:18:49.805Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk3mfh_0ir2o2",
+      "turnId": "turn-1786688329793",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:19:00.653Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk3mfh_0ir2o2",
+      "turnId": "turn-1786688329793",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 10847,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T06:19:01.604Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk3vj8_dgyvfo",
+      "turnId": "turn-1786688341593",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:19:17.339Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk3vj8_dgyvfo",
+      "turnId": "turn-1786688341593",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 15732,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T06:19:18.289Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk48ep_cz7ucg",
+      "turnId": "turn-1786688358278",
+      "providerAttempt": 1,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:19:31.245Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk48ep_cz7ucg",
+      "turnId": "turn-1786688358278",
+      "providerAttempt": 1,
+      "provider": "local",
+      "model": "v1_fallback",
+      "fallbackUsed": true,
+      "latencyMs": 12953,
+      "errorCategory": "provider_or_validation"
+    },
+    {
+      "at": "2026-08-14T06:19:32.194Z",
+      "phase": "started",
+      "reasoningRequestId": "rr_mssk4j4y_rzemib",
+      "turnId": "turn-1786688372186",
+      "providerAttempt": 0,
+      "provider": null,
+      "model": null,
+      "fallbackUsed": null,
+      "latencyMs": null,
+      "errorCategory": null
+    },
+    {
+      "at": "2026-08-14T06:19:32.195Z",
+      "phase": "completed",
+      "reasoningRequestId": "rr_mssk4j4y_rzemib",
+      "turnId": "turn-1786688372186",
+      "providerAttempt": 0,
+      "provider": "local",
+      "model": "deterministic",
+      "fallbackUsed": true,
+      "latencyMs": null,
+      "errorCategory": null
+    }
+  ],
+  "backtestFiles": [
+    "bt_mssk3awp_218a81.chart.json",
+    "bt_mssk3awp_218a81.json",
+    "index.json"
+  ],
+  "paperFiles": [],
+  "memory": [],
+  "sessionFiles": [
+    "agent_80d692aa8ab242ae"
+  ]
+}
