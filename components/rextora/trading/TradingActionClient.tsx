@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Card } from "@/components/ui/primitives";
 import { displayBlockReason, displayLabel } from "@/src/lib/rextora/displayLabels";
 import type { EngineResult, TradingMode } from "@/lib/types";
+import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
 
 type ActionLog = {
   id: string;
@@ -43,6 +44,7 @@ async function postAction(path: string, body: ActionBody = paperBody): Promise<E
 export function PaperBotActionPanel() {
   const [status, setStatus] = useState("PAPER 모의 거래 대기");
   const [logs, setLogs] = useState<ActionLog[]>([]);
+  const { can } = useAuth();
 
   async function run(label: string, path: string, body = paperBody) {
     const result = await postAction(path, body);
@@ -63,9 +65,13 @@ export function PaperBotActionPanel() {
         {status}
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <Button tone="success" data-testid="bot-start" onClick={() => run("PAPER 봇 시작", "/api/bot/start")}>봇 시작</Button>
-        <Button tone="danger" data-testid="bot-stop" onClick={() => run("PAPER 봇 중지", "/api/bot/stop")}>봇 중지</Button>
-        <Button tone="muted" data-testid="bot-restart" onClick={() => run("PAPER 봇 재시작", "/api/bot/restart")}>재시작</Button>
+        {can("paper:operate") ? (
+          <>
+            <Button tone="success" data-testid="bot-start" onClick={() => run("PAPER 봇 시작", "/api/bot/start")}>봇 시작</Button>
+            <Button tone="danger" data-testid="bot-stop" onClick={() => run("PAPER 봇 중지", "/api/bot/stop")}>봇 중지</Button>
+            <Button tone="muted" data-testid="bot-restart" onClick={() => run("PAPER 봇 재시작", "/api/bot/restart")}>재시작</Button>
+          </>
+        ) : null}
       </div>
       <div className="rextora-helper mt-3 space-y-1 text-slate-300" data-testid="bot-action-log">
         {logs.length === 0 ? <div>아직 PAPER 동작 로그가 없습니다.</div> : logs.map((log) => (
@@ -80,6 +86,7 @@ export function LiveTradingActionPanel() {
   const [status, setStatus] = useState("LIVE 실전 거래 대기");
   const [logs, setLogs] = useState<ActionLog[]>([]);
   const [readiness, setReadiness] = useState<ReadinessSummary | null>(null);
+  const { can } = useAuth();
 
   const loadReadiness = useCallback(async () => {
     const res = await fetch("/api/rextora/live/readiness", { cache: "no-store" });
@@ -123,11 +130,17 @@ export function LiveTradingActionPanel() {
         {summary}
       </div>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-        <Button tone="success" data-testid="live-start" onClick={() => run("LIVE 시작", "/api/bot/start", liveBody)}>Start LIVE</Button>
-        <Button tone="danger" data-testid="live-stop" onClick={() => run("LIVE 중지", "/api/bot/stop", liveBody)}>Stop bot</Button>
-        <Button tone="warning" data-testid="live-emergency-stop" onClick={() => run("긴급 중단", "/api/emergency/stop-all", liveBody)}>Emergency stop</Button>
-        <Button tone="warning" data-testid="live-close-all" onClick={() => run("전체 청산", "/api/orders/close-position", liveBody)}>Close all positions</Button>
-        <Button tone="danger" data-testid="live-cancel-all" onClick={() => run("전체 주문 취소", "/api/orders/cancel-all", liveBody)}>Cancel all orders</Button>
+        {can("live:start") ? (
+          <Button tone="success" data-testid="live-start" onClick={() => run("LIVE 시작", "/api/bot/start", liveBody)}>Start LIVE</Button>
+        ) : null}
+        {can("live:emergency_stop") ? (
+          <>
+            <Button tone="danger" data-testid="live-stop" onClick={() => run("LIVE 중지", "/api/bot/stop", liveBody)}>Stop bot</Button>
+            <Button tone="warning" data-testid="live-emergency-stop" onClick={() => run("긴급 중단", "/api/emergency/stop-all", liveBody)}>Emergency stop</Button>
+            <Button tone="warning" data-testid="live-close-all" onClick={() => run("전체 청산", "/api/orders/close-position", liveBody)}>Close all positions</Button>
+            <Button tone="danger" data-testid="live-cancel-all" onClick={() => run("전체 주문 취소", "/api/orders/cancel-all", liveBody)}>Cancel all orders</Button>
+          </>
+        ) : null}
       </div>
       <div className="rextora-helper mt-3 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-red-100" data-testid="live-start-blocked-reason">
         {status}

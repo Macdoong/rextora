@@ -14,9 +14,13 @@ import { evaluateSafeV44Signal } from "@/src/lib/rextora/signal/safeV44SignalEng
 import { computeIndicators } from "@/src/lib/rextora/indicator/indicatorEngine";
 import type { LevelLine, TradeMarker } from "@/src/lib/rextora/charts/types";
 import { CHART_THEME } from "@/src/lib/rextora/charts/theme";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 /** Preview strategy signals + structure overlays for Unified Chart Engine. */
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
   const symbol = (url.searchParams.get("symbol") ?? "BTCUSDT").toUpperCase();

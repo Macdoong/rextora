@@ -20,6 +20,7 @@ import {
   type StrategySearchConfig,
 } from "../src/lib/rextora/strategySearch";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
+import { generateSyntheticCandlesForRange } from "../src/lib/rextora/data/ohlcvTypes";
 
 const tempRoots: string[] = [];
 
@@ -56,8 +57,8 @@ function sampleConfig(
       {
         id: "w1",
         label: "recent",
-        fromOpenTime: 1,
-        toOpenTime: 2,
+        fromOpenTime: Date.UTC(2024, 0, 1),
+        toOpenTime: Date.UTC(2024, 0, 2),
       },
     ],
     passCriteria: { minTradeCount: null },
@@ -73,8 +74,8 @@ function fixtures() {
       {
         id: "w1",
         label: "recent",
-        requestedFrom: 1,
-        requestedTo: 2,
+        requestedFrom: Date.UTC(2024, 0, 1),
+        requestedTo: Date.UTC(2024, 0, 2),
         requiredForPass: true,
       },
     ],
@@ -109,7 +110,30 @@ function fixtures() {
         { key: "ema_fast", min: 10, max: 40, step: 1, valueType: "integer" as const },
       ],
     },
+    preloadedCandlesByKey: {
+      "BTCUSDT|w1": generateSyntheticCandlesForRange(
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 2),
+        15 * 60 * 1000,
+      ),
+    },
   };
+}
+
+function champRef(job: {
+  checkpoint: {
+    bestByCompatibilityGroup?: Array<{
+      bestPassedCandidate?: { score: number | null; paramsHash: string; iteration: number; passed: boolean } | null;
+      bestCandidate?: { score: number | null; paramsHash: string; iteration: number; passed: boolean } | null;
+    }>;
+  };
+}) {
+  const rows = job.checkpoint.bestByCompatibilityGroup ?? [];
+  return (
+    rows.map((row) => row.bestPassedCandidate).find((row) => row != null) ??
+    rows.map((row) => row.bestCandidate).find((row) => row != null) ??
+    null
+  );
 }
 
 function mockEval(
@@ -208,8 +232,7 @@ describe("strategySearch resume", () => {
     expect(first.stopReason).toBe("paused");
     const hashesAfterPause = listSearchTrials(job.id, opts).map((t) => t.paramsHash);
     expect(hashesAfterPause.length).toBeGreaterThanOrEqual(2);
-    const bestAfterPause = first.job.checkpoint.bestCandidate;
-    expect(bestAfterPause?.score).toBe(9);
+    expect(champRef(first.job)?.score).toBe(9);
     const statsAfterPause = readRunnerPayloadFromCheckpoint(first.job.checkpoint)!;
     expect(statsAfterPause.statistics.evaluated).toBe(hashesAfterPause.length);
     const prngAfterPause = statsAfterPause.prng;
@@ -232,7 +255,7 @@ describe("strategySearch resume", () => {
     for (let i = 0; i < hashesAfterPause.length; i += 1) {
       expect(getSearchTrial(job.id, i, opts)?.paramsHash).toBe(hashesAfterPause[i]);
     }
-    expect(second.job.checkpoint.bestCandidate?.score).toBe(9);
+    expect(champRef(second.job)?.score).toBe(9);
     expect(second.statistics.evaluated).toBe(5);
     expect(second.statistics.generated).toBe(5);
 
@@ -363,11 +386,11 @@ describe("strategySearch resume", () => {
     );
     expect(hashesB).toEqual(hashesA);
     expect(resumed.statistics.bestScore).toBe(continuous.statistics.bestScore);
-    expect(resumed.job.checkpoint.bestCandidate).toMatchObject({
-      iteration: continuous.job.checkpoint.bestCandidate?.iteration,
-      paramsHash: continuous.job.checkpoint.bestCandidate?.paramsHash,
-      score: continuous.job.checkpoint.bestCandidate?.score,
-      passed: continuous.job.checkpoint.bestCandidate?.passed,
+    expect(champRef(resumed.job)).toMatchObject({
+      iteration: champRef(continuous.job)?.iteration,
+      paramsHash: champRef(continuous.job)?.paramsHash,
+      score: champRef(continuous.job)?.score,
+      passed: champRef(continuous.job)?.passed,
     });
   });
 });

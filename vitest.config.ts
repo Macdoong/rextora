@@ -6,7 +6,13 @@ export default defineConfig({
     environment: "node",
     fileParallelism: false,
     setupFiles: ["./tests/setup/strategyStoreIsolation.setup.ts"],
-    exclude: ["node_modules/**", "tests/e2e/**"]
+    exclude: [
+      "node_modules/**",
+      "tests/e2e/**",
+      ".validation/**",
+      "tmp/**",
+      ".next/**"
+    ]
   },
   resolve: {
     alias: {

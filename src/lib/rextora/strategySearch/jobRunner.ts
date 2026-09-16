@@ -10,6 +10,13 @@
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
+import { isPatternCandidateParams } from "./patternSearchSpaces";
+import {
+  getJobExecutionProfile,
+  resolveProfileEventSequenceCostModel,
+} from "./jobExecutionProfile";
+import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
+import { resolveEventSequenceCostModel } from "../strategy/eventSequenceCostModel";
 import {
   evaluateCompleteCandidate,
   type EvaluateCompleteCandidateInput,
@@ -19,7 +26,9 @@ import {
   generateUniqueCandidate,
 } from "./candidateGenerator";
 import {
+  buildRepeatedGenerationErrorFingerprint,
   classifyEngineError,
+  isInvalidParameterRangesError,
   isRecoverableGenerationError,
 } from "./engineErrorClassification";
 import { StrategySearchJitterError } from "./jitterEvaluator";
@@ -48,14 +57,21 @@ import { refreshLiveResearchTop10 } from "./researchResultsSummary";
 import { finalizeResearchTop10 } from "./researchTop10";
 import {
   createEmptyJobStatistics,
-  isBetterScore,
   recordDuplicate,
   recordElapsed,
   recordError,
   recordEvaluation,
   recordGenerated,
+  type RecordEvaluationStatsInput,
   type StrategySearchJobStatistics,
 } from "./jobStatistics";
+import {
+  applyGroupChampA,
+  classifyPersistedTrial,
+  cloneBestByCompatibilityGroup,
+  reconstructGroupBestFromReferenced,
+  stampResearchEvaluation,
+} from "./researchEvaluationIdentity";
 import {
   StrategySearchJobStateError,
   isTerminalJobStatus,
@@ -123,6 +139,12 @@ export interface RunSearchJobInput {
   jitterConfig: StrategySearchJitterConfig;
   baseParams?: Record<string, StrategySearchParameterValue> | SafeV44Params;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  /**
+   * Explicit Pattern Event-Sequence cost model for this run.
+   * When omitted, resolved from the persisted job execution profile
+   * (missing field → event_sequence_ledger_v0).
+   */
+  eventSequenceCostModel?: EventSequenceCostModel | null;
   /** Injectable for tests — defaults to evaluateCompleteCandidate. */
   evaluate?: (
     input: EvaluateCompleteCandidateInput,
@@ -207,17 +229,60 @@ async function persistCheckpointWithRetry(
   );
 }
 
+function recordEvaluationCompat(
+  stats: StrategySearchJobStatistics,
+  input: RecordEvaluationStatsInput,
+  frozenBestScore: number | null,
+): StrategySearchJobStatistics {
+  return { ...recordEvaluation(stats, input), bestScore: frozenBestScore };
+}
+
 function trialFromEvaluation(input: {
-  jobId: string;
+  job: StrategySearchJob;
   iteration: number;
   candidate: StrategySearchCandidate;
   evaluation: StrategySearchCompleteCandidateEvaluation | null;
   failureReasons: Array<{ code: string; message: string }>;
   durationMs: number;
+  costConfig: StrategySearchBacktestCostConfig;
+  windows: readonly StrategySearchEvaluationWindowPlan[];
+  evaluationBalance: number;
+  passPolicy: StrategySearchPassPolicy;
+  scoreWeights: StrategySearchScoreWeights;
+  costStressScenarios: StrategySearchCostStressScenario[];
+  jitterConfig: StrategySearchJitterConfig;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }): StrategySearchTrial {
   const ev = input.evaluation;
+  const pattern = isPatternCandidateParams(input.candidate.params);
+  const stamped = stampResearchEvaluation({
+    params: input.candidate.params,
+    paramsHash: input.candidate.paramsHash,
+    cost: input.costConfig,
+    symbols: input.job.config.symbols,
+    timeframe: input.job.config.timeframe,
+    windows: input.windows.map((window) => ({
+      id: window.id,
+      fromOpenTime: window.requestedFrom,
+      toOpenTime: window.requestedTo,
+      requiredForPass: window.requiredForPass,
+    })),
+    dataVersion: input.job.config.dataVersion,
+    evaluationBalance: input.evaluationBalance,
+    passPolicy: input.passPolicy,
+    scoreWeights: input.scoreWeights,
+    costStressScenarios: input.costStressScenarios,
+    jitterConfig: input.jitterConfig,
+    ...(pattern
+      ? {
+          engineCostModel: resolveEventSequenceCostModel(
+            input.eventSequenceCostModel,
+          ),
+        }
+      : {}),
+  });
   return {
-    jobId: input.jobId,
+    jobId: input.job.id,
     iteration: input.iteration,
     candidateId: input.candidate.candidateId,
     params: { ...input.candidate.params },
@@ -253,6 +318,14 @@ function trialFromEvaluation(input: {
     })),
     durationMs: input.durationMs,
     createdAt: new Date().toISOString(),
+    researchEvaluationIdentity: stamped.researchEvaluationIdentity as
+      | Record<string, unknown>
+      | null,
+    researchEvaluationHash: stamped.researchEvaluationHash,
+    engineCostModel: stamped.classification.engineCostModel,
+    rankingCompatibilityGroup: stamped.classification.rankingCompatibilityGroup,
+    rankingEligible: stamped.classification.rankingEligible,
+    promotionEligible: stamped.classification.promotionEligible,
   };
 }
 
@@ -311,6 +384,11 @@ export async function runSearchJob(
   const maxCheckpointRetries = input.maxCheckpointRetries ?? 3;
   const evaluate = input.evaluate ?? evaluateCompleteCandidate;
   const baseParams = input.baseParams ?? CONTEXT_FALLBACK_PARAMS;
+  const persistedProfile = getJobExecutionProfile(input.jobId, store);
+  const eventSequenceCostModel = resolveEventSequenceCostModel(
+    input.eventSequenceCostModel ??
+      resolveProfileEventSequenceCostModel(persistedProfile),
+  );
 
   let job = getSearchJob(input.jobId, store);
   if (!job) {
@@ -387,8 +465,24 @@ export async function runSearchJob(
   let random = restoreSeededRandom(payload.prng);
   let statistics = { ...payload.statistics };
   const seenHashes = new Set(payload.seenHashes);
+  const repeatedErrorSignatures: Record<string, number> = {
+    ...(payload.repeatedErrorSignatures ?? {}),
+  };
+  payload = {
+    ...payload,
+    repeatedErrorSignatures: { ...repeatedErrorSignatures },
+  };
+  const frozenStatsBestScore = statistics.bestScore;
   let bestCandidate = cloneBest(job.checkpoint.bestCandidate);
   let bestPassedCandidate = cloneBest(job.checkpoint.bestPassedCandidate);
+  const resumeJobId = job.id;
+  let groupBest = job.checkpoint.bestByCompatibilityGroup?.length
+    ? cloneBestByCompatibilityGroup(job.checkpoint.bestByCompatibilityGroup)
+    : reconstructGroupBestFromReferenced({
+        bestCandidate,
+        bestPassedCandidate,
+        resolveTrial: (ref) => getSearchTrial(resumeJobId, ref.iteration, store),
+      });
   let iteration = job.checkpoint.nextIteration;
   let completed = job.checkpoint.completedIterations;
   let lastParent: StrategySearchCandidate | null = null;
@@ -477,6 +571,7 @@ export async function runSearchJob(
             payload,
             bestCandidate,
             bestPassedCandidate,
+            bestByCompatibilityGroup: groupBest,
           }),
           store,
           maxCheckpointRetries,
@@ -513,6 +608,7 @@ export async function runSearchJob(
             payload,
             bestCandidate,
             bestPassedCandidate,
+            bestByCompatibilityGroup: groupBest,
           }),
           store,
           maxCheckpointRetries,
@@ -563,47 +659,40 @@ export async function runSearchJob(
         // Stats were not checkpointed for this trial yet when completed === iteration.
         if (completed === iteration) {
           statistics = recordGenerated(statistics);
-          statistics = recordEvaluation(statistics, {
-            score: existingTrial.score,
-            passed: existingTrial.passed,
-            stressPassed:
-              existingTrial.costStressResults.length > 0 &&
-              existingTrial.costStressResults.every((r) => r.passed),
-            jitterPassed:
-              existingTrial.jitterResults.length === 0
-                ? null
-                : existingTrial.jitterResults.every((r) => r.passed),
-            evaluationFailed: existingTrial.failureReasons.some(
-              (f) =>
-                f.code === "EVALUATION_ERROR" || f.code === "EVALUATION_FAILED",
-            ),
-          });
+          statistics = recordEvaluationCompat(
+            statistics,
+            {
+              score: existingTrial.score,
+              passed: existingTrial.passed,
+              stressPassed:
+                existingTrial.costStressResults.length > 0 &&
+                existingTrial.costStressResults.every((r) => r.passed),
+              jitterPassed:
+                existingTrial.jitterResults.length === 0
+                  ? null
+                  : existingTrial.jitterResults.every((r) => r.passed),
+              evaluationFailed: existingTrial.failureReasons.some(
+                (f) =>
+                  f.code === "EVALUATION_ERROR" ||
+                  f.code === "EVALUATION_FAILED",
+              ),
+            },
+            frozenStatsBestScore,
+          );
         }
-        if (
-          isBetterScore(bestCandidate?.score ?? null, existingTrial.score)
-        ) {
-          bestCandidate = {
-            candidateId: existingTrial.candidateId,
-            iteration: existingTrial.iteration,
-            paramsHash: existingTrial.paramsHash,
-            score: existingTrial.score,
-            passed: existingTrial.passed,
-          };
-        }
-        if (
-          existingTrial.passed &&
-          isBetterScore(
-            bestPassedCandidate?.score ?? null,
-            existingTrial.score,
-          )
-        ) {
-          bestPassedCandidate = {
-            candidateId: existingTrial.candidateId,
-            iteration: existingTrial.iteration,
-            paramsHash: existingTrial.paramsHash,
-            score: existingTrial.score,
-            passed: true,
-          };
+        const existingClass = classifyPersistedTrial(existingTrial);
+        if (existingClass.rankingEligible) {
+          groupBest = applyGroupChampA(
+            groupBest,
+            existingClass.rankingCompatibilityGroup,
+            {
+              candidateId: existingTrial.candidateId,
+              iteration: existingTrial.iteration,
+              paramsHash: existingTrial.paramsHash,
+              score: existingTrial.score,
+              passed: existingTrial.passed,
+            },
+          );
         }
         if (!isInvalidPlaceholder) {
           lastParent = {
@@ -673,6 +762,7 @@ export async function runSearchJob(
               payload,
               bestCandidate,
               bestPassedCandidate,
+              bestByCompatibilityGroup: groupBest,
             }),
             store,
             maxCheckpointRetries,
@@ -687,16 +777,73 @@ export async function runSearchJob(
           };
         }
         const classified = classifyEngineError(err, "candidate_generation");
+        if (isInvalidParameterRangesError(err) || classified.code === "CONFIGURATION_INVALID") {
+          const message =
+            err instanceof Error
+              ? err.message
+              : "invalid parameterRanges: min must be <= max";
+          statistics = recordElapsed(
+            statistics,
+            Date.now() - startedMs,
+            completed,
+            maxIterations,
+          );
+          payload = {
+            ...payload,
+            prng: random.getState(),
+            statistics,
+            seenHashes: [...seenHashes],
+            jobStatus: "failed",
+            stopReason: "failed",
+          };
+          job = await persistCheckpointWithRetry(
+            job.id,
+            buildPersistedCheckpoint({
+              completedIterations: completed,
+              nextIteration: iteration,
+              payload,
+              bestCandidate,
+              bestPassedCandidate,
+              bestByCompatibilityGroup: groupBest,
+            }),
+            store,
+            maxCheckpointRetries,
+          );
+          const plan = getSearchPlan(job.id, store);
+          if (plan) {
+            saveSearchPlan(
+              job.id,
+              { ...plan, completionReason: "CONFIGURATION_INVALID" },
+              store,
+            );
+          }
+          job = transitionJobToFailed(job.id, message, store);
+          freezeLiveTop10OnTerminal(job.id, store);
+          return {
+            job,
+            statistics,
+            iterationsCompletedThisRun: iterationsThisRun,
+            stopReason: "failed",
+          };
+        }
         // Recoverable candidate generation errors must not kill the Research Job.
         if (isRecoverableGenerationError(err) || !classified.fatal) {
           statistics = recordError(statistics);
-          statistics = recordEvaluation(statistics, {
-            score: null,
-            passed: false,
-            stressPassed: false,
-            jitterPassed: false,
-            evaluationFailed: true,
-          });
+          statistics = recordEvaluationCompat(
+            statistics,
+            {
+              score: null,
+              passed: false,
+              stressPassed: false,
+              jitterPassed: false,
+              evaluationFailed: true,
+            },
+            frozenStatsBestScore,
+          );
+          const fingerprint =
+            buildRepeatedGenerationErrorFingerprint(classified);
+          const nextCount = (repeatedErrorSignatures[fingerprint] ?? 0) + 1;
+          repeatedErrorSignatures[fingerprint] = nextCount;
           const placeholderId = createStrategySearchCandidateId(
             job.id,
             iteration,
@@ -733,6 +880,12 @@ export async function runSearchJob(
             completed,
             maxIterations,
           );
+          const plan = getSearchPlan(job.id, store);
+          const threshold = plan?.repeatedSignatureThreshold ?? 25;
+          const hitRepeatedSignature =
+            Number.isInteger(threshold) &&
+            threshold >= 1 &&
+            nextCount >= threshold;
           payload = {
             version: 1,
             prng: random.getState(),
@@ -740,7 +893,11 @@ export async function runSearchJob(
             seenHashes: [...seenHashes],
             lastParentCandidateId: lastParent?.candidateId ?? null,
             lastParentParamsHash: lastParent?.paramsHash ?? null,
-            jobStatus: "running",
+            jobStatus: hitRepeatedSignature ? "paused" : "running",
+            repeatedErrorSignatures: { ...repeatedErrorSignatures },
+            ...(hitRepeatedSignature
+              ? { stopReason: "repeated_signature_auto_pause" as const }
+              : {}),
           };
           job = await persistCheckpointWithRetry(
             job.id,
@@ -750,10 +907,23 @@ export async function runSearchJob(
               payload,
               bestCandidate,
               bestPassedCandidate,
+              bestByCompatibilityGroup: groupBest,
             }),
             store,
             maxCheckpointRetries,
           );
+          if (hitRepeatedSignature) {
+            job = transitionJobCooperativelyPaused(job.id, store);
+            if (plan) {
+              saveSearchPlan(job.id, markPlanPaused(plan), store);
+            }
+            return {
+              job,
+              statistics,
+              iterationsCompletedThisRun: iterationsThisRun,
+              stopReason: "paused",
+            };
+          }
           continue;
         }
         throw new StrategySearchJobRunnerError(
@@ -780,15 +950,20 @@ export async function runSearchJob(
           costStressScenarios: input.costStressScenarios,
           jitterConfig: input.jitterConfig,
           preloadedCandlesByKey: input.preloadedCandlesByKey,
+          eventSequenceCostModel,
         });
-        statistics = recordEvaluation(statistics, {
-          score: evaluation.baseScore.finalScore,
-          passed: evaluation.finalPassed,
-          stressPassed: evaluation.costStressPassed,
-          jitterPassed: evaluation.jitterResult.enabled
-            ? evaluation.jitterResult.jitterPassed
-            : null,
-        });
+        statistics = recordEvaluationCompat(
+          statistics,
+          {
+            score: evaluation.baseScore.finalScore,
+            passed: evaluation.finalPassed,
+            stressPassed: evaluation.costStressPassed,
+            jitterPassed: evaluation.jitterResult.enabled
+              ? evaluation.jitterResult.jitterPassed
+              : null,
+          },
+          frozenStatsBestScore,
+        );
         if (!evaluation.finalPassed) {
           failureReasons.push({
             code: "EVALUATION_FAILED_GATES",
@@ -807,13 +982,17 @@ export async function runSearchJob(
         if (!robustnessReject) {
           statistics = recordError(statistics);
         }
-        statistics = recordEvaluation(statistics, {
-          score: null,
-          passed: false,
-          stressPassed: false,
-          jitterPassed: false,
-          evaluationFailed: !robustnessReject,
-        });
+        statistics = recordEvaluationCompat(
+          statistics,
+          {
+            score: null,
+            passed: false,
+            stressPassed: false,
+            jitterPassed: false,
+            evaluationFailed: !robustnessReject,
+          },
+          frozenStatsBestScore,
+        );
         failureReasons.push({
           code:
             jitterCode ??
@@ -826,12 +1005,20 @@ export async function runSearchJob(
 
       const durationMs = Date.now() - iterStarted;
       const trial = trialFromEvaluation({
-        jobId: job.id,
+        job,
         iteration,
         candidate,
         evaluation,
         failureReasons,
         durationMs,
+        costConfig: input.baseCostConfig,
+        windows: input.windows,
+        evaluationBalance: input.balance,
+        passPolicy: input.passPolicy,
+        scoreWeights: input.scoreWeights,
+        costStressScenarios: input.costStressScenarios,
+        jitterConfig: input.jitterConfig,
+        eventSequenceCostModel,
       });
       if (persistSearchTrialSafe(trial, store) === "conflict") {
         statistics = recordError(statistics);
@@ -852,6 +1039,7 @@ export async function runSearchJob(
           lastParentCandidateId: lastParent?.candidateId ?? null,
           lastParentParamsHash: lastParent?.paramsHash ?? null,
           jobStatus: "running",
+          repeatedErrorSignatures: { ...repeatedErrorSignatures },
         };
         job = await persistCheckpointWithRetry(
           job.id,
@@ -861,6 +1049,7 @@ export async function runSearchJob(
             payload,
             bestCandidate,
             bestPassedCandidate,
+            bestByCompatibilityGroup: groupBest,
           }),
           store,
           maxCheckpointRetries,
@@ -882,22 +1071,19 @@ export async function runSearchJob(
         }
       }
 
-      // Best candidate updates (never overwrite with worse)
-      const ref: StrategySearchBestCandidateReference = {
-        candidateId: candidate.candidateId,
-        iteration,
-        paramsHash: candidate.paramsHash,
-        score: trial.score,
-        passed: trial.passed,
-      };
-      if (isBetterScore(bestCandidate?.score ?? null, ref.score)) {
-        bestCandidate = { ...ref };
-      }
+      // Group-local CHAMP-A only. Global scalars stay historical/display.
       if (
-        trial.passed &&
-        isBetterScore(bestPassedCandidate?.score ?? null, ref.score)
+        trial.rankingCompatibilityGroup &&
+        trial.rankingCompatibilityGroup !== "unknown_legacy" &&
+        trial.rankingEligible !== false
       ) {
-        bestPassedCandidate = { ...ref, passed: true };
+        groupBest = applyGroupChampA(groupBest, trial.rankingCompatibilityGroup, {
+          candidateId: candidate.candidateId,
+          iteration,
+          paramsHash: candidate.paramsHash,
+          score: trial.score,
+          passed: trial.passed,
+        });
       }
 
       lastParent = candidate;
@@ -920,6 +1106,7 @@ export async function runSearchJob(
         lastParentCandidateId: candidate.candidateId,
         lastParentParamsHash: candidate.paramsHash,
         jobStatus: "running",
+        repeatedErrorSignatures: { ...repeatedErrorSignatures },
       };
 
       job = await persistCheckpointWithRetry(
@@ -930,6 +1117,7 @@ export async function runSearchJob(
           payload,
           bestCandidate,
           bestPassedCandidate,
+          bestByCompatibilityGroup: groupBest,
         }),
         store,
         maxCheckpointRetries,
@@ -960,6 +1148,7 @@ export async function runSearchJob(
             payload,
             bestCandidate,
             bestPassedCandidate,
+            bestByCompatibilityGroup: groupBest,
           }),
           store,
           maxCheckpointRetries,

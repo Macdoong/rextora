@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build --webpack",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "verify:rextora": "node scripts/verify-rextora.mjs",
     "perf:audit": "node scripts/perf-audit.mjs",
     "test:e2e": "playwright test",
+    "auth:bootstrap": "node scripts/rextora-auth-bootstrap.mjs",
     "check:prelive": "npm run lint && npm run build && npm run verify:rextora"
   },
   "dependencies": {

@@ -26,7 +26,8 @@ export class StrategySearchGenerationError extends Error {
     | "VALIDATION_FAILED"
     | "PROTECTED_HASH_COLLISION"
     | "DUPLICATE_EXHAUSTED"
-    | "INVALID_INPUT";
+    | "INVALID_INPUT"
+    | "CONFIGURATION_INVALID";
 
   constructor(
     code: StrategySearchGenerationError["code"],
@@ -277,7 +278,7 @@ export function generateRandomCandidate(
   const rangeCheck = validateSearchParameterRanges(input.parameterRanges);
   if (!rangeCheck.ok) {
     throw new StrategySearchGenerationError(
-      "VALIDATION_FAILED",
+      "CONFIGURATION_INVALID",
       `invalid parameterRanges: ${rangeCheck.issues[0]?.message}`,
     );
   }
@@ -322,7 +323,7 @@ export function generateLocalCandidate(
   const rangeCheck = validateSearchParameterRanges(input.parameterRanges);
   if (!rangeCheck.ok) {
     throw new StrategySearchGenerationError(
-      "VALIDATION_FAILED",
+      "CONFIGURATION_INVALID",
       `invalid parameterRanges: ${rangeCheck.issues[0]?.message}`,
     );
   }

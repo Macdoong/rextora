@@ -10,13 +10,12 @@ import {
   saveSearchTrial,
   type StrategySearchConfig,
 } from "../src/lib/rextora/strategySearch";
+import { strategySearchRoot } from "../src/lib/rextora/storage/runtimePaths";
+import { isPathInsideProductionRextoraStore } from "../src/lib/rextora/storage/testStoreGuard";
 
-const DEFAULT_ROOT = path.join(
-  process.cwd(),
-  "data",
-  "rextora",
-  "strategy-search",
-);
+function defaultRoot(): string {
+  return strategySearchRoot();
+}
 
 const SAFE_DIR = path.join(process.cwd(), "data", "strategies");
 
@@ -59,13 +58,19 @@ afterEach(() => {
   if (createdJobId) {
     const jobId = createdJobId;
     createdJobId = null;
-    removeIfExists(path.join(DEFAULT_ROOT, "jobs", `${jobId}.json`));
-    removeIfExists(path.join(DEFAULT_ROOT, "jobs", `${jobId}.json.tmp`));
-    removeIfExists(path.join(DEFAULT_ROOT, "jobs", `${jobId}.json.bak`));
-    removeIfExists(path.join(DEFAULT_ROOT, "trials", jobId));
+    const isolatedRoot = defaultRoot();
+    if (isPathInsideProductionRextoraStore(isolatedRoot)) {
+      throw new Error(
+        "strategySearchDefaultRoot cleanup refused to touch production data/rextora",
+      );
+    }
+    removeIfExists(path.join(isolatedRoot, "jobs", `${jobId}.json`));
+    removeIfExists(path.join(isolatedRoot, "jobs", `${jobId}.json.tmp`));
+    removeIfExists(path.join(isolatedRoot, "jobs", `${jobId}.json.bak`));
+    removeIfExists(path.join(isolatedRoot, "trials", jobId));
 
     // Rebuild index without this job if index exists
-    const indexPath = path.join(DEFAULT_ROOT, "index.json");
+    const indexPath = path.join(isolatedRoot, "index.json");
     if (fs.existsSync(indexPath)) {
       try {
         const index = JSON.parse(fs.readFileSync(indexPath, "utf8")) as {
@@ -99,23 +104,23 @@ afterEach(() => {
     }
 
     if (!jobsDirExistedBefore) {
-      const jobsDir = path.join(DEFAULT_ROOT, "jobs");
+      const jobsDir = path.join(isolatedRoot, "jobs");
       if (fs.existsSync(jobsDir) && fs.readdirSync(jobsDir).length === 0) {
         fs.rmdirSync(jobsDir);
       }
     }
     if (!trialsDirExistedBefore) {
-      const trialsDir = path.join(DEFAULT_ROOT, "trials");
+      const trialsDir = path.join(isolatedRoot, "trials");
       if (fs.existsSync(trialsDir) && fs.readdirSync(trialsDir).length === 0) {
         fs.rmdirSync(trialsDir);
       }
     }
     if (!rootExistedBefore) {
       if (
-        fs.existsSync(DEFAULT_ROOT) &&
-        fs.readdirSync(DEFAULT_ROOT).length === 0
+        fs.existsSync(isolatedRoot) &&
+        fs.readdirSync(isolatedRoot).length === 0
       ) {
-        fs.rmdirSync(DEFAULT_ROOT);
+        fs.rmdirSync(isolatedRoot);
       }
     }
   }
@@ -123,10 +128,11 @@ afterEach(() => {
 
 describe("strategySearch default root restart", () => {
   it("persists and reloads through the real default runtime root", () => {
-    rootExistedBefore = fs.existsSync(DEFAULT_ROOT);
-    jobsDirExistedBefore = fs.existsSync(path.join(DEFAULT_ROOT, "jobs"));
-    trialsDirExistedBefore = fs.existsSync(path.join(DEFAULT_ROOT, "trials"));
-    indexExistedBefore = fs.existsSync(path.join(DEFAULT_ROOT, "index.json"));
+    const isolatedRoot = defaultRoot();
+    rootExistedBefore = fs.existsSync(isolatedRoot);
+    jobsDirExistedBefore = fs.existsSync(path.join(isolatedRoot, "jobs"));
+    trialsDirExistedBefore = fs.existsSync(path.join(isolatedRoot, "trials"));
+    indexExistedBefore = fs.existsSync(path.join(isolatedRoot, "index.json"));
 
     const safeBefore = fs.readFileSync(
       path.join(SAFE_DIR, "SAFE_v44_i4060.json"),
@@ -190,10 +196,10 @@ describe("strategySearch default root restart", () => {
     expect(reloadedTrial?.candidateId).toBe(trial.candidateId);
 
     expect(
-      fs.existsSync(path.join(DEFAULT_ROOT, "jobs", `${job.id}.json`)),
+      fs.existsSync(path.join(defaultRoot(), "jobs", `${job.id}.json`)),
     ).toBe(true);
     expect(
-      fs.existsSync(path.join(DEFAULT_ROOT, "trials", job.id, "00000000.json")),
+      fs.existsSync(path.join(defaultRoot(), "trials", job.id, "00000000.json")),
     ).toBe(true);
 
     const safeAfter = fs.readFileSync(

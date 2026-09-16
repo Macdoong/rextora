@@ -7,6 +7,11 @@ import { loadSafeV44Strategy } from "../strategy/safeV44Strategy";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { buildBacktestReport, type BacktestReport } from "./backtestReport";
 import type { BacktestZeroTradeDiagnostics } from "./backtestTypes";
+import {
+  SLIPPAGE_MODEL_EXECUTION_PRICE_V1,
+  applyAdverseSlippage,
+  toSlippageSide,
+} from "./executionSlippage";
 
 export interface BacktestTrade {
   symbol: string;
@@ -35,7 +40,9 @@ export interface BacktestTrade {
   grossPnlUsdt?: number;
   netPnlUsdt?: number;
   feeCostUsdt?: number;
+  /** Economic attribution (unslipped gross − execution gross). Not deducted again. */
   slippageCostUsdt?: number;
+  slippageAttributionUsdt?: number;
   spreadCostUsdt?: number;
   fundingCostUsdt?: number;
 }
@@ -75,28 +82,56 @@ function bumpReason(map: Record<string, number>, reason: string) {
   map[reason] = (map[reason] ?? 0) + 1;
 }
 
-function ledgerFields(
-  margin: number,
-  leverage: number,
-  raw: number,
-  feePct: number,
-  slipPct: number,
-  fundingPct: number,
-  spreadPct: number,
-  pnlPct: number,
-  quantity: number,
-) {
+function signedPriceReturn(
+  side: "LONG" | "SHORT",
+  entry: number,
+  exit: number,
+): number {
+  return side === "LONG" ? (exit - entry) / entry : (entry - exit) / entry;
+}
+
+function ledgerFields(input: {
+  margin: number;
+  leverage: number;
+  executionReturn: number;
+  unslippedReturn: number;
+  feePct: number;
+  fundingPct: number;
+  spreadPct: number;
+  pnlPct: number;
+  quantity: number;
+}) {
+  const {
+    margin,
+    leverage,
+    executionReturn,
+    unslippedReturn,
+    feePct,
+    fundingPct,
+    spreadPct,
+    pnlPct,
+    quantity,
+  } = input;
   const feeCostUsdt = Number((margin * feePct * leverage).toFixed(6));
-  const slippageCostUsdt = Number((margin * slipPct * leverage).toFixed(6));
   const spreadCostUsdt = Number((margin * spreadPct * leverage).toFixed(6));
   const fundingCostUsdt = Number((margin * fundingPct * leverage).toFixed(6));
-  const grossPnlUsdt = Number((margin * raw * leverage).toFixed(6));
+  const grossPnlUsdt = Number((margin * executionReturn * leverage).toFixed(6));
+  const unslippedGrossUsdt = Number(
+    (margin * unslippedReturn * leverage).toFixed(6),
+  );
+  const slippageAttributionUsdt = Number(
+    (unslippedGrossUsdt - grossPnlUsdt).toFixed(6),
+  );
+  const notional = margin * leverage;
+  const slippagePct = notional > 0 ? slippageAttributionUsdt / notional : 0;
   const netPnlUsdt = Number((margin * pnlPct).toFixed(6));
   return {
     marginUsdt: Number(margin.toFixed(6)),
     quantity: Number(quantity.toFixed(8)),
     feeCostUsdt,
-    slippageCostUsdt,
+    slippageCostUsdt: slippageAttributionUsdt,
+    slippageAttributionUsdt,
+    slippagePct: Number(slippagePct.toFixed(8)),
     spreadCostUsdt,
     fundingCostUsdt,
     grossPnlUsdt,
@@ -133,12 +168,13 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
   let peak = balance0;
   let lastEntryBar: number | null = null;
 
-  let open:
+      let open:
     | {
         side: "LONG" | "SHORT";
         signalType: string;
         entryBar: number;
         entryPrice: number;
+        rawEntryPrice: number;
         stopLoss: number;
         takeProfit: number;
         trailDistance: number;
@@ -179,20 +215,41 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       }
 
       if (exitPrice != null && exitReason) {
-        const slip = exitReason === "max_hold" ? slippageRate : 0;
-        const px = open.side === "LONG" ? exitPrice * (1 - slip) : exitPrice * (1 + slip);
-        const raw =
-          open.side === "LONG"
-            ? (px - open.entryPrice) / open.entryPrice
-            : (open.entryPrice - px) / open.entryPrice;
+        const execExit = applyAdverseSlippage({
+          side: toSlippageSide(open.side),
+          action: "exit",
+          rawPrice: exitPrice,
+          slippageRate,
+        });
+        const executionReturn = signedPriceReturn(
+          open.side,
+          open.entryPrice,
+          execExit,
+        );
+        const unslippedReturn = signedPriceReturn(
+          open.side,
+          open.rawEntryPrice,
+          exitPrice,
+        );
         const feePct = feeRate * 2;
         const fundingPct = fundingRate;
-        const slipPct = slip * 2;
         const spreadPct = spreadRate;
-        const pnlPct = (raw - feePct - slipPct - fundingPct - spreadPct) * open.leverage;
+        const pnlPct =
+          (executionReturn - feePct - fundingPct - spreadPct) * open.leverage;
         equity = equity + open.margin * pnlPct;
         peak = Math.max(peak, equity);
         equityCurve.push(equity);
+        const ledger = ledgerFields({
+          margin: open.margin,
+          leverage: open.leverage,
+          executionReturn,
+          unslippedReturn,
+          feePct,
+          fundingPct,
+          spreadPct,
+          pnlPct,
+          quantity: open.quantity,
+        });
 
         trades.push({
           symbol: input.symbol,
@@ -201,30 +258,19 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
           entryBar: open.entryBar,
           exitBar: i,
           entryPrice: open.entryPrice,
-          exitPrice: px,
+          exitPrice: execExit,
           stopLoss: stop,
           takeProfit: open.takeProfit,
           leverage: open.leverage,
           pnlPct,
           feePct,
-          slippagePct: slipPct,
           fundingPct,
           spreadPct,
           exitReason,
           entryTime: candles[open.entryBar]?.openTime,
           exitTime: candle.openTime,
           holdBars: i - open.entryBar,
-          ...ledgerFields(
-            open.margin,
-            open.leverage,
-            raw,
-            feePct,
-            slipPct,
-            fundingPct,
-            spreadPct,
-            pnlPct,
-            open.quantity,
-          ),
+          ...ledger,
         });
         lastEntryBar = open.entryBar;
         open = null;
@@ -279,12 +325,18 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       continue;
     }
 
-    const entrySlip = signal.side === "LONG" ? 1 + slippageRate : 1 - slippageRate;
+    const entrySlipSide = toSlippageSide(signal.side);
     open = {
       side: signal.side,
       signalType: signal.signalType,
       entryBar: i,
-      entryPrice: risk.entryPrice * entrySlip,
+      entryPrice: applyAdverseSlippage({
+        side: entrySlipSide,
+        action: "entry",
+        rawPrice: risk.entryPrice,
+        slippageRate,
+      }),
+      rawEntryPrice: risk.entryPrice,
       stopLoss: risk.stopLossPrice,
       takeProfit: risk.takeProfitPrice,
       trailDistance: risk.trailingStopDistance,
@@ -297,18 +349,41 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
 
   if (open) {
     const last = candles[candles.length - 1];
-    const px = last.close;
-    const raw =
-      open.side === "LONG"
-        ? (px - open.entryPrice) / open.entryPrice
-        : (open.entryPrice - px) / open.entryPrice;
+    const rawExit = last.close;
+    const execExit = applyAdverseSlippage({
+      side: toSlippageSide(open.side),
+      action: "exit",
+      rawPrice: rawExit,
+      slippageRate,
+    });
+    const executionReturn = signedPriceReturn(
+      open.side,
+      open.entryPrice,
+      execExit,
+    );
+    const unslippedReturn = signedPriceReturn(
+      open.side,
+      open.rawEntryPrice,
+      rawExit,
+    );
     const feePct = feeRate * 2;
     const fundingPct = fundingRate;
     const spreadPct = spreadRate;
-    const slipPct = 0;
-    const pnlPct = (raw - feePct - fundingPct - spreadPct) * open.leverage;
+    const pnlPct =
+      (executionReturn - feePct - fundingPct - spreadPct) * open.leverage;
     equity = equity + open.margin * pnlPct;
     equityCurve.push(equity);
+    const ledger = ledgerFields({
+      margin: open.margin,
+      leverage: open.leverage,
+      executionReturn,
+      unslippedReturn,
+      feePct,
+      fundingPct,
+      spreadPct,
+      pnlPct,
+      quantity: open.quantity,
+    });
     trades.push({
       symbol: input.symbol,
       side: open.side,
@@ -316,7 +391,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       entryBar: open.entryBar,
       exitBar: candles.length - 1,
       entryPrice: open.entryPrice,
-      exitPrice: px,
+      exitPrice: execExit,
       stopLoss: open.stopLoss,
       takeProfit: open.takeProfit,
       leverage: open.leverage,
@@ -328,17 +403,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       entryTime: candles[open.entryBar]?.openTime,
       exitTime: last.openTime,
       holdBars: candles.length - 1 - open.entryBar,
-      ...ledgerFields(
-        open.margin,
-        open.leverage,
-        raw,
-        feePct,
-        slipPct,
-        fundingPct,
-        spreadPct,
-        pnlPct,
-        open.quantity,
-      ),
+      ...ledger,
     });
   }
 
@@ -392,6 +457,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
     fundingApplied: Boolean(input.applyFunding),
     spreadApplied: Boolean(input.applySpread),
     paramsHashVerified: paramsHash === strategy.paramsHash || Boolean(input.paramsHash),
+    slippageModelVersion: SLIPPAGE_MODEL_EXECUTION_PRICE_V1,
     zeroTradeDiagnostics
   });
 

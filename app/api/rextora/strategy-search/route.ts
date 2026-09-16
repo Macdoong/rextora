@@ -2,6 +2,7 @@ import {
   createStrategySearchJobApi,
   listStrategySearchJobsApi,
 } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 import {
   strategySearchError,
   strategySearchJson,
@@ -9,6 +10,9 @@ import {
 
 /** GET /api/rextora/strategy-search — list newest jobs (default limit 20) */
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const url = new URL(request.url);
@@ -38,6 +42,8 @@ export async function GET(request: Request) {
 
 /** POST /api/rextora/strategy-search — create job */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = await request.json().catch(() => null);

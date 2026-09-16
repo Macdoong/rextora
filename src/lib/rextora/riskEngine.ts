@@ -1,7 +1,8 @@
-import { loadRiskState, resolveRiskStateFromStatus } from "./riskStateStore";
+import { getEffectiveRiskState, loadRiskState, resolveRiskStateFromStatus } from "./riskStateStore";
 import { evaluateRiskRules, isCandidateRiskBlocked } from "./riskRules";
 import { isRiskLimitBreached } from "./safety";
 import { getRiskWarnings } from "./riskManager";
+import { getRuntimeState } from "./runtimeState";
 import { riskStatusSeed } from "./seedData";
 import type { AiCandidate, MarketCoin, RiskState, RiskStatus } from "./types";
 
@@ -11,10 +12,17 @@ export function getRiskEngineStatus(): RiskStatus {
 }
 
 export function evaluateCandidateRisk(coin: MarketCoin, signalStrength: number): { passed: boolean; reason?: string } {
-  return evaluateRiskRules(coin, signalStrength, getRiskEngineStatus());
+  return evaluateRiskRules(
+    coin,
+    signalStrength,
+    getEffectiveRiskState(getRuntimeState().mode),
+  );
 }
 
-export function isCandidateBlocked(candidate: AiCandidate, status: RiskStatus = getRiskEngineStatus()): boolean {
+export function isCandidateBlocked(
+  candidate: AiCandidate,
+  status: RiskStatus = getEffectiveRiskState(getRuntimeState().mode),
+): boolean {
   if (isCandidateRiskBlocked(candidate, status)) return true;
   if (candidate.status === "비용 초과로 차단") return true;
   return false;

@@ -38,6 +38,12 @@ import {
 import { resolveResearchOutcome } from "./researchOutcome";
 import type { StrategySearchTrial } from "./types";
 import {
+  champAHashes,
+  classifyPersistedTrial,
+  reconstructGroupBestFromTrials,
+  sortTrialsByChampA,
+} from "./researchEvaluationIdentity";
+import {
   promoteSearchCandidateToStrategy,
   promoteSelectedTrialsFromJob,
 } from "./promoteFromSearch";
@@ -186,6 +192,46 @@ export interface ResearchResultsSummary {
     nextActions: string[];
   };
   provenanceNote: string;
+  rankingGroups?: Array<{
+    rankingCompatibilityGroup:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    engineCostModel:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    rankingEligible: true;
+    bestCandidate: {
+      candidateId: string;
+      iteration: number;
+      paramsHash: string;
+      score: number | null;
+      passed: boolean;
+    } | null;
+    bestPassedCandidate: {
+      candidateId: string;
+      iteration: number;
+      paramsHash: string;
+      score: number | null;
+      passed: boolean;
+    } | null;
+    topCandidates: Array<{
+      iteration: number;
+      paramsHash: string;
+      score: number | null;
+      passed: boolean;
+    }>;
+    bestPassedParamsHash: string | null;
+    recommendedParamsHash: string | null;
+  }>;
+  unknownLegacy?: {
+    rankingCompatibilityGroup: "unknown_legacy";
+    rankingEligible: false;
+    promotionEligible: false;
+    provenanceStatus: "legacy_unclassified";
+    count: number;
+  };
 }
 
 const SOURCE_JOB_RE = /sourceResearchJobId=([^\s·]+)/;
@@ -846,7 +892,14 @@ export function buildResearchResultsSummary(
 
   const topProfit = byReturn[0] ?? null;
   const topStable = byStability[0] ?? null;
-  const topRecommend = byRecommend[0] ?? null;
+  const groupBest = job.checkpoint.bestByCompatibilityGroup?.length
+    ? job.checkpoint.bestByCompatibilityGroup
+    : reconstructGroupBestFromTrials(trials);
+  const recommendedHashes = champAHashes(groupBest);
+  const champCards = recommendedHashes
+    .map((hash) => representatives.find((card) => card.paramsHash === hash) ?? null)
+    .filter((card): card is ResearchResultCard => card != null);
+  const topRecommend = champCards.length === 1 ? champCards[0] : null;
 
   const roleByHash = new Map<string, StrategyRoleBadge[]>();
   const pushRole = (hash: string | undefined, role: StrategyRoleBadge) => {
@@ -857,7 +910,9 @@ export function buildResearchResultsSummary(
   };
   pushRole(topProfit?.paramsHash, "TOP 수익");
   pushRole(topStable?.paramsHash, "TOP 안정");
-  pushRole(topRecommend?.paramsHash, "최종 추천");
+  for (const hash of recommendedHashes) {
+    pushRole(hash, "최종 추천");
+  }
 
   const withRoles = (card: ResearchResultCard): ResearchResultCard => ({
     ...card,
@@ -964,6 +1019,7 @@ export function buildResearchResultsSummary(
     representatives: representatives.map(withRoles),
     previousSameScope,
     options,
+    champAHashes: recommendedHashes,
   });
   const isTerminal =
     job.status === "completed" ||
@@ -1089,6 +1145,43 @@ export function buildResearchResultsSummary(
     topProfit: topProfit ? withRoles(topProfit) : null,
     topStable: topStable ? withRoles(topStable) : null,
     topRecommend: topRecommend ? withRoles(topRecommend) : null,
+    rankingGroups: groupBest.map((row) => ({
+      rankingCompatibilityGroup: row.rankingCompatibilityGroup,
+      engineCostModel: row.rankingCompatibilityGroup,
+      rankingEligible: true as const,
+      bestCandidate: row.bestCandidate ? { ...row.bestCandidate } : null,
+      bestPassedCandidate: row.bestPassedCandidate
+        ? { ...row.bestPassedCandidate }
+        : null,
+      topCandidates: sortTrialsByChampA(
+        trials.filter((trial) => {
+          const classified = classifyPersistedTrial(trial);
+          return (
+            classified.rankingEligible &&
+            classified.rankingCompatibilityGroup ===
+              row.rankingCompatibilityGroup
+          );
+        }),
+      )
+        .slice(0, 10)
+        .map((trial) => ({
+          iteration: trial.iteration,
+          paramsHash: trial.paramsHash,
+          score: trial.score,
+          passed: trial.passed,
+        })),
+      bestPassedParamsHash: row.bestPassedCandidate?.paramsHash ?? null,
+      recommendedParamsHash: row.bestPassedCandidate?.paramsHash ?? null,
+    })),
+    unknownLegacy: {
+      rankingCompatibilityGroup: "unknown_legacy" as const,
+      rankingEligible: false,
+      promotionEligible: false,
+      provenanceStatus: "legacy_unclassified" as const,
+      count: trials.filter(
+        (t) => classifyPersistedTrial(t).class === "UNKNOWN_LEGACY",
+      ).length,
+    },
     backtestRecommendations,
     top10: top10Cards,
     top10RankChanges: top10Snapshot.rankChanges,

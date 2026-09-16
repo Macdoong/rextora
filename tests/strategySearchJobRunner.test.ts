@@ -241,9 +241,14 @@ describe("strategySearch jobRunner", () => {
     expect(result.job.status).toBe("completed");
     expect(result.statistics.generated).toBe(3);
     expect(result.statistics.evaluated).toBe(3);
-    expect(result.statistics.bestScore).toBe(5);
+    expect(result.statistics.bestScore).toBeNull();
+    expect(result.job.checkpoint.bestCandidate).toBeNull();
     expect(listSearchTrials(job.id, opts)).toHaveLength(3);
-    expect(result.job.checkpoint.bestCandidate?.score).toBe(5);
+    expect(
+      result.job.checkpoint.bestByCompatibilityGroup?.find(
+        (row) => row.rankingCompatibilityGroup === "safe_execution_price_v1",
+      )?.bestCandidate?.score,
+    ).toBe(5);
     expect(result.job.checkpoint.completedIterations).toBe(3);
   });
 
@@ -257,8 +262,13 @@ describe("strategySearch jobRunner", () => {
       ...evalFixtures(),
       evaluate: mockEval((_i, call) => [10, 2, 7][call - 1]!),
     });
-    expect(result.job.checkpoint.bestCandidate?.score).toBe(10);
-    expect(result.statistics.bestScore).toBe(10);
+    expect(result.job.checkpoint.bestCandidate).toBeNull();
+    expect(result.statistics.bestScore).toBeNull();
+    expect(
+      result.job.checkpoint.bestByCompatibilityGroup?.find(
+        (row) => row.rankingCompatibilityGroup === "safe_execution_price_v1",
+      )?.bestCandidate?.score,
+    ).toBe(10);
   });
 
   it("recovers from candidate evaluation failures and continues", async () => {

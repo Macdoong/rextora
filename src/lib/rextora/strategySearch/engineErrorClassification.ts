@@ -3,8 +3,19 @@
  * Candidate-level failures must not terminate the Research Job unless fatal.
  */
 
+import { HistoricalDataCoverageError } from "../data/historicalDataCoverage";
+import { HistoricalCandleLoadError } from "../data/historicalCandleLoader";
+import { StrategySearchAdapterError } from "./backtestAdapter";
 import { StrategySearchGenerationError } from "./candidateGenerator";
 import { StrategySearchJitterError } from "./jitterEvaluator";
+
+const RESEARCH_DATA_ADAPTER_CODES = new Set([
+  "EMPTY_CANDLES",
+  "UNSORTED_CANDLES",
+  "DUPLICATE_CANDLE_TIME",
+  "CANDLE_OUTSIDE_WINDOW",
+  "DATA_COVERAGE_INSUFFICIENT",
+]);
 
 export type StrategySearchEngineErrorClass =
   | "candidate_invalid"
@@ -32,10 +43,53 @@ export interface ClassifiedEngineError {
   retryable: boolean;
 }
 
+function dataUnavailableClassification(
+  err: { code: string; message: string },
+  stage: string,
+): ClassifiedEngineError {
+  return {
+    class: "data_unavailable",
+    fatal: true,
+    code: err.code,
+    message: err.message,
+    stage: stage || "evaluation",
+    retryable: true,
+  };
+}
+
+export function isResearchMarketDataError(err: unknown): boolean {
+  if (err instanceof HistoricalCandleLoadError) return true;
+  if (err instanceof HistoricalDataCoverageError) return true;
+  if (err instanceof StrategySearchAdapterError) {
+    return RESEARCH_DATA_ADAPTER_CODES.has(err.code);
+  }
+  return false;
+}
+
 export function classifyEngineError(
   err: unknown,
   stage = "unknown",
 ): ClassifiedEngineError {
+  if (err instanceof HistoricalCandleLoadError) {
+    return dataUnavailableClassification(err, stage);
+  }
+  if (err instanceof HistoricalDataCoverageError) {
+    return dataUnavailableClassification(
+      { code: err.sourceReason, message: err.message },
+      stage,
+    );
+  }
+  if (err instanceof StrategySearchAdapterError) {
+    if (RESEARCH_DATA_ADAPTER_CODES.has(err.code)) {
+      return dataUnavailableClassification(
+        {
+          code: err.sourceReason ?? err.code,
+          message: err.message,
+        },
+        stage,
+      );
+    }
+  }
   if (err instanceof StrategySearchJitterError) {
     return {
       class: "robustness_failed",
@@ -47,6 +101,16 @@ export function classifyEngineError(
     };
   }
   if (err instanceof StrategySearchGenerationError) {
+    if (err.code === "CONFIGURATION_INVALID") {
+      return {
+        class: "fatal_engine_error",
+        fatal: true,
+        code: "CONFIGURATION_INVALID",
+        message: err.message,
+        stage: stage || "candidate_generation",
+        retryable: false,
+      };
+    }
     if (
       err.code === "VALIDATION_FAILED" ||
       err.code === "INVALID_INPUT" ||
@@ -198,4 +262,25 @@ export function classifyEngineError(
 export function isRecoverableGenerationError(err: unknown): boolean {
   const c = classifyEngineError(err, "candidate_generation");
   return !c.fatal && c.class === "candidate_invalid";
+}
+
+/**
+ * Stable generation-error fingerprint for repeatedSignatureThreshold.
+ * Uses only classifier-owned structured fields (code + class).
+ * Never includes raw messages, timestamps, iterations, or parameter values.
+ *
+ * The classifier emits a closed set of codes and StrategySearchEngineErrorClass
+ * values, so the fingerprint domain is finite and does not require eviction.
+ */
+export function buildRepeatedGenerationErrorFingerprint(
+  classified: Pick<ClassifiedEngineError, "code" | "class">,
+): string {
+  return `${classified.code}|${classified.class}`;
+}
+
+export function isInvalidParameterRangesError(err: unknown): boolean {
+  return (
+    err instanceof StrategySearchGenerationError &&
+    err.code === "CONFIGURATION_INVALID"
+  );
 }

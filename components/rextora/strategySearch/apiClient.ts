@@ -36,12 +36,16 @@ async function parseEnvelope<T>(res: Response): Promise<T> {
 export async function listStrategySearchJobs(opts?: {
   limit?: number;
   offset?: number;
+  signal?: AbortSignal;
 }): Promise<StrategySearchJobSummary[]> {
   const params = new URLSearchParams();
   if (opts?.limit != null) params.set("limit", String(opts.limit));
   if (opts?.offset != null) params.set("offset", String(opts.offset));
   const qs = params.toString();
-  const res = await fetch(qs ? `${BASE}?${qs}` : BASE, { cache: "no-store" });
+  const res = await fetch(qs ? `${BASE}?${qs}` : BASE, {
+    cache: "no-store",
+    signal: opts?.signal,
+  });
   return parseEnvelope(res);
 }
 
@@ -119,7 +123,7 @@ export interface StrategySearchRecoveryStatus {
   }>;
 }
 
-/** GET /recover — idempotent orphan / missing-record recovery probe. */
+/** GET /recover — read-only recovery discovery. Does not mutate. */
 export async function fetchStrategySearchRecoveryStatus(): Promise<StrategySearchRecoveryStatus> {
   const res = await fetch(`${BASE}/recover`, { cache: "no-store" });
   return parseEnvelope(res);

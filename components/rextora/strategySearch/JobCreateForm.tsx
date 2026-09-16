@@ -657,7 +657,7 @@ export function JobCreateForm(props: {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700/70 bg-slate-950/45 p-3">
+      <div className="v3-ss-level-bar flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700/70 bg-slate-950/45 p-3">
         <div>
           <p className="ss-subsection-title">설정 수준</p>
           <p className="ss-helper mt-1">

@@ -1,0 +1,111 @@
+/**
+ * V3 light-surface readability layer.
+ * Scoped to migrated V3 screens only — does not restyle unmigrated dark pages.
+ * Token contrast: muted #5f6b7a is >= 4.8:1 on all V3 light surfaces.
+ */
+
+.v3 .rextora-card-title,
+.v3-oc .rextora-card-title,
+.v3-oc-page .rextora-card-title,
+.v3 .rextora-section-title,
+.v3-oc-page .rextora-section-title {
+  color: var(--v3-text-primary);
+}
+
+.v3 .rextora-helper,
+.v3 .rextora-label,
+.v3 .rextora-caption,
+.v3-oc-page .rextora-helper,
+.v3-oc-page .rextora-label,
+.v3-oc-page .rextora-caption,
+.v3-oc .rextora-helper,
+.v3-oc .rextora-label {
+  color: var(--v3-text-secondary);
+}
+
+/* Default Button (tone→secondary) is dark-slate + text-slate-100.
+   A later V3 remap of .text-slate-100 to primary made CTA text dark-on-dark. */
+.v3 button.rextora-btn-text.text-slate-100:not([data-testid^="delete-job-"]):not([data-testid^="library-delete-"]):not([data-testid="bulk-delete"]):not([data-testid="raw-trial-cleanup"]):not([data-testid="risk-settings-reset"]),
+.v3-oc-page button.rextora-btn-text.text-slate-100,
+.v3-oc button.rextora-btn-text.text-slate-100 {
+  background: linear-gradient(180deg, var(--v3-brand), var(--v3-brand-hover)) !important;
+  color: var(--v3-text-on-brand) !important;
+  border-color: transparent !important;
+}
+
+.v3 button.rextora-btn-text.bg-sky-600,
+.v3-oc-page button.rextora-btn-text.bg-sky-600 {
+  background: linear-gradient(180deg, var(--v3-brand), var(--v3-brand-hover));
+  color: var(--v3-text-on-brand);
+  border-color: transparent;
+}
+
+.v3 button.rextora-btn-text.bg-transparent,
+.v3-oc-page button.rextora-btn-text.bg-transparent {
+  background: #fff;
+  color: var(--v3-text-primary);
+  border-color: var(--v3-border);
+}
+
+.v3 button.rextora-btn-text.text-slate-300,
+.v3-oc-page button.rextora-btn-text.text-slate-300 {
+  color: var(--v3-brand);
+  background: transparent;
+  border-color: transparent;
+}
+
+.v3 button.rextora-btn-text:disabled,
+.v3-oc-page button.rextora-btn-text:disabled,
+.v3-oc button.rextora-btn-text:disabled {
+  opacity: 0.55;
+  color: var(--v3-text-on-brand);
+}
+
+.v3 button.rextora-btn-text.bg-transparent:disabled,
+.v3-oc-page button.rextora-btn-text.bg-transparent:disabled {
+  color: var(--v3-text-disabled);
+}
+
+/* AI strip: pale mint Tailwind classes were authored for dark pages. */
+.v3 [data-testid="agent-context-strip"],
+.v3-oc-page [data-testid="agent-context-strip"] {
+  background: var(--v3-surface);
+  border-color: var(--v3-border);
+  color: var(--v3-text-secondary);
+}
+
+.v3 [data-testid="agent-context-strip"] p,
+.v3-oc-page [data-testid="agent-context-strip"] p {
+  color: var(--v3-text-secondary);
+}
+
+.v3 [data-testid="agent-context-strip"] .text-emerald-400,
+.v3 [data-testid="agent-context-strip"] svg.text-emerald-400,
+.v3-oc-page [data-testid="agent-context-strip"] .text-emerald-400 {
+  color: var(--v3-ai);
+}
+
+.v3 [data-testid="agent-context-strip"] button,
+.v3-oc-page [data-testid="agent-context-strip"] button {
+  color: var(--v3-ai);
+  background: #fff;
+  border-color: var(--v3-border);
+}
+
+.v3 [data-testid="agent-context-strip"] .bg-emerald-600\/15,
+.v3-oc-page [data-testid="agent-context-strip"] .bg-emerald-600\/15 {
+  background: var(--v3-ai-soft);
+  color: var(--v3-ai);
+}
+
+/* Destructive actions must not inherit the brand CTA remap. */
+.v3-results button.rextora-btn-text[data-testid^="library-delete-"],
+.v3-results button.rextora-btn-text[data-testid^="delete-job-"],
+.v3-results button.rextora-btn-text[data-testid="bulk-delete"],
+.v3-results button.rextora-btn-text[data-testid="raw-trial-cleanup"],
+.v3 button.rextora-btn-text.bg-red-600\/90,
+.v3-oc-page button.rextora-btn-text.bg-red-600\/90 {
+  background: var(--v3-danger-soft) !important;
+  color: var(--v3-danger) !important;
+  border-color: #f3c4c4 !important;
+}

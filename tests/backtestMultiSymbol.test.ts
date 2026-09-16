@@ -18,6 +18,7 @@ import {
 } from "../src/lib/rextora/backtest/visualAnalysis";
 import { ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
 import * as loader from "../src/lib/rextora/data/historicalCandleLoader";
+import { authedRequest } from "./helpers/authSession";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
 const isolatedStrategies = installIsolatedStrategyStore();
@@ -191,7 +192,7 @@ describe("multi-symbol backtest preservation", () => {
   it("API returns symbolResults array for multi-symbol", async () => {
     mockOkLoad({ BTCUSDT: 1, ETHUSDT: 2 });
     const { POST } = await import("../app/api/rextora/backtest/run/route");
-    const req = new Request("http://localhost/api/rextora/backtest/run", {
+    const req = await authedRequest("http://localhost/api/rextora/backtest/run", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -202,7 +203,7 @@ describe("multi-symbol backtest preservation", () => {
         toOpenTime: TO,
         balance: 10_000,
       }),
-    });
+    }, "operator");
     const res = await POST(req);
     const json = await res.json();
     expect(json.ok).toBe(true);
@@ -273,10 +274,13 @@ describe("distribution and holding reconciliation", () => {
 
     const costSum =
       model.costs.feeCostUsdt +
-      model.costs.slippageCostUsdt +
       model.costs.spreadCostUsdt +
       model.costs.fundingCostUsdt;
     expect(costSum).toBeCloseTo(model.costs.totalCostUsdt, 4);
+    expect(model.costs.totalEconomicFrictionUsdt).toBeCloseTo(
+      costSum + model.costs.slippageCostUsdt,
+      4,
+    );
 
     const stress = result.report.costStress ?? [];
     const base = stress.find((s) => s.multiplier === 1);

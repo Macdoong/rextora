@@ -8,6 +8,7 @@ import {
   type FollowUpSource,
 } from "@/src/lib/rextora/strategySearch/followUpResearch";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * POST /api/rextora/strategy-search/follow-up
@@ -15,6 +16,8 @@ import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiS
  * Does NOT create/start a job and does NOT touch SAFE.
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => null)) as {

@@ -19,6 +19,11 @@ import {
   type PipelineUiStatus,
 } from "./formatters";
 import { cleanStrategyDisplayName } from "./displayNames";
+import { ResearchRankingGroups } from "./ResearchRankingGroups";
+import {
+  formatGroupAwareStatus,
+  hasAuthoritativeRankingGroups,
+} from "@/src/lib/rextora/researchRankingReadModel";
 
 function formatClock(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -321,6 +326,7 @@ export function SearchStatusCard(props: {
         : null;
   const bestReturn = formatPct(job.bestReturn);
   const progression = job.searchProgression ?? [];
+  const groupAware = hasAuthoritativeRankingGroups(job);
   const bestSummary = job.currentBestSummary
     ? cleanStrategyDisplayName(job.currentBestSummary)
     : null;
@@ -342,6 +348,25 @@ export function SearchStatusCard(props: {
   const errorStatus = formatErrorStatusKo(
     counters?.evaluationErrors ?? stats?.errors ?? 0,
   );
+  const errorWarningActive = job.errorWarningActive === true;
+  const errorRatePct =
+    typeof job.errorRate === "number" && Number.isFinite(job.errorRate)
+      ? `${Math.round(job.errorRate * 1000) / 10}%`
+      : null;
+  const errorWarningRatePct =
+    typeof job.errorWarningRate === "number" &&
+    Number.isFinite(job.errorWarningRate)
+      ? `${Math.round(job.errorWarningRate * 1000) / 10}%`
+      : null;
+  const errorWarningHint = errorWarningActive
+    ? `계산 오류율이 경고 기준을 초과했습니다.${
+        errorRatePct && errorWarningRatePct
+          ? ` 현재 ${errorRatePct} · 기준 ${errorWarningRatePct}.`
+          : ""
+      } 탐색은 계속됩니다.`
+    : counters && !counters.invariantOk
+      ? "계수 불일치 — 상세 정보를 확인하세요."
+      : "계산 오류는 조건 탈락과 겹치지 않습니다.";
   const evaluatedCount = counters?.evaluated ?? stats?.evaluated ?? tested;
   const rejectedCount =
     counters?.rejected ??
@@ -440,6 +465,14 @@ export function SearchStatusCard(props: {
               ? ` · ${combinationLabel ?? job.currentSearchFamily}`
               : ""}
           </p>
+          {job.status === "interrupted" && job.recoveryBlocker ? (
+            <p
+              className="mt-1 break-words text-xs text-amber-200"
+              data-testid="ss-recovery-blocker"
+            >
+              복구 불가 · {job.recoveryBlocker}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -489,9 +522,19 @@ export function SearchStatusCard(props: {
           emphasize
         />
         <StatBlock
-          label="현재 최고"
-          value={bestSummary ?? bestReturn ?? "—"}
-          hint={bestSummary && bestReturn ? bestReturn : null}
+          label={groupAware ? "평가 그룹" : "현재 최고"}
+          value={
+            groupAware
+              ? formatGroupAwareStatus(job)
+              : (bestSummary ?? bestReturn ?? "—")
+          }
+          hint={
+            groupAware
+              ? "SAFE와 패턴은 따로 평가합니다."
+              : bestSummary && bestReturn
+                ? bestReturn
+                : "기존 평가 형식"
+          }
           testId="ss-best-return"
           emphasize
         />
@@ -560,14 +603,31 @@ export function SearchStatusCard(props: {
         <StatBlock
           label="오류 상태"
           value={errorStatus}
-          hint={
-            counters && !counters.invariantOk
-              ? "계수 불일치 — 상세 정보를 확인하세요."
-              : "계산 오류는 조건 탈락과 겹치지 않습니다."
-          }
+          hint={errorWarningHint}
           testId="ss-error-status"
         />
       </div>
+      <ResearchRankingGroups
+        source={job}
+        unknownLegacy={job.unknownLegacy}
+      />
+      {errorWarningActive ? (
+        <div
+          className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+          data-testid="ss-error-rate-warning"
+          role="status"
+        >
+          <p className="font-medium">
+            계산 오류율이 경고 기준을 초과했습니다.
+          </p>
+          <p className="mt-1 text-xs text-amber-100/80">
+            {errorRatePct && errorWarningRatePct
+              ? `현재 계산 오류율 ${errorRatePct} · 경고 기준 ${errorWarningRatePct}. `
+              : ""}
+            경고이며 탐색이 일시정지되거나 실패하지 않았습니다.
+          </p>
+        </div>
+      ) : null}
 
       {job.appliedSearchSummary?.sections?.length ? (
         <details
@@ -604,14 +664,16 @@ export function SearchStatusCard(props: {
         </details>
       ) : null}
 
+      {groupAware ? null : (
       <div
         className="rounded-xl border border-[var(--border)] bg-[var(--panel-strong)] px-4 py-3"
         data-testid="ss-live-top10"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="ss-field-label">
+            기존 평가 형식 ·{" "}
             {qualifiedCount > 0
-              ? "실시간 TOP 10"
+              ? "실시간 TOP 10 숏리스트 · 표시용"
               : "임시 평가 상위 후보 — 합격 아님"}
           </div>
           <div
@@ -663,7 +725,7 @@ export function SearchStatusCard(props: {
                     : job.liveTop10.entries.slice(0, 3)
                   ).map((row) => {
                     const move = movementLabelKo(row.rankChangeShort);
-                    const isTop = row.rank === 1;
+                    const isTop = !groupAware && row.rank === 1;
                     const isNew = move === "신규";
                     return (
                       <tr
@@ -844,6 +906,7 @@ export function SearchStatusCard(props: {
           </>
         )}
       </div>
+      )}
 
       {aiNarrative.length > 0 ? (
         <div

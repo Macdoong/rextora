@@ -18,6 +18,7 @@ import {
   type StrategySearchConfig,
 } from "../src/lib/rextora/strategySearch";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
+import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 
 const tempRoots: string[] = [];
 const SAFE_CANDIDATES = [
@@ -206,6 +207,24 @@ describe("strategySearch promote + search space exhausted", () => {
     const root = makeTempRoot();
     const store = { rootDir: root };
     const job = createSearchJob(sampleConfig({ maxIterations: 1 }), store);
+    saveJobExecutionProfile(
+      job.id,
+      {
+        version: 1,
+        balance: 10_000,
+        baseCostConfig: evalFixtures().baseCostConfig,
+        passPolicy: evalFixtures().passPolicy,
+        scoreWeights: evalFixtures().scoreWeights,
+        costStressScenarios: [],
+        jitterConfig: evalFixtures().jitterConfig,
+        dataRef: {
+          availableFrom: 1_700_000_000_000,
+          availableTo: 1_700_100_000_000,
+          source: "preloaded",
+        },
+      },
+      store,
+    );
     saveSearchTrial(
       {
         jobId: job.id,

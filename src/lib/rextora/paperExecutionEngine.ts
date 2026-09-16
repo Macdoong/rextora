@@ -3,11 +3,90 @@ import { canUsePaperMode } from "./safety";
 import { getPreservedSafeStrategy } from "./strategyRepository";
 import { saveBotMode } from "./localStore";
 import { appendPaperOrder, cancelPendingOrders, closeAllPositions, getOpenPositions, getPaperOrderHistory, upsertPosition } from "./positionManager";
+import {
+  closeEventSequencePaperPosition,
+  EVENT_SEQUENCE_PAPER_EMERGENCY_CLOSE,
+  EVENT_SEQUENCE_PAPER_MANUAL_CLOSE,
+  isEventSequencePaperOwned,
+} from "./paper/paperEventSequenceLifecycle";
 import { recordPaperEntry, recordPaperExit } from "./tradeLifecycle";
 import { getTopCandidates } from "./aiRanker";
 import { getStoredMarketCoins } from "./marketDataStore";
 import { computeUnrealizedMetrics } from "./metrics/tradeResult";
 import type { BotStatus, EngineResult, OrderRecord, Position, Strategy, AiCandidate } from "./types";
+import { loadOhlcvCandles } from "./data/candleLoader";
+import {
+  elapsedFinalizedBars,
+  latestFinalizedCandle,
+} from "./data/candleTime";
+import { resolveTimeframe } from "./data/timeframes";
+
+export interface ManagePaperPositionsOptions {
+  nowMs?: number;
+  latestFinalizedBySymbol?: Record<
+    string,
+    { openTime: number; intervalMs: number }
+  >;
+}
+
+async function resolveLatestFinalizedOpenTime(
+  symbol: string,
+  intervalMs: number,
+  nowMs: number,
+): Promise<{ openTime: number; intervalMs: number } | null> {
+  const interval =
+    intervalMs === 60_000
+      ? "1m"
+      : intervalMs === 180_000
+        ? "3m"
+        : intervalMs === 300_000
+          ? "5m"
+          : intervalMs === 3_600_000
+            ? "1h"
+            : "15m";
+  const spec = resolveTimeframe(interval);
+  const { candles } = await loadOhlcvCandles(symbol, {
+    interval: spec.binanceInterval,
+    limit: 8,
+    allowSynthetic: false,
+  });
+  const latest = latestFinalizedCandle(candles, nowMs, spec.intervalMs);
+  return latest
+    ? { openTime: latest.candle.openTime, intervalMs: spec.intervalMs }
+    : null;
+}
+
+function resolveSafePaperBarsHeld(
+  position: Position,
+  latest: { openTime: number; intervalMs: number } | null,
+): { barsHeld: number; lastManaged?: number; canApplyMaxHold: boolean } {
+  const entryOpen = position.entrySignalCandleOpenTime;
+  const intervalMs = position.entrySignalIntervalMs;
+  if (
+    typeof entryOpen !== "number" ||
+    !Number.isFinite(entryOpen) ||
+    typeof intervalMs !== "number" ||
+    intervalMs <= 0
+  ) {
+    return {
+      barsHeld: position.barsHeld ?? 0,
+      lastManaged: position.lastManagedFinalizedCandleOpenTime,
+      canApplyMaxHold: false,
+    };
+  }
+  if (!latest) {
+    return {
+      barsHeld: position.barsHeld ?? 0,
+      lastManaged: position.lastManagedFinalizedCandleOpenTime,
+      canApplyMaxHold: false,
+    };
+  }
+  return {
+    barsHeld: elapsedFinalizedBars(entryOpen, latest.openTime, latest.intervalMs || intervalMs),
+    lastManaged: latest.openTime,
+    canApplyMaxHold: true,
+  };
+}
 
 function resolveMarketPrice(symbol: string, fallback = 100): number {
   const coin = getStoredMarketCoins().find((c) => c.symbol === symbol);
@@ -68,6 +147,18 @@ export async function executePaperEntry(symbolOrCandidate?: string | AiCandidate
 export async function executePaperExit(symbol?: string): Promise<EngineResult> {
   const target = symbol ?? getPaperPosition().symbol;
   const exitPrice = resolveMarketPrice(target, 101);
+  const owned = getOpenPositions().find((p) => p.symbol === target);
+  if (owned && isEventSequencePaperOwned(owned)) {
+    const trade = closeEventSequencePaperPosition({
+      position: owned,
+      rawExitPrice: exitPrice,
+      exitReason: EVENT_SEQUENCE_PAPER_MANUAL_CLOSE,
+    });
+    if (!trade) {
+      return { ok: false, mode: "PAPER", serviceState: "paper", message: "청산할 PAPER 포지션이 없습니다." };
+    }
+    return { ok: true, mode: "PAPER", serviceState: "paper", message: `PAPER 모의 청산이 기록되었습니다: ${target}. 실제 주문은 전송되지 않습니다.` };
+  }
   const event = recordPaperExit(target, exitPrice, "수동 청산");
   if (!event) return { ok: false, mode: "PAPER", serviceState: "paper", message: "청산할 PAPER 포지션이 없습니다." };
   return { ok: true, mode: "PAPER", serviceState: "paper", message: `PAPER 모의 청산이 기록되었습니다: ${target}. 실제 주문은 전송되지 않습니다.` };
@@ -78,18 +169,37 @@ export async function executePaperExit(symbol?: string): Promise<EngineResult> {
  * them when the simulated stop-loss, take-profit, trailing stop, or max-hold is reached.
  * No real orders are placed.
  */
-export async function managePaperPositions(): Promise<{ checked: number; closed: number }> {
+export async function managePaperPositions(
+  options?: ManagePaperPositionsOptions,
+): Promise<{ checked: number; closed: number }> {
   const open = getOpenPositions();
   let closed = 0;
+  const nowMs = options?.nowMs ?? Date.now();
 
   for (const position of open) {
+    if (isEventSequencePaperOwned(position)) continue;
     const price = resolveMarketPrice(position.symbol, position.currentPrice);
     if (!Number.isFinite(price) || price <= 0) continue;
 
     const isLong = position.side === "Long";
     const side = isLong ? "LONG" : "SHORT";
     const unrealizedPnl = computeUnrealizedMetrics(side, position.entryPrice, price, position.quantity).unrealizedPnl;
-    const barsHeld = (position.barsHeld ?? 0) + 1;
+
+    let latest =
+      options?.latestFinalizedBySymbol?.[position.symbol] ?? null;
+    if (
+      !latest &&
+      typeof position.entrySignalCandleOpenTime === "number" &&
+      typeof position.entrySignalIntervalMs === "number"
+    ) {
+      latest = await resolveLatestFinalizedOpenTime(
+        position.symbol,
+        position.entrySignalIntervalMs,
+        nowMs,
+      );
+    }
+    const held = resolveSafePaperBarsHeld(position, latest);
+    const barsHeld = held.barsHeld;
 
     let stopLoss = position.stopLoss;
     if (position.trailingDistance && position.trailingDistance > 0) {
@@ -97,11 +207,21 @@ export async function managePaperPositions(): Promise<{ checked: number; closed:
       else stopLoss = Math.min(stopLoss, price + position.trailingDistance);
     }
 
-    upsertPosition({ ...position, currentPrice: price, unrealizedPnl, stopLoss, barsHeld });
+    upsertPosition({
+      ...position,
+      currentPrice: price,
+      unrealizedPnl,
+      stopLoss,
+      barsHeld,
+      lastManagedFinalizedCandleOpenTime: held.lastManaged,
+    });
 
     const hitTakeProfit = position.takeProfit > 0 && (isLong ? price >= position.takeProfit : price <= position.takeProfit);
     const hitStopLoss = stopLoss > 0 && (isLong ? price <= stopLoss : price >= stopLoss);
-    const hitMaxHold = position.maxHoldBars != null && barsHeld >= position.maxHoldBars;
+    const hitMaxHold =
+      held.canApplyMaxHold &&
+      position.maxHoldBars != null &&
+      barsHeld >= position.maxHoldBars;
 
     if (hitTakeProfit) {
       recordPaperExit(position.symbol, price, "익절");
@@ -145,6 +265,14 @@ export function simulateOrder(order: Partial<OrderRecord> = {}): OrderRecord {
 }
 
 export async function emergencyStopPaper(): Promise<EngineResult> {
+  for (const position of getOpenPositions()) {
+    if (!isEventSequencePaperOwned(position)) continue;
+    closeEventSequencePaperPosition({
+      position,
+      rawExitPrice: resolveMarketPrice(position.symbol, position.currentPrice),
+      exitReason: EVENT_SEQUENCE_PAPER_EMERGENCY_CLOSE,
+    });
+  }
   closeAllPositions();
   await cancelPaperOrders();
   await stopPaperBot();

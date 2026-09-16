@@ -3,8 +3,12 @@ import { buildFinalLiveReadinessChecklist, getExpectedRemainingLiveBlocks } from
 import { evaluateLiveSafetyGate } from "@/src/lib/rextora/liveSafetyGate";
 import { getRextoraSettings } from "@/src/lib/rextora/settings/settingsService";
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const url = new URL(request.url);

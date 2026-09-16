@@ -18,6 +18,8 @@ export interface StrategySearchRecoveryAuditRecord {
   remainingDurationMs: number | null;
   trialCount?: number;
   autoResumed?: boolean;
+  interruptionStartedAt?: string | null;
+  recoveryBlocker?: string | null;
 }
 
 function defaultRoot(): string {

@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { getProviderConfig } from "@/src/lib/rextora/agent/providerConfig";
 import { runProviderHealthChecks } from "@/src/lib/rextora/agent/agentLLM";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 /** GET /api/rextora/agent/health — Provider connectivity check. Never exposes key values. */
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const config = getProviderConfig();
 
   const checks = await runProviderHealthChecks();

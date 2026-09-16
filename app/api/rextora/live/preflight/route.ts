@@ -1,7 +1,10 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { preflightLiveExecution } from "@/src/lib/rextora/liveExecutionEngine";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "live:request");
+  if (denied) return denied;
   const start = Date.now();
   await request.json().catch(() => ({}));
 

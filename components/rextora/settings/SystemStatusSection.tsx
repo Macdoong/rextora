@@ -1,14 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { SystemStatusPanel } from "@/components/rextora/SystemStatusPanel";
+import { SettingsSystemStatusView } from "@/components/rextora/settings/SettingsSystemStatusView";
 import { ErrorState } from "@/components/rextora/ErrorState";
 import { LoadingState } from "@/components/rextora/LoadingState";
 import { PanelErrorBoundary } from "@/components/rextora/PanelShell";
-import { formatRuntimeMeta } from "@/src/lib/rextora/displayFormat";
 import type { BinanceDiagnosticsReport } from "@/src/lib/rextora/binanceDiagnosticsTypes";
 import type { SystemStatus } from "@/lib/types";
+import { formatRuntimeMeta } from "@/src/lib/rextora/displayFormat";
 import type { RuntimeState } from "@/src/lib/rextora/runtimeState";
+import { SETTINGS_SYSTEM_POLL_MS } from "@/src/lib/rextora/settings/settingsSystemStatusPresentation";
+
+type TpSlDisplay = {
+  featureReady: boolean;
+  settingEnabled: boolean;
+  managerActive: boolean;
+  displayLabel: string;
+  displayTone: "success" | "warning" | "danger" | "default";
+  nextAction: string;
+  managerStatusLabel?: string;
+  reason?: string;
+};
 
 type ExtendedSystemStatus = SystemStatus & {
   liveReadiness?: { status: string; passed: boolean; blockedReasons: string[] };
@@ -20,17 +32,12 @@ type ExtendedSystemStatus = SystemStatus & {
     description?: string;
   };
   tpSl?: { ready: boolean; openTpSlCount: number; failedTpSlCount: number };
-  tpSlDisplay?: {
-    featureReady: boolean;
-    settingEnabled: boolean;
-    managerActive: boolean;
-    displayLabel: string;
-    displayTone: "success" | "warning" | "danger" | "default";
-    nextAction: string;
-  };
+  tpSlDisplay?: TpSlDisplay;
   positionSync?: { lastSyncAt: string | null; lastError: string | null };
+  orderSync?: { lastSyncAt: string | null; lastError: string | null };
   telegram?: { configured: boolean; serviceState: string; message: string };
   settingsStore?: { ok: boolean; updatedAt: string };
+  audit?: { total: number; lastEntry: { type: string; timestamp: string } | null };
   diagnostics?: BinanceDiagnosticsReport | null;
 };
 
@@ -44,8 +51,10 @@ type SystemApiData = {
   tpSl?: ExtendedSystemStatus["tpSl"];
   tpSlDisplay?: ExtendedSystemStatus["tpSlDisplay"];
   positionSync?: ExtendedSystemStatus["positionSync"];
+  orderSync?: ExtendedSystemStatus["orderSync"];
   telegram?: ExtendedSystemStatus["telegram"];
   settingsStore?: ExtendedSystemStatus["settingsStore"];
+  audit?: ExtendedSystemStatus["audit"];
   diagnostics?: BinanceDiagnosticsReport | null;
 };
 
@@ -55,14 +64,16 @@ type ApiEnvelope<T> = {
   meta: { durationMs: number; source: string };
 };
 
-const POLL_MS = 12_000;
-
 /** Client wrapper that loads /api/rextora/system for the Settings #system section. */
-export function SystemStatusSection() {
+export function SystemStatusSection(props: {
+  defaultMode: string;
+  liveTradingEnabled: boolean;
+  allowLiveTrading: boolean;
+  serverTpSlRequired: boolean;
+  riskState: string;
+}) {
   const [status, setStatus] = useState<ExtendedSystemStatus | null>(null);
   const [runtime, setRuntime] = useState<RuntimeState | null>(null);
-  const [binanceDiagnostics, setBinanceDiagnostics] =
-    useState<BinanceDiagnosticsReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -88,11 +99,12 @@ export function SystemStatusSection() {
           tpSl: body.data.tpSl,
           tpSlDisplay: body.data.tpSlDisplay,
           positionSync: body.data.positionSync,
+          orderSync: body.data.orderSync,
           telegram: body.data.telegram,
           settingsStore: body.data.settingsStore,
+          audit: body.data.audit,
           diagnostics: body.data.diagnostics,
         });
-        if (body.data.diagnostics) setBinanceDiagnostics(body.data.diagnostics);
         setRuntime(body.data.runtime);
         setError(false);
       }
@@ -113,8 +125,8 @@ export function SystemStatusSection() {
   }, [load]);
 
   useEffect(() => {
-    const boot = window.setTimeout(() => void load(true), 0);
-    const timer = window.setInterval(() => void load(false), POLL_MS);
+    const boot = window.setTimeout(() => void load(false), 0);
+    const timer = window.setInterval(() => void load(false), SETTINGS_SYSTEM_POLL_MS);
     return () => {
       window.clearTimeout(boot);
       window.clearInterval(timer);
@@ -122,12 +134,12 @@ export function SystemStatusSection() {
   }, [load]);
 
   return (
-    <div className="space-y-3" data-testid="settings-system-section">
-      {runtime && (
-        <p className="rextora-caption" data-testid="runtime-meta">
+    <div className="space-y-3 v3-st-system" data-testid="settings-system-section">
+      {runtime ? (
+        <p className="v3-st-help" data-testid="runtime-meta">
           {formatRuntimeMeta(runtime)}
         </p>
-      )}
+      ) : null}
       <PanelErrorBoundary title="시스템 상태">
         {loading ? (
           <LoadingState lines={8} />
@@ -143,12 +155,26 @@ export function SystemStatusSection() {
             onRetry={() => void load(true)}
           />
         ) : (
-          <SystemStatusPanel
-            status={status}
-            lastCheckTime={runtime?.lastHeartbeat}
-            binanceDiagnostics={binanceDiagnostics}
+          <SettingsSystemStatusView
+            runtime={runtime}
+            engines={status.engines}
+            binance={status.binance}
+            liveReadiness={status.liveReadiness}
+            userStream={status.userStream}
+            tpSlDisplay={status.tpSlDisplay}
+            positionSync={status.positionSync}
+            orderSync={status.orderSync}
+            telegram={status.telegram}
+            settingsStore={status.settingsStore}
+            audit={status.audit}
+            diagnostics={status.diagnostics}
             diagnosticsLoading={diagnosticsLoading}
             onRefreshDiagnostics={() => void refreshDiagnostics()}
+            defaultMode={props.defaultMode}
+            liveTradingEnabled={props.liveTradingEnabled}
+            allowLiveTrading={props.allowLiveTrading}
+            serverTpSlRequired={props.serverTpSlRequired}
+            riskState={props.riskState}
           />
         )}
       </PanelErrorBoundary>

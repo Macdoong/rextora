@@ -6,8 +6,11 @@
 import { NextResponse } from "next/server";
 import { resetAgentSession } from "@/src/lib/rextora/agent/v2/session/sessionStore";
 import { sanitizeSessionId } from "@/src/lib/rextora/agent/v2/session/sessionPersistence";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 export async function POST(req: Request) {
+  const denied = await denyUnlessPermitted(req, "agent:operate");
+  if (denied) return denied;
   try {
     const body = (await req.json()) as { sessionId?: string };
     if (!body?.sessionId) {

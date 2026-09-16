@@ -18,26 +18,36 @@ import { createDefaultOperatorFormState } from "../components/rextora/strategySe
 const ROOT = path.resolve(__dirname, "..");
 
 describe("lifecycle redesign fixes", () => {
-  it("sidebar has exactly seven primary items in order", () => {
-    const src = fs.readFileSync(
+  it("shell navigation model defines seven primary routes with lifecycle pipeline", () => {
+    const navigationModel = fs.readFileSync(
+      path.join(ROOT, "components/rextora/shell/navigationModel.ts"),
+      "utf8",
+    );
+    const sidebar = fs.readFileSync(
       path.join(ROOT, "components/rextora/Sidebar.tsx"),
       "utf8",
     );
+
     const labels = [
-      "대시보드",
+      "운영센터",
       "전략 탐색",
       "탐색 결과",
       "백테스트",
-      "모의 매매",
-      "실전 매매",
+      "모의매매",
+      "실전 진입",
       "시스템 설정",
     ];
     let last = -1;
     for (const label of labels) {
-      const idx = src.indexOf(label);
+      const idx = navigationModel.indexOf(`label: "${label}"`);
       expect(idx).toBeGreaterThan(last);
       last = idx;
     }
+
+    expect(sidebar).toContain("SHELL_NAVIGATION_GROUPS");
+    expect(sidebar).toContain("supportingNavItems");
+    expect(sidebar).toContain("sidebar-lifecycle-nav");
+
     for (const banned of [
       "고급 전략 편집",
       "전략 성과",
@@ -46,7 +56,7 @@ describe("lifecycle redesign fixes", () => {
       "AI 분석 보고",
       "리스크 관리",
     ]) {
-      expect(src).not.toContain(banned);
+      expect(navigationModel).not.toContain(`label: "${banned}"`);
     }
   });
 

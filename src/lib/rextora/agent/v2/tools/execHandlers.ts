@@ -145,9 +145,10 @@ export async function handleSearchCreate(input: Record<string, unknown>) {
 export async function handleSearchStart(input: Record<string, unknown>) {
   const jobId = String(input.jobId ?? "");
   const current = getStrategySearchJobApi(jobId);
-  const started = current.status === "paused"
-    ? resumeStrategySearchJobApi(jobId)
-    : startStrategySearchJobApi(jobId);
+  const started =
+    current.status === "paused" || current.status === "interrupted"
+      ? resumeStrategySearchJobApi(jobId)
+      : startStrategySearchJobApi(jobId);
   return {
     jobId: started.id,
     status: started.status,

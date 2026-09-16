@@ -1,7 +1,11 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { getOperatorLearningLogs, getCoinWinRates, getSignalWinRates, getLearningLogsSummary } from "@/src/lib/rextora/learningLogger";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   const { searchParams } = new URL(request.url);
   const limit = Math.min(200, Math.max(1, Number(searchParams.get("limit") ?? 50)));

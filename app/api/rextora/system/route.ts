@@ -8,8 +8,12 @@ import { getApiStatus } from "@/src/lib/rextora/apiStatusService";
 import { getRuntimeState } from "@/src/lib/rextora/runtimeState";
 import { getTelegramStatus } from "@/src/lib/rextora/telegramService";
 import { buildSyncedSystemPayload } from "@/src/lib/rextora/systemStatusSyncService";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const url = new URL(request.url);

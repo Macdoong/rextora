@@ -19,6 +19,7 @@ import {
 import {
   StrategySearchExecutionRegistryError,
   isSearchJobExecutionActive,
+  planHasNormalTerminalCompletionReason,
   startSearchJobExecution,
   type SearchJobExecutionDeps,
 } from "./jobExecutionRegistry";
@@ -39,9 +40,13 @@ import {
   markPlanPaused,
   markPlanResumed,
   saveSearchPlan,
+  type StrategySearchPlan,
 } from "./searchPlan";
 import { resolveTerminationReason } from "./terminationReason";
-import { deriveCanonicalCounters } from "./jobStatistics";
+import {
+  deriveCanonicalCounters,
+  deriveErrorRateWarning,
+} from "./jobStatistics";
 import { SAFETY_BUDGET_CEILING } from "./searchPlan";
 import { buildSymbolSelectionEvidence } from "./symbolSelection";
 import { classifyEngineError } from "./engineErrorClassification";
@@ -82,11 +87,28 @@ import {
 } from "./jobState";
 import { requestCancelWithFinalization } from "./cancellationLifecycle";
 import {
+  completeInterruptedJobAtDeadline,
+  inspectInterruptedRecovery,
+  normalizeQueuedContinuationRuntimeIfNeeded,
+  prepareInterruptedJobForRecovery,
+  restoreQueuedContinuationPlan,
+  rollbackPreparedInterruptedRecovery,
+} from "./processInterruption";
+import {
   getResearchTop10,
   rankChangeLabelShort,
 } from "./researchTop10";
 import { buildPersistedSearchSummary } from "./persistedSearchSummary";
 import { combinationLabelKo } from "./patternCombination";
+import {
+  classifyPersistedTrial,
+  reconstructGroupBestFromTrials,
+  sortTrialsByChampA,
+} from "./researchEvaluationIdentity";
+import {
+  hasAuthoritativeRankingGroups,
+  resolveEvaluationProvenance,
+} from "../researchRankingReadModel";
 import type {
   StrategySearchBestCandidateReference,
   StrategySearchJob,
@@ -123,6 +145,40 @@ export class StrategySearchApiError extends Error {
   }
 }
 
+/** User-facing outcome bucket. Not a lifecycle transition. */
+export type StrategySearchOutcomePresentation =
+  | "queued"
+  | "running"
+  | "interrupted"
+  | "completed"
+  | "user_stopped"
+  | "cancelled"
+  | "partial_completed"
+  | "failed"
+  | null;
+
+export function presentStrategySearchOutcome(input: {
+  status: StrategySearchJob["status"];
+  preservedCandidateCount?: number | null;
+}): StrategySearchOutcomePresentation {
+  if (input.status === "running" || input.status === "pause_requested") {
+    return "running";
+  }
+  if (input.status === "queued") return "queued";
+  if (input.status === "interrupted") return "interrupted";
+  if (input.status === "paused") return "user_stopped";
+  if (input.status === "cancelled" || input.status === "cancel_requested") {
+    return "cancelled";
+  }
+  if (input.status === "completed") return "completed";
+  if (input.status === "failed") {
+    return (input.preservedCandidateCount ?? 0) > 0
+      ? "partial_completed"
+      : "failed";
+  }
+  return null;
+}
+
 export interface StrategySearchJobSummary {
   id: string;
   status: StrategySearchJob["status"];
@@ -138,6 +194,9 @@ export interface StrategySearchJobSummary {
   campaignStartedAtMs?: number | null;
   pausedAtMs?: number | null;
   accumulatedPauseMs?: number | null;
+  interruptedAtMs?: number | null;
+  accumulatedInterruptionMs?: number | null;
+  recoveryBlocker?: string | null;
   resumedAtMs?: number | null;
   expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
@@ -161,6 +220,43 @@ export interface StrategySearchJobSummary {
   bestScore: number | null;
   bestCandidateHash: string | null;
   bestPassedCandidateHash: string | null;
+  /** Authoritative group ranking. Scalars above are compatibility-only. */
+  rankingGroups?: Array<{
+    rankingCompatibilityGroup:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    engineCostModel:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    rankingEligible: true;
+    bestCandidate: StrategySearchBestCandidateReference | null;
+    bestPassedCandidate: StrategySearchBestCandidateReference | null;
+    topCandidates: Array<{
+      iteration: number;
+      paramsHash: string;
+      score: number | null;
+      passed: boolean;
+      researchEvaluationHash?: string | null;
+      engineCostModel?: string | null;
+      rankingCompatibilityGroup?: string | null;
+      rankingEligible?: boolean;
+      promotionEligible?: boolean;
+      provenanceStatus?:
+        | "stamped"
+        | "reconstructed"
+        | "legacy_unclassified"
+        | null;
+    }>;
+  }>;
+  unknownLegacy?: {
+    rankingCompatibilityGroup: "unknown_legacy";
+    rankingEligible: false;
+    promotionEligible: false;
+    provenanceStatus: "legacy_unclassified";
+    count: number;
+  };
   failureMessage: string | null;
   /** Canonical termination reason — never blank when status=failed. */
   terminationReason?: string | null;
@@ -184,6 +280,13 @@ export interface StrategySearchJobSummary {
   completionReason?: string | null;
   candidateBudget?: number | null;
   promotionWarnings?: number | null;
+  /**
+   * Derived live error-rate warning (not persisted).
+   * Same metric as errorAutoPauseRate: errors / evaluated.
+   */
+  errorRate?: number;
+  errorWarningActive?: boolean;
+  errorWarningRate?: number;
   /** Current search family label (operator-facing). */
   currentSearchFamily?: string | null;
   /** Full combination label when multi-pattern plan is active. */
@@ -247,14 +350,7 @@ export interface StrategySearchJobSummary {
   /** Hard safety ceiling — never a normal completion target. */
   resourceSafetyCeiling?: number | null;
   /** Presentation outcome; persisted status may remain failed. */
-  outcomePresentation?:
-    | "running"
-    | "completed"
-    | "user_stopped"
-    | "cancelled"
-    | "partial_completed"
-    | "failed"
-    | null;
+  outcomePresentation?: StrategySearchOutcomePresentation;
   candidatesPreserved?: boolean;
   preservedCandidateCount?: number | null;
   retryable?: boolean;
@@ -354,6 +450,9 @@ export interface StrategySearchJobDetail extends StrategySearchJobSummary {
 export interface StrategySearchBestResultResponse {
   bestCandidate: StrategySearchBestCandidateReference | null;
   bestPassedCandidate: StrategySearchBestCandidateReference | null;
+  rankingGroups?: StrategySearchJobSummary["rankingGroups"];
+  unknownLegacy?: StrategySearchJobSummary["unknownLegacy"];
+  rankingAuthority?: "rankingGroups" | "legacy_scalar";
   bestTrial: StrategySearchTrial | null;
   bestPassedTrial: StrategySearchTrial | null;
   gateNotes: {
@@ -361,6 +460,103 @@ export interface StrategySearchBestResultResponse {
     bestPassedCandidatePassedFinal: boolean | null;
     /** Trial.passed is final PASS (base ∧ stress ∧ jitter). */
     finalPassMeaning: string;
+  };
+}
+
+function trialRankingEvidence(trial: StrategySearchTrial) {
+  const classified = classifyPersistedTrial(trial);
+  const provenanceStatus = resolveEvaluationProvenance({
+    rankingCompatibilityGroup: classified.rankingCompatibilityGroup,
+    researchEvaluationHash: trial.researchEvaluationHash ?? null,
+  });
+  return {
+    researchEvaluationHash: trial.researchEvaluationHash ?? null,
+    engineCostModel: classified.engineCostModel,
+    rankingCompatibilityGroup: classified.rankingCompatibilityGroup,
+    rankingEligible: classified.rankingEligible,
+    promotionEligible: classified.promotionEligible,
+    provenanceStatus,
+  };
+}
+
+function buildRankingReadModel(
+  job: StrategySearchJob,
+  options?: StrategySearchStoreOptions,
+  rankingTrialScan = true,
+): Pick<StrategySearchJobSummary, "rankingGroups" | "unknownLegacy"> {
+  const checkpointGroups = job.checkpoint.bestByCompatibilityGroup;
+  if (checkpointGroups?.length) {
+    return {
+      rankingGroups: checkpointGroups.map((row) => ({
+        rankingCompatibilityGroup: row.rankingCompatibilityGroup,
+        engineCostModel: row.rankingCompatibilityGroup,
+        rankingEligible: true as const,
+        bestCandidate: row.bestCandidate ? { ...row.bestCandidate } : null,
+        bestPassedCandidate: row.bestPassedCandidate
+          ? { ...row.bestPassedCandidate }
+          : null,
+        topCandidates: [],
+      })),
+      unknownLegacy: {
+        rankingCompatibilityGroup: "unknown_legacy" as const,
+        rankingEligible: false as const,
+        promotionEligible: false as const,
+        provenanceStatus: "legacy_unclassified" as const,
+        count: 0,
+      },
+    };
+  }
+  if (!rankingTrialScan) {
+    return {
+      rankingGroups: [],
+      unknownLegacy: {
+        rankingCompatibilityGroup: "unknown_legacy" as const,
+        rankingEligible: false as const,
+        promotionEligible: false as const,
+        provenanceStatus: "legacy_unclassified" as const,
+        count: 0,
+      },
+    };
+  }
+  const trials = listSearchTrials(job.id, options);
+  const groups = reconstructGroupBestFromTrials(trials);
+  return {
+    rankingGroups: groups.map((row) => ({
+      rankingCompatibilityGroup: row.rankingCompatibilityGroup,
+      engineCostModel: row.rankingCompatibilityGroup,
+      rankingEligible: true as const,
+      bestCandidate: row.bestCandidate ? { ...row.bestCandidate } : null,
+      bestPassedCandidate: row.bestPassedCandidate
+        ? { ...row.bestPassedCandidate }
+        : null,
+      topCandidates: sortTrialsByChampA(
+        trials.filter((trial) => {
+          const classified = classifyPersistedTrial(trial);
+          return (
+            classified.rankingEligible &&
+            classified.rankingCompatibilityGroup ===
+              row.rankingCompatibilityGroup
+          );
+        }),
+      )
+        .slice(0, 10)
+        .map((trial) => ({
+          iteration: trial.iteration,
+          paramsHash: trial.paramsHash,
+          score: trial.score,
+          passed: trial.passed,
+          ...trialRankingEvidence(trial),
+        })),
+    })),
+    unknownLegacy: {
+      rankingCompatibilityGroup: "unknown_legacy" as const,
+      rankingEligible: false as const,
+      promotionEligible: false as const,
+      provenanceStatus: "legacy_unclassified" as const,
+      count: trials.filter(
+        (trial) => classifyPersistedTrial(trial).class === "UNKNOWN_LEGACY",
+      ).length,
+    },
   };
 }
 
@@ -456,8 +652,8 @@ function requireJob(
   try {
     let job = getSearchJob(jobId, options);
     if (!job) {
-      // Recover missing job.json when plan/execution/trials/index remain.
-      // Never deletes trials. Restores as paused (no silent auto-resume).
+      // Recover missing job.json only when durable artifacts prove lifecycle.
+      // Never deletes trials. Never invents paused. No silent auto-resume.
       try {
         const recovery = recoverMissingJobRecord(jobId, options);
         if (recovery.recovered) {
@@ -515,6 +711,7 @@ function progressRatio(
 function summarizeJob(
   job: StrategySearchJob,
   options?: StrategySearchStoreOptions,
+  rankingTrialScan = true,
 ): StrategySearchJobSummary {
   let statistics: StrategySearchJobSummary["statistics"] = null;
   let searchSpaceExhausted = false;
@@ -544,6 +741,10 @@ function summarizeJob(
   }
 
   const plan = getSearchPlan(job.id, options);
+  const errorWarning = deriveErrorRateWarning(
+    statistics,
+    plan?.errorWarningRate,
+  );
   if (plan?.completionReason === "SEARCH_SPACE_EXHAUSTED") {
     searchSpaceExhausted = job.status === "completed";
   }
@@ -613,6 +814,15 @@ function summarizeJob(
     campaignStartedAtMs: plan?.campaignStartedAtMs ?? null,
     pausedAtMs: plan?.pausedAtMs ?? null,
     accumulatedPauseMs: plan?.accumulatedPauseMs ?? null,
+    interruptedAtMs: plan?.interruptedAtMs ?? null,
+    accumulatedInterruptionMs: plan?.accumulatedInterruptionMs ?? null,
+    recoveryBlocker:
+      job.status === "interrupted"
+        ? (() => {
+            const inspection = inspectInterruptedRecovery(job.id, options);
+            return inspection.eligible ? null : inspection.blocker;
+          })()
+        : null,
     resumedAtMs: plan?.resumedAtMs ?? null,
     expectedCompletionAtMs: expectedCompletionAtMs ?? null,
     maxIterations: job.config.maxIterations,
@@ -624,6 +834,7 @@ function summarizeJob(
     bestCandidateHash: job.checkpoint.bestCandidate?.paramsHash ?? null,
     bestPassedCandidateHash:
       job.checkpoint.bestPassedCandidate?.paramsHash ?? null,
+    ...buildRankingReadModel(job, options, rankingTrialScan),
     failureMessage: job.failureMessage,
     terminationReason: resolveTerminationReason({
       status: job.status,
@@ -781,34 +992,23 @@ function summarizeJob(
     counters: statistics
       ? deriveCanonicalCounters(statistics)
       : null,
+    errorRate: errorWarning.errorRate,
+    errorWarningActive: errorWarning.errorWarningActive,
+    errorWarningRate: errorWarning.warningRate,
     initialCandidateBudget: plan?.initialCandidateBudget ?? null,
     resourceSafetyCeiling: SAFETY_BUDGET_CEILING,
-    outcomePresentation: (() => {
-      if (
-        job.status === "running" ||
-        job.status === "pause_requested" ||
-        job.status === "queued"
-      ) {
-        return "running";
-      }
-      if (job.status === "paused") return "user_stopped";
-      if (job.status === "cancelled" || job.status === "cancel_requested") {
-        return "cancelled";
-      }
-      if (job.status === "completed") return "completed";
-      if (job.status === "failed") {
-        const preserved = plan?.qualifiedHashes.length ?? statistics?.passed ?? 0;
-        return preserved > 0 ? "partial_completed" : "failed";
-      }
-      return null;
-    })(),
+    outcomePresentation: presentStrategySearchOutcome({
+      status: job.status,
+      preservedCandidateCount:
+        plan?.qualifiedHashes.length ?? statistics?.passed ?? 0,
+    }),
     candidatesPreserved:
       job.status === "failed" &&
       (plan?.qualifiedHashes.length ?? statistics?.passed ?? 0) > 0,
     preservedCandidateCount:
       plan?.qualifiedHashes.length ?? statistics?.passed ?? 0,
     retryable: (() => {
-      if (job.status === "paused") return true;
+      if (job.status === "paused" || job.status === "interrupted") return true;
       if (job.status !== "failed") return false;
       const msg = (job.failureMessage ?? "").toLowerCase();
       // Proven recoverable generation failures (OUT_OF_RANGE after mutation).
@@ -1262,7 +1462,7 @@ export function listStrategySearchJobsApi(
     .sort(compareJobsNewestFirst)
     .slice(offset, offset + limit)
     .map((job) => ({
-      ...summarizeJob(job, store),
+      ...summarizeJob(job, store, false),
       isArchived: isJobArchived(job.id, store),
     }));
 }
@@ -1353,6 +1553,20 @@ export function startStrategySearchJobApi(
         409,
       );
     }
+    if (job.status === "queued") {
+      const plan = getSearchPlan(jobId, store);
+      if (planHasNormalTerminalCompletionReason(plan)) {
+        throw new StrategySearchApiError(
+          "INVALID_STATE",
+          "이 탐색은 이미 정상 종료 사유가 기록되어 있어 시작할 수 없습니다. 수명주기 정합이 필요합니다.",
+          409,
+          [
+            `completionReason=${plan?.completionReason ?? "null"}`,
+            "Research job is already terminal by its recorded completion reason and requires lifecycle reconciliation.",
+          ],
+        );
+      }
+    }
     if (!getJobExecutionProfile(jobId, store)) {
       throw new StrategySearchApiError(
         "MISSING_EXECUTION_PROFILE",
@@ -1360,7 +1574,29 @@ export function startStrategySearchJobApi(
         500,
       );
     }
-    startSearchJobExecution(jobId, merged);
+    let queuedContinuationSnapshot: StrategySearchPlan | null = null;
+    if (job.status === "queued") {
+      const normalized = normalizeQueuedContinuationRuntimeIfNeeded(
+        jobId,
+        Date.now(),
+        store,
+      );
+      if (normalized.normalized) {
+        queuedContinuationSnapshot = normalized.planBefore;
+      }
+    }
+    try {
+      startSearchJobExecution(jobId, merged);
+    } catch (error) {
+      if (queuedContinuationSnapshot) {
+        restoreQueuedContinuationPlan(
+          jobId,
+          queuedContinuationSnapshot,
+          store,
+        );
+      }
+      throw error;
+    }
     const latest = requireJob(jobId, store);
     return detailJob(latest, store);
   } catch (err) {
@@ -1408,12 +1644,43 @@ export function resumeStrategySearchJobApi(
         409,
       );
     }
-    if (job.status !== "paused" && job.status !== "failed") {
+    if (
+      job.status !== "paused" &&
+      job.status !== "failed" &&
+      job.status !== "interrupted"
+    ) {
       throw new StrategySearchApiError(
         "INVALID_STATE",
         `cannot resume strategy-search job in status: ${job.status}`,
         409,
       );
+    }
+    if (job.status === "interrupted") {
+      const inspection = inspectInterruptedRecovery(jobId, store);
+      if (!inspection.eligible) {
+        throw new StrategySearchApiError(
+          "INVALID_STATE",
+          "중단된 탐색의 체크포인트 또는 실행 시간을 안전하게 복구할 수 없습니다.",
+          409,
+          [inspection.blocker],
+        );
+      }
+      const interruptedPlan = getSearchPlan(jobId, store);
+      if (
+        interruptedPlan?.maxRuntimeMs != null &&
+        inspection.activeElapsedMs >= interruptedPlan.maxRuntimeMs
+      ) {
+        completeInterruptedJobAtDeadline(jobId, Date.now(), store);
+        return detailJob(requireJob(jobId, store), store);
+      }
+      prepareInterruptedJobForRecovery(jobId, Date.now(), store);
+      try {
+        startSearchJobExecution(jobId, merged);
+      } catch (error) {
+        rollbackPreparedInterruptedRecovery(jobId, Date.now(), store);
+        throw error;
+      }
+      return detailJob(requireJob(jobId, store), store);
     }
     if (job.status === "failed") {
       const detail = detailJob(job, store);
@@ -1512,6 +1779,16 @@ export function listStrategySearchTrialsApi(
     jitterPassed?: boolean | null;
     jitterEnabled?: boolean | null;
     params?: Record<string, unknown> | null;
+    researchEvaluationHash?: string | null;
+    engineCostModel?: string | null;
+    rankingCompatibilityGroup?: string | null;
+    rankingEligible?: boolean;
+    promotionEligible?: boolean;
+    provenanceStatus?:
+      | "stamped"
+      | "reconstructed"
+      | "legacy_unclassified"
+      | null;
     registeredStrategyId?: string | null;
     registrationState?:
       | "not_registered"
@@ -1610,6 +1887,7 @@ export function listStrategySearchTrialsApi(
         jitterPassed,
         jitterEnabled,
         params: t.params ? { ...t.params } : null,
+        ...trialRankingEvidence(t),
         registeredStrategyId: registeredId,
         registrationState: registeredId
           ? ("registered" as const)
@@ -1643,9 +1921,14 @@ export function getStrategySearchBestApi(
         ? getSearchTrial(jobId, bestPassed.iteration, store)
         : null;
 
+    const ranking = buildRankingReadModel(job, store);
     return {
       bestCandidate: best,
       bestPassedCandidate: bestPassed,
+      ...ranking,
+      rankingAuthority: hasAuthoritativeRankingGroups(ranking)
+        ? "rankingGroups"
+        : "legacy_scalar",
       bestTrial: bestTrial
         ? {
             ...bestTrial,

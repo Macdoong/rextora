@@ -11,6 +11,20 @@ const UI_DIR = path.join(
   "strategySearch",
 );
 const PAGE = path.join(process.cwd(), "app", "strategy-search", "page.tsx");
+const NAV_MODEL = path.join(
+  process.cwd(),
+  "components",
+  "rextora",
+  "shell",
+  "navigationModel.ts",
+);
+const LIFECYCLE_NAV = path.join(
+  process.cwd(),
+  "components",
+  "rextora",
+  "shell",
+  "LifecycleNavigation.tsx",
+);
 const SIDEBAR = path.join(process.cwd(), "components", "rextora", "Sidebar.tsx");
 const SAFE = path.join(
   process.cwd(),
@@ -56,17 +70,23 @@ const FORBIDDEN_VISIBLE = [
 ];
 
 describe("strategy search Korean localization polish", () => {
-  it("page title and sidebar are 전략 탐색", () => {
+  it("page title and research route come from shared navigation model", () => {
     expect(fs.readFileSync(PAGE, "utf8")).toContain("전략 탐색");
-    expect(fs.readFileSync(SIDEBAR, "utf8")).toContain(
-      '["전략 탐색", "/strategy-search"]',
-    );
+    const navigationModel = fs.readFileSync(NAV_MODEL, "utf8");
+    const sidebar = fs.readFileSync(SIDEBAR, "utf8");
+    const lifecycleNav = fs.readFileSync(LIFECYCLE_NAV, "utf8");
+
+    expect(navigationModel).toContain('label: "전략 탐색"');
+    expect(navigationModel).toContain('href: "/strategy-search"');
+    expect(navigationModel).toContain('lifecycleNavId: "research"');
+    expect(sidebar).toContain("navigationModel");
+    expect(sidebar).toContain("LifecycleNavigation");
+    expect(lifecycleNav).toContain("LIFECYCLE_NAVIGATION_ITEMS");
   });
 
   it("visible English UI labels are absent from Strategy Search components", () => {
     const files = [
       PAGE,
-      SIDEBAR,
       path.join(UI_DIR, "JobCreateForm.tsx"),
       path.join(UI_DIR, "ExecutionControls.tsx"),
       path.join(UI_DIR, "SearchStatusCard.tsx"),

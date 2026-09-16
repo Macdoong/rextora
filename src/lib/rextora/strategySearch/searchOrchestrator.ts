@@ -16,6 +16,8 @@ import {
 import {
   getSearchJob,
   listSearchTrials,
+  markSearchJobFailed,
+  markSearchJobRunning,
   reopenSearchJobForNextSpace,
   saveSearchJob,
   updateSearchCheckpoint,
@@ -73,9 +75,20 @@ import {
   createResearchGenerationId,
   listResearchGenerations,
 } from "./researchGeneration";
-import { applySearchSpaceMutation } from "./searchSpaceMutation";
-import type { StrategySearchParameterRange } from "./types";
+import {
+  applySearchSpaceMutation,
+  cloneSearchParameterRanges,
+} from "./searchSpaceMutation";
+import type {
+  StrategySearchJob,
+  StrategySearchParameterRange,
+} from "./types";
 import { classifyRunFailureReason } from "./terminationReason";
+import { validateSearchParameterRanges } from "./paramSpace";
+import {
+  groupForSearchSpaceId,
+  reconstructGroupBestFromTrials,
+} from "./researchEvaluationIdentity";
 
 export interface OrchestratedSearchResult {
   jobId: string;
@@ -211,15 +224,46 @@ function resolveStageBaseParams(plan: StrategySearchPlan) {
   return applyLeverageModeToParams(CONTEXT_FALLBACK_PARAMS, plan);
 }
 
-function applyStageConfig(
+class StageConfigurationInvalidError extends Error {
+  readonly completionReason = "CONFIGURATION_INVALID" as const;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "StageConfigurationInvalidError";
+  }
+}
+
+function failClosedInvalidStageRanges(
+  jobId: string,
+  plan: StrategySearchPlan,
+  message: string,
+  store?: StrategySearchStoreOptions,
+): never {
+  saveSearchPlan(
+    jobId,
+    { ...plan, completionReason: "CONFIGURATION_INVALID" },
+    store,
+  );
+  const current = getSearchJob(jobId, store);
+  if (current?.status === "queued") {
+    markSearchJobRunning(jobId, store);
+  }
+  const latest = getSearchJob(jobId, store);
+  if (latest?.status === "running") {
+    markSearchJobFailed(jobId, message, store);
+  }
+  throw new StageConfigurationInvalidError(message);
+}
+
+export function applyStageConfig(
   jobId: string,
   plan: StrategySearchPlan,
   store?: StrategySearchStoreOptions,
-): void {
+): StrategySearchJob | undefined {
   const job = getSearchJob(jobId, store);
-  if (!job) return;
+  if (!job) return undefined;
   const spaceState = plan.spaces[plan.currentSpaceIndex];
-  if (!spaceState) return;
+  if (!spaceState) return undefined;
   const ranges = filterRangesForLeverageMode(
     activeSpaceRanges(plan, job.config.parameterRanges),
     plan,
@@ -229,6 +273,28 @@ function applyStageConfig(
     spaceState && isPatternSearchSpaceId(spaceState.id)
       ? applyPatternOperatorConfigToRanges(ranges, patternConfig)
       : ranges;
+  const rangeCheck = validateSearchParameterRanges(stageRanges);
+  const invertedNumeric = rangeCheck.issues.some(
+    (issue) =>
+      issue.code === "MIN_GT_MAX" ||
+      issue.code === "NON_FINITE_BOUNDS" ||
+      issue.code === "NAN_BOUNDS",
+  );
+  if (invertedNumeric) {
+    const first =
+      rangeCheck.issues.find(
+        (issue) =>
+          issue.code === "MIN_GT_MAX" ||
+          issue.code === "NON_FINITE_BOUNDS" ||
+          issue.code === "NAN_BOUNDS",
+      ) ?? rangeCheck.issues[0];
+    failClosedInvalidStageRanges(
+      jobId,
+      plan,
+      `invalid parameterRanges: ${first?.message ?? "min must be <= max"}`,
+      store,
+    );
+  }
   const remGlobal = remainingBudget(plan);
   const remFamily = familyBudgetRemaining(plan);
   const rem = Math.min(remGlobal, remFamily);
@@ -237,11 +303,12 @@ function applyStageConfig(
   // Raise the ceiling so the runner can continue from completedIterations.
   const maxIterations = completed + batch;
 
+  const ownedStageRanges = cloneSearchParameterRanges(stageRanges);
   const nextJob = {
     ...job,
     config: {
       ...job.config,
-      parameterRanges: stageRanges,
+      parameterRanges: ownedStageRanges,
       maxIterations,
     },
     finishedAt: null,
@@ -257,7 +324,7 @@ function applyStageConfig(
         ...profile,
         jitterConfig: {
           ...profile.jitterConfig,
-          parameterRanges: stageRanges.map((r) => ({ ...r })),
+          parameterRanges: cloneSearchParameterRanges(ownedStageRanges),
         },
       },
       store,
@@ -311,6 +378,7 @@ function applyStageConfig(
     },
     store,
   );
+  return nextJob;
 }
 
 function syncPlanAfterRun(
@@ -426,13 +494,18 @@ function recordGenerationForSpace(
   const existing = listResearchGenerations(jobId, store);
   const generationNumber = existing.length + 1;
   const trials = listSearchTrials(jobId, store);
-  const bestHash =
-    plan.qualifiedHashes[plan.qualifiedHashes.length - 1] ??
-    trials.find((t) => t.passed)?.paramsHash ??
-    null;
-  const bestTrial = bestHash
-    ? trials.find((t) => t.paramsHash === bestHash) ?? null
+  const leavingGroup = groupForSearchSpaceId(space.id);
+  const groupBest = reconstructGroupBestFromTrials(trials);
+  const groupRow = leavingGroup
+    ? groupBest.find((row) => row.rankingCompatibilityGroup === leavingGroup)
     : null;
+  const bestRef = groupRow?.bestPassedCandidate ?? null;
+  const bestTrial = bestRef
+    ? trials.find((t) => t.iteration === bestRef.iteration) ??
+      trials.find((t) => t.paramsHash === bestRef.paramsHash) ??
+      null
+    : null;
+  const bestHash = bestTrial?.paramsHash ?? null;
   const nextSpace = plan.spaces[plan.currentSpaceIndex + 1];
   const analysis = analyzeCandidateWeaknesses(
     bestTrial
@@ -527,7 +600,7 @@ function recordQualifiedPasses(
   };
 }
 
-function nextQualified(
+export function nextQualified(
   plan: StrategySearchPlan,
   trials: Array<{ paramsHash: string; score: number | null }>,
 ): string[] {
@@ -570,6 +643,31 @@ export async function runOrchestratedSearchJob(
   let plan = getSearchPlan(jobId, store);
   let lastRun: RunSearchJobResult | null = null;
 
+  try {
+    return await runOrchestratedSearchJobInner(input, plan, lastRun);
+  } catch (err) {
+    if (err instanceof StageConfigurationInvalidError) {
+      return {
+        jobId,
+        finalStopReason: "CONFIGURATION_INVALID",
+        plan: getSearchPlan(jobId, store),
+        lastRun,
+      };
+    }
+    throw err;
+  }
+}
+
+async function runOrchestratedSearchJobInner(
+  input: RunSearchJobInput,
+  initialPlan: StrategySearchPlan | null,
+  initialLastRun: RunSearchJobResult | null,
+): Promise<OrchestratedSearchResult> {
+  const store = input.storeOptions;
+  const jobId = input.jobId;
+  let plan = initialPlan;
+  let lastRun: RunSearchJobResult | null = initialLastRun;
+
   if (!plan) {
     lastRun = await runSearchJob(input);
     return {
@@ -609,6 +707,10 @@ export async function runOrchestratedSearchJob(
   applyStageConfig(jobId, plan, store);
 
   for (;;) {
+    const live = getSearchJob(jobId, store);
+    if (live?.status === "queued") {
+      markSearchJobRunning(jobId, store);
+    }
     if (runtimeExceeded(plan)) {
       const reason: StrategySearchCompletionReason = isDeadlineMode(plan)
         ? "DEADLINE_REACHED"

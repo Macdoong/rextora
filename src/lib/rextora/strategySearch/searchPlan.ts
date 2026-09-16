@@ -111,6 +111,10 @@ export interface StrategySearchPlan {
   pausedAtMs: number | null;
   /** Cumulative paused wall-clock ms across pause/resume cycles. */
   accumulatedPauseMs: number;
+  /** When set, execution is stopped because its worker/process disappeared. */
+  interruptedAtMs: number | null;
+  /** Cumulative process-interruption wall-clock ms excluded from active runtime. */
+  accumulatedInterruptionMs: number;
   /** Last resume timestamp (null until first resume). */
   resumedAtMs: number | null;
   /** Expected absolute completion after latest resume (null when unknown/legacy). */
@@ -313,6 +317,8 @@ export function createEmptySearchPlan(input: {
     campaignStartedAtMs: null,
     pausedAtMs: null,
     accumulatedPauseMs: 0,
+    interruptedAtMs: null,
+    accumulatedInterruptionMs: 0,
     resumedAtMs: null,
     expectedCompletionAtMs: null,
     currentSpaceIndex: 0,
@@ -407,6 +413,16 @@ export function getSearchPlan(
         Number.isFinite(parsed.accumulatedPauseMs)
           ? Math.max(0, parsed.accumulatedPauseMs)
           : 0,
+      interruptedAtMs:
+        typeof parsed.interruptedAtMs === "number" &&
+        Number.isFinite(parsed.interruptedAtMs)
+          ? parsed.interruptedAtMs
+          : null,
+      accumulatedInterruptionMs:
+        typeof parsed.accumulatedInterruptionMs === "number" &&
+        Number.isFinite(parsed.accumulatedInterruptionMs)
+          ? Math.max(0, parsed.accumulatedInterruptionMs)
+          : 0,
       resumedAtMs: parsed.resumedAtMs ?? null,
       expectedCompletionAtMs: parsed.expectedCompletionAtMs ?? null,
       patternCombinationSpec: normalizePatternCombinationSpec(
@@ -428,12 +444,18 @@ export function activeElapsedMs(
   }
   const openPause =
     plan.pausedAtMs != null ? Math.max(0, now - plan.pausedAtMs) : 0;
+  const openInterruption =
+    plan.interruptedAtMs != null
+      ? Math.max(0, now - plan.interruptedAtMs)
+      : 0;
   return Math.max(
     0,
     now -
       plan.campaignStartedAtMs -
       (plan.accumulatedPauseMs ?? 0) -
-      openPause,
+      openPause -
+      (plan.accumulatedInterruptionMs ?? 0) -
+      openInterruption,
   );
 }
 
@@ -442,7 +464,11 @@ export function computeExpectedCompletionAtMs(
   plan: StrategySearchPlan,
   now = Date.now(),
 ): number | null {
-  if (plan.maxRuntimeMs == null || plan.campaignStartedAtMs == null) {
+  if (
+    plan.maxRuntimeMs == null ||
+    plan.campaignStartedAtMs == null ||
+    plan.interruptedAtMs != null
+  ) {
     return null;
   }
   const active = activeElapsedMs(plan, now);
@@ -501,6 +527,49 @@ export function markPlanResumed(
       ...plan,
       pausedAtMs: null,
       accumulatedPauseMs,
+      resumedAtMs: now,
+    },
+    now,
+  );
+}
+
+/** Freeze active runtime at a proven process-loss boundary. */
+export function markPlanInterrupted(
+  plan: StrategySearchPlan,
+  interruptionStartedAtMs: number,
+  now = Date.now(),
+): StrategySearchPlan {
+  if (plan.interruptedAtMs != null) return plan;
+  const campaignStart = plan.campaignStartedAtMs;
+  const boundedStart = Math.min(
+    now,
+    Math.max(campaignStart ?? interruptionStartedAtMs, interruptionStartedAtMs),
+  );
+  const interrupted = {
+    ...plan,
+    interruptedAtMs: boundedStart,
+  };
+  return {
+    ...interrupted,
+    elapsedMs: activeElapsedMs(interrupted, now),
+    expectedCompletionAtMs: null,
+  };
+}
+
+/** Close a process-interruption interval without discarding consumed active time. */
+export function markPlanInterruptionResumed(
+  plan: StrategySearchPlan,
+  now = Date.now(),
+): StrategySearchPlan {
+  if (plan.interruptedAtMs == null) return plan;
+  const accumulatedInterruptionMs =
+    (plan.accumulatedInterruptionMs ?? 0) +
+    Math.max(0, now - plan.interruptedAtMs);
+  return syncPlanTimingFields(
+    {
+      ...plan,
+      interruptedAtMs: null,
+      accumulatedInterruptionMs,
       resumedAtMs: now,
     },
     now,

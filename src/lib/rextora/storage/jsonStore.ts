@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { rextoraDataRoot } from "./runtimePaths";
+import { assertTestStoreIsNotProduction } from "./testStoreGuard";
 
 const DEFAULT_TTL_MS = 5_000;
 
@@ -20,7 +21,9 @@ function dataDir(): string {
 
 function ensureDir(): void {
   const dir = dataDir();
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  if (fs.existsSync(dir)) return;
+  assertTestStoreIsNotProduction(dir);
+  fs.mkdirSync(dir, { recursive: true });
 }
 
 function filePath(filename: string): string {
@@ -70,8 +73,9 @@ export function readJsonStore<T>(filename: string, fallback: T, options?: { ttlM
 }
 
 export function writeJsonStore<T>(filename: string, value: T): T {
-  ensureDir();
   const fp = filePath(filename);
+  assertTestStoreIsNotProduction(fp);
+  ensureDir();
   fs.writeFileSync(fp, JSON.stringify(value, null, 2), "utf8");
   const mtimeMs = getFileMtimeMs(filename);
   storeCache.set(filename, { value, mtimeMs, expiresAt: Date.now() + DEFAULT_TTL_MS });

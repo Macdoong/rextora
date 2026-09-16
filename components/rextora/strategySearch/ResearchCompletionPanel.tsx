@@ -15,6 +15,8 @@ import { cleanStrategyDisplayName } from "./displayNames";
 import { fetchResearchResultsSummary } from "./apiClient";
 import type { ResearchResultsSummaryView } from "./types";
 import { LifecycleNextActionsPanel } from "./LifecycleNextActionsPanel";
+import { ResearchRankingGroups } from "./ResearchRankingGroups";
+import { hasAuthoritativeRankingGroups } from "@/src/lib/rextora/researchRankingReadModel";
 
 function BigStat(props: {
   label: string;
@@ -119,7 +121,7 @@ export function ResearchCompletionPanel(props: {
       job.status === "cancelled" ||
       (job.status === "failed" && passCount > 0));
 
-  if (activelyRunning) {
+  if (activelyRunning || job.status === "interrupted") {
     return null;
   }
 
@@ -253,9 +255,19 @@ export function ResearchCompletionPanel(props: {
       </div>
 
       {/* 3. Final Top 3 — only when qualified; else temporary non-qualified best */}
-      {qualified > 0 && mergedTop.length > 0 ? (
+      {hasAuthoritativeRankingGroups(job) ? (
+        <div data-testid="ss-completion-ranking-groups">
+          <div className="ss-field-label text-emerald-100/80">그룹별 최종 추천</div>
+          <ResearchRankingGroups
+            source={job}
+            unknownLegacy={job.unknownLegacy}
+          />
+        </div>
+      ) : qualified > 0 && mergedTop.length > 0 ? (
         <div data-testid="ss-completion-final-top3">
-          <div className="ss-field-label text-emerald-100/80">최종 TOP 3</div>
+          <div className="ss-field-label text-emerald-100/80">
+            기존 평가 형식 · 최종 TOP 3
+          </div>
           <ul className="mt-2 space-y-2">
             {mergedTop.map((row) => (
               <li
@@ -394,6 +406,7 @@ export function ResearchCompletionPanel(props: {
       >
         <summary className="cursor-pointer select-none">연구 상세</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {hasAuthoritativeRankingGroups(job) ? null : (
           <BigStat
             label="최종 정리 후 최고"
             value={
@@ -405,6 +418,7 @@ export function ResearchCompletionPanel(props: {
             }
             testId="ss-completion-finalized-best"
           />
+          )}
           <BigStat
             label="실시간 탐색 최고"
             value={
@@ -414,6 +428,7 @@ export function ResearchCompletionPanel(props: {
             }
             testId="ss-completion-live-best"
           />
+          {hasAuthoritativeRankingGroups(job) ? null : (
           <BigStat
             label="최고 안정"
             value={
@@ -423,6 +438,7 @@ export function ResearchCompletionPanel(props: {
             }
             testId="ss-completion-best-stable"
           />
+          )}
           <BigStat
             label="연구 시간"
             value={elapsed ?? "없음"}

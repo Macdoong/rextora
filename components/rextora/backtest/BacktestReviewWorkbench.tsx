@@ -34,10 +34,19 @@ import {
   validateBacktestCalendarRange,
 } from "@/src/lib/rextora/backtest/backtestDateRange";
 import {
+  COVERAGE_BLOCKER_TITLE_KO,
+  formatCoverageBlockerDetail,
+  isBacktestDataCoverageErrorCode,
+  type BacktestDataCoverage,
+} from "@/src/lib/rextora/backtest/backtestDataCoverage";
+import {
   evaluateBacktestEligibility,
   eligibilityBlocksPaperLive,
+  eligibilityInputFromReport,
+  resolveEligibilityCostRatio,
 } from "@/src/lib/rextora/backtest/backtestEligibility";
 import { computeCostRatios } from "@/src/lib/rextora/backtest/costRatios";
+import { formatCostAssumptionsDisclosure } from "@/src/lib/rextora/backtest/costAssumptions";
 import {
   formatSavedRunOptionLabel,
   backtestStatusLabelKo,
@@ -51,6 +60,31 @@ import type { StoredStrategyV1 } from "@/src/lib/rextora/strategy/definition/bri
 import type { AvailableCandleDateRange } from "@/src/lib/rextora/backtest/backtestDateRange";
 import { resolveEventSequenceFamilyFromStrategy } from "@/src/lib/rextora/backtest/patternOverlayAvailability";
 import { fetchJsonCached } from "@/src/lib/rextora/client/requestCache";
+import { useSetOperatorPageContext } from "@/components/rextora/shell/OperatorPageContext";
+import {
+  BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER,
+  BACKTEST_OPERATOR_UNAVAILABLE,
+  backtestOperatorChartIdentity,
+  backtestOperatorCompactStatusLabel,
+  backtestOperatorDeriveTradeStats,
+  backtestOperatorFailurePresentation,
+  backtestOperatorFormatCount,
+  backtestOperatorFormatPct,
+  backtestOperatorNetPnl,
+  backtestOperatorNextAction,
+  backtestOperatorPageState,
+  backtestOperatorPeriodStats,
+  backtestOperatorResolveResultContext,
+  backtestOperatorResultContextLabel,
+  backtestOperatorStrategyTypeLabel,
+  backtestOperatorUsableLabel,
+  backtestOperatorValidationChecks,
+} from "@/src/lib/rextora/backtest/backtestOperatorPresentation";
+import { BacktestOperatorHeader } from "@/components/rextora/backtest/operator/BacktestOperatorHeader";
+import { BacktestKpiGrid } from "@/components/rextora/backtest/operator/BacktestKpiGrid";
+import { BacktestFailurePanel } from "@/components/rextora/backtest/operator/BacktestFailurePanel";
+import { BacktestOperatorAnalysis } from "@/components/rextora/backtest/operator/BacktestOperatorAnalysis";
+import { BacktestResultState } from "@/components/rextora/backtest/operator/BacktestResultState";
 
 function sourceTypeLabelKo(source: string | null | undefined): string {
   if (source === "user_backtest_run") return "사용자 실행";
@@ -321,9 +355,13 @@ export function BacktestReviewWorkbench() {
   );
   const [runInFlight, setRunInFlight] = useState(false);
   const runLock = useRef(false);
-  const [activeNavSection, setActiveNavSection] = useState("price");
+  const [activeNavSection, setActiveNavSection] = useState("overview");
   const [strategyManageOpen, setStrategyManageOpen] = useState(false);
   const [runErrorDetail, setRunErrorDetail] = useState<string | null>(null);
+  const [runErrorCode, setRunErrorCode] = useState<string | null>(null);
+  const [resultRefreshing, setResultRefreshing] = useState(false);
+  const [runJustCompleted, setRunJustCompleted] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
   const [lastDeduped, setLastDeduped] = useState(false);
   const [hydrationState, setHydrationState] = useState<SavedRunHydrationState>(
     initialStrategyId ? "loading_strategy" : "idle",
@@ -701,6 +739,7 @@ export function BacktestReviewWorkbench() {
       setSymbol(runSymbol);
     }
     setSelectedRunId(run.id);
+    setRunJustCompleted(false);
     setReport(run.report);
     setTrades(run.trades ?? []);
     setEquityCurve([]);
@@ -841,6 +880,8 @@ export function BacktestReviewWorkbench() {
     setRunFeedback("백테스트를 준비하고 있습니다.");
     setRunStatus("loading");
     setRunErrorDetail(null);
+    setRunErrorCode(null);
+    setNetworkError(false);
     setLastDeduped(false);
     if (!strategyId || !strategy) {
       setRunFeedback("전략을 선택하세요.");
@@ -857,18 +898,16 @@ export function BacktestReviewWorkbench() {
       setRunFeedback("백테스트 실행에 실패했습니다.");
       setRunStatus("error");
       setRunErrorDetail(validated.error);
+      setRunErrorCode(validated.code);
       return;
     }
 
     runLock.current = true;
     setRunInFlight(true);
     setLoading(true);
+    setResultRefreshing(true);
     setRunFeedback("백테스트 실행 중입니다.");
     setRunStatus("loading");
-    setReport(null);
-    setTrades([]);
-    setEquityCurve([]);
-    setCandles([]);
     try {
       const res = await fetch("/api/rextora/backtest/run", {
         method: "POST",
@@ -889,9 +928,23 @@ export function BacktestReviewWorkbench() {
       });
       const json = await res.json();
       const payload = json.data;
+      if (isBacktestDataCoverageErrorCode(json.code)) {
+        const coverage = (json.details?.dataCoverage ??
+          json.dataCoverage) as BacktestDataCoverage | undefined;
+        setRunFeedback(COVERAGE_BLOCKER_TITLE_KO);
+        setRunStatus("error");
+        setRunErrorCode(json.code ?? "BACKTEST_DATA_COVERAGE_INSUFFICIENT");
+        setRunErrorDetail(
+          coverage
+            ? formatCoverageBlockerDetail(coverage)
+            : (json.error ?? json.code ?? null),
+        );
+        return;
+      }
       if (!json.ok || !payload?.report) {
         setRunFeedback("백테스트 실행에 실패했습니다.");
         setRunStatus("error");
+        setRunErrorCode(typeof json.code === "string" ? json.code : null);
         setRunErrorDetail(json.error ?? json.code ?? null);
         return;
       }
@@ -900,6 +953,14 @@ export function BacktestReviewWorkbench() {
           (r: { report?: BacktestReport | null }) => r.report != null,
         ) ?? null;
       const activeReport = (first?.report ?? payload.report) as BacktestReport;
+      if (activeReport.dataCoverage && !activeReport.dataCoverage.sufficient) {
+        setRunFeedback(COVERAGE_BLOCKER_TITLE_KO);
+        setRunStatus("error");
+        setRunErrorCode("BACKTEST_DATA_COVERAGE_INSUFFICIENT");
+        setRunErrorDetail(formatCoverageBlockerDetail(activeReport.dataCoverage));
+        return;
+      }
+      setRunJustCompleted(true);
       setReport(activeReport);
       setTrades((first?.trades ?? payload.trades ?? []) as BacktestTrade[]);
       setEquityCurve(first?.equityCurve ?? payload.equityCurve ?? []);
@@ -936,12 +997,14 @@ export function BacktestReviewWorkbench() {
     } catch (error) {
       setRunFeedback("백테스트 실행에 실패했습니다.");
       setRunStatus("error");
+      setNetworkError(true);
       setRunErrorDetail(
         error instanceof Error ? error.message : "알 수 없는 오류",
       );
     } finally {
       setLoading(false);
       setRunInFlight(false);
+      setResultRefreshing(false);
       runLock.current = false;
     }
   }
@@ -955,24 +1018,9 @@ export function BacktestReviewWorkbench() {
       return;
     }
     if (report) {
-      const gate = evaluateBacktestEligibility({
-        status: selectedRun?.status ?? "completed",
-        totalReturn: report.totalReturn,
-        mdd: report.mdd,
-        tradeCount: report.tradeCount,
-        winRate: report.winRate,
-        profitFactor: report.profitFactor,
-        totalCostPctOfInitialCapital: report.costs.totalCostPctOfInitialCapital,
-        totalCostPctOfGrossProfit: computeCostRatios({
-          grossPnLBeforeCosts: report.costs.grossPnLBeforeCosts ?? 0,
-          netPnLAfterCosts: report.costs.netPnLAfterCosts ?? 0,
-          totalCostUsdt: report.costs.totalCostUsdt ?? 0,
-          feeCostUsdt: report.costs.feeCostUsdt ?? 0,
-          slippageCostUsdt: report.costs.slippageCostUsdt ?? 0,
-        }).totalCostPctOfGrossProfit,
-        negativeMonths: report.negativeMonths,
-        monthlyReturnCount: report.monthlyReturns?.length ?? 0,
-      });
+      const gate = evaluateBacktestEligibility(
+        eligibilityInputFromReport(report, selectedRun?.status ?? "completed"),
+      );
       if (eligibilityBlocksPaperLive(gate)) {
         setActionMessage(gate.verdictLabel);
         setActionStatus("error");
@@ -1028,24 +1076,9 @@ export function BacktestReviewWorkbench() {
   async function registerLiveCandidate() {
     if (!strategyId) return;
     if (report) {
-      const gate = evaluateBacktestEligibility({
-        status: selectedRun?.status ?? "completed",
-        totalReturn: report.totalReturn,
-        mdd: report.mdd,
-        tradeCount: report.tradeCount,
-        winRate: report.winRate,
-        profitFactor: report.profitFactor,
-        totalCostPctOfInitialCapital: report.costs.totalCostPctOfInitialCapital,
-        totalCostPctOfGrossProfit: computeCostRatios({
-          grossPnLBeforeCosts: report.costs.grossPnLBeforeCosts ?? 0,
-          netPnLAfterCosts: report.costs.netPnLAfterCosts ?? 0,
-          totalCostUsdt: report.costs.totalCostUsdt ?? 0,
-          feeCostUsdt: report.costs.feeCostUsdt ?? 0,
-          slippageCostUsdt: report.costs.slippageCostUsdt ?? 0,
-        }).totalCostPctOfGrossProfit,
-        negativeMonths: report.negativeMonths,
-        monthlyReturnCount: report.monthlyReturns?.length ?? 0,
-      });
+      const gate = evaluateBacktestEligibility(
+        eligibilityInputFromReport(report, selectedRun?.status ?? "completed"),
+      );
       if (eligibilityBlocksPaperLive(gate)) {
         setActionMessage(gate.verdictLabel);
         setActionStatus("error");
@@ -1091,22 +1124,19 @@ export function BacktestReviewWorkbench() {
 
   const eligibility = useMemo(() => {
     if (!report) return null;
-    return evaluateBacktestEligibility({
-      status: selectedRun?.status ?? "completed",
-      totalReturn: report.totalReturn,
-      mdd: report.mdd,
-      tradeCount: report.tradeCount,
-      winRate: report.winRate,
-      profitFactor: report.profitFactor,
-      totalCostPctOfInitialCapital: report.costs.totalCostPctOfInitialCapital,
-      totalCostPctOfGrossProfit: costRatios?.totalCostPctOfGrossProfit ?? null,
-      negativeMonths: report.negativeMonths,
-      monthlyReturnCount: report.monthlyReturns?.length ?? 0,
-      hasCostStress: Array.isArray(report.costStress)
-        ? report.costStress.length > 0
-        : null,
-    });
-  }, [report, selectedRun, costRatios]);
+    return evaluateBacktestEligibility(
+      eligibilityInputFromReport(report, selectedRun?.status ?? "completed"),
+    );
+  }, [report, selectedRun]);
+
+  const resolvedCostProfile = report
+    ? formatCostAssumptionsDisclosure(report)
+    : costSummary;
+  const eligibilityCostRatio = report
+    ? resolveEligibilityCostRatio(
+        eligibilityInputFromReport(report, selectedRun?.status ?? "completed"),
+      )
+    : costRatios?.totalCostPctOfGrossProfit ?? null;
 
   const handoffBlocked = eligibility
     ? eligibilityBlocksPaperLive(eligibility)
@@ -1152,12 +1182,9 @@ export function BacktestReviewWorkbench() {
     Boolean(paperBlockCode) &&
     Boolean(liveBlockCode) &&
     paperBlockCode === liveBlockCode;
-  const sharedBlockDetail =
-    observedMddPct != null && paperBlockCode === "maximum_drawdown_exceeded"
-      ? `최대 낙폭 ${observedMddPct}%가 허용 기준 ${requiredMddPct}%를 초과했습니다.`
-      : paperBlockedReason;
 
   const workbenchSections = [
+    { id: "overview", label: "개요" },
     { id: "price", label: "차트" },
     { id: "trades", label: "거래" },
     { id: "monthly", label: "월별" },
@@ -1166,6 +1193,8 @@ export function BacktestReviewWorkbench() {
     { id: "timeline", label: "타임라인" },
     { id: "advanced", label: "상세 분석" },
     { id: "validation", label: "검증" },
+    { id: "technical", label: "기술" },
+    { id: "expert", label: "전문가" },
   ] as const;
 
   /**
@@ -1185,9 +1214,11 @@ export function BacktestReviewWorkbench() {
   };
 
   const costBurdenPct =
-    costRatios?.totalCostPctOfGrossProfit != null
-      ? (costRatios.totalCostPctOfGrossProfit * 100).toFixed(1)
+    eligibilityCostRatio != null
+      ? (eligibilityCostRatio * 100).toFixed(1)
       : null;
+  const costBurdenCritical =
+    eligibilityCostRatio != null && eligibilityCostRatio >= 0.5;
   const analysisSectionIds = [
     "price",
     "trades",
@@ -1202,10 +1233,101 @@ export function BacktestReviewWorkbench() {
     activeNavSection as (typeof analysisSectionIds)[number],
   )
     ? (activeNavSection as (typeof analysisSectionIds)[number])
-    : "price";
+    : activeNavSection === "overview" ||
+        activeNavSection === "technical" ||
+        activeNavSection === "expert"
+      ? activeNavSection
+      : "price";
+
+  const operatorFailure = runErrorCode
+    ? backtestOperatorFailurePresentation(runErrorCode, runErrorDetail)
+    : null;
+  const operatorResultContext = backtestOperatorResolveResultContext({
+    selectedRunId,
+    runJustCompleted,
+    sourceType: selectedRun?.sourceType,
+  });
+  const operatorUsable = backtestOperatorUsableLabel({
+    eligible: eligibility?.eligible ?? null,
+    failureCode: runErrorCode,
+    status: selectedRun?.status ?? (report ? "completed" : null),
+  });
+  const operatorPageState = backtestOperatorPageState({
+    strategyId,
+    running: loading || runInFlight,
+    loading: hydrationState === "loading_run" || hydrationState === "loading_runs",
+    report,
+    failureCode: runErrorCode,
+    networkError,
+    historicalSelected: operatorResultContext === "saved_historical" && Boolean(report),
+    eligible: eligibility?.eligible ?? null,
+  });
+  const operatorStats = backtestOperatorDeriveTradeStats(trades, {
+    tradeCount: report?.tradeCount,
+    averageTrade: report?.averageTrade,
+    profitFactor: report?.profitFactor,
+    maxConsecutiveLosses: report?.maxConsecutiveLosses,
+    feeTotal: report?.feeTotal ?? report?.costs?.feeCostUsdt,
+    netPnl:
+      typeof backtestOperatorNetPnl(report) === "number"
+        ? (backtestOperatorNetPnl(report) as number)
+        : null,
+  });
+  const operatorPeriod = backtestOperatorPeriodStats(report?.monthlyReturns);
+  const operatorChecks = backtestOperatorValidationChecks({
+    report,
+    strategyId,
+    paramsHash: strategy?.paramsHash ?? report?.sourceParamsHash,
+    failureCode: runErrorCode,
+  });
+  const operatorNetPnl = backtestOperatorNetPnl(report);
+  const operatorNextAction = backtestOperatorNextAction({
+    state: operatorPageState,
+    recommendedNextActionKo: eligibility?.recommendedNextActionKo,
+    failure: operatorFailure,
+  });
+  const operatorStrategyType = backtestOperatorStrategyTypeLabel({
+    strategyId: strategy?.id ?? strategyId,
+    locked: strategy?.locked,
+    hasEventSequence: Boolean(
+      (strategy as StoredStrategyV1 | null)?.definition?.eventSequence,
+    ),
+    patternCombination: (() => {
+      const raw = (strategy as StoredStrategyV1 | null)?.definition?.metadata
+        ?.patternCombination;
+      return typeof raw === "string" ? raw : null;
+    })(),
+  });
+  const chartIdentity = backtestOperatorChartIdentity({
+    selectedRunId,
+    strategyHash: report?.strategyHash,
+    fromDate: report?.fromDate,
+    toDate: report?.toDate,
+    symbol: report?.symbol,
+  });
+  const compactStatus = backtestOperatorCompactStatusLabel({
+    failure: Boolean(operatorFailure),
+    eligible: eligibility?.eligible ?? null,
+  });
+  const historicalReview =
+    operatorResultContext === "saved_historical" && Boolean(report);
+  const sourceTimeframe =
+    report?.timeframe && report.timeframe !== "unknown"
+      ? report.timeframe
+      : strategy?.timeframe && strategy.timeframe !== "unknown"
+        ? strategy.timeframe
+        : null;
+  useSetOperatorPageContext({
+    source: "backtest",
+    strategyId: strategyId || null,
+    runId: selectedRunId || null,
+    symbol: report?.symbol ?? symbol ?? null,
+    timeframe: sourceTimeframe,
+    statusLabel: compactStatus,
+  });
 
   return (
-    <div className="space-y-4" data-testid="backtest-review-workbench">
+    <div className="v3-bt-workbench space-y-4" data-testid="backtest-review-workbench">
       {(searchParams.get("demo") === "1" ||
         (strategy && isDemoStrategyRecord(strategy)) ||
         (selectedRun && isDemoBacktestRecord(selectedRun))) ? (
@@ -1219,10 +1341,72 @@ export function BacktestReviewWorkbench() {
           </p>
         </div>
       ) : null}
-      <section id="bt-run" className="scroll-mt-20 space-y-4">
+      <BacktestOperatorHeader
+        strategyLabel={
+          (strategy as { displayAlias?: string | null; displayName?: string | null } | null)
+            ?.displayAlias ||
+          (strategy as { displayName?: string | null } | null)?.displayName ||
+          strategy?.name ||
+          strategyId ||
+          "전략 미선택"
+        }
+        strategyType={operatorStrategyType}
+        symbol={report?.symbol ?? symbol}
+        timeframe={
+          strategy?.timeframe
+            ? displayTimeframeLabel(strategy.timeframe)
+            : report?.timeframe
+              ? displayTimeframeLabel(report.timeframe)
+              : "—"
+        }
+        fromDate={report?.fromDate ?? fromDate}
+        toDate={report?.toDate ?? toDate}
+        validationLabel={compactStatus}
+        validationTone={
+          operatorFailure || eligibility?.eligible === false
+            ? "danger"
+            : eligibility?.eligible
+              ? "success"
+              : "muted"
+        }
+        usableLabel={operatorUsable.labelKo}
+        resultContext={operatorResultContext}
+        runId={selectedRunId || null}
+        createdAt={
+          selectedRun?.completedAt
+            ? new Date(selectedRun.completedAt).toLocaleString("ko-KR")
+            : selectedRun?.createdAt
+              ? new Date(selectedRun.createdAt).toLocaleString("ko-KR")
+              : null
+        }
+      />
+      {operatorFailure ? <BacktestFailurePanel failure={operatorFailure} /> : null}
+      {networkError && !operatorFailure ? (
+        <BacktestResultState state="network_error" nextAction={operatorNextAction} />
+      ) : null}
+      <section
+        id="bt-run"
+        className="scroll-mt-20 v3-bt-exec-region space-y-4"
+        data-historical-review={historicalReview ? "true" : "false"}
+      >
+      <details
+        key={`${selectedRunId || "none"}:${historicalReview ? "hist" : "live"}`}
+        className="v3-bt-setup-disc"
+        open={historicalReview ? undefined : true}
+        data-testid="backtest-setup-disclosure"
+      >
+        <summary className="v3-bt-setup-summary">
+          <strong>{historicalReview ? "실행 설정" : "백테스트 실행"}</strong>
+          <span>
+            {historicalReview
+              ? `${strategyId || "전략"} · ${symbol} · ${fromDate} → ${toDate} · ${resolvedCostProfile}`
+              : "전략 ID와 해시는 유지한 채, 선택한 심볼·기간으로 시뮬레이션을 실행합니다."}
+          </span>
+        </summary>
       <Card
+        className="v3-bt-exec"
         title="백테스트 실행"
-        description="탐색으로 확정된 전략의 불변 ID·해시를 유지한 채, 선택한 기간으로 새 백테스트를 실행합니다."
+        description="전략 ID와 해시는 유지한 채, 선택한 심볼·기간으로 시뮬레이션을 실행합니다."
         data-testid="backtest-strategy-context"
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -1516,7 +1700,9 @@ export function BacktestReviewWorkbench() {
               data-testid="backtest-to"
             />
           </label>
-          <Metric label="비용 프로필" value={costSummary} />
+          <div data-testid="backtest-cost-assumptions">
+            <Metric label="비용 프로필" value={resolvedCostProfile} />
+          </div>
         </div>
 
         <div
@@ -1545,16 +1731,27 @@ export function BacktestReviewWorkbench() {
             선택된 전략이 없어 보호 기준 전략 SAFE를 표시합니다.
           </p>
         ) : null}
+      </Card>
+      </details>
 
-        <div className="mt-3 flex flex-wrap gap-2">
+      <div className="v3-bt-run-actions">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
-            tone="success"
+            tone={historicalReview ? "muted" : "success"}
+            variant={historicalReview ? "outline" : undefined}
             disabled={!strategyId || loading || runInFlight}
             onClick={() => void runUserBacktest()}
             data-testid="backtest-run"
           >
-            {loading || runInFlight ? "실행 중…" : "백테스트 실행"}
+            {loading || runInFlight
+              ? "실행 중…"
+              : historicalReview
+                ? "새 백테스트 실행"
+                : "백테스트 실행"}
           </Button>
+          {historicalReview ? (
+            <span className="text-xs rx-text-muted">저장된 결과를 검토 중입니다. 이 버튼은 새 실행을 만듭니다.</span>
+          ) : null}
           {(expertMode || expertQuery) && (
             <Link
               href="/backtest?expert=1"
@@ -1581,7 +1778,20 @@ export function BacktestReviewWorkbench() {
                 동일한 조건의 기존 계산 결과를 사용했습니다. 이번 실행 기록은 새로 저장되었습니다.
               </p>
             ) : null}
-            {runErrorDetail ? (
+            {runFeedback === COVERAGE_BLOCKER_TITLE_KO ? (
+              <div
+                className="mt-1 text-xs opacity-90"
+                data-testid="backtest-coverage-blocker"
+              >
+                <p>{COVERAGE_BLOCKER_TITLE_KO}</p>
+                {runErrorDetail ? (
+                  <pre className="mt-1 whitespace-pre-wrap break-all opacity-80">
+                    {runErrorDetail}
+                  </pre>
+                ) : null}
+              </div>
+            ) : null}
+            {runErrorDetail && runFeedback !== COVERAGE_BLOCKER_TITLE_KO ? (
               <details className="text-xs" data-testid="backtest-run-error-detail">
                 <summary className="cursor-pointer opacity-75">기술 상세</summary>
                 <pre className="mt-1 whitespace-pre-wrap break-all opacity-80">{runErrorDetail}</pre>
@@ -1593,7 +1803,7 @@ export function BacktestReviewWorkbench() {
         <p className="sr-only" data-testid="backtest-message">
           {runFeedback}
         </p>
-      </Card>
+      </div>
 
       <Card title="저장된 백테스트" data-testid="backtest-run-history">
         <div className="mb-3 flex flex-wrap gap-2" data-testid="backtest-run-symbol-filter">
@@ -1662,6 +1872,14 @@ export function BacktestReviewWorkbench() {
           </label>
         )}
         {selectedRun ? (
+          <details className="v3-bt-run-tech mt-3">
+            <summary>
+              실행 ID {selectedRun.id}
+              <span aria-hidden="true"> · </span>
+              {selectedRun.completedAt
+                ? new Date(selectedRun.completedAt).toLocaleString("ko-KR")
+                : new Date(selectedRun.createdAt).toLocaleString("ko-KR")}
+            </summary>
           <div
             className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
             data-testid="backtest-run-technical-detail"
@@ -1712,6 +1930,7 @@ export function BacktestReviewWorkbench() {
               value={backtestStatusLabelKo(selectedRun.status)}
             />
           </div>
+          </details>
         ) : null}
         <div className="mt-3">
           <Button
@@ -1743,9 +1962,73 @@ export function BacktestReviewWorkbench() {
       </Card>
       </section>
 
+      <p className="v3-bt-note" data-testid="backtest-no-cancel-note">
+        진행 중 취소 버튼은 넣지 않습니다. 현재 제품에 비행 중 취소가 없습니다.
+      </p>
+
       {report ? (
-        <nav
-          className="sticky top-0 z-30 -mx-1 overflow-x-auto border-b border-slate-800 bg-slate-950/95 px-1 py-2.5 backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        <div
+          className="v3-bt-statusbar"
+          data-testid="backtest-status-bar"
+          data-result-context={operatorResultContext}
+        >
+          <div className="v3-bt-status-main">
+            <span>검증 결과</span>
+            <b>
+              {compactStatus}
+              <span aria-hidden="true"> · </span>
+              {backtestOperatorResultContextLabel(operatorResultContext)}
+            </b>
+          </div>
+          {report.totalReturn != null && Number.isFinite(report.totalReturn) ? (
+            <div className="v3-bt-status-cell">
+              <span>수익률</span>
+              <b
+                className={
+                  report.totalReturn > 0 ? "ok" : report.totalReturn < 0 ? "bad" : undefined
+                }
+              >
+                {backtestOperatorFormatPct(report.totalReturn)}
+              </b>
+            </div>
+          ) : null}
+          {report.mdd != null && Number.isFinite(report.mdd) ? (
+            <div className="v3-bt-status-cell">
+              <span>최대 낙폭</span>
+              <b className="bad">{backtestOperatorFormatPct(report.mdd)}</b>
+            </div>
+          ) : null}
+          {report.winRate != null && Number.isFinite(report.winRate) ? (
+            <div className="v3-bt-status-cell">
+              <span>승률</span>
+              <b>{backtestOperatorFormatPct(report.winRate, 1)}</b>
+            </div>
+          ) : null}
+          {report.tradeCount != null && Number.isFinite(report.tradeCount) ? (
+            <div className="v3-bt-status-cell">
+              <span>거래</span>
+              <b>{backtestOperatorFormatCount(report.tradeCount)}</b>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      <details className="v3-bt-disc" data-testid="backtest-error-coverage">
+        <summary>오류 · 커버리지</summary>
+        <div className="v3-bt-disc-body">
+          {runFeedback ? <p>{runFeedback}</p> : null}
+          {runErrorDetail ? (
+            <pre className="mt-1 whitespace-pre-wrap break-all">{runErrorDetail}</pre>
+          ) : null}
+          {hydrationError ? <p>{hydrationError}</p> : null}
+          {!runFeedback && !runErrorDetail && !hydrationError ? (
+            <p>표시할 오류가 없습니다. 커버리지는 선택된 실행의 보고서 값을 따릅니다.</p>
+          ) : null}
+        </div>
+      </details>
+
+      <nav
+          className="v3-bt-tabs sticky top-0 z-30 -mx-1 overflow-x-auto px-1 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           data-testid="analysis-section-nav"
           aria-label="백테스트 섹션"
           style={{ WebkitOverflowScrolling: "touch" }}
@@ -1757,11 +2040,7 @@ export function BacktestReviewWorkbench() {
                 <button
                   key={s.id}
                   type="button"
-                  className={`min-h-11 whitespace-nowrap rounded-md px-3.5 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:min-h-10 ${
-                    active
-                      ? "bg-sky-600/30 font-semibold text-sky-100 ring-1 ring-sky-400/50"
-                      : "bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-                  }`}
+                  className="v3-tab"
                   aria-current={active ? "true" : undefined}
                   data-active={active ? "true" : "false"}
                   onClick={() => selectWorkbenchSection(s.id)}
@@ -1773,28 +2052,43 @@ export function BacktestReviewWorkbench() {
             })}
           </div>
         </nav>
-      ) : null}
 
       {!strategyId ? (
-        <EmptyState
-          message="전략을 선택하세요"
-          hint="탐색 결과에서 전략을 고르거나 위에서 선택하세요."
-        />
+        <div
+          hidden={
+            activeNavSection === "technical" ||
+            activeNavSection === "expert" ||
+            undefined
+          }
+        >
+        <BacktestResultState state="no_strategy" nextAction={operatorNextAction} />
+        </div>
       ) : loading && !report ? (
-        <Card title="실행 중">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        </Card>
+        <div className="space-y-3" data-testid="backtest-run-loading-result">
+          <BacktestResultState state="running" nextAction={operatorNextAction} />
+          <Card title="실행 중">
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </Card>
+        </div>
       ) : report && eligibility ? (
         <>
+          <div className={resultRefreshing ? "bt-op-refreshing" : undefined}>
+          <div
+            id="bt-overview"
+            className="v3-bt-overview"
+            hidden={activeNavSection !== "overview" || undefined}
+            data-testid="backtest-overview"
+          >
+          <div className="v3-bt-overview-primary">
           <section id="bt-verdict" className="scroll-mt-20" data-testid="backtest-decision-summary">
             <Card title="판정 요약">
               <div className="mb-3 flex flex-wrap gap-2">
                 <Badge tone={eligibility.eligible ? "success" : "danger"}>
-                  {eligibility.verdictLabel}
+                  {eligibility.eligible ? "적격" : "부적격"}
                 </Badge>
                 {selectedRunId ? (
                   <span title={selectedRunId}>
@@ -1818,11 +2112,6 @@ export function BacktestReviewWorkbench() {
                   tone={!eligibility.eligible ? "danger" : "default"}
                 />
                 <Metric
-                  label="가장 큰 위험"
-                  value={eligibility.primaryRiskKo}
-                  tone="danger"
-                />
-                <Metric
                   label="거래 수 신뢰도"
                   value={eligibility.sampleAdequate ? "충분" : "부족"}
                   tone={eligibility.sampleAdequate ? "success" : "warning"}
@@ -1832,7 +2121,7 @@ export function BacktestReviewWorkbench() {
                   label="비용 부담"
                   value={costBurdenPct == null ? "—" : `${costBurdenPct}%`}
                   tone={
-                    costRatios?.criticalCostOfGross ? "danger" : "warning"
+                    costBurdenCritical ? "danger" : "warning"
                   }
                   help="총수익 대비 거래비용 비율"
                 />
@@ -1847,18 +2136,13 @@ export function BacktestReviewWorkbench() {
                 </p>
               ) : !eligibility.eligible && primaryBlockReason ? (
                 <p
-                  className="mt-3 rounded-lg border border-rose-500/50 bg-rose-950/40 px-3 py-2 text-sm font-medium text-rose-100"
+                  className="sr-only"
                   data-testid="backtest-eligibility-fail-reason"
                 >
-                  {primaryBlockReason.labelKo}
-                  {primaryBlockReason.code === "insufficient_trade_sample" &&
-                  primaryBlockReason.observedValue != null &&
-                  primaryBlockReason.requiredThreshold != null
-                    ? ` (거래 ${primaryBlockReason.observedValue}건 · 최소 ${primaryBlockReason.requiredThreshold}건)`
-                    : ""}
+                  {BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER}
                 </p>
               ) : null}
-              {costRatios?.criticalCostOfGross && costBurdenPct != null ? (
+              {costBurdenCritical && costBurdenPct != null ? (
                 <p
                   className="mt-2 rounded-lg border border-amber-500/40 bg-amber-950/30 px-3 py-2 text-sm text-amber-100"
                   data-testid="decision-cost-warning"
@@ -1874,7 +2158,9 @@ export function BacktestReviewWorkbench() {
               </p>
             </Card>
           </section>
+          </div>
 
+          <div className="v3-bt-actions">
           <Card title="다음 행동" data-testid="backtest-review-actions">
             {sharedPromotionBlock ? (
               <div
@@ -1886,7 +2172,7 @@ export function BacktestReviewWorkbench() {
                   className="text-sm leading-relaxed text-rose-50"
                   data-testid="backtest-shared-block-detail"
                 >
-                  {sharedBlockDetail}
+                  {BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER}
                 </p>
               </div>
             ) : (
@@ -1899,7 +2185,9 @@ export function BacktestReviewWorkbench() {
                     <p className="text-sm font-semibold text-rose-100">
                       모의매매 등록 불가
                     </p>
-                    <p className="mt-1 text-sm text-rose-50">{paperBlockedReason}</p>
+                    <p className="mt-1 text-sm text-rose-50">
+                      {BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER}
+                    </p>
                   </div>
                 ) : null}
                 {liveBlockedReason && liveBlockCode !== paperBlockCode ? (
@@ -1910,7 +2198,9 @@ export function BacktestReviewWorkbench() {
                     <p className="text-sm font-semibold text-rose-100">
                       실전 후보 등록 불가
                     </p>
-                    <p className="mt-1 text-sm text-rose-50">{liveBlockedReason}</p>
+                    <p className="mt-1 text-sm text-rose-50">
+                      {BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER}
+                    </p>
                   </div>
                 ) : null}
               </>
@@ -2030,8 +2320,70 @@ export function BacktestReviewWorkbench() {
             ) : null}
           </Card>
 
+          </div>
+
+          <div className="v3-bt-overview-side">
+          <BacktestKpiGrid
+            totalReturn={
+              report.totalReturn == null || !Number.isFinite(report.totalReturn)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.totalReturn
+            }
+            netPnl={operatorNetPnl}
+            winRate={
+              report.winRate == null || !Number.isFinite(report.winRate)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.winRate
+            }
+            tradeCount={operatorStats.totalTrades}
+            averageTrade={
+              report.averageTrade == null || !Number.isFinite(report.averageTrade)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.averageTrade
+            }
+            profitFactor={
+              report.profitFactor == null || !Number.isFinite(report.profitFactor)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.profitFactor
+            }
+            payoffRatio={operatorStats.payoffRatio}
+            mdd={
+              report.mdd == null || !Number.isFinite(report.mdd)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.mdd
+            }
+            maxConsecutiveLosses={operatorStats.maxConsecutiveLosses}
+            stale={resultRefreshing}
+          />
+
+          <BacktestOperatorAnalysis
+            totalReturn={
+              report.totalReturn == null || !Number.isFinite(report.totalReturn)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.totalReturn
+            }
+            netPnl={operatorNetPnl}
+            mdd={
+              report.mdd == null || !Number.isFinite(report.mdd)
+                ? BACKTEST_OPERATOR_UNAVAILABLE
+                : report.mdd
+            }
+            stats={operatorStats}
+            period={operatorPeriod}
+            checks={operatorChecks}
+          />
+          </div>
+          </div>
+
+          <div
+            hidden={
+              activeNavSection === "technical" ||
+              activeNavSection === "expert" ||
+              undefined
+            }
+          >
           <BacktestAnalysisView
-            key={`${selectedRunId || "live"}-${report.symbol}-${symbol}`}
+            key={chartIdentity}
             report={report}
             trades={trades}
             equityCurve={equityCurve}
@@ -2068,13 +2420,118 @@ export function BacktestReviewWorkbench() {
             chartReproWarning={chartReproWarning}
             chartSource={chartSource}
           />
+          </div>
+          </div>
         </>
       ) : (
-        <EmptyState
-          message="아직 선택된 백테스트가 없습니다."
-          hint="기간을 설정한 뒤 백테스트 실행을 누르거나, 저장된 실행을 불러오세요."
+        <div
+          hidden={
+            activeNavSection === "technical" ||
+            activeNavSection === "expert" ||
+            undefined
+          }
+        >
+        <BacktestResultState
+          state={strategyId ? "ready" : "no_strategy"}
+          nextAction={operatorNextAction}
         />
+        </div>
       )}
+
+      <section
+        id="bt-technical"
+        className="v3-bt-tech scroll-mt-20"
+        hidden={activeNavSection !== "technical" || undefined}
+        data-testid="backtest-technical-panel"
+      >
+        <h3 className="bt-op-section-title">기술 · 개발자 공개</h3>
+        {selectedRun ? (
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <Metric label="실행 ID" value={selectedRun.id} />
+            <Metric
+              label="실행 일시"
+              value={
+                selectedRun.completedAt
+                  ? new Date(selectedRun.completedAt).toLocaleString("ko-KR")
+                  : new Date(selectedRun.createdAt).toLocaleString("ko-KR")
+              }
+            />
+            <Metric
+              label="실행 방식"
+              value={sourceTypeLabelKo(selectedRun.sourceType)}
+            />
+            <Metric
+              label="심볼"
+              value={(
+                selectedRun.report.symbol ??
+                selectedRun.config.symbols?.[0] ??
+                "—"
+              ).toString()}
+            />
+            <Metric
+              label="결과 재사용 여부"
+              value={
+                selectedRun.deduplicatedResult
+                  ? "예 (기존 계산 결과 사용)"
+                  : "아니오"
+              }
+            />
+            <Metric label="결과 hash" value={selectedRun.resultHash ?? "—"} />
+            <Metric
+              label="백테스트 엔진 버전"
+              value={selectedRun.engineVersion ?? "rextora-backtest-1"}
+            />
+            <Metric
+              label="데이터 버전"
+              value={dataVersionLabelKo(selectedRun.dataVersion)}
+            />
+            <Metric
+              label="상태"
+              value={backtestStatusLabelKo(selectedRun.status)}
+            />
+            <Metric
+              label={displayParamsHashLabel()}
+              value={strategy?.paramsHash ?? "—"}
+            />
+            <Metric
+              label={displayStrategyHashLabel()}
+              value={formatShortHash(strategy?.strategyHash)}
+            />
+          </div>
+        ) : (
+          <p className="v3-bt-empty">선택된 저장 실행이 없습니다.</p>
+        )}
+      </section>
+
+      <section
+        id="bt-expert"
+        className="v3-bt-expert scroll-mt-20"
+        hidden={activeNavSection !== "expert" || undefined}
+        data-testid="backtest-expert-panel"
+      >
+        {expertMode || expertQuery ? (
+          <p>
+            전문가 경로{" "}
+            <Link href="/backtest?expert=1" data-testid="backtest-expert-tab-link">
+              /backtest?expert=1
+            </Link>
+            에서 수동 파라미터 백테스트를 엽니다. 이 탭은 새 전문가 기능을 추가하지 않습니다.
+          </p>
+        ) : (
+          <div className="v3-bt-expert-disabled">
+            <p>
+              전문가 모드는 시스템 설정에서 켠 뒤에만 사용할 수 있습니다. 스트레스·펀딩·다중 심볼·비용 오버라이드는 기존 전문가 화면에만 있습니다.
+            </p>
+            <Link
+              href="/settings"
+              className="v3-bt-settings-link"
+              data-testid="backtest-expert-settings-link"
+            >
+              시스템 설정 열기
+            </Link>
+          </div>
+        )}
+      </section>
 
       <BacktestStrategyManageDrawer
         open={strategyManageOpen}

@@ -13,6 +13,7 @@ import {
 } from "../src/lib/rextora/strategy/strategyStore";
 import { listProductionStrategies } from "../src/lib/rextora/strategy/strategyMetadata";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
+import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import {
   createSearchJob,
   createStrategySearchCandidateId,
@@ -219,6 +220,47 @@ describe("strategy persistence (isolated)", () => {
       jitter: { enabled: false, samples: 0, relativeAmplitude: 0 },
     };
     const job = createSearchJob(config, { rootDir: searchRoot });
+    saveJobExecutionProfile(
+      job.id,
+      {
+        version: 1,
+        balance: 10_000,
+        baseCostConfig: {
+          feeRate: 0.0004,
+          slippageRate: 0.0002,
+          fundingRate: 0.0001,
+          applyFunding: false,
+          applySpread: false,
+          spreadRate: 0.0001,
+        },
+        passPolicy: { thresholds: { minTradeCount: 1 } },
+        scoreWeights: {
+          returnWeight: 1,
+          mddWeight: 0.5,
+          profitFactorWeight: 0.25,
+          winRateWeight: 0.25,
+          tradeAdequacyWeight: 0.25,
+          negativeMonthWeight: 0.1,
+          consistencyWeight: 0.1,
+        },
+        costStressScenarios: [],
+        jitterConfig: {
+          enabled: false,
+          sampleCount: 1,
+          mutationScale: 0.1,
+          seed: 1,
+          minimumPassRate: 0,
+          maximumScoreDropRatio: 1,
+          parameterRanges: config.parameterRanges,
+        },
+        dataRef: {
+          availableFrom: 1_700_000_000_000,
+          availableTo: 1_700_100_000_000,
+          source: "preloaded",
+        },
+      },
+      { rootDir: searchRoot },
+    );
     const params = { ...CONTEXT_FALLBACK_PARAMS, ema_fast: 17, ema_slow: 55 };
     seedPassedTrial(job.id, searchRoot, params);
 

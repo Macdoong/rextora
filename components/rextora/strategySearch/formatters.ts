@@ -134,6 +134,7 @@ export function researchStatusLabelKo(
   if (status === "running" || status === "pause_requested") {
     return "연구 중";
   }
+  if (status === "interrupted") return "실행 중단";
   if (status === "cancel_requested") {
     return opts?.executionActive ? "중지 요청 중" : "결과 정리 중";
   }
@@ -164,9 +165,13 @@ export function historyStatusLabelKo(
     completionReason?: StrategySearchCompletionReason | null;
   },
 ): string {
-  if (status === "running" || status === "pause_requested" || status === "queued") {
+  if (status === "running" || status === "pause_requested") {
     return "연구 중";
   }
+  if (status === "queued") {
+    return researchStatusLabelKo(status);
+  }
+  if (status === "interrupted") return "실행 중단";
   if (status === "paused") return "일시정지";
   if (status === "cancel_requested") return "중지 요청 중";
   if (status === "cancelling") return "결과 정리 중";
@@ -271,6 +276,7 @@ export function resolveCurrentStageLabelKo(input: {
     return "전략 생성";
   }
   if (input.status === "paused") return "일시정지";
+  if (input.status === "interrupted") return "실행 중단";
   if (input.status === "completed") return "정상 완료";
   if (input.status === "cancelled") return "사용자 중지";
   if (input.status === "failed") return "실패";
@@ -325,6 +331,7 @@ export function pipelineStageUiStatus(input: {
     if (input.jobStatus === "completed" || input.jobStatus === "cancelled") {
       return "completed";
     }
+    if (input.jobStatus === "interrupted") return "waiting";
     return "running";
   }
   // pending / unknown

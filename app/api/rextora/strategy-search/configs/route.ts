@@ -10,9 +10,13 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 /** GET /api/rextora/strategy-search/configs — list saved operator configs */
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const data = listStrategySearchConfigs();
@@ -24,6 +28,8 @@ export async function GET() {
 
 /** POST /api/rextora/strategy-search/configs — save or manage named operator config */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = await request.json().catch(() => null);

@@ -19,6 +19,7 @@ import {
   registerTrialForBacktest,
 } from "../src/lib/rextora/strategySearch/researchResultsSummary";
 import { resolveResearchOutcome } from "../src/lib/rextora/strategySearch/researchOutcome";
+import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import { listStrategies } from "../src/lib/rextora/strategy/strategyStore";
 import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
@@ -225,6 +226,47 @@ describe("register then backtest", () => {
         },
         dataRef: {
           source: "binance_historical",
+          availableFrom: 0,
+          availableTo: 1,
+        },
+      },
+      store,
+    );
+    saveJobExecutionProfile(
+      job.id,
+      {
+        version: 1,
+        balance: 10_000,
+        baseCostConfig: {
+          feeRate: 0.0004,
+          slippageRate: 0.0002,
+          fundingRate: 0,
+          applyFunding: false,
+          applySpread: false,
+          spreadRate: 0,
+        },
+        passPolicy: { thresholds: {} },
+        scoreWeights: {
+          returnWeight: 1,
+          mddWeight: 1,
+          profitFactorWeight: 0.25,
+          winRateWeight: 0.25,
+          tradeAdequacyWeight: 0.25,
+          negativeMonthWeight: 0.1,
+          consistencyWeight: 0.1,
+        },
+        costStressScenarios: [],
+        jitterConfig: {
+          enabled: true,
+          sampleCount: 1,
+          mutationScale: 0.1,
+          seed: 1,
+          minimumPassRate: 0,
+          maximumScoreDropRatio: 1,
+          parameterRanges: [],
+        },
+        dataRef: {
+          source: "preloaded",
           availableFrom: 0,
           availableTo: 1,
         },

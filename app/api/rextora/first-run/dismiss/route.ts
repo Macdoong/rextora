@@ -4,11 +4,14 @@ import {
   markFirstRunSetupComplete,
 } from "@/src/lib/rextora/firstRun/demoFixture";
 import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatus";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * Dismiss onboarding or mark setup complete. Does not create or delete data.
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "settings:write");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => ({}))) as {

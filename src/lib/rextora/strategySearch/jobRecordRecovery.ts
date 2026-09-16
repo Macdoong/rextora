@@ -11,12 +11,14 @@ import {
   saveSearchJob,
   type StrategySearchStoreOptions,
 } from "./jobStore";
-import { activeElapsedMs, getSearchPlan } from "./searchPlan";
+import { activeElapsedMs, getSearchPlan, type StrategySearchPlan } from "./searchPlan";
+import { isNormalSearchCompletionReason } from "./jobExecutionRegistry";
 import { getJobExecutionProfile } from "./jobExecutionProfile";
 import {
   buildPersistedCheckpoint,
   createInitialRunnerPayload,
 } from "./jobCheckpoint";
+import { reconstructGroupBestFromTrials } from "./researchEvaluationIdentity";
 import { createSeededRandom } from "./random";
 import type {
   StrategySearchConfig,
@@ -26,6 +28,7 @@ import type {
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import { appendRecoveryAudit } from "./recoveryAudit";
 import { strategySearchRoot } from "../storage/runtimePaths";
+import { cloneSearchParameterRanges } from "./searchSpaceMutation";
 
 export interface JobRecordRecoveryResult {
   jobId: string;
@@ -35,6 +38,111 @@ export interface JobRecordRecoveryResult {
   recoveredStatus: StrategySearchJobStatus | null;
   completedIterations: number;
   trialCount: number;
+}
+
+export const MISSING_JOB_RECOVERY_REASON = {
+  TERMINAL_COMPLETION: "terminal_completion_proven",
+  TERMINAL_CANCELLED: "terminal_cancelled_proven",
+  TERMINAL_FAILED: "terminal_failed_proven",
+  INTERRUPTED: "process_loss_interrupted_proven",
+  QUEUED: "queued_state_proven",
+  COOPERATIVE_PAUSE: "cooperative_pause_proven",
+  INSUFFICIENT: "insufficient_lifecycle_evidence",
+} as const;
+
+const FAILED_COMPLETION_REASONS = new Set([
+  "FATAL_ERROR",
+  "ENGINE_ERROR",
+  "RECOVERY_FAILED",
+  "CONFIGURATION_INVALID",
+  "DATA_UNAVAILABLE",
+  "RESOURCE_SAFETY_LIMIT",
+]);
+
+type MissingJobClassification =
+  | {
+      ok: true;
+      status: StrategySearchJobStatus;
+      reason: string;
+    }
+  | { ok: false; reason: string };
+
+function planIsIdle(plan: StrategySearchPlan | null): boolean {
+  if (!plan) return false;
+  return (
+    plan.completionReason == null &&
+    plan.pausedAtMs == null &&
+    plan.interruptedAtMs == null
+  );
+}
+
+/**
+ * Proven lifecycle only. Index status is corroboration, never sole authority.
+ */
+function classifyMissingJobLifecycle(input: {
+  plan: StrategySearchPlan | null;
+  indexStatus: string | null;
+  indexFinishedAt: string | null | undefined;
+}): MissingJobClassification {
+  const { plan, indexStatus, indexFinishedAt } = input;
+  if (plan) {
+    if (plan.pausedAtMs != null && plan.interruptedAtMs != null) {
+      return { ok: false, reason: MISSING_JOB_RECOVERY_REASON.INSUFFICIENT };
+    }
+    if (isNormalSearchCompletionReason(plan.completionReason)) {
+      return {
+        ok: true,
+        status: "completed",
+        reason: MISSING_JOB_RECOVERY_REASON.TERMINAL_COMPLETION,
+      };
+    }
+    if (
+      plan.completionReason === "USER_CANCELLED" ||
+      plan.completionReason === "USER_STOPPED"
+    ) {
+      return {
+        ok: true,
+        status: "cancelled",
+        reason: MISSING_JOB_RECOVERY_REASON.TERMINAL_CANCELLED,
+      };
+    }
+    if (
+      plan.completionReason != null &&
+      FAILED_COMPLETION_REASONS.has(plan.completionReason)
+    ) {
+      return {
+        ok: true,
+        status: "failed",
+        reason: MISSING_JOB_RECOVERY_REASON.TERMINAL_FAILED,
+      };
+    }
+    if (plan.interruptedAtMs != null) {
+      return {
+        ok: true,
+        status: "interrupted",
+        reason: MISSING_JOB_RECOVERY_REASON.INTERRUPTED,
+      };
+    }
+    if (plan.pausedAtMs != null || plan.completionReason === "PAUSED") {
+      return {
+        ok: true,
+        status: "paused",
+        reason: MISSING_JOB_RECOVERY_REASON.COOPERATIVE_PAUSE,
+      };
+    }
+  }
+  if (
+    planIsIdle(plan) &&
+    indexStatus === "queued" &&
+    (indexFinishedAt == null || indexFinishedAt === "")
+  ) {
+    return {
+      ok: true,
+      status: "queued",
+      reason: MISSING_JOB_RECOVERY_REASON.QUEUED,
+    };
+  }
+  return { ok: false, reason: MISSING_JOB_RECOVERY_REASON.INSUFFICIENT };
 }
 
 function defaultRoot(): string {
@@ -101,7 +209,7 @@ function buildFallbackConfig(input: {
     seed: input.seed,
     generatorType: "random",
     maxIterations: input.maxIterations,
-    parameterRanges: input.parameterRanges,
+    parameterRanges: cloneSearchParameterRanges(input.parameterRanges),
     evaluationWindows: [
       {
         id: "w1",
@@ -147,9 +255,8 @@ function defaultParameterRanges(): StrategySearchConfig["parameterRanges"] {
 }
 
 /**
- * If job.json is missing but index/plan/execution/trials remain, rebuild a
- * paused recoverable job record. Checkpoint PRNG is re-seeded; seenHashes
- * are restored from plan/trials so resume does not duplicate candidates.
+ * If job.json is missing but durable artifacts remain, rebuild the job only
+ * when lifecycle state is positively proven. Does not auto-resume execution.
  */
 export function recoverMissingJobRecord(
   jobId: string,
@@ -186,6 +293,24 @@ export function recoverMissingJobRecord(
     };
   }
 
+  const previousStatus = indexRow?.status ?? null;
+  const classified = classifyMissingJobLifecycle({
+    plan,
+    indexStatus: previousStatus,
+    indexFinishedAt: indexRow?.finishedAt,
+  });
+  if (!classified.ok) {
+    return {
+      jobId,
+      recovered: false,
+      reason: classified.reason,
+      previousStatus,
+      recoveredStatus: null,
+      completedIterations: 0,
+      trialCount: trials.length,
+    };
+  }
+
   const maxTrialIter =
     trials.length > 0
       ? Math.max(...trials.map((t) => t.iteration))
@@ -207,35 +332,7 @@ export function recoverMissingJobRecord(
     }
   }
 
-  let bestCandidate = null as StrategySearchJob["checkpoint"]["bestCandidate"];
-  let bestPassed = null as StrategySearchJob["checkpoint"]["bestPassedCandidate"];
-  for (const t of trials) {
-    if (t.score == null) continue;
-    if (
-      !bestCandidate ||
-      (bestCandidate.score ?? -Infinity) < t.score
-    ) {
-      bestCandidate = {
-        candidateId: t.candidateId,
-        iteration: t.iteration,
-        paramsHash: t.paramsHash,
-        score: t.score,
-        passed: t.passed,
-      };
-    }
-    if (
-      t.passed &&
-      (!bestPassed || (bestPassed.score ?? -Infinity) < t.score)
-    ) {
-      bestPassed = {
-        candidateId: t.candidateId,
-        iteration: t.iteration,
-        paramsHash: t.paramsHash,
-        score: t.score,
-        passed: true,
-      };
-    }
-  }
+  const groupBest = reconstructGroupBestFromTrials(trials);
 
   const symbol =
     plan?.symbolSelection?.selectedSymbol ??
@@ -263,7 +360,7 @@ export function recoverMissingJobRecord(
   const prng = createSeededRandom(seed);
   const payload = createInitialRunnerPayload({
     prng: prng.getState(),
-    jobStatus: "paused",
+    jobStatus: classified.status,
   });
   payload.seenHashes = [...seen];
   payload.statistics.evaluated = Math.max(
@@ -276,44 +373,42 @@ export function recoverMissingJobRecord(
   );
 
   const at = new Date().toISOString();
-  const previousStatus = indexRow?.status ?? "running";
+  const terminal =
+    classified.status === "completed" ||
+    classified.status === "cancelled" ||
+    classified.status === "failed";
   const job: StrategySearchJob = {
     id: jobId,
-    status: "paused",
+    status: classified.status,
     config,
     checkpoint: buildPersistedCheckpoint({
       completedIterations,
       nextIteration,
       payload,
-      bestCandidate,
-      bestPassedCandidate: bestPassed,
+      bestCandidate: null,
+      bestPassedCandidate: null,
+      bestByCompatibilityGroup: groupBest,
       updatedAt: at,
     }),
     createdAt: indexRow?.createdAt ?? at,
     updatedAt: at,
     startedAt: indexRow?.createdAt ?? at,
-    finishedAt: null,
-    failureMessage: null,
+    finishedAt: terminal ? (indexRow?.finishedAt ?? at) : null,
+    failureMessage:
+      classified.status === "failed"
+        ? "전략 탐색이 실패 상태로 복구되었습니다."
+        : null,
   };
 
   saveSearchJob(job, options);
-
-  const reason = `missing_job_json_restored_from_${[
-    plan ? "plan" : null,
-    profile ? "execution" : null,
-    trials.length ? "trials" : null,
-    indexRow ? "index" : null,
-  ]
-    .filter(Boolean)
-    .join("+")}`;
 
   appendRecoveryAudit(
     {
       jobId,
       previousState: previousStatus,
-      recoveredState: "paused",
+      recoveredState: classified.status,
       recoveryTime: at,
-      reason,
+      reason: classified.reason,
       resumedGeneration: completedIterations,
       remainingDurationMs:
         plan?.maxRuntimeMs != null
@@ -328,9 +423,9 @@ export function recoverMissingJobRecord(
   return {
     jobId,
     recovered: true,
-    reason,
+    reason: classified.reason,
     previousStatus,
-    recoveredStatus: "paused",
+    recoveredStatus: classified.status,
     completedIterations,
     trialCount: trials.length,
   };

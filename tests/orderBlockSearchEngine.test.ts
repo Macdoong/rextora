@@ -16,6 +16,7 @@ import {
   orderBlockSearchRanges,
 } from "../src/lib/rextora/strategySearch/patternSearchSpaces";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
+import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import {
   createSearchJob,
   saveSearchTrial,
@@ -205,6 +206,47 @@ describe("Order Block Search engine", () => {
     cleanups.push(isolated.cleanup);
     const store = tempStore();
     const job = createSearchJob(sampleConfig(), store);
+    saveJobExecutionProfile(
+      job.id,
+      {
+        version: 1,
+        balance: 10_000,
+        baseCostConfig: {
+          feeRate: 0.0004,
+          slippageRate: 0.0002,
+          fundingRate: 0,
+          applyFunding: false,
+          applySpread: false,
+          spreadRate: 0,
+        },
+        passPolicy: { thresholds: { minTradeCount: 0 } },
+        scoreWeights: {
+          returnWeight: 1,
+          mddWeight: 0.5,
+          profitFactorWeight: 0.25,
+          winRateWeight: 0.25,
+          tradeAdequacyWeight: 0.25,
+          negativeMonthWeight: 0.1,
+          consistencyWeight: 0.1,
+        },
+        costStressScenarios: [],
+        jitterConfig: {
+          enabled: false,
+          sampleCount: 1,
+          mutationScale: 0.1,
+          seed: 1,
+          minimumPassRate: 0,
+          maximumScoreDropRatio: 1,
+          parameterRanges: orderBlockSearchRanges(),
+        },
+        dataRef: {
+          availableFrom: START,
+          availableTo: START + 40 * INTERVAL,
+          source: "preloaded",
+        },
+      },
+      store,
+    );
     const params = { ...ORDER_BLOCK_BASE_PARAMS, penetrationPct: 0.55 };
     const paramsHash = computeParamsHash(params);
     const trial: StrategySearchTrial = {

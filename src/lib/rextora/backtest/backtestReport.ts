@@ -5,6 +5,11 @@ import type {
   BacktestZeroTradeDiagnostics,
   MonthlyReturnRow,
 } from "./backtestTypes";
+import {
+  SLIPPAGE_MODEL_EXECUTION_PRICE_V1,
+  resolveSlippageModelVersion,
+  tradeCostSplit,
+} from "./executionSlippage";
 import { buildTradeEventTraces } from "./tradeEventTrace";
 
 export type { BacktestReport, MonthlyReturnRow };
@@ -14,8 +19,13 @@ export function aggregateBacktestMetrics(input: {
   endingBalance: number;
   equityCurve: number[];
   trades: BacktestTrade[];
+  slippageModelVersion?: string | null;
 }) {
   const { startingBalance, endingBalance, equityCurve, trades } = input;
+  const slippageModelVersion = resolveSlippageModelVersion(
+    input.slippageModelVersion,
+  );
+  const v1 = slippageModelVersion === SLIPPAGE_MODEL_EXECUTION_PRICE_V1;
   const totalReturn =
     startingBalance > 0
       ? (endingBalance - startingBalance) / startingBalance
@@ -72,8 +82,11 @@ export function aggregateBacktestMetrics(input: {
     (s, t) => s + (t.fundingCostUsdt ?? 0),
     0,
   );
-  const totalCostUsdt =
-    feeCostUsdt + slippageCostUsdt + spreadCostUsdt + fundingCostUsdt;
+  const totalDeductedCostUsdt = feeCostUsdt + spreadCostUsdt + fundingCostUsdt;
+  const totalEconomicFrictionUsdt = totalDeductedCostUsdt + slippageCostUsdt;
+  const totalCostUsdt = v1
+    ? totalDeductedCostUsdt
+    : totalEconomicFrictionUsdt;
   const grossPnLBeforeCosts = trades.reduce(
     (s, t) => s + (t.grossPnlUsdt ?? 0),
     0,
@@ -88,22 +101,32 @@ export function aggregateBacktestMetrics(input: {
     funding: Number(fundingTotal.toFixed(6)),
     spread: Number(spreadTotal.toFixed(6)),
     totalTradingCost: Number(
-      (feeTotal + slippageTotal + fundingTotal + spreadTotal).toFixed(6),
+      (v1
+        ? feeTotal + fundingTotal + spreadTotal
+        : feeTotal + slippageTotal + fundingTotal + spreadTotal
+      ).toFixed(6),
     ),
     feeCostUsdt: Number(feeCostUsdt.toFixed(4)),
     feeCostPctOfInitialCapital: pctCap(feeCostUsdt),
     slippageCostUsdt: Number(slippageCostUsdt.toFixed(4)),
     slippageCostPctOfInitialCapital: pctCap(slippageCostUsdt),
+    slippageAttributionUsdt: Number(slippageCostUsdt.toFixed(4)),
     spreadCostUsdt: Number(spreadCostUsdt.toFixed(4)),
     spreadCostPctOfInitialCapital: pctCap(spreadCostUsdt),
     fundingCostUsdt: Number(fundingCostUsdt.toFixed(4)),
     fundingCostPctOfInitialCapital: pctCap(fundingCostUsdt),
     totalCostUsdt: Number(totalCostUsdt.toFixed(4)),
     totalCostPctOfInitialCapital: pctCap(totalCostUsdt),
+    totalDeductedCostUsdt: Number(totalDeductedCostUsdt.toFixed(4)),
+    totalDeductedCostPctOfInitialCapital: pctCap(totalDeductedCostUsdt),
+    totalEconomicFrictionUsdt: Number(totalEconomicFrictionUsdt.toFixed(4)),
+    totalEconomicFrictionPctOfInitialCapital: pctCap(
+      totalEconomicFrictionUsdt,
+    ),
     grossPnLBeforeCosts: Number(grossPnLBeforeCosts.toFixed(4)),
     netPnLAfterCosts: Number(netPnLAfterCosts.toFixed(4)),
     rateSumNoteKo:
-      "fees/slippage/spread/funding 필드는 거래별 비용률(소수) 합계입니다. USDT·자본대비 %는 feeCostUsdt 등을 사용하세요.",
+      "fees/slippage/spread/funding 필드는 거래별 비용률(소수) 합계입니다. USDT·자본대비 %는 feeCostUsdt 등을 사용하세요. execution_price_v1에서 totalCostUsdt는 별도 차감 원장(수수료+펀딩+스프레드)이며 슬리피지 귀속은 totalEconomicFrictionUsdt에 포함됩니다.",
   };
   return {
     totalReturn: Number(totalReturn.toFixed(6)),
@@ -138,7 +161,9 @@ function calendarMonthLabelKo(key: string): string {
 export function buildCalendarMonthlyReturns(
   trades: BacktestTrade[],
   startingBalance: number,
+  slippageModelVersion?: string | null,
 ): MonthlyReturnRow[] {
+  const version = resolveSlippageModelVersion(slippageModelVersion);
   const byMonth = new Map<
     string,
     {
@@ -167,11 +192,7 @@ export function buildCalendarMonthlyReturns(
     cur.trades += 1;
     if (t.pnlPct > 0) cur.wins += 1;
     cur.feesRate += t.feePct || 0;
-    cur.costUsdt +=
-      (t.feeCostUsdt ?? 0) +
-      (t.slippageCostUsdt ?? 0) +
-      (t.spreadCostUsdt ?? 0) +
-      (t.fundingCostUsdt ?? 0);
+    cur.costUsdt += tradeCostSplit(t, version).deductedUsdt;
     cur.trough = Math.min(cur.trough, t.pnlPct);
     byMonth.set(month, cur);
   }
@@ -209,6 +230,7 @@ export function buildBacktestReport(input: {
   candleCount: number;
   processedCandleCount?: number;
   dataSource?: "binance" | "synthetic-test";
+  dataCoverage?: BacktestReport["dataCoverage"];
   startingBalance: number;
   endingBalance: number;
   equityCurve: number[];
@@ -221,10 +243,23 @@ export function buildBacktestReport(input: {
   costStress?: BacktestReport["costStress"];
   zeroTradeDiagnostics?: BacktestZeroTradeDiagnostics | null;
   rejectedSetups?: BacktestReport["rejectedSetups"];
+  slippageModelVersion?: string | null;
+  costAssumptions?: BacktestReport["costAssumptions"];
+  primaryCostAssumptions?: BacktestReport["primaryCostAssumptions"];
 }): BacktestReport {
   const { startingBalance, endingBalance, trades } = input;
-  const metrics = aggregateBacktestMetrics(input);
-  const monthlyReturns = buildCalendarMonthlyReturns(trades, startingBalance);
+  const slippageModelVersion = resolveSlippageModelVersion(
+    input.slippageModelVersion,
+  );
+  const metrics = aggregateBacktestMetrics({
+    ...input,
+    slippageModelVersion,
+  });
+  const monthlyReturns = buildCalendarMonthlyReturns(
+    trades,
+    startingBalance,
+    slippageModelVersion,
+  );
 
   return {
     strategyName: input.strategyName,
@@ -244,11 +279,15 @@ export function buildBacktestReport(input: {
     candleCount: input.candleCount,
     processedCandleCount: input.processedCandleCount ?? input.candleCount,
     dataSource: input.dataSource ?? "binance",
+    dataCoverage: input.dataCoverage,
     ...metrics,
     monthlyReturns,
     negativeMonths: monthlyReturns.filter((m) => m.returnPct < 0).length,
     startingBalance,
     endingBalance: Number(endingBalance.toFixed(4)),
+    slippageModelVersion,
+    costAssumptions: input.costAssumptions,
+    primaryCostAssumptions: input.primaryCostAssumptions,
     costStress: input.costStress,
     zeroTradeDiagnostics: input.zeroTradeDiagnostics ?? null,
     tradeEventTraces: buildTradeEventTraces(

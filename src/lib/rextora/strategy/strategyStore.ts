@@ -16,6 +16,8 @@ import { STRATEGY_SCHEMA_VERSION, type StrategyKind } from "./definition/types";
 import { assertSafeStrategyId, StrategyValidationError, validateCanonicalDefinition } from "./definition/validator";
 import { definitionToStoredPatch, storedToDefinition, type StoredStrategyV1 } from "./definition/bridge";
 import type { CanonicalStrategyDefinition } from "./definition/types";
+import { parseStrategyExecutionProvenance } from "./strategyExecutionProvenance";
+import type { StrategyExecutionProvenance } from "./strategyExecutionProvenance";
 import { isTestStrategyRecord } from "./strategyTestFilter";
 import { isDemoLiveBlocked } from "../firstRun/demoIdentity";
 
@@ -538,6 +540,7 @@ export function createStrategy(input: {
   definition?: CanonicalStrategyDefinition;
   sourceParamsHash?: string;
   strategyHash?: string;
+  executionProvenance?: StrategyExecutionProvenance;
   /**
    * Optional fixed id. Only reserved demo_strategy_* ids are accepted —
    * never SAFE, never path traversal.
@@ -601,6 +604,18 @@ export function createStrategy(input: {
     definition,
     ...summary
   };
+  const parsedProvenance = parseStrategyExecutionProvenance(
+    input.executionProvenance,
+  );
+  if (parsedProvenance.kind === "ok") {
+    strategy.executionProvenance = parsedProvenance.value;
+    if (input.executionProvenance && typeof input.executionProvenance === "object") {
+      strategy.executionProvenance = {
+        ...input.executionProvenance,
+        ...parsedProvenance.value,
+      };
+    }
+  }
   strategy.strategyHash =
     input.strategyHash ?? computeStrategyHash(storedToDefinition(strategy));
   const all = listStrategies();

@@ -180,6 +180,8 @@ describe("strategySearch operator UX", () => {
     expect(src).toContain("AI가 연구 중입니다");
     expect(src).toContain("탐색 파이프라인");
     expect(src).toContain("기술 정보");
+    expect(src).toContain("ss-error-rate-warning");
+    expect(src).toContain("계산 오류율이 경고 기준을 초과했습니다.");
     expect(src).toContain("<details");
     expect(src).not.toContain("PIPELINE_ORDER");
     expect(src).not.toContain("합격 목표");

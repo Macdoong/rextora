@@ -1,0 +1,443 @@
+/**
+ * V3.7 presentation motion. CSS only.
+ * Never starts jobs, writes stores, or changes control authority.
+ */
+
+.v3-hover {
+  transition:
+    background var(--v3-motion-fast) var(--v3-ease-micro),
+    border-color var(--v3-motion-fast) var(--v3-ease-micro),
+    color var(--v3-motion-fast) var(--v3-ease-micro),
+    box-shadow var(--v3-motion-fast) var(--v3-ease-micro),
+    transform var(--v3-motion-fast) var(--v3-ease-micro);
+}
+
+.v3-card--interactive {
+  transition:
+    transform var(--v3-motion-base) var(--v3-ease-micro),
+    box-shadow var(--v3-motion-base) var(--v3-ease-micro),
+    border-color var(--v3-motion-base) var(--v3-ease-micro);
+}
+
+.v3-card--interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--v3-shadow-hover);
+  border-color: #ccd5df;
+}
+
+.v3-gate.v3-hover:hover {
+  background: #fafbfc;
+}
+
+.v3-tab,
+.v3-ss-tabs button,
+.v3-ss-drawer .rextora-segmented button,
+.v3-paper [data-testid="paper-trades-session-filter"] button,
+.v3-paper [data-testid="paper-trades-global-filter"] button {
+  transition:
+    background var(--v3-motion-base) var(--v3-ease-micro),
+    border-color var(--v3-motion-base) var(--v3-ease-micro),
+    color var(--v3-motion-base) var(--v3-ease-micro);
+}
+
+.v3-tab.v3-hover:hover,
+.v3-drawer__close:hover,
+.v3-dialog__close:hover {
+  background: var(--v3-surface-subtle);
+}
+
+.v3-screen-in {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+@keyframes v3-screen-in {
+  from { opacity: 0.55; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.v3-kpi-pop {
+  animation: v3-kpi-pop var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+@keyframes v3-kpi-pop {
+  from { opacity: 0.4; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.v3-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8edf2;
+}
+
+.v3-progress > i,
+.v3-progress__bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--v3-brand), #7188ef);
+  transform-origin: left;
+  animation: v3-grow-bar var(--v3-motion-chart) var(--v3-ease-panel) both;
+}
+
+@keyframes v3-grow-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.v3-chart-reveal .v3-chart-line {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: v3-draw-line var(--v3-motion-chart) var(--v3-ease-panel) both;
+}
+
+.v3-chart-reveal .v3-chart-fill {
+  opacity: 0;
+  animation: v3-fade-fill 0.5s 0.32s var(--v3-ease-panel) both;
+}
+
+.v3-chart-reveal .v3-chart-marker {
+  opacity: 0;
+  transform-origin: center;
+  animation: v3-marker-in var(--v3-motion-panel) 0.52s var(--v3-ease-panel) both;
+}
+
+@keyframes v3-draw-line {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes v3-fade-fill {
+  to { opacity: 1; }
+}
+
+@keyframes v3-marker-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.v3-drawer-backdrop,
+.v3-dialog-backdrop {
+  opacity: 0;
+  transition: opacity var(--v3-motion-base) var(--v3-ease-micro);
+}
+
+.v3-drawer-backdrop[data-open="true"],
+.v3-dialog-backdrop[data-open="true"] {
+  opacity: 1;
+  animation: v3-overlay-in var(--v3-motion-base) var(--v3-ease-micro) both;
+}
+
+.v3-drawer {
+  transform: translateX(100%);
+  transition: transform 220ms var(--v3-ease-panel);
+}
+
+.v3-drawer[data-open="true"] {
+  transform: translateX(0);
+  transition-duration: var(--v3-motion-drawer);
+  animation: v3-drawer-in var(--v3-motion-drawer) var(--v3-ease-panel) both;
+}
+
+.v3-dialog {
+  animation: v3-dialog-in var(--v3-motion-medium) var(--v3-ease-panel) both;
+}
+
+@keyframes v3-dialog-in {
+  from { opacity: 0.55; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.v3-ai-pulse::after {
+  content: none;
+}
+
+.v3-ai-pulse.is-working {
+  position: relative;
+}
+
+.v3-ai-pulse.is-working::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid rgba(109, 79, 214, 0.2);
+  border-radius: 16px;
+  animation: v3-ai-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes v3-ai-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.98); }
+  50% { opacity: 0.7; transform: scale(1.03); }
+}
+
+/* Page entry — major blocks only */
+.v3-oc-page > .v3-oc-pagehead,
+.v3-strategy-search > .v3-ss-pagehead,
+.v3-results > .v3-res-pagehead,
+.v3-backtest > .v3-bt-pagehead,
+.v3-paper > .v3-pp-pagehead,
+.v3-risk > .v3-rk-pagehead,
+.v3-live > .v3-lv-pagehead {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+.v3-oc-page .v3-oc-hero,
+.v3-strategy-search .v3-ss-statusbar,
+.v3-results .v3-res-statusbar,
+.v3-backtest .v3-bt-statusbar,
+.v3-paper .v3-pp-statusbar,
+.v3-risk .v3-rk-statusbar,
+.v3-live .v3-lv-hero {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+  animation-delay: 40ms;
+}
+
+.v3-oc-page .v3-oc-kpis {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+  animation-delay: 80ms;
+}
+
+.v3-oc-page .v3-oc-grid12 {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+  animation-delay: 120ms;
+}
+
+/* Migrated-page controls */
+.v3-oc-page .rextora-btn-text,
+.v3-strategy-search .rextora-btn-text,
+.v3-results .rextora-btn-text,
+.v3-backtest .rextora-btn-text,
+.v3-paper .rextora-btn-text,
+.v3-risk .v3-rk-btn-secondary,
+.v3-risk .v3-rk-btn-ghost,
+.v3-live .v3-lv-btn-primary,
+.v3-live .v3-lv-btn-secondary,
+.v3-live .v3-lv-btn-ghost,
+.v3-live .v3-lv-btn-danger,
+.v3-live button.rextora-btn-text,
+.v3-oc-ai-open {
+  transition:
+    background var(--v3-motion-fast) var(--v3-ease-micro),
+    border-color var(--v3-motion-fast) var(--v3-ease-micro),
+    color var(--v3-motion-fast) var(--v3-ease-micro),
+    box-shadow var(--v3-motion-fast) var(--v3-ease-micro),
+    filter var(--v3-motion-fast) var(--v3-ease-micro),
+    transform var(--v3-motion-fast) var(--v3-ease-micro);
+}
+
+.v3-oc-page .rextora-btn-text:hover,
+.v3-strategy-search .rextora-btn-text:hover,
+.v3-results .rextora-btn-text:hover,
+.v3-backtest .rextora-btn-text:hover,
+.v3-paper .rextora-btn-text:hover,
+.v3-live .v3-lv-btn-primary:hover,
+.v3-live .v3-lv-btn-secondary:hover,
+.v3-live button.rextora-btn-text:hover,
+.v3-oc-ai-open:hover {
+  transform: translateY(-1px);
+}
+
+.v3-oc-page .rextora-btn-text:active,
+.v3-strategy-search .rextora-btn-text:active,
+.v3-results .rextora-btn-text:active,
+.v3-backtest .rextora-btn-text:active,
+.v3-paper .rextora-btn-text:active,
+.v3-oc-ai-open:active,
+.v3-ss-btn-primary:active,
+.v3-ss-btn-secondary:active {
+  transform: translateY(0);
+}
+
+.v3-oc-page .rextora-btn-text:disabled:hover,
+.v3-strategy-search .rextora-btn-text:disabled:hover,
+.v3-results .rextora-btn-text:disabled:hover,
+.v3-backtest .rextora-btn-text:disabled:hover,
+.v3-live .rextora-btn-text:disabled:hover,
+.v3-live button[data-testid="live-start"]:disabled:hover,
+.v3-paper .rextora-btn-text:disabled:hover,
+.v3-ss-btn-primary:disabled:hover,
+.v3-ss-btn-secondary:disabled:hover,
+.v3-oc-page .rextora-btn-text[aria-disabled="true"]:hover,
+.v3-strategy-search .rextora-btn-text[aria-disabled="true"]:hover,
+.v3-results .rextora-btn-text[aria-disabled="true"]:hover,
+.v3-backtest .rextora-btn-text[aria-disabled="true"]:hover,
+.v3-paper .rextora-btn-text[aria-disabled="true"]:hover {
+  transform: none;
+  filter: none;
+}
+
+.v3-table tbody tr,
+.v3-pp-table tbody tr,
+.v3-results tbody tr,
+.v3-backtest tbody tr,
+.v3-strategy-search tbody tr {
+  transition: background var(--v3-motion-instant) var(--v3-ease-micro);
+}
+
+.v3-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.v3-oc-page [data-testid="empty-state"],
+.v3-strategy-search [data-testid="empty-state"],
+.v3-results [data-testid="empty-state"],
+.v3-backtest [data-testid="empty-state"],
+.v3-paper [data-testid="empty-state"] {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+.v3-paper details[open] > *:not(summary),
+.v3-live details[open] > *:not(summary),
+.v3-backtest details[open] > *:not(summary),
+.v3-results details[open] > *:not(summary),
+.v3-strategy-search details[open] > *:not(summary),
+.v3-shell-tech[open] > *:not(summary),
+.v3-ss-rank-panel {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+.v3-shell .rextora-agent-fab {
+  transition:
+    background var(--v3-motion-fast) var(--v3-ease-micro),
+    border-color var(--v3-motion-fast) var(--v3-ease-micro),
+    transform var(--v3-motion-fast) var(--v3-ease-micro);
+}
+
+.v3-shell .rextora-agent-fab:hover {
+  transform: translateY(-1px);
+}
+
+.v3-shell .rextora-agent-fab.is-working {
+  box-shadow: 0 0 0 4px rgba(109, 79, 214, 0.12);
+}
+
+.v3-shell .rextora-agent-host--tablet,
+.v3-shell .rextora-agent-host--mobile {
+  animation: v3-overlay-in var(--v3-motion-base) var(--v3-ease-micro) both;
+}
+
+.v3-shell .rextora-agent-host--tablet .rextora-agent-drawer,
+.v3-shell .rextora-agent-host--mobile .rextora-agent-drawer {
+  animation: v3-drawer-in var(--v3-motion-drawer) var(--v3-ease-panel) both;
+}
+
+@keyframes v3-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes v3-drawer-in {
+  from { transform: translateX(16px); opacity: 0.72; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-hover,
+  .v3-card--interactive,
+  .v3-gate.v3-hover,
+  .v3-drawer,
+  .v3-drawer[data-open="true"],
+  .v3-drawer-backdrop,
+  .v3-dialog-backdrop,
+  .v3-tab,
+  .v3-ss-tabs button,
+  .v3-ss-drawer .rextora-segmented button,
+  .v3-paper [data-testid="paper-trades-session-filter"] button,
+  .v3-paper [data-testid="paper-trades-global-filter"] button,
+  .v3-oc-page .rextora-btn-text,
+  .v3-strategy-search .rextora-btn-text,
+  .v3-results .rextora-btn-text,
+  .v3-backtest .rextora-btn-text,
+  .v3-paper .rextora-btn-text,
+  .v3-risk .v3-rk-btn-secondary,
+  .v3-risk .v3-rk-btn-ghost,
+  .v3-live .v3-lv-btn-primary,
+  .v3-live .v3-lv-btn-secondary,
+  .v3-live .v3-lv-btn-ghost,
+  .v3-live .v3-lv-btn-danger,
+  .v3-live button.rextora-btn-text,
+  .v3-oc-ai-open,
+  .v3-table tbody tr,
+  .v3-pp-table tbody tr,
+  .v3-results tbody tr,
+  .v3-backtest tbody tr,
+  .v3-strategy-search tbody tr,
+  .v3-shell .rextora-agent-fab {
+    transition: none !important;
+  }
+
+  .v3-card--interactive:hover,
+  .v3-oc-page .rextora-btn-text:hover,
+  .v3-strategy-search .rextora-btn-text:hover,
+  .v3-results .rextora-btn-text:hover,
+  .v3-backtest .rextora-btn-text:hover,
+  .v3-paper .rextora-btn-text:hover,
+  .v3-risk .v3-rk-btn-secondary:hover,
+  .v3-risk .v3-rk-btn-ghost:hover,
+  .v3-live .v3-lv-btn-primary:hover,
+  .v3-live .v3-lv-btn-secondary:hover,
+  .v3-live button.rextora-btn-text:hover,
+  .v3-oc-ai-open:hover,
+  .v3-shell .rextora-agent-fab:hover {
+    transform: none;
+  }
+
+  .v3-screen-in,
+  .v3-kpi-pop,
+  .v3-dialog,
+  .v3-drawer[data-open="true"],
+  .v3-drawer-backdrop[data-open="true"],
+  .v3-dialog-backdrop[data-open="true"],
+  .v3-progress > i,
+  .v3-progress__bar,
+  .v3-chart-reveal .v3-chart-line,
+  .v3-chart-reveal .v3-chart-fill,
+  .v3-chart-reveal .v3-chart-marker,
+  .v3-ai-pulse.is-working::after,
+  .v3-oc-page > .v3-oc-pagehead,
+  .v3-strategy-search > .v3-ss-pagehead,
+  .v3-results > .v3-res-pagehead,
+  .v3-backtest > .v3-bt-pagehead,
+  .v3-paper > .v3-pp-pagehead,
+  .v3-risk > .v3-rk-pagehead,
+  .v3-live > .v3-lv-pagehead,
+  .v3-oc-page .v3-oc-hero,
+  .v3-strategy-search .v3-ss-statusbar,
+  .v3-results .v3-res-statusbar,
+  .v3-backtest .v3-bt-statusbar,
+  .v3-paper .v3-pp-statusbar,
+  .v3-risk .v3-rk-statusbar,
+  .v3-live .v3-lv-hero,
+  .v3-oc-page .v3-oc-kpis,
+  .v3-oc-page .v3-oc-grid12,
+  .v3-oc-page [data-testid="empty-state"],
+  .v3-strategy-search [data-testid="empty-state"],
+  .v3-results [data-testid="empty-state"],
+  .v3-backtest [data-testid="empty-state"],
+  .v3-paper [data-testid="empty-state"],
+  .v3-paper details[open] > *:not(summary),
+  .v3-risk details[open] > *:not(summary),
+  .v3-live details[open] > *:not(summary),
+  .v3-backtest details[open] > *:not(summary),
+  .v3-results details[open] > *:not(summary),
+  .v3-strategy-search details[open] > *:not(summary),
+  .v3-shell-tech[open] > *:not(summary),
+  .v3-ss-rank-panel,
+  .v3-shell .rextora-agent-host--tablet,
+  .v3-shell .rextora-agent-host--mobile,
+  .v3-shell .rextora-agent-host--tablet .rextora-agent-drawer,
+  .v3-shell .rextora-agent-host--mobile .rextora-agent-drawer {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+
+  .v3-drawer {
+    transform: none;
+  }
+
+  .v3-drawer:not([data-open="true"]) {
+    display: none;
+  }
+}

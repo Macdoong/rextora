@@ -11,6 +11,10 @@ import { candlesToPoints } from "../charts/adapters";
 import { evaluateStrategyVerdict, type StrategyVerdict } from "./strategyVerdict";
 import { resolveTimeframe } from "../data/timeframes";
 import {
+  isExecutionPriceSlippageV1,
+  tradeCostSplit,
+} from "./executionSlippage";
+import {
   buildMonthlyCoverage,
   firstTradeEntryMs,
   lastTradeExitMs,
@@ -91,6 +95,8 @@ export interface CostLedger {
   spreadCostUsdt: number;
   fundingCostUsdt: number;
   totalCostUsdt: number;
+  totalDeductedCostUsdt?: number;
+  totalEconomicFrictionUsdt?: number;
   feeCostPctOfInitialCapital: number;
   slippageCostPctOfInitialCapital: number;
   spreadCostPctOfInitialCapital: number;
@@ -221,6 +227,7 @@ function enrichTrade(
   index: number,
   intervalMs: number,
   startingBalance = 0,
+  slippageModelVersion?: string | null,
 ): EnrichedTrade {
   const leverage = t.leverage || 1;
   let margin =
@@ -248,10 +255,13 @@ function enrichTrade(
     t.fundingCostUsdt ?? Number((margin * fundingPct * leverage).toFixed(6));
   const netPnlUsdt =
     t.netPnlUsdt ?? Number((margin * t.pnlPct).toFixed(6));
-  const totalCost =
-    feeCostUsdt + slippageCostUsdt + spreadCostUsdt + fundingCostUsdt;
+  const deducted = tradeCostSplit(
+    { feeCostUsdt, slippageCostUsdt, spreadCostUsdt, fundingCostUsdt },
+    slippageModelVersion,
+  ).deductedUsdt;
   const grossPnlUsdt =
-    t.grossPnlUsdt ?? Number((netPnlUsdt + totalCost).toFixed(6));
+    t.grossPnlUsdt ??
+    Number((netPnlUsdt + deducted).toFixed(6));
   const holdMs =
     t.entryTime != null && t.exitTime != null
       ? Math.max(0, t.exitTime - t.entryTime)
@@ -280,6 +290,7 @@ export function buildCostLedger(
   trades: EnrichedTrade[],
   startingBalance: number,
   endingBalance: number,
+  slippageModelVersion?: string | null,
 ): CostLedger {
   const feeRateSum = trades.reduce((s, t) => s + (t.feePct || 0), 0);
   const slippageRateSum = trades.reduce((s, t) => s + (t.slippagePct || 0), 0);
@@ -289,8 +300,12 @@ export function buildCostLedger(
   const slippageCostUsdt = trades.reduce((s, t) => s + t.slippageCostUsdt, 0);
   const spreadCostUsdt = trades.reduce((s, t) => s + t.spreadCostUsdt, 0);
   const fundingCostUsdt = trades.reduce((s, t) => s + t.fundingCostUsdt, 0);
-  const totalCostUsdt =
-    feeCostUsdt + slippageCostUsdt + spreadCostUsdt + fundingCostUsdt;
+  const totalDeductedCostUsdt =
+    feeCostUsdt + spreadCostUsdt + fundingCostUsdt;
+  const totalEconomicFrictionUsdt = totalDeductedCostUsdt + slippageCostUsdt;
+  const totalCostUsdt = isExecutionPriceSlippageV1(slippageModelVersion)
+    ? totalDeductedCostUsdt
+    : totalEconomicFrictionUsdt;
   const grossPnlBeforeCostsUsdt = trades.reduce((s, t) => s + t.grossPnlUsdt, 0);
   const netPnlAfterCostsUsdt = trades.reduce((s, t) => s + t.netPnlUsdt, 0);
   const expectedNet = grossPnlBeforeCostsUsdt - totalCostUsdt;
@@ -316,6 +331,8 @@ export function buildCostLedger(
     spreadCostUsdt: Number(spreadCostUsdt.toFixed(4)),
     fundingCostUsdt: Number(fundingCostUsdt.toFixed(4)),
     totalCostUsdt: Number(totalCostUsdt.toFixed(4)),
+    totalDeductedCostUsdt: Number(totalDeductedCostUsdt.toFixed(4)),
+    totalEconomicFrictionUsdt: Number(totalEconomicFrictionUsdt.toFixed(4)),
     feeCostPctOfInitialCapital: pct(feeCostUsdt),
     slippageCostPctOfInitialCapital: pct(slippageCostUsdt),
     spreadCostPctOfInitialCapital: pct(spreadCostUsdt),
@@ -333,6 +350,7 @@ export function buildCostLedger(
 export function aggregateCalendarMonthly(
   trades: EnrichedTrade[],
   startingBalance: number,
+  slippageModelVersion?: string | null,
 ): MonthlyBucket[] {
   const map = new Map<
     string,
@@ -344,8 +362,7 @@ export function aggregateCalendarMonthly(
     const key = monthKeyUtc(ts);
     const cur = map.get(key) ?? { net: 0, cost: 0, wins: 0, count: 0 };
     cur.net += t.netPnlUsdt;
-    cur.cost +=
-      t.feeCostUsdt + t.slippageCostUsdt + t.spreadCostUsdt + t.fundingCostUsdt;
+    cur.cost += tradeCostSplit(t, slippageModelVersion).deductedUsdt;
     cur.count += 1;
     if (t.profitable) cur.wins += 1;
     map.set(key, cur);
@@ -366,6 +383,7 @@ export function aggregateCalendarMonthly(
 
 export function holdingBuckets(
   trades: EnrichedTrade[],
+  slippageModelVersion?: string | null,
 ): HoldingBucket[] {
   const defs = [
     { label: "15분 미만", max: 15 * 60_000 },
@@ -389,12 +407,7 @@ export function holdingBuckets(
       : 0;
     const avgTotalCostUsdt = n
       ? subset.reduce(
-          (s, t) =>
-            s +
-            t.feeCostUsdt +
-            t.slippageCostUsdt +
-            t.spreadCostUsdt +
-            t.fundingCostUsdt,
+          (s, t) => s + tradeCostSplit(t, slippageModelVersion).deductedUsdt,
           0,
         ) / n
       : 0;
@@ -501,6 +514,7 @@ function sampleCandles(candles: CandlePoint[]): {
 function buildMarkers(
   trades: EnrichedTrade[],
   densityReduce: boolean,
+  slippageModelVersion?: string | null,
 ): TradeMarker[] {
   const step = densityReduce
     ? Math.max(1, Math.ceil(trades.length / MARKER_DENSITY_THRESHOLD))
@@ -528,11 +542,7 @@ function buildMarkers(
         quantity: t.quantity,
         symbol: t.symbol,
         holdMs: t.holdMs,
-        totalCostUsdt:
-          t.feeCostUsdt +
-          t.slippageCostUsdt +
-          t.spreadCostUsdt +
-          t.fundingCostUsdt,
+        totalCostUsdt: tradeCostSplit(t, slippageModelVersion).deductedUsdt,
       },
     });
     if (t.exitTime == null) continue;
@@ -565,11 +575,7 @@ function buildMarkers(
         quantity: t.quantity,
         symbol: t.symbol,
         holdMs: t.holdMs,
-        totalCostUsdt:
-          t.feeCostUsdt +
-          t.slippageCostUsdt +
-          t.spreadCostUsdt +
-          t.fundingCostUsdt,
+        totalCostUsdt: tradeCostSplit(t, slippageModelVersion).deductedUsdt,
       },
     });
   }
@@ -606,8 +612,9 @@ export function buildVisualAnalysisModel(input: {
     /* keep default */
   }
 
+  const version = report.slippageModelVersion;
   const trades = input.trades.map((t, i) =>
-    enrichTrade(t, i, intervalMs, report.startingBalance ?? 0),
+    enrichTrade(t, i, intervalMs, report.startingBalance ?? 0, version),
   );
   const priceCandles = candlesToPoints(candles);
   const { sampled, applied } = sampleCandles(priceCandles);
@@ -615,6 +622,7 @@ export function buildVisualAnalysisModel(input: {
     trades,
     report.startingBalance,
     report.endingBalance,
+    version,
   );
 
   // Align equity/drawdown to candle or trade exit times when possible
@@ -644,7 +652,11 @@ export function buildVisualAnalysisModel(input: {
     };
   });
 
-  const monthlyReturns = aggregateCalendarMonthly(trades, report.startingBalance);
+  const monthlyReturns = aggregateCalendarMonthly(
+    trades,
+    report.startingBalance,
+    version,
+  );
   const wins = trades.filter((t) => t.pnlPct > 0).length;
   const losses = trades.filter((t) => t.pnlPct < 0).length;
   const flats = trades.filter((t) => t.pnlPct === 0).length;
@@ -662,8 +674,7 @@ export function buildVisualAnalysisModel(input: {
     cum.slip += t.slippageCostUsdt;
     cum.spread += t.spreadCostUsdt;
     cum.fund += t.fundingCostUsdt;
-    cum.total +=
-      t.feeCostUsdt + t.slippageCostUsdt + t.spreadCostUsdt + t.fundingCostUsdt;
+    cum.total += tradeCostSplit(t, version).deductedUsdt;
     const x = t.exitTime ?? i;
     cumulativeCostPoints.fees.push({ x, y: cum.fees });
     cumulativeCostPoints.slippage.push({ x, y: cum.slip });
@@ -740,7 +751,7 @@ export function buildVisualAnalysisModel(input: {
     priceCandles,
     sampledPriceCandles: sampled,
     chartSamplingApplied: applied,
-    tradeMarkers: buildMarkers(trades, trades.length > MARKER_DENSITY_THRESHOLD),
+    tradeMarkers: buildMarkers(trades, trades.length > MARKER_DENSITY_THRESHOLD, version),
     equityPoints,
     drawdownPoints,
     equitySeries: {
@@ -763,7 +774,7 @@ export function buildVisualAnalysisModel(input: {
       winPct: trades.length ? wins / trades.length : 0,
       lossPct: trades.length ? losses / trades.length : 0,
     },
-    holdingTimeBuckets: holdingBuckets(trades),
+    holdingTimeBuckets: holdingBuckets(trades, version),
     exitCategoryBuckets: exitCategoryBuckets(trades),
     cumulativeCostPoints,
     rollingWinRatePoints,

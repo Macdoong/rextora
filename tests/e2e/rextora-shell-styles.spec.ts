@@ -48,6 +48,8 @@ async function assertStyledShell(page: Page, route: string) {
       await expect(page.locator(".dashboard-shell")).toBeVisible();
       await expect(page.locator("main.dashboard-main")).toBeVisible();
       await expect(page.getByTestId("main-nav")).toBeVisible();
+      await expect(page.getByTestId("sidebar-lifecycle-nav")).toBeVisible();
+      await expect(page.getByTestId("shell-lifecycle-navigation")).toBeVisible();
     }
 
     const stylesheets = page.locator('link[rel="stylesheet"]');
@@ -80,6 +82,8 @@ async function assertStyledShell(page: Page, route: string) {
     await expect(page.locator(".dashboard-shell")).toBeVisible();
     await expect(page.locator("main.dashboard-main")).toBeVisible();
     await expect(page.getByTestId("main-nav")).toBeVisible();
+    await expect(page.getByTestId("sidebar-lifecycle-nav")).toBeVisible();
+    await expect(page.getByTestId("shell-lifecycle-navigation")).toBeVisible();
 
     const body = await page.evaluate(() => {
       const style = getComputedStyle(document.body);
@@ -117,12 +121,24 @@ test.describe("Rextora shell styles (production)", () => {
   }) => {
     await page.goto("/strategy-search", { waitUntil: "networkidle" });
     await expect(page.getByTestId("main-nav")).toBeVisible();
-    await page.getByTestId("nav-results").click();
+    await expect(page.getByTestId("shell-lifecycle-nav-research")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+    await page.getByTestId("shell-lifecycle-nav-strategy").click();
     await expect(page).toHaveURL(/\/results/);
+    await expect(page.getByTestId("shell-lifecycle-nav-strategy")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
     await expect(page.locator(".dashboard-shell")).toBeVisible();
     await expect(page.getByTestId("main-nav")).toBeVisible();
     await page.reload({ waitUntil: "networkidle" });
     await expect(page.locator(".dashboard-shell")).toBeVisible();
     await expect(page.getByTestId("main-nav")).toBeVisible();
+    await expect(page.getByTestId("shell-lifecycle-nav-strategy")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
   });
 });

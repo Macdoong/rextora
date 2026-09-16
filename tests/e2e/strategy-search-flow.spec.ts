@@ -450,9 +450,11 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-goal")).toBeVisible();
     await expect(page.getByTestId("ss-run-until-qualified")).toBeAttached();
     await expect(page.getByTestId("ss-advanced-settings-link")).toBeVisible();
-    await expect(
-      page.getByTestId("main-nav").getByText("전략 탐색", { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByTestId("shell-lifecycle-nav-research")).toBeVisible();
+    await expect(page.getByTestId("shell-lifecycle-nav-research")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
     await expect(page.getByRole("heading", { name: "전략 탐색" })).toBeVisible();
     await expect(
       page.getByText(/연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다/),

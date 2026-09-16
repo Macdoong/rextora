@@ -1,7 +1,11 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { exportSettingsJson, getRextoraSettings, importSettingsJson, resetRextoraSettings, updateRextoraSettings } from "@/src/lib/rextora/settings/settingsService";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   const settings = getRextoraSettings();
   return apiJsonResponse(
@@ -14,6 +18,8 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const denied = await denyUnlessPermitted(request, "settings:write");
+  if (denied) return denied;
   const start = Date.now();
   const body = await request.json().catch(() => ({}));
   const action = body.action as string | undefined;

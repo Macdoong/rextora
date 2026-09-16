@@ -8,6 +8,7 @@ import {
   type UseAgentSessionResult,
 } from "./useAgentSession";
 import { useSharedAgentSession } from "./AgentSessionProvider";
+import { useGlobalAgentPresentation } from "./GlobalAgentPresentationContext";
 import { AgentInput } from "./AgentInput";
 import { AgentSuggestions } from "./AgentSuggestions";
 import { AgentMessage } from "./AgentMessage";
@@ -15,8 +16,14 @@ import { AgentWorkspacePanel } from "./AgentWorkspacePanel";
 import { ApprovalCenter } from "./ApprovalCenter";
 import { AgentModelSelector } from "./AgentModelSelector";
 
+export type AgentPanelVariant =
+  | "embedded"
+  | "workspace"
+  | "drawer"
+  | "mobile-sheet";
+
 interface AgentPanelProps {
-  variant?: "embedded" | "drawer";
+  variant?: AgentPanelVariant;
   shared?: boolean;
 }
 
@@ -28,29 +35,29 @@ export function AgentPanel({
   return <AgentPanelLocal variant={variant} />;
 }
 
-function AgentPanelShared({
-  variant,
-}: {
-  variant: "embedded" | "drawer";
-}) {
+function AgentPanelShared({ variant }: { variant: AgentPanelVariant }) {
   const session = useSharedAgentSession();
   return <AgentPanelInner variant={variant} session={session} />;
 }
 
-function AgentPanelLocal({
-  variant,
-}: {
-  variant: "embedded" | "drawer";
-}) {
+function AgentPanelLocal({ variant }: { variant: AgentPanelVariant }) {
   const session = useAgentSession();
   return <AgentPanelInner variant={variant} session={session} />;
+}
+
+function isCompactVariant(variant: AgentPanelVariant): boolean {
+  return variant === "drawer" || variant === "mobile-sheet";
+}
+
+function isExpandedVariant(variant: AgentPanelVariant): boolean {
+  return variant === "embedded" || variant === "workspace";
 }
 
 function AgentPanelInner({
   variant,
   session,
 }: {
-  variant: "embedded" | "drawer";
+  variant: AgentPanelVariant;
   session: UseAgentSessionResult;
 }) {
   const {
@@ -71,8 +78,11 @@ function AgentPanelInner({
     providerSelection,
     setProviderSelection,
   } = session;
+  const { open: globalAgentOpen } = useGlobalAgentPresentation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const suppressEmbeddedForGlobal =
+    variant === "embedded" && globalAgentOpen;
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -80,35 +90,38 @@ function AgentPanelInner({
   }, [turns, isThinking]);
 
   const isEmpty = turns.length === 0;
-  const isDrawer = variant === "drawer";
+  const compactChrome = isCompactVariant(variant);
+  const expandedChrome = isExpandedVariant(variant);
+  const isCompactHistory = variant === "drawer" || variant === "mobile-sheet";
   const hasPendingApproval = Boolean(
     pendingProposedAction || entityMemory?.pendingPlan,
   );
-  // Drawer: show only the latest turn for scanability; full history on expand.
-  const visibleTurns = isDrawer && !detailsOpen ? turns.slice(-1) : turns;
+  const visibleTurns =
+    isCompactHistory && !detailsOpen ? turns.slice(-1) : turns;
 
   return (
     <section
-      className={
-        isDrawer
-          ? "flex h-full w-full flex-col overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950"
-          : "flex w-full flex-col overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900/90 shadow-xl"
-      }
+      className={`rextora-agent-panel rextora-agent-panel--${variant}${
+        suppressEmbeddedForGlobal
+          ? " rextora-agent-panel--global-open-suppressed"
+          : ""
+      }`}
       data-testid="dashboard-agent-workspace"
+      data-agent-variant={variant}
       data-agent-session-hydrated={sessionHydrated ? "true" : "false"}
+      data-global-agent-open={globalAgentOpen ? "true" : "false"}
+      aria-hidden={suppressEmbeddedForGlobal ? true : undefined}
       aria-label="AI 트레이딩 직원"
     >
-      {!isDrawer ? (
-        <div className="flex items-center justify-between gap-3 border-b border-slate-800/70 px-4 py-3 sm:px-5">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600/15 ring-1 ring-emerald-500/30">
-              <BrainCircuit className="size-4 text-emerald-400" />
+      {expandedChrome ? (
+        <div className="rextora-agent-panel-header">
+          <div className="rextora-agent-panel-header-main">
+            <div className="rextora-agent-panel-mark">
+              <BrainCircuit className="size-4 text-emerald-400" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <div className="truncate text-base font-semibold text-slate-100">
-                AI 트레이딩 직원
-              </div>
-              <div className="mt-0.5 flex flex-wrap items-center gap-2">
+              <div className="rextora-agent-panel-title">AI 트레이딩 직원</div>
+              <div className="rextora-agent-panel-header-meta">
                 <Badge tone="success">승인 후 실행</Badge>
                 <AgentModelSelector
                   value={providerSelection}
@@ -118,17 +131,17 @@ function AgentPanelInner({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="rextora-agent-panel-header-actions">
             {canResume && !isEmpty ? (
               <button
                 type="button"
                 onClick={() => void resumeWhereLeftOff()}
                 disabled={isThinking}
                 data-testid="agent-resume-session"
-                className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg border border-emerald-500/35 px-3 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-900/40 disabled:opacity-40"
+                className="rextora-agent-panel-action"
               >
-                <Play className="size-4" />
-                <span className="hidden sm:inline">이어서</span>
+                <Play className="size-4" aria-hidden="true" />
+                <span className="rextora-agent-panel-action-label">이어서</span>
               </button>
             ) : null}
             <button
@@ -137,21 +150,17 @@ function AgentPanelInner({
               disabled={isEmpty && !isThinking}
               aria-label="새 대화"
               data-testid="agent-new-conversation"
-              className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="rextora-agent-panel-action"
             >
-              <RotateCcw className="size-4" />
-              <span className="hidden sm:inline">새 대화</span>
+              <RotateCcw className="size-4" aria-hidden="true" />
+              <span className="rextora-agent-panel-action-label">새 대화</span>
             </button>
           </div>
         </div>
       ) : null}
 
-      {/* Compact approval — primary when pending */}
-      <div
-        className="space-y-2 border-b border-slate-800/50 px-3 py-2"
-        data-testid="agent-session-chrome"
-      >
-        {isDrawer ? (
+      <div className="rextora-agent-panel-chrome" data-testid="agent-session-chrome">
+        {compactChrome ? (
           <AgentModelSelector
             value={providerSelection}
             onChange={setProviderSelection}
@@ -159,10 +168,7 @@ function AgentPanelInner({
           />
         ) : null}
         {pinnedObjective ? (
-          <p
-            className="truncate text-xs text-emerald-100/80"
-            data-testid="agent-pinned-objective"
-          >
+          <p className="rextora-agent-pinned-objective" data-testid="agent-pinned-objective">
             {pinnedObjective}
           </p>
         ) : null}
@@ -177,17 +183,18 @@ function AgentPanelInner({
         <button
           type="button"
           onClick={() => setDetailsOpen((v) => !v)}
-          className="flex min-h-9 w-full items-center justify-between rounded-lg border border-slate-800 px-2.5 py-1.5 text-left text-[11px] text-slate-400 hover:text-slate-200"
+          className="rextora-agent-details-toggle"
           data-testid="agent-details-toggle"
           aria-expanded={detailsOpen}
         >
           <span>워크스페이스 · 타임라인 · 이전 대화</span>
           <ChevronDown
-            className={`size-3.5 transition-transform ${detailsOpen ? "rotate-180" : ""}`}
+            className={`rextora-agent-details-chevron ${detailsOpen ? "is-open" : ""}`}
+            aria-hidden="true"
           />
         </button>
         {detailsOpen ? (
-          <div className="max-h-48 space-y-2 overflow-y-auto" data-testid="agent-details-panel">
+          <div className="rextora-agent-details-panel" data-testid="agent-details-panel">
             <AgentWorkspacePanel
               timeline={missionTimeline}
               workspace={workspace}
@@ -199,23 +206,14 @@ function AgentPanelInner({
 
       <div
         ref={scrollRef}
-        className={
-          isDrawer
-            ? "min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-2"
-            : "flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-5"
-        }
-        style={
-          isDrawer
-            ? undefined
-            : { minHeight: "14rem", maxHeight: "min(48vh, 28rem)" }
-        }
+        className="rextora-agent-conversation"
         aria-live="polite"
         aria-label="에이전트 대화"
         data-testid="agent-conversation-scroll"
       >
         {isEmpty ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4 py-5 text-center">
-            <p className="text-sm font-medium text-slate-200">
+          <div className="rextora-agent-empty">
+            <p className="rextora-agent-empty-title">
               {canResume
                 ? "멈춘 지점에서 이어서 진행할까요?"
                 : "오늘 무엇을 하면 좋을까요?"}
@@ -225,10 +223,10 @@ function AgentPanelInner({
                 type="button"
                 onClick={() => void resumeWhereLeftOff()}
                 disabled={isThinking}
-                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-600/90 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                className="rextora-agent-continue-cta"
                 data-testid="agent-continue-cta"
               >
-                <Play className="size-4" />
+                <Play className="size-4" aria-hidden="true" />
                 이어서 진행
               </button>
             ) : (
@@ -236,7 +234,7 @@ function AgentPanelInner({
             )}
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-3xl space-y-5">
+          <div className="rextora-agent-conversation-inner">
             {visibleTurns.map((turn) => (
               <AgentMessage
                 key={turn.id}
@@ -251,10 +249,10 @@ function AgentPanelInner({
                 hideApprovalActions={hasPendingApproval}
               />
             ))}
-            {isDrawer && turns.length > 1 && !detailsOpen ? (
+            {isCompactHistory && turns.length > 1 && !detailsOpen ? (
               <button
                 type="button"
-                className="text-xs text-slate-500 underline"
+                className="rextora-agent-history-link"
                 onClick={() => setDetailsOpen(true)}
               >
                 이전 대화 {turns.length - 1}개 보기
@@ -264,7 +262,7 @@ function AgentPanelInner({
         )}
       </div>
 
-      <div className="space-y-1.5 border-t border-slate-800/70 px-3 py-2.5 sm:px-4">
+      <div className="rextora-agent-composer">
         <AgentInput
           onSend={sendQuery}
           onStop={stopResponse}

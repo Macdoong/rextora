@@ -1,4 +1,10 @@
 import type { BacktestTrade } from "./backtestEngine";
+import type { BacktestDataCoverage } from "./backtestDataCoverage";
+import type { SlippageModelVersion } from "./executionSlippage";
+import type {
+  CostAssumptionsV1,
+  ResolvedScenarioCostAssumptions,
+} from "./costAssumptions";
 
 export interface MonthlyReturnRow {
   month: string;
@@ -34,6 +40,13 @@ export interface BacktestCostBreakdown {
   totalCostPctOfInitialCapital?: number;
   grossPnLBeforeCosts?: number;
   netPnLAfterCosts?: number;
+  /** Separately deducted ledger: fee + funding + spread (v1). Legacy includes slippage. */
+  totalDeductedCostUsdt?: number;
+  totalDeductedCostPctOfInitialCapital?: number;
+  /** Attribution + deducted ledger. Not used for net identity on v1. */
+  totalEconomicFrictionUsdt?: number;
+  totalEconomicFrictionPctOfInitialCapital?: number;
+  slippageAttributionUsdt?: number;
   /** Explains legacy `fees` etc. are sum of per-trade rate fractions */
   rateSumNoteKo?: string;
 }
@@ -69,6 +82,8 @@ export interface BacktestReport {
   candleCount: number;
   processedCandleCount: number;
   dataSource: "binance" | "synthetic-test";
+  /** Canonical requested-vs-actual market-data coverage (MODEL C). */
+  dataCoverage?: BacktestDataCoverage;
   totalReturn: number;
   mdd: number;
   tradeCount: number;
@@ -86,12 +101,27 @@ export interface BacktestReport {
   negativeMonths: number;
   startingBalance: number;
   endingBalance: number;
+  /** SAFE MODEL A stamp. Absent on historical JSON → resolve as legacy_v0. */
+  slippageModelVersion?: SlippageModelVersion;
+  /** Canonical v1 snapshot. Absent on historical JSON — do not invent defaults. */
+  costAssumptions?: CostAssumptionsV1;
+  /** Primary run after costStressMultipliers[0] scaling. */
+  primaryCostAssumptions?: ResolvedScenarioCostAssumptions;
   costStress?: Array<{
     multiplier: number;
     totalReturn: number;
     mdd: number;
     tradeCount: number;
     negativeMonths: number;
+    slippageRate?: number;
+    slippageModelVersion?: SlippageModelVersion;
+    feeRate?: number;
+    fundingEnabled?: boolean;
+    fundingConfiguredRate?: number;
+    fundingEffectiveRate?: number;
+    spreadEnabled?: boolean;
+    spreadRate?: number;
+    costGuardK?: number;
   }>;
   zeroTradeDiagnostics?: BacktestZeroTradeDiagnostics | null;
   /** Derived trade event traces for chart explanation UI. */
@@ -123,6 +153,8 @@ export interface BacktestConfig {
   spreadRate: number;
   costStressMultipliers: number[];
   costGuardK: number;
+  /** Present on the canonical API path after normalizeCostAssumptions. */
+  costAssumptions?: CostAssumptionsV1;
   baseBalPct?: number;
   maxConcurrent?: number;
   /**

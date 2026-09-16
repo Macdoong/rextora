@@ -4,11 +4,14 @@ import {
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { archiveResearchJob } from "@/src/lib/rextora/strategySearch/jobArchive";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 type Ctx = { params: Promise<{ jobId: string }> };
 
 /** POST /api/rextora/strategy-search/[jobId]/archive — soft-archive terminal jobs */
 export async function POST(request: Request, context: Ctx) {
+  const denied = await denyUnlessPermitted(request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { jobId } = await context.params;

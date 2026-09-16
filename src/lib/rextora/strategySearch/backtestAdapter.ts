@@ -7,8 +7,17 @@ import { buildBacktestReport } from "../backtest/backtestReport";
 import { runSafeV44Backtest } from "../backtest/backtestEngine";
 import type { BacktestReport } from "../backtest/backtestTypes";
 import { loadHistoricalCandles } from "../data/historicalCandleLoader";
+import {
+  calculateHistoricalDataCoverage,
+  pickPrimaryCoverageReason,
+} from "../data/historicalDataCoverage";
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
+import {
+  EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
+  resolveEventSequenceCostModel,
+  type EventSequenceCostModel,
+} from "../strategy/eventSequenceCostModel";
 import { isLockedSafeHash } from "../strategy/strategyHash";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { buildPatternSearchDefinition } from "./patternEventSequence";
@@ -34,6 +43,7 @@ export type StrategySearchAdapterErrorCode =
   | "UNSORTED_CANDLES"
   | "DUPLICATE_CANDLE_TIME"
   | "CANDLE_OUTSIDE_WINDOW"
+  | "DATA_COVERAGE_INSUFFICIENT"
   | "BACKTEST_FAILED";
 
 export class StrategySearchAdapterError extends Error {
@@ -41,6 +51,7 @@ export class StrategySearchAdapterError extends Error {
   readonly symbol: string | null;
   readonly windowId: string | null;
   readonly candidateId: string | null;
+  readonly sourceReason: string | null;
 
   constructor(
     code: StrategySearchAdapterErrorCode,
@@ -49,6 +60,7 @@ export class StrategySearchAdapterError extends Error {
       symbol?: string | null;
       windowId?: string | null;
       candidateId?: string | null;
+      sourceReason?: string | null;
     },
   ) {
     super(message);
@@ -57,6 +69,7 @@ export class StrategySearchAdapterError extends Error {
     this.symbol = context?.symbol ?? null;
     this.windowId = context?.windowId ?? null;
     this.candidateId = context?.candidateId ?? null;
+    this.sourceReason = context?.sourceReason ?? null;
   }
 }
 
@@ -69,6 +82,8 @@ export interface EvaluateCandidateWindowInput {
   costConfig: StrategySearchBacktestCostConfig;
   /** When supplied, skips the production candle loader (tests / future cache). */
   preloadedCandles?: OhlcvCandle[];
+  /** Explicit Pattern Event-Sequence cost model. Omitted → ledger_v0. */
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 export interface EvaluateCandidateAcrossWindowsInput {
@@ -83,6 +98,8 @@ export interface EvaluateCandidateAcrossWindowsInput {
    * Key format: `${symbol}|${windowId}`
    */
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  /** Explicit Pattern Event-Sequence cost model. Omitted → ledger_v0. */
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 /** Stress-only across-windows input — constructed by costStress.ts only. */
@@ -94,6 +111,7 @@ export interface EvaluateCandidateAcrossWindowsForStressInput {
   balance: number;
   costConfig: StrategySearchStressRuntimeCostConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 function preloadedKey(symbol: string, windowId: string): string {
@@ -299,6 +317,7 @@ function validateCandles(
   window: StrategySearchEvaluationWindowPlan,
   symbol: string,
   candidateId: string,
+  timeframe?: string,
 ): void {
   if (!Array.isArray(candles) || candles.length === 0) {
     throw new StrategySearchAdapterError(
@@ -343,6 +362,31 @@ function validateCandles(
       );
     }
     prevOpenTime = openTime;
+  }
+
+  if (typeof timeframe !== "string" || timeframe.trim() === "") return;
+  try {
+    const coverage = calculateHistoricalDataCoverage({
+      timeframe,
+      requestedStartMs: window.requestedFrom,
+      requestedEndMs: window.requestedTo,
+      candles,
+    });
+    if (!coverage.sufficient) {
+      const sourceReason = pickPrimaryCoverageReason(coverage.failureReasons);
+      throw new StrategySearchAdapterError(
+        "DATA_COVERAGE_INSUFFICIENT",
+        `DATA_COVERAGE_INSUFFICIENT:${sourceReason}`,
+        {
+          symbol,
+          windowId: window.id,
+          candidateId,
+          sourceReason,
+        },
+      );
+    }
+  } catch (err) {
+    if (err instanceof StrategySearchAdapterError) throw err;
   }
 }
 
@@ -421,6 +465,7 @@ async function runCandidateWindowEvaluation(input: {
   /** When set, stress-only engine costGuardK. When omitted, candidate.params.cost_guard_k. */
   stressCostGuardKOverride?: number;
   preloadedCandles?: OhlcvCandle[];
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }): Promise<StrategySearchWindowEvaluation> {
   const started = Date.now();
   assertCandidate(input.candidate);
@@ -480,6 +525,7 @@ async function runCandidateWindowEvaluation(input: {
     input.window,
     input.symbol,
     input.candidate.candidateId,
+    input.timeframe,
   );
 
   const requestedFromIso = new Date(input.window.requestedFrom).toISOString();
@@ -511,6 +557,11 @@ async function runCandidateWindowEvaluation(input: {
       );
     }
 
+    const eventSequenceCostModel = resolveEventSequenceCostModel(
+      input.eventSequenceCostModel,
+    );
+    const canonical =
+      eventSequenceCostModel === EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1;
     let obResult;
     try {
       obResult = runEventSequenceBacktest({
@@ -520,6 +571,11 @@ async function runCandidateWindowEvaluation(input: {
         balance: input.balance,
         feeRate: input.feeRate,
         slippageRate: input.slippageRate,
+        costModel: eventSequenceCostModel,
+        applyFunding: canonical ? input.applyFunding : false,
+        fundingRate: canonical ? input.fundingRate : 0,
+        applySpread: canonical ? input.applySpread : false,
+        spreadRate: canonical ? input.spreadRate : 0,
         params: input.candidate.params as Record<string, unknown>,
       });
     } catch (err) {
@@ -550,8 +606,8 @@ async function runCandidateWindowEvaluation(input: {
       trades: obResult.trades,
       feesApplied: true,
       slippageApplied: true,
-      fundingApplied: false,
-      spreadApplied: input.applySpread,
+      fundingApplied: canonical ? Boolean(input.applyFunding) : false,
+      spreadApplied: canonical ? Boolean(input.applySpread) : false,
       rejectedSetups: obResult.rejectedSetups.map((r) => ({
         ...r,
         at:
@@ -657,6 +713,7 @@ export async function evaluateCandidateWindow(
     applySpread: input.costConfig.applySpread,
     spreadRate: input.costConfig.spreadRate,
     preloadedCandles: input.preloadedCandles,
+    eventSequenceCostModel: input.eventSequenceCostModel,
   });
 }
 
@@ -676,6 +733,7 @@ async function evaluateAcrossWindowsCore(input: {
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   /** Stored on the result for serialization (base or stress rates). */
   resultCostConfig: StrategySearchBacktestCostConfig;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }): Promise<StrategySearchCandidateEvaluation> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -721,6 +779,7 @@ async function evaluateAcrossWindowsCore(input: {
         spreadRate: input.spreadRate,
         stressCostGuardKOverride: input.stressCostGuardKOverride,
         preloadedCandles: preloaded,
+        eventSequenceCostModel: input.eventSequenceCostModel,
       });
       windows.push(evaluation);
     }
@@ -760,6 +819,7 @@ export async function evaluateCandidateAcrossWindows(
     applySpread: input.costConfig.applySpread,
     spreadRate: input.costConfig.spreadRate,
     preloadedCandlesByKey: input.preloadedCandlesByKey,
+    eventSequenceCostModel: input.eventSequenceCostModel,
     resultCostConfig: {
       feeRate: input.costConfig.feeRate,
       slippageRate: input.costConfig.slippageRate,
@@ -794,6 +854,7 @@ export async function evaluateCandidateAcrossWindowsForStress(
     spreadRate: input.costConfig.spreadRate,
     stressCostGuardKOverride: input.costConfig.costGuardKOverride,
     preloadedCandlesByKey: input.preloadedCandlesByKey,
+    eventSequenceCostModel: input.eventSequenceCostModel,
     resultCostConfig: {
       feeRate: input.costConfig.feeRate,
       slippageRate: input.costConfig.slippageRate,

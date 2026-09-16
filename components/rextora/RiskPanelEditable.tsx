@@ -16,7 +16,16 @@ import {
   computeRiskUsagePct,
   normalizeDailyLossPct,
 } from "@/src/lib/rextora/metrics/riskFormulas";
-import { Gauge, ShieldAlert } from "lucide-react";
+import { Gauge } from "lucide-react";
+import {
+  SETTINGS_RISK_GROUPS,
+  settingsRiskConfiguredFacts,
+  settingsRiskDisplayUnit,
+  settingsRiskFieldLabel,
+  settingsRiskTechnicalKeyLabel,
+  SETTINGS_RISK_FIELD_KEYS,
+  type SettingsRiskFieldKey,
+} from "@/src/lib/rextora/settings/settingsRiskPresentation";
 
 const DEFAULT_SETTINGS: RiskSettings = {
   dailyLossLimitPct: -5,
@@ -32,7 +41,8 @@ const DEFAULT_SETTINGS: RiskSettings = {
 const RISK_FIELD_HELPERS: Record<keyof RiskSettings, string> = {
   dailyLossLimitPct: "하루에 허용할 최대 손실입니다.",
   totalLossLimitPct: "전체 계정 기준 최대 손실입니다.",
-  consecutiveLossLimit: "연속으로 손실이 발생하면 봇을 멈춥니다.",
+  consecutiveLossLimit:
+    "실거래 연속 손실 한도입니다. 기본 3회. 모의매매 자동화는 별도 6회입니다.",
   maxSimultaneousPositions: "동시에 열 수 있는 최대 거래 수입니다.",
   maxPositionSizePerCoinPct: "한 코인에 너무 많이 들어가지 않도록 제한합니다.",
   maxLeverage: "사용할 수 있는 최대 레버리지입니다.",
@@ -199,31 +209,37 @@ export function RiskPanelEditable({ initialRisk }: { initialRisk: EditableRisk }
     }
   }
 
-  const fields: Array<{ key: keyof RiskSettings; label: string; step?: number }> =
-    [
-      { key: "dailyLossLimitPct", label: "일일 손실 한도 (%)", step: 0.5 },
-      { key: "totalLossLimitPct", label: "전체 손실 한도 (%)", step: 0.5 },
-      { key: "consecutiveLossLimit", label: "연속 손실 제한", step: 1 },
-      { key: "maxSimultaneousPositions", label: "동시 포지션 수", step: 1 },
-      {
-        key: "maxPositionSizePerCoinPct",
-        label: "코인별 진입 금액 제한 (%)",
-        step: 0.5,
-      },
-      { key: "maxLeverage", label: "최대 레버리지", step: 0.1 },
-      { key: "maxDailyTrades", label: "하루 최대 거래 횟수", step: 1 },
-      {
-        key: "overtradingCooldownMinutes",
-        label: "과매매 방지 쿨다운 (분)",
-        step: 1,
-      },
-    ];
+  const fieldSteps: Record<SettingsRiskFieldKey, number> = {
+    dailyLossLimitPct: 0.5,
+    totalLossLimitPct: 0.5,
+    consecutiveLossLimit: 1,
+    maxSimultaneousPositions: 1,
+    maxPositionSizePerCoinPct: 0.5,
+    maxLeverage: 0.1,
+    maxDailyTrades: 1,
+    overtradingCooldownMinutes: 1,
+  };
+  const configuredFacts = settingsRiskConfiguredFacts(settings);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 v3-st-risk">
+      <div className="v3-st-facts v3-st-cost-summary" data-testid="settings-risk-summary">
+        {configuredFacts.map((fact) => (
+          <div className="v3-st-metric" key={fact.key}>
+            <span>{fact.label}</span>
+            <b>
+              {fact.value}
+              <span className="v3-st-unit"> {fact.unit}</span>
+            </b>
+          </div>
+        ))}
+      </div>
+
+      <details className="v3-st-disc">
+        <summary>현재 사용률 (읽기 전용 · 감시 화면은 위험)</summary>
       <Card
-        title="리스크 사용률"
-        description="한도 대비 현재 소진과 남은 여유를 한눈에 확인합니다."
+        title="현재 사용률"
+        description="한도 대비 현재 소진과 남은 여유입니다. 실시간 감시는 위험 화면에서 합니다."
         icon={<Gauge className="h-4 w-4" />}
         action={<Badge tone={riskTone}>{view.riskState}</Badge>}
       >
@@ -303,73 +319,98 @@ export function RiskPanelEditable({ initialRisk }: { initialRisk: EditableRisk }
           />
         </div>
       </Card>
+      </details>
 
-      <Card
-        title="리스크 한도 설정"
-        icon={<ShieldAlert className="h-4 w-4" />}
-        description="권장·안전 값을 참고해 조정하세요. 과도한 완화는 자본 위험을 키웁니다."
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {fields.map(({ key, label, step = 1 }) => {
-            const meta = RISK_FIELD_META[key];
-            return (
-              <label key={key} className="block">
-                <span className="rextora-body mb-1 block font-medium text-slate-200">
-                  {label}
-                </span>
-                <FieldHelp
-                  help={RISK_FIELD_HELPERS[key]}
-                  recommended={meta?.recommended}
-                  safe={meta?.safe}
-                />
-                <input
-                  type="number"
-                  step={step}
-                  value={settings[key] as number}
-                  onChange={(e) =>
-                    updateField(key, Number(e.target.value) as RiskSettings[typeof key])
-                  }
-                  className="rextora-input"
-                />
-              </label>
-            );
-          })}
+      {SETTINGS_RISK_GROUPS.map((group) => (
+        <div className="v3-st-group" key={group.id} data-testid={`settings-risk-group-${group.id}`}>
+          <p className="v3-st-group-label">{group.label}</p>
+          <div className="v3-st-form" data-section="risk">
+            {group.keys.map((key) => {
+              const meta = RISK_FIELD_META[key];
+              const sensitive =
+                key === "maxLeverage" ||
+                key === "dailyLossLimitPct" ||
+                key === "totalLossLimitPct" ||
+                key === "consecutiveLossLimit";
+              return (
+                <label
+                  key={key}
+                  className={`v3-st-field${sensitive ? " v3-st-sensitive" : ""}`}
+                >
+                  <span>{settingsRiskFieldLabel(key)}</span>
+                  <FieldHelp
+                    help={RISK_FIELD_HELPERS[key]}
+                    recommended={meta?.recommended}
+                    safe={meta?.safe}
+                  />
+                  <div className="v3-st-input-unit">
+                    <input
+                      type="number"
+                      step={fieldSteps[key]}
+                      value={settings[key] as number}
+                      onChange={(e) =>
+                        updateField(
+                          key,
+                          Number(e.target.value) as RiskSettings[typeof key],
+                        )
+                      }
+                      className="rextora-input"
+                      data-testid={`risk-settings-field-${key}`}
+                    />
+                    <span className="v3-st-unit">{settingsRiskDisplayUnit(key)}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button
-            variant="success"
-            loading={saving}
-            onClick={() => void saveSettings()}
-            data-testid="risk-settings-save"
-          >
-            설정 저장
-          </Button>
-          <Button
-            variant="secondary"
-            disabled={saving}
-            onClick={() => void resetDefaults()}
-            data-testid="risk-settings-reset"
-          >
-            기본값 복원
-          </Button>
-        </div>
-        {statusMessage && (
-          <p
-            className="rextora-helper mt-3 text-emerald-300"
-            data-testid="risk-settings-success"
-          >
-            {statusMessage}
-          </p>
-        )}
-        {errorMessage && (
-          <p
-            className="rextora-helper mt-3 text-red-300"
-            data-testid="risk-settings-error"
-          >
-            {errorMessage}
-          </p>
-        )}
-      </Card>
+      ))}
+
+      <div className="v3-st-toolbar">
+        <Button
+          variant="success"
+          loading={saving}
+          onClick={() => void saveSettings()}
+          data-testid="risk-settings-save"
+        >
+          설정 저장
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={saving}
+          onClick={() => void resetDefaults()}
+          data-testid="risk-settings-reset"
+        >
+          기본값 복원
+        </Button>
+      </div>
+      {statusMessage && (
+        <p
+          className="rextora-helper mt-3 text-emerald-300"
+          data-testid="risk-settings-success"
+        >
+          {statusMessage}
+        </p>
+      )}
+      {errorMessage && (
+        <p
+          className="rextora-helper mt-3 text-red-300"
+          data-testid="risk-settings-error"
+        >
+          {errorMessage}
+        </p>
+      )}
+      <details className="v3-st-disc" data-testid="settings-risk-source-keys">
+        <summary>원본 설정 키</summary>
+        <ul className="v3-st-tech-keys">
+          {SETTINGS_RISK_FIELD_KEYS.map((key) => (
+            <li key={key}>
+              <span>{key}</span>
+              {settingsRiskTechnicalKeyLabel(key)}
+            </li>
+          ))}
+        </ul>
+      </details>
     </div>
   );
 }

@@ -5,12 +5,18 @@ import { cacheDiagnosticsReport } from "./systemStatusSyncService";
 import { initializeServerTpSlManagerReadiness } from "./serverTpSlReadiness";
 import { evaluateLiveSafetyGate } from "./liveSafetyGate";
 import { executeLiveEntry, preflightLiveExecution } from "./liveExecutionEngine";
+import {
+  dispatchLiveExecution,
+  liveExecutionDispatchRoute,
+  resolveLiveExecutionTarget,
+} from "./live/liveExecutionTarget";
+import { runEventSequenceLiveEntries } from "./live/liveEventSequenceLiveScan";
 import { getRextoraSettings } from "./settings/settingsService";
 import { getConfig } from "./config";
 import { refreshMarketData, getMarketSnapshotAgeMs, getMarketDataSource } from "./marketDataStore";
 import { invalidateCandidateCache, getCandidateSnapshotAgeMs } from "./aiRanker";
 import {
-  loadPaperRiskState,
+  getEffectiveRiskState,
   resetPaperRiskStateForNewSession,
   resolveRiskStateFromStatus
 } from "./riskStateStore";
@@ -33,7 +39,11 @@ import { getWatchedSymbols } from "./marketWatcherService";
 import { getAccountState } from "./accountStateStore";
 import { markRiskAlertStateNormal, sendRiskAlertIfNeeded } from "./telegramAssistant";
 import { logSystemEvent } from "./learningLogger";
-import { cancelAllScheduledTasks, scheduleInterval } from "./scheduler";
+import {
+  cancelAllScheduledTasks,
+  PAPER_SCAN_TASK_ID,
+  scheduleInterval,
+} from "./scheduler";
 import {
   clearEmergencyStop,
   getRuntimeState,
@@ -45,7 +55,8 @@ import {
 import { isEmergencyActive } from "./emergencyControls";
 import type { AiCandidate, EngineResult, TradingMode } from "./types";
 
-const SCAN_TASK_ID = "rextora-scan-loop";
+export { PAPER_SCAN_TASK_ID };
+const SCAN_TASK_ID = PAPER_SCAN_TASK_ID;
 const HEARTBEAT_TASK_ID = "rextora-heartbeat";
 
 let scanLock = false;
@@ -189,12 +200,23 @@ async function runExecutionScanLoop(mode: TradingMode): Promise<void> {
     const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
 
     if (mode === "PAPER") {
-      const risk = loadPaperRiskState();
+      const risk = getEffectiveRiskState(mode);
       if (isRiskLimitBreached(risk)) {
         const breachFingerprint = getRiskBreachKeys(risk).sort().join("|");
         await sendRiskAlertIfNeeded("리스크 한도 위반으로 자동 중단", breachFingerprint);
         await emergencyStopPaper();
         markEmergencyStop("리스크 한도 위반");
+        try {
+          const { getCurrentPaperSession, haltPaperSessionForRisk } = await import(
+            "./paper/paperSessionStore"
+          );
+          const current = getCurrentPaperSession();
+          if (current?.status === "active") {
+            haltPaperSessionForRisk(current.id, "리스크 한도 위반");
+          }
+        } catch {
+          // Session halt is best-effort after executor stop; never resume.
+        }
         return;
       }
       markRiskAlertStateNormal();
@@ -222,17 +244,45 @@ async function runExecutionScanLoop(mode: TradingMode): Promise<void> {
         await initializeServerTpSlManagerReadiness({ exchangeInfoValidated: true }).catch(() => undefined);
       }
 
-      const entered = await runSafeLiveEntries(1);
+      const liveTarget = resolveLiveExecutionTarget();
+      const entered = await dispatchLiveExecution(liveTarget, {
+        runSafe: () => runSafeLiveEntries(1),
+        runEventSequence: async () => {
+          if (!liveTarget.ok) return 0;
+          liveEntryInProgress = true;
+          try {
+            const result = await runEventSequenceLiveEntries({
+              strategyId: liveTarget.strategyId,
+              maxEntries: 1,
+            });
+            return result.entered;
+          } finally {
+            liveEntryInProgress = false;
+          }
+        },
+        failClosed: async (reason) => {
+          appendAuditLog({
+            type: "candidate_block",
+            actor: "botRuntime",
+            message: reason.message,
+            mode: "LIVE",
+            correlationId: `live-target-${Date.now()}`,
+            details: { code: reason.code, fallbackToSafe: false },
+          });
+          return 0;
+        },
+      });
       appendAuditLog({
         type: "candidate_selected",
         actor: "botRuntime",
-        message: `SAFE live scan entries=${entered}`,
+        message: `live scan entries=${entered}`,
         mode: "LIVE",
-        correlationId: `safe-live-scan-${Date.now()}`,
+        correlationId: `live-scan-${Date.now()}`,
         details: {
           entered,
-          signals: getLastSafeSignals(5).length,
-          paramsHash: strategyMeta.paramsHash
+          strategyId: liveTarget.ok ? liveTarget.strategyId : null,
+          executionKind: liveTarget.ok ? liveTarget.executionKind : null,
+          paramsHash: liveTarget.ok ? liveTarget.paramsHash : null,
         }
       });
     }
@@ -334,6 +384,18 @@ export async function startLiveBotRuntime(): Promise<EngineResult> {
   const preflight = preflightLiveExecution();
   if (!preflight.ok) {
     return preflight;
+  }
+  const liveTarget = resolveLiveExecutionTarget();
+  if (!liveTarget.ok || liveExecutionDispatchRoute(liveTarget) === "blocked") {
+    return {
+      ok: false,
+      mode: "LIVE",
+      serviceState: "live-blocked",
+      message: liveTarget.ok
+        ? "이 전략은 실전 실행 경로가 없습니다."
+        : liveTarget.message,
+      blockedReasons: [liveTarget.ok ? "UNSUPPORTED_LIVE_EXECUTION_KIND" : liveTarget.code],
+    };
   }
 
   const report = await runBinanceDiagnostics().catch(() => null);

@@ -1,11 +1,14 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { resetDemoWorkspace } from "@/src/lib/rextora/firstRun/demoFixture";
 import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatus";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * Reset ONLY reserved demo records. Never deletes SAFE or real user data.
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "settings:write");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => ({}))) as {

@@ -1,4 +1,5 @@
 import { getStrategySearchBestApi } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 import {
   strategySearchError,
   strategySearchJson,
@@ -8,6 +9,9 @@ type Ctx = { params: Promise<{ jobId: string }> };
 
 /** GET /api/rextora/strategy-search/[jobId]/best */
 export async function GET(_request: Request, context: Ctx) {
+  const denied = await denyUnlessAuthenticated(_request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const { jobId } = await context.params;

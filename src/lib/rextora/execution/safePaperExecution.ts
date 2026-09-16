@@ -8,6 +8,10 @@ export async function executePaperEntryFromSignal(input: {
   risk: RiskEngineResult;
   strategyName: string;
   paramsHash: string;
+  paperSessionId?: string;
+  paperStrategyId?: string;
+  entrySignalCandleOpenTime?: number;
+  entrySignalIntervalMs?: number;
 }): Promise<EngineResult> {
   if (!input.signal.passed || input.signal.side === "NONE") {
     return { ok: false, mode: "PAPER", serviceState: "paper", message: "유효한 SAFE 신호가 없습니다." };
@@ -28,7 +32,11 @@ export async function executePaperEntryFromSignal(input: {
     strategyName: input.strategyName,
     paramsHash: input.paramsHash,
     trailingDistance: input.risk.trailingStopDistance,
-    maxHoldBars: input.risk.maxHoldBars
+    maxHoldBars: input.risk.maxHoldBars,
+    paperSessionId: input.paperSessionId,
+    paperStrategyId: input.paperStrategyId,
+    entrySignalCandleOpenTime: input.entrySignalCandleOpenTime,
+    entrySignalIntervalMs: input.entrySignalIntervalMs,
   };
 
   recordPaperEntryFromSafe(payload);

@@ -308,6 +308,7 @@ function cardToEntry(
  */
 export function selectResearchTop10(
   representatives: ResearchResultCard[],
+  options?: { champAHashes?: readonly string[] },
 ): ResearchResultCard[] {
   const recommendable = representatives.filter((c) => c.recommendable);
   const byReturn = [...representatives].sort(
@@ -346,7 +347,16 @@ export function selectResearchTop10(
 
   take(byReturn[0], "TOP 수익");
   take(byStability[0], "TOP 안정");
-  take(byRecommend[0], "최종 추천");
+  if (options?.champAHashes) {
+    for (const hash of options.champAHashes) {
+      take(
+        representatives.find((card) => card.paramsHash === hash),
+        "최종 추천",
+      );
+    }
+  } else {
+    take(byRecommend[0], "최종 추천");
+  }
 
   for (const c of byRecommend) {
     if (selected.length >= RESEARCH_TOP10_LIMIT) break;
@@ -431,6 +441,7 @@ function computeRankChanges(
 export function mergeTop10AcrossScope(input: {
   previous: ResearchTop10Entry[] | null;
   incoming: ResearchResultCard[];
+  champAHashes?: readonly string[];
 }): ResearchResultCard[] {
   const byHash = new Map<string, ResearchResultCard>();
   for (const card of input.incoming) {
@@ -488,7 +499,9 @@ export function mergeTop10AcrossScope(input: {
         prev.rank != null ? `이전 TOP 10 ${prev.rank}위` : "",
     });
   }
-  return selectResearchTop10([...byHash.values()]);
+  return selectResearchTop10([...byHash.values()], {
+    champAHashes: input.champAHashes,
+  });
 }
 
 export function getResearchTop10(
@@ -570,12 +583,15 @@ export function buildAndPersistResearchTop10(input: {
   representatives: ResearchResultCard[];
   previousSameScope?: ResearchTop10Snapshot | null;
   options?: StrategySearchStoreOptions;
+  champAHashes?: readonly string[];
 }): ResearchTop10Snapshot {
   const now = new Date().toISOString();
   const existing = getResearchTop10(input.jobId, input.options);
   // Job-local shortlist only. Never import another Research Job's Top-10 entries
   // into this jobId (same-scope peers may share market settings but different stacks).
-  const selected = selectResearchTop10(input.representatives);
+  const selected = selectResearchTop10(input.representatives, {
+    champAHashes: input.champAHashes,
+  });
   const previousEntries =
     existing?.jobId === input.jobId && existing.scopeKey === input.scopeKey
       ? existing.entries

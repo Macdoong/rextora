@@ -202,7 +202,7 @@ export function FirstRunOnboarding({
   }
 
   return (
-    <div className="space-y-4" data-testid="first-run-root">
+    <div className="space-y-4 v3-oc-firstrun" data-testid="first-run-root">
       {showDemoBanner ? (
         <div
           className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2"
@@ -255,7 +255,7 @@ export function FirstRunOnboarding({
       ) : null}
 
       {showOnboarding ? (
-        <Card data-testid="first-run-onboarding">
+        <Card data-testid="first-run-onboarding" className="v3-card">
           <SectionHeader
             title="Rextora 시작하기"
             description="AI Trading Employee — 연구·검증·보고를 돕고, 최종 승인은 항상 사용자에게 있습니다."

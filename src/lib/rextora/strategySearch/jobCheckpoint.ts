@@ -25,6 +25,7 @@ export type StrategySearchRunnerStopReason =
   | "cancelled"
   | "paused"
   | "error_rate_auto_pause"
+  | "repeated_signature_auto_pause"
   | "failed";
 
 export interface StrategySearchRunnerCheckpointPayload {
@@ -39,6 +40,11 @@ export interface StrategySearchRunnerCheckpointPayload {
   jobStatus: StrategySearchJobStatus;
   /** Present when the runner stopped for a classified reason (Phase operator UX). */
   stopReason?: StrategySearchRunnerStopReason;
+  /**
+   * Cumulative recoverable generation-error fingerprint counts.
+   * Additive — old checkpoints omit it and load as empty.
+   */
+  repeatedErrorSignatures?: Record<string, number>;
 }
 
 export class StrategySearchCheckpointError extends Error {
@@ -56,6 +62,46 @@ export class StrategySearchCheckpointError extends Error {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function cloneRepeatedErrorSignatures(
+  value: Record<string, number>,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const key of Object.keys(value).sort()) {
+    out[key] = value[key]!;
+  }
+  return out;
+}
+
+function assertRepeatedErrorSignatures(
+  value: unknown,
+): Record<string, number> | undefined {
+  if (value == null) return undefined;
+  if (!isObject(value)) {
+    throw new StrategySearchCheckpointError(
+      "CORRUPT_CHECKPOINT",
+      "checkpoint repeatedErrorSignatures invalid",
+    );
+  }
+  const out: Record<string, number> = {};
+  for (const key of Object.keys(value).sort()) {
+    const count = value[key];
+    if (
+      typeof key !== "string" ||
+      key.length === 0 ||
+      typeof count !== "number" ||
+      !Number.isInteger(count) ||
+      count < 0
+    ) {
+      throw new StrategySearchCheckpointError(
+        "CORRUPT_CHECKPOINT",
+        "checkpoint repeatedErrorSignatures entries invalid",
+      );
+    }
+    out[key] = count;
+  }
+  return out;
 }
 
 function assertPrng(value: unknown): SeededRandomState {
@@ -182,6 +228,13 @@ export function encodeRunnerCheckpointPayload(
     lastParentParamsHash: payload.lastParentParamsHash,
     jobStatus: payload.jobStatus,
     ...(payload.stopReason ? { stopReason: payload.stopReason } : {}),
+    ...(payload.repeatedErrorSignatures
+      ? {
+          repeatedErrorSignatures: cloneRepeatedErrorSignatures(
+            payload.repeatedErrorSignatures,
+          ),
+        }
+      : {}),
   });
 }
 
@@ -229,6 +282,7 @@ export function decodeRunnerCheckpointPayload(
     ![
       "queued",
       "running",
+      "interrupted",
       "pause_requested",
       "paused",
       "cancel_requested",
@@ -250,9 +304,15 @@ export function decodeRunnerCheckpointPayload(
     stopReasonRaw === "search_space_exhausted" ||
     stopReasonRaw === "cancelled" ||
     stopReasonRaw === "paused" ||
+    stopReasonRaw === "error_rate_auto_pause" ||
+    stopReasonRaw === "repeated_signature_auto_pause" ||
     stopReasonRaw === "failed"
       ? stopReasonRaw
       : undefined;
+
+  const repeatedErrorSignatures = assertRepeatedErrorSignatures(
+    parsed.repeatedErrorSignatures,
+  );
 
   return {
     version: RUNNER_CHECKPOINT_VERSION,
@@ -269,6 +329,7 @@ export function decodeRunnerCheckpointPayload(
         : String(parsed.lastParentParamsHash),
     jobStatus: parsed.jobStatus as StrategySearchJobStatus,
     ...(stopReason ? { stopReason } : {}),
+    ...(repeatedErrorSignatures ? { repeatedErrorSignatures } : {}),
   };
 }
 
@@ -293,6 +354,7 @@ export function buildPersistedCheckpoint(input: {
   payload: StrategySearchRunnerCheckpointPayload;
   bestCandidate: StrategySearchBestCandidateReference | null;
   bestPassedCandidate: StrategySearchBestCandidateReference | null;
+  bestByCompatibilityGroup?: StrategySearchCheckpoint["bestByCompatibilityGroup"];
   updatedAt?: string;
 }): StrategySearchCheckpoint {
   return {
@@ -305,6 +367,9 @@ export function buildPersistedCheckpoint(input: {
     bestPassedCandidate: input.bestPassedCandidate
       ? { ...input.bestPassedCandidate }
       : null,
+    ...(input.bestByCompatibilityGroup
+      ? { bestByCompatibilityGroup: input.bestByCompatibilityGroup }
+      : {}),
     updatedAt: input.updatedAt ?? new Date().toISOString(),
   };
 }

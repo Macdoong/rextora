@@ -17,11 +17,21 @@ import {
 } from "../strategy/strategyTypes";
 import { StrategySearchApiError } from "./jobApiService";
 import {
+  getJobExecutionProfile,
+  resolveProfileEventSequenceCostModel,
+} from "./jobExecutionProfile";
+import { isPatternCandidateParams } from "./patternSearchSpaces";
+import { classifyPersistedTrial, formatEvaluationEvidence, stampResearchEvaluation, buildResearchCostProvenance } from "./researchEvaluationIdentity";
+import {
   getSearchJob,
   getSearchTrial,
   listSearchTrials,
   type StrategySearchStoreOptions,
 } from "./jobStore";
+import type {
+  StrategySearchJob,
+  StrategySearchTrial,
+} from "./types";
 import { describeLeverageFromParams } from "./leverageMode";
 import { buildPatternSearchDefinition } from "./patternEventSequence";
 import { resolvePatternFamilyFromParams } from "./patternSearchSpaces";
@@ -34,6 +44,9 @@ import {
   buildReadableStrategyIdentity,
   type StrategyFamilyId,
 } from "./readableStrategyName";
+import { buildStrategyExecutionProvenance } from "../strategy/strategyExecutionProvenance";
+import type { StrategyExecutionProvenance } from "../strategy/strategyExecutionProvenance";
+import type { ResearchEngineCostModel } from "./researchEvaluationIdentity";
 
 export interface PromoteSearchCandidateInput {
   jobId: string;
@@ -123,6 +136,154 @@ function findExistingByCandidateHash(candidateParamsHash: string) {
   );
 }
 
+function resolvePromotionEvaluationEvidence(input: {
+  job: StrategySearchJob;
+  trial: StrategySearchTrial;
+  store?: StrategySearchStoreOptions;
+}): {
+  researchEvaluationHash: string;
+  engineCostModel: string;
+  rankingCompatibilityGroup: string;
+  reconstructed: boolean;
+} {
+  const classified = classifyPersistedTrial(input.trial);
+  if (
+    !classified.promotionEligible ||
+    classified.class === "UNKNOWN_LEGACY" ||
+    classified.rankingCompatibilityGroup === "unknown_legacy"
+  ) {
+    throw new StrategySearchApiError(
+      "INVALID_REQUEST",
+      "unknown_legacy trials cannot be newly promoted",
+      400,
+    );
+  }
+
+  const hasAnyProvenance = Boolean(
+    input.trial.researchEvaluationHash ||
+      input.trial.engineCostModel ||
+      input.trial.researchEvaluationIdentity ||
+      input.trial.rankingCompatibilityGroup,
+  );
+  const hasCompleteProvenance = Boolean(
+    input.trial.researchEvaluationHash &&
+      input.trial.engineCostModel &&
+      input.trial.researchEvaluationIdentity &&
+      input.trial.rankingCompatibilityGroup &&
+      input.trial.rankingCompatibilityGroup !== "unknown_legacy",
+  );
+
+  if (hasAnyProvenance && !hasCompleteProvenance) {
+    throw new StrategySearchApiError(
+      "INVALID_REQUEST",
+      "promotion requires complete research evaluation evidence",
+      400,
+    );
+  }
+
+  if (hasCompleteProvenance) {
+    return {
+      researchEvaluationHash: input.trial.researchEvaluationHash as string,
+      engineCostModel: input.trial.engineCostModel as string,
+      rankingCompatibilityGroup: input.trial.rankingCompatibilityGroup as string,
+      reconstructed: false,
+    };
+  }
+
+  const profile = getJobExecutionProfile(input.job.id, input.store);
+  if (
+    !profile ||
+    !input.job.config.evaluationWindows?.length ||
+    !input.job.config.dataVersion
+  ) {
+    throw new StrategySearchApiError(
+      "INVALID_REQUEST",
+      "historical promotion blocked: evaluation evidence cannot be reconstructed",
+      400,
+    );
+  }
+
+  const stamped = stampResearchEvaluation({
+    params: input.trial.params as Record<string, unknown>,
+    paramsHash: input.trial.paramsHash,
+    cost: profile.baseCostConfig,
+    symbols: input.job.config.symbols,
+    timeframe: input.job.config.timeframe,
+    windows: input.job.config.evaluationWindows,
+    dataVersion: input.job.config.dataVersion,
+    evaluationBalance: profile.balance,
+    passPolicy: profile.passPolicy,
+    scoreWeights: profile.scoreWeights,
+    costStressScenarios: profile.costStressScenarios,
+    jitterConfig: profile.jitterConfig,
+    ...(isPatternCandidateParams(input.trial.params as Record<string, unknown>)
+      ? {
+          engineCostModel: resolveProfileEventSequenceCostModel(profile),
+        }
+      : {}),
+  });
+  if (
+    !stamped.researchEvaluationHash ||
+    !stamped.classification.engineCostModel ||
+    !stamped.classification.promotionEligible
+  ) {
+    throw new StrategySearchApiError(
+      "INVALID_REQUEST",
+      "historical promotion blocked: evaluation evidence cannot be reconstructed",
+      400,
+    );
+  }
+
+  return {
+    researchEvaluationHash: stamped.researchEvaluationHash,
+    engineCostModel: stamped.classification.engineCostModel,
+    rankingCompatibilityGroup: stamped.classification.rankingCompatibilityGroup,
+    reconstructed: true,
+  };
+}
+
+function stampPromotionExecutionProvenance(input: {
+  job: StrategySearchJob;
+  trial: StrategySearchTrial;
+  evaluation: {
+    researchEvaluationHash: string;
+    engineCostModel: string;
+    rankingCompatibilityGroup: string;
+    reconstructed: boolean;
+  };
+  store?: StrategySearchStoreOptions;
+}): StrategyExecutionProvenance | undefined {
+  const profile = getJobExecutionProfile(input.job.id, input.store);
+  const engine = input.evaluation.engineCostModel as ResearchEngineCostModel;
+  const costAssumptions =
+    profile &&
+    (engine === "safe_execution_price_v1" ||
+      engine === "event_sequence_ledger_v0" ||
+      engine === "event_sequence_execution_price_v1")
+      ? buildResearchCostProvenance({
+          engineCostModel: engine,
+          cost: profile.baseCostConfig,
+          costGuardK:
+            typeof (input.trial.params as { cost_guard_k?: unknown }).cost_guard_k ===
+            "number"
+              ? ((input.trial.params as { cost_guard_k: number }).cost_guard_k)
+              : null,
+        })
+      : undefined;
+  return (
+    buildStrategyExecutionProvenance({
+      engineCostModel: input.evaluation.engineCostModel,
+      rankingCompatibilityGroup: input.evaluation.rankingCompatibilityGroup,
+      researchEvaluationHash: input.evaluation.researchEvaluationHash,
+      sourceResearchJobId: input.job.id,
+      sourceIteration: input.trial.iteration,
+      candidateParamsHash: input.trial.paramsHash,
+      reconstructed: input.evaluation.reconstructed,
+      costAssumptions,
+    }) ?? undefined
+  );
+}
+
 function buildProvenanceDescription(input: {
   jobId: string;
   iteration: number;
@@ -135,6 +296,7 @@ function buildProvenanceDescription(input: {
   identityLabel: string;
   symbols: string[];
   timeframe: string;
+  evaluationEvidence?: string;
 }): string {
   const clusterPart = input.clusterId
     ? ` · sourceClusterId=${input.clusterId}`
@@ -152,7 +314,8 @@ function buildProvenanceDescription(input: {
     ` · leverage=${input.leverageLabel}` +
     ` · ${input.identityLabel}` +
     ` · ${input.symbols.join(",")}` +
-    ` · ${input.timeframe}`
+    ` · ${input.timeframe}` +
+    (input.evaluationEvidence ?? "")
   );
 }
 
@@ -306,6 +469,11 @@ export function promoteSearchCandidateToStrategy(
       );
     }
 
+    const evaluation = resolvePromotionEvaluationEvidence({
+      job,
+      trial,
+      store,
+    });
     const created = createStrategy({
       name,
       displayAlias,
@@ -324,12 +492,19 @@ export function promoteSearchCandidateToStrategy(
         identityLabel: identity.strategyTypeLabelKo,
         symbols: job.config.symbols,
         timeframe: job.config.timeframe,
+        evaluationEvidence: formatEvaluationEvidence(evaluation),
       }),
       params: shellParams,
       timeframe,
       strategyType: "condition_builder",
       definition,
       sourceParamsHash: trial.paramsHash,
+      executionProvenance: stampPromotionExecutionProvenance({
+        job,
+        trial,
+        evaluation,
+        store,
+      }),
     });
 
     if (lastBacktest) {
@@ -417,6 +592,11 @@ export function promoteSearchCandidateToStrategy(
     paramsHash: trial.paramsHash,
   });
 
+  const evaluation = resolvePromotionEvaluationEvidence({
+    job,
+    trial,
+    store,
+  });
   const created = createStrategy({
     name,
     displayAlias,
@@ -433,11 +613,18 @@ export function promoteSearchCandidateToStrategy(
       identityLabel: identity.strategyTypeLabelKo,
       symbols: job.config.symbols,
       timeframe: job.config.timeframe,
+      evaluationEvidence: formatEvaluationEvidence(evaluation),
     }),
     params,
     timeframe,
     strategyType: "safe_params",
     sourceParamsHash: trial.paramsHash,
+    executionProvenance: stampPromotionExecutionProvenance({
+      job,
+      trial,
+      evaluation,
+      store,
+    }),
   });
 
   if (lastBacktest) {

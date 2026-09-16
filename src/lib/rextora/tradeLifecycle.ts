@@ -5,6 +5,7 @@ import { notifyTradeEntry, notifyTradeClosed } from "./telegramOperation";
 import { generateAiTradeReport } from "./report/aiTradeReport";
 import { buildUnifiedTradeResult } from "./metrics/tradeResult";
 import { appendUnifiedTradeResult } from "./metrics/tradeResultStore";
+import { applySafePaperSessionCloseAccounting } from "./paper/paperSessionStore";
 import { SAFE_STRATEGY_ID } from "./strategy/strategyTypes";
 import type { AiCandidate, OrderRecord, Position, SignalType, TradeDirection } from "./types";
 
@@ -24,6 +25,10 @@ export interface SafePaperEntryPayload {
   paramsHash: string;
   trailingDistance?: number;
   maxHoldBars?: number;
+  paperSessionId?: string;
+  paperStrategyId?: string;
+  entrySignalCandleOpenTime?: number;
+  entrySignalIntervalMs?: number;
 }
 
 export interface TradeLifecycleEvent {
@@ -59,7 +64,12 @@ export function recordPaperEntryFromSafe(payload: SafePaperEntryPayload): { posi
     strategyName: payload.strategyName,
     trailingDistance: payload.trailingDistance,
     maxHoldBars: payload.maxHoldBars,
-    barsHeld: 0
+    barsHeld: 0,
+    paperSessionId: payload.paperSessionId,
+    paperStrategyId: payload.paperStrategyId,
+    entrySignalCandleOpenTime: payload.entrySignalCandleOpenTime,
+    entrySignalIntervalMs: payload.entrySignalIntervalMs,
+    lastManagedFinalizedCandleOpenTime: payload.entrySignalCandleOpenTime,
   };
   const order: OrderRecord = {
     id: `paper-order-${Date.now()}`,
@@ -135,6 +145,7 @@ export function recordPaperExit(symbol: string, exitPrice: number, exitReason: s
   const tradeSide = closed.side === "Short" ? "SHORT" : "LONG";
 
   const unified = buildUnifiedTradeResult({
+    id: `safe-close-${closed.id}`,
     symbol,
     side: tradeSide,
     strategyId: closed.strategyName ?? SAFE_STRATEGY_ID,
@@ -147,6 +158,13 @@ export function recordPaperExit(symbol: string, exitPrice: number, exitReason: s
     openedAt: closed.openedAt
   });
   appendUnifiedTradeResult(unified);
+
+  applySafePaperSessionCloseAccounting({
+    paperSessionId: closed.paperSessionId,
+    paperStrategyId: closed.paperStrategyId,
+    closeId: unified.id,
+    realizedNetUsdt: unified.realizedUsdt,
+  });
 
   const pnlPct = unified.netPct;
 

@@ -67,25 +67,76 @@ export function expectedBarCount(fromMs: number, toMs: number, intervalMs: numbe
   return Math.floor((toMs - fromMs) / intervalMs) + 1;
 }
 
+export type CandleSpacingIssueCode =
+  | "OFF_GRID"
+  | "INTERNAL_MISSING_BARS"
+  | "DUPLICATE_OR_ORDER";
+
+export type CandleSpacingInspection =
+  | { ok: true }
+  | { ok: false; code: CandleSpacingIssueCode; reason: string };
+
 /**
- * Validate consecutive candle spacing (allows one missing bar).
+ * Canonical P3-A4 spacing inspection.
+ * Absolute grid: openTime % intervalMs === 0.
+ * Adjacent delta must equal intervalMs exactly. No ±5% tolerance.
+ */
+export function inspectCandleSpacing(
+  openTimes: number[],
+  intervalMs: number,
+): CandleSpacingInspection {
+  if (!Number.isFinite(intervalMs) || intervalMs <= 0) {
+    return {
+      ok: false,
+      code: "OFF_GRID",
+      reason: `invalid intervalMs ${intervalMs}`,
+    };
+  }
+  for (let i = 0; i < openTimes.length; i += 1) {
+    const openTime = openTimes[i];
+    if (!Number.isFinite(openTime) || openTime % intervalMs !== 0) {
+      return {
+        ok: false,
+        code: "OFF_GRID",
+        reason: `off-grid openTime ${openTime} at index ${i} (expected openTime % ${intervalMs} === 0)`,
+      };
+    }
+  }
+  if (openTimes.length < 2) return { ok: true };
+  for (let i = 1; i < openTimes.length; i += 1) {
+    const delta = openTimes[i]! - openTimes[i - 1]!;
+    if (delta <= 0) {
+      return {
+        ok: false,
+        code: "DUPLICATE_OR_ORDER",
+        reason: `non-ascending openTime at index ${i}`,
+      };
+    }
+    if (delta === intervalMs) continue;
+    if (delta % intervalMs === 0) {
+      return {
+        ok: false,
+        code: "INTERNAL_MISSING_BARS",
+        reason: `internal missing bars: delta ${delta}ms at index ${i} (expected ${intervalMs}ms)`,
+      };
+    }
+    return {
+      ok: false,
+      code: "OFF_GRID",
+      reason: `off-grid spacing ${delta}ms at index ${i} (expected ${intervalMs}ms)`,
+    };
+  }
+  return { ok: true };
+}
+
+/**
+ * Validate candle grid alignment and exact adjacency.
  * Returns null when OK, otherwise a Korean-safe technical reason.
  */
 export function validateCandleSpacing(
   openTimes: number[],
   intervalMs: number,
-  toleranceMs = Math.floor(intervalMs * 0.05),
 ): string | null {
-  if (openTimes.length < 2) return null;
-  for (let i = 1; i < openTimes.length; i += 1) {
-    const delta = openTimes[i] - openTimes[i - 1];
-    if (delta <= 0) {
-      return `non-ascending openTime at index ${i}`;
-    }
-    // Allow gaps of N intervals (missing bars), but reject wrong step size
-    if (delta % intervalMs > toleranceMs && intervalMs - (delta % intervalMs) > toleranceMs) {
-      return `unexpected spacing ${delta}ms at index ${i} (expected multiple of ${intervalMs}ms)`;
-    }
-  }
-  return null;
+  const result = inspectCandleSpacing(openTimes, intervalMs);
+  return result.ok ? null : result.reason;
 }

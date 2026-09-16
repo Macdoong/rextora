@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { loadOhlcvCandles } from "@/src/lib/rextora/data/candleLoader";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 /** Chart-only candle feed. Does not place orders or alter trading logic. */
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const url = new URL(request.url);
   const symbol = (url.searchParams.get("symbol") ?? "BTCUSDT").toUpperCase();
   const interval = url.searchParams.get("interval") ?? "15m";

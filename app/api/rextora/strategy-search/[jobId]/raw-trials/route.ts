@@ -2,6 +2,7 @@ import {
   strategySearchError,
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 import {
   executeRawTrialCleanup,
   getRawTrialRetentionPolicy,
@@ -21,6 +22,9 @@ const POLICIES = new Set<RawTrialRetentionPolicy>([
 
 /** GET /api/rextora/strategy-search/[jobId]/raw-trials — cleanup preview */
 export async function GET(_request: Request, context: Ctx) {
+  const denied = await denyUnlessAuthenticated(_request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const { jobId } = await context.params;
@@ -42,6 +46,8 @@ export async function GET(_request: Request, context: Ctx) {
  * body: { action: "preview" | "cleanup" | "setPolicy", dryRun?: boolean, policy?: string }
  */
 export async function POST(request: Request, context: Ctx) {
+  const denied = await denyUnlessPermitted(request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { jobId } = await context.params;

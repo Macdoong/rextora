@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { emptyEntityMemory } from "../src/lib/rextora/agent/conversationContext";
 import type { AgentResponse } from "../src/lib/rextora/agent/types";
+import { authedRequest } from "./helpers/authSession";
 
 vi.mock("../src/lib/rextora/agent/v2/reasoning/reasoningProvider", () => ({
   callReasoningProvider: vi.fn(async () => ({
@@ -45,7 +46,7 @@ describe("conversation provider failure preserves route mode", () => {
 
   async function ask(query: string): Promise<AgentResponse> {
     const response = await POST(
-      new Request("http://localhost/api/rextora/agent", {
+      await authedRequest("http://localhost/api/rextora/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -56,7 +57,7 @@ describe("conversation provider failure preserves route mode", () => {
           entityMemory: emptyEntityMemory(),
           pendingApprovals: [],
         }),
-      }),
+      }, "operator"),
     );
     expect(response.status).toBe(200);
     return (await response.json()) as AgentResponse;

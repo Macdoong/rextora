@@ -15,8 +15,12 @@ import { getLastSafeSignals } from "@/src/lib/rextora/execution/safePaperLoop";
 import { calculateSafeV44Risk } from "@/src/lib/rextora/risk/safeV44RiskEngine";
 import { loadSafeV44Strategy } from "@/src/lib/rextora/strategy/safeV44Strategy";
 import { getAccountState } from "@/src/lib/rextora/accountStateStore";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   const force = new URL(request.url).searchParams.get("force") === "true";
 
@@ -64,6 +68,7 @@ export async function GET(request: Request) {
         reason: row.reason,
         rejectReason: row.signal.rejectReason,
         entryReason: row.signal.entryReason,
+        observeCode: row.observeCode ?? null,
         estimatedEntryPrice: risk?.entryPrice ?? null,
         estimatedStopPrice: risk?.stopLossPrice ?? null,
         estimatedTakeProfitPrice: risk?.takeProfitPrice ?? null,

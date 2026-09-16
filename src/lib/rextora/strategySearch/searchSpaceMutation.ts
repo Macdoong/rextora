@@ -23,13 +23,20 @@ export interface SearchSpaceMutationRecord {
 
 type MutationField = "min" | "max" | "step" | "defaultValue";
 
-function cloneRanges(
+/** Independent array + range objects, including enumValues. */
+export function cloneSearchParameterRanges(
   ranges: StrategySearchParameterRange[],
 ): StrategySearchParameterRange[] {
   return ranges.map((r) => ({
     ...r,
     enumValues: r.enumValues ? [...r.enumValues] : undefined,
   }));
+}
+
+function cloneRanges(
+  ranges: StrategySearchParameterRange[],
+): StrategySearchParameterRange[] {
+  return cloneSearchParameterRanges(ranges);
 }
 
 function isNumericRange(r: StrategySearchParameterRange): boolean {

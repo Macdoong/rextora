@@ -1,4 +1,4 @@
-import { loadRiskState, resolveRiskStateFromStatus, saveRiskState, syncOpenPositionCount } from "../riskStateStore";
+import { getEffectiveRiskState, loadRiskState, resolveRiskStateFromStatus, saveRiskState, syncOpenPositionCount } from "../riskStateStore";
 import { getOpenPositions } from "../positionManager";
 import { getAccountState } from "../accountStateStore";
 import { getRuntimeState } from "../runtimeState";
@@ -19,9 +19,9 @@ export { computeRiskUsagePct, computeRemainingLossAllowancePct, normalizeDailyLo
  * - openPositions: real open count only
  */
 export function getUnifiedRiskView(): UnifiedRiskView {
-  const status = loadRiskState();
   const metrics = getUnifiedMetrics();
   const runtime = getRuntimeState();
+  const status = getEffectiveRiskState(runtime.mode);
   const settings = status.settings;
 
   const openFromStore =

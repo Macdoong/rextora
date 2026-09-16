@@ -1,6 +1,7 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { initializeDemoWorkspace } from "@/src/lib/rextora/firstRun/demoFixture";
 import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatus";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * Explicit demo workspace initialization.
@@ -8,6 +9,8 @@ import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatu
  * Never starts Paper or Live. Never touches SAFE.
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "settings:write");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => ({}))) as {

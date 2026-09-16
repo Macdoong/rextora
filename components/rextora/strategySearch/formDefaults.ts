@@ -16,6 +16,11 @@ import {
   selectedSpaceIdsForSelectionMode,
   type PatternSelectionMode,
 } from "@/src/lib/rextora/patternSelectionMode";
+import { resolveResearchEffectiveEnd } from "@/src/lib/rextora/data/researchPeriodEnd";
+import {
+  isSupportedTimeframe,
+  resolveTimeframe,
+} from "@/src/lib/rextora/data/timeframes";
 import {
   maxDrawdownPercentToPolicy,
   percentInputToRatio,
@@ -765,9 +770,17 @@ export function operatorFormToCreateBody(
   form: StrategySearchOperatorFormState,
 ): StrategySearchCreateJobBody {
   const availableFrom = parseDateStart(form.availableFromDate);
-  const availableTo = parseDateEnd(form.availableToDate);
   const symbol = resolveSymbol(form) || "BTCUSDT";
   const timeframe = form.timeframe.trim() || "15m";
+  const intervalMs = isSupportedTimeframe(timeframe)
+    ? resolveTimeframe(timeframe).intervalMs
+    : 900_000;
+  const availableTo = resolveResearchEffectiveEnd({
+    requestedEndMs: parseDateEnd(form.availableToDate),
+    nowMs: Date.now(),
+    intervalMs,
+    isCurrentPeriodPreset: form.periodPreset !== "custom" ? true : undefined,
+  }).effectiveEndMs;
   const depthId = resolveDepthProfileId(form);
   const qualId = resolveQualificationProfileId(form);
   const depth = getDepthProfile(depthId);

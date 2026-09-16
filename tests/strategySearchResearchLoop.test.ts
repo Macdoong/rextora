@@ -6,6 +6,11 @@ import {
 import { createEmptySearchPlan } from "../src/lib/rextora/strategySearch/searchPlan";
 import { buildTradeEventTrace } from "../src/lib/rextora/backtest/tradeEventTrace";
 import { buildPaperFeedback } from "../src/lib/rextora/strategySearch/paperFeedback";
+import {
+  LIFECYCLE_NAVIGATION_ITEMS,
+  SIDEBAR_NAV_ITEMS,
+} from "@/components/rextora/shell/navigationModel";
+import { getLifecycleStageForRoute } from "@/components/rextora/shell/routeLifecycle";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -98,15 +103,69 @@ describe("paper feedback", () => {
 
 describe("UI workflow wiring", () => {
   it("sidebar prioritizes research lifecycle and expert-gates the wizard", () => {
+    const navigationModel = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/navigationModel.ts"),
+      "utf8",
+    );
     const sidebar = fs.readFileSync(
       path.join(process.cwd(), "components/rextora/Sidebar.tsx"),
       "utf8",
     );
-    expect(sidebar.indexOf("전략 탐색")).toBeLessThan(
-      sidebar.indexOf("시스템 설정"),
+    const lifecycleNav = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/LifecycleNavigation.tsx"),
+      "utf8",
     );
-    expect(sidebar).toContain('"/results"');
-    expect(sidebar).not.toContain("고급 전략 편집");
+
+    expect(navigationModel).toContain("SHELL_NAVIGATION_GROUPS");
+    expect(navigationModel).toContain("LIFECYCLE_NAVIGATION_ITEMS");
+    expect(navigationModel).toContain('label: "전략 탐색"');
+    expect(navigationModel).toContain('href: "/strategy-search"');
+    expect(navigationModel).toContain('lifecycleNavId: "research"');
+    expect(navigationModel).toContain('lifecycleNavId: "strategy"');
+    expect(navigationModel).toContain('href: "/results"');
+    expect(navigationModel).not.toContain("고급 전략 편집");
+    expect(navigationModel.indexOf('lifecycleNavId: "research"')).toBeLessThan(
+      navigationModel.indexOf('label: "시스템 설정"'),
+    );
+
+    expect(sidebar).toContain("navigationModel");
+    expect(sidebar).toContain("SIDEBAR_NAV_ITEMS");
+    expect(sidebar).toContain("LifecycleNavigation");
+    expect(sidebar).toContain('variant="compact-sidebar"');
+    expect(sidebar).toContain('data-testid="sidebar-lifecycle-nav"');
+    expect(sidebar).not.toContain("전략 탐색");
+    expect(sidebar).not.toContain('href: "/results"');
+
+    expect(lifecycleNav).toContain("LIFECYCLE_NAVIGATION_ITEMS");
+    expect(lifecycleNav).toContain("getLifecycleStageForRoute");
+    expect(lifecycleNav).toContain('data-testid={`shell-lifecycle-nav-${item.id}`}');
+    expect(lifecycleNav).toContain("data-active");
+
+    const researchLifecycle = LIFECYCLE_NAVIGATION_ITEMS.find(
+      (item) => item.id === "research",
+    );
+    const strategyLifecycle = LIFECYCLE_NAVIGATION_ITEMS.find(
+      (item) => item.id === "strategy",
+    );
+    expect(researchLifecycle?.href).toBe("/strategy-search");
+    expect(researchLifecycle?.stage).toBe("RESEARCH");
+    expect(strategyLifecycle?.href).toBe("/results");
+    expect(strategyLifecycle?.stage).toBe("STRATEGY");
+
+    const researchNav = SIDEBAR_NAV_ITEMS.find((item) => item.id === "strategy-search");
+    const strategyNav = SIDEBAR_NAV_ITEMS.find((item) => item.id === "results");
+    expect(researchNav?.href).toBe("/strategy-search");
+    expect(strategyNav?.href).toBe("/results");
+    expect(researchNav?.isActive("/strategy-search")).toBe(true);
+    expect(researchNav?.isActive("/market-watch")).toBe(true);
+    expect(researchNav?.isActive("/results")).toBe(false);
+    expect(strategyNav?.isActive("/results")).toBe(true);
+    expect(strategyNav?.isActive("/strategy-performance/run-1")).toBe(true);
+    expect(strategyNav?.isActive("/strategy-search")).toBe(false);
+
+    expect(getLifecycleStageForRoute("/strategy-search")).toBe("RESEARCH");
+    expect(getLifecycleStageForRoute("/results")).toBe("STRATEGY");
+
     const strategies = fs.readFileSync(
       path.join(process.cwd(), "app/strategies/page.tsx"),
       "utf8",

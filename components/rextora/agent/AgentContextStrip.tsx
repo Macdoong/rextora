@@ -14,6 +14,8 @@ import {
   requestOpenAssistant,
   type PersistedAgentWorkspace,
 } from "./agentPersistence";
+import { useOperatorPageContext } from "@/components/rextora/shell/OperatorPageContext";
+import { paperOperatorStatusLabel } from "@/src/lib/rextora/paper/paperOperatorPresentation";
 
 function readMemory(): ConversationEntityMemory | null {
   if (typeof window === "undefined") return null;
@@ -40,6 +42,13 @@ interface AgentContextStripProps {
  */
 export function AgentContextStrip({ pageLabelKo }: AgentContextStripProps) {
   const [memory, setMemory] = useState<ConversationEntityMemory | null>(null);
+  const pageContext = useOperatorPageContext();
+  const paperPageContext =
+    pageContext?.source === "paper" ? pageContext : null;
+  const backtestPageContext =
+    pageContext?.source === "backtest" ? pageContext : null;
+  const liveGatePageContext =
+    pageContext?.source === "live_gate" ? pageContext : null;
 
   useEffect(() => {
     const initialRead = window.setTimeout(() => setMemory(readMemory()), 0);
@@ -64,7 +73,63 @@ export function AgentContextStrip({ pageLabelKo }: AgentContextStripProps) {
     };
   }, []);
 
+  const paperObjective = paperPageContext
+    ? [
+        paperPageContext.strategyId
+          ? `전략 ${paperPageContext.strategyId}`
+          : "선택된 모의 전략 없음",
+        paperPageContext.paperSessionId
+          ? `세션 ${paperPageContext.paperSessionId}`
+          : "모의매매 세션 없음",
+        paperPageContext.paperSessionStatus
+          ? paperOperatorStatusLabel(
+              paperPageContext.paperSessionStatus as
+                | "pending_approval"
+                | "ready"
+                | "active"
+                | "paused"
+                | "risk_halted"
+                | "stopped"
+                | "failed"
+                | "idle",
+            )
+          : null,
+        paperPageContext.symbol,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
+  const backtestObjective = backtestPageContext
+    ? [
+        backtestPageContext.strategyId
+          ? `전략 ${backtestPageContext.strategyId}`
+          : "선택된 백테스트 전략 없음",
+        backtestPageContext.runId
+          ? `실행 ${backtestPageContext.runId}`
+          : "선택된 실행 없음",
+        backtestPageContext.symbol,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
+  const liveGateObjective = liveGatePageContext
+    ? [
+        liveGatePageContext.strategyId
+          ? `전략 ${liveGatePageContext.strategyId}`
+          : "선택된 실전 검토 대상 없음",
+        liveGatePageContext.runId
+          ? `백테스트 ${liveGatePageContext.runId}`
+          : null,
+        liveGatePageContext.symbol,
+        liveGatePageContext.readinessLabel,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
   const objective =
+    paperObjective ??
+    backtestObjective ??
+    liveGateObjective ??
     memory?.pinnedObjectiveKo ??
     memory?.previousRecommendation ??
     "AI 직원과 다음 단계를 이어서 확인하세요.";
@@ -93,10 +158,12 @@ export function AgentContextStrip({ pageLabelKo }: AgentContextStripProps) {
           <p className="mt-0.5 flex items-start gap-1.5 text-sm text-emerald-100/90">
             <Pin className="mt-0.5 size-3.5 shrink-0 text-emerald-400" />
             <span className="leading-snug">
-              {sanitizePrimaryUserText(objective)}
+              {paperObjective || backtestObjective || liveGateObjective
+                ? objective
+                : sanitizePrimaryUserText(objective)}
             </span>
           </p>
-          {pending ? (
+          {pending && !paperPageContext && !backtestPageContext && !liveGatePageContext ? (
             <p className="mt-1 text-xs text-amber-200/90">
               승인 대기: {sanitizePrimaryUserText(pending)} · 엔진 자동 실행 없음
             </p>

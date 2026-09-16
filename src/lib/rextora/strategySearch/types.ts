@@ -6,6 +6,7 @@
 export type StrategySearchJobStatus =
   | "queued"
   | "running"
+  | "interrupted"
   | "pause_requested"
   | "paused"
   | "cancel_requested"
@@ -394,13 +395,30 @@ export interface StrategySearchBestCandidateReference {
   passed: boolean;
 }
 
+/** Additive CHAMP-A group ranking state. Unknown-legacy has no competitive row. */
+export interface StrategySearchGroupBestState {
+  rankingCompatibilityGroup:
+    | "safe_execution_price_v1"
+    | "event_sequence_execution_price_v1"
+    | "event_sequence_ledger_v0";
+  bestCandidate: StrategySearchBestCandidateReference | null;
+  bestPassedCandidate: StrategySearchBestCandidateReference | null;
+  bestScore: number | null;
+}
+
 export interface StrategySearchCheckpoint {
   completedIterations: number;
   nextIteration: number;
   /** Opaque PRNG / generator resume token (string or null). */
   randomState: string | null;
+  /**
+   * Legacy/global scalar. Load-compatible only.
+   * New provenance-aware jobs do not update this as ranking authority.
+   */
   bestCandidate: StrategySearchBestCandidateReference | null;
   bestPassedCandidate: StrategySearchBestCandidateReference | null;
+  /** Authoritative group ranking for P3-A7.2+. Absent on historical checkpoints. */
+  bestByCompatibilityGroup?: StrategySearchGroupBestState[];
   updatedAt: string;
 }
 
@@ -443,6 +461,22 @@ export interface StrategySearchTrial {
   jitterResults: StrategySearchMetricRecord[];
   durationMs: number;
   createdAt: string;
+  /** Additive P3-A7.2 evaluation identity. Absent on historical trials. */
+  researchEvaluationIdentity?: Record<string, unknown> | null;
+  researchEvaluationHash?: string | null;
+  engineCostModel?:
+    | "safe_execution_price_v1"
+    | "event_sequence_execution_price_v1"
+    | "event_sequence_ledger_v0"
+    | null;
+  rankingCompatibilityGroup?:
+    | "safe_execution_price_v1"
+    | "event_sequence_execution_price_v1"
+    | "event_sequence_ledger_v0"
+    | "unknown_legacy"
+    | null;
+  rankingEligible?: boolean;
+  promotionEligible?: boolean;
 }
 
 /** Index row synchronized with jobs on disk. */

@@ -32,6 +32,16 @@ import type { MonthlyCoverageRow } from "@/src/lib/rextora/backtest/monthlyCover
 import type { TradeEventTrace } from "@/src/lib/rextora/backtest/tradeEventTrace";
 import { formatPenetrationKo } from "@/src/lib/rextora/backtest/tradeEventTrace";
 import { displayParamsHashLabel, displaySignalReason, displayStrategyHashLabel, displayTimeframeLabel, formatShortHash } from "@/src/lib/rextora/displayLabels";
+import { isFutureCalendarDate } from "@/src/lib/rextora/backtest/backtestDateRange";
+import {
+  COST_ASSUMPTIONS_VERSION,
+  formatCostAssumptionsDisclosure,
+  formatDecimalRateAsPercentLabel,
+} from "@/src/lib/rextora/backtest/costAssumptions";
+import {
+  COVERAGE_UI,
+  formatCoveragePercent,
+} from "@/src/lib/rextora/backtest/backtestDataCoverage";
 import {
   buildPatternBlockSections,
   buildPatternSummaryGroups,
@@ -55,6 +65,7 @@ import {
   type PatternOverlayKind,
 } from "@/src/lib/rextora/backtest/patternOverlayAvailability";
 import type { BacktestEligibilityResult } from "@/src/lib/rextora/backtest/backtestEligibility";
+import { BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER } from "@/src/lib/rextora/backtest/backtestOperatorPresentation";
 import { SAMPLE_MIN_TRADES } from "@/src/lib/rextora/backtest/statusThresholds";
 import {
   DRAWDOWN_BASIS_HELP_KO,
@@ -231,6 +242,20 @@ function isWorkspaceTabId(id: string): id is WorkspaceTabId {
   return (WORKSPACE_TAB_IDS as readonly string[]).includes(id);
 }
 
+function isWorkspaceSectionHidden(
+  id: string,
+  activeSection?: string,
+): boolean {
+  if (activeSection == null) return false;
+  if (id === "summary") {
+    return activeSection !== "overview" && activeSection !== "summary";
+  }
+  if (!isWorkspaceTabId(id)) return false;
+  if (activeSection === "overview") return id !== "equity";
+  if (activeSection === "technical" || activeSection === "expert") return true;
+  return activeSection !== id;
+}
+
 function SectionAnchor({
   id,
   children,
@@ -241,8 +266,8 @@ function SectionAnchor({
   /** When set, workspace sections are exclusive tabs — only the active one mounts visibly. */
   activeSection?: WorkspaceTabId | string;
 }) {
-  const exclusive = isWorkspaceTabId(id);
-  const hidden = exclusive && activeSection != null && activeSection !== id;
+  const exclusive = isWorkspaceTabId(id) || id === "summary";
+  const hidden = exclusive && activeSection != null && isWorkspaceSectionHidden(id, activeSection);
   return (
     <section
       id={`bt-${id}`}
@@ -316,8 +341,8 @@ export function BacktestAnalysisView({
   chartReproWarning?: string | null;
   chartSource?: "persisted" | "legacy_remote_hydrate" | "live_run" | null;
   initialSelectedTradeId?: string | null;
-  activeSection?: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation";
-  onSectionChange?: (section: "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation") => void;
+  activeSection?: "overview" | "price" | "trades" | "monthly" | "cost" | "equity" | "timeline" | "advanced" | "validation" | "technical" | "expert" | string;
+  onSectionChange?: (section: string) => void;
   onSelectedTradeChange?: (tradeId: string | null) => void;
 }) {
   const model = useMemo(() => buildVisualAnalysisModel({ report, trades, equityCurve, candles }), [report, trades, equityCurve, candles]);
@@ -856,7 +881,7 @@ export function BacktestAnalysisView({
 
   // Selected workspace tab forces content open — no scroll-driven tab mutation.
   const tradesOpen = activeSection === "trades" || tradeListExpanded;
-  const equityOpen = activeSection === "equity" || equityExpanded;
+  const equityOpen = activeSection === "equity" || activeSection === "overview" || equityExpanded;
   const timelineOpen = activeSection === "timeline" || timelineExpanded;
   const advancedOpen = activeSection === "advanced" || advancedExpanded;
   const validationOpen =
@@ -886,6 +911,7 @@ export function BacktestAnalysisView({
     ...(selectedTrace?.assumptionsKo ?? []),
     "완료 봉(OHLC) 기준으로 체결합니다.",
     "동일 봉에서 손절·익절이 모두 닿으면 손절을 우선합니다.",
+    formatCostAssumptionsDisclosure(report),
   ];
   const rejectedSetups = report.rejectedSetups ?? [];
   const rejectedFromTraces = (report.tradeEventTraces ?? []).filter(
@@ -966,7 +992,12 @@ export function BacktestAnalysisView({
           <div className="mb-3 flex flex-wrap gap-3 text-xs rx-text-muted">
             <span>데이터 출처: {dataSourceLabel}</span>
             <span>
-              실제 캔들:{" "}
+              {COVERAGE_UI.requestedPeriodKo}:{" "}
+              {report.requestedFrom?.slice(0, 16) ?? report.fromDate ?? "-"} ~{" "}
+              {report.requestedTo?.slice(0, 16) ?? report.toDate ?? "-"}
+            </span>
+            <span>
+              {COVERAGE_UI.actualPeriodKo}:{" "}
               {report.actualFirstCandleTime
                 ? formatKoreanDateTime(new Date(report.actualFirstCandleTime).getTime())
                 : "-"}{" "}
@@ -975,7 +1006,12 @@ export function BacktestAnalysisView({
                 ? formatKoreanDateTime(new Date(report.actualLastCandleTime).getTime())
                 : "-"}
             </span>
-            <span>처리 캔들: {processed.toLocaleString("ko-KR")}</span>
+            <span data-testid="backtest-coverage-disclosure">
+              {COVERAGE_UI.candleCountKo}: {processed.toLocaleString("ko-KR")}
+              {report.dataCoverage
+                ? ` / ${report.dataCoverage.expectedCandleCount.toLocaleString("ko-KR")} · ${COVERAGE_UI.coverageKo} ${formatCoveragePercent(report.dataCoverage.coverageRatio)}`
+                : ""}
+            </span>
             {samplingNote && <span data-testid="chart-sampling-note">{samplingNote}</span>}
           </div>
           <div className="mb-3 flex flex-wrap gap-2" data-testid="status-chips">
@@ -990,7 +1026,7 @@ export function BacktestAnalysisView({
               className="mb-3 rounded-lg border border-rose-500/40 bg-rose-950/30 px-3 py-2 text-sm text-rose-100"
               data-testid="summary-mdd-warning"
             >
-              {eligibility.verdictLabel}
+              {BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER}
             </p>
           ) : null}
           {costRatios?.criticalCostOfGross ? (
@@ -1511,10 +1547,10 @@ export function BacktestAnalysisView({
         {hasTrades ? (
           <Card title="거래 목록" data-testid="backtest-trade-list">
             <div
-              className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] gap-4"
+              className="v3-bt-trade-workspace lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] gap-4"
               data-testid="backtest-trade-workspace"
             >
-              <div className="min-w-0">
+              <div className="v3-bt-trade-list-col min-w-0">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <input
                     className="min-h-11 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
@@ -1560,12 +1596,17 @@ export function BacktestAnalysisView({
                       : " · 미리보기"}
                   </span>
                 </div>
-                <div className="hidden overflow-x-auto md:block">
-                  <table className="w-full min-w-[880px] text-left text-sm">
-                    <thead className="sticky top-0 bg-slate-950 rx-text-muted">
+                <div className="hidden overflow-auto md:block v3-bt-trade-table-wrap">
+                  <table className="v3-bt-trade-table w-full min-w-[880px] text-left text-sm">
+                    <thead>
                       <tr>
-                        {TRADE_HEADERS.map((h) => (
-                          <th key={h} className="whitespace-nowrap px-2 py-2 font-medium">
+                        {TRADE_HEADERS.map((h, i) => (
+                          <th
+                            key={h}
+                            className={`whitespace-nowrap px-3 py-3 font-semibold ${
+                              i === 4 || i === 7 ? "v3-bt-col-group" : ""
+                            }`}
+                          >
                             {h}
                           </th>
                         ))}
@@ -1652,7 +1693,7 @@ export function BacktestAnalysisView({
                   )}
                 </div>
               </div>
-              <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
+              <div className="v3-bt-trade-inspector-col min-w-0">
                 {selectedTrade ? (
                   <SelectedTradeInspector
                     trade={selectedTrade}
@@ -1722,7 +1763,45 @@ export function BacktestAnalysisView({
                 },
               ]}
             />
-            <BarChart title="월별 수익률" series={monthlySeries} height={300} diverging />
+            <BarChart
+              title="월별 수익률"
+              series={monthlySeries}
+              height={monthlySeries.data.length <= 3 ? 168 : 260}
+              diverging
+            />
+            {model.monthlyCoverage.length > 0 ? (
+              <MonthlyCoveragePanel
+                rows={model.monthlyCoverage}
+                lastExitMs={model.ledgerRange.lastExitMs}
+                candleEndMs={model.ledgerRange.lastCandleMs}
+              />
+            ) : (
+              <div className="mt-3 overflow-x-auto">
+                <table className="rextora-data-table w-full min-w-[480px] text-sm">
+                  <thead>
+                    <tr>
+                      {["월", "거래", "순손익", "수익률"].map((h) => (
+                        <th key={h}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {model.monthlyReturns.map((m) => (
+                      <tr key={m.monthKey}>
+                        <td className="rx-text-primary font-medium">{m.labelKo}</td>
+                        <td>{m.tradeCount}</td>
+                        <td className={m.netPnlUsdt >= 0 ? "text-emerald-300" : "text-rose-300"}>
+                          {formatUsdt(m.netPnlUsdt)}
+                        </td>
+                        <td className={m.returnPctOfInitial >= 0 ? "text-emerald-300" : "text-rose-300"}>
+                          {formatPct(m.returnPctOfInitial)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </Card>
         </SectionAnchor>
       ) : null}
@@ -1768,6 +1847,26 @@ export function BacktestAnalysisView({
                 ) : null}
               </div>
             ) : null}
+            <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-4" data-testid="backtest-cost-split">
+              {costParts.map((p) => (
+                <div key={p.label} className="v3-bt-cost-part">
+                  <span>{p.label}</span>
+                  <b>{formatUsdt(p.v)}</b>
+                </div>
+              ))}
+            </div>
+            <div className="mb-3 flex h-3 overflow-hidden rounded" aria-hidden="true">
+              {costParts.map((p) => (
+                <div
+                  key={p.label}
+                  style={{
+                    width: `${(p.v / costSum) * 100}%`,
+                    background: p.c,
+                  }}
+                  title={`${p.label} ${formatUsdt(p.v)}`}
+                />
+              ))}
+            </div>
             <details className="text-sm text-slate-300">
               <summary className="cursor-pointer rx-text-muted">상세 비용 비율</summary>
               <div className="mt-2">
@@ -1804,18 +1903,6 @@ export function BacktestAnalysisView({
                     },
                   ]}
                 />
-                <div className="mb-2 flex h-4 overflow-hidden rounded">
-                  {costParts.map((p) => (
-                    <div
-                      key={p.label}
-                      style={{
-                        width: `${(p.v / costSum) * 100}%`,
-                        background: p.c,
-                      }}
-                      title={`${p.label} ${formatUsdt(p.v)}`}
-                    />
-                  ))}
-                </div>
               </div>
             </details>
           </Card>
@@ -2135,17 +2222,17 @@ function HoldBucketRow({ b, best, costly }: { b: HoldingBucket; best?: string; c
 function TradeTableRow({ t, selected, onSelect, rowRef }: { t: EnrichedTrade; selected: boolean; onSelect: () => void; rowRef: (el: HTMLTableRowElement | null) => void }) {
   const pnlCls = t.netPnlUsdt >= 0 ? "text-emerald-300" : "text-rose-300";
   return (
-    <tr ref={rowRef} className={`cursor-pointer border-t border-slate-900 ${selected ? "bg-sky-950/40" : "hover:bg-slate-900/50"}`} data-testid="trade-row" data-trade-id={t.id} onClick={onSelect}>
-      <td className="px-2 py-2 font-mono text-xs">{t.id}</td>
-      <td className="px-2 py-2"><Badge tone={t.side === "LONG" ? "success" : "danger"}>{t.side === "LONG" ? "롱" : "숏"}</Badge></td>
-      <td className="whitespace-nowrap px-2 py-2 text-xs">{formatKoreanDateTime(t.entryTime)}</td>
-      <td className="whitespace-nowrap px-2 py-2 text-xs">{formatKoreanDateTime(t.exitTime)}</td>
-      <td className="px-2 py-2">{t.entryPrice.toLocaleString("ko-KR")}</td>
-      <td className="px-2 py-2">{t.exitPrice.toLocaleString("ko-KR")}</td>
-      <td className="px-2 py-2">{t.leverage.toFixed(2)}</td>
-      <td className={`px-2 py-2 ${pnlCls}`}>{formatUsdt(t.netPnlUsdt)}</td>
-      <td className={`px-2 py-2 ${t.pnlPct >= 0 ? "text-emerald-300" : "text-rose-300"}`}>{formatPct(t.pnlPct)}</td>
-      <td className="px-2 py-2 text-xs">{displaySignalReason(t.exitReason)}</td>
+    <tr ref={rowRef} className={`v3-bt-trade-row cursor-pointer ${selected ? "is-selected" : ""}`} data-testid="trade-row" data-trade-id={t.id} onClick={onSelect}>
+      <td className="px-3 py-3 font-mono text-sm">{t.id}</td>
+      <td className="px-3 py-3"><Badge tone={t.side === "LONG" ? "success" : "danger"}>{t.side === "LONG" ? "롱" : "숏"}</Badge></td>
+      <td className="whitespace-nowrap px-3 py-3 text-sm">{formatKoreanDateTime(t.entryTime)}</td>
+      <td className="whitespace-nowrap px-3 py-3 text-sm">{formatKoreanDateTime(t.exitTime)}</td>
+      <td className="v3-bt-col-group px-3 py-3 tabular-nums text-sm">{t.entryPrice.toLocaleString("ko-KR")}</td>
+      <td className="px-3 py-3 tabular-nums text-sm">{t.exitPrice.toLocaleString("ko-KR")}</td>
+      <td className="px-3 py-3 tabular-nums text-sm">{t.leverage.toFixed(2)}</td>
+      <td className={`v3-bt-col-group px-3 py-3 tabular-nums text-sm font-semibold ${pnlCls}`}>{formatUsdt(t.netPnlUsdt)}</td>
+      <td className={`px-3 py-3 tabular-nums text-sm font-semibold ${t.pnlPct >= 0 ? "text-emerald-300" : "text-rose-300"}`}>{formatPct(t.pnlPct)}</td>
+      <td className="px-3 py-3 text-sm">{displaySignalReason(t.exitReason)}</td>
     </tr>
   );
 }
@@ -2411,10 +2498,11 @@ function ValidationGrid({
       ? !eligibility.reasons.some((r) => r.code === "maximum_drawdown_exceeded")
       : Math.abs(report.mdd) <= 0.2;
   const sampleOk = report.tradeCount >= sampleMin;
-  const reqDay = report.requestedTo?.slice(0, 10) ?? null;
-  const actDay =
-    report.actualLastCandleTime?.slice(0, 10) ?? report.toDate ?? null;
-  const futureOk = !reqDay || !actDay || reqDay <= actDay;
+  const requestedToYmd = report.requestedTo?.slice(0, 10) ?? null;
+  const futureDataOk =
+    !requestedToYmd || !isFutureCalendarDate(requestedToYmd);
+  const coverage = report.dataCoverage;
+  const coverageOk = coverage ? coverage.sufficient : null;
   const badge = (s: Status) =>
     s === "pass" ? "통과" : s === "fail" ? "실패" : s === "warning" ? "경고" : "불가";
   const tone = (s: Status): Tone =>
@@ -2461,22 +2549,37 @@ function ValidationGrid({
           explain: "저장된 백테스트 실행 ID입니다. 전략 ID와 별도로 표시됩니다.",
         },
         {
-          title: "요청 기간",
-          status: report.fromDate || report.requestedFrom ? "pass" : "unavailable",
+          title: COVERAGE_UI.requestedPeriodKo,
+          status: report.requestedFrom || report.fromDate ? "pass" : "unavailable",
           value: `${report.requestedFrom?.slice(0, 10) ?? report.fromDate ?? "-"} ~ ${report.requestedTo?.slice(0, 10) ?? report.toDate ?? "-"}`,
           explain: "요청한 조회 기간입니다.",
         },
         {
-          title: "실제 캔들 범위",
+          title: COVERAGE_UI.actualPeriodKo,
           status: report.actualFirstCandleTime ? "pass" : "unavailable",
           value: `${report.actualFirstCandleTime?.slice(0, 16) ?? "-"} ~ ${report.actualLastCandleTime?.slice(0, 16) ?? "-"}`,
           explain: "실제로 로드된 첫·마지막 캔들 시각입니다.",
         },
         {
-          title: "처리 캔들 수",
+          title: COVERAGE_UI.candleCountKo,
           status: processed > 0 ? "pass" : "fail",
-          value: processed.toLocaleString("ko-KR"),
-          explain: "엔진이 처리한 캔들 개수입니다.",
+          value: coverage
+            ? `${coverage.actualCandleCount.toLocaleString("ko-KR")} / ${coverage.expectedCandleCount.toLocaleString("ko-KR")}`
+            : processed.toLocaleString("ko-KR"),
+          explain: "요청 대비 실제 로드된 캔들 개수입니다.",
+        },
+        {
+          title: COVERAGE_UI.coverageKo,
+          status:
+            coverageOk == null
+              ? "unavailable"
+              : coverageOk
+                ? "pass"
+                : "fail",
+          value: coverage
+            ? formatCoveragePercent(coverage.coverageRatio)
+            : "데이터 없음",
+          explain: "요청 구간 경계 대비 데이터 커버리지입니다. 비율은 참고 값입니다.",
         },
         {
           title: "타임프레임",
@@ -2486,9 +2589,9 @@ function ValidationGrid({
         },
         {
           title: "미래 데이터 차단",
-          status: futureOk ? "pass" : "fail",
-          value: futureOk ? "정상" : "미래 구간 의",
-          explain: "종료일이 미래 달력이면 실행이 거부됩니다.",
+          status: futureDataOk ? "pass" : "fail",
+          value: futureDataOk ? "정상" : "미래 달력 구간",
+          explain: "요청 종료일이 오늘 이후 달력이면 실행이 거부됩니다. 실제 캔들이 요청보다 이른 것은 데이터 범위 문제입니다.",
         },
       ],
     },
@@ -2526,6 +2629,45 @@ function ValidationGrid({
             ? `${report.costStress.length}개 배수`
             : "미기록",
           explain: "비용 배수 스트레스 결과 존재 여부입니다.",
+        },
+        {
+          title: "비용 가정 버전",
+          status:
+            report.costAssumptions?.version === COST_ASSUMPTIONS_VERSION
+              ? "pass"
+              : "warning",
+          value: report.costAssumptions?.version ?? "레거시 (미기록)",
+          explain: "이 결과를 만든 비용 모델 버전입니다. 없으면 레거시 결과입니다.",
+        },
+        {
+          title: "수수료 요율",
+          status: report.costAssumptions ? "pass" : "unavailable",
+          value: report.costAssumptions
+            ? `${formatDecimalRateAsPercentLabel(report.primaryCostAssumptions?.feeRate ?? report.costAssumptions.fee.effectiveRate)} · ${report.costAssumptions.fee.model}`
+            : "레거시",
+          explain: "엔진에 전달된 소수 요율을 퍼센트로 표시합니다.",
+        },
+        {
+          title: "슬리피지 모델",
+          status:
+            report.slippageModelVersion === "execution_price_v1" ||
+            report.costAssumptions?.slippage.modelVersion ===
+              "execution_price_v1"
+              ? "pass"
+              : "warning",
+          value:
+            report.costAssumptions?.slippage.modelVersion ??
+            report.slippageModelVersion ??
+            "레거시",
+          explain: "체결가 슬리피지 모델 여부입니다.",
+        },
+        {
+          title: "펀딩 / 스프레드",
+          status: report.costAssumptions ? "pass" : "unavailable",
+          value: report.costAssumptions
+            ? `펀딩 ${report.costAssumptions.funding.enabled ? "적용" : "미적용"} ${formatDecimalRateAsPercentLabel(report.costAssumptions.funding.configuredRate)} · 스프레드 ${report.costAssumptions.spread.enabled ? "적용" : "미적용"}`
+            : "레거시",
+          explain: "설정된 펀딩·스프레드 가정입니다.",
         },
       ],
     },
@@ -2632,7 +2774,13 @@ function ValidationGrid({
                 {g.group} 검증
               </h4>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {g.items.map((item) => (
+                {[...g.items]
+                  .sort((a, b) => {
+                    const rank = (s: Status) =>
+                      s === "fail" ? 0 : s === "warning" ? 1 : s === "unavailable" ? 2 : 3;
+                    return rank(a.status) - rank(b.status);
+                  })
+                  .map((item) => (
                   <div
                     key={item.title}
                     className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"
@@ -2665,7 +2813,7 @@ function MonthlyCoveragePanel({ rows, lastExitMs, candleEndMs }: { rows: Monthly
     <div className="mb-4" data-testid="monthly-coverage-panel">
       {showGapNotice && (
         <p className="mb-2 rounded border border-amber-700/50 bg-amber-950/30 px-3 py-2 text-sm rx-text-secondary" data-testid="no-trades-after-notice">
-          6월 이후 진입 조건을 충족한 거래가 없습니다.{lastExitMs != null ? ` 마지막 청산: ${formatKoreanDateTime(lastExitMs)}.` : ""} 월별 거래 수는 아래 표에서 확인하세요.
+          마지막 청산 이후 캔들이 있는 달에 거래가 없습니다.{lastExitMs != null ? ` 마지막 청산: ${formatKoreanDateTime(lastExitMs)}.` : ""} 월별 거래 수는 아래 표에서 확인하세요.
         </p>
       )}
       <div className="overflow-x-auto">
@@ -2713,8 +2861,6 @@ function TimelineLanes({
   range,
   sideFilter = "all",
   resultFilter = "all",
-  domainStartMs = null,
-  domainEndMs = null,
 }: {
   long: TimelineSeg[];
   short: TimelineSeg[];
@@ -2748,22 +2894,18 @@ function TimelineLanes({
 
   const tradeMin = Math.min(...all.map((s) => s.entryTime));
   const tradeMax = Math.max(...all.map((s) => s.exitTime));
-  const fullMin =
-    range === "all" && domainStartMs != null
-      ? Math.min(domainStartMs, tradeMin)
-      : tradeMin;
-  const fullMax =
-    range === "all" && domainEndMs != null
-      ? Math.max(domainEndMs, tradeMax)
-      : tradeMax;
+  const tradeSpan = Math.max(1, tradeMax - tradeMin);
+  const fitPad = Math.max(tradeSpan * 0.06, 6 * 3_600_000);
+  const fullMin = tradeMin - (range === "all" ? fitPad : 0);
+  const fullMax = tradeMax + (range === "all" ? fitPad : 0);
   const windowMs =
     range === "7d" ? 7 * 86_400_000 : range === "30d" ? 30 * 86_400_000 : null;
   const minT = windowMs ? fullMax - windowMs : fullMin;
   const maxT = fullMax;
   const span = Math.max(1, maxT - minT);
   const width = 960;
-  const rowH = 88;
-  const chartH = rowH * 2 + 48;
+  const rowH = 96;
+  const chartH = rowH * 2 + 56;
 
   const inWindow = (segs: TimelineSeg[]) =>
     segs.filter((s) => s.exitTime >= minT && s.entryTime <= maxT);
@@ -2795,6 +2937,35 @@ function TimelineLanes({
     while (d.getTime() <= maxT && monthMarks.length < 24) {
       monthMarks.push(d.getTime());
       d.setUTCMonth(d.getUTCMonth() + 1);
+    }
+  }
+  const dayMs = 86_400_000;
+  const axisMarks: { t: number; label: string }[] = [];
+  if (span <= 45 * dayMs) {
+    const stepDays = span <= 8 * dayMs ? 1 : span <= 21 * dayMs ? 2 : 3;
+    const cursor = new Date(minT);
+    cursor.setUTCHours(0, 0, 0, 0);
+    if (cursor.getTime() <= minT) cursor.setTime(cursor.getTime() + dayMs);
+    while (cursor.getTime() < maxT && axisMarks.length < 14) {
+      axisMarks.push({
+        t: cursor.getTime(),
+        label: cursor.toLocaleDateString("ko-KR", {
+          timeZone: "Asia/Seoul",
+          month: "numeric",
+          day: "numeric",
+        }),
+      });
+      cursor.setUTCDate(cursor.getUTCDate() + stepDays);
+    }
+  } else {
+    for (const t of monthMarks) {
+      axisMarks.push({
+        t,
+        label: new Date(t).toLocaleDateString("ko-KR", {
+          timeZone: "Asia/Seoul",
+          month: "short",
+        }),
+      });
     }
   }
 
@@ -2843,30 +3014,33 @@ function TimelineLanes({
             onMouseLeave={() => setHoverTip(null)}
           >
             <rect
-              x={x1 - 6}
-              y={midY - 18}
-              width={segW + 12}
-              height={36}
+              x={x1 - 8}
+              y={midY - 22}
+              width={segW + 16}
+              height={44}
               fill="transparent"
             />
             <rect
               x={x1}
-              y={midY - 10}
+              y={midY - 14}
               width={segW}
-              height={20}
-              rx={4}
+              height={28}
+              rx={6}
               fill={s.profitable ? CHART_THEME.up : CHART_THEME.down}
-              opacity={selected ? 1 : 0.85}
+              opacity={selected ? 1 : 0.92}
               stroke={selected ? "#fff" : "transparent"}
               strokeWidth={selected ? 2 : 0}
             />
-            <circle cx={x1} cy={midY} r={4} fill="#e2e8f0" />
+            <circle cx={x1} cy={midY} r={6} fill="#f8fafc" stroke="#0f172a" strokeWidth={1.5} />
             <rect
-              x={x2 - 4}
-              y={midY - 4}
-              width={8}
-              height={8}
-              fill="#94a3b8"
+              x={x2 - 6}
+              y={midY - 6}
+              width={12}
+              height={12}
+              rx={2}
+              fill="#e2e8f0"
+              stroke="#0f172a"
+              strokeWidth={1.5}
             />
           </g>
         );
@@ -2879,7 +3053,7 @@ function TimelineLanes({
     : 1;
 
   return (
-    <div className="min-h-[320px] overflow-x-auto" data-testid="timeline-lanes">
+    <div className="v3-bt-timeline-canvas overflow-x-auto" data-testid="timeline-lanes">
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <Badge
           tone={aggregate ? "warning" : "success"}
@@ -2902,21 +3076,23 @@ function TimelineLanes({
       )}
       <div className="relative">
         <svg
-          width={width}
+          viewBox={`0 0 ${width} ${chartH}`}
+          width="100%"
           height={chartH}
-          className="min-w-full"
+          preserveAspectRatio="xMidYMid meet"
+          className="block w-full"
           style={{ fontFamily: CHART_THEME.fontFamily }}
         >
-          {monthMarks.map((t) => {
-            const x = 56 + ((t - minT) / span) * (width - 64);
+          {axisMarks.map((mark) => {
+            const x = 56 + ((mark.t - minT) / span) * (width - 64);
             return (
-              <g key={t}>
+              <g key={mark.t}>
                 <line
                   x1={x}
                   x2={x}
                   y1={8}
                   y2={rowH * 2 + 4}
-                  stroke="#334155"
+                  stroke="#475569"
                   strokeDasharray="3 4"
                 />
                 <text
@@ -2924,12 +3100,10 @@ function TimelineLanes({
                   y={16}
                   fill={CHART_THEME.axisLabel}
                   fontSize={11}
+                  fontWeight={600}
                   fontFamily={CHART_THEME.fontFamily}
                 >
-                  {new Date(t).toLocaleDateString("ko-KR", {
-                    timeZone: "Asia/Seoul",
-                    month: "short",
-                  })}
+                  {mark.label}
                 </text>
               </g>
             );

@@ -1,3 +1,5 @@
+import type { StrategyExecutionProvenance } from "./strategyExecutionProvenance";
+
 export type StrategySourceStatus =
   | "locked_file"
   | "data_file"
@@ -103,6 +105,12 @@ export interface StoredStrategy {
   shortConditionSummary: string;
   stopLossSummary: string;
   takeProfitSummary: string;
+  /**
+   * Optional structured Research execution provenance (P3-A8.3.1).
+   * Absent on historical records. Never required for parse.
+   * When present, this is machine execution authority — description is display/audit only.
+   */
+  executionProvenance?: StrategyExecutionProvenance;
 }
 
 export interface StrategyIndexFile {

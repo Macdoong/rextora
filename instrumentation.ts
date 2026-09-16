@@ -1,6 +1,7 @@
 /**
- * Next.js server instrumentation — recover orphaned strategy-search jobs on boot.
- * Never touches SAFE strategy files.
+ * Next.js server instrumentation — recover orphaned strategy-search jobs,
+ * then restore an eligible Paper executor after process death.
+ * Never auto-starts Live. Never touches SAFE strategy files.
  */
 
 export async function register() {
@@ -24,21 +25,10 @@ export async function register() {
   setTimeout(() => {
     void (async () => {
       try {
-        const port = process.env.PORT || "3000";
-        const response = await fetch(
-          `http://127.0.0.1:${port}/api/rextora/internal/orphan-recovery`,
-          {
-            method: "POST",
-            headers: { "x-rextora-boot": "1" },
-          },
+        const { recoverOrphanSearchJobs } = await import(
+          "@/src/lib/rextora/strategySearch/orphanJobRecovery"
         );
-        if (!response.ok) {
-          throw new Error(`orphan_recovery_http_${response.status}`);
-        }
-        const result = (await response.json()) as {
-          resumed?: string[];
-          errors?: unknown[];
-        };
+        const result = recoverOrphanSearchJobs();
         if ((result.resumed?.length ?? 0) > 0 || (result.errors?.length ?? 0) > 0) {
           console.info("[rextora] orphan search recovery", result);
         }
@@ -46,6 +36,17 @@ export async function register() {
         console.warn(
           "[rextora] orphan search recovery skipped",
           err instanceof Error ? err.message : err,
+        );
+      }
+      try {
+        const { recoverPaperRuntimeAfterBoot } = await import(
+          "@/src/lib/rextora/paper/paperRuntimeRecovery"
+        );
+        await recoverPaperRuntimeAfterBoot();
+      } catch (err) {
+        console.warn(
+          "[PAPER RECOVERY] failed reason=" +
+            (err instanceof Error ? err.message : String(err)),
         );
       }
     })();

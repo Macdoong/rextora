@@ -45,6 +45,7 @@ const NON_EXECUTABLE: ReadonlySet<PaperSessionStatus> = new Set([
   "pending_approval",
   "ready",
   "paused",
+  "risk_halted",
   "stopped",
   "failed",
 ]);

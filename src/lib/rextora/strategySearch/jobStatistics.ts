@@ -205,3 +205,50 @@ export function assertCanonicalCounterInvariant(
     );
   }
 }
+
+/** Same minimum sample as jobRunner errorAutoPauseRate. */
+export const ERROR_RATE_MIN_EVALUATED = 20 as const;
+
+export interface StrategySearchErrorRateWarning {
+  evaluated: number;
+  errors: number;
+  errorRate: number;
+  warningRate: number;
+  errorWarningActive: boolean;
+}
+
+/**
+ * Derived non-blocking error-rate warning.
+ * Uses the live auto-pause metric: statistics.errors / statistics.evaluated.
+ * Never uses post-hoc calculationErrorRate().
+ */
+export function deriveErrorRateWarning(
+  stats: Pick<StrategySearchJobStatistics, "evaluated" | "errors"> | null | undefined,
+  warningRate: number | null | undefined,
+): StrategySearchErrorRateWarning {
+  const evaluated =
+    typeof stats?.evaluated === "number" && Number.isFinite(stats.evaluated)
+      ? Math.max(0, stats.evaluated)
+      : 0;
+  const errors =
+    typeof stats?.errors === "number" && Number.isFinite(stats.errors)
+      ? Math.max(0, stats.errors)
+      : 0;
+  const threshold =
+    warningRate != null && Number.isFinite(warningRate)
+      ? warningRate
+      : 0.35;
+  const errorRate = evaluated > 0 ? errors / evaluated : 0;
+  const errorWarningActive =
+    evaluated >= ERROR_RATE_MIN_EVALUATED &&
+    Number.isFinite(errorRate) &&
+    Number.isFinite(threshold) &&
+    errorRate >= threshold;
+  return {
+    evaluated,
+    errors,
+    errorRate,
+    warningRate: threshold,
+    errorWarningActive,
+  };
+}

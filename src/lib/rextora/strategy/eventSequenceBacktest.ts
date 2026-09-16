@@ -31,6 +31,10 @@ import {
 } from "./conditions/supplyDemand";
 import type { CanonicalStrategyDefinition } from "./definition/types";
 import {
+  EVENT_SEQUENCE_WALKER_WARMUP_BARS,
+  getEventSequenceMinimumHistoryBars,
+} from "./eventSequenceHistoryRequirement";
+import {
   normalizePatternBlockRole,
   validateEventSequence,
   type PatternFamily,
@@ -44,6 +48,22 @@ import {
   validateEntryZoneAtExecution,
 } from "./definition/entryTrigger";
 import { resolveEventSequenceLeverage } from "../strategySearch/leverageMode";
+import {
+  applyAdverseSlippage,
+  toSlippageSide,
+} from "../backtest/executionSlippage";
+import {
+  resolveEventSequenceCostModel,
+  settleEventSequenceClose,
+  type EventSequenceCostModel,
+} from "./eventSequenceCostModel";
+export type { EventSequenceCostModel } from "./eventSequenceCostModel";
+export {
+  EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
+  EVENT_SEQUENCE_COST_MODEL_LEDGER_V0,
+  resolveEventSequenceCostModel,
+} from "./eventSequenceCostModel";
+
 
 export type EvidenceScalar = number | string | boolean | null;
 
@@ -135,6 +155,9 @@ export interface PatternBlockEvidence {
 }
 
 export type EventSequenceTrade = BacktestTrade & {
+  rawEntryPrice?: number;
+  rawExitPrice?: number;
+  eventSequenceCostModel?: EventSequenceCostModel;
   stopPrice?: number;
   takeProfitPrice?: number;
   patternType?: string;
@@ -215,6 +238,183 @@ const ASSUMPTIONS_KO = [
   "패턴 기하(존/라인)는 조건 감지기(OB/FVG/추세선/지지저항) 결과에서만 채웁니다.",
 ];
 
+export interface EventSequenceLifecycleGeo {
+  patternType: string;
+  zoneHigh: number;
+  zoneLow: number;
+  creationBar: number;
+  revisitBar?: number;
+  confirmationBar?: number;
+  breakBar?: number;
+  invalidationBar?: number;
+  penetrationPct?: number;
+}
+
+export interface EventSequencePositionExitInput {
+  side: "LONG" | "SHORT";
+  candle: OhlcvCandle;
+  stop: number;
+  tp: number;
+  holdBars: number;
+  maxHoldBars: number;
+  geo: EventSequenceLifecycleGeo;
+  invalidateRule: string;
+  combination?: StrategyEventSequence["combination"];
+  window?: OhlcvCandle[];
+  bar: number;
+  atr: number;
+  creationStep?: StrategyEventStep;
+  blockEvidence?: PatternBlockEvidence[];
+}
+
+export interface EventSequencePositionExitResult {
+  exitPrice: number | null;
+  exitReason: BacktestTrade["exitReason"];
+  geo: EventSequenceLifecycleGeo;
+  blockEvidence?: PatternBlockEvidence[];
+}
+
+/**
+ * Exact in-position exit decision used by Research/Backtest.
+ * Precedence: SL over TP (same bar), then max_hold, then combination
+ * invalidation ("end"), then geo invalidation ("end").
+ */
+export function decideEventSequencePositionExit(
+  input: EventSequencePositionExitInput,
+): EventSequencePositionExitResult {
+  const c = input.candle;
+  let exitPrice: number | null = null;
+  let exitReason: BacktestTrade["exitReason"] = "end";
+  let geo = input.geo;
+  let blockEvidence = input.blockEvidence;
+
+  if (input.side === "LONG") {
+    if (c.low <= input.stop) {
+      exitPrice = input.stop;
+      exitReason = "stop_loss";
+    } else if (c.high >= input.tp) {
+      exitPrice = input.tp;
+      exitReason = "take_profit";
+    }
+  } else if (c.high >= input.stop) {
+    exitPrice = input.stop;
+    exitReason = "stop_loss";
+  } else if (c.low <= input.tp) {
+    exitPrice = input.tp;
+    exitReason = "take_profit";
+  }
+
+  if (exitPrice == null && input.holdBars >= input.maxHoldBars) {
+    exitPrice = c.close;
+    exitReason = "max_hold";
+  }
+
+  if (exitPrice == null && input.combination && input.window) {
+    const lifecycle = evaluateCombinationBlocks({
+      combination: input.combination,
+      window: input.window,
+      bar: input.bar,
+      atr: input.atr,
+      side: input.side,
+      creationStep: input.creationStep,
+      roles: ["invalidation", "exit_filter"],
+      stage: "position_lifecycle",
+    });
+    const configured = input.combination.blocks.filter(
+      (block) =>
+        (block.role === "invalidation" || block.role === "exit_filter") &&
+        block.required,
+    );
+    const failedIds = new Set(
+      configured
+        .filter((block) => {
+          const evidence = lifecycle.blocks.find(
+            (item) => item.blockId === block.id,
+          );
+          if (!evidence || evidence.status !== "detected") return true;
+          if (block.role === "exit_filter") return false;
+          if (evidence.zoneHigh == null || evidence.zoneLow == null) return false;
+          return isInvalidated(
+            c,
+            {
+              patternType: evidence.patternType,
+              zoneHigh: evidence.zoneHigh,
+              zoneLow: evidence.zoneLow,
+              creationBar: evidence.creationBar ?? input.bar,
+            },
+            input.side,
+            typeof block.params.invalidationMode === "string" &&
+              block.params.invalidationMode === "none"
+              ? "none"
+              : "close_beyond_zone",
+          );
+        })
+        .map((block) => block.id),
+    );
+    const failed = failedIds.size;
+    const policy =
+      input.combination.failurePolicy ??
+      input.combination.invalidationMode ??
+      "any";
+    if (failurePolicyTriggered(policy, failed, configured.length)) {
+      exitPrice = c.close;
+      exitReason = "end";
+    }
+    blockEvidence = [
+      ...(blockEvidence ?? []).filter(
+        (item) => item.role !== "invalidation" && item.role !== "exit_filter",
+      ),
+      ...lifecycle.blocks.map((block) =>
+        failedIds.has(block.blockId)
+          ? {
+              ...block,
+              status: "failed" as const,
+              invalidationBar: input.bar,
+              invalidationTime: candleTimeIso(c) ?? null,
+              breakBar: block.family === "trendline" ? input.bar : null,
+              breakTime:
+                block.family === "trendline" ? candleTimeIso(c) ?? null : null,
+              reasonCode: "lifecycle_invalidation",
+            }
+          : block,
+      ),
+    ];
+  }
+
+  if (exitPrice == null && isInvalidated(c, geo, input.side, input.invalidateRule)) {
+    geo = {
+      ...geo,
+      invalidationBar: input.bar,
+      breakBar: geo.patternType === "trendline" ? input.bar : geo.breakBar,
+    };
+    exitPrice = c.close;
+    exitReason = "end";
+  }
+
+  return { exitPrice, exitReason, geo, blockEvidence };
+}
+
+export function readEventSequenceLifecycleParams(
+  def: CanonicalStrategyDefinition,
+): { maxHoldBars: number; invalidateRule: string; stopAtrMult: number; tpAtrMult: number } {
+  const seq = def.eventSequence;
+  const stopStep = seq ? stepByKind(seq, "stop_loss") : undefined;
+  const tpStep = seq ? stepByKind(seq, "take_profit") : undefined;
+  const invalidationStep = seq ? stepByKind(seq, "invalidation") : undefined;
+  const validityStep = seq ? stepByKind(seq, "pattern_validity") : undefined;
+  const maxHoldStep = seq ? stepByKind(seq, "max_hold_exit") : undefined;
+  return {
+    maxHoldBars: numParam(maxHoldStep, "maxHoldBars", def.risk.maxHoldBars),
+    invalidateRule: strParam(
+      invalidationStep ?? validityStep,
+      "rule",
+      strParam(validityStep, "invalidation", "close_beyond_zone"),
+    ),
+    stopAtrMult: numParam(stopStep, "atrMult", def.risk.stopLossAtrMult),
+    tpAtrMult: numParam(tpStep, "atrMult", def.risk.takeProfitAtrMult),
+  };
+}
+
 function stepByKind(
   seq: StrategyEventSequence,
   kind: StrategyEventStep["kind"],
@@ -273,47 +473,6 @@ function measurePenetration(
   return Math.max(0, Math.max(c.high, zoneLow) - zoneLow) / w;
 }
 
-/** Persist USDT ledger fields so UI metrics match pnlPct / equity update. */
-function eventSequenceLedger(input: {
-  equityBefore: number;
-  baseBalancePct: number;
-  leverage: number;
-  entryPrice: number;
-  raw: number;
-  feePct: number;
-  slipPct: number;
-  pnlPctStored: number;
-}): {
-  marginUsdt: number;
-  quantity: number;
-  feeCostUsdt: number;
-  slippageCostUsdt: number;
-  grossPnlUsdt: number;
-  netPnlUsdt: number;
-} {
-  const margin = Math.max(
-    0,
-    input.equityBefore * input.baseBalancePct,
-  );
-  const quantity =
-    margin > 0 && input.entryPrice > 0
-      ? (margin * input.leverage) / input.entryPrice
-      : 0;
-  return {
-    marginUsdt: Number(margin.toFixed(6)),
-    quantity: Number(quantity.toFixed(8)),
-    feeCostUsdt: Number(
-      (margin * input.feePct * input.leverage).toFixed(6),
-    ),
-    slippageCostUsdt: Number(
-      (margin * input.slipPct * input.leverage).toFixed(6),
-    ),
-    grossPnlUsdt: Number(
-      (margin * input.raw * input.leverage).toFixed(6),
-    ),
-    netPnlUsdt: Number((margin * input.pnlPctStored).toFixed(6)),
-  };
-}
 
 function touchesZone(
   c: OhlcvCandle,
@@ -1256,6 +1415,15 @@ export function runEventSequenceBacktest(input: {
   balance: number;
   feeRate: number;
   slippageRate: number;
+  /**
+   * Explicit Event-Sequence cost model. Omitted / unknown → ledger_v0.
+   * Canonical Research/Backtest callers must pass this explicitly.
+   */
+  costModel?: EventSequenceCostModel | null;
+  applyFunding?: boolean;
+  fundingRate?: number;
+  applySpread?: boolean;
+  spreadRate?: number;
   /** Optional Search candidate params (lev_*, direction passthrough already in def). */
   params?: Record<string, unknown> | null;
 }): EventSequenceBacktestResult {
@@ -1424,7 +1592,7 @@ export function runEventSequenceBacktest(input: {
     geo: null,
   }));
 
-  const warmUp = 20;
+  const warmUp = EVENT_SEQUENCE_WALKER_WARMUP_BARS;
 
   for (let i = warmUp; i < candles.length; i += 1) {
     // No look-ahead: detectors only see completed bars through i
@@ -1437,139 +1605,48 @@ export function runEventSequenceBacktest(input: {
     for (const m of machines) {
       if (m.phase === "in_position" && m.geo && m.stop != null && m.tp != null) {
         const hold = i - (m.entryBar ?? i);
-        let exitPrice: number | null = null;
-        let exitReason: BacktestTrade["exitReason"] = "end";
-
-        // Conservative: same-candle stop preferred over target
-        if (m.side === "LONG") {
-          if (c.low <= m.stop) {
-            exitPrice = m.stop;
-            exitReason = "stop_loss";
-          } else if (c.high >= m.tp) {
-            exitPrice = m.tp;
-            exitReason = "take_profit";
-          }
-        } else if (c.high >= m.stop) {
-          exitPrice = m.stop;
-          exitReason = "stop_loss";
-        } else if (c.low <= m.tp) {
-          exitPrice = m.tp;
-          exitReason = "take_profit";
-        }
-
-        if (exitPrice == null && hold >= maxHoldBars) {
-          exitPrice = c.close;
-          exitReason = "max_hold";
-        }
-
-        if (exitPrice == null && seq.combination) {
-          const lifecycle = evaluateCombinationBlocks({
-            combination: seq.combination,
-            window,
-            bar: i,
-            atr,
-            side: m.side,
-            creationStep,
-            roles: ["invalidation", "exit_filter"],
-            stage: "position_lifecycle",
-          });
-          const configured = seq.combination.blocks.filter(
-            (block) =>
-              (block.role === "invalidation" ||
-                block.role === "exit_filter") &&
-              block.required,
-          );
-          const failedIds = new Set(
-            configured.filter((block) => {
-            const evidence = lifecycle.blocks.find(
-              (item) => item.blockId === block.id,
-            );
-            if (!evidence || evidence.status !== "detected") return true;
-            if (block.role === "exit_filter") return false;
-            if (evidence.zoneHigh == null || evidence.zoneLow == null) return false;
-            return isInvalidated(
-              c,
-              {
-                patternType: evidence.patternType,
-                zoneHigh: evidence.zoneHigh,
-                zoneLow: evidence.zoneLow,
-                creationBar: evidence.creationBar ?? i,
-              },
-              m.side,
-              typeof block.params.invalidationMode === "string" &&
-                block.params.invalidationMode === "none"
-                ? "none"
-                : "close_beyond_zone",
-            );
-            }).map((block) => block.id),
-          );
-          const failed = failedIds.size;
-          const policy =
-            seq.combination.failurePolicy ??
-            seq.combination.invalidationMode ??
-            "any";
-          if (failurePolicyTriggered(policy, failed, configured.length)) {
-            exitPrice = c.close;
-            exitReason = "end";
-          }
-          m.blockEvidence = [
-            ...(m.blockEvidence ?? []).filter(
-              (item) =>
-                item.role !== "invalidation" && item.role !== "exit_filter",
-            ),
-            ...lifecycle.blocks.map((block) =>
-              failedIds.has(block.blockId)
-                ? {
-                    ...block,
-                    status: "failed" as const,
-                    invalidationBar: i,
-                    invalidationTime: candleTimeIso(c) ?? null,
-                    breakBar: block.family === "trendline" ? i : null,
-                    breakTime:
-                      block.family === "trendline"
-                        ? candleTimeIso(c) ?? null
-                        : null,
-                    reasonCode: "lifecycle_invalidation",
-                  }
-                : block,
-            ),
-          ];
-        }
-
-        if (
-          exitPrice == null &&
-          isInvalidated(c, m.geo, m.side, invalidateRule)
-        ) {
-          m.geo = {
-            ...m.geo,
-            invalidationBar: i,
-            breakBar: m.geo.patternType === "trendline" ? i : m.geo.breakBar,
-          };
-          exitPrice = c.close;
-          exitReason = "end";
-        }
+        const decided = decideEventSequencePositionExit({
+          side: m.side,
+          candle: c,
+          stop: m.stop,
+          tp: m.tp,
+          holdBars: hold,
+          maxHoldBars,
+          geo: m.geo,
+          invalidateRule,
+          combination: seq.combination,
+          window,
+          bar: i,
+          atr,
+          creationStep,
+          blockEvidence: m.blockEvidence,
+        });
+        m.geo = decided.geo;
+        m.blockEvidence = decided.blockEvidence;
+        const exitPrice = decided.exitPrice;
+        const exitReason = decided.exitReason;
 
         if (exitPrice != null) {
-          const feePct = input.feeRate * 2;
-          const slipPct = input.slippageRate * 2;
-          const raw =
-            m.side === "LONG"
-              ? (exitPrice - (m.entryPrice ?? exitPrice)) / (m.entryPrice ?? 1)
-              : ((m.entryPrice ?? exitPrice) - exitPrice) / (m.entryPrice ?? 1);
-          const pnlPct = raw - feePct - slipPct;
           const lev = m.leverage ?? 1;
-          const entryPx = m.entryPrice ?? c.close;
-          const ledger = eventSequenceLedger({
+          const rawEntryPrice = m.entryPrice ?? c.close;
+          const settlement = settleEventSequenceClose({
+            side: m.side,
+            rawEntryPrice,
+            rawExitPrice: exitPrice,
+            feeRate: input.feeRate,
+            slippageRate: input.slippageRate,
+            leverage: lev,
             equityBefore: equity,
             baseBalancePct: def.positionSizing.baseBalancePct,
-            leverage: lev,
-            entryPrice: entryPx,
-            raw,
-            feePct,
-            slipPct,
-            pnlPctStored: pnlPct * lev,
+            costModel: input.costModel,
+            applyFunding: input.applyFunding,
+            fundingRate: input.fundingRate,
+            applySpread: input.applySpread,
+            spreadRate: input.spreadRate,
           });
-          equity *= 1 + pnlPct * def.positionSizing.baseBalancePct * lev;
+          equity *=
+            1 +
+            settlement.pnlUnit * def.positionSizing.baseBalancePct * lev;
           if (equity > peakEquity) peakEquity = equity;
 
           const geo = m.geo;
@@ -1579,17 +1656,30 @@ export function runEventSequenceBacktest(input: {
             signalType: "EVENT_SEQUENCE",
             entryBar: m.entryBar ?? i,
             exitBar: i,
-            entryPrice: entryPx,
-            exitPrice,
+            entryPrice: settlement.fillEntryPrice,
+            exitPrice: settlement.fillExitPrice,
+            rawEntryPrice: settlement.rawEntryPrice,
+            rawExitPrice: settlement.rawExitPrice,
+            eventSequenceCostModel: settlement.costModel,
             stopLoss: m.stop,
             takeProfit: m.tp,
             stopPrice: m.stop,
             takeProfitPrice: m.tp,
             leverage: lev,
-            pnlPct: pnlPct * lev,
-            feePct,
-            slippagePct: slipPct,
-            ...ledger,
+            pnlPct: settlement.pnlPct,
+            feePct: settlement.feePct,
+            slippagePct: settlement.slippagePct,
+            fundingPct: settlement.fundingPct,
+            spreadPct: settlement.spreadPct,
+            marginUsdt: settlement.marginUsdt,
+            quantity: settlement.quantity,
+            feeCostUsdt: settlement.feeCostUsdt,
+            slippageCostUsdt: settlement.slippageCostUsdt,
+            slippageAttributionUsdt: settlement.slippageAttributionUsdt,
+            spreadCostUsdt: settlement.spreadCostUsdt,
+            fundingCostUsdt: settlement.fundingCostUsdt,
+            grossPnlUsdt: settlement.grossPnlUsdt,
+            netPnlUsdt: settlement.netPnlUsdt,
             exitReason,
             holdBars: hold,
             entryTime: candles[m.entryBar ?? i]?.openTime,
@@ -2513,25 +2603,23 @@ export function runEventSequenceBacktest(input: {
   for (const m of machines) {
     if (m.phase !== "in_position" || !m.geo || m.entryPrice == null) continue;
     const last = candles[candles.length - 1];
-    const feePct = input.feeRate * 2;
-    const slipPct = input.slippageRate * 2;
-    const raw =
-      m.side === "LONG"
-        ? (last.close - m.entryPrice) / m.entryPrice
-        : (m.entryPrice - last.close) / m.entryPrice;
-    const pnlPct = raw - feePct - slipPct;
     const lev = m.leverage ?? 1;
-    const ledger = eventSequenceLedger({
+    const settlement = settleEventSequenceClose({
+      side: m.side,
+      rawEntryPrice: m.entryPrice,
+      rawExitPrice: last.close,
+      feeRate: input.feeRate,
+      slippageRate: input.slippageRate,
+      leverage: lev,
       equityBefore: equity,
       baseBalancePct: def.positionSizing.baseBalancePct,
-      leverage: lev,
-      entryPrice: m.entryPrice,
-      raw,
-      feePct,
-      slipPct,
-      pnlPctStored: pnlPct * lev,
+      costModel: input.costModel,
+      applyFunding: input.applyFunding,
+      fundingRate: input.fundingRate,
+      applySpread: input.applySpread,
+      spreadRate: input.spreadRate,
     });
-    equity *= 1 + pnlPct * def.positionSizing.baseBalancePct * lev;
+    equity *= 1 + settlement.pnlUnit * def.positionSizing.baseBalancePct * lev;
     if (equity > peakEquity) peakEquity = equity;
     const geo = m.geo;
     trades.push({
@@ -2540,17 +2628,30 @@ export function runEventSequenceBacktest(input: {
       signalType: "EVENT_SEQUENCE",
       entryBar: m.entryBar ?? candles.length - 1,
       exitBar: candles.length - 1,
-      entryPrice: m.entryPrice,
-      exitPrice: last.close,
+      entryPrice: settlement.fillEntryPrice,
+      exitPrice: settlement.fillExitPrice,
+      rawEntryPrice: settlement.rawEntryPrice,
+      rawExitPrice: settlement.rawExitPrice,
+      eventSequenceCostModel: settlement.costModel,
       stopLoss: m.stop ?? m.entryPrice,
       takeProfit: m.tp ?? m.entryPrice,
       stopPrice: m.stop,
       takeProfitPrice: m.tp,
       leverage: lev,
-      pnlPct: pnlPct * lev,
-      feePct,
-      slippagePct: slipPct,
-      ...ledger,
+      pnlPct: settlement.pnlPct,
+      feePct: settlement.feePct,
+      slippagePct: settlement.slippagePct,
+      fundingPct: settlement.fundingPct,
+      spreadPct: settlement.spreadPct,
+      marginUsdt: settlement.marginUsdt,
+      quantity: settlement.quantity,
+      feeCostUsdt: settlement.feeCostUsdt,
+      slippageCostUsdt: settlement.slippageCostUsdt,
+      slippageAttributionUsdt: settlement.slippageAttributionUsdt,
+      spreadCostUsdt: settlement.spreadCostUsdt,
+      fundingCostUsdt: settlement.fundingCostUsdt,
+      grossPnlUsdt: settlement.grossPnlUsdt,
+      netPnlUsdt: settlement.netPnlUsdt,
       exitReason: "end",
       holdBars: candles.length - 1 - (m.entryBar ?? 0),
       entryTime: candles[m.entryBar ?? 0]?.openTime,
@@ -2641,14 +2742,27 @@ export interface EventSequencePaperSignal {
   zoneHigh: number | null;
   zoneLow: number | null;
   entryPrice: number | null;
+  rawEntryPrice: number | null;
+  executionEntryPrice: number | null;
   stopPrice: number | null;
   targetPrice: number | null;
+  costModel: EventSequenceCostModel;
+  leverage: number | null;
+  entryBar: number | null;
+  entryCandleOpenTime: number | null;
+  creationBar: number | null;
+  maxHoldBars: number | null;
+  invalidateRule: string | null;
 }
 
 /**
- * Paper / live dry-run signal from eventSequence at the latest completed bar.
+ * Paper signal from eventSequence at the latest completed bar.
  * Reuses the same deterministic walker as backtest (no look-ahead).
  * Emits LONG/SHORT only when an entry occurs on the last candle.
+ *
+ * Paper callers MUST pass an explicit costModel. Omitting costModel keeps
+ * the engine compatibility fallback (event_sequence_ledger_v0) for old tests.
+ * Live execution must not use this function for accounting in P3-A8.3.
  */
 export function evaluateEventSequencePaperSignal(input: {
   def: CanonicalStrategyDefinition;
@@ -2656,7 +2770,13 @@ export function evaluateEventSequencePaperSignal(input: {
   candles: OhlcvCandle[];
   feeRate?: number;
   slippageRate?: number;
+  costModel?: EventSequenceCostModel | null;
+  applyFunding?: boolean;
+  fundingRate?: number;
+  applySpread?: boolean;
+  spreadRate?: number;
 }): EventSequencePaperSignal {
+  const costModel = resolveEventSequenceCostModel(input.costModel);
   const none = (
     reason: string,
   ): EventSequencePaperSignal => ({
@@ -2668,14 +2788,23 @@ export function evaluateEventSequencePaperSignal(input: {
     zoneHigh: null,
     zoneLow: null,
     entryPrice: null,
+    rawEntryPrice: null,
+    executionEntryPrice: null,
     stopPrice: null,
     targetPrice: null,
+    costModel,
+    leverage: null,
+    entryBar: null,
+    entryCandleOpenTime: null,
+    creationBar: null,
+    maxHoldBars: null,
+    invalidateRule: null,
   });
 
   if (!input.def.eventSequence || !validateEventSequence(input.def.eventSequence).ok) {
     return none("eventSequence 없음 또는 무효");
   }
-  if (input.candles.length < 25) {
+  if (input.candles.length < getEventSequenceMinimumHistoryBars(input.def)) {
     return none("캔들 부족");
   }
 
@@ -2686,6 +2815,11 @@ export function evaluateEventSequencePaperSignal(input: {
     balance: 10_000,
     feeRate: input.feeRate ?? 0.0004,
     slippageRate: input.slippageRate ?? 0.0002,
+    costModel,
+    applyFunding: input.applyFunding,
+    fundingRate: input.fundingRate,
+    applySpread: input.applySpread,
+    spreadRate: input.spreadRate,
   });
 
   const lastBar = input.candles.length - 1;
@@ -2701,6 +2835,15 @@ export function evaluateEventSequencePaperSignal(input: {
     );
   }
 
+  const rawEntry = entered.rawEntryPrice ?? entered.entryPrice;
+  const executionEntry = applyAdverseSlippage({
+    side: toSlippageSide(entered.side),
+    action: "entry",
+    rawPrice: rawEntry,
+    slippageRate: input.slippageRate ?? 0.0002,
+  });
+  const life = readEventSequenceLifecycleParams(input.def);
+
   return {
     side: entered.side,
     passed: true,
@@ -2710,7 +2853,16 @@ export function evaluateEventSequencePaperSignal(input: {
     zoneHigh: entered.zoneHigh ?? null,
     zoneLow: entered.zoneLow ?? null,
     entryPrice: entered.entryPrice,
+    rawEntryPrice: rawEntry,
+    executionEntryPrice: executionEntry,
     stopPrice: entered.stopPrice ?? entered.stopLoss ?? null,
     targetPrice: entered.takeProfitPrice ?? entered.takeProfit ?? null,
+    costModel,
+    leverage: entered.leverage ?? 1,
+    entryBar: entered.entryBar,
+    entryCandleOpenTime: input.candles[entered.entryBar]?.openTime ?? null,
+    creationBar: entered.creationBar ?? null,
+    maxHoldBars: life.maxHoldBars,
+    invalidateRule: life.invalidateRule,
   };
 }

@@ -1,5 +1,6 @@
 node_modules
 .next
+.next-*
 out
 dist
 coverage
@@ -11,6 +12,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 data/rextora/
+secrets/
+.master.key
+*.enc.json
+*.tsbuildinfo
+.DS_Store
+tmp/
+.validation/
 
 # Local diagnostic files
 binance_direct_test.js

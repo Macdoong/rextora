@@ -1,34 +1,53 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { BrainCircuit, X, Play } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSharedAgentSession } from "./AgentSessionProvider";
-import { AgentPanel } from "./AgentPanel";
+import { useGlobalAgentPresentation } from "./GlobalAgentPresentationContext";
+import { AgentPanel, type AgentPanelVariant } from "./AgentPanel";
 import { OPEN_EVENT } from "./agentPersistence";
+import { useAgentPresentationSurface } from "@/components/rextora/shell/ShellAgentWorkspace";
 
 /** Shared bottom slot so FAB never covers sticky primary CTAs. */
 export const REXTORA_FAB_OFFSET_VAR = "--rextora-fab-offset";
 export const REXTORA_FAB_OFFSET_DEFAULT = "5.5rem";
 
+function panelVariantForSurface(
+  surface: ReturnType<typeof useAgentPresentationSurface>,
+): AgentPanelVariant {
+  if (surface === "mobile") return "mobile-sheet";
+  return "drawer";
+}
+
 /**
- * Global floating AI Trading Employee.
- * Compact drawer — must not obscure critical page CTAs.
+ * Global AI Trading Employee host.
+ * Open/close chrome and a single shared AgentPanel instance.
+ * Shell placement is owned by ShellAgentWorkspace + globals.css.
  */
 export function GlobalAgentAssistant() {
   const session = useSharedAgentSession();
   const pathname = usePathname() ?? "";
-  const [open, setOpen] = useState(false);
+  const surface = useAgentPresentationSurface();
+  const { open, setOpen } = useGlobalAgentPresentation();
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const pendingCount = session.missionTimeline.pendingApprovals.length;
   const showResume =
     session.canResume && session.turns.length > 0 && !session.isThinking;
 
-  // Pages with sticky primary actions: park FAB above the sticky bar slot.
   const hasStickyPrimary =
     pathname.startsWith("/strategy-search") ||
     pathname.startsWith("/backtest") ||
     pathname.startsWith("/paper-trading") ||
     pathname.startsWith("/live-trading");
+
+  const closeAgent = () => {
+    setOpen(false);
+    requestAnimationFrame(() => {
+      fabRef.current?.focus();
+    });
+  };
 
   useEffect(() => {
     const onOpen = (event: Event) => {
@@ -50,23 +69,50 @@ export function GlobalAgentAssistant() {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        requestAnimationFrame(() => {
+          fabRef.current?.focus();
+        });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [open, setOpen]);
+
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      closeRef.current?.focus();
+    });
   }, [open]);
 
+  useEffect(() => {
+    if (!open || surface === "desktop") return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open, surface]);
+
+  const fabMode = hasStickyPrimary ? "raised" : "default";
+  const panelVariant = panelVariantForSurface(surface);
+
   return (
-    <>
+    <div
+      className="rextora-agent-root"
+      data-agent-open={open ? "true" : "false"}
+      data-agent-surface={surface}
+      data-agent-expanded="false"
+      data-agent-host="global"
+    >
       {!open ? (
         <button
+          ref={fabRef}
           type="button"
           onClick={() => setOpen(true)}
-          className={`fixed z-40 flex min-h-11 items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/90 px-3 py-2 text-sm font-semibold text-emerald-50 shadow-lg backdrop-blur transition hover:bg-emerald-900 ${
-            hasStickyPrimary
-              ? "bottom-[var(--rextora-fab-offset,5.5rem)] right-4 sm:right-5"
-              : "bottom-5 right-4 sm:right-5"
-          }`}
+          className={`rextora-agent-fab rextora-agent-fab--${fabMode}${session.isThinking ? " is-working" : ""}`}
           style={
             hasStickyPrimary
               ? ({
@@ -75,14 +121,14 @@ export function GlobalAgentAssistant() {
               : undefined
           }
           data-testid="global-agent-fab"
-          data-fab-mode={hasStickyPrimary ? "raised" : "default"}
+          data-fab-mode={fabMode}
           aria-label="AI 트레이딩 직원 열기"
         >
-          <BrainCircuit className="size-4 text-emerald-300" />
-          <span className="hidden sm:inline">AI</span>
+          <BrainCircuit className="rextora-agent-fab-icon" aria-hidden="true" />
+          <span className="rextora-agent-fab-label">AI</span>
           {pendingCount > 0 ? (
             <span
-              className="rounded-full bg-amber-500/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-950"
+              className="rextora-agent-fab-badge"
               data-testid="global-agent-pending-badge"
             >
               {pendingCount}
@@ -93,60 +139,61 @@ export function GlobalAgentAssistant() {
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex justify-end bg-slate-950/40 backdrop-blur-[1px] sm:bg-slate-950/50"
+          className={`rextora-agent-host rextora-agent-host--open rextora-agent-host--${surface}`}
           data-testid="global-agent-overlay"
           role="dialog"
-          aria-modal="true"
+          aria-modal={surface !== "desktop" ? "true" : "false"}
           aria-label="AI 트레이딩 직원"
         >
           <button
             type="button"
-            className="absolute inset-0 cursor-default"
-            aria-label="닫기"
-            onClick={() => setOpen(false)}
+            className="rextora-agent-host-dismiss"
+            aria-hidden="true"
+            tabIndex={-1}
+            onClick={closeAgent}
           />
-          <div
-            className="relative flex h-full w-full max-w-[100vw] flex-col border-l border-slate-700/70 bg-slate-950 shadow-2xl sm:max-w-md lg:max-w-lg"
+          <aside
+            className={`rextora-agent-drawer rextora-agent-workspace rextora-agent-workspace--${surface}`}
             data-testid="global-agent-drawer"
+            data-agent-surface={surface}
           >
-            <div className="flex items-center justify-between gap-2 border-b border-slate-800 px-3 py-2.5">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-100">
-                  AI 트레이딩 직원
-                </p>
-                <p className="truncate text-[11px] text-slate-500">
+            <header className="rextora-agent-drawer-header">
+              <div className="rextora-agent-drawer-heading">
+                <p className="rextora-agent-drawer-title">AI 트레이딩 직원</p>
+                <p className="rextora-agent-drawer-subtitle">
                   승인 후에만 실행 · Live/실주문 없음
                 </p>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="rextora-agent-drawer-actions">
                 {showResume ? (
                   <button
                     type="button"
                     onClick={() => void session.resumeWhereLeftOff()}
-                    className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-emerald-500/35 px-2.5 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-900/40"
+                    className="rextora-agent-drawer-resume"
                     data-testid="global-agent-resume"
                   >
-                    <Play className="size-3.5" />
+                    <Play className="size-3.5" aria-hidden="true" />
                     이어서
                   </button>
                 ) : null}
                 <button
+                  ref={closeRef}
                   type="button"
-                  onClick={() => setOpen(false)}
-                  className="inline-flex size-10 items-center justify-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800"
+                  onClick={closeAgent}
+                  className="rextora-agent-drawer-close"
                   aria-label="닫기"
                   data-testid="global-agent-close"
                 >
-                  <X className="size-4" />
+                  <X className="size-4" aria-hidden="true" />
                 </button>
               </div>
+            </header>
+            <div className="rextora-agent-drawer-body">
+              <AgentPanel variant={panelVariant} shared />
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden p-2 sm:p-3">
-              <AgentPanel variant="drawer" shared />
-            </div>
-          </div>
+          </aside>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

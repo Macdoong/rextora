@@ -29,6 +29,7 @@ import type {
   BacktestTrade,
   SavedBacktestResult,
 } from "../src/lib/rextora/backtest/backtestTypes";
+import { overrideRextoraDataDir } from "./helpers/productionResearchBaseline";
 
 const ROOT = path.resolve(__dirname, "..");
 
@@ -114,17 +115,20 @@ function baseConfig(): BacktestConfig {
 describe("backtest execution identity and UX polish", () => {
   let prevCwd: string;
   let tmp: string;
+  let restoreDataDir: (() => void) | undefined;
 
   beforeEach(() => {
     tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-bt-exec-"));
     prevCwd = process.cwd();
     process.chdir(tmp);
-    fs.mkdirSync(path.join(tmp, "data", "rextora", "backtests"), {
-      recursive: true,
-    });
+    const dataRoot = path.join(tmp, "data", "rextora");
+    fs.mkdirSync(path.join(dataRoot, "backtests"), { recursive: true });
+    restoreDataDir = overrideRextoraDataDir(dataRoot);
   });
 
   afterEach(() => {
+    restoreDataDir?.();
+    restoreDataDir = undefined;
     process.chdir(prevCwd);
     fs.rmSync(tmp, { recursive: true, force: true });
   });

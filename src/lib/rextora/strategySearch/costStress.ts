@@ -6,6 +6,7 @@
  */
 
 import type { OhlcvCandle } from "../data/ohlcvTypes";
+import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
 import { evaluateCandidateAcrossWindowsForStress } from "./backtestAdapter";
 import {
   calculateCandidateScore,
@@ -58,6 +59,7 @@ export interface EvaluateCostStressInput {
   passPolicy: StrategySearchPassPolicy;
   scoreWeights: StrategySearchScoreWeights;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 function isFiniteNumber(n: unknown): n is number {
@@ -271,6 +273,7 @@ export async function evaluateCostStress(
         balance: input.balance,
         costConfig,
         preloadedCandlesByKey: input.preloadedCandlesByKey,
+        eventSequenceCostModel: input.eventSequenceCostModel,
       });
       const pass = evaluateCandidatePass({
         evaluation,

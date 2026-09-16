@@ -23,6 +23,8 @@ import {
   type EvaluateCompleteCandidateInput,
   type StrategySearchCompleteCandidateEvaluation,
 } from "../src/lib/rextora/strategySearch";
+import { generateSyntheticCandlesForRange } from "../src/lib/rextora/data/ohlcvTypes";
+import { authedRequest } from "./helpers/authSession";
 
 const SAFE_PATH = path.join(
   process.cwd(),
@@ -33,6 +35,13 @@ const SAFE_PATH = path.join(
 const STRATEGIES_DIR = path.join(process.cwd(), "data", "strategies");
 const FROM = Date.UTC(2024, 0, 1);
 const TO = Date.UTC(2024, 0, 10);
+const INTERVAL_MS = 15 * 60 * 1000;
+
+function coveringApiCandles(): Record<string, ReturnType<typeof generateSyntheticCandlesForRange>> {
+  return {
+    "BTCUSDT|full": generateSyntheticCandlesForRange(FROM, TO, INTERVAL_MS),
+  };
+}
 
 const tempRoots: string[] = [];
 
@@ -217,7 +226,13 @@ describe("strategySearch Phase 6 API", () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
       evaluate: mockEval(() => 5),
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: {
+        "BTCUSDT|full": generateSyntheticCandlesForRange(
+          FROM,
+          TO,
+          15 * 60 * 1000,
+        ),
+      },
     });
   });
 
@@ -332,7 +347,7 @@ describe("strategySearch Phase 6 API", () => {
   it("pauses a running job and rejects invalid pause", async () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: coveringApiCandles(),
       evaluate: async (input) => {
         // Keep first iteration slow enough to pause
         await new Promise((r) => setTimeout(r, 30));
@@ -365,7 +380,7 @@ describe("strategySearch Phase 6 API", () => {
   it("resumes a paused job and rejects invalid resume", async () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: coveringApiCandles(),
       evaluate: async (input) => {
         const job = getSearchJob(input.candidate.jobId, { rootDir: root });
         if (job && job.checkpoint.completedIterations === 0) {
@@ -399,7 +414,7 @@ describe("strategySearch Phase 6 API", () => {
   it("cancels a running job and rejects invalid cancellation", async () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: coveringApiCandles(),
       evaluate: async (input) => {
         await new Promise((r) => setTimeout(r, 20));
         return mockEval(() => 2)(input);
@@ -459,16 +474,19 @@ describe("strategySearch Phase 6 API", () => {
   it("returns best-scored and best fully-passed results", async () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: coveringApiCandles(),
       evaluate: mockEval((call) => [10, 2, 7][call - 1] ?? 1, { passScore: 5 }),
     });
     const job = createStrategySearchJobApi(validCreateBody({ maxIterations: 3 }));
     startStrategySearchJobApi(job.id);
     await waitForSearchJobExecution(job.id);
     const best = getStrategySearchBestApi(job.id);
-    expect(best.bestCandidate?.score).toBe(10);
-    expect(best.bestPassedCandidate?.score).toBe(10);
-    expect(best.bestTrial?.paramsHash).toBe(best.bestCandidate?.paramsHash);
+    expect(best.rankingAuthority).toBe("rankingGroups");
+    const champ =
+      best.rankingGroups
+        ?.flatMap((row) => [row.bestPassedCandidate, row.bestCandidate])
+        .find((row) => row != null) ?? null;
+    expect(champ?.score).toBe(10);
     expect(best.gateNotes.finalPassMeaning).toMatch(/final PASS/i);
   });
 
@@ -502,7 +520,7 @@ describe("strategySearch Phase 6 API", () => {
   it("reflects recoverable evaluation failures in statistics without writing strategies", async () => {
     setDefaultSearchJobExecutionDepsForTests({
       storeOptions: { rootDir: root },
-      preloadedCandlesByKey: {},
+      preloadedCandlesByKey: coveringApiCandles(),
       evaluate: mockEval(() => 1, { failCalls: new Set([1]) }),
     });
     const job = createStrategySearchJobApi(validCreateBody({ maxIterations: 2 }));
@@ -536,15 +554,26 @@ describe("strategySearch Phase 6 API", () => {
   });
 
   it("HTTP routes expose create/list/detail/start/trials/best", async () => {
+    setStrategySearchApiStoreOptionsForTests(null);
+    setDefaultSearchJobExecutionDepsForTests({
+      evaluate: mockEval(() => 5),
+      preloadedCandlesByKey: {
+        "BTCUSDT|full": generateSyntheticCandlesForRange(
+          FROM,
+          TO,
+          15 * 60 * 1000,
+        ),
+      },
+    });
     const { GET: listGet, POST: createPost } = await import(
       "../app/api/rextora/strategy-search/route"
     );
     const createRes = await createPost(
-      new Request("http://localhost/api/rextora/strategy-search", {
+      await authedRequest("http://localhost/api/rextora/strategy-search", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(validCreateBody({ maxIterations: 2, seed: 55 })),
-      }),
+      }, "operator"),
     );
     expect(createRes.status).toBe(201);
     const created = (await createRes.json()) as {
@@ -555,7 +584,7 @@ describe("strategySearch Phase 6 API", () => {
     const jobId = created.data.id;
 
     const listRes = await listGet(
-      new Request("http://localhost/api/rextora/strategy-search?limit=20"),
+      await authedRequest("http://localhost/api/rextora/strategy-search?limit=20", {}, "operator"),
     );
     const listed = (await listRes.json()) as { ok: boolean; data: unknown[] };
     expect(listed.ok).toBe(true);
@@ -564,7 +593,9 @@ describe("strategySearch Phase 6 API", () => {
     const { GET: detailGet } = await import(
       "../app/api/rextora/strategy-search/[jobId]/route"
     );
-    const detailRes = await detailGet(new Request("http://localhost"), {
+    const detailRes = await detailGet(
+      await authedRequest("http://localhost/api/rextora/strategy-search/job", {}, "operator"),
+      {
       params: Promise.resolve({ jobId }),
     });
     const detail = (await detailRes.json()) as { ok: boolean; data: { id: string } };
@@ -573,7 +604,11 @@ describe("strategySearch Phase 6 API", () => {
     const { POST: startPost } = await import(
       "../app/api/rextora/strategy-search/[jobId]/start/route"
     );
-    const startRes = await startPost(new Request("http://localhost"), {
+    const startRes = await startPost(
+      await authedRequest("http://localhost/api/rextora/strategy-search/job/start", {
+        method: "POST",
+      }, "operator"),
+      {
       params: Promise.resolve({ jobId }),
     });
     const started = (await startRes.json()) as {
@@ -587,8 +622,10 @@ describe("strategySearch Phase 6 API", () => {
       "../app/api/rextora/strategy-search/[jobId]/trials/route"
     );
     const trialsRes = await trialsGet(
-      new Request(
+      await authedRequest(
         "http://localhost/api/rextora/strategy-search/x/trials?limit=10&offset=0",
+        {},
+        "operator",
       ),
       { params: Promise.resolve({ jobId }) },
     );
@@ -602,12 +639,28 @@ describe("strategySearch Phase 6 API", () => {
     const { GET: bestGet } = await import(
       "../app/api/rextora/strategy-search/[jobId]/best/route"
     );
-    const bestRes = await bestGet(new Request("http://localhost"), {
+    const bestRes = await bestGet(
+      await authedRequest("http://localhost/api/rextora/strategy-search/job/best", {}, "operator"),
+      {
       params: Promise.resolve({ jobId }),
     });
-    const best = (await bestRes.json()) as { ok: boolean; data: { bestCandidate: unknown } };
+    const best = (await bestRes.json()) as {
+      ok: boolean;
+      data: {
+        rankingAuthority?: string;
+        rankingGroups?: Array<{
+          bestCandidate: { score: number } | null;
+          bestPassedCandidate: { score: number } | null;
+        }>;
+        bestCandidate: unknown;
+      };
+    };
     expect(best.ok).toBe(true);
-    expect(best.data.bestCandidate).toBeTruthy();
+    expect(best.data.rankingAuthority).toBe("rankingGroups");
+    const champ = best.data.rankingGroups
+      ?.flatMap((row) => [row.bestPassedCandidate, row.bestCandidate])
+      .find((row) => row != null);
+    expect(champ).toBeTruthy();
   });
 
   it("keeps existing backtest route importable (unaffected)", async () => {

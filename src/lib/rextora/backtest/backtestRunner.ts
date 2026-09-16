@@ -22,10 +22,20 @@ import {
 } from "../strategy/definition/bridge";
 import { runConditionBuilderBacktest } from "../strategy/conditionBacktest";
 import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
+import { EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1 } from "../strategy/eventSequenceCostModel";
 import { validateEventSequence } from "../strategy/definition/eventSequence";
 import { validateCanonicalDefinition } from "../strategy/definition/validator";
 import { buildBacktestReport } from "./backtestReport";
 import { computeStrategyHash } from "../strategy/strategyHash";
+import {
+  BACKTEST_DATA_COVERAGE_INSUFFICIENT,
+  COVERAGE_BLOCKER_TITLE_KO,
+  calculateBacktestDataCoverage,
+} from "./backtestDataCoverage";
+import {
+  enrichCostStressRow,
+  stampReportCostProvenance,
+} from "./costAssumptions";
 
 /**
  * Legacy display-sample ceiling (disabled).
@@ -302,6 +312,26 @@ export async function runConfiguredBacktest(
   for (const symbol of symbols) {
     try {
       const loaded = await loadCandlesForSymbol(config, symbol);
+      const requestedStartMs = Date.parse(loaded.requestedFrom ?? "");
+      const requestedEndMs = Date.parse(loaded.requestedTo ?? "");
+      const dataCoverage = calculateBacktestDataCoverage({
+        timeframe: config.timeframe,
+        requestedStartMs: Number.isFinite(requestedStartMs)
+          ? requestedStartMs
+          : (config.fromOpenTime ?? 0),
+        requestedEndMs: Number.isFinite(requestedEndMs)
+          ? requestedEndMs
+          : (config.toOpenTime ?? 0),
+        candles: loaded.candles,
+      });
+      if (dataMode !== "synthetic-test" && !dataCoverage.sufficient) {
+        throw new BacktestPipelineError({
+          code: BACKTEST_DATA_COVERAGE_INSUFFICIENT,
+          userMessage: COVERAGE_BLOCKER_TITLE_KO,
+          technicalReason: dataCoverage.failureReasons.join(",") || "coverage insufficient",
+          details: { dataCoverage },
+        });
+      }
       const warmUp = strategy.params.ema_slow ?? 50;
       if (loaded.candles.length === 0) {
         symbolResults.push(
@@ -357,6 +387,11 @@ export async function runConfiguredBacktest(
           balance: perSymbolBalance,
           feeRate,
           slippageRate,
+          costModel: EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
+          applyFunding: config.applyFunding,
+          fundingRate: config.fundingRate,
+          applySpread: config.applySpread,
+          spreadRate,
           params: levParams,
         });
         resultTrades = es.trades;
@@ -493,6 +528,11 @@ export async function runConfiguredBacktest(
             balance: perSymbolBalance,
             feeRate: f,
             slippageRate: s,
+            costModel: EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
+            applyFunding: config.applyFunding,
+            fundingRate: config.fundingRate,
+            applySpread: config.applySpread,
+            spreadRate: sp,
             params: levParams,
           });
           const totalReturn =
@@ -558,15 +598,28 @@ export async function runConfiguredBacktest(
             mdd: safe.report.mdd,
             tradeCount: safe.report.tradeCount,
             negativeMonths: safe.report.negativeMonths,
+            slippageRate: s,
+            slippageModelVersion: safe.report.slippageModelVersion,
           });
         }
       }
-      resultReport = {
-        ...resultReport,
-        strategyHash: resolveReportStrategyHash(strategy),
-        sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
-        costStress: stress,
-      };
+      const isSafeEngine =
+        !useEventSequence && strategy.strategyType !== "condition_builder";
+      const stressWithProvenance = stress.map((row) =>
+        enrichCostStressRow(row, config, config.costAssumptions),
+      );
+      resultReport = stampReportCostProvenance({
+        report: {
+          ...resultReport,
+          strategyHash: resolveReportStrategyHash(strategy),
+          sourceParamsHash: strategy.sourceParamsHash ?? strategy.paramsHash ?? null,
+          costStress: stressWithProvenance,
+          dataCoverage,
+        },
+        config,
+        isSafeEngine,
+        multipliers,
+      });
 
       const { chartCandles, chartSamplingApplied } = sampleChartCandles(
         loaded.candles,
@@ -583,6 +636,12 @@ export async function runConfiguredBacktest(
         processedCandleCount: loaded.candles.length,
       });
     } catch (error) {
+      if (
+        error instanceof BacktestPipelineError &&
+        error.code === BACKTEST_DATA_COVERAGE_INSUFFICIENT
+      ) {
+        throw error;
+      }
       const code =
         error instanceof BacktestPipelineError
           ? error.code
@@ -680,7 +739,21 @@ export async function runConfiguredBacktest(
       slippageApplied: true,
       fundingApplied: config.applyFunding,
       spreadApplied: config.applySpread,
+      slippageModelVersion: successResults[0].report?.slippageModelVersion,
+      costAssumptions: successResults[0].report?.costAssumptions,
+      primaryCostAssumptions: successResults[0].report?.primaryCostAssumptions,
+      costStress: successResults[0].report?.costStress,
     });
+    if (config.costAssumptions) {
+      combinedReport = stampReportCostProvenance({
+        report: combinedReport,
+        config,
+        isSafeEngine:
+          successResults[0].report?.slippageModelVersion ===
+          "execution_price_v1",
+        multipliers,
+      });
+    }
   }
 
   const primary = successResults[0];

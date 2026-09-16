@@ -8,12 +8,15 @@ import {
   type DryRunOrderSide,
 } from "@/src/lib/rextora/live/liveDryRunEngine";
 import { resolveLiveDryRunExecutionStrategy } from "@/src/lib/rextora/execution/paperStrategyResolver";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * POST /api/rextora/live/dry-run
  * Dry-run adapter only — never calls executeLiveEntry / Binance.
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "live:request");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => null)) as {

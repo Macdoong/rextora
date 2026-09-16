@@ -57,7 +57,11 @@ export function archiveResearchJob(
   if (!job) {
     throw new Error(`strategy-search job not found: ${jobId}`);
   }
-  if (job.status === "running" || job.status === "queued") {
+  if (
+    job.status === "running" ||
+    job.status === "queued" ||
+    job.status === "interrupted"
+  ) {
     throw new Error("active jobs cannot be archived; stop or cancel first");
   }
   const record: JobArchiveRecord = {

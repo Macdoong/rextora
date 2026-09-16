@@ -1,4 +1,5 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 import {
   PaperSessionError,
   approveAndStartPaperSession,
@@ -11,6 +12,9 @@ import {
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, ctx: Params) {
+  const denied = await denyUnlessAuthenticated(_request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const { id } = await ctx.params;
@@ -34,6 +38,8 @@ export async function GET(_request: Request, ctx: Params) {
 }
 
 export async function POST(request: Request, ctx: Params) {
+  const denied = await denyUnlessPermitted(request, "paper:operate");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { id } = await ctx.params;

@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Button, ConfirmDialog } from "@/components/ui/primitives";
+import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
+import { V3Card } from "@/components/rextora/v3/V3Card";
+import { V3Drawer } from "@/components/rextora/v3/V3Drawer";
+import { V3PermissionGate } from "@/components/rextora/v3/V3PermissionGate";
+import {
+  LIVE_DISABLED_LABEL,
+  LIVE_ORDERS_BLOCKED_LABEL,
+} from "@/src/lib/rextora/live/liveGateOperatorPresentation";
 import {
   cancelStrategySearchJob,
   createStrategySearchJob,
@@ -17,6 +25,14 @@ import {
   startStrategySearchJob,
 } from "./apiClient";
 import { STRATEGY_SEARCH_HISTORY_RETENTION_NOTE } from "./JobList";
+import {
+  InterruptedRecoverySection,
+  RECOVERY_COLLAPSED_PREVIEW_COUNT,
+} from "./InterruptedRecoverySection";
+import {
+  RECOVERY_VISIBLE_PAGE_SIZE,
+  discoverInterruptedRecoveryJobs,
+} from "./interruptedRecoveryDiscovery";
 import { ExecutionControls } from "./ExecutionControls";
 import {
   formatErrorDetails,
@@ -35,6 +51,7 @@ import {
   type RegistrationSummary,
 } from "./QualifiedResultsPanel";
 import { ResearchCompletionPanel } from "./ResearchCompletionPanel";
+import { ResearchRankingGroups } from "./ResearchRankingGroups";
 import { SearchStatusCard } from "./SearchStatusCard";
 import { StrategySearchClientError } from "./types";
 import type {
@@ -45,7 +62,13 @@ import type {
 } from "./types";
 import type { StrategySearchOperatorFormState as FormState } from "./formDefaults";
 import { cleanStrategyDisplayName } from "./displayNames";
-import { completionReasonLabelKo, historyStatusLabelKo } from "./formatters";
+import {
+  completionReasonLabelKo,
+  formatCount,
+  historyStatusLabelKo,
+  researchStatusLabelKo,
+} from "./formatters";
+import { hasAuthoritativeRankingGroups } from "@/src/lib/rextora/researchRankingReadModel";
 
 /** Server operatorPlan owns runUntilQualified / multi-space progression. */
 const OPERATOR_RUN_UNTIL_QUALIFIED = true as const;
@@ -188,6 +211,8 @@ function readSearchQueryBootstrap(): {
 }
 
 export function StrategySearchWorkbench() {
+  const { can } = useAuth();
+  const canRunResearch = can("research:run");
   // Hydration-safe: never read window/localStorage/sessionStorage during first render.
   const [form, setForm] = useState<FormState>(() =>
     createDefaultOperatorFormState(),
@@ -199,6 +224,14 @@ export function StrategySearchWorkbench() {
   const [jobs, setJobs] = useState<StrategySearchJobSummary[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
+  const [recoveryJobs, setRecoveryJobs] = useState<StrategySearchJobSummary[]>(
+    [],
+  );
+  const [recoveryVisibleCount, setRecoveryVisibleCount] = useState(
+    RECOVERY_VISIBLE_PAGE_SIZE,
+  );
+  const [recoveryListExpanded, setRecoveryListExpanded] = useState(false);
+  const [recoveryLoading, setRecoveryLoading] = useState(true);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<StrategySearchJobDetail | null>(null);
@@ -208,6 +241,9 @@ export function StrategySearchWorkbench() {
   const [recoveryBanner, setRecoveryBanner] = useState<string | null>(null);
 
   const [actionPending, setActionPending] = useState(false);
+  const [pendingActionJobId, setPendingActionJobId] = useState<string | null>(
+    null,
+  );
   const [registering, setRegistering] = useState(false);
   const [completionRegisterIter, setCompletionRegisterIter] = useState<
     number | null
@@ -219,6 +255,10 @@ export function StrategySearchWorkbench() {
     detail: string | null;
     tone: "error" | "info" | "success";
   } | null>(null);
+  const [configOpen, setConfigOpen] = useState(false);
+  const [rankPanel, setRankPanel] = useState<"top10" | "groups" | "completion">(
+    "top10",
+  );
 
   const [strategiesSavedHint, setStrategiesSavedHint] = useState(false);
   const [generationMeta, setGenerationMeta] = useState<{
@@ -274,6 +314,23 @@ export function StrategySearchWorkbench() {
       setListLoading(false);
     }
   }, [HISTORY_PAGE]);
+
+  const refreshRecovery = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const rows = await discoverInterruptedRecoveryJobs(
+        listStrategySearchJobs,
+        signal,
+      );
+      if (signal?.aborted) return;
+      setRecoveryJobs(rows);
+    } catch (err) {
+      if (signal?.aborted) return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setRecoveryJobs([]);
+    } finally {
+      if (!signal?.aborted) setRecoveryLoading(false);
+    }
+  }, []);
 
   // Hard stop: never leave "연구 목록 불러오는 중…" forever.
   useEffect(() => {
@@ -398,6 +455,7 @@ export function StrategySearchWorkbench() {
 
   useEffect(() => {
     let cancelled = false;
+    const ac = new AbortController();
     let timer: number | undefined;
     const schedule = (ms: number) => {
       timer = window.setTimeout(async () => {
@@ -408,20 +466,25 @@ export function StrategySearchWorkbench() {
         }
         await refreshList();
         if (cancelled) return;
+        await refreshRecovery(ac.signal);
+        if (cancelled) return;
         schedule(hasActiveJobs ? LIST_POLL_MS : LIST_POLL_IDLE_MS);
       }, ms);
     };
     const boot = window.setTimeout(() => {
-      void refreshList().then(() => {
-        if (!cancelled) schedule(hasActiveJobs ? LIST_POLL_MS : LIST_POLL_IDLE_MS);
-      });
+      void refreshList()
+        .then(() => (cancelled ? undefined : refreshRecovery(ac.signal)))
+        .then(() => {
+          if (!cancelled) schedule(hasActiveJobs ? LIST_POLL_MS : LIST_POLL_IDLE_MS);
+        });
     }, 0);
     return () => {
       cancelled = true;
+      ac.abort();
       window.clearTimeout(boot);
       if (timer != null) window.clearTimeout(timer);
     };
-  }, [refreshList, hasActiveJobs]);
+  }, [refreshList, refreshRecovery, hasActiveJobs]);
 
   const pollActive =
     !!selectedId &&
@@ -524,6 +587,17 @@ export function StrategySearchWorkbench() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    const syncHash = () => {
+      if (window.location.hash === "#ss-section-engine") {
+        setConfigOpen(true);
+      }
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
   }, []);
 
   async function handleRegister(iterations: number[]) {
@@ -638,6 +712,7 @@ export function StrategySearchWorkbench() {
         detail: `${created.searchName || form.searchName} · 합격 목표까지 AI가 연구를 이어갑니다.`,
         tone: "info",
       });
+      setConfigOpen(false);
     } catch (err) {
       const mapped = toUserError(err);
       setFeedback({ ...mapped, tone: "error" });
@@ -648,9 +723,12 @@ export function StrategySearchWorkbench() {
 
   async function runAction(
     action: "start" | "pause" | "resume" | "cancel",
+    explicitJobId?: string,
   ) {
-    if (!selectedId || actionPending) return;
+    const jobId = explicitJobId ?? selectedId;
+    if (!jobId || actionPending) return;
     setActionPending(true);
+    setPendingActionJobId(jobId);
     setFeedback(null);
     try {
       const fn =
@@ -661,9 +739,12 @@ export function StrategySearchWorkbench() {
             : action === "resume"
               ? resumeStrategySearchJob
               : cancelStrategySearchJob;
-      const next = await fn(selectedId);
-      setDetail(next);
+      const next = await fn(jobId);
+      if (selectedIdRef.current === jobId) {
+        setDetail(next);
+      }
       await refreshList();
+      await refreshRecovery();
       if (action === "cancel") {
         setFeedback({
           message: "중지가 요청되었습니다.",
@@ -676,6 +757,7 @@ export function StrategySearchWorkbench() {
       setFeedback({ ...mapped, tone: "error" });
     } finally {
       setActionPending(false);
+      setPendingActionJobId(null);
     }
   }
 
@@ -697,12 +779,168 @@ export function StrategySearchWorkbench() {
         (qualifiedFromTrials.length > 0 &&
           detail.status !== "running" &&
           detail.status !== "queued" &&
+          detail.status !== "interrupted" &&
           detail.status !== "pause_requested" &&
           !detail.executionActive)),
   );
 
+  const activeJobSummary =
+    detail &&
+    (detail.status === "running" ||
+      detail.status === "pause_requested" ||
+      detail.status === "queued" ||
+      detail.status === "interrupted" ||
+      detail.executionActive)
+      ? {
+          searchName: detail.searchName || "전략 탐색",
+          symbols: detail.symbols,
+          timeframe: detail.timeframe,
+          maxRuntimeMs: detail.maxRuntimeMs ?? null,
+          status: detail.status,
+          expectedCompletionAtMs: detail.expectedCompletionAtMs ?? null,
+          appliedSummary:
+            (
+              detail as {
+                appliedSearchSummary?: {
+                  titleKo: string;
+                  subtitleKo: string;
+                  sections: Array<{
+                    id: string;
+                    titleKo: string;
+                    rows: Array<{ labelKo: string; valueKo: string }>;
+                  }>;
+                  developerPayload: Record<string, unknown>;
+                } | null;
+              }
+            ).appliedSearchSummary ?? null,
+        }
+      : null;
+
+  const selectedName =
+    detail?.searchName ||
+    jobs.find((job) => job.id === selectedId)?.searchName ||
+    null;
+  const selectedStatusKo = detail
+    ? researchStatusLabelKo(detail.status, {
+        completionReason: detail.completionReason ?? null,
+        executionActive: detail.executionActive,
+        preservedCandidateCount:
+          detail.preservedCandidateCount ?? qualifiedFromTrials.length,
+      })
+    : jobMissing
+      ? "찾을 수 없음"
+      : selectedId
+        ? "불러오는 중"
+        : "대기";
+  const configSummary = detail
+    ? [
+        detail.currentCombinationLabel ??
+          (detail.patternCombinationFamilies &&
+          detail.patternCombinationFamilies.length > 1
+            ? detail.patternCombinationFamilies.join(" + ")
+            : null),
+        detail.patternCombinationOperator
+          ? String(detail.patternCombinationOperator).toUpperCase()
+          : null,
+        `${detail.symbols.join(", ")} ${detail.timeframe}`,
+      ]
+        .filter(Boolean)
+        .join(" · ") +
+      (!detail.currentCombinationLabel &&
+      !(
+        detail.patternCombinationFamilies &&
+        detail.patternCombinationFamilies.length > 1
+      ) &&
+      detail.currentSearchFamily
+        ? ` · ${detail.currentSearchFamily}`
+        : "")
+    : "";
+  const activeCount = jobs.filter((job) =>
+    isOperationallyActiveStatus(job.status, job.executionActive),
+  ).length;
+  const qualifiedFact =
+    detail != null
+      ? formatCount(detail.qualifiedCount ?? qualifiedFromTrials.length)
+      : "—";
+  const activityJobs = jobs.slice(0, 7);
+  const liveTop10Entries = detail?.liveTop10?.entries ?? [];
+  const groupAware = Boolean(
+    detail && !jobMissing && hasAuthoritativeRankingGroups(detail),
+  );
+  const hasLiveTop10 = !groupAware && liveTop10Entries.length > 0;
+  const top10EmptyReason = !detail
+    ? "탐색을 선택하거나 새 탐색을 시작하세요."
+    : groupAware
+      ? "이 탐색의 순위는 순위 그룹에서 확인합니다."
+      : !detail.liveTop10
+        ? "이 탐색에는 Live TOP10 스냅샷이 없습니다."
+        : liveTop10Entries.length === 0
+          ? "아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다."
+          : null;
+  const showCompletion = Boolean(
+    detail &&
+      !jobMissing &&
+      (detail.status === "completed" ||
+        detail.status === "cancelled" ||
+        detail.status === "cancel_requested" ||
+        detail.status === "failed" ||
+        detail.outcomePresentation === "partial_completed" ||
+        (qualifiedFromTrials.length > 0 &&
+          detail.status !== "running" &&
+          detail.status !== "queued" &&
+          detail.status !== "interrupted" &&
+          detail.status !== "pause_requested" &&
+          !detail.executionActive)),
+  );
+  const periodLabel =
+    form.periodPreset === "short"
+      ? "단기 (30일)"
+      : form.periodPreset === "standard"
+        ? "표준 (60일)"
+        : form.periodPreset === "long"
+          ? "장기 (120일)"
+          : "직접 기간";
+  const patternChip =
+    detail?.currentCombinationLabel ||
+    (detail?.patternCombinationFamilies &&
+    detail.patternCombinationFamilies.length > 0
+      ? detail.patternCombinationFamilies.join(" + ")
+      : form.patternConfigLevel === "automatic"
+        ? "자동"
+        : form.patternConfigLevel === "basic"
+          ? "기본"
+          : "전문가");
+  const symbolChip = detail?.symbols?.join(", ") || form.symbol || "—";
+  const timeframeChip = detail?.timeframe || form.timeframe || "—";
+  const generationFact =
+    generationMeta?.generationCount != null
+      ? formatCount(generationMeta.generationCount)
+      : null;
+
+  const createForm = (
+    <JobCreateForm
+      form={form}
+      errors={formErrors}
+      submitting={creating}
+      onChange={setForm}
+      onSubmit={() => void handleStartSearch()}
+      activeJobSummary={activeJobSummary}
+    />
+  );
+
+  const openConfig = () => {
+    setConfigOpen(true);
+  };
+
+  const probeRecovery = () => {
+    void refreshRecovery();
+    document
+      .getElementById("ss-recovery")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
-    <div className="space-y-4" data-testid="strategy-search-workbench">
+    <div className="v3-ss-workbench" data-testid="strategy-search-workbench">
       {!clientReady ? (
         <div
           className="rextora-card p-4 text-sm text-slate-400"
@@ -710,387 +948,66 @@ export function StrategySearchWorkbench() {
         >
           탐색 설정을 준비하는 중…
         </div>
-      ) : showOutcomeFirst ? (
-        <details className="rextora-card p-4" data-testid="ss-config-collapsed">
-          <summary className="cursor-pointer text-sm text-slate-200">
-            탐색 설정(접힘) · 새 탐색을 시작할 때만 펼치세요
-          </summary>
-          <div className="mt-3">
-            <JobCreateForm
-              form={form}
-              errors={formErrors}
-              submitting={creating}
-              onChange={setForm}
-              onSubmit={() => void handleStartSearch()}
-              activeJobSummary={null}
-            />
-          </div>
-        </details>
       ) : (
-        <JobCreateForm
-          form={form}
-          errors={formErrors}
-          submitting={creating}
-          onChange={setForm}
-          onSubmit={() => void handleStartSearch()}
-          activeJobSummary={
-            detail &&
-            (detail.status === "running" ||
-              detail.status === "pause_requested" ||
-              detail.status === "queued" ||
-              detail.executionActive)
-              ? {
-                  searchName: detail.searchName || "전략 탐색",
-                  symbols: detail.symbols,
-                  timeframe: detail.timeframe,
-                  maxRuntimeMs: detail.maxRuntimeMs ?? null,
-                  status: detail.status,
-                  expectedCompletionAtMs: detail.expectedCompletionAtMs ?? null,
-                  appliedSummary:
-                    (
-                      detail as {
-                        appliedSearchSummary?: {
-                          titleKo: string;
-                          subtitleKo: string;
-                          sections: Array<{
-                            id: string;
-                            titleKo: string;
-                            rows: Array<{ labelKo: string; valueKo: string }>;
-                          }>;
-                          developerPayload: Record<string, unknown>;
-                        } | null;
-                      }
-                    ).appliedSearchSummary ?? null,
-                }
-              : null
-          }
-        />
-      )}
-
-      {recoveryBanner ? (
-        <div
-          className="rounded-lg border border-sky-500/35 bg-sky-500/10 px-3 py-2.5 text-sm text-sky-100"
-          role="status"
-          data-testid="ss-recovery-banner"
-        >
-          {recoveryBanner}
-        </div>
-      ) : null}
-
-      {jobMissing ? (
-        <section
-          className="rextora-card space-y-3 p-4"
-          data-testid="ss-recovery-chooser"
-          role="alert"
-        >
-          <h3 className="ss-section-title">탐색 작업을 찾을 수 없습니다</h3>
-          <p className="text-sm text-slate-300">
-            선택한 탐색 ID가 삭제되었거나 아직 저장되지 않았을 수 있습니다.
-            아래에서 다시 조회하거나 다른 탐색을 선택하세요.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              data-testid="ss-recovery-retry"
-              onClick={() => {
-                if (!missingJobId) return;
-                void refreshDetail(missingJobId, { retryNotFound: true });
-              }}
-            >
-              다시 조회
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              data-testid="ss-recovery-pick-newest"
-              disabled={jobs.length === 0}
-              onClick={() => {
-                const newest = jobs[0];
-                if (newest) handleSelect(newest.id);
-              }}
-            >
-              최근 탐색 선택
-            </Button>
-            {missingJobId ? (
-              <Link
-                href={`/results?jobId=${encodeURIComponent(missingJobId)}`}
-                className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
-                data-testid="ss-recovery-open-results"
+        <>
+          {showOutcomeFirst ? (
+            <details className="v3-ss-config-collapsed" data-testid="ss-config-collapsed">
+              <summary
+                className="cursor-pointer"
+                onClick={(event) => {
+                  event.preventDefault();
+                  openConfig();
+                }}
               >
-                보존 결과 열기
-              </Link>
-            ) : null}
-            <Button
-              type="button"
-              className="ss-btn-primary"
-              data-testid="ss-recovery-new-search"
-              onClick={() => {
-                clearJobSelection();
-                setJobMissing(false);
-                setMissingJobId(null);
-                setFeedback(null);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                window.setTimeout(() => {
-                  document
-                    .querySelector<HTMLElement>(
-                      '[data-testid="strategy-search-create"]',
-                    )
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }, 100);
-              }}
-            >
-              새 탐색 시작
-            </Button>
-          </div>
-        </section>
-      ) : null}
-
-      {feedback ? (
-        <div
-          className={`rounded-lg border px-3 py-2.5 text-sm shadow-sm ${
-            feedback.tone === "error"
-              ? "border-red-500/30 bg-red-500/10 text-red-100"
-              : feedback.tone === "success"
-                ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-50"
-                : "border-sky-500/30 bg-sky-500/10 text-sky-100"
-          }`}
-          role={feedback.tone === "error" ? "alert" : "status"}
-          data-testid="ss-feedback"
-        >
-          <div className="font-medium">{feedback.message}</div>
-          {feedback.detail ? (
-            <div
-              className="mt-1 text-xs opacity-80"
-              data-testid="ss-feedback-detail"
-            >
-              {feedback.detail}
-            </div>
+                탐색 설정(접힘) · 새 탐색을 시작할 때만 펼치세요
+              </summary>
+            </details>
           ) : null}
-          {strategiesSavedHint ? (
-            <div className="mt-2 text-xs">
-              <Link
-                href="/strategies"
-                className="font-medium underline decoration-emerald-300/60 underline-offset-2 hover:text-white"
-                data-testid="ss-strategies-link"
-              >
-                전략 관리 열기
-              </Link>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
-      {selectedId && !detail && !jobMissing ? (
-        <section
-          className="rextora-card space-y-3 p-4"
-          data-testid="ss-job-detail-loading"
-          role="status"
-        >
-          <h2 className="ss-section-title">연구 상세 불러오는 중…</h2>
-          <p className="text-sm text-slate-400">
-            진행률·TOP10·파이프라인을 불러옵니다. 응답이 지연되면 목록에서 다시
-            선택하거나 새로고침하세요.
-          </p>
-        </section>
-      ) : null}
-
-      {detail && !jobMissing ? (
-        <section
-          className="rextora-card space-y-3 p-4"
-          data-testid="ss-job-detail"
-          aria-labelledby="ss-job-detail-title"
-        >
-          <div className="sticky top-16 z-20 -mx-2 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-slate-700/60 bg-slate-950/95 px-3 py-3 shadow-lg backdrop-blur min-[1101px]:top-3" data-testid="ss-sticky-status-header">
-            <div>
-              <h2
-                id="ss-job-detail-title"
-                className="ss-section-title"
-                data-testid="ss-job-user-name"
-              >
-                {detail.searchName || "전략 탐색"}
-              </h2>
-              <p
-                className="rextora-helper mt-1"
-                data-testid="ss-job-config-summary"
-              >
-                {[
-                  detail.currentCombinationLabel ??
-                    (detail.patternCombinationFamilies &&
-                    detail.patternCombinationFamilies.length > 1
-                      ? detail.patternCombinationFamilies.join(" + ")
-                      : null),
-                  detail.patternCombinationOperator
-                    ? String(detail.patternCombinationOperator).toUpperCase()
-                    : null,
-                  `${detail.symbols.join(", ")} ${detail.timeframe}`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-                {!detail.currentCombinationLabel &&
-                !(
-                  detail.patternCombinationFamilies &&
-                  detail.patternCombinationFamilies.length > 1
-                ) &&
-                detail.currentSearchFamily
-                  ? ` · ${detail.currentSearchFamily}`
-                  : ""}
-              </p>
-            </div>
-            <ExecutionControls
-              status={detail.status}
-              pending={actionPending}
-              retryable={detail.retryable === true}
-              jobMissing={jobMissing}
-              onStart={() => void runAction("start")}
-              onPause={() => void runAction("pause")}
-              onResume={() => void runAction("resume")}
-              onCancel={() => void runAction("cancel")}
-            />
-          </div>
-
-          <SearchStatusCard
-            job={detail}
-            qualifiedCountFallback={qualifiedFromTrials.length}
-            generationCount={generationMeta?.generationCount ?? null}
-            latestWeaknessKo={generationMeta?.latestWeaknessKo ?? null}
-            latestAdjustmentKo={generationMeta?.latestAdjustmentKo ?? null}
-          />
-
-          {detail.status === "completed" ||
-          detail.status === "cancelled" ||
-          detail.status === "cancel_requested" ||
-          detail.status === "failed" ||
-          detail.outcomePresentation === "partial_completed" ||
-          (qualifiedFromTrials.length > 0 &&
-            detail.status !== "running" &&
-            detail.status !== "queued" &&
-            detail.status !== "pause_requested" &&
-            !detail.executionActive) ? (
-            <ResearchCompletionPanel
-              job={detail}
-              passCount={qualifiedFromTrials.length}
-              bestStrategyName={
-                qualifiedFromTrials[0]?.name ?? detail.currentBestSummary
-              }
-              bestStrategyId={
-                qualifiedFromTrials.find((q) => q.strategyId)?.strategyId ??
-                null
-              }
-              onRegisterBest={
-                qualifiedFromTrials.some(
-                  (q) => q.registrationState === "not_registered",
-                )
-                  ? () => {
-                      const first = qualifiedFromTrials.find(
-                        (q) => q.registrationState === "not_registered",
-                      );
-                      if (first) setCompletionRegisterIter(first.iteration);
-                    }
-                  : null
-              }
-              onPromoteTop={() => {
-                void (async () => {
-                  try {
-                    setRegistering(true);
-                    const { promoteStrategySearchTrials } = await import(
-                      "./apiClient"
-                    );
-                    const data = await promoteStrategySearchTrials(detail.id, {
-                      mode: "top",
-                      limit: 10,
-                    });
-                    const n = Array.isArray(data.promoted)
-                      ? data.promoted.length
-                      : 0;
-                    setFeedback({
-                      message: "상위 전략 등록",
-                      detail: `상위 전략 ${n}개를 전략 라이브러리에 등록했습니다.`,
-                      tone: "success",
-                    });
-                    setStrategiesSavedHint(true);
-                  } catch (e) {
-                    setFeedback({
-                      message: "일괄 등록 실패",
-                      detail:
-                        e instanceof Error ? e.message : "일괄 등록 실패",
-                      tone: "error",
-                    });
-                  } finally {
-                    setRegistering(false);
-                  }
-                })();
-              }}
-              onResume={
-                detail.status === "paused" || detail.retryable === true
-                  ? () => void runAction("resume")
-                  : null
-              }
-              onNewResearch={() => {
-                clearJobSelection();
-                setJobMissing(false);
-                setMissingJobId(null);
-                setFeedback(null);
-                setRegistrationSummary(null);
-                setStrategiesSavedHint(false);
-                setCompletionRegisterIter(null);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            />
-          ) : null}
-        </section>
-      ) : null}
-
-      {completionRegisterIter != null ? (
-        <ConfirmDialog
-          open
-          title="전략 등록"
-          description="이 합격 전략을 전략 관리에 등록할까요? 자동으로 저장되지 않습니다."
-          confirmLabel="등록"
-          cancelLabel="취소"
-          tone="success"
-          loading={registering}
-          onCancel={() => setCompletionRegisterIter(null)}
-          onConfirm={() => {
-            const iter = completionRegisterIter;
-            setCompletionRegisterIter(null);
-            void handleRegister([iter]);
-          }}
-        />
-      ) : null}
-
-      <section
-        className="rextora-card space-y-3 p-4"
-        data-testid="ss-results-handoff"
-      >
-        <h3 className="ss-section-title">탐색 결과</h3>
-        <p className="text-sm text-slate-400">
-          합격 전략 카드, 순위, 등록·삭제·보관 작업은 탐색 결과 페이지에서
-          확인합니다. 연구 페이지에는 현재 연구 상태만 표시합니다.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/results"
-            className="inline-flex items-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-100"
-            data-testid="ss-open-results"
+          <section
+            className="v3-ss-statusbar"
+            data-testid="ss-sticky-status-header"
+            aria-label="현재 탐색 상태"
           >
-            탐색 결과 열기
-          </Link>
-          {detail?.id ? (
-            <Link
-              href={`/results?jobId=${encodeURIComponent(detail.id)}`}
-              className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
-              data-testid="ss-open-results-job"
-            >
-              이 연구 결과 보기
-            </Link>
-          ) : null}
-        </div>
-        {jobs.length > 0 ? (
-          <label className="block text-sm text-slate-300">
-            최근 연구 선택
+            <div className="v3-ss-status-main">
+              <span>현재 상태</span>
+              <b data-testid="ss-job-user-name">
+                {selectedStatusKo}
+                {selectedName ? ` · ${selectedName}` : ""}
+              </b>
+              {configSummary ? (
+                <p data-testid="ss-job-config-summary">{configSummary}</p>
+              ) : (
+                <p data-testid="ss-job-config-summary">
+                  {symbolChip} · {timeframeChip} · {periodLabel}
+                </p>
+              )}
+            </div>
+            <div className="v3-ss-status-cell">
+              <span>진행 중</span>
+              <b>{formatCount(activeCount)}</b>
+            </div>
+            <div className="v3-ss-status-cell">
+              <span>재개 가능</span>
+              <b className={recoveryJobs.length > 0 ? "v3-ss-tone-warn" : undefined}>
+                {formatCount(recoveryJobs.length)}
+              </b>
+            </div>
+            <div className="v3-ss-status-cell">
+              <span>통과 후보</span>
+              <b className={qualifiedFact !== "—" && qualifiedFact !== "0" ? "v3-ss-tone-ok" : undefined}>
+                {qualifiedFact}
+              </b>
+            </div>
+            <div className="v3-ss-status-cell">
+              <span>실제 주문</span>
+              <b className="v3-ss-tone-bad">{LIVE_ORDERS_BLOCKED_LABEL}</b>
+            </div>
+          </section>
+
+          <div className="v3-ss-exec" aria-label="탐색 실행">
             <select
-              className="mt-1 rextora-input max-w-xl"
+              className="v3-ss-select"
               value={selectedId ?? ""}
               onChange={(e) => {
                 const id = e.target.value || null;
@@ -1102,34 +1019,526 @@ export function StrategySearchWorkbench() {
                 }
               }}
               data-testid="ss-recent-job-select"
+              aria-label="실행 중 작업"
             >
               <option value="">선택…</option>
-              {jobs.slice(0, 12).map((j) => (
-                <option key={j.id} value={j.id}>
-                  {j.searchName || j.id} ·{" "}
-                  {historyStatusLabelKo(j.status, {
-                    completionReason: j.completionReason,
+              {jobs.slice(0, 12).map((job) => (
+                <option key={job.id} value={job.id}>
+                  {job.searchName || job.id} ·{" "}
+                  {historyStatusLabelKo(job.status, {
+                    completionReason: job.completionReason,
                   })}
                 </option>
               ))}
             </select>
-          </label>
-        ) : null}
-        {listError ? (
-          <p className="text-sm text-red-300" role="alert">
-            {listError}
+            <V3PermissionGate allowed={canRunResearch}>
+              <ExecutionControls
+                status={detail?.status ?? "queued"}
+                pending={actionPending}
+                retryable={detail?.retryable === true}
+                jobMissing={jobMissing}
+                hasSelection={Boolean(detail)}
+                onStart={() => void runAction("start")}
+                onPause={() => void runAction("pause")}
+                onResume={() => void runAction("resume")}
+                onCancel={() => void runAction("cancel")}
+              />
+            </V3PermissionGate>
+          </div>
+          <p className="v3-ss-perm">
+            권한 없는 제어는 흐리게 표시되며 사용 불가로 보입니다.
           </p>
-        ) : null}
-        {listLoading && jobs.length === 0 ? (
-          <p className="text-xs text-slate-500" data-testid="ss-list-loading">
-            연구 목록 불러오는 중…
-          </p>
-        ) : null}
-        <p className="text-xs text-slate-500" data-testid="ss-history-retention-note">
-          최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.
-          전체 합격 전략·기록 관리는 탐색 결과에서 확인하세요.
-        </p>
-      </section>
+
+          <section className="v3-ss-command-card">
+            <div className="v3-ss-form-row v3-ss-facts">
+              <div className="v3-ss-chip">
+                <span>종목</span>
+                <b>{symbolChip}</b>
+              </div>
+              <div className="v3-ss-chip">
+                <span>타임프레임</span>
+                <b>{timeframeChip}</b>
+              </div>
+              <div className="v3-ss-chip">
+                <span>분석 기간</span>
+                <b>{periodLabel}</b>
+              </div>
+              <div className="v3-ss-chip">
+                <span>패턴</span>
+                <b>{patternChip}</b>
+              </div>
+              <Button
+                type="button"
+                className="v3-ss-btn-primary"
+                data-testid="ss-open-new-search"
+                onClick={openConfig}
+              >
+                새 탐색
+              </Button>
+            </div>
+          </section>
+
+          <div className="v3-ss-toolbar">
+            <Button
+              type="button"
+              variant="outline"
+              className="v3-ss-btn-secondary"
+              onClick={openConfig}
+            >
+              탐색 구성
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="v3-ss-btn-secondary"
+              data-testid="ss-recovery-probe"
+              onClick={probeRecovery}
+            >
+              복구
+            </Button>
+            <Link
+              href="/results"
+              className="v3-ss-btn-ghost"
+              data-testid="ss-open-results"
+            >
+              탐색 결과 열기
+            </Link>
+            {detail?.id ? (
+              <Link
+                href={`/results?jobId=${encodeURIComponent(detail.id)}`}
+                className="v3-ss-btn-ghost"
+                data-testid="ss-open-results-job"
+              >
+                이 연구 결과 보기
+              </Link>
+            ) : null}
+          </div>
+
+          {recoveryBanner ? (
+            <div
+              className="v3-ss-banner"
+              role="status"
+              data-testid="ss-recovery-banner"
+            >
+              {recoveryBanner}
+            </div>
+          ) : null}
+
+          {jobMissing ? (
+            <section
+              className="rextora-card space-y-3 p-4"
+              data-testid="ss-recovery-chooser"
+              role="alert"
+            >
+              <h3 className="ss-section-title">탐색 작업을 찾을 수 없습니다</h3>
+              <p className="text-sm text-slate-300">
+                선택한 탐색 ID가 삭제되었거나 아직 저장되지 않았을 수 있습니다.
+                아래에서 다시 조회하거나 다른 탐색을 선택하세요.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  data-testid="ss-recovery-retry"
+                  onClick={() => {
+                    if (!missingJobId) return;
+                    void refreshDetail(missingJobId, { retryNotFound: true });
+                  }}
+                >
+                  다시 조회
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  data-testid="ss-recovery-pick-newest"
+                  disabled={jobs.length === 0}
+                  onClick={() => {
+                    const newest = jobs[0];
+                    if (newest) handleSelect(newest.id);
+                  }}
+                >
+                  최근 탐색 선택
+                </Button>
+                {missingJobId ? (
+                  <Link
+                    href={`/results?jobId=${encodeURIComponent(missingJobId)}`}
+                    className="inline-flex items-center rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200"
+                    data-testid="ss-recovery-open-results"
+                  >
+                    보존 결과 열기
+                  </Link>
+                ) : null}
+                <Button
+                  type="button"
+                  className="ss-btn-primary"
+                  data-testid="ss-recovery-new-search"
+                  onClick={() => {
+                    clearJobSelection();
+                    setJobMissing(false);
+                    setMissingJobId(null);
+                    setFeedback(null);
+                    setConfigOpen(true);
+                  }}
+                >
+                  새 탐색 시작
+                </Button>
+              </div>
+            </section>
+          ) : null}
+
+          {feedback ? (
+            <div
+              className="v3-ss-feedback"
+              data-tone={feedback.tone}
+              role={feedback.tone === "error" ? "alert" : "status"}
+              data-testid="ss-feedback"
+            >
+              <div className="font-medium">{feedback.message}</div>
+              {feedback.detail ? (
+                <div className="mt-1 text-xs opacity-80" data-testid="ss-feedback-detail">
+                  {feedback.detail}
+                </div>
+              ) : null}
+              {strategiesSavedHint ? (
+                <div className="mt-2 text-xs">
+                  <Link
+                    href="/strategies"
+                    className="font-medium underline underline-offset-2"
+                    data-testid="ss-strategies-link"
+                  >
+                    전략 관리 열기
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {selectedId && !detail && !jobMissing ? (
+            <section
+              className="rextora-card space-y-3 p-4"
+              data-testid="ss-job-detail-loading"
+              role="status"
+            >
+              <h2 className="ss-section-title">연구 상세 불러오는 중…</h2>
+              <p className="text-sm text-slate-400">
+                진행률·TOP10·파이프라인을 불러옵니다. 응답이 지연되면 목록에서 다시
+                선택하거나 새로고침하세요.
+              </p>
+            </section>
+          ) : null}
+
+          <div className="v3-ss-grid">
+            <V3Card
+              className="v3-ss-s4"
+              title="탐색 활동"
+              meta={activityJobs.length > 0 ? `최근 ${formatCount(activityJobs.length)}회` : "없음"}
+            >
+              {activityJobs.length === 0 ? (
+                <p className="v3-ss-empty">
+                  최근 탐색 활동이 없습니다. 새 탐색을 시작하면 여기에 표시됩니다.
+                </p>
+              ) : (
+                <div className="v3-ss-activity">
+                  {activityJobs.map((job, index) => (
+                    <div key={job.id} className="v3-ss-activity-row">
+                      <span>{index + 1}</span>
+                      <div>
+                        <strong>{job.searchName || job.id}</strong>
+                        <small>
+                          {historyStatusLabelKo(job.status, {
+                            completionReason: job.completionReason,
+                          })}
+                          {job.qualifiedCount != null
+                            ? ` · 합격 ${formatCount(job.qualifiedCount)}`
+                            : ""}
+                        </small>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="v3-ss-activity-foot">
+                    <span>탐색량 {formatCount(jobs.length)}</span>
+                    <span>
+                      통과 후보 {qualifiedFact}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </V3Card>
+
+            <V3Card
+              className="v3-ss-s8"
+              title="상위 후보 · Live TOP10"
+              headerAction={
+                <div className="v3-ss-tabs" role="tablist" aria-label="순위 보기">
+                  <button
+                    type="button"
+                    role="tab"
+                    className={rankPanel === "top10" ? "is-active" : undefined}
+                    aria-selected={rankPanel === "top10"}
+                    onClick={() => setRankPanel("top10")}
+                  >
+                    Live TOP10
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    className={rankPanel === "groups" ? "is-active" : undefined}
+                    aria-selected={rankPanel === "groups"}
+                    onClick={() => setRankPanel("groups")}
+                  >
+                    순위 그룹
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    className={rankPanel === "completion" ? "is-active" : undefined}
+                    aria-selected={rankPanel === "completion"}
+                    onClick={() => setRankPanel("completion")}
+                  >
+                    완료 요약
+                  </button>
+                </div>
+              }
+            >
+              {rankPanel === "top10" && !hasLiveTop10 ? (
+                <div className="v3-ss-top10-empty">
+                  <div className="v3-ss-top10-empty__mark" aria-hidden="true">
+                    10
+                  </div>
+                  <strong>표시할 순위 데이터가 없습니다</strong>
+                  <p>{top10EmptyReason}</p>
+                  {detail && !jobMissing ? (
+                    <p className="v3-ss-note">
+                      {detail.searchName || "전략 탐색"}
+                      {selectedStatusKo ? ` · ${selectedStatusKo}` : ""}
+                    </p>
+                  ) : null}
+                  {detail?.id ? (
+                    <Link
+                      href={`/results?jobId=${encodeURIComponent(detail.id)}`}
+                      className="v3-ss-btn-ghost"
+                    >
+                      이 연구 결과 보기
+                    </Link>
+                  ) : (
+                    <Link href="/results" className="v3-ss-btn-ghost">
+                      탐색 결과 열기
+                    </Link>
+                  )}
+                </div>
+              ) : null}
+              {detail && !jobMissing ? (
+                <>
+                  {rankPanel === "top10" ? (
+                    <section
+                      data-testid="ss-job-detail"
+                      aria-labelledby="ss-job-detail-title"
+                    >
+                      <h2 id="ss-job-detail-title" className="v3-ss-sr">
+                        {detail.searchName || "전략 탐색"}
+                      </h2>
+                      <SearchStatusCard
+                        job={detail}
+                        qualifiedCountFallback={qualifiedFromTrials.length}
+                        generationCount={generationMeta?.generationCount ?? null}
+                        latestWeaknessKo={generationMeta?.latestWeaknessKo ?? null}
+                        latestAdjustmentKo={generationMeta?.latestAdjustmentKo ?? null}
+                      />
+                    </section>
+                  ) : null}
+                  {rankPanel === "groups" ? (
+                    <div className="v3-ss-rank-panel">
+                      <ResearchRankingGroups
+                        source={detail}
+                        unknownLegacy={detail.unknownLegacy}
+                      />
+                    </div>
+                  ) : null}
+                  {rankPanel === "completion" ? (
+                  <div className="v3-ss-rank-panel">
+                    {showCompletion ? (
+                      <ResearchCompletionPanel
+                        job={detail}
+                        passCount={qualifiedFromTrials.length}
+                        bestStrategyName={
+                          qualifiedFromTrials[0]?.name ?? detail.currentBestSummary
+                        }
+                        bestStrategyId={
+                          qualifiedFromTrials.find((q) => q.strategyId)?.strategyId ??
+                          null
+                        }
+                        onRegisterBest={
+                          qualifiedFromTrials.some(
+                            (q) => q.registrationState === "not_registered",
+                          )
+                            ? () => {
+                                const first = qualifiedFromTrials.find(
+                                  (q) => q.registrationState === "not_registered",
+                                );
+                                if (first) setCompletionRegisterIter(first.iteration);
+                              }
+                            : null
+                        }
+                        onPromoteTop={() => {
+                          void (async () => {
+                            try {
+                              setRegistering(true);
+                              const { promoteStrategySearchTrials } = await import(
+                                "./apiClient"
+                              );
+                              const data = await promoteStrategySearchTrials(detail.id, {
+                                mode: "top",
+                                limit: 10,
+                              });
+                              const n = Array.isArray(data.promoted)
+                                ? data.promoted.length
+                                : 0;
+                              setFeedback({
+                                message: "상위 전략 등록",
+                                detail: `상위 전략 ${n}개를 전략 라이브러리에 등록했습니다.`,
+                                tone: "success",
+                              });
+                              setStrategiesSavedHint(true);
+                            } catch (e) {
+                              setFeedback({
+                                message: "일괄 등록 실패",
+                                detail:
+                                  e instanceof Error ? e.message : "일괄 등록 실패",
+                                tone: "error",
+                              });
+                            } finally {
+                              setRegistering(false);
+                            }
+                          })();
+                        }}
+                        onResume={
+                          detail.status === "paused" || detail.retryable === true
+                            ? () => void runAction("resume")
+                            : null
+                        }
+                        onNewResearch={() => {
+                          clearJobSelection();
+                          setJobMissing(false);
+                          setMissingJobId(null);
+                          setFeedback(null);
+                          setRegistrationSummary(null);
+                          setStrategiesSavedHint(false);
+                          setCompletionRegisterIter(null);
+                          setConfigOpen(true);
+                        }}
+                      />
+                    ) : (
+                      <p className="v3-ss-empty">
+                        완료 요약은 종료된 탐색을 선택하면 표시됩니다.
+                      </p>
+                    )}
+                  </div>
+                  ) : null}
+                </>
+              ) : rankPanel !== "top10" ? (
+                <p className="v3-ss-empty">
+                  표시할 순위 데이터가 없습니다. 탐색을 선택하거나 새 탐색을 시작하세요.
+                </p>
+              ) : null}
+            </V3Card>
+
+            <V3Card
+              className="v3-ss-full v3-ss-recovery-card"
+              title="재개 가능한 탐색"
+              meta={
+                recoveryJobs.length > 0
+                  ? `${formatCount(recoveryJobs.length)}건 · 누락 작업 복구 포함`
+                  : "없음"
+              }
+            >
+              <InterruptedRecoverySection
+                jobs={recoveryJobs}
+                visibleCount={recoveryVisibleCount}
+                loading={recoveryLoading}
+                pendingJobId={pendingActionJobId}
+                collapsedPreviewCount={RECOVERY_COLLAPSED_PREVIEW_COUNT}
+                expanded={recoveryListExpanded}
+                onToggleExpanded={() =>
+                  setRecoveryListExpanded((open) => !open)
+                }
+                onOpen={(jobId) => void handleSelect(jobId)}
+                onResume={(jobId) => void runAction("resume", jobId)}
+                onLoadMore={() =>
+                  setRecoveryVisibleCount((n) => n + RECOVERY_VISIBLE_PAGE_SIZE)
+                }
+              />
+            </V3Card>
+
+            <section className="v3-ss-full v3-ss-runtime-card">
+              <details className="v3-ss-disc">
+                <summary>실행 파이프라인 · 런타임 세부</summary>
+                <p className="v3-ss-note">
+                  {generationFact
+                    ? `세대 ${generationFact}`
+                    : "세대 · 평가 · 합격 필터는 선택된 탐색의 실제 런타임 값만 표시합니다."}
+                  {detail?.completionReason
+                    ? ` · ${completionReasonLabelKo(detail.completionReason ?? null)}`
+                    : ""}
+                  {LIVE_DISABLED_LABEL ? ` · ${LIVE_DISABLED_LABEL}` : ""}
+                </p>
+                {detail ? (
+                  <p className="v3-ss-note">
+                    상태 {selectedStatusKo}
+                    {qualifiedFact !== "—" ? ` · 통과 후보 ${qualifiedFact}` : ""}
+                  </p>
+                ) : (
+                  <p className="v3-ss-note">선택된 탐색이 없습니다.</p>
+                )}
+              </details>
+              <div data-testid="ss-results-handoff" className="v3-ss-handoff">
+                {listError ? (
+                  <p className="v3-ss-note" role="alert">
+                    {listError}
+                  </p>
+                ) : null}
+                {listLoading && jobs.length === 0 ? (
+                  <p className="v3-ss-note" data-testid="ss-list-loading">
+                    연구 목록 불러오는 중…
+                  </p>
+                ) : null}
+                <p className="v3-ss-note" data-testid="ss-history-retention-note">
+                  최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.
+                  합격 전략 카드와 등록·삭제는 탐색 결과에서 확인합니다.
+                </p>
+              </div>
+            </section>
+          </div>
+
+          {completionRegisterIter != null ? (
+            <ConfirmDialog
+              open
+              title="전략 등록"
+              description="이 합격 전략을 전략 관리에 등록할까요? 자동으로 저장되지 않습니다."
+              confirmLabel="등록"
+              cancelLabel="취소"
+              tone="success"
+              loading={registering}
+              onCancel={() => setCompletionRegisterIter(null)}
+              onConfirm={() => {
+                const iter = completionRegisterIter;
+                setCompletionRegisterIter(null);
+                void handleRegister([iter]);
+              }}
+            />
+          ) : null}
+
+          <V3Drawer
+            open={configOpen}
+            onClose={() => setConfigOpen(false)}
+            title="탐색 구성"
+            wide
+            keepMounted
+            className="v3-ss-drawer"
+          >
+            {createForm}
+          </V3Drawer>
+        </>
+      )}
     </div>
   );
 }

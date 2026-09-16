@@ -1,7 +1,10 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { sendAssistantTestMessage } from "@/src/lib/rextora/telegramAssistant";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "settings:write");
+  if (denied) return denied;
   const start = Date.now();
 
   try {

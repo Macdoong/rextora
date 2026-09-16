@@ -171,16 +171,19 @@ describe("paper single source of truth", () => {
     );
   });
 
-  it("11. active at restart becomes safe-paused", async () => {
+  it("11. active at restart remains active for runtime restore", async () => {
     const started = await startPaperSessionFromStrategy(
       { strategyId },
       opts(),
     );
     expect(started.status).toBe("active");
     const recovery = recoverPaperSessionsAfterRestart(opts());
-    expect(recovery.safePaused).toContain(started.id);
-    expect(getPaperSession(started.id, opts())?.status).toBe("paused");
-    expect(getExecutablePaperSession(opts())).toBeNull();
+    expect(recovery.safePaused).toHaveLength(0);
+    expect(getPaperSession(started.id, opts())?.status).toBe("active");
+    expect(getExecutablePaperSession(opts())?.id).toBe(started.id);
+    expect(
+      recovery.notes.some((n) => n.includes("runtime restore eligible")),
+    ).toBe(true);
   });
 
   it("12. stale paperActive ignored when paused session owns identity", async () => {

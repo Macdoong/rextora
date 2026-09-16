@@ -322,6 +322,72 @@ export interface Position {
   trailingDistance?: number;
   maxHoldBars?: number;
   barsHeld?: number;
+  paperLifecycleModel?: "event_sequence_paper_v1";
+  eventSequencePaper?: EventSequencePaperPositionState;
+  /** Owning Paper session. Absent on historical positions — fail closed. */
+  paperSessionId?: string;
+  paperStrategyId?: string;
+  /** Finalized strategy-bar openTime that produced the SAFE Paper entry. */
+  entrySignalCandleOpenTime?: number;
+  /** Strategy interval in ms for finalized-bar hold/cooldown math. */
+  entrySignalIntervalMs?: number;
+  /** Last finalized openTime applied to barsHeld. Absent on historical rows. */
+  lastManagedFinalizedCandleOpenTime?: number;
+}
+
+export const EVENT_SEQUENCE_PAPER_LIFECYCLE_V1 = "event_sequence_paper_v1" as const;
+
+/**
+ * Immutable finalized-candle snapshot used by Event-Sequence Paper management.
+ * Field names match OhlcvCandle plus manager identity (symbol, intervalMs).
+ * Absent on historical positions opened before this audit existed.
+ */
+export interface EventSequencePaperCandleAudit {
+  symbol: string;
+  intervalMs: number;
+  openTime: number;
+  closeTime: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+export interface EventSequencePaperPositionState {
+  version: "event_sequence_paper_state_v1";
+  paperLifecycleModel: "event_sequence_paper_v1";
+  strategyId: string;
+  costModel: string;
+  rankingCompatibilityGroup?: string;
+  feeRate: number;
+  slippageRate: number;
+  fundingRate: number;
+  applyFunding: boolean;
+  applySpread: boolean;
+  spreadRate: number;
+  side: "LONG" | "SHORT";
+  rawEntryPrice: number;
+  executionEntryPrice: number;
+  stop: number;
+  tp: number;
+  entryCandleOpenTime: number;
+  lastProcessedCandleOpenTime: number;
+  /** Last finalized engine candle actually processed by the ES manager. */
+  lastProcessedFinalizedCandle?: EventSequencePaperCandleAudit;
+  maxHoldBars: number;
+  leverage: number;
+  baseBalancePct: number;
+  invalidateRule: string;
+  geo: {
+    patternType: string;
+    zoneHigh: number;
+    zoneLow: number;
+    creationBar: number;
+  };
+  timeframe: string;
+  intervalMs: number;
+  eventSequenceSnapshot?: unknown;
+  settlementId?: string | null;
 }
 
 export interface OrderRecord {

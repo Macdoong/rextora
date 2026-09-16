@@ -4,6 +4,7 @@ import { emptyEntityMemory } from "../src/lib/rextora/agent/conversationContext"
 import type { ProposedAction } from "../src/lib/rextora/agent/proposedAction";
 import type { AgentResponse } from "../src/lib/rextora/agent/types";
 import { countPrimaryTextLeaks } from "../src/lib/rextora/agent/v2/reasoning/primaryLeakDetector";
+import { authedRequest } from "./helpers/authSession";
 
 function paperApproval(
   id = "pa_api_paper",
@@ -36,7 +37,7 @@ async function ask(input: {
   pending?: ProposedAction | null;
 }) {
   const pending = input.pending ?? null;
-  const request = new Request("http://localhost/api/rextora/agent", {
+  const request = await authedRequest("http://localhost/api/rextora/agent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -30,10 +30,19 @@ import { syncPositionsFromBinance } from "./positionSyncService";
 import { getMarketDataSnapshot } from "./marketDataStore";
 import { markEmergencyStop } from "./runtimeState";
 import type { AiCandidate, EngineResult } from "./types";
+import { evaluateLiveStartApprovalGate } from "./live/liveApprovalTarget";
+import { getStrategyLiveApprovalState } from "./strategyLiveApproval";
+import { resolveLiveExecutionTarget } from "./live/liveExecutionTarget";
 
 export type { LiveExecutionContext } from "./serverTpSlManager";
 
-export function preflightLiveExecution(): EngineResult & { blockedReasons: string[] } {
+export function preflightLiveExecution(): EngineResult & {
+  blockedReasons: string[];
+  approvalGate: ReturnType<typeof evaluateLiveStartApprovalGate>;
+  executionTarget: ReturnType<typeof resolveLiveExecutionTarget>;
+} {
+  const executionTarget = resolveLiveExecutionTarget();
+  const approvalGate = evaluateLiveStartApprovalGate(getStrategyLiveApprovalState());
   const gate = evaluateLiveSafetyGate({
     mode: "LIVE",
     operatorLiveStartRequested: true,
@@ -41,14 +50,19 @@ export function preflightLiveExecution(): EngineResult & { blockedReasons: strin
   });
   const tpSl = validateServerTpSlRequired("LIVE");
   const blockedReasons = [...gate.blockedReasons];
+  if (!executionTarget.ok) blockedReasons.unshift(executionTarget.message);
+  if (!approvalGate.ok) blockedReasons.unshift(approvalGate.message);
   if (!tpSl.ok) blockedReasons.push(tpSl.message);
+  const ok = executionTarget.ok && approvalGate.ok && gate.passed && tpSl.ok;
 
   return {
-    ok: gate.passed && tpSl.ok,
+    ok,
     mode: "LIVE",
-    serviceState: gate.passed && tpSl.ok ? "live-ready" : "live-blocked",
-    message: gate.passed && tpSl.ok ? "LIVE preflight passed" : "LIVE preflight blocked",
-    blockedReasons: Array.from(new Set(blockedReasons))
+    serviceState: ok ? "live-ready" : "live-blocked",
+    message: ok ? "LIVE preflight passed" : "LIVE preflight blocked",
+    blockedReasons: Array.from(new Set(blockedReasons)),
+    approvalGate,
+    executionTarget
   };
 }
 
@@ -64,6 +78,16 @@ async function closeLivePositionAfterTpSlFailure(
 }
 
 export async function executeLiveEntry(candidate: AiCandidate): Promise<EngineResult> {
+  const approvalGate = evaluateLiveStartApprovalGate(getStrategyLiveApprovalState());
+  if (!approvalGate.ok) {
+    return {
+      ok: false,
+      mode: "LIVE",
+      serviceState: "live-blocked",
+      message: approvalGate.message,
+      blockedReasons: [approvalGate.message]
+    };
+  }
   const gate = await evaluateLiveSafetyGateAsync({
     mode: "LIVE",
     operatorLiveStartRequested: true,

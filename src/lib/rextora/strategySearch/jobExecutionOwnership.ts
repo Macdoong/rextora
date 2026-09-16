@@ -36,6 +36,14 @@ export interface JobExecutionOwnershipRecord {
   releaseReason: string | null;
 }
 
+export interface StaleJobExecutionOwnershipRecovery {
+  jobId: string;
+  previousOwnerId: string;
+  acquiredAt: string;
+  heartbeatAt: string;
+  recoveredAt: string;
+}
+
 export interface JobExecutionOwnershipAuditRecord {
   jobId: string;
   ownerId: string;
@@ -340,25 +348,31 @@ export function releaseJobExecutionOwnership(
   }
 }
 
-/** Remove stale owner leases before orphan resume. Returns recovered job IDs. */
-export function recoverStaleJobExecutionOwnership(
+/**
+ * Remove stale owner leases and retain their last durable heartbeat boundary.
+ * The heartbeat is authoritative evidence that the previous worker was alive
+ * through that timestamp; callers may conservatively advance it to a later
+ * persisted checkpoint mutation, but must never backdate it.
+ */
+export function recoverStaleJobExecutionOwnershipDetailed(
   options?: StrategySearchStoreOptions,
-): string[] {
+): StaleJobExecutionOwnershipRecovery[] {
   const root = resolveRoot(options);
   const dir = ownersDir(root);
   if (!fs.existsSync(dir)) return [];
-  const recovered: string[] = [];
+  const recovered: StaleJobExecutionOwnershipRecovery[] = [];
   for (const name of fs.readdirSync(dir)) {
     if (!name.endsWith(".owner.json")) continue;
     const jobId = name.slice(0, -".owner.json".length);
     const record = readOwnerRecord(root, jobId);
     if (!record) continue;
     if (isHeartbeatFresh(record)) continue;
+    const recoveredAt = nowIso();
     appendOwnershipAudit(root, {
       jobId,
       ownerId: getProcessExecutionOwnerId(),
       event: "recovered_stale",
-      at: nowIso(),
+      at: recoveredAt,
       previousOwnerId: record.ownerId,
       reason: "startup_stale_sweep",
       pid: process.pid,
@@ -369,9 +383,24 @@ export function recoverStaleJobExecutionOwnership(
     } catch {
       /* ignore */
     }
-    recovered.push(jobId);
+    recovered.push({
+      jobId,
+      previousOwnerId: record.ownerId,
+      acquiredAt: record.acquiredAt,
+      heartbeatAt: record.heartbeatAt,
+      recoveredAt,
+    });
   }
   return recovered;
+}
+
+/** Backward-compatible ID-only stale-lease cleanup API. */
+export function recoverStaleJobExecutionOwnership(
+  options?: StrategySearchStoreOptions,
+): string[] {
+  return recoverStaleJobExecutionOwnershipDetailed(options).map(
+    (row) => row.jobId,
+  );
 }
 
 export function resetJobExecutionOwnershipForTests(

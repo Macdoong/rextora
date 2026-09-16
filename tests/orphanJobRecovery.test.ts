@@ -19,6 +19,7 @@ function tempStore(): StrategySearchStoreOptions {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   while (tempRoots.length) {
     const root = tempRoots.pop();
     if (root) fs.rmSync(root, { recursive: true, force: true });
@@ -30,6 +31,7 @@ describe("recoverOrphanSearchJobs", () => {
     const store = tempStore();
     const result = recoverOrphanSearchJobs(store);
     expect(result.scanned).toBe(0);
+    expect(result.resumeLimit).toBe(0);
     expect(result.resumed).toEqual([]);
     expect(result.errors).toEqual([]);
   });
@@ -62,7 +64,7 @@ describe("recoverOrphanSearchJobs", () => {
     expect(startSpy).not.toHaveBeenCalled();
   });
 
-  it("resumes disk-running job that is not active in-process", async () => {
+  it("does not resume a bare running record without new stale-owner proof", async () => {
     const store = tempStore();
     const registry = await import(
       "../src/lib/rextora/strategySearch/jobExecutionRegistry"
@@ -85,19 +87,22 @@ describe("recoverOrphanSearchJobs", () => {
     ]);
 
     const result = recoverOrphanSearchJobs(store);
-    expect(result.resumed).toContain("search_resume_me");
-    expect(startSpy).toHaveBeenCalledWith("search_resume_me", {
-      storeOptions: store,
-    });
+    expect(result.resumed).not.toContain("search_resume_me");
+    expect(result.skipped).toContain("search_resume_me");
+    expect(startSpy).not.toHaveBeenCalled();
   });
 
-  it("defaults auto-resume to 0 in development and the production cap otherwise", () => {
+  it("defaults auto-resume to 0 in every environment", () => {
+    expect(DEFAULT_ORPHAN_AUTO_RESUME_LIMIT).toBe(0);
     expect(
       resolveOrphanAutoResumeLimit({ NODE_ENV: "development" } as NodeJS.ProcessEnv),
     ).toBe(0);
     expect(
       resolveOrphanAutoResumeLimit({ NODE_ENV: "production" } as NodeJS.ProcessEnv),
-    ).toBe(DEFAULT_ORPHAN_AUTO_RESUME_LIMIT);
+    ).toBe(0);
+    expect(
+      resolveOrphanAutoResumeLimit({ NODE_ENV: "test" } as NodeJS.ProcessEnv),
+    ).toBe(0);
     expect(
       resolveOrphanAutoResumeLimit({
         NODE_ENV: "development",
@@ -128,6 +133,7 @@ describe("recoverOrphanSearchJobs", () => {
     vi.stubEnv("REXTORA_ORPHAN_AUTO_RESUME_LIMIT", "2");
 
     const result = recoverOrphanSearchJobs(store);
+    expect(result.resumeLimit).toBe(2);
     expect(result.resumed).toHaveLength(2);
     expect(startSpy).toHaveBeenCalledTimes(2);
     expect(result.skipped.length).toBeGreaterThanOrEqual(6);

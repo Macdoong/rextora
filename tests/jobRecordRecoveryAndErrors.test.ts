@@ -70,7 +70,7 @@ function minimalConfig() {
 }
 
 describe("job record recovery", () => {
-  it("rebuilds missing job.json from plan/trials as paused without deleting trials", () => {
+  it("rebuilds missing job.json from plan/trials as queued without deleting trials", () => {
     const store = tempStore();
     const job = createSearchJob(minimalConfig(), store);
     saveSearchPlan(
@@ -114,7 +114,7 @@ describe("job record recovery", () => {
     const recovery = recoverMissingJobRecord(job.id, store);
     expect(recovery.recovered).toBe(true);
     const restored = getSearchJob(job.id, store);
-    expect(restored?.status).toBe("paused");
+    expect(restored?.status).toBe("queued");
     expect(restored?.checkpoint.completedIterations).toBeGreaterThanOrEqual(1);
     expect(listSearchTrials(job.id, store)).toHaveLength(1);
   });

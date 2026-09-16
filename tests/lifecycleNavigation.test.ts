@@ -7,25 +7,109 @@ import {
   validateEventSequence,
 } from "../src/lib/rextora/strategy/definition/eventSequence";
 import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+import {
+  LIFECYCLE_NAVIGATION_ITEMS,
+  shellPageLocationLabel,
+} from "../components/rextora/shell/navigationModel";
+import { getLifecycleStageForRoute } from "../components/rextora/shell/routeLifecycle";
 
 describe("lifecycle navigation", () => {
-  it("sidebar exposes exactly seven primary menus", () => {
-    const src = fs.readFileSync(
+  it("shell navigation uses shared model with lifecycle-first desktop sidebar", () => {
+    const navigationModel = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/navigationModel.ts"),
+      "utf8",
+    );
+    const sidebar = fs.readFileSync(
       path.join(process.cwd(), "components/rextora/Sidebar.tsx"),
       "utf8",
     );
-    const labels = [
-      "대시보드",
+    const lifecycleNav = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/LifecycleNavigation.tsx"),
+      "utf8",
+    );
+
+    expect(navigationModel).toContain("SHELL_NAVIGATION_GROUPS");
+    expect(navigationModel).toContain("SIDEBAR_NAV_ITEMS");
+    expect(navigationModel).toContain("LIFECYCLE_NAVIGATION_ITEMS");
+
+    const primaryLabels = [
+      "운영센터",
       "전략 탐색",
       "탐색 결과",
       "백테스트",
-      "모의 매매",
-      "실전 매매",
+      "모의매매",
+      "실전 진입",
       "시스템 설정",
     ];
-    for (const label of labels) {
-      expect(src).toContain(`["${label}"`);
+    for (const label of primaryLabels) {
+      expect(navigationModel).toContain(`label: "${label}"`);
     }
+
+    for (const href of [
+      "/dashboard",
+      "/strategy-search",
+      "/results",
+      "/backtest",
+      "/paper-trading",
+      "/live-trading",
+      "/settings",
+    ]) {
+      expect(navigationModel).toContain(`href: "${href}"`);
+    }
+
+    for (const lifecycleNavId of [
+      "research",
+      "strategy",
+      "backtest",
+      "paper",
+      "live-gate",
+    ]) {
+      expect(navigationModel).toContain(`lifecycleNavId: "${lifecycleNavId}"`);
+    }
+
+    expect(sidebar).toContain("navigationModel");
+    expect(sidebar).toContain("SIDEBAR_NAV_ITEMS");
+    expect(sidebar).toContain("LifecycleNavigation");
+    expect(sidebar).toContain('variant="compact-sidebar"');
+    expect(sidebar).toContain('data-testid="sidebar-lifecycle-nav"');
+    expect(sidebar).toContain('data-testid="sidebar-supporting-nav"');
+    expect(sidebar).toContain('data-testid="main-nav"');
+    expect(sidebar).toContain('data-testid="mobile-nav"');
+    expect(sidebar).not.toContain("v3-shell-results-entry");
+    expect(sidebar).not.toContain('results: "결"');
+
+    expect(lifecycleNav).toContain("LIFECYCLE_NAVIGATION_ITEMS");
+    expect(lifecycleNav).toContain("SIDEBAR_NAV_ITEMS");
+    expect(lifecycleNav).toContain("getLifecycleStageForRoute");
+    expect(lifecycleNav).toContain('data-testid="shell-lifecycle-navigation"');
+    expect(lifecycleNav).toContain("data-destination");
+    expect(lifecycleNav).toContain("destinationOwnedSeparately");
+    expect(lifecycleNav).toContain("visibleLabel");
+    expect(lifecycleNav).toContain("isDestination");
+    expect(lifecycleNav).not.toContain('pathname === "/results"');
+    expect(lifecycleNav).not.toContain(
+      "active && !item.destinationOwnedSeparately",
+    );
+    expect(navigationModel).toContain("lifecycleDestinationOwnedSeparately");
+    expect(navigationModel).toContain("lifecycleItemIsDestination");
+    expect(navigationModel).toContain("destinationOwnedSeparately");
+
+    const byId = Object.fromEntries(
+      LIFECYCLE_NAVIGATION_ITEMS.map((item) => [item.id, item]),
+    );
+    expect(byId.strategy?.destinationOwnedSeparately).toBe(true);
+    expect(byId.strategy?.isDestination("/results")).toBe(false);
+    expect(getLifecycleStageForRoute("/results")).toBe("STRATEGY");
+    expect(byId.research?.isDestination("/strategy-search")).toBe(true);
+    expect(byId.backtest?.isDestination("/backtest")).toBe(true);
+    expect(byId.paper?.isDestination("/paper-trading")).toBe(true);
+    expect(byId["live-gate"]?.isDestination("/live-trading")).toBe(true);
+    expect(byId["live-gate"]?.isDestination("/risk")).toBe(false);
+    expect(getLifecycleStageForRoute("/risk")).toBe("LIVE_GATE");
+    expect(shellPageLocationLabel("/risk")).toBe("위험 관리");
+    expect(shellPageLocationLabel("/live-trading")).toBe("실전 진입");
+    expect(shellPageLocationLabel("/results")).toBe("탐색 결과");
+
     for (const removed of [
       "고급 전략 편집",
       "전략 성과",
@@ -35,10 +119,8 @@ describe("lifecycle navigation", () => {
       "리스크 관리",
       "시스템 상태",
     ]) {
-      expect(src).not.toContain(`["${removed}"`);
+      expect(navigationModel).not.toContain(`label: "${removed}"`);
     }
-    expect(src).toContain('"/results"');
-    expect(src).toContain('"/settings"');
   });
 
   it("default backtest page supports strategy+date Run without expert params", () => {
@@ -67,13 +149,55 @@ describe("lifecycle navigation", () => {
     expect(review).not.toContain("기본 진입 비중");
   });
 
+  it("context bar uses page-supplied Paper context and does not fetch sessions", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/ContextBar.tsx"),
+      "utf8",
+    );
+    expect(src).toContain("OPERATOR_LABEL.selectedWork");
+    expect(src).toContain("OPERATOR_LABEL.agentPaperSession");
+    expect(src).toContain("paperOperatorShellContext");
+    expect(src).toContain("useOperatorPageContext");
+    expect(src).toContain("session.sessionHydrated && session.canResume");
+    expect(src).toContain("no fetching, storage reads, or lifecycle inference");
+    expect(src).toContain("shellPageLocationLabel");
+    expect(src).toContain("pageLocationLabel");
+    expect(src).toContain("shellStageLabel");
+    expect(src).toContain('data-testid="shell-context-breadcrumb"');
+    expect(src).not.toContain("getCurrentPaperSession");
+    expect(src).not.toContain("getExecutablePaperSession");
+  });
+
+  it("settings hash tabs exist and are applied from location.hash", () => {
+    const shell = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components/rextora/settings/LifecycleSettingsShell.tsx",
+      ),
+      "utf8",
+    );
+    expect(shell).toContain('id="risk"');
+    expect(shell).toContain('id="system"');
+    expect(shell).toContain("window.location.hash");
+    expect(shell).toContain("hashchange");
+    expect(shell).toContain("settings-live-gate-facts");
+  });
+
+  it("risk page is an operator surface, not a silent redirect", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "app/risk/page.tsx"),
+      "utf8",
+    );
+    expect(src).toContain("risk-operator-page");
+    expect(src).not.toContain('redirect("/settings#risk")');
+  });
+
   it("legacy routes redirect to lifecycle pages", () => {
     const checks: Array<[string, string]> = [
       ["app/strategy-performance/page.tsx", "/results"],
       ["app/ai-reports/page.tsx", "/results"],
       ["app/market-watch/page.tsx", "/strategy-search"],
       ["app/trades/page.tsx", "/paper-trading"],
-      ["app/risk/page.tsx", "/settings#risk"],
       ["app/system-status/page.tsx", "/settings#system"],
     ];
     for (const [file, target] of checks) {

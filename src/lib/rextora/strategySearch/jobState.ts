@@ -4,6 +4,7 @@
  * Conceptual Phase 5 names map onto the persisted StrategySearchJobStatus values:
  *   CREATED     → queued
  *   RUNNING     → running
+ *   INTERRUPTED → interrupted
  *   PAUSED      → paused
  *   CANCELLING  → cancel_requested | cancelling
  *   CANCELLED   → cancelled
@@ -20,6 +21,7 @@ import {
   markSearchJobCancelling,
   markSearchJobCompleted,
   markSearchJobFailed,
+  markSearchJobInterrupted,
   markSearchJobPaused,
   markSearchJobRunning,
   requestCancelSearchJob,
@@ -33,6 +35,7 @@ import type { StrategySearchJob, StrategySearchJobStatus } from "./types";
 export type StrategySearchJobStateLabel =
   | "CREATED"
   | "RUNNING"
+  | "INTERRUPTED"
   | "PAUSE_REQUESTED"
   | "PAUSED"
   | "CANCELLING"
@@ -64,7 +67,9 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   readonly [StrategySearchJobStatus, StrategySearchJobStatus]
 > = [
   ["queued", "running"],
+  ["queued", "interrupted"],
   ["queued", "cancel_requested"],
+  ["running", "interrupted"],
   ["running", "pause_requested"],
   ["running", "cancel_requested"],
   ["running", "completed"],
@@ -73,6 +78,9 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   ["pause_requested", "cancel_requested"],
   ["paused", "queued"],
   ["paused", "cancel_requested"],
+  ["interrupted", "queued"],
+  ["interrupted", "cancel_requested"],
+  ["interrupted", "completed"],
   ["cancel_requested", "cancelling"],
   ["cancel_requested", "cancelled"],
   ["cancelling", "cancelled"],
@@ -89,6 +97,8 @@ export function toJobStateLabel(
       return "CREATED";
     case "running":
       return "RUNNING";
+    case "interrupted":
+      return "INTERRUPTED";
     case "pause_requested":
       return "PAUSE_REQUESTED";
     case "paused":
@@ -173,6 +183,17 @@ export function transitionJobToPauseRequested(
 ): StrategySearchJob {
   try {
     return requestPauseSearchJob(jobId, options);
+  } catch (err) {
+    wrapStoreError(err);
+  }
+}
+
+export function transitionJobToInterrupted(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob {
+  try {
+    return markSearchJobInterrupted(jobId, options);
   } catch (err) {
     wrapStoreError(err);
   }

@@ -21,6 +21,7 @@ import {
   SAFE_STRATEGY_ID,
 } from "../src/lib/rextora/strategy/strategyTypes";
 import { loadSafeV44Strategy } from "../src/lib/rextora/strategy/safeV44Strategy";
+import { authedRequest } from "./helpers/authSession";
 import * as marketDataStore from "../src/lib/rextora/marketDataStore";
 import * as binanceReadOnly from "../src/lib/rextora/binance/binanceReadOnlyService";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
@@ -344,7 +345,7 @@ describe("backtest data pipeline", () => {
       message: "no network",
     });
 
-    const req = new Request("http://localhost/api/rextora/backtest/run", {
+    const req = await authedRequest("http://localhost/api/rextora/backtest/run", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -356,7 +357,7 @@ describe("backtest data pipeline", () => {
         dataMode: "synthetic-test",
         costStressMultipliers: [1],
       }),
-    });
+    }, "operator");
     const res = await POST(req);
     const json = await res.json();
     expect(json.ok).toBe(false);

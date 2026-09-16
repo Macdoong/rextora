@@ -7,8 +7,12 @@ import { getRiskEngineStatus } from "@/src/lib/rextora/riskEngine";
 import { getOpenPositions } from "@/src/lib/rextora/positionManager";
 import { getTodayPnlSummary, getUnifiedMetrics } from "@/src/lib/rextora/metrics/metricsEngine";
 import { getUnifiedRiskView, sanitizePersistedRiskState } from "@/src/lib/rextora/metrics/riskService";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
 
   try {

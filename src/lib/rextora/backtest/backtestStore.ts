@@ -3,13 +3,170 @@ import path from "node:path";
 import crypto from "node:crypto";
 import type { SavedBacktestResult } from "./backtestTypes";
 import { hasChartEvidence } from "./chartEvidenceStore";
+import {
+  COST_ASSUMPTIONS_VERSION,
+  hasPersistedCostAssumptions,
+  hasPersistedSlippageModelVersion,
+} from "./costAssumptions";
 
 import { backtestsRoot } from "../storage/runtimePaths";
+import { assertTestStoreIsNotProduction } from "../storage/testStoreGuard";
+
+export const IDENTITY_SCHEMA_LEGACY_ORIGINAL = "legacy_original" as const;
+export const IDENTITY_SCHEMA_P3A52 = "p3a52" as const;
+export const IDENTITY_SCHEMA_COST_ASSUMPTIONS_V1 =
+  "cost_assumptions_v1" as const;
+
+export type BacktestIdentitySchema =
+  | typeof IDENTITY_SCHEMA_LEGACY_ORIGINAL
+  | typeof IDENTITY_SCHEMA_P3A52
+  | typeof IDENTITY_SCHEMA_COST_ASSUMPTIONS_V1;
+
+type IdentitySource = Omit<SavedBacktestResult, "id" | "createdAt">;
+
+function identitySymbol(result: IdentitySource): string {
+  return String(
+    result.report.symbol ?? result.config.symbols?.[0] ?? "",
+  ).toUpperCase();
+}
+
+function identityBaseFields(result: IdentitySource) {
+  return {
+    strategyId: result.report.strategyId,
+    paramsHash: result.report.strategyHash,
+    symbol: identitySymbol(result),
+    timeframe: result.report.timeframe,
+    fromDate: result.report.fromDate,
+    toDate: result.report.toDate,
+    fromOpenTime: result.config.fromOpenTime ?? null,
+    toOpenTime: result.config.toOpenTime ?? null,
+    feeRate: result.config.feeRate,
+    slippageRate: result.config.slippageRate,
+    fundingRate: result.config.fundingRate,
+    costGuardK: result.config.costGuardK,
+    engineVersion: result.engineVersion ?? "rextora-backtest-1",
+    dataVersion: result.dataVersion ?? result.report.dataSource ?? null,
+  };
+}
+
+function identityOutcomeFields(result: IdentitySource) {
+  return {
+    totalReturn: result.report.totalReturn,
+    mdd: result.report.mdd,
+    tradeCount: result.report.tradeCount,
+    endingBalance: result.report.endingBalance,
+  };
+}
+
+export function resolveBacktestIdentitySchema(
+  result: IdentitySource,
+): BacktestIdentitySchema {
+  const assumptions = result.report.costAssumptions;
+  if (
+    hasPersistedCostAssumptions(result.report) &&
+    assumptions?.version === COST_ASSUMPTIONS_VERSION
+  ) {
+    return IDENTITY_SCHEMA_COST_ASSUMPTIONS_V1;
+  }
+  if (
+    !hasPersistedCostAssumptions(result.report) &&
+    !hasPersistedSlippageModelVersion(result.report)
+  ) {
+    return IDENTITY_SCHEMA_LEGACY_ORIGINAL;
+  }
+  if (
+    !hasPersistedCostAssumptions(result.report) &&
+    hasPersistedSlippageModelVersion(result.report)
+  ) {
+    return IDENTITY_SCHEMA_P3A52;
+  }
+  return IDENTITY_SCHEMA_COST_ASSUMPTIONS_V1;
+}
+
+export function buildLegacyOriginalBacktestIdentity(result: IdentitySource) {
+  return {
+    ...identityBaseFields(result),
+    ...identityOutcomeFields(result),
+  };
+}
+
+export function buildP3A52BacktestIdentity(result: IdentitySource) {
+  return {
+    ...identityBaseFields(result),
+    slippageModelVersion: result.report.slippageModelVersion,
+    ...identityOutcomeFields(result),
+  };
+}
+
+export function buildCostAssumptionsV1BacktestIdentity(result: IdentitySource) {
+  const assumptions = result.report.costAssumptions;
+  const stress = (result.report.costStress ?? []).map((row) => ({
+    multiplier: row.multiplier,
+    feeRate: row.feeRate ?? null,
+    slippageRate: row.slippageRate ?? null,
+    slippageModelVersion: row.slippageModelVersion ?? null,
+    fundingEnabled: row.fundingEnabled ?? null,
+    fundingConfiguredRate: row.fundingConfiguredRate ?? null,
+    fundingEffectiveRate: row.fundingEffectiveRate ?? null,
+    spreadEnabled: row.spreadEnabled ?? null,
+    spreadRate: row.spreadRate ?? null,
+    costGuardK: row.costGuardK ?? null,
+  }));
+  return {
+    ...identityBaseFields(result),
+    ...identityOutcomeFields(result),
+    costAssumptions: assumptions
+      ? {
+          version: assumptions.version,
+          fee: {
+            configuredRate: assumptions.fee.configuredRate,
+            effectiveRate: assumptions.fee.effectiveRate,
+            model: assumptions.fee.model,
+            unit: assumptions.fee.unit,
+            legCount: assumptions.fee.legCount,
+          },
+          slippage: {
+            configuredRate: assumptions.slippage.configuredRate,
+            effectiveRate: assumptions.slippage.effectiveRate,
+            modelVersion: assumptions.slippage.modelVersion,
+            unit: assumptions.slippage.unit,
+            legCount: assumptions.slippage.legCount,
+          },
+          funding: {
+            enabled: assumptions.funding.enabled,
+            configuredRate: assumptions.funding.configuredRate,
+            effectiveRate: assumptions.funding.effectiveRate,
+            model: assumptions.funding.model,
+            unit: assumptions.funding.unit,
+          },
+          spread: {
+            enabled: assumptions.spread.enabled,
+            configuredRate: assumptions.spread.configuredRate,
+            effectiveRate: assumptions.spread.effectiveRate,
+            model: assumptions.spread.model,
+            unit: assumptions.spread.unit,
+          },
+          costGuard: {
+            enabled: assumptions.costGuard.enabled,
+            k: assumptions.costGuard.k,
+            slippageEstimateModel: assumptions.costGuard.slippageEstimateModel,
+          },
+        }
+      : null,
+    primaryCostAssumptions: result.report.primaryCostAssumptions ?? null,
+    costStressAssumptions: stress,
+    costStressMultipliers: result.config.costStressMultipliers ?? [],
+  };
+}
 
 const DIR = () => backtestsRoot();
 
 function ensure(): void {
-  fs.mkdirSync(DIR(), { recursive: true });
+  const dir = DIR();
+  if (!fs.existsSync(dir)) {
+    assertTestStoreIsNotProduction(dir);
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
 export type IndexRow = {
@@ -24,30 +181,13 @@ export type IndexRow = {
 export function backtestResultHash(
   result: Omit<SavedBacktestResult, "id" | "createdAt">,
 ): string {
-  const symbol =
-    result.report.symbol ??
-    result.config.symbols?.[0] ??
-    "";
-  const payload = {
-    strategyId: result.report.strategyId,
-    paramsHash: result.report.strategyHash,
-    symbol: String(symbol).toUpperCase(),
-    timeframe: result.report.timeframe,
-    fromDate: result.report.fromDate,
-    toDate: result.report.toDate,
-    fromOpenTime: result.config.fromOpenTime ?? null,
-    toOpenTime: result.config.toOpenTime ?? null,
-    feeRate: result.config.feeRate,
-    slippageRate: result.config.slippageRate,
-    fundingRate: result.config.fundingRate,
-    costGuardK: result.config.costGuardK,
-    engineVersion: result.engineVersion ?? "rextora-backtest-1",
-    dataVersion: result.dataVersion ?? result.report.dataSource ?? null,
-    totalReturn: result.report.totalReturn,
-    mdd: result.report.mdd,
-    tradeCount: result.report.tradeCount,
-    endingBalance: result.report.endingBalance,
-  };
+  const schema = resolveBacktestIdentitySchema(result);
+  const payload =
+    schema === IDENTITY_SCHEMA_COST_ASSUMPTIONS_V1
+      ? buildCostAssumptionsV1BacktestIdentity(result)
+      : schema === IDENTITY_SCHEMA_P3A52
+        ? buildP3A52BacktestIdentity(result)
+        : buildLegacyOriginalBacktestIdentity(result);
   return crypto.createHash("sha256").update(JSON.stringify(payload)).digest("hex").slice(0, 16);
 }
 
@@ -62,8 +202,10 @@ function readIndex(): IndexRow[] {
 }
 
 function writeIndex(index: IndexRow[]): void {
+  const indexPath = path.join(DIR(), "index.json");
+  assertTestStoreIsNotProduction(indexPath);
   fs.writeFileSync(
-    path.join(DIR(), "index.json"),
+    indexPath,
     JSON.stringify(index.slice(0, 200), null, 2),
     "utf8",
   );
@@ -151,8 +293,10 @@ export function saveBacktestResult(
       result.chartEvidenceSchemaVersion ?? (hasChart ? 1 : undefined),
   };
 
+  const savedPath = path.join(DIR(), `${saved.id}.json`);
+  assertTestStoreIsNotProduction(savedPath);
   fs.writeFileSync(
-    path.join(DIR(), `${saved.id}.json`),
+    savedPath,
     JSON.stringify(saved, null, 2),
     "utf8",
   );
@@ -186,8 +330,12 @@ export function listSavedBacktests(limit = 50): SavedBacktestResult[] {
   return out;
 }
 
-export function getSavedBacktest(id: string): SavedBacktestResult | null {
-  const full = path.join(DIR(), `${id}.json`);
+export function getSavedBacktest(
+  id: string,
+  options?: { rootDir?: string },
+): SavedBacktestResult | null {
+  const dir = options?.rootDir ? path.resolve(options.rootDir) : DIR();
+  const full = path.join(dir, `${id}.json`);
   if (!fs.existsSync(full)) return null;
   return JSON.parse(fs.readFileSync(full, "utf8")) as SavedBacktestResult;
 }
@@ -205,6 +353,7 @@ export function deleteSavedBacktest(id: string): {
     return { ok: false, reason: "invalid_id" };
   }
   const full = path.join(DIR(), `${id}.json`);
+  assertTestStoreIsNotProduction(full);
   if (!fs.existsSync(full)) return { ok: false, reason: "not_found" };
   try {
     fs.unlinkSync(full);

@@ -25,6 +25,11 @@ import {
 } from "../strategy/definition/bridge";
 import { computeStrategyHash } from "../strategy/strategyHash";
 import { paperSessionsRootDefault } from "../storage/runtimePaths";
+import { assertTestStoreIsNotProduction } from "../storage/testStoreGuard";
+import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
+import { snapshotPaperEventSequenceCostIfMissing } from "./paperEventSequenceCostModel";
+import type { PaperEventSequenceCostAssumptions } from "./paperEventSequenceCostModel";
+import type { PaperEventSequenceCostModelStatus } from "./paperEventSequenceCostLabels";
 
 /** Canonical commercial Paper session status. */
 export type PaperSessionStatus =
@@ -32,6 +37,7 @@ export type PaperSessionStatus =
   | "ready"
   | "active"
   | "paused"
+  | "risk_halted"
   | "stopped"
   | "failed";
 
@@ -82,6 +88,18 @@ export interface PaperSession {
   tradeCount: number;
   signalCount: number;
   drawdown: number;
+  /**
+   * SAFE close IDs already applied to this session ledger.
+   * Prevents double tradeCount / realizedPnl increments.
+   */
+  accountedCloseIds?: string[];
+  /**
+   * Persisted Event-Sequence cost model for Pattern Paper.
+   * Absent on pre-A8.3 sessions — do not infer today's canonical default.
+   */
+  eventSequenceCostModel?: EventSequenceCostModel | null;
+  eventSequenceCostModelStatus?: PaperEventSequenceCostModelStatus;
+  eventSequenceCostAssumptions?: PaperEventSequenceCostAssumptions;
   /** Set when a v1 record was migrated. */
   migrationAudit?: {
     fromSchemaVersion: number;
@@ -114,7 +132,40 @@ const CURRENT: ReadonlySet<PaperSessionStatus> = new Set([
   "ready",
   "active",
   "paused",
+  "risk_halted",
 ]);
+
+/** Session capital displayed and used for SAFE Paper sizing. */
+export function paperSessionCapitalUsdt(
+  session: Pick<PaperSession, "virtualBalance" | "realizedPnl">,
+): number {
+  return Number((session.virtualBalance + session.realizedPnl).toFixed(8));
+}
+
+/**
+ * Operator-facing runtime truth for Paper UI / read models.
+ * active = executor may scan. risk_halted = halted, explicit resume required.
+ */
+export function paperSessionOperatorView(session: PaperSession): {
+  scanning: boolean;
+  resumable: boolean;
+  haltReason: string | null;
+  requiresOperatorAction: boolean;
+  resumeRequiresOperator: true;
+} {
+  const haltReason =
+    session.status === "risk_halted"
+      ? session.lastError ?? session.stopReason ?? "리스크 한도 위반"
+      : null;
+  return {
+    scanning: session.status === "active",
+    resumable: session.status === "paused" || session.status === "risk_halted",
+    haltReason,
+    requiresOperatorAction:
+      session.status === "paused" || session.status === "risk_halted",
+    resumeRequiresOperator: true,
+  };
+}
 
 function defaultRoot(): string {
   if (process.env.REXTORA_PAPER_SESSIONS_DIR) {
@@ -147,6 +198,7 @@ function sessionPath(root: string, id: string): string {
 }
 
 function writeJson(filePath: string, value: unknown): void {
+  assertTestStoreIsNotProduction(filePath);
   ensureDir(path.dirname(filePath));
   const tmp = `${filePath}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(value, null, 2), "utf8");
@@ -218,6 +270,7 @@ function asStatus(raw: unknown): PaperSessionStatus | null {
     raw === "ready" ||
     raw === "active" ||
     raw === "paused" ||
+    raw === "risk_halted" ||
     raw === "stopped" ||
     raw === "failed"
   ) {
@@ -311,7 +364,10 @@ export function migratePaperSessionRecord(
   const startedAt =
     typeof raw.startedAt === "string"
       ? raw.startedAt
-      : status === "active" || status === "paused" || status === "stopped"
+      : status === "active" ||
+          status === "paused" ||
+          status === "risk_halted" ||
+          status === "stopped"
         ? createdAt
         : null;
 
@@ -411,7 +467,59 @@ export function migratePaperSessionRecord(
       typeof raw.drawdown === "number" && Number.isFinite(raw.drawdown)
         ? raw.drawdown
         : 0,
+    accountedCloseIds: Array.isArray(raw.accountedCloseIds)
+      ? raw.accountedCloseIds.filter(
+          (id): id is string => typeof id === "string" && id.length > 0,
+        )
+      : undefined,
   };
+
+  const persistedModel =
+    raw.eventSequenceCostModel === "event_sequence_execution_price_v1" ||
+    raw.eventSequenceCostModel === "event_sequence_ledger_v0"
+      ? raw.eventSequenceCostModel
+      : raw.eventSequenceCostModel === null
+        ? null
+        : undefined;
+  if (persistedModel !== undefined) {
+    session.eventSequenceCostModel = persistedModel;
+  }
+  if (
+    raw.eventSequenceCostModelStatus === "not_applicable" ||
+    raw.eventSequenceCostModelStatus === "canonical" ||
+    raw.eventSequenceCostModelStatus === "legacy" ||
+    raw.eventSequenceCostModelStatus === "unresolved"
+  ) {
+    session.eventSequenceCostModelStatus = raw.eventSequenceCostModelStatus;
+  }
+  if (
+    raw.eventSequenceCostAssumptions &&
+    typeof raw.eventSequenceCostAssumptions === "object"
+  ) {
+    const costs = raw.eventSequenceCostAssumptions as Record<string, unknown>;
+    session.eventSequenceCostAssumptions = {
+      feeRate:
+        typeof costs.feeRate === "number" && Number.isFinite(costs.feeRate)
+          ? costs.feeRate
+          : 0.0004,
+      slippageRate:
+        typeof costs.slippageRate === "number" &&
+        Number.isFinite(costs.slippageRate)
+          ? costs.slippageRate
+          : 0.0002,
+      fundingRate:
+        typeof costs.fundingRate === "number" &&
+        Number.isFinite(costs.fundingRate)
+          ? costs.fundingRate
+          : 0.0001,
+      applyFunding: costs.applyFunding === true,
+      applySpread: costs.applySpread === true,
+      spreadRate:
+        typeof costs.spreadRate === "number" && Number.isFinite(costs.spreadRate)
+          ? costs.spreadRate
+          : 0.0001,
+    };
+  }
 
   if (notes.length > 0 && fromVersion < PAPER_SESSION_SCHEMA_VERSION) {
     session.migrationAudit = {
@@ -638,6 +746,15 @@ export function preparePaperSession(
     signalCount: 0,
     drawdown: 0,
   };
+  const costSnapshot = snapshotPaperEventSequenceCostIfMissing({
+    session,
+    strategy: identity.strategy as StoredStrategyV1,
+  });
+  session.eventSequenceCostModel = costSnapshot.eventSequenceCostModel;
+  session.eventSequenceCostModelStatus =
+    costSnapshot.eventSequenceCostModelStatus;
+  session.eventSequenceCostAssumptions =
+    costSnapshot.eventSequenceCostAssumptions;
   session.sessionId = session.id;
   return persistSession(root, session);
 }
@@ -696,9 +813,14 @@ export function activatePaperSession(
   stopCurrentNonTerminal(options, session.id);
   setPaperActiveStrategy(session.strategyId);
   const now = nowIso();
+  const strategy = getStrategyById(session.strategyId) as StoredStrategyV1 | null;
+  const snapshotted = snapshotPaperEventSequenceCostIfMissing({
+    session,
+    strategy,
+  });
   return persistSession(
     root,
-    bump(session, {
+    bump(snapshotted, {
       status: "active",
       startedAt: session.startedAt ?? now,
       heartbeatAt: now,
@@ -849,6 +971,51 @@ export function pausePaperSession(
   );
 }
 
+/**
+ * Risk / emergency halt: session is no longer executable.
+ * Explicit operator resume is required. Does not start or resume the executor.
+ */
+export function haltPaperSessionForRisk(
+  id: string,
+  lastError: string,
+  options?: PaperSessionStoreOptions,
+): PaperSession {
+  const root = resolveRoot(options);
+  const session = readSessionRaw(root, id);
+  if (!session) {
+    throw new PaperSessionError(`session not found: ${id}`, "NOT_FOUND");
+  }
+  if (session.status === "risk_halted") {
+    return persistSession(
+      root,
+      bump(session, {
+        lastError: lastError || session.lastError,
+        stopReason: session.stopReason ?? "risk_halt",
+      }),
+    );
+  }
+  if (TERMINAL.has(session.status)) {
+    throw new PaperSessionError(
+      "terminal session cannot be risk-halted",
+      "INVALID_STATE",
+    );
+  }
+  if (session.status !== "active") {
+    throw new PaperSessionError(
+      `cannot risk-halt from status ${session.status}`,
+      "INVALID_STATE",
+    );
+  }
+  return persistSession(
+    root,
+    bump(session, {
+      status: "risk_halted",
+      lastError,
+      stopReason: "risk_halt",
+    }),
+  );
+}
+
 export function resumePaperSession(
   id: string,
   options?: PaperSessionStoreOptions,
@@ -867,7 +1034,7 @@ export function resumePaperSession(
   if (session.status === "active") {
     throw new PaperSessionError("session already active", "DUPLICATE_START");
   }
-  if (session.status !== "paused") {
+  if (session.status !== "paused" && session.status !== "risk_halted") {
     throw new PaperSessionError(
       `cannot resume from status ${session.status}`,
       "INVALID_STATE",
@@ -875,12 +1042,19 @@ export function resumePaperSession(
   }
   setPaperActiveStrategy(session.strategyId);
   const now = nowIso();
+  const strategy = getStrategyById(session.strategyId) as StoredStrategyV1 | null;
+  const snapshotted = snapshotPaperEventSequenceCostIfMissing({
+    session,
+    strategy,
+  });
   return persistSession(
     root,
-    bump(session, {
+    bump(snapshotted, {
       status: "active",
       resumedAt: now,
       heartbeatAt: now,
+      lastError: null,
+      stopReason: null,
     }),
   );
 }
@@ -937,6 +1111,69 @@ export function failPaperSession(
       stoppedAt: now,
       lastError,
       stopReason: "failed",
+    }),
+  );
+}
+
+export function applyActivePaperSessionRealizedPnl(
+  deltaUsdt: number,
+  options?: PaperSessionStoreOptions,
+): PaperSession | null {
+  if (!Number.isFinite(deltaUsdt)) return null;
+  const session = getExecutablePaperSession(options) ?? getActivePaperSession(options);
+  if (!session || session.status !== "active") return null;
+  const root = resolveRoot(options);
+  return persistSession(
+    root,
+    bump(session, {
+      realizedPnl: Number((session.realizedPnl + deltaUsdt).toFixed(8)),
+      tradeCount: (session.tradeCount ?? 0) + 1,
+    }),
+  );
+}
+
+const MAX_ACCOUNTED_CLOSE_IDS = 500;
+
+/**
+ * Apply one SAFE Paper close to the owning session.
+ * Fail closed when ownership cannot be proven or the session is not active.
+ * Dedupes by closeId so the same unified result cannot increment twice.
+ */
+export function applySafePaperSessionCloseAccounting(input: {
+  paperSessionId: string | null | undefined;
+  paperStrategyId?: string | null;
+  closeId: string;
+  realizedNetUsdt: number;
+  options?: PaperSessionStoreOptions;
+}): PaperSession | null {
+  const sessionId = input.paperSessionId?.trim();
+  const closeId = input.closeId?.trim();
+  if (!sessionId || !closeId || !Number.isFinite(input.realizedNetUsdt)) {
+    return null;
+  }
+  const root = resolveRoot(input.options);
+  const session = readSessionRaw(root, sessionId);
+  if (!session) return null;
+  if (session.status !== "active") return null;
+  if (session.mode !== "paper") return null;
+  if (
+    input.paperStrategyId &&
+    input.paperStrategyId.trim() &&
+    session.strategyId !== input.paperStrategyId.trim()
+  ) {
+    return null;
+  }
+  const seen = session.accountedCloseIds ?? [];
+  if (seen.includes(closeId)) return session;
+  const accountedCloseIds = [...seen, closeId].slice(-MAX_ACCOUNTED_CLOSE_IDS);
+  return persistSession(
+    root,
+    bump(session, {
+      realizedPnl: Number(
+        (session.realizedPnl + input.realizedNetUsdt).toFixed(8),
+      ),
+      tradeCount: (session.tradeCount ?? 0) + 1,
+      accountedCloseIds,
     }),
   );
 }

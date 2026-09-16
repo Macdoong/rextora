@@ -15,6 +15,7 @@ import {
   evaluateCandidatePass,
 } from "./evaluationPolicy";
 import { createSeededRandom } from "./random";
+import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
 import { validateSearchParameterRanges } from "./paramSpace";
 import type {
   StrategySearchBacktestCostConfig,
@@ -79,6 +80,7 @@ export interface EvaluateCandidateJitterInput {
   scoreWeights: StrategySearchScoreWeights;
   config: StrategySearchJitterConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 const PROTECTED_HASH = "7893ca3f0e30";
@@ -317,6 +319,7 @@ export async function evaluateCandidateJitter(
         balance: input.balance,
         costConfig: input.baseCostConfig,
         preloadedCandlesByKey: input.preloadedCandlesByKey,
+        eventSequenceCostModel: input.eventSequenceCostModel,
       });
       const pass = evaluateCandidatePass({
         evaluation,

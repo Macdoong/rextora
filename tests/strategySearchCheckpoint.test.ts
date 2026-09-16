@@ -114,5 +114,33 @@ describe("strategySearch jobCheckpoint", () => {
     expect(p.statistics.generated).toBe(0);
     expect(p.jobStatus).toBe("queued");
     expect(p.prng).toEqual(prng);
+    expect(p).not.toHaveProperty("repeatedErrorSignatures");
+  });
+
+  it("round-trips additive repeatedErrorSignatures and loads missing as empty", () => {
+    const withCounts = samplePayload({
+      stopReason: "repeated_signature_auto_pause",
+      repeatedErrorSignatures: {
+        "VALIDATION_FAILED|candidate_invalid": 3,
+        "PARAMETER_OUT_OF_RANGE|parameter_out_of_range": 1,
+      },
+    });
+    const decoded = decodeRunnerCheckpointPayload(
+      encodeRunnerCheckpointPayload(withCounts),
+    );
+    expect(decoded?.repeatedErrorSignatures).toEqual({
+      "PARAMETER_OUT_OF_RANGE|parameter_out_of_range": 1,
+      "VALIDATION_FAILED|candidate_invalid": 3,
+    });
+    expect(decoded?.stopReason).toBe("repeated_signature_auto_pause");
+
+    const legacy = JSON.parse(
+      encodeRunnerCheckpointPayload(samplePayload()),
+    ) as Record<string, unknown>;
+    delete legacy.repeatedErrorSignatures;
+    delete legacy.stopReason;
+    const loaded = decodeRunnerCheckpointPayload(JSON.stringify(legacy));
+    expect(loaded).not.toHaveProperty("repeatedErrorSignatures");
+    expect(loaded?.seenHashes).toEqual(["aaa", "bbb"]);
   });
 });

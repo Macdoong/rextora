@@ -13,6 +13,7 @@ import {
   assertSessionIdMatch,
   assertSessionStrategyMatch,
   failPaperSession,
+  haltPaperSessionForRisk,
   getCurrentPaperSession,
   getExecutablePaperSession,
   getPaperSession,
@@ -35,6 +36,9 @@ import type { StoredStrategy } from "../strategy/strategyTypes";
 export {
   PaperSessionError,
   migratePaperSessionRecord,
+  haltPaperSessionForRisk,
+  paperSessionCapitalUsdt,
+  paperSessionOperatorView,
   type PaperSession,
   type PaperSessionStatus,
   type PreparePaperSessionInput,
@@ -334,12 +338,24 @@ export async function stopPaperSessionService(
 }
 
 /**
+ * Official risk-halt reconciliation. Persists session status only.
+ * Never starts or resumes the Paper executor.
+ */
+export function haltPaperSessionForRiskService(
+  input: { sessionId: string; lastError: string },
+  options?: PaperSessionServiceOptions,
+): PaperSession {
+  return haltPaperSessionForRisk(input.sessionId, input.lastError, options);
+}
+
+/**
  * After process restart: session disk is authoritative.
- * - active → safe-paused (require explicit resume) to avoid duplicate owner
- * - paused → remains paused
+ * - active remains active so boot runtime recovery can restore the executor
+ * - paused → remains paused (operator pause wins)
+ * - risk_halted → remains risk_halted (no auto-resume)
  * - stopped/failed → unchanged
  * - ready/pending → unchanged (never auto-start)
- * Stale paperActive flags never override session truth.
+ * Does not start or stop the executor. Does not create sessions.
  */
 export function recoverPaperSessionsAfterRestart(
   options?: PaperSessionServiceOptions,
@@ -355,14 +371,15 @@ export function recoverPaperSessionsAfterRestart(
   for (const session of listPaperSessions(options)) {
     recovered.push(session);
     if (session.status === "active") {
-      // Policy: active before crash → safe-paused (no auto executor).
-      const paused = pausePaperSession(session.id, options);
-      safePaused.push(paused.id);
       notes.push(
-        `session ${paused.id} was active at restart → safe-paused (explicit resume required)`,
+        `session ${session.id} remains active (runtime restore eligible)`,
       );
     } else if (session.status === "paused") {
       notes.push(`session ${session.id} remains paused`);
+    } else if (session.status === "risk_halted") {
+      notes.push(
+        `session ${session.id} remains risk_halted (explicit resume required, no auto-start)`,
+      );
     } else if (session.status === "stopped" || session.status === "failed") {
       notes.push(`session ${session.id} remains ${session.status}`);
     } else {

@@ -78,12 +78,28 @@ export async function handleSearchStatus(input: Record<string, unknown>) {
 export async function handleSearchResult(input: Record<string, unknown>) {
   const jobId = String(input.jobId ?? "");
   const best = getStrategySearchBestApi(jobId);
+  const groupAware = best.rankingAuthority === "rankingGroups";
   return {
     jobId,
-    bestCandidate: best.bestCandidate ?? null,
-    bestPassedCandidate: best.bestPassedCandidate ?? null,
-    bestTrial: best.bestTrial ?? null,
-    bestPassedTrial: best.bestPassedTrial ?? null,
+    rankingAuthority: best.rankingAuthority ?? "legacy_scalar",
+    rankingGroups: best.rankingGroups ?? [],
+    unknownLegacy: best.unknownLegacy ?? null,
+    bestSafeCandidate:
+      best.rankingGroups?.find(
+        (group) => group.rankingCompatibilityGroup === "safe_execution_price_v1",
+      )?.bestPassedCandidate ?? null,
+    bestPatternCandidate:
+      best.rankingGroups?.find(
+        (group) =>
+          group.rankingCompatibilityGroup === "event_sequence_ledger_v0",
+      )?.bestPassedCandidate ?? null,
+    note: groupAware
+      ? "SAFE and Pattern scores are not globally comparable. Use rankingGroups."
+      : "Legacy scalar best is compatibility-only.",
+    bestCandidate: groupAware ? null : (best.bestCandidate ?? null),
+    bestPassedCandidate: groupAware ? null : (best.bestPassedCandidate ?? null),
+    bestTrial: groupAware ? null : (best.bestTrial ?? null),
+    bestPassedTrial: groupAware ? null : (best.bestPassedTrial ?? null),
     gateNotes: best.gateNotes ?? [],
   };
 }

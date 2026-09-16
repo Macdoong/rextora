@@ -36,6 +36,7 @@ import type {
   StrategySearchPassPolicy,
   StrategySearchScoreWeights,
 } from "./types";
+import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
 
 const PROTECTED_STRATEGY_ID = "SAFE_v44_i4060";
 const PROTECTED_HASH = "7893ca3f0e30";
@@ -76,6 +77,7 @@ export interface EvaluateCompleteCandidateInput {
   costStressScenarios: StrategySearchCostStressScenario[];
   jitterConfig: StrategySearchJitterConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
+  eventSequenceCostModel?: EventSequenceCostModel | null;
 }
 
 function assertCandidateIdentity(candidate: StrategySearchCandidate): void {
@@ -145,6 +147,7 @@ export async function evaluateCompleteCandidate(
       balance: input.balance,
       costConfig: input.baseCostConfig,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
+      eventSequenceCostModel: input.eventSequenceCostModel,
     });
 
     // 3. Required-window gate (short-circuits score / stress / jitter)
@@ -174,6 +177,7 @@ export async function evaluateCompleteCandidate(
       passPolicy: input.passPolicy,
       scoreWeights: input.scoreWeights,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
+      eventSequenceCostModel: input.eventSequenceCostModel,
     });
 
     const costStressPassed = costStressResults.every(
@@ -194,6 +198,7 @@ export async function evaluateCompleteCandidate(
       scoreWeights: input.scoreWeights,
       config: input.jitterConfig,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
+      eventSequenceCostModel: input.eventSequenceCostModel,
     });
 
     // 8. Final decision

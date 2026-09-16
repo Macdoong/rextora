@@ -11,6 +11,7 @@ import {
   registerTrialForBacktest,
 } from "@/src/lib/rextora/strategySearch/researchResultsSummary";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 type Ctx = { params: Promise<{ jobId: string }> };
 
@@ -23,6 +24,8 @@ type Ctx = { params: Promise<{ jobId: string }> };
  * Never auto-registers all qualified trials.
  */
 export async function POST(request: Request, context: Ctx) {
+  const denied = await denyUnlessPermitted(request, "strategy:write");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { jobId } = await context.params;

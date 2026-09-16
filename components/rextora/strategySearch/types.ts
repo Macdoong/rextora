@@ -6,6 +6,7 @@
 export type StrategySearchJobStatus =
   | "queued"
   | "running"
+  | "interrupted"
   | "pause_requested"
   | "paused"
   | "cancel_requested"
@@ -179,6 +180,9 @@ export interface StrategySearchJobSummary {
   campaignStartedAtMs?: number | null;
   pausedAtMs?: number | null;
   accumulatedPauseMs?: number | null;
+  interruptedAtMs?: number | null;
+  accumulatedInterruptionMs?: number | null;
+  recoveryBlocker?: string | null;
   resumedAtMs?: number | null;
   expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
@@ -189,6 +193,43 @@ export interface StrategySearchJobSummary {
   bestScore: number | null;
   bestCandidateHash: string | null;
   bestPassedCandidateHash: string | null;
+  /** Authoritative group ranking. Scalars above are compatibility-only. */
+  rankingGroups?: Array<{
+    rankingCompatibilityGroup:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    engineCostModel:
+      | "safe_execution_price_v1"
+      | "event_sequence_execution_price_v1"
+      | "event_sequence_ledger_v0";
+    rankingEligible: true;
+    bestCandidate: StrategySearchBestRef | null;
+    bestPassedCandidate: StrategySearchBestRef | null;
+    topCandidates: Array<{
+      iteration: number;
+      paramsHash: string;
+      score: number | null;
+      passed: boolean;
+      researchEvaluationHash?: string | null;
+      engineCostModel?: string | null;
+      rankingCompatibilityGroup?: string | null;
+      rankingEligible?: boolean;
+      promotionEligible?: boolean;
+      provenanceStatus?:
+        | "stamped"
+        | "reconstructed"
+        | "legacy_unclassified"
+        | null;
+    }>;
+  }>;
+  unknownLegacy?: {
+    rankingCompatibilityGroup: "unknown_legacy";
+    rankingEligible: false;
+    promotionEligible: false;
+    provenanceStatus: "legacy_unclassified";
+    count: number;
+  };
   failureMessage: string | null;
   terminationReason?: string | null;
   executionActive: boolean;
@@ -208,6 +249,10 @@ export interface StrategySearchJobSummary {
   completionReason?: StrategySearchCompletionReason | string | null;
   candidateBudget?: number | null;
   promotionWarnings?: number | null;
+  /** Derived live error-rate warning (not persisted). */
+  errorRate?: number;
+  errorWarningActive?: boolean;
+  errorWarningRate?: number;
   currentSearchFamily?: string | null;
   currentCombinationLabel?: string | null;
   patternCombinationFamilies?: string[] | null;
@@ -333,7 +378,9 @@ export interface StrategySearchJobSummary {
   initialCandidateBudget?: number | null;
   resourceSafetyCeiling?: number | null;
   outcomePresentation?:
+    | "queued"
     | "running"
+    | "interrupted"
     | "completed"
     | "user_stopped"
     | "cancelled"
@@ -431,6 +478,16 @@ export interface StrategySearchTrialRow {
   jitterPassed?: boolean | null;
   jitterEnabled?: boolean | null;
   params?: Record<string, unknown> | null;
+  researchEvaluationHash?: string | null;
+  engineCostModel?: string | null;
+  rankingCompatibilityGroup?: string | null;
+  rankingEligible?: boolean;
+  promotionEligible?: boolean;
+  provenanceStatus?:
+    | "stamped"
+    | "reconstructed"
+    | "legacy_unclassified"
+    | null;
   registeredStrategyId?: string | null;
   registrationState?:
     | "not_registered"
@@ -469,6 +526,9 @@ export interface StrategySearchTrialDetail {
 export interface StrategySearchBestResult {
   bestCandidate: StrategySearchBestRef | null;
   bestPassedCandidate: StrategySearchBestRef | null;
+  rankingGroups?: StrategySearchJobSummary["rankingGroups"];
+  unknownLegacy?: StrategySearchJobSummary["unknownLegacy"];
+  rankingAuthority?: "rankingGroups" | "legacy_scalar";
   bestTrial: StrategySearchTrialDetail | null;
   bestPassedTrial: StrategySearchTrialDetail | null;
   gateNotes: {
@@ -700,6 +760,8 @@ export interface ResearchResultsSummaryView {
   topProfit: ResearchResultCardView | null;
   topStable: ResearchResultCardView | null;
   topRecommend: ResearchResultCardView | null;
+  rankingGroups?: StrategySearchJobSummary["rankingGroups"];
+  unknownLegacy?: StrategySearchJobSummary["unknownLegacy"];
   backtestRecommendations: ResearchResultCardView[];
   /** Persistent Top-10 shortlist (canonical Results focus). */
   top10: ResearchResultCardView[];

@@ -1,4 +1,5 @@
 import { resumeStrategySearchJobApi } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 import {
   strategySearchError,
   strategySearchJson,
@@ -8,6 +9,8 @@ type Ctx = { params: Promise<{ jobId: string }> };
 
 /** POST /api/rextora/strategy-search/[jobId]/resume */
 export async function POST(_request: Request, context: Ctx) {
+  const denied = await denyUnlessPermitted(_request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { jobId } = await context.params;

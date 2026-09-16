@@ -1,7 +1,7 @@
 import { readJsonStore, writeJsonStore } from "./storage/jsonStore";
 import { getConfig } from "./config";
 import { riskStatusSeed } from "./seedData";
-import type { RiskState, RiskStatus } from "./types";
+import type { RiskState, RiskStatus, TradingMode } from "./types";
 import { isRiskLimitBreached } from "./riskRules";
 import { computeRiskUsagePct, normalizeDailyLossPct } from "./metrics/riskFormulas";
 
@@ -28,6 +28,11 @@ export function loadPaperRiskState(): RiskStatus {
   return applyPaperRiskDefaults(loadRiskState());
 }
 
+/** Mode-aware risk authority. Paper overlay is in-memory only. */
+export function getEffectiveRiskState(mode: TradingMode): RiskStatus {
+  return mode === "PAPER" ? loadPaperRiskState() : loadRiskState();
+}
+
 /** Start a deliberately new Paper simulation without reusing prior outcomes. */
 export function resetPaperRiskStateForNewSession(): RiskStatus {
   const shared = loadRiskState();
@@ -36,6 +41,9 @@ export function resetPaperRiskStateForNewSession(): RiskStatus {
     ...shared,
     settings: {
       ...shared.settings,
+      // Persist the Live/shared store threshold so Paper reset cannot loosen Live.
+      // Paper runtime continues to overlay PAPER_MAX_CONSECUTIVE_LOSSES via
+      // applyPaperRiskDefaults / loadPaperRiskState.
       consecutiveLossLimit: liveConsecutiveLossLimit
     },
     dailyLossPct: 0,

@@ -54,6 +54,62 @@ export function getAccountState(): AccountState {
   return accountState;
 }
 
+/** Paper Event-Sequence realized PnL only. Does not touch Live balances. */
+/** In-memory Paper reconstruction only. Does not persist. Does not touch Live. */
+export function replacePaperAccountBalances(input: {
+  balanceUsdt: number;
+  availableBalanceUsdt: number;
+}): AccountState {
+  if (accountState.mode === "LIVE") {
+    return accountState;
+  }
+  if (
+    !Number.isFinite(input.balanceUsdt) ||
+    !Number.isFinite(input.availableBalanceUsdt)
+  ) {
+    return accountState;
+  }
+  accountState = {
+    ...accountState,
+    balanceUsdt: Number(input.balanceUsdt.toFixed(8)),
+    availableBalanceUsdt: Number(input.availableBalanceUsdt.toFixed(8)),
+  };
+  return accountState;
+}
+
+export function applyPaperRealizedPnl(deltaUsdt: number): AccountState {
+  if (!Number.isFinite(deltaUsdt) || accountState.mode === "LIVE") {
+    return accountState;
+  }
+  const nextBalance = Number((accountState.balanceUsdt + deltaUsdt).toFixed(8));
+  const nextAvailable = Number(
+    (accountState.availableBalanceUsdt + deltaUsdt).toFixed(8),
+  );
+  accountState = {
+    ...accountState,
+    balanceUsdt: nextBalance,
+    availableBalanceUsdt: nextAvailable,
+  };
+  return accountState;
+}
+
+export function resetAccountStateForTests(partial?: Partial<AccountState>): AccountState {
+  accountState = {
+    mode: "PAPER",
+    balanceUsdt: 10_000,
+    availableBalanceUsdt: 10_000,
+    positions: [],
+    openOrders: [],
+    lastSyncAt: null,
+    source: "mock",
+    userStreamConnected: false,
+    userStreamLastEventAt: null,
+    initialSeedUsdt: 10_000,
+    ...partial,
+  };
+  return accountState;
+}
+
 export function initializeSeed(seed: number): void {
   accountState = { ...accountState, initialSeedUsdt: seed };
 }

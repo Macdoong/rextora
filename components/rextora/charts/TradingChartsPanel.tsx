@@ -63,6 +63,7 @@ export function TradingChartsPanel({
   riskView,
   symbol,
   sessionActive = true,
+  idleCopy,
 }: {
   mode: "PAPER" | "LIVE";
   metrics: UnifiedMetricsSnapshot | null;
@@ -70,6 +71,12 @@ export function TradingChartsPanel({
   symbol?: string;
   /** When false, hide zero-filled metric grids and show idle guidance. */
   sessionActive?: boolean;
+  idleCopy?: {
+    message: string;
+    hint: string;
+    actionHref?: string;
+    actionLabel?: string;
+  };
 }) {
   const [candles, setCandles] = useState<CandlePoint[]>([]);
   const [candlesLoading, setCandlesLoading] = useState(true);
@@ -152,15 +159,28 @@ export function TradingChartsPanel({
           <IdlePanel
             testId={isLive ? "live-charts-idle" : "paper-charts-idle"}
             icon={<Activity className="h-5 w-5" aria-hidden />}
-            message="아직 거래가 시작되지 않았습니다."
-            hint={
-              isLive
-                ? "안전 게이트를 통과한 뒤 실전 매매를 시작하면 차트와 지표가 표시됩니다."
-                : "모의매매를 시작하면 차트·손익·거래 내역이 여기에 표시됩니다."
+            message={
+              idleCopy?.message ?? "아직 거래가 시작되지 않았습니다."
             }
-            actionHref={isLive ? "/settings" : "/results"}
+            hint={
+              idleCopy?.hint ??
+              (isLive
+                ? "안전 게이트를 통과한 뒤 실전 매매를 시작하면 차트와 지표가 표시됩니다."
+                : "모의매매를 시작하면 차트·손익·거래 내역이 여기에 표시됩니다.")
+            }
+            actionHref={
+              idleCopy
+                ? idleCopy.actionHref
+                : isLive
+                  ? "/settings"
+                  : "/results"
+            }
             actionLabel={
-              isLive ? "시스템 설정에서 실전 허용 확인" : "탐색 결과에서 전략 등록"
+              idleCopy
+                ? idleCopy.actionLabel
+                : isLive
+                  ? "시스템 설정에서 실전 허용 확인"
+                  : "탐색 결과에서 전략 등록"
             }
           />
         </Card>

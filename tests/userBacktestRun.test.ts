@@ -14,6 +14,7 @@ import type {
 import { evaluateLiveCandidateRegistration } from "../src/lib/rextora/results/liveCandidateEligibility";
 import { operatorFormToCreateBody } from "../components/rextora/strategySearch/formDefaults";
 import { createDefaultOperatorFormState } from "../components/rextora/strategySearch/formDefaults";
+import { overrideRextoraDataDir } from "./helpers/productionResearchBaseline";
 
 const ROOT = path.resolve(__dirname, "..");
 
@@ -46,17 +47,20 @@ function stubReport(
 describe("user Backtest Run workflow", () => {
   let prevCwd: string;
   let tmp: string;
+  let restoreDataDir: (() => void) | undefined;
 
   beforeEach(() => {
     tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-bt-run-"));
     prevCwd = process.cwd();
     process.chdir(tmp);
-    fs.mkdirSync(path.join(tmp, "data", "rextora", "backtests"), {
-      recursive: true,
-    });
+    const dataRoot = path.join(tmp, "data", "rextora");
+    fs.mkdirSync(path.join(dataRoot, "backtests"), { recursive: true });
+    restoreDataDir = overrideRextoraDataDir(dataRoot);
   });
 
   afterEach(() => {
+    restoreDataDir?.();
+    restoreDataDir = undefined;
     process.chdir(prevCwd);
     fs.rmSync(tmp, { recursive: true, force: true });
   });

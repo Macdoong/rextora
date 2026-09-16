@@ -51,7 +51,10 @@ export {
 } from "./searchId";
 
 export type { StrategySearchStoreOptions } from "./jobStore";
-export { StrategySearchPersistenceError } from "./jobStore";
+export {
+  StrategySearchPersistenceError,
+  projectSearchJobIndexEntry,
+} from "./jobStore";
 
 export {
   createSearchJob,
@@ -64,6 +67,7 @@ export {
   markSearchJobCancelling,
   markSearchJobCompleted,
   markSearchJobFailed,
+  markSearchJobInterrupted,
   markSearchJobPaused,
   markSearchJobRunning,
   requestCancelSearchJob,
@@ -192,6 +196,7 @@ export {
   transitionJobToCancelled,
   transitionJobToCompleted,
   transitionJobToFailed,
+  transitionJobToInterrupted,
   transitionJobToPauseRequested,
   transitionJobCooperativelyPaused,
   transitionJobToPaused,
@@ -204,9 +209,11 @@ export type {
   StrategySearchJobStatistics,
 } from "./jobStatistics";
 export {
+  ERROR_RATE_MIN_EVALUATED,
   assertCanonicalCounterInvariant,
   createEmptyJobStatistics,
   deriveCanonicalCounters,
+  deriveErrorRateWarning,
   isBetterScore,
   recordDuplicate,
   recordElapsed,
@@ -214,10 +221,14 @@ export {
   recordEvaluation,
   recordGenerated,
 } from "./jobStatistics";
+export type { StrategySearchErrorRateWarning } from "./jobStatistics";
 
 export {
+  buildRepeatedGenerationErrorFingerprint,
   classifyEngineError,
+  isInvalidParameterRangesError,
   isRecoverableGenerationError,
+  isResearchMarketDataError,
 } from "./engineErrorClassification";
 export type { StrategySearchEngineErrorClass } from "./engineErrorClassification";
 
@@ -279,17 +290,21 @@ export type {
   StrategySearchExecutionProfile,
 } from "./jobExecutionProfile";
 export {
+  NEW_JOB_EVENT_SEQUENCE_COST_MODEL,
   STRATEGY_SEARCH_EXECUTION_PROFILE_VERSION,
   getJobExecutionProfile,
+  resolveProfileEventSequenceCostModel,
   saveJobExecutionProfile,
 } from "./jobExecutionProfile";
 
 export type { SearchJobExecutionDeps } from "./jobExecutionRegistry";
 export {
   StrategySearchExecutionRegistryError,
+  isNormalSearchCompletionReason,
   isSearchJobExecutionActive,
   isSearchJobExecutionWorkerActive,
   listActiveSearchJobExecutions,
+  planHasNormalTerminalCompletionReason,
   resetSearchJobExecutionRegistryForTests,
   setDefaultSearchJobExecutionDepsForTests,
   startSearchJobExecution,
@@ -299,6 +314,7 @@ export {
 export type {
   JobExecutionOwnershipAuditRecord,
   JobExecutionOwnershipRecord,
+  StaleJobExecutionOwnershipRecovery,
 } from "./jobExecutionOwnership";
 export {
   acquireJobExecutionOwnership,
@@ -307,6 +323,7 @@ export {
   isJobExecutionOwnedOnDisk,
   listJobExecutionOwnershipAudits,
   recoverStaleJobExecutionOwnership,
+  recoverStaleJobExecutionOwnershipDetailed,
   releaseJobExecutionOwnership,
   resetJobExecutionOwnershipForTests,
 } from "./jobExecutionOwnership";
@@ -369,11 +386,93 @@ export {
   createEmptySearchPlan,
   getSearchPlan,
   markPlanPaused,
+  markPlanInterrupted,
+  markPlanInterruptionResumed,
   markPlanResumed,
   saveSearchPlan,
   syncPlanTimingFields,
   replenishDeadlineBudget,
 } from "./searchPlan";
+
+export type {
+  InterruptedRecoveryBlocker,
+  InterruptedRecoveryInspection,
+} from "./processInterruption";
+export {
+  completeInterruptedJobAtDeadline,
+  inspectInterruptedRecovery,
+  interruptRunningJobFromStaleOwnership,
+  prepareInterruptedJobForRecovery,
+  resolveProcessInterruptionBoundaryMs,
+  rollbackPreparedInterruptedRecovery,
+} from "./processInterruption";
+
+export type {
+  CanonicalHistoricalInventoryRow,
+  HistoricalBoundaryConfidence,
+  HistoricalBudgetVerdict,
+  HistoricalCheckpointVerdict,
+  HistoricalProcessLossApplyResult,
+  HistoricalProcessLossCandidate,
+  HistoricalProcessLossClassification,
+  HistoricalProcessLossDryRunResult,
+} from "./historicalProcessLossRecovery";
+export {
+  canonicalHistoricalInventoryDigest,
+  recoverHistoricalProcessLossOrphans,
+} from "./historicalProcessLossRecovery";
+
+export {
+  APPROVED_P2_E2B_RECONCILE_IDS,
+  INDEX_PROJECTION_FIELDS,
+  assessJobCatalogAuthority,
+  buildIndexReconciliationPlan,
+  projectIndexInPlace,
+} from "./indexReconciliationPlan";
+export type {
+  IndexReconciliationPlanResult,
+  IndexReconciliationTarget,
+} from "./indexReconciliationPlan";
+export {
+  loadRawIndexReconciliationSnapshot,
+  runIndexReconciliationDryRun,
+} from "./indexReconciliationDryRun";
+export {
+  applyApprovedIndexReconciliation,
+  EXPECTED_POST_APPLY_INDEX_SHA256,
+  EXPECTED_PRE_APPLY_INDEX_SHA256,
+} from "./indexReconciliationApply";
+export {
+  APPROVED_P2_F2B_IDS,
+  CANONICAL_COMPLETION_WRITE_SET,
+  FINISHED_AT_CONTRACT,
+  expectedOutcomeAfterProposal,
+  expectedPendingAfterProposal,
+  loadHistoricalDeadlineDryRun,
+  projectHistoricalDeadlineCompletion,
+  reconstructHistoricalFinishedAt,
+  writeHistoricalDeadlineDryRunArtifacts,
+} from "./historicalDeadlineCompletionDryRun";
+export {
+  APPROVED_HISTORICAL_FINISHED_AT,
+  EXPECTED_F2B_MANIFEST_SHA256,
+  EXPECTED_POST_APPLY_INDEX_SHA256 as EXPECTED_F2C_POST_APPLY_INDEX_SHA256,
+  EXPECTED_PRE_APPLY_INDEX_SHA256 as EXPECTED_F2C_PRE_APPLY_INDEX_SHA256,
+  applyApprovedHistoricalDeadlineCompletion,
+  evaluateHistoricalDeadlineApplyGates,
+} from "./historicalDeadlineCompletionApply";
+export {
+  classifyCheckpoint,
+  classifyInterruptedJob,
+  classifyQueuedJob,
+  detectDashboardContradiction,
+  loadResidualLifecycleInventory,
+  writeResidualLifecycleInventoryArtifacts,
+} from "./residualLifecycleInventory";
+export {
+  planOrphanStartupSelection,
+  STARTUP_CANDIDATE_ORDER,
+} from "./startupResumePolicyDiagnosis";
 
 export {
   buildReadableStrategyIdentity,
@@ -385,7 +484,11 @@ export {
   formatMetricOrUnavailable,
 } from "./performanceSummary";
 
-export { runOrchestratedSearchJob, retryFailedPromotions } from "./searchOrchestrator";
+export {
+  nextQualified,
+  runOrchestratedSearchJob,
+  retryFailedPromotions,
+} from "./searchOrchestrator";
 
 export type {
   StrategyWeaknessCategory,
@@ -412,8 +515,14 @@ export {
 export type { PaperFeedback } from "./paperFeedback";
 export { buildPaperFeedback } from "./paperFeedback";
 
-export { recoverOrphanSearchJobs } from "./orphanJobRecovery";
-export type { OrphanJobRecoveryResult } from "./orphanJobRecovery";
+export {
+  recoverOrphanSearchJobs,
+  inspectOrphanSearchJobs,
+} from "./orphanJobRecovery";
+export type {
+  OrphanJobRecoveryResult,
+  OrphanJobInspectionResult,
+} from "./orphanJobRecovery";
 
 export {
   CANCEL_ACK_TIMEOUT_MS,

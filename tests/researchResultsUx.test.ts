@@ -565,6 +565,8 @@ describe("UI source contracts", () => {
     expect(src).toContain("stageBasicQualified");
     expect(src).toContain("pageSize");
     expect(src).toContain("explorer-pagination");
+    expect(src).toContain("표시 기준");
+    expect(src).not.toContain("상태 배지 안내");
     expect(src).toContain("전략 등록 후 백테스트");
     expect(src).not.toContain("ResearchCardView");
   });

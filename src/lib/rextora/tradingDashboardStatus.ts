@@ -1,7 +1,8 @@
 import { rankCandidates } from "./aiRanker";
 import { getAccountState } from "./accountStateStore";
+import { getCurrentPaperSession } from "./paper/paperSessionStore";
 import { getMarketDataSnapshot } from "./marketDataStore";
-import { getOpenPositions } from "./positionManager";
+import { getAllPaperPositions, getOpenPositions } from "./positionManager";
 import { evaluateLiveSafetyGate } from "./liveSafetyGate";
 import {
   getServerTpSlReadiness,
@@ -77,6 +78,21 @@ export interface DashboardPositionRow {
   currentSignal: string;
   entryReason: string;
   holdTimeLabel: string;
+  paperSessionId?: string;
+  paperStrategyId?: string;
+  paperLifecycleModel?: string;
+  maxHoldBars?: number;
+  barsHeld?: number;
+  lastProcessedFinalizedCandle?: {
+    symbol?: string;
+    intervalMs?: number;
+    openTime: number;
+    closeTime?: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
   modeLabel: "모의 거래" | "실전 거래";
   protectionLabel: PositionProtectionLabel;
 }
@@ -111,6 +127,9 @@ export interface DashboardRecentTradeRow {
   slippage?: number;
   holdingTimeLabel?: string;
   realizedUsdt?: number;
+  strategyId?: string;
+  paperSessionId?: string;
+  mode?: "PAPER" | "LIVE";
 }
 
 export interface DashboardTodayStats {
@@ -197,6 +216,8 @@ export interface TradingDashboardStatus {
   topCandidates: DashboardCandidateRow[];
   selectedCandidate: DashboardCandidateRow | null;
   positions: DashboardPositionRow[];
+  /** All stored Paper positions including Flat — operator audit only. */
+  paperPositions: DashboardPositionRow[];
   position: DashboardPositionRow | null;
   queueSummary: {
     received: number;
@@ -339,6 +360,13 @@ function mapPaperPosition(position: Position): DashboardPositionRow {
       stopLoss: position.stopLoss,
       takeProfit: position.takeProfit,
     }),
+    paperSessionId: position.paperSessionId,
+    paperStrategyId: position.paperStrategyId,
+    paperLifecycleModel: position.paperLifecycleModel,
+    maxHoldBars: position.maxHoldBars,
+    barsHeld: position.barsHeld,
+    lastProcessedFinalizedCandle:
+      position.eventSequencePaper?.lastProcessedFinalizedCandle,
   };
 }
 
@@ -423,6 +451,8 @@ function mapUnifiedTrade(trade: UnifiedTradeResult): DashboardRecentTradeRow {
     slippage: trade.slippage,
     holdingTimeLabel: trade.holdingTimeLabel,
     realizedUsdt: trade.realizedUsdt,
+    strategyId: trade.strategyId,
+    mode: trade.mode,
   };
 }
 
@@ -432,6 +462,12 @@ function buildRecentTrades(limit = 10): DashboardRecentTradeRow[] {
 
 function buildTodayStats(): DashboardTodayStats {
   const m = getUnifiedMetrics();
+  const session = getCurrentPaperSession();
+  const paperEquity = session
+    ? Number((session.virtualBalance + session.realizedPnl).toFixed(4))
+    : undefined;
+  const liveEquity =
+    getAccountState().mode === "LIVE" ? m.accountEquity : undefined;
   return {
     realizedPnlPct: m.todayRealizedPnlPct,
     trades: m.todayTradeCount,
@@ -441,8 +477,8 @@ function buildTodayStats(): DashboardTodayStats {
     feeUsdt: m.todayFeeUsdt,
     fundingUsdt: m.todayFundingUsdt,
     slippageUsdt: m.todaySlippageUsdt,
-    accountEquity: m.accountEquity,
-    accountReturnPct: m.accountReturnPct,
+    accountEquity: paperEquity ?? liveEquity,
+    accountReturnPct: paperEquity != null ? m.accountReturnPct : liveEquity != null ? m.accountReturnPct : undefined,
   };
 }
 
@@ -655,7 +691,7 @@ export function buildTradingDashboardStatus(
     todayStats: buildTodayStats(),
     initialSeed: state.initialSeedUsdt ?? "확인 불가",
     opportunities,
-    recentTrades: buildRecentTrades(10),
+    recentTrades: buildRecentTrades(40),
     activeStrategy: {
       name: strategyMeta.name,
       paramsHash: strategyMeta.paramsHash,
@@ -675,6 +711,7 @@ export function buildTradingDashboardStatus(
     topCandidates,
     selectedCandidate: executionTop,
     positions,
+    paperPositions: getAllPaperPositions().map(mapPaperPosition),
     position: positions[0] ?? null,
 
     queueSummary: {

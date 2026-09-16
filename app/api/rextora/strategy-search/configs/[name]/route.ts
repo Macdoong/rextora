@@ -7,11 +7,15 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 type RouteContext = { params: Promise<{ name: string }> };
 
 /** GET /api/rextora/strategy-search/configs/[name] */
 export async function GET(_request: Request, context: RouteContext) {
+  const denied = await denyUnlessAuthenticated(_request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const { name } = await context.params;
@@ -27,6 +31,8 @@ export async function GET(_request: Request, context: RouteContext) {
 
 /** DELETE /api/rextora/strategy-search/configs/[name] */
 export async function DELETE(_request: Request, context: RouteContext) {
+  const denied = await denyUnlessPermitted(_request, "research:run");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const { name } = await context.params;

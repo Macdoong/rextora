@@ -1,3 +1,5 @@
+export const PAPER_SCAN_TASK_ID = "rextora-scan-loop";
+
 type ScheduledTask = {
   id: string;
   intervalMs: number;
@@ -28,4 +30,8 @@ export function cancelAllScheduledTasks(): void {
 
 export function listScheduledTasks(): string[] {
   return Array.from(tasks.keys());
+}
+
+export function hasScheduledTask(id: string): boolean {
+  return tasks.has(id);
 }

@@ -1,0 +1,685 @@
+/**
+ * V3.7 Settings presentation. Scoped to .v3-settings.
+ * Presentation only. Does not change save, flags, credentials, or Risk authority.
+ */
+
+.v3-shell:has(.v3-settings) .dashboard-main {
+  background: var(--v3-background);
+  color: var(--v3-text-primary);
+}
+
+.v3-shell:has(.v3-settings) .rextora-main-workspace,
+.v3-shell:has(.v3-settings) .rextora-main-content {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.v3-settings.rextora-page {
+  --bg: var(--v3-background);
+  --bg-elevated: var(--v3-surface);
+  --panel: var(--v3-surface);
+  --panel-strong: var(--v3-surface-subtle);
+  --border: var(--v3-border);
+  --text: var(--v3-text-primary);
+  --text-primary: var(--v3-text-primary);
+  --text-secondary: var(--v3-text-secondary);
+  --text-muted: var(--v3-text-muted);
+  max-width: var(--v3-content);
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px;
+  display: grid;
+  gap: 14px;
+  color: var(--v3-text-primary);
+  word-break: keep-all;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+.v3-st-pagehead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.v3-st-pagehead header { margin: 0; }
+
+.v3-st-pagehead h1,
+.v3-st-pagehead .rextora-page-title {
+  margin: 0;
+  font-size: 31px !important;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  color: var(--v3-text-primary);
+}
+
+.v3-st-pagehead p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-asof {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--v3-text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.v3-st-workspace {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.v3-st-menu {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.v3-st-menu button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-menu button:hover {
+  background: #f7f9fb;
+  color: var(--v3-text-primary);
+}
+
+.v3-st-menu button.is-active {
+  background: var(--v3-brand-soft);
+  color: var(--v3-brand);
+  font-weight: 760;
+}
+
+.v3-st-panel {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+.v3-st-lede {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.v3-st-group {
+  display: grid;
+  gap: 8px;
+}
+
+.v3-st-group + .v3-st-group {
+  margin-top: 14px;
+}
+
+.v3-st-group-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-metric {
+  border: 1px solid var(--v3-border);
+  border-radius: 11px;
+  background: var(--v3-surface-subtle);
+  padding: 12px;
+  min-width: 0;
+}
+
+.v3-st-metric span {
+  display: block;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--v3-text-muted);
+}
+
+.v3-st-metric b {
+  display: block;
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 750;
+  color: var(--v3-text-primary);
+}
+
+.v3-st-metric b.ok { color: var(--v3-success); }
+.v3-st-metric b.warn { color: var(--v3-warning); }
+.v3-st-metric b.bad { color: var(--v3-danger); }
+
+.v3-st-metric b .v3-st-unit {
+  display: inline;
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-warn {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #f0dfb0;
+  background: var(--v3-warning-soft);
+  color: var(--v3-text-primary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.v3-st-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.v3-st-cost-summary {
+  margin: 0 0 14px;
+}
+
+.v3-st-form[data-section="cost"] .v3-st-field:has(input[type="checkbox"]) {
+  grid-column: 1 / -1;
+}
+
+.v3-st-form[data-section="telegram"] .v3-st-field:has(input[type="checkbox"]) {
+  min-width: 0;
+}
+
+.v3-st-input-unit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.v3-st-unit {
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--v3-text-secondary);
+  min-width: 2.25em;
+}
+
+.v3-st-field:has([data-testid="settings-symbol-list"]) {
+  grid-column: 1 / -1;
+}
+
+.v3-st-symbol-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.v3-st-symbol-expanded {
+  animation: v3-screen-in 180ms var(--v3-ease-panel) both;
+}
+
+.v3-st-symbol-more {
+  min-height: 44px;
+  align-self: start;
+  padding: 0 12px;
+  border: 1px solid var(--v3-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--v3-brand);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.v3-st-tech-keys {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.v3-st-tech-keys li {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-tech-keys span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--v3-text-muted);
+}
+
+.v3-st-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.v3-st-field > span,
+.v3-settings .v3-st-field .rextora-body {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--v3-text-primary);
+}
+
+.v3-st-help,
+.v3-settings .v3-st-field .rextora-helper {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--v3-brand);
+  background: #fff;
+  border: 1px solid var(--v3-border);
+  border-radius: 4px;
+}
+
+.v3-st-field input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.v3-st-field select,
+.v3-st-field textarea,
+.v3-settings .v3-st-field .rextora-input,
+.v3-settings .v3-st-field .rextora-body.w-full {
+  width: 100%;
+  min-height: 44px;
+  max-height: none;
+  align-self: start;
+  padding: 10px 12px;
+  border: 1px solid var(--v3-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--v3-text-primary);
+  font: inherit;
+}
+
+.v3-st-sensitive {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #f0dfb0;
+  background: var(--v3-warning-soft);
+}
+
+.v3-st-sensitive.is-danger {
+  border-color: #f0c7c7;
+  background: var(--v3-danger-soft);
+}
+
+.v3-st-metric b.v3-st-wrap,
+.v3-st-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.v3-st-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.v3-st-dirty {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--v3-warning);
+}
+
+.v3-st-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--v3-danger);
+}
+
+.v3-st-ok {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--v3-success);
+}
+
+.v3-st-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.v3-st-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--v3-border);
+  background: var(--v3-surface-subtle);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--v3-text-secondary);
+}
+
+.v3-st-disc {
+  margin-top: 14px;
+  border: 1px solid var(--v3-border);
+  border-radius: 12px;
+  background: var(--v3-surface-subtle);
+  padding: 4px 14px 12px;
+}
+
+.v3-st-disc > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--v3-text-primary);
+}
+
+.v3-settings details[open] > :not(summary) {
+  animation: v3-screen-in var(--v3-motion-base) var(--v3-ease-panel) both;
+}
+
+.v3-st-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--v3-border-soft);
+}
+
+.v3-st-row:last-child { border-bottom: 0; }
+
+.v3-st-row small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--v3-text-secondary);
+}
+
+.v3-settings .v3-card,
+.v3-settings .rextora-card {
+  min-width: 0;
+  background: var(--v3-surface) !important;
+  border: 1px solid var(--v3-border) !important;
+  box-shadow: var(--v3-shadow-sm) !important;
+  color: var(--v3-text-primary);
+}
+
+.v3-settings .rextora-input,
+.v3-settings textarea.rextora-body,
+.v3-settings input.rextora-body,
+.v3-settings select.rextora-body {
+  background: #fff !important;
+  color: var(--v3-text-primary) !important;
+  border: 1px solid var(--v3-border) !important;
+  min-height: 44px;
+}
+
+.v3-settings .rextora-badge {
+  font-weight: 700;
+}
+
+.v3-settings .border-slate-600\/80.bg-slate-800\/80,
+.v3-settings .bg-slate-800\/50,
+.v3-settings .bg-slate-800\/80,
+.v3-settings .bg-slate-800\/90 {
+  background: var(--v3-surface-subtle) !important;
+  border-color: var(--v3-border) !important;
+  color: var(--v3-text-primary) !important;
+}
+
+.v3-settings .bg-emerald-500\/10 { background: var(--v3-success-soft) !important; }
+.v3-settings .bg-amber-500\/10 { background: var(--v3-warning-soft) !important; }
+.v3-settings .bg-red-500\/10,
+.v3-settings .bg-rose-500\/10 { background: var(--v3-danger-soft) !important; }
+.v3-settings .bg-sky-500\/10,
+.v3-settings .bg-indigo-500\/10 { background: var(--v3-brand-soft) !important; }
+
+.v3-settings .text-emerald-200,
+.v3-settings .text-emerald-300 { color: var(--v3-success) !important; }
+.v3-settings .text-amber-200 { color: var(--v3-warning) !important; }
+.v3-settings .text-red-200,
+.v3-settings .text-red-300,
+.v3-settings .text-rose-200,
+.v3-settings .text-rose-300 { color: var(--v3-danger) !important; }
+.v3-settings .text-sky-200,
+.v3-settings .text-indigo-200 { color: var(--v3-brand) !important; }
+
+.v3-settings button.border-sky-500\/40,
+.v3-settings a.bg-sky-600 {
+  min-height: 44px;
+}
+
+.v3-settings [data-testid="expert-mode-toggle"],
+.v3-settings [data-testid="expert-wizard-link"],
+.v3-settings [data-testid="risk-settings-save"],
+.v3-settings [data-testid="risk-settings-reset"],
+.v3-settings [data-testid^="ai-provider-card-"] button {
+  min-height: 44px;
+}
+
+.v3-settings .v3-st-expert .v3-st-toolbar {
+  margin-top: 4px;
+}
+
+.v3-settings .v3-st-ai-grid {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .v3-settings .v3-st-ai-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.v3-settings .v3-st-model-id {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.v3-settings .v3-st-metric b.v3-st-model-id {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.v3-settings select.v3-st-model-id {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v3-settings button.rextora-btn-text,
+.v3-settings .v3-st-toolbar button {
+  min-height: 44px;
+}
+
+.v3.v3-settings [data-testid="settings-tabs"] button[class*="bg-emerald"],
+.v3.v3-settings button.rextora-btn-text[data-testid="risk-settings-save"] {
+  background: linear-gradient(180deg, var(--v3-brand), var(--v3-brand-hover)) !important;
+  color: #fff !important;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 7px 15px rgba(50, 87, 215, 0.16);
+}
+
+.v3.v3-settings [data-testid="settings-tabs"] button[class*="bg-slate"],
+.v3.v3-settings button.rextora-btn-text[data-testid="risk-settings-reset"],
+.v3.v3-settings button.rextora-btn-text.bg-slate-800\/90[data-testid="risk-settings-reset"] {
+  background: #fff !important;
+  color: var(--v3-text-primary) !important;
+  border: 1px solid var(--v3-border) !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+.v3-settings .text-slate-100,
+.v3-settings .text-slate-200,
+.v3-settings .text-white,
+.v3-settings .rextora-card-title,
+.v3-settings .rextora-metric-primary,
+.v3-settings .rextora-metric-secondary {
+  color: var(--v3-text-primary) !important;
+}
+
+.v3-settings .text-slate-300,
+.v3-settings .text-slate-400,
+.v3-settings .text-slate-500,
+.v3-settings .rextora-helper,
+.v3-settings .rextora-caption,
+.v3-settings .rx-text-muted {
+  color: var(--v3-text-secondary) !important;
+}
+
+.v3-settings .text-red-300,
+.v3-settings .text-rose-300,
+.v3-settings .text-red-100 {
+  color: var(--v3-danger) !important;
+}
+
+.v3-settings .text-emerald-300 {
+  color: var(--v3-success) !important;
+}
+
+.v3-settings .text-amber-50,
+.v3-settings .text-amber-100,
+.v3-settings .text-amber-300 {
+  color: var(--v3-warning) !important;
+}
+
+.v3-settings .border-slate-700,
+.v3-settings .border-slate-800,
+.v3-settings .border-slate-800\/80 {
+  border-color: var(--v3-border) !important;
+}
+
+.v3-settings .bg-slate-950,
+.v3-settings .bg-slate-950\/40,
+.v3-settings .bg-slate-950\/70,
+.v3-settings .bg-slate-800 {
+  background: var(--v3-surface-subtle) !important;
+  color: var(--v3-text-primary);
+}
+
+.v3-settings [data-testid="system-status-panel"] .rounded-lg,
+.v3-settings [data-testid="system-status-panel"] .rounded-xl {
+  border-color: var(--v3-border) !important;
+  background: var(--v3-surface-subtle) !important;
+}
+
+@media (min-width: 768px) and (max-width: 1179px) {
+  .v3-settings.rextora-page {
+    padding: 20px 16px 84px;
+  }
+
+  .v3-st-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-st-menu {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .v3-st-menu button {
+    text-align: center;
+  }
+
+  .v3-st-form {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-st-form[data-section="cost"],
+  .v3-st-form[data-section="telegram"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .v3-settings.rextora-page {
+    padding: 14px 10px 82px;
+  }
+
+  .v3-st-pagehead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .v3-st-pagehead h1,
+  .v3-st-pagehead .rextora-page-title {
+    font-size: 24px !important;
+  }
+
+  .v3-st-asof { text-align: left; }
+
+  .v3-st-workspace,
+  .v3-st-facts,
+  .v3-st-form,
+  .v3-st-row,
+  .v3-st-ai-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-st-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .v3-st-menu button {
+    text-align: center;
+  }
+
+  .v3-st-toolbar button,
+  .v3-settings [data-testid="settings-tabs"] button,
+  .v3-settings [data-testid="risk-settings-save"],
+  .v3-settings [data-testid="risk-settings-reset"] {
+    width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+  .v3-settings.rextora-page {
+    padding: 12px 8px 86px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-st-panel,
+  .v3-st-symbol-expanded,
+  .v3-settings details[open] > :not(summary) {
+    animation: none !important;
+  }
+}

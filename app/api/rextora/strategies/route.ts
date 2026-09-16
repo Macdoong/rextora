@@ -26,6 +26,15 @@ import { buildComboAwareStrategyName } from "@/src/lib/rextora/strategySearch/re
 import { applyLibraryArchiveTag } from "@/src/lib/rextora/strategy/libraryArchive";
 import { PaperSessionError } from "@/src/lib/rextora/paper/paperSessionStore";
 import { preparePaperFromResults } from "@/src/lib/rextora/paper/paperSessionService";
+import { roleHasPermission } from "@/src/lib/rextora/auth/permissions";
+import { permissionForStrategyAction } from "@/src/lib/rextora/auth/routePermissions";
+import {
+  forbiddenResponse,
+  originRejectedResponse,
+  requireAuthenticatedUser,
+  denyUnlessAuthenticated,
+} from "@/src/lib/rextora/auth/requireUser";
+import { isSameOriginMutation } from "@/src/lib/rextora/auth/requestSecurity";
 
 function koreanError(error: unknown): string {
   if (error instanceof StrategyValidationError) return error.message;
@@ -40,6 +49,9 @@ function koreanError(error: unknown): string {
 }
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   ensureStrategyStore();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -62,6 +74,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginMutation(request)) return originRejectedResponse();
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
   const body = (await request.json()) as {
     action: string;
     id?: string;
@@ -91,6 +106,10 @@ export async function POST(request: Request) {
     sourceResearchJobId?: string | null;
     sourceTrialIteration?: number | null;
   };
+
+  if (!roleHasPermission(auth.user.role, permissionForStrategyAction(body.action))) {
+    return forbiddenResponse();
+  }
 
   try {
     switch (body.action) {

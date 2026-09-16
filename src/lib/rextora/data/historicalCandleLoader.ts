@@ -4,6 +4,7 @@ import {
   type OhlcvCandle,
 } from "./ohlcvTypes";
 import {
+  expectedBarCount,
   resolveTimeframe,
   validateCandleSpacing,
   type SupportedTimeframe,
@@ -11,6 +12,42 @@ import {
 
 /** Binance USD-M futures max klines per request */
 export const BINANCE_KLINES_PAGE_LIMIT = 1500;
+
+/**
+ * Extra pages beyond ceil(expectedBars / pageSize).
+ * Covers inclusive-end off-by-one, cursor +1 overlap, and a short extra provider page.
+ * Must stay small: hitting this ceiling without end coverage is a coverage failure.
+ */
+export const PAGINATION_SAFETY_PAGE_MARGIN = 2;
+
+export type PaginationTerminatedBy =
+  | "range_end"
+  | "empty_page"
+  | "short_page"
+  | "safety_ceiling"
+  | "explicit_max_candles"
+  | "cursor_stuck";
+
+export function computeRangePaginationBudget(
+  fromOpenTime: number,
+  toOpenTime: number,
+  intervalMs: number,
+): {
+  expectedBars: number;
+  expectedPages: number;
+  safetyPages: number;
+} {
+  const expectedBars = expectedBarCount(fromOpenTime, toOpenTime, intervalMs);
+  const expectedPages = Math.max(
+    1,
+    Math.ceil(expectedBars / BINANCE_KLINES_PAGE_LIMIT),
+  );
+  return {
+    expectedBars,
+    expectedPages,
+    safetyPages: expectedPages + PAGINATION_SAFETY_PAGE_MARGIN,
+  };
+}
 
 export type HistoricalLoadErrorCode =
   | "TIMEFRAME_UNSUPPORTED"
@@ -99,7 +136,11 @@ export interface LoadHistoricalCandlesInput {
   timeframe: string;
   fromOpenTime: number;
   toOpenTime: number;
-  /** Soft upper bound to avoid runaway pagination (default 20_000) */
+  /**
+   * Optional explicit collected-row cap. No implicit default.
+   * Callers that omit this paginate until the requested end or the
+   * range-derived safety page ceiling.
+   */
   maxCandles?: number;
   /** Injected fetch for unit tests */
   fetchPage?: typeof getKlinesRange;
@@ -115,6 +156,14 @@ export interface LoadHistoricalCandlesResult {
   requestedTo: string;
   actualFirstCandleTime: string | null;
   actualLastCandleTime: string | null;
+  pagination: {
+    pagesFetched: number;
+    expectedBars: number;
+    expectedPages: number;
+    safetyPages: number;
+    terminatedBy: PaginationTerminatedBy;
+    explicitMaxCandles: number | null;
+  };
 }
 
 /**
@@ -162,18 +211,44 @@ export async function loadHistoricalCandles(
   }
 
   const fetchPage = input.fetchPage ?? getKlinesRange;
-  const maxCandles = input.maxCandles ?? 20_000;
+  const explicitMaxCandles =
+    input.maxCandles != null &&
+    Number.isFinite(input.maxCandles) &&
+    input.maxCandles > 0
+      ? Math.floor(input.maxCandles)
+      : null;
+  const budget = computeRangePaginationBudget(
+    input.fromOpenTime,
+    input.toOpenTime,
+    spec.intervalMs,
+  );
   const collected: OhlcvCandle[] = [];
   let cursor = input.fromOpenTime;
   let pages = 0;
-  const maxPages = Math.ceil(maxCandles / BINANCE_KLINES_PAGE_LIMIT) + 2;
+  let terminatedBy: PaginationTerminatedBy = "range_end";
 
-  while (cursor <= input.toOpenTime && pages < maxPages && collected.length < maxCandles) {
+  while (cursor <= input.toOpenTime && pages < budget.safetyPages) {
+    if (
+      explicitMaxCandles != null &&
+      collected.length >= explicitMaxCandles
+    ) {
+      terminatedBy = "explicit_max_candles";
+      break;
+    }
+    const remaining =
+      explicitMaxCandles != null
+        ? explicitMaxCandles - collected.length
+        : BINANCE_KLINES_PAGE_LIMIT;
+    const pageLimit = Math.min(BINANCE_KLINES_PAGE_LIMIT, remaining);
+    if (pageLimit <= 0) {
+      terminatedBy = "explicit_max_candles";
+      break;
+    }
     pages += 1;
     const result = await fetchPage(
       symbol,
       spec.binanceInterval,
-      BINANCE_KLINES_PAGE_LIMIT,
+      pageLimit,
       cursor,
       input.toOpenTime,
     );
@@ -192,7 +267,10 @@ export async function loadHistoricalCandles(
       });
     }
 
-    if (result.data.length === 0) break;
+    if (result.data.length === 0) {
+      terminatedBy = "empty_page";
+      break;
+    }
 
     const pageCandles = candlesFromBinanceKlines(
       result.data as Array<Array<string | number>>,
@@ -200,10 +278,28 @@ export async function loadHistoricalCandles(
     collected.push(...pageCandles);
 
     const lastOpen = pageCandles[pageCandles.length - 1]?.openTime;
-    if (lastOpen == null || lastOpen <= cursor) break;
+    if (lastOpen == null || lastOpen <= cursor) {
+      terminatedBy = "cursor_stuck";
+      break;
+    }
     // Advance past last open so we do not re-fetch the same candle
     cursor = lastOpen + 1;
-    if (pageCandles.length < BINANCE_KLINES_PAGE_LIMIT) break;
+    if (pageCandles.length < pageLimit) {
+      terminatedBy = "short_page";
+      break;
+    }
+    if (cursor > input.toOpenTime) {
+      terminatedBy = "range_end";
+      break;
+    }
+  }
+
+  if (
+    pages >= budget.safetyPages &&
+    cursor <= input.toOpenTime &&
+    terminatedBy === "range_end"
+  ) {
+    terminatedBy = "safety_ceiling";
   }
 
   const inRange = collected.filter(
@@ -268,5 +364,13 @@ export async function loadHistoricalCandles(
     actualLastCandleTime: new Date(
       candles[candles.length - 1].openTime,
     ).toISOString(),
+    pagination: {
+      pagesFetched: pages,
+      expectedBars: budget.expectedBars,
+      expectedPages: budget.expectedPages,
+      safetyPages: budget.safetyPages,
+      terminatedBy,
+      explicitMaxCandles,
+    },
   };
 }

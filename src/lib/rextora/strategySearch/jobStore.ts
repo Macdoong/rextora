@@ -11,11 +11,18 @@ import type {
   StrategySearchConfig,
   StrategySearchJob,
   StrategySearchJobIndex,
-  StrategySearchJobIndexEntry,
   StrategySearchJobStatus,
   StrategySearchTrial,
 } from "./types";
 import { strategySearchRoot } from "../storage/runtimePaths";
+import { projectSearchJobIndexEntry } from "./indexProjection";
+import {
+  DurableJsonWriteError,
+  writeDurableJsonPayload,
+} from "./durableJsonWrite";
+
+export { projectSearchJobIndexEntry } from "./indexProjection";
+export { writeDurableJsonPayload } from "./durableJsonWrite";
 
 export interface StrategySearchStoreOptions {
   /** Injectable root for tests. Default: data/rextora/strategy-search */
@@ -51,7 +58,10 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   readonly [StrategySearchJobStatus, StrategySearchJobStatus]
 > = [
   ["queued", "running"],
+  /** Recovery rollback when a prepared restart cannot create its worker. */
+  ["queued", "interrupted"],
   ["queued", "cancel_requested"],
+  ["running", "interrupted"],
   ["running", "pause_requested"],
   ["running", "cancel_requested"],
   ["running", "completed"],
@@ -60,6 +70,9 @@ const ALLOWED_TRANSITIONS: ReadonlyArray<
   ["pause_requested", "cancel_requested"],
   ["paused", "queued"],
   ["paused", "cancel_requested"],
+  ["interrupted", "queued"],
+  ["interrupted", "cancel_requested"],
+  ["interrupted", "completed"],
   ["cancel_requested", "cancelling"],
   ["cancel_requested", "cancelled"],
   ["cancelling", "cancelled"],
@@ -162,77 +175,23 @@ function tryParseJsonFile(
   }
 }
 
-function writeTmpFlushed(tmpFile: string, payload: string): void {
-  const fd = fs.openSync(tmpFile, "w");
-  try {
-    fs.writeFileSync(fd, payload, "utf8");
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-}
-
-function tryFsyncDirectory(dir: string): void {
-  try {
-    const fd = fs.openSync(dir, "r");
-    try {
-      fs.fsyncSync(fd);
-    } finally {
-      fs.closeSync(fd);
-    }
-  } catch {
-    // Directory fsync is unsupported on some platforms (notably Windows).
-  }
-}
-
 /**
  * Recoverable crash-safe JSON write (not fully atomic cross-platform).
  * Uses sibling `<target>.tmp` and `<target>.bak` with fsync + rename.
  */
 function recoverableWriteJson(targetPath: string, value: unknown): void {
-  const dir = path.dirname(targetPath);
-  ensureDir(dir);
-  const payload = JSON.stringify(value, null, 2);
-  const tmp = tmpPathFor(targetPath);
-  const bak = bakPathFor(targetPath);
-
+  ensureDir(path.dirname(targetPath));
   try {
-    writeTmpFlushed(tmp, payload);
-
-    if (fs.existsSync(targetPath)) {
-      safeUnlink(bak);
-      fs.renameSync(targetPath, bak);
-    }
-
-    fs.renameSync(tmp, targetPath);
-    tryFsyncDirectory(dir);
-
-    const verified = tryParseJsonFile(targetPath);
-    if (!verified.ok) {
-      throw new StrategySearchPersistenceError(
-        "WRITE_FAILED",
-        `strategy-search write verification failed for ${targetPath}`,
-        targetPath,
-      );
-    }
-
-    safeUnlink(bak);
+    writeDurableJsonPayload(targetPath, JSON.stringify(value, null, 2));
   } catch (error) {
-    // Restore last valid backup when the target is missing after failure.
-    if (!fs.existsSync(targetPath) && tryParseJsonFile(bak).ok) {
-      try {
-        fs.renameSync(bak, targetPath);
-      } catch {
-        // preserve bak for manual recovery
-      }
-    }
-    safeUnlink(tmp);
     if (error instanceof StrategySearchPersistenceError) throw error;
     throw new StrategySearchPersistenceError(
       "WRITE_FAILED",
-      `strategy-search filesystem write failed for ${targetPath}: ${
-        error instanceof Error ? error.message : "unknown error"
-      }`,
+      error instanceof DurableJsonWriteError
+        ? error.message
+        : `strategy-search filesystem write failed for ${targetPath}: ${
+            error instanceof Error ? error.message : "unknown error"
+          }`,
       targetPath,
     );
   }
@@ -241,7 +200,11 @@ function recoverableWriteJson(targetPath: string, value: unknown): void {
 type RecoverReadOptions = {
   /** When true, absence of target/bak/tmp returns null instead of throwing. */
   allowMissing?: boolean;
+  /** Job-owned callers may hook sibling promotion; other JSON files omit this. */
+  onPromoted?: (source: "bak" | "tmp") => void;
 };
+
+const INDEX_SYNC_ATTEMPTS = 3;
 
 /**
  * Read JSON with interrupted-write recovery from `.bak` / `.tmp` siblings.
@@ -278,6 +241,7 @@ function recoverReadJson<T>(
           targetPath,
         );
       }
+      options?.onPromoted?.("bak");
       return restored.value as T;
     } catch (error) {
       if (error instanceof StrategySearchPersistenceError) throw error;
@@ -301,6 +265,7 @@ function recoverReadJson<T>(
           targetPath,
         );
       }
+      options?.onPromoted?.("tmp");
       return promoted.value as T;
     } catch (error) {
       if (error instanceof StrategySearchPersistenceError) throw error;
@@ -335,6 +300,26 @@ function emptyCheckpoint(at: string): StrategySearchCheckpoint {
     randomState: null,
     bestCandidate: null,
     bestPassedCandidate: null,
+    bestByCompatibilityGroup: [
+      {
+        rankingCompatibilityGroup: "safe_execution_price_v1",
+        bestCandidate: null,
+        bestPassedCandidate: null,
+        bestScore: null,
+      },
+      {
+        rankingCompatibilityGroup: "event_sequence_execution_price_v1",
+        bestCandidate: null,
+        bestPassedCandidate: null,
+        bestScore: null,
+      },
+      {
+        rankingCompatibilityGroup: "event_sequence_ledger_v0",
+        bestCandidate: null,
+        bestPassedCandidate: null,
+        bestScore: null,
+      },
+    ],
     updatedAt: at,
   };
 }
@@ -384,19 +369,6 @@ function assertTransition(
   }
 }
 
-function toIndexEntry(job: StrategySearchJob): StrategySearchJobIndexEntry {
-  return {
-    id: job.id,
-    status: job.status,
-    strategyTemplateId: job.config.strategyTemplateId,
-    generatorType: job.config.generatorType,
-    createdAt: job.createdAt,
-    updatedAt: job.updatedAt,
-    completedIterations: job.checkpoint.completedIterations,
-    finishedAt: job.finishedAt,
-  };
-}
-
 function emptyIndex(): StrategySearchJobIndex {
   return { version: 1, updatedAt: nowIso(), jobs: [] };
 }
@@ -420,7 +392,7 @@ function readIndex(root: string): StrategySearchJobIndex {
 function syncIndexWithJob(root: string, job: StrategySearchJob): void {
   const index = readIndex(root);
   const next = index.jobs.filter((row) => row.id !== job.id);
-  next.unshift(toIndexEntry(job));
+  next.unshift(projectSearchJobIndexEntry(job));
   recoverableWriteJson(indexPath(root), {
     version: 1 as const,
     updatedAt: nowIso(),
@@ -428,10 +400,50 @@ function syncIndexWithJob(root: string, job: StrategySearchJob): void {
   });
 }
 
-function loadJobOrThrow(root: string, jobId: string): StrategySearchJob {
+function syncIndexWithJobWithRetry(root: string, job: StrategySearchJob): void {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < INDEX_SYNC_ATTEMPTS; attempt++) {
+    try {
+      syncIndexWithJob(root, job);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (lastError instanceof Error) throw lastError;
+  throw new StrategySearchPersistenceError(
+    "WRITE_FAILED",
+    "strategy-search index synchronization failed",
+    indexPath(root),
+  );
+}
+
+function readJobFile(
+  root: string,
+  jobId: string,
+  allowMissing: boolean,
+): StrategySearchJob | null {
   assertStrategySearchJobId(jobId);
   const fp = jobFilePath(root, jobId);
-  const job = recoverReadJson<StrategySearchJob>(fp, { allowMissing: true });
+  let promoted: "bak" | "tmp" | null = null;
+  const job = recoverReadJson<StrategySearchJob>(fp, {
+    allowMissing,
+    onPromoted: (source) => {
+      promoted = source;
+    },
+  });
+  if (job && promoted) {
+    const indexed = readIndex(root).jobs.some((row) => row.id === job.id);
+    if (indexed) {
+      syncIndexWithJobWithRetry(root, job);
+    }
+  }
+  return job;
+}
+
+function loadJobOrThrow(root: string, jobId: string): StrategySearchJob {
+  const fp = jobFilePath(root, jobId);
+  const job = readJobFile(root, jobId, true);
   if (job == null) {
     throw new StrategySearchPersistenceError(
       "NOT_FOUND",
@@ -443,9 +455,25 @@ function loadJobOrThrow(root: string, jobId: string): StrategySearchJob {
 }
 
 function persistJob(root: string, job: StrategySearchJob): StrategySearchJob {
-  recoverableWriteJson(jobFilePath(root, job.id), job);
-  syncIndexWithJob(root, job);
-  return job;
+  const fp = jobFilePath(root, job.id);
+  const previousParsed = tryParseJsonFile(fp);
+  const previous = previousParsed.ok
+    ? (previousParsed.value as StrategySearchJob)
+    : null;
+  recoverableWriteJson(fp, job);
+  try {
+    syncIndexWithJobWithRetry(root, job);
+    return job;
+  } catch (error) {
+    if (previous == null) {
+      safeUnlink(fp);
+      safeUnlink(tmpPathFor(fp));
+      safeUnlink(bakPathFor(fp));
+    } else {
+      recoverableWriteJson(fp, previous);
+    }
+    throw error;
+  }
 }
 
 function transitionJob(
@@ -529,8 +557,7 @@ export function getSearchJob(
 ): StrategySearchJob | null {
   assertStrategySearchJobId(jobId);
   const root = resolveRoot(options);
-  const fp = jobFilePath(root, jobId);
-  return recoverReadJson<StrategySearchJob>(fp, { allowMissing: true });
+  return readJobFile(root, jobId, true);
 }
 
 export function listSearchJobs(
@@ -580,6 +607,13 @@ export function markSearchJobPaused(
   return transitionJob(resolveRoot(options), jobId, "paused");
 }
 
+export function markSearchJobInterrupted(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob {
+  return transitionJob(resolveRoot(options), jobId, "interrupted");
+}
+
 export function resumeSearchJob(
   jobId: string,
   options?: StrategySearchStoreOptions,
@@ -592,7 +626,7 @@ export function resumeSearchJob(
       `cannot resume strategy-search job in terminal status: ${current.status}`,
     );
   }
-  // paused → queued (normal resume) or failed → queued (recoverable retry)
+  // paused/interrupted → queued (resume) or failed → queued (recoverable retry)
   return transitionJob(root, jobId, "queued", {
     finishedAt: null,
     failureMessage: null,

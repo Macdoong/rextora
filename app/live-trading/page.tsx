@@ -1,24 +1,75 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { Badge, Button, Card, Metric } from "@/components/ui/primitives";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/primitives";
 import { TradingChartsPanel } from "@/components/rextora/charts/TradingChartsPanel";
 import { LiveActivationGates } from "@/components/rextora/live/LiveActivationGates";
 import { AgentContextStrip } from "@/components/rextora/agent/AgentContextStrip";
+import { LiveSafetyHeader } from "@/components/rextora/live/operator/LiveSafetyHeader";
+import { ApiPermissionPanel } from "@/components/rextora/live/operator/ApiPermissionPanel";
+import { RiskLimitsPanel } from "@/components/rextora/live/operator/RiskLimitsPanel";
+import { V3Card } from "@/components/rextora/v3/V3Card";
+import { useSetOperatorPageContext } from "@/components/rextora/shell/OperatorPageContext";
 import type { UnifiedMetricsSnapshot } from "@/src/lib/rextora/metrics/types";
 import type { UnifiedRiskView } from "@/src/lib/rextora/metrics/types";
-export default function LiveTradingPage() {
+import type { LiveReadinessChecklistItem } from "@/src/lib/rextora/liveReadinessChecklist";
+import {
+  LIVE_DISABLED_LABEL,
+  LIVE_ORDERS_BLOCKED_LABEL,
+  LIVE_SETTINGS_BLOCK_COPY,
+  liveGateFailurePresentation,
+  liveGateLiveStatusLabel,
+  liveGatePermissionRows,
+  liveGateRealOrderCountLabel,
+  liveGateRealOrderLabel,
+} from "@/src/lib/rextora/live/liveGateOperatorPresentation";
+import {
+  riskOperatorRowsFromUnified,
+  riskOperatorStatePresentation,
+  riskOperatorUtilizationFromUnified,
+} from "@/src/lib/rextora/risk/riskOperatorPresentation";
+
+function LiveTradingPageInner() {
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
   const [riskView, setRiskView] = useState<UnifiedRiskView | null>(null);
+  const [flags, setFlags] = useState({
+    liveTradingEnabled: false,
+    allowLiveTrading: false,
+  });
+  const [gateSnapshot, setGateSnapshot] = useState<{
+    checklist: LiveReadinessChecklistItem[];
+    remainingBlocks: string[];
+    liveReady: boolean;
+    liveAllowed: boolean;
+    approvalOk: boolean | null;
+    riskOk: boolean | null;
+    approvedAt: string | null;
+    approvedBy: string | null;
+    approvalLabel: string | null;
+    emergencyStopActive: boolean;
+    gatePassed: number;
+    gateTotal: number;
+  } | null>(null);
 
   async function refresh() {
-    const [dash, bot] = await Promise.all([
+    const [dash, bot, settingsRes] = await Promise.all([
       fetch("/api/rextora/trading/dashboard").then((r) => r.json()),
       fetch("/api/rextora/bot/status").then((r) => r.json()),
+      fetch("/api/rextora/settings").then((r) => r.json()),
     ]);
     setStatus(dash.data?.status ?? dash.status ?? null);
     setRiskView(bot.data?.riskView ?? null);
+    const trading = settingsRes.data?.settings?.trading as
+      | { liveTradingEnabled?: boolean; allowLiveTrading?: boolean }
+      | undefined;
+    setFlags({
+      liveTradingEnabled: trading?.liveTradingEnabled === true,
+      allowLiveTrading: trading?.allowLiveTrading === true,
+    });
   }
 
   useEffect(() => {
@@ -52,20 +103,10 @@ export default function LiveTradingPage() {
     canStartLive?: boolean;
     liveBlockReason?: string | null;
     botStatusLabel?: "대기 중" | "실행 중" | "중지됨" | "오류" | string;
-    serverTpSlLabel?: string;
     safetyLabel?: string;
     activeStrategy?: { name: string; paramsHash: string };
     positions?: Array<Record<string, unknown>>;
-    recentTrades?: Array<Record<string, unknown>>;
-    metrics?: {
-      todayRealizedPnlUsdt: number;
-      todayUnrealizedPnlUsdt: number;
-      accountEquity: number;
-      accountReturnPct: number;
-      todayFeeUsdt: number;
-      todayFundingUsdt: number;
-      todaySlippageUsdt: number;
-    };
+    metrics?: UnifiedMetricsSnapshot;
     todayStats?: {
       realizedPnlUsdt?: number;
       unrealizedPnlUsdt?: number;
@@ -81,137 +122,202 @@ export default function LiveTradingPage() {
   const m = s?.metrics;
   const ts = s?.todayStats;
   const liveSessionActive = s?.botStatusLabel === "실행 중";
+  const liveStatus = liveGateLiveStatusLabel(flags);
+  const realOrderStatus = liveGateRealOrderLabel(flags);
+  const emergencyLabel = gateSnapshot?.emergencyStopActive
+    ? "긴급 정지"
+    : "비활성";
+  const approvalLabel =
+    gateSnapshot?.approvalLabel ??
+    (gateSnapshot?.approvalOk === true ? "실전 승인 완료" : "실전 승인 전");
+  const riskState = riskOperatorStatePresentation({
+    riskState: riskView?.riskState ?? null,
+    emergencyStopActive: Boolean(gateSnapshot?.emergencyStopActive),
+    limitBreached: Boolean(riskView?.limitBreached),
+  });
+  const riskRows = riskOperatorRowsFromUnified(riskView ?? {});
+  const riskUsageById = Object.fromEntries(
+    riskOperatorUtilizationFromUnified(riskView ?? {}).metrics.map((metric) => [
+      metric.id,
+      metric.usageRatio,
+    ]),
+  );
+  const permissionRows = liveGatePermissionRows({
+    apiConfigured:
+      gateSnapshot?.checklist.find((item) => item.id === "binance_connection")
+        ?.status !== "needed",
+    readPermission:
+      gateSnapshot?.checklist.find((item) => item.id === "account_queries")
+        ?.status === "passed"
+        ? "정상"
+        : gateSnapshot?.checklist.find((item) => item.id === "account_queries")
+            ?.status === "blocked"
+          ? "차단"
+          : "미확인",
+    futuresPermission:
+      gateSnapshot?.checklist.find((item) => item.id === "futures_permission")
+        ?.status === "passed"
+        ? "정상"
+        : gateSnapshot?.checklist.find((item) => item.id === "futures_permission")
+            ?.status === "blocked"
+          ? "차단"
+          : "미확인",
+    orderPermission:
+      gateSnapshot?.checklist.find((item) => item.id === "order_permission")
+        ?.status === "passed"
+        ? "정상"
+        : gateSnapshot?.checklist.find((item) => item.id === "order_permission")
+            ?.status === "blocked"
+          ? "차단"
+          : "미확인",
+    usedPublicMarketDataOnly: false,
+  });
+  const primaryBlock = gateSnapshot?.remainingBlocks[0]
+    ? liveGateFailurePresentation(gateSnapshot.remainingBlocks[0])
+    : null;
+  const headline = gateSnapshot?.emergencyStopActive
+    ? "차단 · 긴급 정지"
+    : !flags.liveTradingEnabled || !flags.allowLiveTrading
+      ? "차단 · 승인과 설정 필요"
+      : primaryBlock
+        ? primaryBlock.titleKo
+        : gateSnapshot?.liveReady
+          ? "게이트 통과"
+          : "준비 전";
+  const detail = `${liveStatus} · ${realOrderStatus} · 긴급 정지 ${emergencyLabel}`;
+
+  const onSnapshot = useCallback(
+    (snapshot: NonNullable<typeof gateSnapshot>) => {
+      setGateSnapshot(snapshot);
+    },
+    [],
+  );
+
+  useSetOperatorPageContext({
+    source: "live_gate",
+    strategyId:
+      searchParams.get("candidate") ??
+      searchParams.get("strategyId") ??
+      null,
+    runId: searchParams.get("runId"),
+    paperSessionId: searchParams.get("sessionId"),
+    symbol: searchParams.get("symbol"),
+    timeframe: searchParams.get("timeframe"),
+    readinessLabel: liveStatus,
+  });
 
   return (
-    <div className="space-y-4" data-testid="live-trading-page">
-      <div>
-        <h1 className="text-2xl font-bold text-white">실전 매매</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          아직 실전 주문을 보내지 않습니다. 안전 점검·승인·시작을 모두 통과한
-          뒤에만 실주문이 가능합니다.
-        </p>
+    <div className="rextora-page v3 v3-live" data-testid="live-trading-page">
+      <div className="v3-lv-pagehead">
+        <header>
+          <h1 className="rextora-page-title">실전 진입</h1>
+          <p>
+            승인과 안전 조건을 모두 통과해야 실전 매매를 시작할 수 있습니다.
+          </p>
+        </header>
+        <p className="v3-lv-asof">{liveStatus}</p>
       </div>
-      <AgentContextStrip pageLabelKo="실전 매매" />
+      <AgentContextStrip pageLabelKo="실전 진입" />
 
-      <div
-        className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"
-        data-testid="live-dry-run-banner"
-        role="status"
-      >
-        <p className="font-semibold">
-          {liveSessionActive
-            ? "실전 세션이 실행 중입니다. 위험 한도를 계속 확인하세요."
-            : "지금은 거래 중이 아닙니다."}
-        </p>
-        <p className="mt-1 text-amber-100/90">
-          현재는 검증 모드입니다. 실제 주문은 전송되지 않으며, 가상 점검(드라이런)만
-          사용합니다.
-        </p>
-      </div>
+      <LiveSafetyHeader
+        modeLabel="검증 모드"
+        liveStatus={liveStatus}
+        realOrderStatus={realOrderStatus}
+        emergencyLabel={emergencyLabel}
+        approvalLabel={approvalLabel}
+        riskLabel={riskState.labelKo}
+        headline={headline}
+        detail={detail}
+        gatePassed={gateSnapshot?.gatePassed ?? null}
+        gateTotal={gateSnapshot?.gateTotal ?? null}
+      />
 
-      <Suspense
-        fallback={
-          <p className="rextora-helper text-slate-400">게이트를 불러오는 중…</p>
-        }
-      >
-        <LiveActivationGates />
+      {!flags.liveTradingEnabled || !flags.allowLiveTrading ? (
+        <p className="v3-lv-flag" data-testid="live-feature-flag-notice">
+          {LIVE_SETTINGS_BLOCK_COPY} {LIVE_DISABLED_LABEL} ·{" "}
+          {LIVE_ORDERS_BLOCKED_LABEL}
+        </p>
+      ) : null}
+
+      <Suspense fallback={<p className="v3-lv-note">게이트를 불러오는 중…</p>}>
+        <LiveActivationGates onSnapshot={onSnapshot} />
       </Suspense>
 
-      <Card title="실전 준비 상태" data-testid="live-readiness">
-        <div className="grid gap-3 md:grid-cols-3">
-          <Metric label="실전 허용" value={s?.liveAllowed ? "허용" : "차단"} />
-          <Metric label="시작 가능" value={liveEnabled ? "가능" : "불가"} />
-          <Metric
-            label="봇 상태"
-            value={s?.botStatusLabel ?? "대기 중"}
+      <div className="v3-lv-grid v3-lv-split">
+        <V3Card className="v3-lv-s6" title="위험 상태" meta="읽기 전용" interactive>
+          <RiskLimitsPanel
+            stateLabel={riskState.labelKo}
+            rows={riskRows}
+            usageById={riskUsageById}
           />
-          <Metric
-            label="활성 전략"
-            value={s?.activeStrategy?.name ?? "미선택"}
-          />
-          <Metric label="안전 상태" value={s?.safetyLabel ?? "-"} />
-          <Metric
-            label="다음 행동"
-            value={
-              liveSessionActive
-                ? "위험·포지션 모니터링"
-                : liveEnabled
-                  ? "실전 매매 시작"
-                  : "게이트·승인 확인"
-            }
-          />
-        </div>
-        {!liveSessionActive ? (
-          <div
-            className="mt-3 rounded-xl border border-dashed border-slate-700/80 bg-slate-950/40 px-4 py-5 text-center"
-            data-testid="live-idle-status"
-          >
-            <p className="font-medium text-slate-100">
-              현재 실전매매가 시작되지 않았습니다.
-            </p>
-            <p
-              className="mt-2 text-sm text-slate-400"
-              data-testid="live-start-helper"
+          <div className="v3-lv-toolbar" style={{ marginTop: 12 }}>
+            <Link
+              href="/risk"
+              className="v3-lv-btn-secondary v3-hover"
+              data-testid="live-gate-risk-link"
             >
+              위험 설정 확인
+            </Link>
+          </div>
+        </V3Card>
+        <V3Card className="v3-lv-s6" title="API 권한" meta="구성 · 조회 · 주문" interactive>
+          <ApiPermissionPanel rows={permissionRows} />
+        </V3Card>
+      </div>
+
+      <V3Card
+        title="실전 제어"
+        meta={liveEnabled ? "시작 가능" : "시작 불가"}
+        data-testid="live-readiness"
+      >
+        <dl className="v3-lv-control-grid">
+          <div>
+            <dt>실전 허용</dt>
+            <dd className={s?.liveAllowed ? "ok" : "bad"}>
+              {s?.liveAllowed ? "허용" : "차단"}
+            </dd>
+          </div>
+          <div>
+            <dt>시작 가능</dt>
+            <dd className={liveEnabled ? "ok" : "bad"}>
+              {liveEnabled ? "가능" : "불가"}
+            </dd>
+          </div>
+          <div>
+            <dt>봇 상태</dt>
+            <dd>{s?.botStatusLabel ?? "대기 중"}</dd>
+          </div>
+          <div>
+            <dt>활성 전략</dt>
+            <dd>{s?.activeStrategy?.name ?? "미선택"}</dd>
+          </div>
+          <div>
+            <dt>안전 상태</dt>
+            <dd>{s?.safetyLabel ?? "데이터 없음"}</dd>
+          </div>
+          <div>
+            <dt>실주문</dt>
+            <dd>
+              {liveGateRealOrderCountLabel(liveSessionActive ? null : 0)}
+            </dd>
+          </div>
+        </dl>
+        {!liveSessionActive ? (
+          <div className="v3-lv-idle" data-testid="live-idle-status" style={{ marginTop: 12 }}>
+            <p>
+              <strong>현재 실전매매가 시작되지 않았습니다.</strong>
+            </p>
+            <p className="v3-lv-note" data-testid="live-start-helper">
               {s?.liveBlockReason ??
                 "안전 게이트와 승인을 통과한 뒤 아래에서 시작할 수 있습니다. 시작 전에도 실제 주문은 전송되지 않습니다."}
             </p>
           </div>
         ) : null}
-      </Card>
-
-      {liveSessionActive ? (
-        <Card title="통일 지표">
-          <div className="grid gap-3 md:grid-cols-4">
-            <Metric
-              label="오늘 실현"
-              value={`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}
-            />
-            <Metric
-              label="오늘 미실현"
-              value={`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}
-            />
-            <Metric
-              label="현재 자본"
-              value={`${m?.accountEquity ?? ts?.accountEquity ?? "-"} USDT`}
-            />
-            <Metric
-              label="계정 수익률"
-              value={`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`}
-            />
-            <Metric
-              label="수수료"
-              value={`${m?.todayFeeUsdt ?? ts?.feeUsdt ?? 0} USDT`}
-            />
-            <Metric
-              label="펀딩"
-              value={`${m?.todayFundingUsdt ?? ts?.fundingUsdt ?? 0} USDT`}
-            />
-            <Metric
-              label="슬리피지"
-              value={`${m?.todaySlippageUsdt ?? ts?.slippageUsdt ?? 0} USDT`}
-            />
-          </div>
-        </Card>
-      ) : null}
-
-      <TradingChartsPanel
-        mode="LIVE"
-        sessionActive={liveSessionActive}
-        metrics={(s?.metrics as UnifiedMetricsSnapshot) ?? null}
-        riskView={riskView}
-        symbol={
-          typeof s?.positions?.[0]?.symbol === "string"
-            ? String(s.positions[0].symbol)
-            : undefined
-        }
-      />
-
-      <Card title="실전 제어">
-        <div className="flex flex-wrap gap-2">
+        <div className="v3-lv-toolbar" style={{ marginTop: 14 }}>
           <Button
             tone={liveEnabled ? "success" : "default"}
             data-testid="live-start"
+            className="v3-lv-start"
             disabled={!liveEnabled}
             onClick={() => liveEnabled && void run("/api/bot/start", "LIVE")}
           >
@@ -224,6 +330,40 @@ export default function LiveTradingPage() {
           >
             실전 매매 중지
           </Button>
+        </div>
+        {message ? <p className="v3-lv-note">{message}</p> : null}
+      </V3Card>
+
+      {liveSessionActive ? (
+        <V3Card title="통일 지표" meta="실행 중">
+          <div className="v3-lv-status-grid">
+            <div>
+              <dt>오늘 실현</dt>
+              <dd>{`${m?.todayRealizedPnlUsdt ?? ts?.realizedPnlUsdt ?? 0} USDT`}</dd>
+            </div>
+            <div>
+              <dt>오늘 미실현</dt>
+              <dd>{`${m?.todayUnrealizedPnlUsdt ?? ts?.unrealizedPnlUsdt ?? 0} USDT`}</dd>
+            </div>
+            <div>
+              <dt>현재 자본</dt>
+              <dd>{`${m?.accountEquity ?? ts?.accountEquity ?? "데이터 없음"} USDT`}</dd>
+            </div>
+            <div>
+              <dt>계정 수익률</dt>
+              <dd>{`${m?.accountReturnPct ?? ts?.accountReturnPct ?? 0}%`}</dd>
+            </div>
+          </div>
+        </V3Card>
+      ) : null}
+
+      <div className="v3-lv-danger" data-testid="live-emergency-controls">
+        <h3>위험 제어 · 실전 전용</h3>
+        <p className="v3-lv-note">
+          이 구역만 긴급 변이를 담습니다. 위험 관리 화면에는 같은 버튼이 없습니다.
+          이 검증에서는 실행하지 않습니다.
+        </p>
+        <div className="v3-lv-toolbar">
           <Button
             tone="danger"
             data-testid="emergency-stop"
@@ -238,61 +378,94 @@ export default function LiveTradingPage() {
             전체 포지션 청산
           </Button>
           <Button
+            tone="danger"
             onClick={() => void run("/api/rextora/trading/cancel-all", "LIVE")}
           >
             모든 주문 취소
           </Button>
         </div>
-        {message && <p className="mt-3 text-sm text-slate-300">{message}</p>}
-        <div className="mt-3 space-y-1 text-xs text-slate-400">
-          <p>
-            실전 제어는 게이트 통과 후에만 활성화됩니다. 현재 검증은 드라이런
-            어댑터만 사용하며 실제 주문은 전송되지 않습니다.
-          </p>
-          <p>진입 직후 거래소 서버 손절/익절을 등록합니다.</p>
-          <p>손절/익절 등록 실패 시 포지션을 즉시 정리합니다.</p>
-        </div>
-      </Card>
+      </div>
 
       {liveSessionActive ? (
-        <Card title="현재 실전 포지션">
-          {(s?.positions?.length ?? 0) > 0 ? (
-            <table className="w-full text-left text-sm">
-              <thead className="text-slate-400">
-                <tr>
-                  <th>코인</th>
-                  <th>방향</th>
-                  <th>수량</th>
-                  <th>진입가</th>
-                  <th>현재가</th>
-                  <th>미실현 손익</th>
-                  <th>보호</th>
-                </tr>
-              </thead>
-              <tbody>
-                {s?.positions?.map((p) => (
-                  <tr
-                    key={String(p.symbol)}
-                    className="border-t border-slate-900"
-                  >
-                    <td className="py-2">{String(p.symbol)}</td>
-                    <td>{String(p.side)}</td>
-                    <td>{String(p.quantity)}</td>
-                    <td>{String(p.entryPrice)}</td>
-                    <td>{String(p.currentPrice)}</td>
-                    <td>{String(p.unrealizedPnl)}</td>
-                    <td>
-                      <Badge>{String(p.protectionLabel)}</Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-sm text-slate-400">열린 실전 포지션이 없습니다.</p>
-          )}
-        </Card>
-      ) : null}
+        <div className="v3-screen-in">
+          <TradingChartsPanel
+            mode="LIVE"
+            sessionActive={liveSessionActive}
+            metrics={(s?.metrics as UnifiedMetricsSnapshot) ?? null}
+            riskView={riskView}
+            symbol={
+              typeof s?.positions?.[0]?.symbol === "string"
+                ? String(s.positions[0].symbol)
+                : undefined
+            }
+          />
+        </div>
+      ) : (
+        <div data-testid="trading-charts-live">
+          <div className="v3-lv-chart-empty" data-testid="live-charts-idle">
+            <strong>실전 차트·지표</strong>
+            <p>
+              실전 매매가 시작되지 않아 차트 데이터를 표시하지 않습니다. 가짜
+              캔들이나 손익 곡선은 그리지 않습니다.
+            </p>
+            <Link href="/settings">시스템 설정에서 실전 허용 확인</Link>
+          </div>
+        </div>
+      )}
+
+      <details className="v3-lv-tech">
+        <summary>기술 정보</summary>
+        <dl className="v3-lv-tech-grid">
+          <div>
+            <dt>실전 허용</dt>
+            <dd>{s?.liveAllowed ? "허용" : "차단"}</dd>
+          </div>
+          <div>
+            <dt>시작 가능</dt>
+            <dd>{liveEnabled ? "가능" : "불가"}</dd>
+          </div>
+          <div>
+            <dt>봇 상태</dt>
+            <dd>{s?.botStatusLabel ?? "대기 중"}</dd>
+          </div>
+          <div>
+            <dt>활성 전략</dt>
+            <dd>{s?.activeStrategy?.name ?? "미선택"}</dd>
+          </div>
+          <div>
+            <dt>파라미터 해시</dt>
+            <dd>{s?.activeStrategy?.paramsHash ?? "데이터 없음"}</dd>
+          </div>
+          <div>
+            <dt>안전 상태</dt>
+            <dd>{s?.safetyLabel ?? "데이터 없음"}</dd>
+          </div>
+          <div>
+            <dt>liveTradingEnabled</dt>
+            <dd>{flags.liveTradingEnabled ? "예" : "아니오"}</dd>
+          </div>
+          <div>
+            <dt>allowLiveTrading</dt>
+            <dd>{flags.allowLiveTrading ? "예" : "아니오"}</dd>
+          </div>
+          <div>
+            <dt>승인자</dt>
+            <dd>{gateSnapshot?.approvedBy ?? "데이터 없음"}</dd>
+          </div>
+          <div>
+            <dt>승인 시각</dt>
+            <dd>{gateSnapshot?.approvedAt ?? "데이터 없음"}</dd>
+          </div>
+        </dl>
+      </details>
     </div>
+  );
+}
+
+export default function LiveTradingPage() {
+  return (
+    <Suspense fallback={<p className="v3-lv-note">실전 게이트를 불러오는 중…</p>}>
+      <LiveTradingPageInner />
+    </Suspense>
   );
 }

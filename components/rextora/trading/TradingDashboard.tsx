@@ -8,6 +8,7 @@ import {
 } from "@/src/lib/rextora/displayLabels";
 import type { TradingDashboardStatus } from "@/src/lib/rextora/tradingDashboardStatus";
 import type { EngineResult, TradingMode } from "@/lib/types";
+import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
 
 type DashboardPayload = {
   status: TradingDashboardStatus;
@@ -89,6 +90,7 @@ export function TradingDashboard() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const { can } = useAuth();
 
   const load = useCallback(async () => {
     try {
@@ -258,6 +260,8 @@ export function TradingDashboard() {
           </p>
         )}
         <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+          {can("paper:operate") ? (
+            <>
           <Button
             tone="success"
             data-testid="paper-start"
@@ -276,6 +280,9 @@ export function TradingDashboard() {
           >
             모의 자동매매 중지
           </Button>
+            </>
+          ) : null}
+          {can("live:start") ? (
           <Button
             tone={liveStartEnabled ? "success" : "default"}
             data-testid="live-start"
@@ -288,6 +295,9 @@ export function TradingDashboard() {
           >
             실전 자동매매 시작
           </Button>
+          ) : null}
+          {can("live:emergency_stop") ? (
+            <>
           <Button
             tone="warning"
             data-testid="live-stop"
@@ -306,6 +316,8 @@ export function TradingDashboard() {
           >
             긴급 중지
           </Button>
+            </>
+          ) : null}
         </div>
         <div className="rextora-helper mt-3 space-y-1 rx-text-muted">
           <p>모의 거래는 실제 주문을 넣지 않습니다.</p>

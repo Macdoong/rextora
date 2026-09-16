@@ -22,8 +22,16 @@ import type {
   StrategySearchScoreWeights,
 } from "./types";
 import { strategySearchRoot } from "../storage/runtimePaths";
+import {
+  EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
+  resolveEventSequenceCostModel,
+  type EventSequenceCostModel,
+} from "../strategy/eventSequenceCostModel";
 
 export const STRATEGY_SEARCH_EXECUTION_PROFILE_VERSION = 1 as const;
+
+export const NEW_JOB_EVENT_SEQUENCE_COST_MODEL =
+  EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1;
 
 /** Data reference — never raw candle arrays in API payloads. */
 export interface StrategySearchDataReference {
@@ -47,6 +55,11 @@ export interface StrategySearchExecutionProfile {
   costStressScenarios: StrategySearchCostStressScenario[];
   jitterConfig: StrategySearchJitterConfig;
   dataRef: StrategySearchDataReference;
+  /**
+   * Durable Pattern Event-Sequence cost model for this job.
+   * Absent on historical profiles → resolve as event_sequence_ledger_v0.
+   */
+  eventSequenceCostModel?: EventSequenceCostModel;
 }
 
 function defaultRoot(): string {
@@ -99,6 +112,13 @@ export function saveJobExecutionProfile(
       })),
     },
     dataRef: { ...profile.dataRef },
+    ...(profile.eventSequenceCostModel
+      ? {
+          eventSequenceCostModel: resolveEventSequenceCostModel(
+            profile.eventSequenceCostModel,
+          ),
+        }
+      : {}),
   };
   writeJsonAtomic(profilePath(root, jobId), stored);
   return stored;
@@ -131,4 +151,10 @@ export function getJobExecutionProfile(
       fp,
     );
   }
+}
+
+export function resolveProfileEventSequenceCostModel(
+  profile: StrategySearchExecutionProfile | null | undefined,
+): EventSequenceCostModel {
+  return resolveEventSequenceCostModel(profile?.eventSequenceCostModel);
 }

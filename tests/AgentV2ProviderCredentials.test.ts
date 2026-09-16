@@ -16,14 +16,11 @@ import {
   isProviderRuntimeEmergencyDisabled,
   resolveProviderRuntime,
 } from "@/src/lib/rextora/agent/v2/providers/providerRuntimeConfig";
+import { rextoraDataRoot } from "@/src/lib/rextora/storage/runtimePaths";
 
-const secretsDir = path.join(
-  process.cwd(),
-  "data",
-  "rextora",
-  "secrets",
-);
-const credFile = path.join(secretsDir, "ai-provider-credentials.enc.json");
+function credentialFilePath(): string {
+  return path.join(rextoraDataRoot(), "secrets", "ai-provider-credentials.enc.json");
+}
 
 describe("Agent V2 provider credentials", () => {
   const prevOpenAi = process.env.OPENAI_API_KEY;
@@ -71,13 +68,13 @@ describe("Agent V2 provider credentials", () => {
     expect(pub.openai.configured).toBe(true);
     expect(pub.openai.fingerprint).toBe(fingerprint);
     expect(JSON.stringify(pub)).not.toContain(key);
-    if (fs.existsSync(credFile)) {
-      const disk = fs.readFileSync(credFile, "utf8");
-      expect(disk).not.toContain(key);
-      expect(disk).toContain("ciphertext");
-      const mode = fs.statSync(credFile).mode & 0o777;
-      expect(mode).toBe(0o600);
-    }
+    const credFile = credentialFilePath();
+    expect(fs.existsSync(credFile)).toBe(true);
+    const disk = fs.readFileSync(credFile, "utf8");
+    expect(disk).not.toContain(key);
+    expect(disk).toContain("ciphertext");
+    const mode = fs.statSync(credFile).mode & 0o777;
+    expect(mode).toBe(0o600);
     deleteProviderCredential("openai");
     expect(resolveProviderApiKey("openai")).toBeUndefined();
   });

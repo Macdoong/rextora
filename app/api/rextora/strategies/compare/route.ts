@@ -3,9 +3,12 @@ import { getStrategyById, listStrategies } from "@/src/lib/rextora/strategy/stra
 import { listSavedBacktests } from "@/src/lib/rextora/backtest/backtestStore";
 import { equityCurveToSeries, drawdownFromEquity, strategyScatter } from "@/src/lib/rextora/charts/adapters";
 import { SERIES_PALETTE } from "@/src/lib/rextora/charts/theme";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /** Compare strategies using only actual saved backtest results. */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "strategy:write");
+  if (denied) return denied;
   const body = (await request.json()) as { ids?: string[] };
   const ids = (body.ids ?? []).slice(0, 5);
   if (ids.length < 1) {

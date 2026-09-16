@@ -101,6 +101,7 @@ type JobSummary = {
   timeframe?: string | null;
   currentSearchFamily?: string | null;
   bestScore?: number | null;
+  rankingGroups?: unknown[] | null;
   bestReturn?: number | null;
   createdAt?: string;
   updatedAt?: string;
@@ -156,6 +157,45 @@ const RESULTS_NAV_ITEMS = [
   { id: "results-section-library", label: "라이브러리" },
   { id: "results-section-history", label: "연구·저장소 관리" },
 ] as const;
+
+type ResultsTabId =
+  | "summary"
+  | "explorer"
+  | "library"
+  | "history"
+  | "advanced";
+
+const RESULTS_TABS: ReadonlyArray<{
+  id: ResultsTabId;
+  label: string;
+  section: string;
+}> = [
+  { id: "summary", label: "요약", section: "results-section-outcome" },
+  { id: "explorer", label: "후보 탐색", section: "results-section-top10" },
+  { id: "library", label: "전략 보관함", section: "results-section-library" },
+  { id: "history", label: "탐색 이력", section: "results-section-history" },
+  { id: "advanced", label: "고급", section: "results-section-safe" },
+];
+
+function sectionToTab(id: string): ResultsTabId {
+  if (id === "results-section-library") return "library";
+  if (id === "results-section-history") return "history";
+  if (
+    id === "results-section-safe" ||
+    id === "results-section-raw-mgmt" ||
+    id === "results-storage-summary"
+  ) {
+    return "advanced";
+  }
+  if (
+    id === "results-section-top10" ||
+    id === "results-raw-candidates" ||
+    id === "results-section-rank-history"
+  ) {
+    return "explorer";
+  }
+  return "summary";
+}
 
 function formatBytes(n: number): string {
   if (!Number.isFinite(n) || n <= 0) return "0 B";
@@ -332,7 +372,9 @@ export function ResultsWorkbench() {
   const impactsFetchedRef = useRef(new Set<string>());
   const [rawPreview, setRawPreview] = useState<RawTrialPreview | null>(null);
   const [rawBusy, setRawBusy] = useState(false);
+  const HISTORY_PREVIEW_LIMIT = 8;
   const [libraryOpen, setLibraryOpen] = useState(true);
+  const [resultsTab, setResultsTab] = useState<ResultsTabId>("summary");
   const [libraryShowAll, setLibraryShowAll] = useState(false);
   const [runsPanelStrategyId, setRunsPanelStrategyId] = useState<string | null>(
     null,
@@ -399,6 +441,10 @@ export function ResultsWorkbench() {
     selectedJobIdOverride !== undefined
       ? selectedJobIdOverride
       : jobIdFromUrl ?? jobs[0]?.id ?? null;
+  const selectedJob =
+    selectedJobId == null
+      ? null
+      : jobs.find((j) => j.id === selectedJobId) ?? null;
 
   const refreshSeqRef = useRef(0);
   const refreshAbortRef = useRef<AbortController | null>(null);
@@ -524,7 +570,7 @@ export function ResultsWorkbench() {
 
   // Deletion-impact is expensive — only hydrate when research history is opened.
   useEffect(() => {
-    if (!historyOpen || jobs.length === 0) return;
+    if ((!historyOpen && resultsTab !== "history") || jobs.length === 0) return;
     const pending = jobs
       .map((j) => j.id)
       .filter((id) => !impactsFetchedRef.current.has(id));
@@ -555,7 +601,7 @@ export function ResultsWorkbench() {
         return next;
       });
     })();
-  }, [jobs, historyOpen]);
+  }, [jobs, historyOpen, resultsTab]);
 
   function switchHistoryView(view: "default" | "archived") {
     if (view === historyView) return;
@@ -1533,10 +1579,15 @@ export function ResultsWorkbench() {
   }, [selectedJobId, libraryOpen, historyOpen, safeOpen, loading]);
 
   function goToSection(id: string) {
-    if (id === "results-section-library") setLibraryOpen(true);
-    if (id === "results-section-history") setHistoryOpen(true);
-    if (id === "results-section-safe") setSafeOpen(true);
-    if (id === "results-raw-candidates") {
+    const nextTab = sectionToTab(id);
+    setResultsTab(nextTab);
+    if (id === "results-section-library" || nextTab === "library") {
+      setLibraryOpen(true);
+    }
+    if (id === "results-section-safe" || nextTab === "advanced") {
+      setSafeOpen(true);
+    }
+    if (id === "results-raw-candidates" || nextTab === "explorer") {
       window.setTimeout(() => {
         const details = document.querySelector<HTMLDetailsElement>(
           '[data-testid="results-raw-candidates"] details',
@@ -1545,7 +1596,9 @@ export function ResultsWorkbench() {
       }, 0);
     }
     window.setTimeout(() => {
-      const el = document.getElementById(id);
+      const el =
+        document.getElementById(id) ??
+        document.getElementById("results-raw-candidates");
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
       const focusable = el?.querySelector<HTMLElement>(
         "button, a, input, select, [tabindex]:not([tabindex='-1'])",
@@ -1555,8 +1608,27 @@ export function ResultsWorkbench() {
     }, 0);
   }
 
+  const statusJobTitle = selectedJob
+    ? selectedJob.searchName?.trim() || "이름 없는 작업"
+    : "선택된 작업 없음";
+  const statusJobState = selectedJob
+    ? historyStatusLabelKo(selectedJob.status, {
+        completionReason: selectedJob.completionReason ?? null,
+      })
+    : "작업 없음";
+  const statusEvaluated =
+    selectedJob?.uniqueEvaluatedCount != null &&
+    Number.isFinite(selectedJob.uniqueEvaluatedCount)
+      ? selectedJob.uniqueEvaluatedCount.toLocaleString("ko-KR")
+      : "없음";
+  const statusQualified =
+    selectedJob?.qualifiedCount != null &&
+    Number.isFinite(selectedJob.qualifiedCount)
+      ? selectedJob.qualifiedCount.toLocaleString("ko-KR")
+      : "없음";
+
   return (
-    <div className="space-y-5" data-testid="results-workbench">
+    <div className="v3-res-workbench space-y-5" data-testid="results-workbench">
       {message ? (
         <StatusBanner status={deriveMessageStatus(message)} message={message} aria-live="polite" />
       ) : null}
@@ -1580,25 +1652,76 @@ export function ResultsWorkbench() {
       ) : null}
 
       <nav
-        className="sticky top-0 z-30 -mx-1 overflow-x-auto border-b border-slate-800/80 bg-[rgba(8,14,26,0.92)] px-1 py-2 backdrop-blur-md"
+        className="v3-res-tabs v3-tabs"
         data-testid="results-section-nav"
         aria-label="결과 섹션 바로가기"
+        role="tablist"
       >
-        <div className="flex min-w-max gap-1">
-          {RESULTS_NAV_ITEMS.map((item) => (
-            <Button
+        {RESULTS_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            className="v3-tab"
+            aria-selected={resultsTab === tab.id}
+            onClick={() => goToSection(tab.section)}
+            data-testid={`nav-${tab.section}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+        <span className="v3-res-sr">
+          {RESULTS_NAV_ITEMS.filter(
+            (item) => !RESULTS_TABS.some((tab) => tab.section === item.id),
+          ).map((item) => (
+            <button
               key={item.id}
-              size="sm"
-              variant={activeSection === item.id ? "primary" : "outline"}
+              type="button"
               onClick={() => goToSection(item.id)}
               data-testid={`nav-${item.id}`}
             >
               {item.label}
-            </Button>
+            </button>
           ))}
-        </div>
+        </span>
       </nav>
 
+      {resultsTab === "summary" ? (
+        <section
+          className="v3-res-statusbar"
+          data-testid="results-job-statusbar"
+          aria-label="작업 요약"
+        >
+          <div className="v3-res-status-main">
+            <span>작업 요약</span>
+            <b>
+              {statusJobTitle} · {statusJobState}
+            </b>
+          </div>
+          <div className="v3-res-status-cell">
+            <span>평가</span>
+            <b>{statusEvaluated}</b>
+          </div>
+          <div className="v3-res-status-cell">
+            <span>합격</span>
+            <b className={statusQualified !== "없음" ? "ok" : undefined}>
+              {statusQualified}
+            </b>
+          </div>
+          <div className="v3-res-status-cell">
+            <span>상태</span>
+            <button
+              type="button"
+              className="v3-res-btn-ghost"
+              onClick={() => void refreshPrimary()}
+            >
+              요약 다시 불러오기
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      <div hidden={resultsTab !== "advanced"}>
       <details
         className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3"
         data-testid="results-storage-summary"
@@ -1658,31 +1781,33 @@ export function ResultsWorkbench() {
           <p className="mt-2 text-xs text-slate-500">저장소 요약을 불러오는 중…</p>
         )}
       </details>
+      </div>
 
+      <div hidden={resultsTab !== "summary" && resultsTab !== "explorer"}>
       {loading ? (
         <Card title="이번 탐색 요약" data-testid="current-research-parent-loading">
           <div
-            className="min-h-[calc(100vh-16rem)] space-y-4"
+            className="space-y-3"
             aria-busy="true"
             aria-label="탐색 결과 불러오는 중"
           >
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((item) => (
-                <Skeleton key={item} className="h-20 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-xl" />
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <Skeleton key={item} className="h-12 w-full rounded-xl" />
               ))}
             </div>
-            <Skeleton className="h-52 w-full rounded-xl" />
           </div>
         </Card>
       ) : (
         <CurrentResearchResultsPanel
           jobId={selectedJobId}
           onMessage={setMessage}
+          presentation={resultsTab === "explorer" ? "explorer" : "summary"}
         />
       )}
 
-      {!selectedJobId ? (
+      {!selectedJobId && resultsTab === "summary" ? (
         <div className="grid gap-4 lg:grid-cols-3" id="results-section-top3-fallback">
           {renderHighlight("최고 수익 전략", ranked.topProfit, "success")}
           {renderHighlight(
@@ -1701,7 +1826,9 @@ export function ResultsWorkbench() {
           )}
         </div>
       ) : null}
+      </div>
 
+      <div hidden={resultsTab !== "library"}>
       <section id="results-section-library" data-testid="results-full-ranking">
         <Card
           title="기존 전략 라이브러리"
@@ -1800,7 +1927,16 @@ export function ResultsWorkbench() {
                               s.name}
                           </div>
                           <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-400">
-                            <Badge tone="muted">{metricState}</Badge>
+                            <Badge
+                              tone={metricState === "합격" ? "success" : "muted"}
+                              className={
+                                metricState === "합격"
+                                  ? "v3-res-badge-qualified"
+                                  : undefined
+                              }
+                            >
+                              {metricState}
+                            </Badge>
                             <span>
                               수익{" "}
                               {s.lastBacktest?.totalReturn == null
@@ -1846,44 +1982,6 @@ export function ResultsWorkbench() {
                           >
                             <Button size="sm">백테스트</Button>
                           </Link>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              busyId === s.id || s.id === SAFE_STRATEGY_ID
-                            }
-                            onClick={() => void renameDisplay(s.id)}
-                            data-testid={`library-rename-${s.id}`}
-                          >
-                            이름 변경
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={
-                              busyId === s.id || s.id === SAFE_STRATEGY_ID
-                            }
-                            onClick={() =>
-                              void setLibraryArchive(
-                                s.id,
-                                !isLibraryArchived(s),
-                              )
-                            }
-                            data-testid={`library-archive-${s.id}`}
-                          >
-                            {isLibraryArchived(s) ? "복원" : "보관"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={busyId === s.id}
-                            onClick={() => void loadRelatedRuns(s.id)}
-                            data-testid={`library-related-runs-${s.id}`}
-                          >
-                            {runsPanelStrategyId === s.id
-                              ? "실행 닫기"
-                              : "관련 실행 보기"}
-                          </Button>
                           <div className="relative">
                             <Button
                               size="sm"
@@ -1904,6 +2002,54 @@ export function ResultsWorkbench() {
                                 role="menu"
                                 onClick={(e) => e.stopPropagation()}
                               >
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                  disabled={
+                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                  }
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void renameDisplay(s.id);
+                                  }}
+                                  data-testid={`library-rename-${s.id}`}
+                                >
+                                  이름 변경
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                  disabled={
+                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                  }
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void setLibraryArchive(
+                                      s.id,
+                                      !isLibraryArchived(s),
+                                    );
+                                  }}
+                                  data-testid={`library-archive-${s.id}`}
+                                >
+                                  {isLibraryArchived(s) ? "복원" : "보관"}
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
+                                  disabled={busyId === s.id}
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    void loadRelatedRuns(s.id);
+                                  }}
+                                  data-testid={`library-related-runs-${s.id}`}
+                                >
+                                  {runsPanelStrategyId === s.id
+                                    ? "실행 닫기"
+                                    : "관련 실행 보기"}
+                                </button>
                                 <button
                                   type="button"
                                   role="menuitem"
@@ -2101,7 +2247,9 @@ export function ResultsWorkbench() {
           )}
         </Card>
       </section>
+      </div>
 
+      <div hidden={resultsTab !== "advanced"}>
       <section id="results-section-raw-mgmt" data-testid="results-raw-trial-mgmt">
         <Card title="원본 후보 관리">
           <p className="mb-3 text-sm text-slate-400">
@@ -2173,7 +2321,9 @@ export function ResultsWorkbench() {
           )}
         </Card>
       </section>
+      </div>
 
+      <div hidden={resultsTab !== "history"}>
       <section id="results-section-history" data-testid="results-research-history">
         <Card
           title={historyView === "archived" ? "보관된 연구 이력" : "연구 이력 관리"}
@@ -2202,7 +2352,7 @@ export function ResultsWorkbench() {
                 data-testid="history-toggle"
                 aria-expanded={historyOpen}
               >
-                {historyOpen ? "접기" : "펼치기"}
+                {historyOpen ? "미리보기만" : "전체 탐색 이력 보기"}
               </Button>
             </div>
           }
@@ -2297,7 +2447,10 @@ export function ResultsWorkbench() {
             <>
               <ul className="space-y-2" data-testid="history-preview">
                 {historyJobs
-                  .slice(0, historyOpen ? historyJobs.length : 3)
+                  .slice(
+                    0,
+                    historyOpen ? historyJobs.length : HISTORY_PREVIEW_LIMIT,
+                  )
                   .map((j) => {
                     const impact = historyImpact[j.id];
                     const busy = historyBusyJobId === j.id || bulkBusy;
@@ -2354,10 +2507,12 @@ export function ResultsWorkbench() {
                                 Number.isFinite(j.bestReturn)
                                   ? ` · 최고 ${(j.bestReturn * 100).toFixed(1)}%`
                                   : ""}
-                                {j.bestScore != null &&
-                                Number.isFinite(j.bestScore)
-                                  ? ` · 점수 ${j.bestScore.toFixed(2)}`
-                                  : ""}{" "}
+                                {j.rankingGroups && j.rankingGroups.length > 0
+                                  ? " · 2개 평가 그룹"
+                                  : j.bestScore != null &&
+                                      Number.isFinite(j.bestScore)
+                                    ? ` · 점수 ${j.bestScore.toFixed(2)}`
+                                    : ""}{" "}
                                 ·{" "}
                                 {impact
                                   ? formatBytes(impact.bytesToRemove)
@@ -2376,7 +2531,7 @@ export function ResultsWorkbench() {
                               )}
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap items-start gap-2">
                             {historyView === "archived" ? (
                               <Button
                                 size="sm"
@@ -2388,65 +2543,72 @@ export function ResultsWorkbench() {
                                 복원
                               </Button>
                             ) : (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant={
-                                    selectedJobId === j.id ? "primary" : "outline"
-                                  }
-                                  onClick={() => setSelectedJobIdOverride(j.id)}
-                                  data-testid={`select-job-${j.id}`}
-                                >
-                                  이번 탐색으로 보기
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  disabled={busy}
-                                  onClick={() => void previewJobImpact(j.id)}
-                                  data-testid={`impact-job-${j.id}`}
-                                >
-                                  영향 미리보기
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  disabled={archiveDisabled}
-                                  title={
-                                    impact?.classification === "protected"
-                                      ? "실행 중·보호 작업은 보관할 수 없습니다."
-                                      : undefined
-                                  }
-                                  onClick={() => void archiveJob(j.id)}
-                                  data-testid={`archive-job-${j.id}`}
-                                >
-                                  보관
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  tone="muted"
-                                  disabled={deleteDisabled}
-                                  title={
-                                    impact?.classification === "archive_only"
-                                      ? `삭제 불가 — 참조: ${impact.registeredStrategyRefs.join(", ") || impact.protectedItems.join(", ")}`
-                                      : impact?.classification === "protected"
-                                        ? impact.reasonsKo[0]
-                                        : undefined
-                                  }
-                                  onClick={() => void deleteJob(j.id)}
-                                  data-testid={`delete-job-${j.id}`}
-                                >
-                                  삭제
-                                </Button>
-                              </>
-                            )}
-                            <Link
-                              href={`/strategy-search?jobId=${encodeURIComponent(j.id)}`}
-                            >
-                              <Button size="sm" variant="outline">
-                                상세
+                              <Button
+                                size="sm"
+                                variant={
+                                  selectedJobId === j.id ? "primary" : "outline"
+                                }
+                                onClick={() => setSelectedJobIdOverride(j.id)}
+                                data-testid={`select-job-${j.id}`}
+                              >
+                                이번 탐색으로 보기
                               </Button>
-                            </Link>
+                            )}
+                            <details className="v3-res-more">
+                              <summary>작업</summary>
+                              <div className="v3-res-more-body">
+                                {historyView === "archived" ? null : (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      disabled={busy}
+                                      onClick={() => void previewJobImpact(j.id)}
+                                      data-testid={`impact-job-${j.id}`}
+                                    >
+                                      영향 미리보기
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      disabled={archiveDisabled}
+                                      title={
+                                        impact?.classification === "protected"
+                                          ? "실행 중·보호 작업은 보관할 수 없습니다."
+                                          : undefined
+                                      }
+                                      onClick={() => void archiveJob(j.id)}
+                                      data-testid={`archive-job-${j.id}`}
+                                    >
+                                      보관
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      tone="muted"
+                                      disabled={deleteDisabled}
+                                      title={
+                                        impact?.classification === "archive_only"
+                                          ? `삭제 불가 — 참조: ${impact.registeredStrategyRefs.join(", ") || impact.protectedItems.join(", ")}`
+                                          : impact?.classification === "protected"
+                                            ? impact.reasonsKo[0]
+                                            : undefined
+                                      }
+                                      onClick={() => void deleteJob(j.id)}
+                                      data-testid={`delete-job-${j.id}`}
+                                    >
+                                      삭제
+                                    </Button>
+                                  </>
+                                )}
+                                <Link
+                                  href={`/strategy-search?jobId=${encodeURIComponent(j.id)}`}
+                                >
+                                  <Button size="sm" variant="outline">
+                                    상세
+                                  </Button>
+                                </Link>
+                              </div>
+                            </details>
                           </div>
                         </div>
                         {impact ? (
@@ -2482,9 +2644,10 @@ export function ResultsWorkbench() {
                     );
                   })}
               </ul>
-              {!historyOpen && historyJobs.length > 3 ? (
+              {!historyOpen && historyJobs.length > HISTORY_PREVIEW_LIMIT ? (
                 <p className="mt-2 text-xs text-slate-500">
-                  최근 3건 미리보기 · 전체 {historyJobs.length}건은 펼쳐서 확인
+                  최근 {HISTORY_PREVIEW_LIMIT}건 미리보기 · 전체{" "}
+                  {historyJobs.length}건은 「전체 탐색 이력 보기」로 확인
                 </p>
               ) : null}
             </>
@@ -2496,7 +2659,9 @@ export function ResultsWorkbench() {
           </div>
         </Card>
       </section>
+      </div>
 
+      <div hidden={resultsTab !== "advanced"}>
       <section id="results-section-safe" data-testid="results-safe-baseline">
         <Card
           title="SAFE 기준 전략"
@@ -2545,6 +2710,7 @@ export function ResultsWorkbench() {
           ) : null}
         </Card>
       </section>
+      </div>
 
       {/* ── Confirm dialog (generic) ───────────────────────────────────── */}
       <ConfirmDialog

@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/rextora/Sidebar";
-import { AppShell } from "@/components/rextora/agent/AppShell";
+import { AppShellGate } from "@/components/rextora/shell/AppShellGate";
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -13,6 +12,16 @@ const sans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Rextora — Quant Futures Platform",
   description: "Private Binance Futures quant automation dashboard",
+  applicationName: "Rextora",
+  appleWebApp: {
+    capable: true,
+    title: "Rextora",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0f16",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,22 +29,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko" className={sans.variable}>
       <head>
         <style>{`
-          .dashboard-shell{display:grid;grid-template-columns:15.75rem 1fr;min-height:100vh}
+          .dashboard-shell{display:grid;grid-template-columns:242px minmax(0,1fr);min-height:100vh}
           .rextora-mobile-header{display:none}
-          @media(max-width:1100px){
+          @media(min-width:1180px) and (max-width:1399px){
+            .dashboard-shell{grid-template-columns:92px minmax(0,1fr)}
+          }
+          @media(max-width:1179px){
             .dashboard-shell{display:block}
             .rextora-desktop-sidebar{display:none!important}
-            .rextora-mobile-header{display:block;height:61px;min-height:61px}
+            .rextora-mobile-header{display:block}
           }
         `}</style>
       </head>
       <body>
-        <div className="dashboard-shell">
-          <Sidebar />
-          <main className="dashboard-main">
-            <AppShell>{children}</AppShell>
-          </main>
-        </div>
+        <AppShellGate>{children}</AppShellGate>
       </body>
     </html>
   );

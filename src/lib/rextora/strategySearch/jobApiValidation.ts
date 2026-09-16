@@ -20,7 +20,10 @@ import type {
   StrategySearchDataReference,
   StrategySearchExecutionProfile,
 } from "./jobExecutionProfile";
-import { STRATEGY_SEARCH_EXECUTION_PROFILE_VERSION } from "./jobExecutionProfile";
+import {
+  NEW_JOB_EVENT_SEQUENCE_COST_MODEL,
+  STRATEGY_SEARCH_EXECUTION_PROFILE_VERSION,
+} from "./jobExecutionProfile";
 import type {
   QualificationProfileId,
   SearchDepthProfileId,
@@ -30,6 +33,8 @@ import {
   normalizePatternCombinationSpec,
   type PatternCombinationSpec,
 } from "./patternCombination";
+import { resolveResearchEffectiveEnd } from "../data/researchPeriodEnd";
+import { isSupportedTimeframe, resolveTimeframe } from "../data/timeframes";
 
 export interface ValidatedOperatorPlanInput {
   depthProfile: SearchDepthProfileId;
@@ -440,6 +445,28 @@ export function validateCreateSearchJobBody(
   const parameterRanges =
     body.parameterRanges as unknown as StrategySearchConfig["parameterRanges"];
 
+  const nowMs = Date.now();
+  const timeframeId = String(body.timeframe);
+  const intervalMs = isSupportedTimeframe(timeframeId)
+    ? resolveTimeframe(timeframeId).intervalMs
+    : 900_000;
+  const evaluationWindows = windows!.map((w) => ({
+    ...w,
+    toOpenTime: resolveResearchEffectiveEnd({
+      requestedEndMs: w.toOpenTime,
+      nowMs,
+      intervalMs,
+    }).effectiveEndMs,
+  }));
+  const resolvedDataRef = {
+    ...dataRef!,
+    availableTo: resolveResearchEffectiveEnd({
+      requestedEndMs: dataRef!.availableTo,
+      nowMs,
+      intervalMs,
+    }).effectiveEndMs,
+  };
+
   const config: StrategySearchConfig = {
     searchVersion: String(body.searchVersion),
     strategyTemplateId: String(body.strategyTemplateId),
@@ -450,7 +477,7 @@ export function validateCreateSearchJobBody(
     generatorType: body.generatorType as StrategySearchConfig["generatorType"],
     maxIterations,
     parameterRanges: parameterRanges.map((r) => ({ ...r })),
-    evaluationWindows: windows!.map((w) => ({ ...w })),
+    evaluationWindows,
     passCriteria: isObject(body.passCriteria)
       ? { ...(body.passCriteria as StrategySearchConfig["passCriteria"]) }
       : {
@@ -481,7 +508,8 @@ export function validateCreateSearchJobBody(
       ...jitterConfig,
       parameterRanges: jitterConfig.parameterRanges.map((r) => ({ ...r })),
     },
-    dataRef: { ...dataRef! },
+    dataRef: resolvedDataRef,
+    eventSequenceCostModel: NEW_JOB_EVENT_SEQUENCE_COST_MODEL,
   };
 
   let operatorPlan: ValidatedOperatorPlanInput | null = null;

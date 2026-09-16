@@ -18,6 +18,7 @@
     "jsx": "react-jsx",
     "incremental": true,
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "plugins": [
       {
         "name": "next"
@@ -35,7 +36,13 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    ".next/dev/dev/types/**/*.ts"
+    ".next/dev/dev/types/**/*.ts",
+    ".next-auth/types/**/*.ts",
+    ".next-auth/dev/types/**/*.ts",
+    ".next-auth-next/types/**/*.ts",
+    ".next-auth-next/dev/types/**/*.ts",
+    ".next-ui-redesign/types/**/*.ts",
+    ".next-ui-redesign/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

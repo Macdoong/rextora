@@ -109,6 +109,17 @@ describe("strategy search runtime correction", () => {
     expect(classified.class).toBe("candidate_invalid");
   });
 
+  it("invalid parameterRanges is CONFIGURATION_INVALID and fatal", () => {
+    const err = new StrategySearchGenerationError(
+      "CONFIGURATION_INVALID",
+      "invalid parameterRanges: min must be <= max",
+    );
+    expect(isRecoverableGenerationError(err)).toBe(false);
+    const classified = classifyEngineError(err, "candidate_generation");
+    expect(classified.fatal).toBe(true);
+    expect(classified.code).toBe("CONFIGURATION_INVALID");
+  });
+
   it("nextInt range collapse is recoverable parameter_out_of_range", () => {
     const classified = classifyEngineError(
       new Error("nextInt minInclusive must be <= maxInclusive"),

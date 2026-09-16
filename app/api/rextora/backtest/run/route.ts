@@ -16,9 +16,16 @@ import {
 } from "@/src/lib/rextora/strategy/strategyStore";
 import type { BacktestConfig } from "@/src/lib/rextora/backtest/backtestTypes";
 import {
+  CostAssumptionsError,
+  DEFAULT_COST_STRESS_MULTIPLIERS,
+  normalizeCostAssumptions,
+  resolveEffectiveRates,
+} from "@/src/lib/rextora/backtest/costAssumptions";
+import {
   HistoricalCandleLoadError,
   loadHistoricalCandles,
 } from "@/src/lib/rextora/data/historicalCandleLoader";
+import { BACKTEST_DATA_COVERAGE_INSUFFICIENT } from "@/src/lib/rextora/backtest/backtestDataCoverage";
 import { probeAvailableCandleDateRange } from "@/src/lib/rextora/backtest/availableCandleRange";
 import { resolveEffectiveEndFromOpenTime } from "@/src/lib/rextora/backtest/backtestDateRange";
 import { resolveChartEvidence } from "@/src/lib/rextora/backtest/chartEvidenceStore";
@@ -28,8 +35,12 @@ import {
   resolveStrategySymbolCompatibility,
 } from "@/src/lib/rextora/backtest/strategySymbolCompatibility";
 import type { StoredStrategyV1 } from "@/src/lib/rextora/strategy/definition/bridge";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const { searchParams } = new URL(request.url);
   const strategyId = searchParams.get("strategyId");
   const runId = searchParams.get("runId") ?? searchParams.get("id");
@@ -213,6 +224,8 @@ function serializeSymbolResult(
 }
 
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "backtest:run");
+  if (denied) return denied;
   const started = Date.now();
   ensureStrategyStore();
   try {
@@ -302,6 +315,29 @@ export async function POST(request: Request) {
       );
     }
 
+    let costAssumptions;
+    try {
+      costAssumptions = normalizeCostAssumptions({
+        feeRate: body.feeRate,
+        slippageRate: body.slippageRate,
+        fundingRate: body.fundingRate,
+        applyFunding: body.applyFunding,
+        applySpread: body.applySpread,
+        spreadRate: body.spreadRate,
+        costGuardK: body.costGuardK,
+      });
+    } catch (error) {
+      const message =
+        error instanceof CostAssumptionsError
+          ? error.message
+          : "비용 가정이 유효하지 않습니다.";
+      return NextResponse.json(
+        { ok: false, error: message, code: "INVALID_COST_ASSUMPTIONS" },
+        { status: 400 },
+      );
+    }
+    const rates = resolveEffectiveRates(costAssumptions);
+
     const config: BacktestConfig = {
       strategyId: body.strategyId,
       symbols: body.symbols?.length ? body.symbols : ["BTCUSDT"],
@@ -311,16 +347,17 @@ export async function POST(request: Request) {
       fromOpenTime: body.fromOpenTime,
       toOpenTime: effectiveToOpenTime,
       balance: body.balance ?? 10_000,
-      feeRate: body.feeRate ?? 0.0004,
-      slippageRate: body.slippageRate ?? 0.0002,
-      fundingRate: body.fundingRate ?? 0.0001,
-      applyFunding: body.applyFunding ?? false,
-      applySpread: body.applySpread ?? false,
-      spreadRate: body.spreadRate ?? 0.0001,
+      feeRate: rates.feeRate,
+      slippageRate: rates.slippageRate,
+      fundingRate: rates.fundingRate,
+      applyFunding: rates.applyFunding,
+      applySpread: rates.applySpread,
+      spreadRate: rates.spreadRate,
       costStressMultipliers: body.costStressMultipliers?.length
         ? body.costStressMultipliers
-        : [1, 1.5, 2],
-      costGuardK: body.costGuardK ?? 3,
+        : [...DEFAULT_COST_STRESS_MULTIPLIERS],
+      costGuardK: rates.costGuardK,
+      costAssumptions,
       baseBalPct: body.baseBalPct,
       maxConcurrent: body.maxConcurrent,
       dataMode: "binance",
@@ -398,6 +435,28 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (
+      error instanceof BacktestPipelineError &&
+      error.code === BACKTEST_DATA_COVERAGE_INSUFFICIENT
+    ) {
+      const payload = error.toJSON();
+      return NextResponse.json(
+        {
+          ok: false,
+          error: error.userMessage,
+          code: BACKTEST_DATA_COVERAGE_INSUFFICIENT,
+          details: payload,
+          data: null,
+          meta: {
+            source: "rextora",
+            durationMs: Date.now() - started,
+            cached: false,
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        { status: 422 },
+      );
+    }
+    if (
       error instanceof BacktestPipelineError ||
       error instanceof HistoricalCandleLoadError
     ) {
@@ -445,6 +504,8 @@ export async function POST(request: Request) {
 
 /** Delete a saved Backtest Run. Never touches SAFE or live order endpoints. */
 export async function DELETE(request: Request) {
+  const denied = await denyUnlessPermitted(request, "backtest:run");
+  if (denied) return denied;
   const { searchParams } = new URL(request.url);
   const runId = searchParams.get("runId") ?? searchParams.get("id");
   if (!runId) {

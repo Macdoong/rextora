@@ -44,6 +44,7 @@ function statusToneClass(status: string, historyLabel: string): string {
     status === "pause_requested" ||
     status === "queued" ||
     status === "paused" ||
+    status === "interrupted" ||
     status === "cancel_requested"
   ) {
     return "text-sky-300";

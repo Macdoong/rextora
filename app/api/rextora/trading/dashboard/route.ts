@@ -3,8 +3,12 @@ import { getCachedDiagnosticsReport } from "@/src/lib/rextora/systemStatusSyncSe
 import { buildTradingDashboardStatus } from "@/src/lib/rextora/tradingDashboardStatus";
 import { getBotRuntimeStatus } from "@/src/lib/rextora/botRuntime";
 import { getAuditLogs } from "@/src/lib/rextora/storage/auditStore";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const diagnostics = getCachedDiagnosticsReport();

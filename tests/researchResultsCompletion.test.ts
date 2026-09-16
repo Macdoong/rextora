@@ -25,6 +25,7 @@ import {
   SAFE_STRATEGY_ID,
 } from "../src/lib/rextora/strategy/strategyTypes";
 import { StrategySearchApiError } from "../src/lib/rextora/strategySearch/jobApiService";
+import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
 
 const tempRoots: string[] = [];
@@ -159,6 +160,47 @@ function seedJobWithTrials() {
       },
       dataRef: {
         source: "binance_historical",
+        availableFrom: 0,
+        availableTo: 1,
+      },
+    },
+    store,
+  );
+  saveJobExecutionProfile(
+    job.id,
+    {
+      version: 1,
+      balance: 10_000,
+      baseCostConfig: {
+        feeRate: 0.0004,
+        slippageRate: 0.0002,
+        fundingRate: 0,
+        applyFunding: false,
+        applySpread: false,
+        spreadRate: 0,
+      },
+      passPolicy: { thresholds: {} },
+      scoreWeights: {
+        returnWeight: 1,
+        mddWeight: 1,
+        profitFactorWeight: 0.25,
+        winRateWeight: 0.25,
+        tradeAdequacyWeight: 0.25,
+        negativeMonthWeight: 0.1,
+        consistencyWeight: 0.1,
+      },
+      costStressScenarios: [],
+      jitterConfig: {
+        enabled: true,
+        sampleCount: 1,
+        mutationScale: 0.1,
+        seed: 1,
+        minimumPassRate: 0,
+        maximumScoreDropRatio: 1,
+        parameterRanges: [],
+      },
+      dataRef: {
+        source: "preloaded",
         availableFrom: 0,
         availableTo: 1,
       },
@@ -342,10 +384,9 @@ describe("Research → Results completion", () => {
     const { job, store } = seedJobWithTrials();
     const summary = buildResearchResultsSummary(job.id, store);
     expect(summary.topProfit?.paramsHash).toBe("hash_hi_ret");
-    expect(summary.topRecommend?.paramsHash).not.toBe("hash_hi_ret");
-    expect(summary.topRecommend?.recommendable).toBe(true);
-    expect(summary.topRecommend?.jitterPassed).toBe(true);
-    expect(summary.topRecommend?.stressPassed).toBe(true);
+    // Seeded trials lack research evaluation identity, so CHAMP-A does not
+    // promote highest return (or any trial) to final recommendation.
+    expect(summary.topRecommend).toBeNull();
   });
 
   it("13. backtest recommendation set is bounded (≤10)", () => {

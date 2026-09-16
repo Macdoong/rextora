@@ -78,6 +78,19 @@ function adjustFloatRange(
   return next;
 }
 
+/**
+ * One-sided max tightening must not invent an inverted range.
+ * If nextMax < currentMin, keep the previously valid field unchanged.
+ */
+function requestedMaxWouldInvert(
+  range: StrategySearchParameterRange,
+  nextMax: number,
+): boolean {
+  if (!Number.isFinite(nextMax)) return true;
+  if (typeof range.min !== "number" || !Number.isFinite(range.min)) return false;
+  return nextMax < range.min;
+}
+
 function adjustNumericDefault(
   base: Record<string, number | boolean | string>,
   key: string,
@@ -180,10 +193,12 @@ export function applyPatternOperatorConfigToRanges(
     } else if (config.patternStrength === "loose") {
       max = clampNum(max + 0.05, 0.2, 0.95);
     }
-    next = adjustFloatRange(next, "penetrationPct", {
-      max,
-      ...(defaultValue != null ? { defaultValue } : {}),
-    });
+    if (!requestedMaxWouldInvert(penetration, max)) {
+      next = adjustFloatRange(next, "penetrationPct", {
+        max,
+        ...(defaultValue != null ? { defaultValue } : {}),
+      });
+    }
   }
 
   if (config.patternConfirmStrength === "strict") {
@@ -299,17 +314,21 @@ export function applyPatternOperatorConfigToRanges(
       ];
     }
     if (!next.some((r) => r.key === "confirmationWindow")) {
-      next = [
-        ...next,
-        {
-          key: "confirmationWindow",
-          valueType: "integer",
-          min: countDefault,
-          max: 24,
-          defaultValue: windowDefault,
-          step: 1,
-        },
-      ];
+      const windowMin = countDefault;
+      const windowMax = 24;
+      if (Number.isFinite(windowMin) && windowMin <= windowMax) {
+        next = [
+          ...next,
+          {
+            key: "confirmationWindow",
+            valueType: "integer",
+            min: windowMin,
+            max: windowMax,
+            defaultValue: windowDefault,
+            step: 1,
+          },
+        ];
+      }
     }
   }
 

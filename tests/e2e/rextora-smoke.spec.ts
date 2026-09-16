@@ -10,15 +10,15 @@ const routes = [
   "/settings",
 ];
 
-const navLabels = [
-  "대시보드",
+const lifecycleNavLabels = [
   "전략 탐색",
-  "탐색 결과",
+  "전략",
   "백테스트",
-  "모의 매매",
-  "실전 매매",
-  "시스템 설정",
+  "모의매매",
+  "실전 진입",
 ];
+
+const supportingNavLabels = ["운영센터", "시스템 설정"];
 
 const removedNavLabels = [
   "고급 전략 편집",
@@ -42,10 +42,53 @@ test.describe("Rextora lifecycle smoke", () => {
     });
   }
 
-  test("sidebar has exactly seven primary nav items", async ({ page }) => {
+  test("desktop sidebar uses lifecycle-first navigation with supporting destinations", async ({
+    page,
+  }) => {
     await page.goto("/dashboard");
-    const nav = page.getByTestId("main-nav");
-    for (const label of navLabels) {
+    await expect(page.getByTestId("main-nav")).toBeVisible();
+    await expect(page.getByTestId("sidebar-lifecycle-nav")).toBeVisible();
+    await expect(page.getByTestId("shell-lifecycle-navigation")).toBeVisible();
+    await expect(page.getByTestId("sidebar-supporting-nav")).toBeVisible();
+
+    for (const label of lifecycleNavLabels) {
+      await expect(
+        page.getByTestId("shell-lifecycle-navigation").getByText(label, {
+          exact: true,
+        }),
+      ).toBeVisible();
+    }
+
+    for (const label of supportingNavLabels) {
+      await expect(
+        page.getByTestId("sidebar-supporting-nav").getByText(label, {
+          exact: true,
+        }),
+      ).toBeVisible();
+    }
+
+    await expect(page.getByTestId("nav-dashboard")).toBeVisible();
+    await expect(page.getByTestId("nav-settings")).toBeVisible();
+
+    for (const label of removedNavLabels) {
+      await expect(page.getByTestId("main-nav").getByText(label, { exact: true })).toHaveCount(0);
+    }
+  });
+
+  test("mobile menu preserves seven primary Korean nav items", async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 1000 });
+    await page.goto("/dashboard");
+    await page.getByText("메뉴").click();
+    const nav = page.getByTestId("mobile-nav");
+    for (const label of [
+      "운영센터",
+      "전략 탐색",
+      "탐색 결과",
+      "백테스트",
+      "모의매매",
+      "실전 진입",
+      "시스템 설정",
+    ]) {
       await expect(nav.getByText(label, { exact: true })).toBeVisible();
     }
     for (const label of removedNavLabels) {

@@ -32,6 +32,7 @@ export const STRATEGY_SEARCH_HISTORY_RETENTION_MAX = 100;
 const PROTECTED_ACTIVE_STATUSES: ReadonlySet<StrategySearchJobStatus> = new Set([
   "queued",
   "running",
+  "interrupted",
   "pause_requested",
   "paused",
   "cancel_requested",
@@ -97,6 +98,7 @@ export function normalizeJobStatusForRetention(
   if (
     status === "queued" ||
     status === "running" ||
+    status === "interrupted" ||
     status === "pause_requested" ||
     status === "paused" ||
     status === "cancel_requested" ||

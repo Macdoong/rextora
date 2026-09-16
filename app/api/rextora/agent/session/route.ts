@@ -12,8 +12,12 @@ import {
 import { sanitizeSessionId } from "@/src/lib/rextora/agent/v2/session/sessionPersistence";
 import type { SessionPatchRequest } from "@/src/lib/rextora/agent/v2/session/sessionTypes";
 import { readTaskLedger } from "@/src/lib/rextora/agent/v2/tasks";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(req: Request) {
+  const denied = await denyUnlessAuthenticated(req);
+  if (denied) return denied;
+
   try {
     const url = new URL(req.url);
     const sessionId = url.searchParams.get("sessionId");
@@ -53,6 +57,8 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const denied = await denyUnlessPermitted(req, "agent:operate");
+  if (denied) return denied;
   try {
     const body = (await req.json()) as SessionPatchRequest;
     if (!body?.sessionId || typeof body.updatedAt !== "string") {

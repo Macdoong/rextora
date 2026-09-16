@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Badge, Button, Card, Metric, Tooltip } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/rextora/EmptyState";
+import { V3Drawer } from "@/components/rextora/v3/V3Drawer";
 import type {
   ResearchClusterView as ResearchCluster,
   ResearchResultCardView as ResearchResultCard,
@@ -25,6 +26,14 @@ import {
   type ExplorerPageSize,
   type ExplorerSortKey,
 } from "@/components/rextora/results/researchExplorerUtils";
+import { ResearchRankingGroups } from "@/components/rextora/strategySearch/ResearchRankingGroups";
+import {
+  GROUP_RANK_HISTORY_UNAVAILABLE,
+  groupDecisionHighlights,
+  groupScopedRankHistory,
+  hasAuthoritativeRankingGroups,
+  rankingGroupLabel,
+} from "@/src/lib/rextora/researchRankingReadModel";
 
 function formatPct(v: number | null | undefined): string {
   if (v == null || !Number.isFinite(v)) return "없음";
@@ -167,6 +176,14 @@ function StatusBadge({
   return <Tooltip content={tip}>{badge}</Tooltip>;
 }
 
+function RegistrationBadge({ label }: { label: string }) {
+  return (
+    <Badge className={label === "미등록" ? "v3-res-badge-unregistered" : undefined}>
+      {label}
+    </Badge>
+  );
+}
+
 function RowMenu(props: {
   card: ResearchResultCard;
   registered: boolean;
@@ -304,7 +321,7 @@ function TopDecisionCard(props: {
             tip={STAGE_TIP[card.eligibilityStatus]}
             tone={card.finalRecommendable ? "success" : "warning"}
           />
-          <Badge>{registrationLabel}</Badge>
+          <RegistrationBadge label={registrationLabel} />
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           <Metric label="순수익" value={formatPct(card.netReturn)} />
@@ -391,7 +408,7 @@ function CompactRecRow(props: {
               tip={card.sampleConfidenceDetail}
               tone={card.sampleConfidence === "표본 충분" ? "success" : "warning"}
             />
-            <Badge>{registrationLabel}</Badge>
+            <RegistrationBadge label={registrationLabel} />
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -408,19 +425,16 @@ function CompactRecRow(props: {
               {props.busy ? "등록 중" : "전략 등록 후 백테스트"}
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={props.onToggleDetail}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={props.onToggleDetail}
+            aria-expanded={props.expanded}
+          >
             상세 보기
           </Button>
         </div>
       </div>
-      {props.expanded ? (
-        <div className="mt-2 border-t border-slate-800 pt-2 text-xs text-slate-400">
-          <p>정식 이름: {card.readableName}</p>
-          <p>약점: {card.primaryWeakness}</p>
-          <p>사유: {card.recommendationReason}</p>
-          <p>비용: {card.costStatus}</p>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -429,7 +443,7 @@ function RowDetail(props: { card: ResearchResultCard; cluster?: ResearchCluster 
   const { card, cluster } = props;
   return (
     <div
-      className="space-y-1 border-t border-slate-800 bg-slate-950/60 px-3 py-3 text-xs text-slate-400"
+      className="v3-res-row-detail space-y-1 text-xs"
       data-testid={`row-detail-${card.iteration}`}
     >
       <p>
@@ -479,6 +493,7 @@ function RowDetail(props: { card: ResearchResultCard; cluster?: ResearchCluster 
 export function CurrentResearchResultsPanel(props: {
   jobId: string | null;
   onMessage?: (msg: string) => void;
+  presentation?: "all" | "summary" | "explorer";
 }) {
   const router = useRouter();
   const [summary, setSummary] = useState<ResearchResultsSummary | null>(null);
@@ -819,7 +834,21 @@ export function CurrentResearchResultsPanel(props: {
   const visibleRecs = showAllRecs ? recs : recs.slice(0, 3);
   const activeFilters = filters.filter((f) => f !== "all");
   const top10Visible = top10Expanded ? top10 : top10.slice(0, 3);
+  const groupAware = hasAuthoritativeRankingGroups(summary);
+  const groupHighlights = groupDecisionHighlights({
+    source: summary,
+    candidates: [
+      ...summary.representatives,
+      ...top10,
+      summary.topProfit,
+      summary.topStable,
+    ].filter((card): card is ResearchResultCard => card != null),
+  });
+  const groupedRankHistory = groupAware
+    ? groupScopedRankHistory({ snapshots: [] })
+    : null;
   const decisionTop3 = (() => {
+    if (groupAware) return [];
     const map = new Map<
       string,
       { card: ResearchResultCard; titles: string[] }
@@ -827,7 +856,6 @@ export function CurrentResearchResultsPanel(props: {
     for (const [title, card] of [
       ["최고 수익 전략", summary.topProfit],
       ["최고 안정 전략", summary.topStable],
-      ["최종 추천 전략", summary.topRecommend],
     ] as const) {
       if (!card) continue;
       const current = map.get(card.paramsHash);
@@ -853,9 +881,32 @@ export function CurrentResearchResultsPanel(props: {
     { id: "stage-final", label: "최종 추천", value: c.stageFinalRecommendable },
     { id: "stage-top10", label: "TOP 10", value: c.top10Saved },
   ];
+  const presentation = props.presentation ?? "all";
+  const showSummary = presentation !== "explorer";
+  const showExplorer = presentation !== "summary";
+  const primaryCard =
+    (!groupAware && decisionTop3[0]?.card) ||
+    summary.topProfit ||
+    recs[0] ||
+    null;
+  const drawerCard =
+    (expandedRow
+      ? pageModel.pageRows.find((card) => strategyRowKey(card) === expandedRow) ??
+        summary.representatives.find((card) => strategyRowKey(card) === expandedRow) ??
+        top10.find((card) => strategyRowKey(card) === expandedRow) ??
+        recs.find((card) => strategyRowKey(card) === expandedRow)
+      : null) ??
+    (recDetail != null
+      ? top10.find((card) => card.iteration === recDetail) ??
+        recs.find((card) => card.iteration === recDetail) ??
+        summary.representatives.find((card) => card.iteration === recDetail)
+      : null) ??
+    null;
 
   return (
-    <div className="space-y-5" data-testid="current-research-panel">
+    <div className="space-y-5 v3-res-research" data-testid="current-research-panel">
+      {showSummary ? (
+      <>
       <section id="results-section-outcome" data-testid="current-research-outcome">
         <Card title={summary.outcome?.titleKo ?? "이번 탐색 요약"}>
           <p
@@ -884,8 +935,47 @@ export function CurrentResearchResultsPanel(props: {
           >
             {summary.provenanceNote}
           </p>
+          {primaryCard ? (
+            <div className="mt-4">
+              <TopDecisionCard
+                title="대표 후보"
+                card={primaryCard}
+                empty="표시할 대표 후보가 없습니다."
+                testId="results-primary-candidate"
+                busyIteration={busyIteration}
+                promoting={promoting}
+                onRegisterThenBacktest={registerThenBacktest}
+              />
+            </div>
+          ) : (
+            <EmptyState
+              className="mt-4"
+              message="표시할 대표 후보가 없습니다."
+            />
+          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              disabled={promoting || c.recommendationEligibleStrategies === 0}
+              onClick={() => void promoteTop()}
+              data-testid="promote-top-batch"
+            >
+              상위 전략 일괄 등록
+            </Button>
+            <Link href={`/strategy-search?jobId=${encodeURIComponent(summary.jobId)}`}>
+              <Button size="sm" variant="outline">
+                탐색 화면으로
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </section>
+
+      <details className="v3-res-analysis" data-testid="results-detailed-analysis">
+        <summary>상세 분석</summary>
+        <div className="v3-res-analysis-body">
           <div
-            className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
             data-testid="current-research-stage-counts"
           >
             {stageCounts.map((s) => (
@@ -895,7 +985,7 @@ export function CurrentResearchResultsPanel(props: {
             ))}
           </div>
           <details className="mt-3 text-xs text-slate-500">
-            <summary className="cursor-pointer select-none">집계 상세 · 최고 수익 비교</summary>
+            <summary className="cursor-pointer select-none">집계 상세</summary>
             <div
               className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
               data-testid="current-research-counts"
@@ -987,63 +1077,133 @@ export function CurrentResearchResultsPanel(props: {
             </ul>
             <p className="mt-2">편중: {summary.selectionSummary.overfittingNote}</p>
           </details>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              disabled={promoting || c.recommendationEligibleStrategies === 0}
-              onClick={() => void promoteTop()}
-              data-testid="promote-top-batch"
-            >
-              상위 전략 일괄 등록
-            </Button>
-            <Link href={`/strategy-search?jobId=${encodeURIComponent(summary.jobId)}`}>
-              <Button size="sm" variant="outline">
-                탐색 화면으로
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </section>
 
       <section
         id="results-section-final-recommendation"
         data-testid="results-final-recommendation"
       >
-        <TopDecisionCard
-          title="최종 추천"
-          card={summary.topRecommend}
-          empty="최종 추천 자격을 충족한 전략이 없습니다."
-          testId="final-recommendation"
-          busyIteration={busyIteration}
-          promoting={promoting}
-          onRegisterThenBacktest={registerThenBacktest}
-        />
+        <Card title="그룹별 최종 추천">
+          <p className="mb-3 text-xs text-slate-400">
+            각 평가 그룹의 최종 추천은 CHAMP-A bestPassedCandidate입니다.
+            TOP 10·종합 점수는 참고용입니다.
+          </p>
+          <ResearchRankingGroups
+            source={summary}
+            unknownLegacy={summary.unknownLegacy}
+          />
+        </Card>
       </section>
 
       <section id="results-section-top3" data-testid="results-top3">
-        <div className="grid gap-4 lg:grid-cols-3">
-          {decisionTop3.map(({ card, titles }) => (
-            <TopDecisionCard
-              key={card.paramsHash}
-              title={titles.join(" · ")}
-              card={card}
-              empty="추천 가능한 전략 없음"
-              testId={`highlight-${titles[0]}`}
-              busyIteration={busyIteration}
-              promoting={promoting}
-              onRegisterThenBacktest={registerThenBacktest}
-            />
-          ))}
-          {decisionTop3.length === 0 ? (
-            <Card title="Best strategy">
-              <EmptyState message="합격 전략이 없습니다." />
-            </Card>
-          ) : null}
-        </div>
+        {groupAware && groupHighlights ? (
+          <div className="space-y-3" data-testid="results-group-highlights">
+            <p className="text-xs text-slate-400">
+              수익·안정 표시는 같은 평가 그룹 안에서만 비교합니다. 최종 추천은
+              CHAMP-A입니다.
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {groupHighlights.map((group) => (
+                <div
+                  key={group.groupId}
+                  className="min-w-0 space-y-3"
+                  data-testid={`results-highlights-${group.groupId}`}
+                >
+                  <h3 className="text-sm font-semibold text-slate-200">
+                    {rankingGroupLabel(group.groupId)}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    <TopDecisionCard
+                      title={group.highestReturnLabel}
+                      card={group.highestReturn}
+                      empty="그룹 최고 수익 없음"
+                      testId={`highlight-${group.groupId}-return`}
+                      busyIteration={busyIteration}
+                      promoting={promoting}
+                      onRegisterThenBacktest={registerThenBacktest}
+                    />
+                    <TopDecisionCard
+                      title={group.highestStabilityLabel}
+                      card={group.highestStability}
+                      empty="그룹 최고 안정 없음"
+                      testId={`highlight-${group.groupId}-stability`}
+                      busyIteration={busyIteration}
+                      promoting={promoting}
+                      onRegisterThenBacktest={registerThenBacktest}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 lg:grid-cols-3">
+            {decisionTop3.map(({ card, titles }) => (
+              <TopDecisionCard
+                key={card.paramsHash}
+                title={`기존 평가 형식 · ${titles.join(" · ")}`}
+                card={card}
+                empty="추천 가능한 전략 없음"
+                testId={`highlight-${titles[0]}`}
+                busyIteration={busyIteration}
+                promoting={promoting}
+                onRegisterThenBacktest={registerThenBacktest}
+              />
+            ))}
+            {decisionTop3.length === 0 ? (
+              <Card title="기존 평가 형식 · Best strategy">
+                <EmptyState message="합격 전략이 없습니다." />
+              </Card>
+            ) : null}
+          </div>
+        )}
       </section>
 
+      <section id="results-section-backtest-rec" data-testid="backtest-recommendations">
+        <Card title="백테스트 추천 전략">
+          {recs.length === 0 ? (
+            <EmptyState message="추천 자격이 있는 전략이 없어 백테스트 추천이 비어 있습니다." />
+          ) : (
+            <div className="space-y-2">
+              {visibleRecs.map((card, i) => (
+                <CompactRecRow
+                  key={strategyRowKey(card)}
+                  card={card}
+                  rank={i + 1}
+                  busy={busyIteration === card.iteration || promoting}
+                  onRegisterThenBacktest={registerThenBacktest}
+                  onToggleDetail={() =>
+                    setRecDetail((v) => (v === card.iteration ? null : card.iteration))
+                  }
+                  expanded={recDetail === card.iteration}
+                />
+              ))}
+              {recs.length > 3 ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowAllRecs((v) => !v)}
+                  data-testid="backtest-rec-expand"
+                >
+                  {showAllRecs ? "상위 3개만 보기" : `전체 ${recs.length}개 보기`}
+                </Button>
+              ) : null}
+            </div>
+          )}
+        </Card>
+      </section>
+        </div>
+      </details>
+      </>
+      ) : null}
+
+      {showExplorer ? (
+      hasAuthoritativeRankingGroups(summary) ? null : (
       <section id="results-section-top10" data-testid="results-top10">
-        <Card title="TOP 10 기관형 비교">
+        <Card title="기존 평가 형식 · TOP 10 숏리스트 · 표시용">
+          <p className="mb-3 text-xs text-slate-400" data-testid="results-top10-role">
+            기존 평가 형식입니다. TOP 10은 표시용 숏리스트이며 브라우저에서 SAFE/패턴
+            그룹을 새로 만들지 않습니다.
+          </p>
           {top10.length === 0 ? (
             <EmptyState message="저장된 TOP 10 후보가 없습니다." />
           ) : (
@@ -1082,7 +1242,6 @@ export function CurrentResearchResultsPanel(props: {
                             >
                               {aliasOf(card)}
                             </button>
-                            {expanded ? <RowDetail card={card} cluster={clusterById.get(card.clusterId)} /> : null}
                           </td>
                           <td className="px-2 py-2">{card.patternStack || card.strategyFamily}</td>
                           <td className="px-2 py-2 tabular-nums">{formatPct(card.winRate)}</td>
@@ -1131,9 +1290,6 @@ export function CurrentResearchResultsPanel(props: {
                     >
                       상세 보기
                     </Button>
-                    {recDetail === card.iteration ? (
-                      <RowDetail card={card} cluster={clusterById.get(card.clusterId)} />
-                    ) : null}
                   </article>
                 ))}
               </div>
@@ -1151,75 +1307,94 @@ export function CurrentResearchResultsPanel(props: {
           )}
         </Card>
       </section>
+      )
+      ) : null}
 
-      <section id="results-section-backtest-rec" data-testid="backtest-recommendations">
-        <Card title="백테스트 추천 전략">
-          {recs.length === 0 ? (
-            <EmptyState message="추천 자격이 있는 전략이 없어 백테스트 추천이 비어 있습니다." />
-          ) : (
-            <div className="space-y-2">
-              {visibleRecs.map((card, i) => (
-                <CompactRecRow
-                  key={strategyRowKey(card)}
-                  card={card}
-                  rank={i + 1}
-                  busy={busyIteration === card.iteration || promoting}
-                  onRegisterThenBacktest={registerThenBacktest}
-                  onToggleDetail={() =>
-                    setRecDetail((v) => (v === card.iteration ? null : card.iteration))
-                  }
-                  expanded={recDetail === card.iteration}
-                />
-              ))}
-              {recs.length > 3 ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowAllRecs((v) => !v)}
-                  data-testid="backtest-rec-expand"
-                >
-                  {showAllRecs ? "상위 3개만 보기" : `전체 ${recs.length}개 보기`}
-                </Button>
-              ) : null}
-            </div>
-          )}
-        </Card>
-      </section>
-
+      {showExplorer ? (
+      <>
       <section id="results-section-rank-history" data-testid="top10-rank-changes">
-        <Card title="TOP 10 순위 변동">
-          {rankChanges.length === 0 ? (
-            <EmptyState message="이번 탐색에서 TOP 10 순위 변동 기록이 없습니다." />
-          ) : (
-            <ul className="space-y-2 text-sm" data-testid="rank-change-list">
-              {rankChanges.map((entry) => {
-                const card = top10.find((candidate) => candidate.paramsHash === entry.strategyHash);
-                return (
-                  <li
-                    key={`${entry.strategyHash}-${entry.currentRank ?? "x"}-${entry.previousRank ?? "y"}`}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 px-3 py-2"
-                    data-testid={`rank-change-${entry.strategyHash.slice(0, 8)}`}
+        {groupAware ? (
+          <Card title="TOP 10 순위 변동">
+            {groupedRankHistory?.available ? (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {groupedRankHistory.groups.map((group) => (
+                  <div
+                    key={group.groupId}
+                    className="min-w-0"
+                    data-testid={`rank-history-${group.groupId}`}
                   >
-                  <span className="text-sm font-medium text-slate-200">
-                    {card ? aliasOf(card) : "순위 변동 전략"}
-                  </span>
-                  <Badge tone={entry.change === "신규 진입" ? "success" : "info"}>
-                    {entry.change}
-                  </Badge>
-                  <span className="text-xs text-slate-300">
-                    {entry.previousRank != null ? `${entry.previousRank}위` : "—"} →{" "}
-                    {entry.currentRank != null ? `${entry.currentRank}위` : "제외"}
-                  </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
+                    <h3 className="text-sm font-semibold text-slate-200">
+                      {rankingGroupLabel(group.groupId)}
+                    </h3>
+                    <ul className="mt-2 space-y-2 text-sm">
+                      {group.changes.map((entry) => (
+                        <li
+                          key={`${group.groupId}-${entry.strategyHash}`}
+                          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 px-3 py-2"
+                        >
+                          <span className="text-sm font-medium text-slate-200">
+                            {entry.strategyHash}
+                          </span>
+                          <Badge tone={entry.change === "신규 진입" ? "success" : "info"}>
+                            {entry.change}
+                          </Badge>
+                          <span className="text-xs text-slate-300">
+                            {entry.previousRank != null ? `${entry.previousRank}위` : "—"} →{" "}
+                            {entry.currentRank != null ? `${entry.currentRank}위` : "제외"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p
+                className="text-sm text-slate-400"
+                data-testid="rank-history-group-unavailable"
+              >
+                {GROUP_RANK_HISTORY_UNAVAILABLE}
+              </p>
+            )}
+          </Card>
+        ) : (
+          <Card title="기존 평가 형식 · TOP 10 순위 변동">
+            {rankChanges.length === 0 ? (
+              <EmptyState message="이번 탐색에서 TOP 10 순위 변동 기록이 없습니다." />
+            ) : (
+              <ul className="space-y-2 text-sm" data-testid="rank-change-list">
+                {rankChanges.map((entry) => {
+                  const card = top10.find((candidate) => candidate.paramsHash === entry.strategyHash);
+                  return (
+                    <li
+                      key={`${entry.strategyHash}-${entry.currentRank ?? "x"}-${entry.previousRank ?? "y"}`}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-800 px-3 py-2"
+                      data-testid={`rank-change-${entry.strategyHash.slice(0, 8)}`}
+                    >
+                    <span className="text-sm font-medium text-slate-200">
+                      {card ? aliasOf(card) : "순위 변동 전략"}
+                    </span>
+                    <Badge tone={entry.change === "신규 진입" ? "success" : "info"}>
+                      {entry.change}
+                    </Badge>
+                    <span className="text-xs text-slate-300">
+                      {entry.previousRank != null ? `${entry.previousRank}위` : "—"} →{" "}
+                      {entry.currentRank != null ? `${entry.currentRank}위` : "제외"}
+                    </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+        )}
       </section>
 
       <section id="results-raw-candidates" data-testid="results-raw-candidates">
-        <details className="rounded-xl border border-slate-800 bg-slate-950/30">
+        <details
+          className="rounded-xl border border-slate-800 bg-slate-950/30"
+          open={presentation === "explorer" ? true : undefined}
+        >
           <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-slate-200">
             전체 원본 후보 보기 ({formatCount(c.clusteredRepresentatives)}개 대표)
           </summary>
@@ -1227,6 +1402,11 @@ export function CurrentResearchResultsPanel(props: {
       <div className="mb-2 text-xs text-slate-400">
         전체 대표 후보를 검색·필터·정렬합니다. 기본 화면은 TOP 10만 표시합니다.
       </div>
+          <div className="v3-res-chip-row mb-3">
+            {summary.symbol ? <span className="v3-res-tag">{summary.symbol}</span> : null}
+            {summary.timeframe ? <span className="v3-res-tag">{summary.timeframe}</span> : null}
+            {summary.searchName ? <span className="v3-res-tag">{summary.searchName}</span> : null}
+          </div>
           <div
             className="mb-3 space-y-3"
             data-testid="explorer-toolbar"
@@ -1335,7 +1515,7 @@ export function CurrentResearchResultsPanel(props: {
               개 표시
             </p>
             <details className="text-xs text-slate-500">
-              <summary className="cursor-pointer select-none">상태 배지 안내</summary>
+              <summary className="cursor-pointer select-none">표시 기준</summary>
               <ul className="mt-1 list-disc space-y-1 pl-5">
                 <li>기본 검토 가능: {STAGE_TIP["기본 검토 가능"]}</li>
                 <li>최종 추천 가능: {STAGE_TIP["최종 추천 가능"]}</li>
@@ -1417,12 +1597,6 @@ export function CurrentResearchResultsPanel(props: {
                                 />
                               </div>
                             ) : null}
-                            {expanded ? (
-                              <RowDetail
-                                card={card}
-                                cluster={clusterById.get(card.clusterId)}
-                              />
-                            ) : null}
                           </td>
                           <td>
                             <RoleBadges roles={card.roles} />
@@ -1476,7 +1650,7 @@ export function CurrentResearchResultsPanel(props: {
                             />
                           </td>
                           <td>
-                            <Badge>{registrationLabel}</Badge>
+                            <RegistrationBadge label={registrationLabel} />
                           </td>
                           <td>
                             <div className="flex flex-wrap items-center gap-1">
@@ -1545,7 +1719,7 @@ export function CurrentResearchResultsPanel(props: {
                           <span>낙폭 {formatPct(card.maxDrawdown)}</span>
                           <span>거래 {card.tradeCount ?? "없음"}</span>
                           <span>{card.robustnessStatus}</span>
-                          <Badge>{registrationLabel}</Badge>
+                          <RegistrationBadge label={registrationLabel} />
                           {card.sampleConfidence !== "표본 충분" ? (
                             <Badge tone="warning">{card.sampleConfidence}</Badge>
                           ) : null}
@@ -1577,12 +1751,6 @@ export function CurrentResearchResultsPanel(props: {
                           onPromote={() => void promoteOne(card.iteration)}
                         />
                       </div>
-                      {expanded ? (
-                        <RowDetail
-                          card={card}
-                          cluster={clusterById.get(card.clusterId)}
-                        />
-                      ) : null}
                     </div>
                   );
                 })}
@@ -1637,6 +1805,25 @@ export function CurrentResearchResultsPanel(props: {
           </div>
         </details>
       </section>
+      </>
+      ) : null}
+
+      <V3Drawer
+        open={drawerCard != null}
+        onClose={() => {
+          setExpandedRow(null);
+          setRecDetail(null);
+        }}
+        title={drawerCard ? aliasOf(drawerCard) : "후보 상세"}
+        wide
+      >
+        {drawerCard ? (
+          <RowDetail
+            card={drawerCard}
+            cluster={clusterById.get(drawerCard.clusterId)}
+          />
+        ) : null}
+      </V3Drawer>
     </div>
   );
 }

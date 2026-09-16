@@ -1,4 +1,5 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 import {
   PaperSessionError,
   getActivePaperSessionService,
@@ -8,10 +9,15 @@ import {
 } from "@/src/lib/rextora/paper/paperSessionService";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const { searchParams } = new URL(request.url);
     if (searchParams.get("recover") === "1") {
+      const recoverDenied = await denyUnlessPermitted(request, "paper:operate");
+      if (recoverDenied) return recoverDenied;
       const { recoverPaperSessionsAfterRestart } = await import(
         "@/src/lib/rextora/paper/paperSessionService"
       );
@@ -50,6 +56,8 @@ export async function GET(request: Request) {
  * - action: "prepare" | "start" for clarity
  */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "paper:operate");
+  if (denied) return denied;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => null)) as {

@@ -16,16 +16,29 @@ import {
   resetJobExecutionOwnershipForTests,
 } from "@/src/lib/rextora/strategySearch/jobExecutionOwnership";
 import {
+  finalizeNormalSearchCompletion,
+  isNormalSearchCompletionReason,
+  isSearchJobExecutionActive,
   resetSearchJobExecutionRegistryForTests,
   startSearchJobExecution,
   StrategySearchExecutionRegistryError,
+  waitForSearchJobExecution,
 } from "@/src/lib/rextora/strategySearch/jobExecutionRegistry";
 import {
   createSearchJob,
+  getSearchJob,
+  markSearchJobCompleted,
+  markSearchJobRunning,
   saveSearchTrial,
   type StrategySearchStoreOptions,
 } from "@/src/lib/rextora/strategySearch/jobStore";
 import { saveJobExecutionProfile } from "@/src/lib/rextora/strategySearch/jobExecutionProfile";
+import {
+  createEmptySearchPlan,
+  getSearchPlan,
+  saveSearchPlan,
+  type StrategySearchCompletionReason,
+} from "@/src/lib/rextora/strategySearch/searchPlan";
 import type { StrategySearchConfig } from "@/src/lib/rextora/strategySearch/types";
 
 function tmpStore(): StrategySearchStoreOptions {
@@ -219,6 +232,99 @@ describe("job execution ownership", () => {
       "utf8",
     );
     expect(readBack).toContain("deadbeef0001");
+  });
+
+  it("finalizes a deadline-stopped orchestrated job and clears execution ownership", async () => {
+    const store = tmpStore();
+    resetJobExecutionOwnershipForTests(store);
+    const job = createSearchJob(minimalConfig(), store);
+    saveJobExecutionProfile(job.id, sampleExecution(), store);
+    markSearchJobRunning(job.id, store);
+    const now = Date.now();
+    saveSearchPlan(
+      job.id,
+      {
+        ...createEmptySearchPlan({
+          searchName: "deadline finalization",
+          depthProfile: "fast",
+          qualificationProfile: "balanced",
+          qualifiedTarget: 1,
+          candidateBudget: 10,
+          stageBatchSize: 1,
+          maxRuntimeMs: 1,
+          spaces: [{ id: "ema_core", labelKo: "EMA" }],
+        }),
+        campaignStartedAtMs: now - 1_000,
+      },
+      store,
+    );
+
+    startSearchJobExecution(job.id, {
+      storeOptions: store,
+      preloadedCandlesByKey: {},
+    });
+    await waitForSearchJobExecution(job.id);
+
+    const persisted = getSearchJob(job.id, store)!;
+    expect(persisted.status).toBe("completed");
+    expect(persisted.finishedAt).toBeTruthy();
+    expect(getSearchPlan(job.id, store)?.completionReason).toBe(
+      "DEADLINE_REACHED",
+    );
+    expect(isSearchJobExecutionActive(job.id)).toBe(false);
+    expect(isJobExecutionOwnedOnDisk(job.id, store)).toBe(false);
+  });
+
+  it("does not double-finalize an already completed runner path", () => {
+    const store = tmpStore();
+    const job = createSearchJob(minimalConfig(), store);
+    markSearchJobRunning(job.id, store);
+    const completed = markSearchJobCompleted(job.id, store);
+
+    const finalized = finalizeNormalSearchCompletion(
+      job.id,
+      "MAX_ITERATIONS",
+      store,
+    );
+
+    expect(finalized).toEqual(completed);
+    expect(getSearchJob(job.id, store)).toEqual(completed);
+  });
+
+  it("classifies every completion reason without completing pause, cancel, failure, or null", () => {
+    const normal: StrategySearchCompletionReason[] = [
+      "QUALIFIED_TARGET_REACHED",
+      "MAX_CANDIDATE_BUDGET",
+      "MAX_RUNTIME",
+      "DEADLINE_REACHED",
+      "HARD_SAFETY_LIMIT",
+      "SEARCH_SPACE_EXHAUSTED",
+      "MAX_ITERATIONS",
+    ];
+    const nonCompletion: StrategySearchCompletionReason[] = [
+      "USER_CANCELLED",
+      "FATAL_ERROR",
+      "PAUSED",
+      "CONFIGURATION_INVALID",
+      "DATA_UNAVAILABLE",
+      "RECOVERY_FAILED",
+      "USER_STOPPED",
+      "ENGINE_ERROR",
+      "RESOURCE_SAFETY_LIMIT",
+      null,
+    ];
+
+    for (const reason of normal) {
+      expect(isNormalSearchCompletionReason(reason)).toBe(true);
+    }
+    for (const reason of nonCompletion) {
+      expect(isNormalSearchCompletionReason(reason)).toBe(false);
+      const store = tmpStore();
+      const job = createSearchJob(minimalConfig(), store);
+      markSearchJobRunning(job.id, store);
+      finalizeNormalSearchCompletion(job.id, reason, store);
+      expect(getSearchJob(job.id, store)?.status).toBe("running");
+    }
   });
 });
 

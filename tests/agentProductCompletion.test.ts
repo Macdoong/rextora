@@ -45,7 +45,11 @@ describe("STEP 8 product completion contracts", () => {
       path.join(process.cwd(), "app/layout.tsx"),
       "utf8",
     );
-    const shell = fs.readFileSync(
+    const globalShell = fs.readFileSync(
+      path.join(process.cwd(), "components/rextora/shell/GlobalShell.tsx"),
+      "utf8",
+    );
+    const appShell = fs.readFileSync(
       path.join(process.cwd(), "components/rextora/agent/AppShell.tsx"),
       "utf8",
     );
@@ -60,9 +64,13 @@ describe("STEP 8 product completion contracts", () => {
       path.join(process.cwd(), "app/dashboard/page.tsx"),
       "utf8",
     );
-    expect(layout).toContain("AppShell");
-    expect(shell).toContain("AgentSessionProvider");
-    expect(shell).toContain("GlobalAgentAssistant");
+    expect(layout).toContain("AppShellGate");
+    expect(globalShell).toContain("AgentSessionProvider");
+    expect(globalShell).toMatch(/<AgentSessionProvider[\s>]/);
+    expect(appShell).not.toMatch(/import\s+\{[^}]*AgentSessionProvider/);
+    expect(appShell).not.toMatch(/<AgentSessionProvider[\s>]/);
+    expect(appShell).toContain("GlobalAgentAssistant");
+    expect(appShell).toContain("ClientHydrated");
     expect(global).toContain("global-agent-fab");
     expect(dashboard).toContain("shared");
   });

@@ -83,6 +83,7 @@ import {
 import { getAgentSession, ensureAgentSession } from "@/src/lib/rextora/agent/v2/session/sessionStore";
 import { sanitizeSessionId } from "@/src/lib/rextora/agent/v2/session/sessionPersistence";
 import { executeTool } from "@/src/lib/rextora/agent/v2/tools/toolExecutor";
+import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 import {
   buildConversationContextView,
   composeConversationResponse,
@@ -464,6 +465,8 @@ function buildEmptyApprovalResponse(input: {
 
 /** POST /api/rextora/agent — AI Agent Control Plane entry point (read-only). */
 export async function POST(request: Request) {
+  const denied = await denyUnlessPermitted(request, "agent:operate");
+  if (denied) return denied;
   let body: AgentRequest;
   try {
     body = await request.json();

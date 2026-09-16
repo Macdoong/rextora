@@ -1,12 +1,16 @@
 import { apiErrorResponse, apiJsonResponse } from "@/src/lib/rextora/apiResponse";
 import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatus";
 import { getDemoDeepLinks } from "@/src/lib/rextora/firstRun/demoFixture";
+import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 /**
  * Read-only first-run readiness status.
  * Never returns absolute filesystem paths or secrets.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const start = Date.now();
   try {
     const status = classifyFirstRunStatus();

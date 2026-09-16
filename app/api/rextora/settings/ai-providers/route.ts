@@ -4,8 +4,12 @@ import {
   patchAiProviders,
 } from "@/src/lib/rextora/agent/v2/providers";
 import { assertLocalOperatorRequest } from "@/src/lib/rextora/agent/v2/providers/providerRequestGuard";
+import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
 export async function GET(request: Request) {
+  const denied = await denyUnlessAuthenticated(request);
+  if (denied) return denied;
+
   const guard = assertLocalOperatorRequest(request);
   if (!guard.ok) {
     return NextResponse.json(
@@ -17,6 +21,8 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const denied = await denyUnlessPermitted(request, "credentials:manage");
+  if (denied) return denied;
   const guard = assertLocalOperatorRequest(request);
   if (!guard.ok) {
     return NextResponse.json(
