@@ -5,6 +5,7 @@ const SESSION_COOKIE = "rextora_session";
 
 export function isPublicPath(pathname: string): boolean {
   if (pathname === "/login" || pathname.startsWith("/login/")) return true;
+  if (pathname === "/healthz") return true;
   if (pathname.startsWith("/api/rextora/auth/")) return true;
   if (pathname.startsWith("/_next")) return true;
   if (pathname === "/favicon.ico" || pathname === "/robots.txt") return true;
