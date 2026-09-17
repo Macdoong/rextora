@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import {
   V3_MORE_SHEET_NAV_IDS,
   V3_MOBILE_PRIMARY_NAV_IDS,
   V3_OPERATIONS_NAV_IDS,
+  V3_STRATEGY_NAV_IDS,
   type ShellNavigationItem,
 } from "@/components/rextora/shell/navigationModel";
 import { AuthIdentity } from "@/components/rextora/auth/AuthIdentity";
@@ -48,11 +49,13 @@ function SidebarNavLink({
   pathname,
   variant,
   shortLabel,
+  onNavigate,
 }: {
   item: ShellNavigationItem;
   pathname: string;
   variant: "desktop" | "mobile" | "bottom";
   shortLabel?: string;
+  onNavigate?: () => void;
 }) {
   const active = item.isActive(pathname);
   const label = shortLabel ?? item.label;
@@ -66,6 +69,7 @@ function SidebarNavLink({
         data-active={active ? "true" : "false"}
         aria-current={active ? "page" : undefined}
         className="rextora-sidebar-supporting-link v3-shell-nav-link v3-hover"
+        onClick={onNavigate}
       >
         <span className="v3-shell-nav-ico" aria-hidden="true">
           {NAV_ICO[item.id] ?? item.label.slice(0, 1)}
@@ -94,11 +98,15 @@ function SidebarNavLink({
     <Link
       href={item.href}
       title={item.label}
-      className={`flex min-h-11 items-center rounded-lg px-3 py-2 text-sm ${
-        active ? "bg-sky-600 text-white" : "text-slate-300"
-      }`}
+      className="rextora-sidebar-supporting-link v3-shell-nav-link v3-hover"
+      data-active={active ? "true" : "false"}
+      aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
     >
-      {item.label}
+      <span className="v3-shell-nav-ico" aria-hidden="true">
+        {NAV_ICO[item.id] ?? item.label.slice(0, 1)}
+      </span>
+      <span className="v3-shell-nav-label">{item.label}</span>
     </Link>
   );
 }
@@ -107,9 +115,13 @@ export function Sidebar() {
   const pathname = usePathname();
   const { role } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const sidebarNavigationItems = visibleShellNavItems(role);
   const supportingNavItems = sidebarNavigationItems.filter((item) =>
     (V3_OPERATIONS_NAV_IDS as readonly string[]).includes(item.id),
+  );
+  const strategyNavItems = sidebarNavigationItems.filter((item) =>
+    (V3_STRATEGY_NAV_IDS as readonly string[]).includes(item.id),
   );
   const mobilePrimaryItems = V3_MOBILE_PRIMARY_NAV_IDS.map((id) =>
     sidebarNavigationItems.find((item) => item.id === id),
@@ -117,6 +129,20 @@ export function Sidebar() {
   const moreSheetItems = V3_MORE_SHEET_NAV_IDS.map((id) =>
     sidebarNavigationItems.find((item) => item.id === id),
   ).filter((item): item is ShellNavigationItem => item != null);
+
+  useEffect(() => {
+    setMenuOpen(false);
+    setMoreOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   return (
     <>
@@ -204,46 +230,103 @@ export function Sidebar() {
             className="v3-shell-compact-brand flex min-h-11 items-center"
           >
             <Image
-              src="/brand/rextora-icon-main.png"
+              src="/brand/rextora-mark-v3.png"
               alt="Rextora"
-              width={114}
-              height={114}
-              className="rextora-mobile-brand-icon"
+              width={119}
+              height={105}
+              className="rextora-mobile-brand-mark"
               priority
               unoptimized
             />
           </Link>
-          <ModeBadge />
-          <details className="relative v3-shell-menu">
-            <summary className="v3-shell-menu-summary flex min-h-11 cursor-pointer list-none items-center">
-              메뉴
-            </summary>
-            <nav
-              className="v3-shell-menu-panel absolute right-0 z-50 mt-2 grid w-56 gap-1 rounded-xl p-2 shadow-2xl"
-              style={{ position: "absolute", right: 0 }}
-              data-testid="mobile-nav"
-              data-navigation-group={sidebarNavigationGroups[0]?.id}
-            >
-              {sidebarNavigationItems.map((item) => (
+          <div className="v3-shell-compact-mode">
+            <ModeBadge />
+          </div>
+          <button
+            type="button"
+            className="v3-shell-menu-summary flex min-h-11 cursor-pointer items-center"
+            aria-expanded={menuOpen}
+            aria-controls="rextora-mobile-drawer"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            메뉴
+          </button>
+        </div>
+      </div>
+
+      {menuOpen ? (
+        <button
+          type="button"
+          className="v3-shell-menu-backdrop"
+          aria-label="메뉴 닫기"
+          onClick={() => setMenuOpen(false)}
+        />
+      ) : null}
+
+      <aside
+        id="rextora-mobile-drawer"
+        className="v3-shell-mobile-drawer"
+        data-testid="mobile-nav"
+        data-open={menuOpen ? "true" : "false"}
+        data-navigation-group={sidebarNavigationGroups[0]?.id}
+        hidden={!menuOpen}
+      >
+        <header className="v3-shell-mobile-drawer-brand">
+          <Image
+            src="/brand/rextora-logo-main-transparent.png"
+            alt="Rextora"
+            width={460}
+            height={128}
+            className="v3-shell-mobile-drawer-logo"
+            unoptimized
+          />
+        </header>
+        <section className="v3-shell-mode-card v3-shell-mobile-drawer-mode" aria-label="현재 거래 모드">
+          <div className="rextora-sidebar-mode-row">
+            <span className="rextora-sidebar-mode-label">{OPERATOR_LABEL.currentMode}</span>
+            <ModeBadge />
+          </div>
+        </section>
+        <div className="v3-shell-mobile-drawer-nav">
+          <section aria-label="전략 검증">
+            <p className="rextora-sidebar-section-label">전략 검증</p>
+            <div className="rextora-sidebar-supporting-links">
+              {strategyNavItems.map((item) => (
                 <SidebarNavLink
                   key={item.href}
                   item={item}
                   pathname={pathname}
                   variant="mobile"
+                  onNavigate={() => setMenuOpen(false)}
                 />
               ))}
-              <div className="v3-shell-menu-identity">
-                <AuthIdentity />
-              </div>
-            </nav>
-          </details>
+            </div>
+          </section>
+          <section aria-label="운영">
+            <p className="rextora-sidebar-section-label">운영</p>
+            <div className="rextora-sidebar-supporting-links">
+              {supportingNavItems.map((item) => (
+                <SidebarNavLink
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  variant="mobile"
+                  onNavigate={() => setMenuOpen(false)}
+                />
+              ))}
+            </div>
+          </section>
         </div>
-      </div>
+        <footer className="v3-shell-mobile-drawer-footer">
+          <AuthIdentity />
+        </footer>
+      </aside>
 
       <nav
         className="v3-shell-bottom-nav"
         aria-label="주요 이동"
         data-testid="shell-bottom-nav"
+        data-drawer-open={menuOpen ? "true" : "false"}
       >
         {mobilePrimaryItems.map((item) => (
           <SidebarNavLink

@@ -332,10 +332,11 @@
 .v3-shell-compact-top.rextora-mobile-header {
   min-height: 58px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--v3-border);
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
-  color: var(--v3-text-primary);
+  border-bottom: 1px solid #17202c;
+  background:
+    radial-gradient(circle at 8% -20%, rgba(50, 87, 215, 0.16), transparent 42%),
+    linear-gradient(180deg, #0b1119, #080d13);
+  color: #eef3f8;
 }
 
 .v3-shell-compact-top-row {
@@ -347,34 +348,166 @@
 }
 
 .v3-shell-compact-brand {
-  color: var(--v3-text-primary);
-  font-size: 14px;
+  flex: 0 0 auto;
+  color: #eef3f8;
 }
 
-.v3-shell-compact-brand .rextora-mobile-brand-icon {
-  width: 32px !important;
-  height: 32px !important;
+.v3-shell-compact-mode {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.v3-shell-compact-brand .rextora-mobile-brand-mark {
+  width: auto !important;
+  height: 40px !important;
   object-fit: contain;
-  border-radius: 8px;
+  background: transparent;
 }
 
 .v3-shell-menu-summary {
+  flex: 0 0 auto;
   min-height: 44px;
   padding: 0 12px;
+  border: 1px solid #1f2a36;
   border-radius: 10px;
-  background: var(--v3-surface-muted);
-  color: var(--v3-text-primary);
+  background: linear-gradient(180deg, #161f2a, #121923);
+  color: #eef3f8;
   font-size: 13px;
+  font-weight: 650;
 }
 
-.v3-shell-menu-panel {
-  background: #fff;
-  border: 1px solid var(--v3-border);
-  color: var(--v3-text-primary);
+.v3-shell-menu-summary:hover,
+.v3-shell-menu-summary[aria-expanded="true"] {
+  border-color: #2a3a4c;
+  color: #fff;
 }
 
-.v3-shell-menu-panel a {
-  color: var(--v3-text-secondary);
+.v3-shell-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  border: 0;
+  background: rgba(4, 8, 14, 0.62);
+}
+
+.v3-shell-mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 50;
+  width: min(86vw, 360px);
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px 16px;
+  border-right: 1px solid #17202c;
+  background:
+    radial-gradient(circle at 12% -8%, rgba(50, 87, 215, 0.16), transparent 25%),
+    linear-gradient(180deg, #0b1119, #080d13 84%);
+  color: #eef3f8;
+  box-shadow: 18px 0 40px rgba(0, 0, 0, 0.28);
+  overflow-y: auto;
+}
+
+.v3-shell-mobile-drawer[hidden] {
+  display: none;
+}
+
+.v3-shell-mobile-drawer-brand {
+  padding: 0 7px 18px;
+  border-bottom: 1px solid #1e2733;
+}
+
+.v3-shell-mobile-drawer-logo {
+  display: block;
+  width: 100% !important;
+  max-width: 240px;
+  height: auto !important;
+  object-fit: contain;
+  background: transparent;
+}
+
+.v3-shell-mobile-drawer-mode {
+  margin: 15px 0;
+}
+
+.v3-shell-mobile-drawer .rextora-sidebar-mode-label,
+.v3-shell-mobile-drawer .rextora-sidebar-section-label {
+  color: #909bab;
+  text-transform: none;
+  letter-spacing: 0.08em;
+}
+
+.v3-shell-mobile-drawer .rextora-sidebar-section-label {
+  padding: 12px 9px 7px;
+  font-size: 10px;
+}
+
+.v3-shell-mobile-drawer-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.v3-shell-mobile-drawer .v3-shell-nav-link.rextora-sidebar-supporting-link {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #aeb9c8;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.v3-shell-mobile-drawer .v3-shell-nav-link.rextora-sidebar-supporting-link[data-active="true"] {
+  background: linear-gradient(180deg, #fff, #f3f5f8);
+  color: #10141a;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+.v3-shell-mobile-drawer .v3-shell-nav-link.rextora-sidebar-supporting-link[data-active="false"]:hover {
+  background: #151d27;
+  color: #fff;
+}
+
+.v3-shell-mobile-drawer .v3-shell-nav-ico {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 7px;
+  font-size: 10px;
+  opacity: 0.72;
+}
+
+.v3-shell-mobile-drawer-footer {
+  margin-top: auto;
+  padding: 14px 7px 0;
+  border-top: 1px solid #1e2733;
+  color: #9da8b7;
+}
+
+.v3-shell-mobile-drawer-footer [data-testid="auth-display-name"] {
+  color: #eef3f8;
+}
+
+.v3-shell-mobile-drawer-footer [data-testid="auth-role-label"] {
+  color: #8994a4;
+}
+
+.v3-shell-mobile-drawer-footer [data-testid="auth-logout"] {
+  min-height: 44px;
+  color: #9da8b7;
 }
 
 .v3-shell-menu-identity,
@@ -608,8 +741,21 @@
     z-index: 26;
     height: 64px;
     padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid var(--v3-border);
+    border-top: 1px solid rgba(23, 32, 44, 0.12);
     background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 -8px 24px rgba(16, 24, 40, 0.06);
+  }
+
+  .v3-shell-bottom-nav[data-drawer-open="true"] {
+    pointer-events: none;
+  }
+
+  .v3-shell-bottom-link {
+    color: #5b6573;
+  }
+
+  .v3-shell-bottom-link.is-active {
+    color: var(--v3-brand);
   }
 
   .v3-shell .rextora-agent-fab {
@@ -660,6 +806,13 @@
 
   .v3-shell-chip.rextora-context-primary-item {
     min-height: 44px;
+  }
+}
+
+@media (min-width: 1180px) {
+  .v3-shell-mobile-drawer,
+  .v3-shell-menu-backdrop {
+    display: none !important;
   }
 }
 
