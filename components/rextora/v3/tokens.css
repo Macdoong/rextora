@@ -79,8 +79,7 @@
 /* Light shell chrome sits outside `.v3` page roots. Do not remap the dark rail. */
 .v3-shell .dashboard-main,
 .v3-shell-topbar,
-.v3-shell-bottom-nav,
-.v3-shell-more-sheet {
+.v3-shell-bottom-nav {
   --text: var(--v3-text-primary);
   --text-primary: var(--v3-text-primary);
   --text-secondary: var(--v3-text-secondary);

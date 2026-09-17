@@ -9,7 +9,6 @@ import { LifecycleNavigation } from "@/components/rextora/shell/LifecycleNavigat
 import {
   SHELL_NAVIGATION_GROUPS,
   SIDEBAR_NAV_ITEMS,
-  V3_MORE_SHEET_NAV_IDS,
   V3_MOBILE_PRIMARY_NAV_IDS,
   V3_OPERATIONS_NAV_IDS,
   V3_STRATEGY_NAV_IDS,
@@ -114,7 +113,6 @@ function SidebarNavLink({
 export function Sidebar() {
   const pathname = usePathname();
   const { role } = useAuth();
-  const [moreOpen, setMoreOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const sidebarNavigationItems = visibleShellNavItems(role);
   const supportingNavItems = sidebarNavigationItems.filter((item) =>
@@ -126,22 +124,23 @@ export function Sidebar() {
   const mobilePrimaryItems = V3_MOBILE_PRIMARY_NAV_IDS.map((id) =>
     sidebarNavigationItems.find((item) => item.id === id),
   ).filter((item): item is ShellNavigationItem => item != null);
-  const moreSheetItems = V3_MORE_SHEET_NAV_IDS.map((id) =>
-    sidebarNavigationItems.find((item) => item.id === id),
-  ).filter((item): item is ShellNavigationItem => item != null);
 
   useEffect(() => {
     setMenuOpen(false);
-    setMoreOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [menuOpen]);
 
   return (
@@ -242,15 +241,6 @@ export function Sidebar() {
           <div className="v3-shell-compact-mode">
             <ModeBadge />
           </div>
-          <button
-            type="button"
-            className="v3-shell-menu-summary flex min-h-11 cursor-pointer items-center"
-            aria-expanded={menuOpen}
-            aria-controls="rextora-mobile-drawer"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            메뉴
-          </button>
         </div>
       </div>
 
@@ -339,50 +329,16 @@ export function Sidebar() {
         ))}
         <button
           type="button"
-          className={`v3-shell-bottom-link${moreOpen ? " is-active" : ""}`}
-          data-testid="shell-more-open"
-          aria-expanded={moreOpen}
-          aria-controls="shell-more-sheet"
-          onClick={() => setMoreOpen((open) => !open)}
+          className={`v3-shell-bottom-link${menuOpen ? " is-active" : ""}`}
+          data-testid="shell-full-menu-open"
+          aria-label="전체 메뉴"
+          aria-expanded={menuOpen}
+          aria-controls="rextora-mobile-drawer"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          더보기
+          전체 메뉴
         </button>
       </nav>
-
-      {moreOpen ? (
-        <button
-          type="button"
-          className="v3-shell-more-backdrop"
-          aria-label="더보기 닫기"
-          onClick={() => setMoreOpen(false)}
-        />
-      ) : null}
-
-      <div
-        id="shell-more-sheet"
-        className="v3-shell-more-sheet"
-        data-testid="shell-more-sheet"
-        data-open={moreOpen ? "true" : "false"}
-        hidden={!moreOpen}
-      >
-        <strong>운영</strong>
-        {moreSheetItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            title={item.label}
-            data-testid={`shell-more-${item.id}`}
-            data-active={item.isActive(pathname) ? "true" : "false"}
-            className="v3-shell-more-item"
-            onClick={() => setMoreOpen(false)}
-          >
-            {item.label}
-          </Link>
-        ))}
-        <div className="v3-shell-more-identity">
-          <AuthIdentity />
-        </div>
-      </div>
     </>
   );
 }

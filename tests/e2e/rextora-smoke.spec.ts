@@ -78,7 +78,7 @@ test.describe("Rextora lifecycle smoke", () => {
   test("mobile menu preserves seven primary Korean nav items", async ({ page }) => {
     await page.setViewportSize({ width: 800, height: 1000 });
     await page.goto("/dashboard");
-    await page.getByText("메뉴").click();
+    await page.getByTestId("shell-full-menu-open").click();
     const nav = page.getByTestId("mobile-nav");
     for (const label of [
       "운영센터",
