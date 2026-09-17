@@ -15,22 +15,18 @@ import {
   type ShellNavigationItem,
 } from "@/components/rextora/shell/navigationModel";
 import { AuthIdentity } from "@/components/rextora/auth/AuthIdentity";
+import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
+import { isAdminConsoleNavVisible } from "@/src/lib/rextora/auth/adminUserPolicy";
+import type { RextoraRole } from "@/src/lib/rextora/auth/authTypes";
 import { OPERATOR_LABEL } from "@/src/lib/rextora/ui/operatorTerminology";
 
 const sidebarNavigationGroups = SHELL_NAVIGATION_GROUPS;
-const sidebarNavigationItems = SIDEBAR_NAV_ITEMS;
 
-const supportingNavItems = SIDEBAR_NAV_ITEMS.filter((item) =>
-  (V3_OPERATIONS_NAV_IDS as readonly string[]).includes(item.id),
-);
-
-const mobilePrimaryItems = V3_MOBILE_PRIMARY_NAV_IDS.map((id) =>
-  SIDEBAR_NAV_ITEMS.find((item) => item.id === id),
-).filter((item): item is ShellNavigationItem => item != null);
-
-const moreSheetItems = V3_MORE_SHEET_NAV_IDS.map((id) =>
-  SIDEBAR_NAV_ITEMS.find((item) => item.id === id),
-).filter((item): item is ShellNavigationItem => item != null);
+function visibleShellNavItems(role: RextoraRole | null): ShellNavigationItem[] {
+  return SIDEBAR_NAV_ITEMS.filter(
+    (item) => item.id !== "admin-users" || isAdminConsoleNavVisible(role),
+  );
+}
 
 const NAV_ICO: Record<string, string> = {
   dashboard: "운",
@@ -40,6 +36,7 @@ const NAV_ICO: Record<string, string> = {
   "live-trading": "실",
   risk: "위",
   settings: "설",
+  "admin-users": "회",
 };
 
 function sidebarNavTestId(href: string): string {
@@ -108,7 +105,18 @@ function SidebarNavLink({
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { role } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
+  const sidebarNavigationItems = visibleShellNavItems(role);
+  const supportingNavItems = sidebarNavigationItems.filter((item) =>
+    (V3_OPERATIONS_NAV_IDS as readonly string[]).includes(item.id),
+  );
+  const mobilePrimaryItems = V3_MOBILE_PRIMARY_NAV_IDS.map((id) =>
+    sidebarNavigationItems.find((item) => item.id === id),
+  ).filter((item): item is ShellNavigationItem => item != null);
+  const moreSheetItems = V3_MORE_SHEET_NAV_IDS.map((id) =>
+    sidebarNavigationItems.find((item) => item.id === id),
+  ).filter((item): item is ShellNavigationItem => item != null);
 
   return (
     <>

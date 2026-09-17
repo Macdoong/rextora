@@ -18,6 +18,7 @@
 @import "../components/rextora/v3/live.css";
 @import "../components/rextora/v3/readability.css";
 @import "../components/rextora/v3/settings.css";
+@import "../components/rextora/v3/admin.css";
 
 :root {
   color-scheme: dark;
@@ -3420,14 +3421,17 @@ a {
   color: var(--v3-brand);
 }
 
-.v3-shell:has(.v3-oc-page) .dashboard-main {
+.v3-shell:has(.v3-oc-page) .dashboard-main,
+.v3-shell:has(.v3-admin-users) .dashboard-main {
   padding: 0;
   gap: 0;
   background: var(--v3-background);
 }
 
 .v3-shell:has(.v3-oc-page) .rextora-main-workspace,
-.v3-shell:has(.v3-oc-page) .rextora-main-content {
+.v3-shell:has(.v3-oc-page) .rextora-main-content,
+.v3-shell:has(.v3-admin-users) .rextora-main-workspace,
+.v3-shell:has(.v3-admin-users) .rextora-main-content {
   padding: 0;
   background: transparent;
   border: 0;

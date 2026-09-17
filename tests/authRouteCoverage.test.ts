@@ -33,6 +33,9 @@ function hasReadGuard(source: string): boolean {
   return (
     source.includes("denyUnlessAuthenticated") ||
     source.includes("requireAuthenticatedUser") ||
+    source.includes("requireAdmin") ||
+    source.includes("requireCeo") ||
+    source.includes("requireMemberManagementViewer") ||
     source.includes("resolveRequestUser")
   );
 }
@@ -84,7 +87,10 @@ describe("auth route coverage", () => {
       const guarded =
         source.includes("denyUnlessPermitted") ||
         source.includes("requirePermission") ||
-        source.includes("requireAuthenticatedUser");
+        source.includes("requireAuthenticatedUser") ||
+        source.includes("requireAdmin") ||
+        source.includes("requireCeo") ||
+        source.includes("requireMemberManagementViewer");
       expect(guarded, `${row.method} ${row.path} missing auth guard`).toBe(true);
     }
 

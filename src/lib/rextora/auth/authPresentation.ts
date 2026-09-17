@@ -2,12 +2,13 @@ import type { RextoraRole } from "./authTypes";
 
 export const AUTH_ROLE_LABEL_KO: Record<RextoraRole, string> = {
   ceo: "대표",
+  admin: "관리자",
   operator: "운영자",
-  viewer: "조회 전용",
+  viewer: "회원",
 };
 
 export function authRoleLabelKo(role: RextoraRole | null | undefined): string {
-  if (role === "ceo" || role === "operator" || role === "viewer") {
+  if (role === "ceo" || role === "admin" || role === "operator" || role === "viewer") {
     return AUTH_ROLE_LABEL_KO[role];
   }
   return "권한 없음";

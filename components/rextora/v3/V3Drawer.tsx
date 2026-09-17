@@ -26,6 +26,8 @@ export function V3Drawer({
   const titleId = useId();
   const panelRef = useRef<HTMLElement | null>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
@@ -35,14 +37,14 @@ export function V3Drawer({
     panelRef.current?.focus();
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
       lastFocus.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open && !keepMounted) return null;
 
@@ -52,7 +54,7 @@ export function V3Drawer({
         <div
           className="v3-drawer-backdrop"
           data-open="true"
-          onClick={onClose}
+          onClick={() => onCloseRef.current()}
         />
       ) : null}
       <aside
@@ -74,7 +76,7 @@ export function V3Drawer({
             type="button"
             className="v3-drawer__close"
             aria-label="닫기"
-            onClick={onClose}
+            onClick={() => onCloseRef.current()}
           >
             ×
           </button>

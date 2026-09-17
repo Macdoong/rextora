@@ -61,6 +61,56 @@ export function requireAuthenticatedUser(
   return { ok: true, user };
 }
 
+/**
+ * CEO-only role gate. Uses requireAuthenticatedUser(); does not parse cookies
+ * itself and does not apply mutation-origin checks. CEO means role === "ceo".
+ */
+export function requireCeo(
+  request: Request,
+): { ok: true; user: AuthenticatedUser } | { ok: false; response: AuthGateFailure } {
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth;
+  if (auth.user.role !== "ceo") {
+    return { ok: false, response: forbiddenResponse() };
+  }
+  return auth;
+}
+
+/**
+ * CEO or admin role gate. Uses requireAuthenticatedUser(); does not parse
+ * cookies itself and does not apply mutation-origin checks.
+ * Member-management mutations (POST/PATCH) use this gate.
+ */
+export function requireAdmin(
+  request: Request,
+): { ok: true; user: AuthenticatedUser } | { ok: false; response: AuthGateFailure } {
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth;
+  if (auth.user.role !== "ceo" && auth.user.role !== "admin") {
+    return { ok: false, response: forbiddenResponse() };
+  }
+  return auth;
+}
+
+/**
+ * Member-management read gate. CEO, admin, and operator may view.
+ * Viewer and unauthenticated callers are denied.
+ */
+export function requireMemberManagementViewer(
+  request: Request,
+): { ok: true; user: AuthenticatedUser } | { ok: false; response: AuthGateFailure } {
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth;
+  if (
+    auth.user.role !== "ceo" &&
+    auth.user.role !== "admin" &&
+    auth.user.role !== "operator"
+  ) {
+    return { ok: false, response: forbiddenResponse() };
+  }
+  return auth;
+}
+
 export function requirePermission(
   request: Request,
   permission: RextoraPermission,

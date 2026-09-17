@@ -1,0 +1,301 @@
+/**
+ * Member Management presentation. Scoped to admin components.
+ * Page canvas comes from the normal v3-shell / dashboard-main layout.
+ */
+
+.v3-admin-users.rextora-page {
+  --bg: var(--v3-background);
+  --bg-elevated: var(--v3-surface);
+  --panel: var(--v3-surface);
+  --panel-strong: var(--v3-surface-subtle);
+  --border: var(--v3-border);
+  --text: var(--v3-text-primary);
+  --text-primary: var(--v3-text-primary);
+  --text-secondary: var(--v3-text-secondary);
+  --text-muted: var(--v3-text-muted);
+  max-width: var(--v3-content);
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px;
+  display: grid;
+  gap: 14px;
+  color: var(--v3-text-primary);
+  word-break: keep-all;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+.v3-admin-pagehead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.v3-admin-pagehead header {
+  margin: 0;
+}
+
+.v3-admin-pagehead .rextora-page-title {
+  margin: 0;
+  font-size: 31px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  color: var(--v3-text-primary);
+}
+
+.v3-admin-pagehead p {
+  margin: 8px 0 0;
+  max-width: 42rem;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--v3-text-secondary);
+}
+
+.v3-admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.v3-admin-users .v3-kpi {
+  padding: 15px 16px;
+  border: 1px solid var(--v3-border);
+  border-radius: var(--v3-radius-card);
+  background: var(--v3-surface);
+  box-shadow: var(--v3-shadow-sm);
+}
+
+.v3-admin-users .v3-card {
+  background: var(--v3-surface);
+}
+
+.v3-admin-users .v3-table th {
+  background: var(--v3-surface-subtle);
+  color: var(--v3-text-secondary);
+}
+
+.v3-admin-users .v3-table tbody tr:hover td {
+  background: var(--v3-surface-subtle);
+}
+
+.v3-dialog.v3-admin-create-dialog {
+  width: min(760px, 94vw);
+  max-width: 760px;
+}
+
+.v3-admin-create-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px 18px;
+  align-items: start;
+}
+
+.v3-admin-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--v3-text-secondary);
+}
+
+.v3-admin-field input,
+.v3-admin-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: light;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  height: 44px;
+  border: 1px solid #c5ced8;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--v3-text-primary);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.35;
+  box-shadow: none;
+}
+
+.v3-admin-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%235e6b7a' stroke-width='1.6' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+
+.v3-admin-field input:hover,
+.v3-admin-field select:hover {
+  border-color: #9aa8b6;
+  background: #fff;
+}
+
+.v3-admin-field input:focus,
+.v3-admin-field select:focus,
+.v3-admin-field input:focus-visible,
+.v3-admin-field select:focus-visible {
+  outline: 2px solid var(--v3-brand);
+  outline-offset: 1px;
+  border-color: var(--v3-brand);
+  background: #fff;
+}
+
+.v3-admin-section {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--v3-border-soft);
+}
+
+.v3-admin-section:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.v3-admin-section__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0.02em;
+  color: var(--v3-text-muted);
+}
+
+.v3-admin-danger {
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  border-radius: var(--v3-radius-card);
+  background: rgba(254, 226, 226, 0.45);
+  padding: 14px;
+  gap: 10px;
+}
+
+.v3-admin-danger .v3-admin-section__title {
+  color: #b42318;
+}
+
+.v3-admin-danger-copy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--v3-text-secondary);
+}
+
+.v3-admin-user-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--v3-border);
+  border-radius: var(--v3-radius-card);
+  background: var(--v3-surface);
+}
+
+.v3-admin-protected {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  font-size: 11px;
+  color: var(--v3-text-muted);
+}
+
+.v3-admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  opacity: 1;
+}
+
+.v3-admin-badge--ceo {
+  color: #1a1450;
+  background-color: #cfc4ff;
+  border-color: #4c3db8;
+}
+
+.v3-admin-badge--ceo-account {
+  color: #6b3b00;
+  background-color: #ffd789;
+  border-color: #c48412;
+}
+
+.v3-admin-badge--admin {
+  color: #152a73;
+  background-color: #c9d4ff;
+  border-color: #3257d7;
+}
+
+.v3-admin-badge--operator {
+  color: #0a4d5e;
+  background-color: #bfeaf5;
+  border-color: #1b86a8;
+}
+
+.v3-admin-badge--member {
+  color: #1e293b;
+  background-color: #d8dee6;
+  border-color: #64748b;
+}
+
+.v3-admin-badge--active {
+  color: #0a4a2c;
+  background-color: #b7ebc9;
+  border-color: #1f8a55;
+}
+
+.v3-admin-badge--disabled {
+  color: #7f1212;
+  background-color: #f8b4b4;
+  border-color: #c53030;
+}
+
+.v3-admin-edit-drawer.v3-drawer {
+  width: min(560px, 96vw);
+}
+
+.v3-admin-users .v3-dialog,
+.v3-admin-users .v3-drawer {
+  background: var(--v3-surface);
+  color: var(--v3-text-primary);
+}
+
+.v3-admin-users .v3-drawer__close,
+.v3-admin-users .v3-dialog__close {
+  background: var(--v3-surface-muted);
+  color: var(--v3-text-primary);
+}
+
+@media (min-width: 720px) {
+  .v3-admin-create-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .v3-admin-users.rextora-page {
+    padding: 18px 16px 28px;
+  }
+
+  .v3-admin-pagehead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .v3-dialog.v3-admin-create-dialog {
+    width: min(520px, 94vw);
+  }
+}

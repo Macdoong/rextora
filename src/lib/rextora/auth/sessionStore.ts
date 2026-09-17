@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
-import { readJsonStore, writeJsonStore } from "../storage/jsonStore";
+import { readJsonStoreAtomic, writeJsonStoreAtomic } from "../storage/jsonStore";
+import { sessionStoreWriteGate } from "./authWriteGate";
 import {
   AUTH_SESSIONS_FILE,
   AUTH_SESSION_TTL_MS,
@@ -17,12 +18,12 @@ type SessionStoreFile = {
 const EMPTY: SessionStoreFile = { version: 1, sessions: [] };
 
 function readStore(): SessionStoreFile {
-  const stored = readJsonStore<SessionStoreFile>(AUTH_SESSIONS_FILE, EMPTY, { ttlMs: 0 });
+  const stored = readJsonStoreAtomic<SessionStoreFile>(AUTH_SESSIONS_FILE, EMPTY, { ttlMs: 0 });
   return { version: 1, sessions: Array.isArray(stored.sessions) ? stored.sessions : [] };
 }
 
 function writeStore(store: SessionStoreFile): SessionStoreFile {
-  return writeJsonStore(AUTH_SESSIONS_FILE, store);
+  return writeJsonStoreAtomic(AUTH_SESSIONS_FILE, store);
 }
 
 export function hashSessionToken(token: string): string {
@@ -42,10 +43,12 @@ export function createSession(userId: string, nowMs = Date.now()): {
     expiresAt: new Date(nowMs + AUTH_SESSION_TTL_MS).toISOString(),
     revokedAt: null,
   };
-  const store = readStore();
-  store.sessions = [record, ...store.sessions].slice(0, 500);
-  writeStore(store);
-  return { token, record };
+  return sessionStoreWriteGate.run(() => {
+    const store = readStore();
+    store.sessions = [record, ...store.sessions].slice(0, 500);
+    writeStore(store);
+    return { token, record };
+  });
 }
 
 function isUsable(record: AuthSessionRecord, nowMs: number): boolean {
@@ -72,25 +75,56 @@ export function revokeSessionToken(token: string | null | undefined, nowMs = Dat
   const raw = token?.trim();
   if (!raw) return false;
   const tokenHash = hashSessionToken(raw);
-  const store = readStore();
-  const index = store.sessions.findIndex((row) => row.tokenHash === tokenHash);
-  if (index < 0) return false;
-  const current = store.sessions[index];
-  if (!current || current.revokedAt) return true;
-  store.sessions[index] = { ...current, revokedAt: new Date(nowMs).toISOString() };
-  writeStore(store);
-  return true;
+  return sessionStoreWriteGate.run(() => {
+    const store = readStore();
+    const index = store.sessions.findIndex((row) => row.tokenHash === tokenHash);
+    if (index < 0) return false;
+    const current = store.sessions[index];
+    if (!current || current.revokedAt) return true;
+    store.sessions[index] = { ...current, revokedAt: new Date(nowMs).toISOString() };
+    writeStore(store);
+    return true;
+  });
+}
+
+/**
+ * Mark every stored session for userId as revoked.
+ * Does not expose raw tokens. Other users' sessions are unchanged.
+ * Missing/empty session files are treated as zero sessions.
+ */
+export function revokeSessionsForUser(
+  userId: string,
+  nowMs = Date.now(),
+): { userId: string; revokedCount: number } {
+  const id = userId?.trim() ?? "";
+  if (!id) return { userId: "", revokedCount: 0 };
+  return sessionStoreWriteGate.run(() => {
+    const store = readStore();
+    let revokedCount = 0;
+    const revokedAt = new Date(nowMs).toISOString();
+    const sessions = store.sessions.map((row) => {
+      if (row.userId !== id || row.revokedAt) return row;
+      revokedCount += 1;
+      return { ...row, revokedAt };
+    });
+    if (revokedCount > 0) {
+      writeStore({ version: 1, sessions });
+    }
+    return { userId: id, revokedCount };
+  });
 }
 
 export function expireSessionForTests(token: string, expiresAt: string): void {
   const tokenHash = hashSessionToken(token);
-  const store = readStore();
-  const index = store.sessions.findIndex((row) => row.tokenHash === tokenHash);
-  if (index < 0) return;
-  const current = store.sessions[index];
-  if (!current) return;
-  store.sessions[index] = { ...current, expiresAt };
-  writeStore(store);
+  sessionStoreWriteGate.run(() => {
+    const store = readStore();
+    const index = store.sessions.findIndex((row) => row.tokenHash === tokenHash);
+    if (index < 0) return;
+    const current = store.sessions[index];
+    if (!current) return;
+    store.sessions[index] = { ...current, expiresAt };
+    writeStore(store);
+  });
 }
 
 export function persistentSessionContainsRawToken(token: string): boolean {

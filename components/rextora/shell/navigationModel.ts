@@ -13,7 +13,8 @@ export type ShellNavigationGroupId =
   | "paper"
   | "live"
   | "risk"
-  | "settings";
+  | "settings"
+  | "admin";
 
 export interface ShellNavigationItem {
   id: string;
@@ -156,6 +157,14 @@ export const SHELL_NAVIGATION_GROUPS: readonly ShellNavigationGroup[] = [
           pathname.startsWith("/system-status") ||
           pathname.startsWith("/strategies"),
       },
+      {
+        id: "admin-users",
+        label: "회원 관리",
+        href: "/admin",
+        group: "admin",
+        isActive: (pathname) =>
+          pathname === "/admin" || pathname.startsWith("/admin/"),
+      },
     ],
   },
 ] as const;
@@ -197,6 +206,7 @@ export const V3_OPERATIONS_NAV_IDS = [
   "dashboard",
   "risk",
   "settings",
+  "admin-users",
 ] as const;
 
 export const V3_MOBILE_PRIMARY_NAV_IDS = [
@@ -211,6 +221,7 @@ export const V3_MORE_SHEET_NAV_IDS = [
   "risk",
   "live-trading",
   "settings",
+  "admin-users",
 ] as const;
 
 /** Visible destination label for the current route. Independent of lifecycle stage. */

@@ -10,6 +10,7 @@ import { POST as researchPost } from "../app/api/rextora/strategy-search/route";
 import { POST as backtestPost } from "../app/api/rextora/backtest/run/route";
 import { POST as paperPost } from "../app/api/rextora/paper/session/route";
 import { AUTH_ERROR } from "../src/lib/rextora/auth/authTypes";
+import { roleHasPermission } from "../src/lib/rextora/auth/permissions";
 import { loadSettings } from "../src/lib/rextora/settings/settingsStore";
 import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategyRepository";
 import { authedRequest } from "./helpers/authSession";
@@ -69,7 +70,7 @@ describe("auth authorization and actor trust", () => {
     expect(paper.status).not.toBe(403);
   });
 
-  it("20-22. operator can request live approval but cannot approve or start live", async () => {
+  it("20-22. operator live approve/start pass auth; flags still block execution", async () => {
     const request = await approvePost(
       await authedRequest(
         "http://localhost/api/rextora/strategy/approve",
@@ -94,7 +95,8 @@ describe("auth authorization and actor trust", () => {
         "operator",
       ),
     );
-    expect(approve.status).toBe(403);
+    expect(approve.status).not.toBe(401);
+    expect(approve.status).not.toBe(403);
     const start = await botStartPost(
       await authedRequest(
         "http://localhost/api/rextora/bot/start",
@@ -106,9 +108,13 @@ describe("auth authorization and actor trust", () => {
         "operator",
       ),
     );
-    expect(start.status).toBe(403);
-    const body = await jsonOf(start);
-    expect(body.code).toBe(AUTH_ERROR.forbidden);
+    expect(start.status).not.toBe(401);
+    const started = await jsonOf(start);
+    expect(started.code).not.toBe(AUTH_ERROR.unauthenticated);
+    expect(started.code).not.toBe(AUTH_ERROR.forbidden);
+    const flags = loadSettings().trading;
+    expect(flags.liveTradingEnabled).toBe(false);
+    expect(flags.allowLiveTrading).toBe(false);
   });
 
   it("23-25. ceo live approve/start pass auth; flags still block execution", async () => {
@@ -165,7 +171,10 @@ describe("auth authorization and actor trust", () => {
     expect(viewer.status).toBe(403);
   });
 
-  it("28-30. credential, risk, and live flags are CEO only", async () => {
+  it("28-30. operator has CEO application permissions for credentials/risk/settings", async () => {
+    expect(roleHasPermission("operator", "credentials:manage")).toBe(true);
+    expect(roleHasPermission("operator", "risk:write")).toBe(true);
+    expect(roleHasPermission("operator", "settings:write")).toBe(true);
     const credential = await credentialDelete(
       await authedRequest(
         "http://localhost/api/rextora/settings/ai-providers/credential",
@@ -173,7 +182,10 @@ describe("auth authorization and actor trust", () => {
         "operator",
       ),
     );
-    expect(credential.status).toBe(403);
+    expect(credential.status).not.toBe(401);
+    const credentialBody = await jsonOf(credential);
+    expect(credentialBody.code).not.toBe(AUTH_ERROR.unauthenticated);
+    expect(credentialBody.code).not.toBe(AUTH_ERROR.forbidden);
     const risk = await riskPost(
       await authedRequest(
         "http://localhost/api/rextora/risk",
@@ -181,19 +193,21 @@ describe("auth authorization and actor trust", () => {
         "operator",
       ),
     );
-    expect(risk.status).toBe(403);
+    expect(risk.status).not.toBe(401);
+    expect(risk.status).not.toBe(403);
     const flags = await settingsPut(
       await authedRequest(
         "http://localhost/api/rextora/settings",
         {
           method: "PUT",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ trading: { liveTradingEnabled: true, allowLiveTrading: true } }),
+          body: JSON.stringify({ action: "export" }),
         },
         "operator",
       ),
     );
-    expect(flags.status).toBe(403);
+    expect(flags.status).not.toBe(401);
+    expect(flags.status).not.toBe(403);
     const ceoSettings = await settingsPut(
       await authedRequest(
         "http://localhost/api/rextora/settings",

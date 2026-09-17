@@ -1,4 +1,4 @@
-export const REXTORA_ROLES = ["ceo", "operator", "viewer"] as const;
+export const REXTORA_ROLES = ["ceo", "admin", "operator", "viewer"] as const;
 
 export type RextoraRole = (typeof REXTORA_ROLES)[number];
 
@@ -64,7 +64,7 @@ export const AUTH_ERROR = {
 } as const;
 
 export function isRextoraRole(value: unknown): value is RextoraRole {
-  return value === "ceo" || value === "operator" || value === "viewer";
+  return value === "ceo" || value === "admin" || value === "operator" || value === "viewer";
 }
 
 export function toPublicUser(user: RextoraUser): PublicRextoraUser {

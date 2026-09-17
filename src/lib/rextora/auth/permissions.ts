@@ -21,8 +21,7 @@ const CEO_PERMISSIONS: readonly RextoraPermission[] = [
 ];
 
 export function permissionsForRole(role: RextoraRole): readonly RextoraPermission[] {
-  if (role === "ceo") return CEO_PERMISSIONS;
-  if (role === "operator") return OPERATOR_PERMISSIONS;
+  if (role === "ceo" || role === "admin" || role === "operator") return CEO_PERMISSIONS;
   return [];
 }
 

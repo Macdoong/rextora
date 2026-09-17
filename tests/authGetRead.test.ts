@@ -113,7 +113,10 @@ describe("authenticated GET reads", () => {
         "operator",
       ),
     );
-    expect(operatorApprove.status).toBe(403);
+    expect(operatorApprove.status).not.toBe(401);
+    expect(operatorApprove.status).not.toBe(403);
+    expect(permissionsForRole("operator")).toContain("live:approve");
+    expect(permissionsForRole("viewer")).toEqual([]);
 
     const ceoStart = await botStartPost(
       await authedRequest(

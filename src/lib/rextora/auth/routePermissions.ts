@@ -15,6 +15,9 @@ export type MutationRoutePermission = {
 export const MUTATION_ROUTE_PERMISSIONS: MutationRoutePermission[] = [
   { method: "POST", path: "/api/rextora/auth/login", permission: "auth", sourceFile: "app/api/rextora/auth/login/route.ts" },
   { method: "POST", path: "/api/rextora/auth/logout", permission: "auth", sourceFile: "app/api/rextora/auth/logout/route.ts" },
+  { method: "POST", path: "/api/rextora/admin/users", permission: "action", sourceFile: "app/api/rextora/admin/users/route.ts" },
+  { method: "PATCH", path: "/api/rextora/admin/users/[userId]", permission: "action", sourceFile: "app/api/rextora/admin/users/[userId]/route.ts" },
+  { method: "DELETE", path: "/api/rextora/admin/users/[userId]", permission: "action", sourceFile: "app/api/rextora/admin/users/[userId]/route.ts" },
   { method: "POST", path: "/api/rextora/strategy/approve", permission: "action", sourceFile: "app/api/rextora/strategy/approve/route.ts" },
   { method: "POST", path: "/api/rextora/bot/start", permission: "action", sourceFile: "app/api/rextora/bot/start/route.ts" },
   { method: "POST", path: "/api/bot/start", permission: "action", sourceFile: "app/api/bot/start/route.ts" },
@@ -99,6 +102,7 @@ export const GET_ROUTE_ACCESS: GetRoutePermission[] = [
   { method: "GET", path: "/api/binance/status", access: "AUTH_REQUIRED", sourceFile: "app/api/binance/status/route.ts" },
   { method: "GET", path: "/api/bot/status", access: "AUTH_REQUIRED", sourceFile: "app/api/bot/status/route.ts" },
   { method: "GET", path: "/api/dashboard", access: "AUTH_REQUIRED", sourceFile: "app/api/dashboard/route.ts" },
+  { method: "GET", path: "/api/rextora/admin/users", access: "AUTH_REQUIRED", sourceFile: "app/api/rextora/admin/users/route.ts" },
   { method: "GET", path: "/api/rextora/agent/health", access: "AUTH_REQUIRED", sourceFile: "app/api/rextora/agent/health/route.ts" },
   { method: "GET", path: "/api/rextora/agent/session", access: "AUTH_REQUIRED", sourceFile: "app/api/rextora/agent/session/route.ts" },
   { method: "GET", path: "/api/rextora/auth/me", access: "AUTH_ENDPOINT", sourceFile: "app/api/rextora/auth/me/route.ts" },

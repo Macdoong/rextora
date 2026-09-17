@@ -26,6 +26,8 @@ export function V3Dialog({
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
@@ -35,14 +37,14 @@ export function V3Dialog({
     panelRef.current?.focus();
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
       lastFocus.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -50,7 +52,7 @@ export function V3Dialog({
     <div
       className="v3-dialog-backdrop"
       data-open="true"
-      onClick={closeOnBackdrop ? onClose : undefined}
+      onClick={closeOnBackdrop ? () => onCloseRef.current() : undefined}
     >
       <div
         ref={panelRef}
@@ -69,7 +71,7 @@ export function V3Dialog({
             type="button"
             className="v3-dialog__close"
             aria-label="닫기"
-            onClick={onClose}
+            onClick={() => onCloseRef.current()}
           >
             ×
           </button>

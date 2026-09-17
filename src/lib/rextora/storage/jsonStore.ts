@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { recoverAtomicJsonFile, writeAtomicJsonFile } from "./atomicJsonWrite";
 import { rextoraDataRoot } from "./runtimePaths";
 import { assertTestStoreIsNotProduction } from "./testStoreGuard";
 
@@ -72,14 +73,44 @@ export function readJsonStore<T>(filename: string, fallback: T, options?: { ttlM
   }
 }
 
+function rememberWrite<T>(filename: string, value: T): T {
+  const mtimeMs = getFileMtimeMs(filename);
+  storeCache.set(filename, { value, mtimeMs, expiresAt: Date.now() + DEFAULT_TTL_MS });
+  return value;
+}
+
 export function writeJsonStore<T>(filename: string, value: T): T {
   const fp = filePath(filename);
   assertTestStoreIsNotProduction(fp);
   ensureDir();
   fs.writeFileSync(fp, JSON.stringify(value, null, 2), "utf8");
-  const mtimeMs = getFileMtimeMs(filename);
-  storeCache.set(filename, { value, mtimeMs, expiresAt: Date.now() + DEFAULT_TTL_MS });
-  return value;
+  return rememberWrite(filename, value);
+}
+
+/**
+ * Auth user/session persistence. Same schema/formatting as writeJsonStore
+ * (JSON.stringify(value, null, 2)) but never truncates the live file first.
+ */
+export function writeJsonStoreAtomic<T>(filename: string, value: T): T {
+  const fp = filePath(filename);
+  assertTestStoreIsNotProduction(fp);
+  ensureDir();
+  writeAtomicJsonFile(fp, JSON.stringify(value, null, 2));
+  return rememberWrite(filename, value);
+}
+
+/**
+ * Auth read path: recover a valid .bak only when the live file is missing,
+ * then read. Does not invent users/sessions if both live and backup are gone.
+ */
+export function readJsonStoreAtomic<T>(
+  filename: string,
+  fallback: T,
+  options?: { ttlMs?: number },
+): T {
+  const fp = filePath(filename);
+  recoverAtomicJsonFile(fp);
+  return readJsonStore(filename, fallback, options);
 }
 
 export function appendJsonStore<T>(filename: string, item: T, maxItems = 500): T[] {

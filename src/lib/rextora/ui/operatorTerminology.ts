@@ -72,8 +72,9 @@ export const OPERATOR_ACTION_GROUP = {
 
 export const OPERATOR_ROLE = {
   ceo: "대표",
+  admin: "관리자",
   operator: "운영자",
-  viewer: "조회 전용",
+  viewer: "회원",
 } as const;
 
 export const OPERATOR_EMPTY = {

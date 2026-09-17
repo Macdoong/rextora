@@ -23,13 +23,16 @@
   padding: 0;
 }
 
-.v3-shell:has(.v3-oc-page) .dashboard-main {
+.v3-shell:has(.v3-oc-page) .dashboard-main,
+.v3-shell:has(.v3-admin-users) .dashboard-main {
   background: var(--v3-background);
   color: var(--v3-text-primary);
 }
 
 .v3-shell:has(.v3-oc-page) .rextora-main-workspace,
-.v3-shell:has(.v3-oc-page) .rextora-main-content {
+.v3-shell:has(.v3-oc-page) .rextora-main-content,
+.v3-shell:has(.v3-admin-users) .rextora-main-workspace,
+.v3-shell:has(.v3-admin-users) .rextora-main-content {
   background: transparent;
   border: 0;
   padding: 0;
