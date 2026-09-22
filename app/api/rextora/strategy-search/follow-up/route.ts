@@ -8,7 +8,10 @@ import {
   type FollowUpSource,
 } from "@/src/lib/rextora/strategySearch/followUpResearch";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
+import { requirePermission } from "@/src/lib/rextora/auth/requireUser";
+import { canReadStoredStrategy } from "@/src/lib/rextora/auth/searchResourceAccess";
+import { getStrategyById } from "@/src/lib/rextora/strategy/strategyStore";
+import { NextResponse } from "next/server";
 
 /**
  * POST /api/rextora/strategy-search/follow-up
@@ -16,8 +19,8 @@ import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
  * Does NOT create/start a job and does NOT touch SAFE.
  */
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "research:run");
-  if (denied) return denied;
+  const auth = requirePermission(request, "research:run");
+  if (!auth.ok) return auth.response;
   const start = Date.now();
   try {
     const body = (await request.json().catch(() => null)) as {
@@ -32,6 +35,21 @@ export async function POST(request: Request) {
 
     if (!body || typeof body !== "object") {
       throw new FollowUpResearchError("JSON body required", "INVALID_REQUEST");
+    }
+
+    if (body.strategyId) {
+      let strategy;
+      try {
+        strategy = getStrategyById(body.strategyId);
+      } catch {
+        strategy = null;
+      }
+      if (!strategy || !canReadStoredStrategy(auth.user, strategy)) {
+        return NextResponse.json(
+          { ok: false, error: "전략을 찾을 수 없습니다." },
+          { status: 404 },
+        );
+      }
     }
 
     const result = buildFollowUpResearch({

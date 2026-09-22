@@ -17,7 +17,7 @@ export const SETTINGS_EXPERT_LEDE =
   "기본 경로는 전략 탐색입니다. 전문가 모드는 이 브라우저에서만 켜지며 서버 설정을 저장하지 않습니다. 켜면 수동 전략 빌더와 전문가 백테스트 가드가 열립니다. 실주문·Live는 켜지지 않습니다.";
 
 export const SETTINGS_EXPERT_SAFE_NOTE =
-  "SAFE는 잠긴 원본이라 수정할 수 없습니다. 변경이 필요하면 복사본을 만드세요.";
+  "전문가 모드는 이 브라우저에서만 켜지며 실주문을 켜지 않습니다.";
 
 export const SETTINGS_EXPERT_TECHNICAL_KEYS = [
   "rextora.expertMode",
@@ -88,7 +88,7 @@ export function settingsExpertServerSettingsLabel(): string {
 }
 
 export function settingsExpertSafeLockLabel(): string {
-  return "잠금 · 수정 불가";
+  return "해당 없음";
 }
 
 export function settingsExpertBuilderStatus(enabled: boolean): string {

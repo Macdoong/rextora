@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
 import * as strategyStore from "../src/lib/rextora/strategy/strategyStore";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   createSearchJob,
   getSearchJob,
@@ -19,6 +19,8 @@ import {
 } from "../src/lib/rextora/strategySearch";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
 import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const tempRoots: string[] = [];
 const SAFE_CANDIDATES = [
@@ -197,12 +199,12 @@ function mockEval(): (
 }
 
 describe("strategySearch promote + search space exhausted", () => {
-  it("promotes Final PASS into Strategy Management without touching SAFE", () => {
-    const beforeSafe = fs.readFileSync(safePath());
+  it("promotes Final PASS into Strategy Management without resurrecting SAFE", () => {
+    expect(fs.existsSync(safePath())).toBe(false);
 
     const params = { ...CONTEXT_FALLBACK_PARAMS, ema_fast: 11 };
     const paramsHash = computeParamsHash(params);
-    expect(paramsHash).not.toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(paramsHash).not.toBe(RETIRED_SAFE_PARAMS_HASH);
 
     const root = makeTempRoot();
     const store = { rootDir: root };
@@ -300,41 +302,13 @@ describe("strategySearch promote + search space exhausted", () => {
     expect(second.strategyId).toBe(createdId);
     expect(createSpy).toHaveBeenCalledTimes(1);
 
-    expect(Buffer.compare(beforeSafe, fs.readFileSync(safePath()))).toBe(0);
+    expect(fs.existsSync(safePath())).toBe(false);
   });
 
-  it("rejects SAFE-hash and non-passing candidates", () => {
+  it("rejects non-passing candidates", () => {
     const root = makeTempRoot();
     const store = { rootDir: root };
     const job = createSearchJob(sampleConfig({ maxIterations: 1 }), store);
-    saveSearchTrial(
-      {
-        jobId: job.id,
-        iteration: 0,
-        candidateId: "c0",
-        params: {},
-        paramsHash: "7893ca3f0e30",
-        generatorType: "random",
-        parentCandidateIds: [],
-        score: 1,
-        passed: true,
-        failureReasons: [],
-        windowResults: [],
-        costStressResults: [],
-        jitterResults: [],
-        durationMs: 1,
-        createdAt: new Date().toISOString(),
-      },
-      store,
-    );
-    expect(() =>
-      promoteSearchCandidateToStrategy({
-        jobId: job.id,
-        iteration: 0,
-        storeOptions: store,
-      }),
-    ).toThrow(/SAFE|protected/i);
-
     saveSearchTrial(
       {
         jobId: job.id,

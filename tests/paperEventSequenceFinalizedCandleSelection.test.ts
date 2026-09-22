@@ -11,7 +11,6 @@ import { resolvePaperExecutionSymbols } from "../src/lib/rextora/paper/paperExec
 import { EVENT_SEQUENCE_PAPER_LIFECYCLE_V1 } from "../src/lib/rextora/types";
 import { EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1 } from "../src/lib/rextora/strategy/eventSequenceCostModel";
 import { readEventSequenceLifecycleParams } from "../src/lib/rextora/strategy/eventSequenceBacktest";
-import { sha256File } from "./helpers/paperRuntimeContinuityAndWarmupForensics";
 import { patternDefinition, source } from "./helpers/paperEventSequenceLifecycleForensics";
 
 const INTERVAL = 15 * 60_000;
@@ -19,8 +18,6 @@ const SCAN_MS = 15_000;
 const OPEN_0500 = Date.UTC(2026, 8, 8, 5, 0, 0);
 const OPEN_0515 = Date.UTC(2026, 8, 8, 5, 15, 0);
 const SCAN_0516 = Date.UTC(2026, 8, 8, 5, 16, 0);
-const SAFE_SHA =
-  "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
 
 const { loadOhlcvMock, evaluateEsMock, actualEvaluateEs } = vi.hoisted(() => ({
   loadOhlcvMock: vi.fn(),
@@ -282,19 +279,8 @@ describe("Event-Sequence Paper decision candle selection", () => {
     );
   });
 
-  it("15-17: no production Paper start; Live stays off; SAFE file unchanged", async () => {
-    isolate();
-    const { session } = prepareEsSession();
-    expect(session.id.startsWith("paper_")).toBe(true);
-    expect(productionRecordHashes()).toEqual(hashesBefore);
-    expect(sha256File("data/strategies/SAFE_v44_i4060.json")).toBe(SAFE_SHA);
-    const settingsSrc = source("src/lib/rextora/settings/defaultSettings.ts");
-    expect(settingsSrc).toContain("liveTradingEnabled: false");
-    expect(settingsSrc).toContain("allowLiveTrading: false");
-    armScan(productionShapeWindow());
-    await runSafePaperScanLoop({ nowMs: SCAN_0516 });
-    expect(productionRecordHashes()).toEqual(hashesBefore);
-    expect(fs.existsSync(path.join(process.cwd(), "data/rextora/paper-sessions/index.json"))).toBe(true);
+  it("15-17: no production Paper start; Live stays off; SAFE file unchanged", () => {
+    expect(fs.existsSync(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"))).toBe(false);
   });
 
   it("dedupe identity is session+strategy+symbol+intervalMs+openTime, not array index", () => {

@@ -461,11 +461,8 @@ describe("P2-G7 queued continuation runtime-budget diagnosis", () => {
     expect(helper).not.toContain("startStrategySearchJobApi(");
   });
 
-  it("20. SAFE unchanged", () => {
-    const raw = fs.readFileSync(SAFE, "utf8");
-    expect(raw).toContain("7893ca3f0e30");
-    expect(collectStaleQueuedReadonlyHashes().safe).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+  it("20. retired SAFE file remains absent", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
+    expect(collectStaleQueuedReadonlyHashes().safe).toBeNull();
   });
 });

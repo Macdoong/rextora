@@ -32,7 +32,7 @@ import {
   getStrategyById,
   updateStrategyDisplayMeta,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import { createSearchJob, saveSearchTrial } from "../src/lib/rextora/strategySearch/jobStore";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
@@ -48,11 +48,8 @@ import {
 import { orderBlockSearchRanges } from "../src/lib/rextora/strategySearch/patternSearchSpaces";
 import type { StrategySearchConfig } from "../src/lib/rextora/strategySearch/types";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
 
-const SAFE_SHA =
-  "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
-const BACKTEST_INDEX_SHA =
-  "4140af487e4bd32aa0b2b34ea2f57069e7785689a268a437acfca5d886fda9ae";
 
 const INTERVAL = 15 * 60 * 1000;
 const START = Date.UTC(2024, 0, 1);
@@ -704,12 +701,15 @@ describe("P3-A8.3.1 StoredStrategy structured execution provenance", () => {
     expect(resolved.source).toBe("strategy_structured");
   });
 
-  it("33-34. SAFE legacy strategy still loads; SAFE Paper bypass unchanged", () => {
+  it("33-34. retired SAFE is not loaded; ordinary safe_params Paper bypass unchanged", () => {
     isolate();
-    const safe = getStrategyById(SAFE_STRATEGY_ID)!;
-    expect(safe.id).toBe(SAFE_STRATEGY_ID);
-    expect(safe.executionProvenance).toBeUndefined();
-    const paper = resolvePaperEventSequenceCostModel({ strategy: safe });
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    const strategy = createStrategy({
+      name: "safe-params-fixture",
+      timeframe: "15m",
+      strategyType: "safe_params",
+    });
+    const paper = resolvePaperEventSequenceCostModel({ strategy });
     expect(paper.status).toBe("not_applicable");
   });
 
@@ -753,11 +753,11 @@ describe("P3-A8.3.1 StoredStrategy structured execution provenance", () => {
     );
   });
 
-  it("46-48. production records and SAFE unchanged", () => {
+  it("46-48. production records unchanged; retired SAFE file remains absent", () => {
     const after = productionReadonlyHashes();
-    expect(after.safeSha256).toBe(SAFE_SHA);
+    expect(after.safeSha256).toBeNull();
     expect(after.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(after.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(after.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
     expect(after.safeSha256).toBe(hashesBefore.safeSha256);
     if (strategyIndexBefore) {
       const now = createHash("sha256")
@@ -771,11 +771,7 @@ describe("P3-A8.3.1 StoredStrategy structured execution provenance", () => {
         expect(fs.statSync(path.join(dir, name)).mtimeMs).toBe(mtime);
       }
     }
-    expect(
-      createHash("sha256")
-        .update(fs.readFileSync("data/strategies/SAFE_v44_i4060.json"))
-        .digest("hex"),
-    ).toBe(SAFE_SHA);
+    expect(fs.existsSync("data/strategies/SAFE_v44_i4060.json")).toBe(false);
   });
 
   it("UI status labels", () => {

@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -35,16 +34,13 @@ import {
   ensureStrategyStore,
   getStrategyById,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { NEW_JOB_EVENT_SEQUENCE_COST_MODEL } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import { buildPatternSearchDefinition } from "../src/lib/rextora/strategySearch/patternEventSequence";
 import { ORDER_BLOCK_BASE_PARAMS } from "../src/lib/rextora/strategySearch/patternSearchSpaces";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
 
-const SAFE_SHA =
-  "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
-const BACKTEST_INDEX_SHA =
-  "4140af487e4bd32aa0b2b34ea2f57069e7785689a268a437acfca5d886fda9ae";
 
 const INTERVAL = 15 * 60 * 1000;
 const START = Date.UTC(2024, 0, 1);
@@ -64,10 +60,6 @@ afterEach(() => {
   }
   delete process.env.REXTORA_PAPER_SESSIONS_DIR;
 });
-
-function sha256(filePath: string): string {
-  return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
-}
 
 function isolatePaper(): { rootDir: string } {
   const iso = installIsolatedStrategyStore();
@@ -201,10 +193,14 @@ describe("P3-A8.3 Paper Event-Sequence cost-model alignment", () => {
     expect(resolved.costModel).not.toBe(NEW_JOB_EVENT_SEQUENCE_COST_MODEL);
   });
 
-  it("5. SAFE bypasses Pattern resolver", () => {
+  it("5. ordinary safe_params strategy bypasses Pattern resolver", () => {
     isolatePaper();
-    const safe = getStrategyById(SAFE_STRATEGY_ID) as StoredStrategyV1;
-    const resolved = resolvePaperEventSequenceCostModel({ strategy: safe });
+    const strategy = createStrategy({
+      name: "safe-params-fixture",
+      timeframe: "15m",
+      strategyType: "safe_params",
+    }) as StoredStrategyV1;
+    const resolved = resolvePaperEventSequenceCostModel({ strategy });
     expect(resolved.status).toBe("not_applicable");
     expect(resolved.costModel).toBeNull();
   });
@@ -302,8 +298,8 @@ describe("P3-A8.3 Paper Event-Sequence cost-model alignment", () => {
     expect(source("src/lib/rextora/execution/safePaperLoop.ts")).toMatch(
       /executionKind === "event_sequence"[\s\S]*evaluateCostGuard/,
     );
-    expect(source("src/lib/rextora/execution/safePaperLoop.ts")).toContain(
-      'executionKind === "event_sequence"\n        ? { passed: true, reason: "" }',
+    expect(source("src/lib/rextora/execution/safePaperLoop.ts")).toMatch(
+      /executionKind === "event_sequence"\s*\?\s*\{\s*passed:\s*true,\s*reason:\s*""\s*\}/,
     );
     expect(source("src/lib/rextora/strategy/eventSequenceCostModel.ts")).not.toContain(
       "evaluateCostGuard",
@@ -479,14 +475,14 @@ describe("P3-A8.3 Paper Event-Sequence cost-model alignment", () => {
     );
   });
 
-  it("36. SAFE Paper session is not_applicable", () => {
+  it("36. retired SAFE cannot become a Paper session", () => {
     const { rootDir } = isolatePaper();
-    const session = preparePaperSession(
-      { strategyId: SAFE_STRATEGY_ID, requireApproval: true },
-      { rootDir },
-    );
-    expect(session.eventSequenceCostModelStatus).toBe("not_applicable");
-    expect(session.eventSequenceCostModel).toBeNull();
+    expect(() =>
+      preparePaperSession(
+        { strategyId: RETIRED_SAFE_STRATEGY_ID, requireApproval: true },
+        { rootDir },
+      ),
+    ).toThrow();
   });
 
   it("37-39. Live SAFE path remains; Event-Sequence Live is dispatched separately; no Live activation/orders", () => {
@@ -501,8 +497,8 @@ describe("P3-A8.3 Paper Event-Sequence cost-model alignment", () => {
     );
   });
 
-  it("40. SAFE unchanged", () => {
-    expect(sha256("data/strategies/SAFE_v44_i4060.json")).toBe(SAFE_SHA);
+  it("40. retired SAFE file remains absent", () => {
+    expect(fs.existsSync("data/strategies/SAFE_v44_i4060.json")).toBe(false);
     expect(hashesBefore.paramsHash).toBe("7893ca3f0e30");
   });
 
@@ -606,9 +602,9 @@ describe("P3-A8.3 Paper Event-Sequence cost-model alignment", () => {
 
   it("production hashes unchanged after resolver/session tests", () => {
     const after = productionReadonlyHashes();
-    expect(after.safeSha256).toBe(SAFE_SHA);
+    expect(after.safeSha256).toBeNull();
     expect(after.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(after.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(after.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
     expect(after.safeSha256).toBe(hashesBefore.safeSha256);
   });
 });

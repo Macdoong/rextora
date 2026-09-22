@@ -3,9 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  RETIRED_SAFE_STRATEGY_ID,
+} from "../src/lib/rextora/strategy/retiredSafeBaseline";
+import {
   PAPER_OPERATOR_LEGACY_OHLC_LABEL,
   PAPER_OPERATOR_LEGACY_OWNERSHIP_LABEL,
-  PAPER_OPERATOR_SAFE_STRATEGY_ID,
   PAPER_OPERATOR_UNRESOLVED_LABEL,
   paperOperatorCapitalDelta,
   paperOperatorChartEmptyCopy,
@@ -83,9 +85,9 @@ describe("Paper operator presentation", () => {
   it("8-9. SAFE and Pattern identities stay truthful", () => {
     expect(
       paperOperatorExecutionKind({
-        strategyId: PAPER_OPERATOR_SAFE_STRATEGY_ID,
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
       }).label,
-    ).toBe("SAFE");
+    ).toBe(PAPER_OPERATOR_UNRESOLVED_LABEL);
     expect(
       paperOperatorExecutionKind({
         strategyId: "custom_mts6svuf",
@@ -189,9 +191,7 @@ describe("Paper operator presentation", () => {
     ).toBe(PAPER_OPERATOR_UNRESOLVED_LABEL);
     expect(process.env.REXTORA_PAPER_SESSIONS_DIR).toBeUndefined();
     const safe = path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json");
-    expect(
-      createHash("sha256").update(fs.readFileSync(safe)).digest("hex"),
-    ).toBe(SAFE_SHA);
+    expect(fs.existsSync(safe)).toBe(false);
   });
 
   it("LEVERAGE 1-4. execution authority ignores alias text", () => {
@@ -339,9 +339,7 @@ describe("Paper operator presentation", () => {
       process.cwd(),
       "data/strategies/SAFE_v44_i4060.json",
     );
-    expect(
-      createHash("sha256").update(fs.readFileSync(safeFile)).digest("hex"),
-    ).toBe(SAFE_SHA);
+    expect(fs.existsSync(safeFile)).toBe(false);
   });
 
   it("maps signed PnL tone without inventing values", () => {

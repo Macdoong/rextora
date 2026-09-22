@@ -10,6 +10,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { productionReadonlyHashes } from "../backtest/backtestCostAssumptionsDiagnosis";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
 import { computeParamsHash } from "../strategy/strategyHash";
 import { isBetterScore } from "./jobStatistics";
@@ -162,7 +163,7 @@ export function getParamsHashConsumers() {
         file: "src/lib/rextora/strategySearch/candidateEvaluator.ts",
         functions: ["evaluateCandidatePass guard"],
         semantic: "PROTECTION_KEY" as ParamsHashSemantic,
-        note: "isLockedSafeHash / 7893ca3f0e30 collision reject",
+        note: "isLockedSafeHash retired; no longer a product protection key",
       },
       {
         file: "src/lib/rextora/strategySearch/backtestAdapter.ts",
@@ -196,7 +197,7 @@ export function getParamsHashConsumers() {
         file: "src/lib/rextora/strategy/safeV44Strategy.ts",
         functions: ["verifySafeStrategy"],
         semantic: "PROTECTION_KEY" as ParamsHashSemantic,
-        note: "EXPECTED_SAFE_PARAMS_HASH lock",
+        note: "retired SAFE identity; no current hash lock",
       },
       {
         file: "src/lib/rextora/strategySearch/researchTop10.ts",
@@ -1239,7 +1240,7 @@ export function writeP3A711Artifacts(cwd = process.cwd()) {
 
 export function productionSafetySnapshot(cwd = process.cwd()) {
   const hashes = productionReadonlyHashes(cwd);
-  const safePath = path.join(cwd, "data/strategies/SAFE_v44_i4060.json");
+  const safePath = path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME);
   return {
     ...hashes,
     safeSha256Now: sha256File(safePath),

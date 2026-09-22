@@ -13,8 +13,9 @@ export function computeParamsHash(params: SafeV44Params | Record<string, unknown
   return createHash("sha256").update(JSON.stringify(normalized)).digest("hex").slice(0, 12);
 }
 
-export function isLockedSafeHash(hash: string): boolean {
-  return hash === "7893ca3f0e30";
+/** Retired. Canonical SAFE hash lock is no longer used at runtime. */
+export function isLockedSafeHash(_hash: string): boolean {
+  return false;
 }
 
 function stableValue(value: unknown): unknown {

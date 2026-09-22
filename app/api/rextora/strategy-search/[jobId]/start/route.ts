@@ -1,5 +1,5 @@
 import { startStrategySearchJobApi } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
+import { requireSearchJobAccess } from "@/src/lib/rextora/auth/requireSearchJobAccess";
 import {
   strategySearchError,
   strategySearchJson,
@@ -8,12 +8,12 @@ import {
 type Ctx = { params: Promise<{ jobId: string }> };
 
 /** POST /api/rextora/strategy-search/[jobId]/start */
-export async function POST(_request: Request, context: Ctx) {
-  const denied = await denyUnlessPermitted(_request, "research:run");
-  if (denied) return denied;
+export async function POST(request: Request, context: Ctx) {
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "write", "research:run");
+    if (!access.ok) return access.response;
     const data = startStrategySearchJobApi(jobId);
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {

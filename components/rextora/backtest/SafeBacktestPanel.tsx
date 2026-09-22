@@ -51,7 +51,7 @@ const PRESETS: Array<[string, number]> = [
 
 export function BacktestWorkbench() {
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
-  const [strategyId, setStrategyId] = useState("SAFE_v44_i4060");
+  const [strategyId, setStrategyId] = useState("");
   const [symbolsText, setSymbolsText] = useState("BTCUSDT");
   const [timeframe, setTimeframe] = useState("15m");
   const [fromDate, setFromDate] = useState("");

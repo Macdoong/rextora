@@ -1,11 +1,11 @@
 import type { SafeV44Params } from "./strategyTypes";
 
 /**
- * Full SAFE_v44_i4060 trading parameters from operator context.
- * Used when locked research JSON is missing, or when the data strategy
- * file has a verified hash but incomplete params.
+ * Generic search-space baseline. This is parameter-schema fill only.
+ * It is not a selected trading strategy and must never be auto-applied
+ * as paperActive, Live approval, or dashboard identity.
  */
-export const CONTEXT_FALLBACK_PARAMS: SafeV44Params = {
+export const GENERIC_SEARCH_BASELINE_PARAMS: SafeV44Params = {
   ema_fast: 20,
   ema_mid: 60,
   ema_slow: 200,
@@ -55,9 +55,12 @@ export const CONTEXT_FALLBACK_PARAMS: SafeV44Params = {
   cost_guard_k: 3.0
 };
 
+/** @deprecated Use GENERIC_SEARCH_BASELINE_PARAMS. Alias kept for explicit search-space callers. */
+export const CONTEXT_FALLBACK_PARAMS = GENERIC_SEARCH_BASELINE_PARAMS;
+
 export function mergeSafeParams(partial: Partial<SafeV44Params> | Record<string, unknown>): SafeV44Params {
-  const merged = { ...CONTEXT_FALLBACK_PARAMS };
-  for (const key of Object.keys(CONTEXT_FALLBACK_PARAMS) as Array<keyof SafeV44Params>) {
+  const merged = { ...GENERIC_SEARCH_BASELINE_PARAMS };
+  for (const key of Object.keys(GENERIC_SEARCH_BASELINE_PARAMS) as Array<keyof SafeV44Params>) {
     if (partial[key] !== undefined && partial[key] !== null) {
       (merged as Record<string, unknown>)[key] = partial[key];
     }

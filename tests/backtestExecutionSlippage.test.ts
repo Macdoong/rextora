@@ -27,7 +27,7 @@ import {
   runExitReasonFixture,
   SLIPPAGE_RATE,
 } from "../src/lib/rextora/backtest/backtestSlippageModelDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import type {
   BacktestConfig,
   BacktestReport,
@@ -39,7 +39,8 @@ const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
 const hashesBefore = productionReadonlyHashes(ROOT);
 const RATE = 0.0002;
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -728,14 +729,8 @@ describe("P3-A5.2 SAFE execution-price slippage", () => {
     );
   });
 
-  it("44. SAFE unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
-    expect(
-      (JSON.parse(readFileSync(SAFE_PATH, "utf8")) as { params_hash: string })
-        .params_hash,
-    ).toBe(EXPECTED_SAFE_PARAMS_HASH);
+  it("44. retired SAFE file remains absent", () => {
+    expect(sha256(SAFE_PATH)).toBeNull();
   });
 });
 

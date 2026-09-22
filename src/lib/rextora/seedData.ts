@@ -112,25 +112,6 @@ export const backtestValidationSeed: BacktestValidation = {
 
 export const preservedStrategies: Strategy[] = [
   {
-    id: "SAFE_v44_i4060",
-    name: "SAFE_v44_i4060",
-    paramsHash: "7893ca3f0e30",
-    type: "안정형",
-    status: "실전 가능 후보",
-    interpretation: "preserved safe baseline strategy/not explosive",
-    entryCondition: "EMA20 > EMA60, RSI 35~62, 거래량 평균 대비 상승",
-    exitCondition: "서버 TP/SL 우선, EMA 재하향 또는 리스크 제한 접근 시 청산",
-    riskCondition: "일 손실 한도, 총 손실 한도, 연속 손실 제한, 서버 TP/SL 필수",
-    symbol: "BTCUSDT",
-    timeframe: "1H",
-    liveEligible: false,
-    liveEligibleCandidate: true,
-    verifiedForLive: false,
-    serviceState: "live-blocked",
-    validation: backtestValidationSeed,
-    params: safeParams
-  },
-  {
     id: "STR_v8_aggressive_003",
     name: "STR_v8_aggressive_003",
     paramsHash: "a91b20ef0187",

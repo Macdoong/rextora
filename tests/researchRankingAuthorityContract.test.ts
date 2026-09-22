@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { productionReadonlyHashes } from "../src/lib/rextora/backtest/backtestCostAssumptionsDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   GROUP_PATTERN,
   GROUP_SAFE,
@@ -32,6 +32,8 @@ import {
   sampleHistoricalTrials,
   writeP3A712Artifacts,
 } from "../src/lib/rextora/strategySearch/researchRankingAuthorityContract";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const ROOT = process.cwd();
 const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -41,7 +43,8 @@ const hashesBefore = productionReadonlyHashes(ROOT);
 const researchIndexBefore = hashesBefore.researchIndexSha256;
 const backtestIndexBefore = hashesBefore.backtestIndexSha256;
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -386,15 +389,15 @@ describe("P3-A7.1.2 Research ranking authority contract", () => {
   });
 
   it("48. SAFE unchanged", () => {
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(sha256(SAFE_PATH)).toBeNull();
   });
 });
 
 afterAll(() => {
-  expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+  expect(sha256(SAFE_PATH)).toBeNull();
   expect(productionReadonlyHashes(ROOT).researchIndexSha256).toBe(
     researchIndexBefore,
   );
-  expect(productionSafetySnapshot(ROOT).safeSha256Now).toBe(EXPECTED_SAFE_SHA);
+  expect(productionSafetySnapshot(ROOT).safeSha256Now).toBeNull();
 });

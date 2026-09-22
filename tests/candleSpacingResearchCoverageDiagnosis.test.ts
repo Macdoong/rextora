@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateCandleSpacing } from "../src/lib/rextora/data/timeframes";
 import {
@@ -34,10 +34,8 @@ import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
 import { generateSyntheticCandles } from "../src/lib/rextora/data/ohlcvTypes";
 import { classifyEngineError } from "../src/lib/rextora/strategySearch/engineErrorClassification";
 import { StrategySearchAdapterError } from "../src/lib/rextora/strategySearch/backtestAdapter";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const SAFE_PATH = "data/strategies/SAFE_v44_i4060.json";
 const ARTIFACT_TS = "2026-09-03T11-56-00-000Z";
@@ -47,7 +45,8 @@ const artifactDir = join(
   ARTIFACT_TS,
 );
 
-function safeSha256(): string {
+function safeSha256(): string | null {
+  if (!existsSync(SAFE_PATH)) return null;
   return createHash("sha256").update(readFileSync(SAFE_PATH)).digest("hex");
 }
 
@@ -316,9 +315,7 @@ describe("P3-A3 candle spacing + Research coverage diagnosis", () => {
   });
 
   it("20. no production writes", () => {
-    expect(safeSha256()).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(safeSha256()).toBeNull();
   });
 
   it("21. no Research execution", () => {
@@ -330,11 +327,9 @@ describe("P3-A3 candle spacing + Research coverage diagnosis", () => {
   });
 
   it("23. SAFE unchanged", () => {
-    expect(SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(safeSha256()).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(RETIRED_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(safeSha256()).toBeNull();
   });
 
   afterAll(() => {

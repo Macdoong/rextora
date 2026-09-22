@@ -3,7 +3,6 @@
  * No Live activation, order placement, or gate-authority changes.
  */
 
-export const LIVE_GATE_OPERATOR_SAFE_STRATEGY_ID = "SAFE_v44_i4060";
 export const LIVE_GATE_UNAVAILABLE = "데이터 없음";
 export const LIVE_GATE_UNKNOWN_FAILURE_TITLE = "실전 진입 조건 미충족";
 export const LIVE_GATE_APPROVAL_REQUEST_UNAVAILABLE = "승인 요청을 만들 수 없습니다.";

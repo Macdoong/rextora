@@ -59,13 +59,18 @@ export function DashboardPanels() {
         if (stratRes.ok) {
           const body = await stratRes.json();
           const list = body.data ?? [];
-          const activeStrat = list.find((s: { paperActive?: boolean; liveActive?: boolean }) => s.paperActive || s.liveActive) ?? list[0];
+          const activeStrat = list.find(
+            (s: { paperActive?: boolean; liveActive?: boolean }) =>
+              s.paperActive || s.liveActive,
+          );
           if (activeStrat) {
             setStrategy({
               name: activeStrat.name,
               paramsHash: activeStrat.paramsHash,
               lastReturn: activeStrat.lastBacktest?.totalReturn
             });
+          } else {
+            setStrategy(null);
           }
         }
         if (dashRes.ok) {
@@ -122,17 +127,17 @@ export function DashboardPanels() {
         <div data-section="active-strategy">
           <Card title="활성 전략" className="!p-3" data-testid="dashboard-active-strategy">
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              <Metric label="전략" value={strategy?.name ?? "SAFE_v44_i4060"} />
+              <Metric label="전략" value={strategy?.name ?? "—"} />
               <Metric
                 label="전략 해시"
                 value={
                   (strategy as { strategyHash?: string } | null)?.strategyHash?.slice(0, 12) ??
                   strategy?.paramsHash?.slice(0, 12) ??
-                  "7893ca3f0e30"
+                  "—"
                 }
               />
               <Metric label="최근 백테스트" value={strategy?.lastReturn != null ? `${(strategy.lastReturn * 100).toFixed(1)}%` : "-"} />
-              <Metric label="실전 후보" value="보호 전략" />
+              <Metric label="실전 후보" value={strategy ? "활성 후보" : "—"} />
             </div>
           </Card>
         </div>

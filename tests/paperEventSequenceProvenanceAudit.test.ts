@@ -80,7 +80,8 @@ afterEach(() => {
   invalidateJsonStoreCache();
 });
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -479,9 +480,7 @@ describe("Event-Sequence Paper provenance and OHLC audit", () => {
     expect(loop).toContain("openEventSequencePaperPosition");
     const engine = source("src/lib/rextora/paperExecutionEngine.ts");
     expect(engine).toMatch(/isEventSequencePaperOwned/);
-    expect(sha256(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"))).toBe(
-      SAFE_SHA,
-    );
+    expect(sha256(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"))).toBeNull();
     const hashesAfter = productionReadonlyHashes();
     expect(hashesAfter.safeSha256).toBe(hashesBefore.safeSha256);
     expect(hashesAfter.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);

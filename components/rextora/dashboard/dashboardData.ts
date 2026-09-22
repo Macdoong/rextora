@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTestResearchJob } from "@/src/lib/rextora/strategySearch/testJobFilter";
+import { observeSearchTerminalJobs } from "@/src/lib/rextora/strategySearch/searchTerminalNotification";
 import { fetchJsonCached } from "@/src/lib/rextora/client/requestCache";
 import {
   DASHBOARD_RESEARCH_LIST_LIMIT,
@@ -23,6 +24,7 @@ export type ResearchJob = {
   timeframe?: string;
   uniqueEvaluatedCount?: number;
   qualifiedCount?: number;
+  statistics?: { passed?: number | null };
   elapsedMs?: number;
   remainingMs?: number | null;
   maxRuntimeMs?: number | null;
@@ -33,25 +35,72 @@ export type ResearchJob = {
   latestWeaknessKo?: string | null;
 };
 
+export type DashPosition = {
+  symbol?: string;
+  side?: string;
+  unrealizedPnl?: number;
+  pnlPct?: number;
+  leverage?: number;
+  entryPrice?: number;
+  currentPrice?: number;
+  protectionLabel?: string;
+};
+
+export type DashRecentTrade = {
+  realizedUsdt?: number;
+  time?: string;
+};
+
 export type DashStatus = {
   liveAllowed?: boolean;
   canStartLive?: boolean;
   liveBlockReason?: string | null;
   botStatusLabel?: string;
   modeLabel?: string;
-  activeStrategy?: { name: string; paramsHash: string };
-  positions?: unknown[];
+  safetyLabel?: string;
+  lastUpdatedAt?: string;
+  activeStrategy?: { name: string; paramsHash: string } | null;
+  positions?: DashPosition[];
+  recentTrades?: DashRecentTrade[];
   todayStats?: {
     realizedPnlUsdt?: number;
     unrealizedPnlUsdt?: number;
     trades?: number;
+    winRate?: number;
+    accountEquity?: number;
+    feeUsdt?: number;
+    fundingUsdt?: number;
+    slippageUsdt?: number;
   };
   metrics?: {
     todayRealizedPnlUsdt?: number;
     todayUnrealizedPnlUsdt?: number;
     accountEquity?: number;
+    winRate?: number;
+  };
+  operations?: {
+    watchedSymbolCount?: number;
+    eligibleCandidateCount?: number;
+    openPositionCount?: number;
+    queueStatusLabel?: string;
   };
   emergencyActive?: boolean;
+  risk?: {
+    dailyLossLimitPct?: number;
+    currentDailyLossPct?: number;
+    usagePct?: number;
+    accountDrawdownPct?: number;
+    accountLossLimitPct?: number;
+    consecutiveLosses?: number;
+    consecutiveLossLimit?: number;
+    dailyTrades?: number;
+    maxDailyTrades?: number;
+    openPositions?: number;
+    maxPositions?: number;
+    currentLeverage?: number;
+    maxLeverage?: number;
+    riskState?: string;
+  };
 };
 
 export type ReviewItem = DashboardReviewItem;
@@ -190,6 +239,14 @@ export function useDashboardData() {
   const completedRecent = jobs.filter((j) =>
     ["completed", "cancelled", "failed"].includes(j.status),
   )[0];
+  const terminalResearch = useMemo(
+    () => jobs.filter((j) => j.status === "completed" || j.status === "failed"),
+    [jobs],
+  );
+
+  useEffect(() => {
+    observeSearchTerminalJobs(terminalResearch);
+  }, [terminalResearch]);
 
   const reviewItems = useMemo(() => {
     const items: ReviewItem[] = [
@@ -247,6 +304,7 @@ export function useDashboardData() {
     attentionHiddenCount: researchSelection.attentionHiddenCount,
     activeResearch: researchSelection.currentResearch,
     completedRecent,
+    terminalResearch,
     reviewItems,
     primaryAction,
   };

@@ -4,7 +4,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as backtestEngine from "../src/lib/rextora/backtest/backtestEngine";
 import * as binanceReadOnly from "../src/lib/rextora/binance/binanceReadOnlyService";
@@ -32,19 +32,19 @@ import {
   resolveTimeframe,
   validateCandleSpacing,
 } from "../src/lib/rextora/data/timeframes";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
-import { ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
+
+import { createStrategy, ensureStrategyStore, saveStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const SAFE_PATH = "data/strategies/SAFE_v44_i4060.json";
 const NOW = Date.UTC(2026, 8, 3, 12, 0, 0);
 const INTERVAL_15M = 900_000;
 const T0 = Date.UTC(2024, 0, 1);
 
-function safeSha256(): string {
+function safeSha256(): string | null {
+  if (!existsSync(SAFE_PATH)) return null;
   return createHash("sha256").update(readFileSync(SAFE_PATH)).digest("hex");
 }
 
@@ -340,11 +340,9 @@ describe("P3-A4 historical data coverage + grid", () => {
   });
 
   it("34. production records unchanged / 37. SAFE unchanged", () => {
-    expect(SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(safeSha256()).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(RETIRED_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(safeSha256()).toBeNull();
   });
 });
 
@@ -358,6 +356,13 @@ describe("P3-A4 Backtest wrapper regression", () => {
   it("21. Backtest 21k partial engine calls 0", async () => {
     isolated = installIsolatedStrategyStore();
     ensureStrategyStore();
+    const fixtureId = saveStrategy(
+      createStrategy({
+        name: "fixture-historical-coverage",
+        timeframe: "15m",
+      }).id,
+      { symbols: ["BTCUSDT"] },
+    ).id;
     const { fromOpenTime, toOpenTime } = computePresetRangeMs(365, NOW);
     const engineSpy = vi.spyOn(backtestEngine, "runSafeV44Backtest");
     vi.spyOn(binanceReadOnly, "getKlinesRange").mockImplementation(
@@ -365,7 +370,7 @@ describe("P3-A4 Backtest wrapper regression", () => {
     );
     await expect(
       runConfiguredBacktest({
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: fixtureId,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         fromOpenTime,

@@ -11,10 +11,7 @@ import {
   listStrategies,
   updateStrategyLastBacktest,
 } from "../strategy/strategyStore";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  type SafeV44Params,
-} from "../strategy/strategyTypes";
+import { type SafeV44Params } from "../strategy/strategyTypes";
 import { StrategySearchApiError } from "./jobApiService";
 import {
   getJobExecutionProfile,
@@ -54,6 +51,7 @@ export interface PromoteSearchCandidateInput {
   name?: string;
   clusterId?: string;
   storeOptions?: StrategySearchStoreOptions;
+  ownerUserId?: string | null;
 }
 
 export type RegistrationState =
@@ -396,19 +394,7 @@ export function promoteSearchCandidateToStrategy(
   const timeframe: "5m" | "15m" | "1h" =
     tf === "5m" || tf === "15m" || tf === "1h" ? tf : "15m";
 
-  if (isPattern && patternFamily) {
-    if (
-      trial.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-      trial.paramsHash === "7893ca3f0e30"
-    ) {
-      throw new StrategySearchApiError(
-        "PROTECTED_STRATEGY_VIOLATION",
-        "protected SAFE strategy cannot be promoted or overwritten",
-        403,
-      );
-    }
-
-    const existing = findExistingByCandidateHash(trial.paramsHash);
+  if (isPattern && patternFamily) {    const existing = findExistingByCandidateHash(trial.paramsHash);
     if (existing) {
       const dup: PromoteSearchCandidateResult = {
         strategyId: existing.id,
@@ -475,6 +461,7 @@ export function promoteSearchCandidateToStrategy(
       store,
     });
     const created = createStrategy({
+      ownerUserId: input.ownerUserId ?? null,
       name,
       displayAlias,
       displayName: name,
@@ -542,19 +529,6 @@ export function promoteSearchCandidateToStrategy(
 
   const params = mergeSafeParams(trial.params as Partial<SafeV44Params>);
   const paramsHash = computeParamsHash(params);
-  if (
-    paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-    paramsHash === "7893ca3f0e30" ||
-    trial.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-    trial.paramsHash === "7893ca3f0e30"
-  ) {
-    throw new StrategySearchApiError(
-      "PROTECTED_STRATEGY_VIOLATION",
-      "protected SAFE strategy cannot be promoted or overwritten",
-      403,
-    );
-  }
-
   const leverageLabel = describeLeverageFromParams(
     params as unknown as Record<string, unknown>,
   );
@@ -598,6 +572,7 @@ export function promoteSearchCandidateToStrategy(
     store,
   });
   const created = createStrategy({
+    ownerUserId: input.ownerUserId ?? null,
     name,
     displayAlias,
     displayName: name,
@@ -665,6 +640,7 @@ export function promoteSelectedTrialsFromJob(
   jobId: string,
   iterations: number[],
   storeOptions?: StrategySearchStoreOptions,
+  ownerUserId?: string | null,
 ): PromoteSearchCandidateResult[] {
   const unique = [...new Set(iterations.filter((n) => Number.isInteger(n)))];
   const out: PromoteSearchCandidateResult[] = [];
@@ -685,6 +661,7 @@ export function promoteSelectedTrialsFromJob(
         jobId,
         iteration,
         storeOptions,
+        ownerUserId,
       }),
     );
   }

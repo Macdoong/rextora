@@ -33,6 +33,8 @@ function hasReadGuard(source: string): boolean {
   return (
     source.includes("denyUnlessAuthenticated") ||
     source.includes("requireAuthenticatedUser") ||
+    source.includes("requireSearchJobAccess") ||
+    source.includes("requireStoredStrategyAccess") ||
     source.includes("requireAdmin") ||
     source.includes("requireCeo") ||
     source.includes("requireMemberManagementViewer") ||
@@ -88,6 +90,8 @@ describe("auth route coverage", () => {
         source.includes("denyUnlessPermitted") ||
         source.includes("requirePermission") ||
         source.includes("requireAuthenticatedUser") ||
+        source.includes("requireSearchJobAccess") ||
+        source.includes("requireStoredStrategyAccess") ||
         source.includes("requireAdmin") ||
         source.includes("requireCeo") ||
         source.includes("requireMemberManagementViewer");

@@ -8,8 +8,7 @@ export type StrategyRecommendationCode =
   | "improve_search"
   | "paper_candidate"
   | "live_candidate"
-  | "discard"
-  | "protected_safe";
+  | "discard";
 
 export interface StrategyRecommendation {
   code: StrategyRecommendationCode;
@@ -23,7 +22,8 @@ export function recommendStrategyAction(input: {
   passed: boolean | null;
   paperActive: boolean;
   liveActive: boolean;
-  isSafe: boolean;
+  /** @deprecated Retired SAFE identity is not a product privilege. Ignored. */
+  isSafe?: boolean;
   /** When false, strategy must not become final/paper/live recommendation. */
   evaluationComplete?: boolean | null;
   hasRobustnessEvidence?: boolean | null;
@@ -34,9 +34,6 @@ export function recommendStrategyAction(input: {
     | "cancelled"
     | null;
 }): StrategyRecommendation {
-  if (input.isSafe) {
-    return { code: "protected_safe", labelKo: "SAFE 기준 (보호)" };
-  }
   if (
     input.evaluationComplete === false ||
     input.hasRobustnessEvidence === false

@@ -32,7 +32,7 @@ import {
   saveSearchPlan,
 } from "../src/lib/rextora/strategySearch/searchPlan";
 import { buildResearchResultsSummary } from "../src/lib/rextora/strategySearch/researchResultsSummary";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
 
 const tempRoots: string[] = [];
@@ -483,34 +483,12 @@ describe("summary enrichment + SAFE isolation", () => {
       }),
       store,
     );
-    // Must never appear
-    saveSearchTrial(
-      makeTrial(job.id, 3, {
-        paramsHash: EXPECTED_SAFE_PARAMS_HASH,
-        params: {
-          ema_fast: 21,
-          ema_mid: 48,
-          ema_slow: 96,
-          rsi_period: 14,
-          sl_atr_mult: 1.5,
-          tp_atr_mult: 2.5,
-          vol_ratio_min: 1.1,
-          pullback_max_dist: 0.02,
-        },
-        totalReturn: 0.99,
-        mdd: -0.01,
-        trades: 100,
-        totalCost: 1,
-      }),
-      store,
-    );
 
     const summary = buildResearchResultsSummary(job.id, store);
     expect(summary.representatives.length).toBeGreaterThanOrEqual(2);
     expect(
       summary.representatives.every(
         (r) =>
-          r.paramsHash !== EXPECTED_SAFE_PARAMS_HASH &&
           r.paramsHash !== "7893ca3f0e30",
       ),
     ).toBe(true);
@@ -588,7 +566,6 @@ describe("UI source contracts", () => {
     expect(src).toContain("archive-job-");
     expect(src).toContain("libraryOpen");
     expect(src).toContain("historyOpen");
-    expect(src).toContain("safeOpen");
   });
 
   it("does not call exchange order APIs from results modules", () => {

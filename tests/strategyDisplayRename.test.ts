@@ -4,12 +4,14 @@ import {
   getStrategyById,
   updateStrategyDisplayMeta,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   buildCombinationSpec,
   buildCombinedEventSequence,
 } from "../src/lib/rextora/strategySearch/patternCombination";
 import { defaultDefinition } from "../src/lib/rextora/strategy/definition/validator";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("strategy display rename preserves identity", () => {
   it("renaming displayAlias does not change paramsHash or id", () => {
@@ -34,7 +36,7 @@ describe("strategy display rename preserves identity", () => {
         eventSequence: seq!,
       }),
     });
-    expect(created.id).not.toBe(SAFE_STRATEGY_ID);
+    expect(created.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(created.paramsHash).not.toBe("7893ca3f0e30");
     const beforeHash = created.paramsHash;
     const beforeStrategyHash = created.strategyHash;

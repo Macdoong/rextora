@@ -386,12 +386,9 @@ describe("no forced Results navigation + capability honesty", () => {
     }
   });
 
-  it("SAFE canonical fingerprint unchanged", () => {
-    const raw = fs.readFileSync(
-      path.join(ROOT, "data/strategies/SAFE_v44_i4060.json"),
-      "utf8",
-    );
-    const j = JSON.parse(raw) as { params_hash?: string };
-    expect(j.params_hash).toBe("7893ca3f0e30");
+  it("retired SAFE file remains absent", () => {
+    expect(
+      fs.existsSync(path.join(ROOT, "data/strategies/SAFE_v44_i4060.json")),
+    ).toBe(false);
   });
 });

@@ -7,8 +7,7 @@
 
 import { getLiveActiveStrategy, getStrategyById } from "../strategy/strategyStore";
 import { validateEventSequence } from "../strategy/definition/eventSequence";
-import { SAFE_STRATEGY_ID } from "../strategyRepository";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../strategy/strategyTypes";
+import { isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import type { StoredStrategyV1 } from "../strategy/definition/bridge";
 
 export type LiveExecutionKind = "safe_params" | "event_sequence";
@@ -67,8 +66,8 @@ export function resolveLiveExecutionKind(
   strategy: StoredStrategyV1,
 ): LiveExecutionKind | null {
   const seq = strategy.definition?.eventSequence;
+  if (isRetiredSafeId(strategy.id)) return null;
   if (seq && validateEventSequence(seq).ok) return "event_sequence";
-  if (strategy.id === SAFE_STRATEGY_ID) return "safe_params";
   return null;
 }
 
@@ -79,25 +78,24 @@ export function resolveLiveExecutionTargetFromStrategy(
   if (!paramsHash) {
     return fail(LIVE_TARGET_UNKNOWN, LIVE_TARGET_REASON_UNKNOWN);
   }
+  if (isRetiredSafeId(strategy.id)) {
+    return fail(LIVE_TARGET_NO_SELECTION, LIVE_TARGET_REASON_NO_SELECTION);
+  }
   const kind = resolveLiveExecutionKind(strategy);
   if (!kind) {
     return fail(LIVE_TARGET_UNSUPPORTED, LIVE_TARGET_REASON_UNSUPPORTED);
   }
-  const isProtectedSafe = strategy.id === SAFE_STRATEGY_ID;
-  if (kind === "safe_params" && !isProtectedSafe) {
+  if (kind === "safe_params") {
     return fail(LIVE_TARGET_NO_SAFE_FALLBACK, LIVE_TARGET_REASON_NO_SAFE_FALLBACK);
-  }
-  if (kind === "event_sequence" && isProtectedSafe) {
-    return fail(LIVE_TARGET_UNSUPPORTED, LIVE_TARGET_REASON_UNSUPPORTED);
   }
   return {
     ok: true,
     strategyId: strategy.id,
-    paramsHash: isProtectedSafe ? EXPECTED_SAFE_PARAMS_HASH : paramsHash,
+    paramsHash,
     strategyHash: strategy.strategyHash?.trim() || null,
     symbol: declaredSymbol(strategy),
     executionKind: kind,
-    isProtectedSafe,
+    isProtectedSafe: false,
   };
 }
 

@@ -419,6 +419,11 @@ export interface StrategySearchCheckpoint {
   bestPassedCandidate: StrategySearchBestCandidateReference | null;
   /** Authoritative group ranking for P3-A7.2+. Absent on historical checkpoints. */
   bestByCompatibilityGroup?: StrategySearchGroupBestState[];
+  /**
+   * Bounded customer-safe live activity (last 12). Absent on historical checkpoints.
+   * Never store params, hashes, candidate IDs, or runner internals here.
+   */
+  recentActivityEvents?: import("./activityTelemetry").StrategySearchActivityEvent[];
   updatedAt: string;
 }
 
@@ -438,6 +443,11 @@ export interface StrategySearchJob {
   cancellationAcknowledgedAt?: string | null;
   /** True when trials/Top-10 were preserved through cancellation. */
   resultsPreserved?: boolean | null;
+  /**
+   * Customer user who created this job. Absent/null on pre-ownership records.
+   * Not jobExecutionOwnership.ownerId (process/PID lease).
+   */
+  ownerUserId?: string | null;
 }
 
 export interface StrategySearchFailureReason {
@@ -477,6 +487,11 @@ export interface StrategySearchTrial {
     | null;
   rankingEligible?: boolean;
   promotionEligible?: boolean;
+  /**
+   * Allowlisted qualification reason codes from evaluateCandidatePass issues.
+   * Absent on historical trials. Does not replace failureReasons.
+   */
+  customerFailureReasonCodes?: import("./activityTelemetry").StrategySearchCustomerFailureReasonCode[];
 }
 
 /** Index row synchronized with jobs on disk. */

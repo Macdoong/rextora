@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { advancedDisclosureControl } from "../components/rextora/strategySearch/completionCustomerView";
 
 describe("Strategy Search progressive disclosure", () => {
   const form = fs.readFileSync(
@@ -13,9 +14,16 @@ describe("Strategy Search progressive disclosure", () => {
   const css = fs.readFileSync(path.join(process.cwd(), "app/globals.css"), "utf8");
 
   it("keeps automatic, basic, and expert modes engine-backed", () => {
-    expect(form).toContain('value: "automatic"');
-    expect(form).toContain('value: "basic"');
-    expect(form).toContain('value: "expert"');
+    const selector = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components/rextora/strategySearch/visual/AdvancedLevelSelector.tsx",
+      ),
+      "utf8",
+    );
+    expect(selector).toContain('value: "automatic"');
+    expect(selector).toContain('value: "basic"');
+    expect(selector).toContain('value: "expert"');
     expect(form).toContain('set("patternConfigLevel", value)');
     expect(form).toContain('data-config-level={form.patternConfigLevel}');
   });
@@ -24,8 +32,26 @@ describe("Strategy Search progressive disclosure", () => {
     expect(css).toContain('[data-config-level="automatic"]');
     expect(css).toContain('[data-config-level="basic"]');
     expect(form).toContain("StickyActionBar");
-    expect(form).toContain("연구 시작");
+    expect(form).toContain("자동 탐색 시작");
+    expect(form).toContain("선택 범위로 탐색 시작");
     expect(form).toContain("ss-combo-summary");
+  });
+
+  it("drives advanced disclosure copy and chevron from the same open boolean", () => {
+    expect(advancedDisclosureControl(false)).toEqual({
+      copy: "펼치기",
+      chevron: "down",
+      chevronGlyph: "▼",
+    });
+    expect(advancedDisclosureControl(true)).toEqual({
+      copy: "접기",
+      chevron: "up",
+      chevronGlyph: "▲",
+    });
+    expect(form).toContain("advancedDisclosureControl(detailsOpen)");
+    expect(form).toContain("aria-expanded={detailsOpen}");
+    expect(form).toContain("data-direction={disclosure.chevron}");
+    expect(form).toContain("hidden={!detailsOpen}");
   });
 
   it("disables manual pattern matrix under automatic selection", () => {

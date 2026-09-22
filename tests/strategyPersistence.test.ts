@@ -20,7 +20,7 @@ import {
   saveSearchTrial,
   type StrategySearchConfig,
 } from "../src/lib/rextora/strategySearch";
-import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
 import {
@@ -28,6 +28,8 @@ import {
   installIsolatedStrategyStore,
   productionStrategiesDir,
 } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const cleanups: Array<() => void> = [];
 
@@ -71,7 +73,7 @@ describe("strategy persistence (isolated)", () => {
 
   beforeEach(() => {
     const prod = productionStrategiesDir();
-    const safePath = path.join(prod, `${SAFE_STRATEGY_ID}.json`);
+    const safePath = path.join(prod, `${RETIRED_SAFE_STRATEGY_ID}.json`);
     prodSnapshot = {
       files: fs.existsSync(prod) ? fs.readdirSync(prod).sort() : [],
       safeHash: fs.existsSync(safePath) ? hashFile(safePath) : null,
@@ -92,7 +94,7 @@ describe("strategy persistence (isolated)", () => {
     while (cleanups.length) cleanups.pop()!();
 
     const prod = productionStrategiesDir();
-    const safePath = path.join(prod, `${SAFE_STRATEGY_ID}.json`);
+    const safePath = path.join(prod, `${RETIRED_SAFE_STRATEGY_ID}.json`);
     const files = fs.existsSync(prod) ? fs.readdirSync(prod).sort() : [];
     expect(files).toEqual(prodSnapshot.files);
     if (prodSnapshot.safeHash && fs.existsSync(safePath)) {
@@ -102,10 +104,10 @@ describe("strategy persistence (isolated)", () => {
   });
 
   it("1-3. copied strategy persists after reload and restart simulation", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "Persist Copy A");
+    const copy = copyStrategy(createStrategy({ name: "Persist Base" }).id, "Persist Copy A");
     const file = path.join(isolatedRoot, `${copy.id}.json`);
     expect(fs.existsSync(file)).toBe(true);
-    expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
+    expect(copy.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(copy.id.startsWith("copy_")).toBe(true);
 
     // API reload
@@ -114,9 +116,8 @@ describe("strategy persistence (isolated)", () => {
 
     // Browser refresh / server restart simulation: re-read disk + ensure
     ensureStrategyStore();
-    expect(listStrategies().map((s) => s.id).sort()).toEqual(
-      [SAFE_STRATEGY_ID, copy.id].sort(),
-    );
+    expect(listStrategies().some((s) => s.id === copy.id)).toBe(true);
+    expect(listStrategies().every((s) => s.id !== RETIRED_SAFE_STRATEGY_ID)).toBe(true);
     expect(fs.existsSync(file)).toBe(true);
   });
 
@@ -138,7 +139,7 @@ describe("strategy persistence (isolated)", () => {
   });
 
   it("6-8. list API production filter keeps valid copies and search strategies", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "List Copy Visible");
+    const copy = copyStrategy(createStrategy({ name: "Persist Base" }).id, "List Copy Visible");
     const registered = createStrategy({
       name: "List Search Visible",
       description: "전략 탐색 · job=j1",
@@ -149,28 +150,28 @@ describe("strategy persistence (isolated)", () => {
     const prod = listProductionStrategies();
     expect(prod.some((s) => s.id === copy.id)).toBe(true);
     expect(prod.some((s) => s.id === registered.id)).toBe(true);
-    expect(prod.some((s) => s.id === SAFE_STRATEGY_ID)).toBe(true);
+    expect(prod.some((s) => s.id === RETIRED_SAFE_STRATEGY_ID)).toBe(false);
     // SAFE-only fallback must not replace a non-empty store
     expect(prod.length).toBeGreaterThanOrEqual(3);
   });
 
   it("9. unique IDs and filenames for copies", () => {
-    const a = copyStrategy(SAFE_STRATEGY_ID);
-    const b = copyStrategy(SAFE_STRATEGY_ID);
+    const a = copyStrategy(createStrategy({ name: "Persist Base" }).id);
+    const b = copyStrategy(createStrategy({ name: "Persist Base" }).id);
     expect(a.id).not.toBe(b.id);
     expect(fs.existsSync(path.join(isolatedRoot, `${a.id}.json`))).toBe(true);
     expect(fs.existsSync(path.join(isolatedRoot, `${b.id}.json`))).toBe(true);
   });
 
   it("10. purgeTestStrategies never deletes valid user/search strategies", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "User Copy Keep");
+    const copy = copyStrategy(createStrategy({ name: "Persist Base" }).id, "User Copy Keep");
     const registered = createStrategy({
       name: "Search Keep",
       description: "전략 탐색 · job=keep",
       timeframe: "15m",
       strategyType: "safe_params",
     });
-    const pollution = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
+    const pollution = copyStrategy(createStrategy({ name: "Persist Base" }).id, "SAFE_copy_test");
     const result = purgeTestStrategies();
     expect(result.removed).toContain(pollution.id);
     expect(getStrategyById(copy.id)).toBeDefined();
@@ -179,21 +180,18 @@ describe("strategy persistence (isolated)", () => {
     expect(fs.existsSync(path.join(isolatedRoot, `${copy.id}.json`))).toBe(true);
   });
 
-  it("11. SAFE hash remains expected after copy/register/ensure", () => {
-    copyStrategy(SAFE_STRATEGY_ID);
+  it("11. empty store stays empty after ensure", () => {
     createStrategy({ name: "x", timeframe: "15m", strategyType: "safe_params" });
     ensureStrategyStore();
-    const safe = getStrategyById(SAFE_STRATEGY_ID)!;
-    expect(safe.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(safe.locked).toBe(true);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(listStrategies().every((s) => s.id !== RETIRED_SAFE_STRATEGY_ID)).toBe(true);
   });
 
   it("12-13. failed persistence does not leave false success (missing source)", () => {
     expect(() => copyStrategy("does_not_exist_strategy")).toThrow();
-    expect(listStrategies().every((s) => s.id === SAFE_STRATEGY_ID || s.id.startsWith("copy_") || s.id.startsWith("custom_"))).toBe(true);
-    // No orphan files from failed copy
+    expect(listStrategies().every((s) => s.id.startsWith("copy_") || s.id.startsWith("custom_"))).toBe(true);
     const files = fs.readdirSync(isolatedRoot).filter((f) => f.endsWith(".json") && f !== "index.json");
-    expect(files).toEqual([`${SAFE_STRATEGY_ID}.json`]);
+    expect(files.includes(`${RETIRED_SAFE_STRATEGY_ID}.json`)).toBe(false);
   });
 
   it("14. duplicate search registration remains idempotent", () => {
@@ -285,17 +283,17 @@ describe("strategy persistence (isolated)", () => {
   });
 
   it("builder-style afterEach only sweeps isolated store, not production", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "Temp Sweep Target");
+    const copy = copyStrategy(createStrategy({ name: "Persist Base" }).id, "Temp Sweep Target");
     expect(getStrategyById(copy.id)).toBeDefined();
     for (const s of listStrategies()) {
-      if (s.id === SAFE_STRATEGY_ID) continue;
+      if (s.id === RETIRED_SAFE_STRATEGY_ID) continue;
       try {
         deleteStrategy(s.id);
       } catch {
         /* ignore */
       }
     }
-    expect(listStrategies().map((s) => s.id)).toEqual([SAFE_STRATEGY_ID]);
+    expect(listStrategies().every((s) => s.id !== RETIRED_SAFE_STRATEGY_ID)).toBe(true);
     // production snapshot asserted in afterEach
   });
 });

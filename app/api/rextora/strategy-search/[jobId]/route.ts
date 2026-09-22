@@ -2,7 +2,7 @@ import {
   deleteStrategySearchJobApi,
   getStrategySearchJobApi,
 } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireSearchJobAccess } from "@/src/lib/rextora/auth/requireSearchJobAccess";
 import {
   strategySearchError,
   strategySearchJson,
@@ -11,13 +11,12 @@ import {
 type Ctx = { params: Promise<{ jobId: string }> };
 
 /** GET /api/rextora/strategy-search/[jobId] */
-export async function GET(_request: Request, context: Ctx) {
-  const denied = await denyUnlessAuthenticated(_request);
-  if (denied) return denied;
-
+export async function GET(request: Request, context: Ctx) {
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "read");
+    if (!access.ok) return access.response;
     const data = getStrategySearchJobApi(jobId);
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {
@@ -26,12 +25,12 @@ export async function GET(_request: Request, context: Ctx) {
 }
 
 /** DELETE /api/rextora/strategy-search/[jobId] — terminal eligible history only */
-export async function DELETE(_request: Request, context: Ctx) {
-  const denied = await denyUnlessPermitted(_request, "research:run");
-  if (denied) return denied;
+export async function DELETE(request: Request, context: Ctx) {
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "write", "research:run");
+    if (!access.ok) return access.response;
     const data = deleteStrategySearchJobApi(jobId);
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {

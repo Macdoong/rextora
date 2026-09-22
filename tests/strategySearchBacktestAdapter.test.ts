@@ -380,7 +380,7 @@ describe("strategySearch backtestAdapter", () => {
     ).rejects.toMatchObject({ code: "CANDLE_OUTSIDE_WINDOW" });
   });
 
-  it("rejects protected SAFE hash", async () => {
+  it("treats a historical SAFE params hash as an ordinary candidate", async () => {
     await expect(
       evaluateCandidateWindow({
         candidate: makeCandidate({ paramsHash: "7893ca3f0e30" }),
@@ -389,13 +389,9 @@ describe("strategySearch backtestAdapter", () => {
         window: makeWindow(),
         balance: 10_000,
         costConfig: makeCost(),
-        preloadedCandles: makeCandles(50),
+        preloadedCandles: makeCandles(),
       }),
-    ).rejects.toMatchObject({
-      code: "PROTECTED_HASH_COLLISION",
-      name: "StrategySearchAdapterError",
-    });
-    expect(StrategySearchAdapterError).toBeTypeOf("function");
+    ).resolves.toBeTruthy();
   });
 
   it("does not mutate candidate params or candle input", async () => {
@@ -445,8 +441,8 @@ describe("strategySearch backtestAdapter", () => {
     );
   });
 
-  it("persists nothing and leaves SAFE bytes / strategies dir unchanged", async () => {
-    const before = fs.readFileSync(SAFE_PATH);
+  it("persists nothing and does not resurrect retired SAFE", async () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const beforeNames = new Set(fs.readdirSync(STRATEGIES_DIR));
     const saveSpy = vi.spyOn(strategyStore, "saveStrategy");
     const updateSpy = vi.spyOn(strategyStore, "updateStrategyLastBacktest");
@@ -475,14 +471,7 @@ describe("strategySearch backtestAdapter", () => {
     expect(strategyWrites).toHaveLength(0);
     expect(strategyRenames).toHaveLength(0);
 
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(before, after)).toBe(0);
-    const safeJson = JSON.parse(after.toString("utf8")) as {
-      name: string;
-      params_hash: string;
-    };
-    expect(safeJson.name).toBe("SAFE_v44_i4060");
-    expect(safeJson.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(new Set(fs.readdirSync(STRATEGIES_DIR))).toEqual(beforeNames);
   });
 

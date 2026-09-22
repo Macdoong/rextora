@@ -14,7 +14,7 @@ import {
 } from "../src/lib/rextora/strategy/strategyStore";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { isTestStrategyRecord } from "../src/lib/rextora/strategy/strategyTestFilter";
-import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { emptyGroup, newLeafId, type LeafCondition } from "../src/lib/rextora/strategy/definition/types";
 import { defaultDefinition, validateCanonicalDefinition, StrategyValidationError } from "../src/lib/rextora/strategy/definition/validator";
 import { evaluateConditionNode, evaluateBuilderSignal } from "../src/lib/rextora/strategy/conditions/evaluator";
@@ -28,6 +28,8 @@ import { generateSyntheticCandles } from "../src/lib/rextora/data/ohlcvTypes";
 import { getSafeParamCatalog, SNAPSHOT_CONFIRMED_KEYS } from "../src/lib/rextora/strategy/definition/safeParamCatalog";
 import { runConfiguredBacktest } from "../src/lib/rextora/backtest/backtestRunner";
 import { buildIndicatorSeries, compareValues } from "../src/lib/rextora/strategy/conditions/indicators";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 function leaf(partial: Partial<LeafCondition> & Pick<LeafCondition, "type" | "category">): LeafCondition {
   return {
@@ -52,7 +54,7 @@ describe("Priority #3 strategy builder", () => {
 
   afterEach(() => {
     for (const s of listStrategies()) {
-      if (s.id === SAFE_STRATEGY_ID) continue;
+      if (s.id === RETIRED_SAFE_STRATEGY_ID) continue;
       try {
         deleteStrategy(s.id);
       } catch {
@@ -63,18 +65,19 @@ describe("Priority #3 strategy builder", () => {
     cleanupIsolated = undefined;
   });
 
-  it("1. SAFE remains immutable", () => {
-    const safe = getStrategyById(SAFE_STRATEGY_ID)!;
-    expect(safe.locked).toBe(true);
-    expect(() => saveStrategy(SAFE_STRATEGY_ID, { params: safe.params })).toThrow(/잠긴/);
-    expect(() => deleteStrategy(SAFE_STRATEGY_ID)).toThrow(/잠긴/);
+  it("1. retired SAFE is not a loaded strategy", () => {
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(() => saveStrategy(RETIRED_SAFE_STRATEGY_ID, { name: "hacked" })).toThrow();
+    deleteStrategy(RETIRED_SAFE_STRATEGY_ID);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
   });
 
   it("2-4. clone gets new id, new hash, preserves sourceStrategyId", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "편집용복사");
-    expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
-    expect(copy.paramsHash).not.toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(copy.sourceStrategyId).toBe(SAFE_STRATEGY_ID);
+    const source = createStrategy({ name: "편집원본", timeframe: "15m", strategyType: "safe_params" });
+    const copy = copyStrategy(source.id, "편집용복사");
+    expect(copy.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
+    expect(copy.id).not.toBe(source.id);
+    expect(copy.sourceStrategyId).toBe(source.id);
     expect(copy.locked).toBe(false);
     expect(isTestStrategyRecord(copy as never)).toBe(false);
   });
@@ -206,13 +209,14 @@ describe("Priority #3 strategy builder", () => {
   });
 
   it("15. stop-loss and take-profit mapping via definition save", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID);
+    const source = createStrategy({ name: "정의원본", timeframe: "15m", strategyType: "safe_params" });
+    const copy = copyStrategy(source.id);
     const def = defaultDefinition({
       strategyId: copy.id,
       strategyName: copy.name,
       strategyType: "safe_params",
       timeframe: "15m",
-      sourceStrategyId: SAFE_STRATEGY_ID,
+      sourceStrategyId: source.id,
       safeParams: copy.params as unknown as Record<string, number | boolean>,
       risk: {
         stopLossAtrMult: 2.5,
@@ -230,17 +234,19 @@ describe("Priority #3 strategy builder", () => {
     expect(saved.params.tp_atr_mult).toBe(5);
   });
 
-  it("16-18. save/reload, delete editable, reject locked delete", () => {
+  it("16-18. save/reload, delete editable, retired SAFE stays absent", () => {
     const created = createStrategy({ name: "임시전략", timeframe: "15m", strategyType: "safe_params" });
     const reloaded = getStrategyById(created.id);
     expect(reloaded?.name).toBe("임시전략");
     deleteStrategy(created.id);
     expect(getStrategyById(created.id)).toBeUndefined();
-    expect(() => deleteStrategy(SAFE_STRATEGY_ID)).toThrow(StrategyValidationError);
+    deleteStrategy(RETIRED_SAFE_STRATEGY_ID);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
   });
 
-  it("19. backtest integration for SAFE and clone", async () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID);
+  it("19. backtest integration for user strategy and clone", async () => {
+    const source = createStrategy({ name: "백테스트원본", timeframe: "15m", strategyType: "safe_params" });
+    const copy = copyStrategy(source.id);
     const result = await runConfiguredBacktest({
       strategyId: copy.id,
       symbols: ["BTCUSDT"],
@@ -262,13 +268,14 @@ describe("Priority #3 strategy builder", () => {
   });
 
   it("20-21. paper apply and live candidate mark", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID);
+    const source = createStrategy({ name: "적용원본", timeframe: "15m", strategyType: "safe_params" });
+    const copy = copyStrategy(source.id);
     const paper = setPaperActiveStrategy(copy.id);
     expect(paper.paperActive).toBe(true);
     const live = setLiveActiveStrategy(copy.id);
     expect(live.liveActive).toBe(true);
     expect(live.liveEligible).toBe(true);
-    setPaperActiveStrategy(SAFE_STRATEGY_ID);
+    expect(() => setPaperActiveStrategy(RETIRED_SAFE_STRATEGY_ID)).toThrow();
   });
 
   it("22-23. catalog + empty preview contract helpers", () => {
@@ -281,17 +288,18 @@ describe("Priority #3 strategy builder", () => {
     expect(unconfirmed.every((c) => c.sourceLabel === "unconfirmed")).toBe(true);
   });
 
-  it("24. validateStrategyById works", () => {
-    const v = validateStrategyById(SAFE_STRATEGY_ID);
-    expect(v.ok).toBe(true);
+  it("24. validateStrategyById fails closed for retired SAFE", () => {
+    const v = validateStrategyById(RETIRED_SAFE_STRATEGY_ID);
+    expect(v.ok).toBe(false);
   });
 
   it("25. restore clone from source", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID);
+    const source = createStrategy({ name: "복원원본", timeframe: "15m", strategyType: "safe_params" });
+    const copy = copyStrategy(source.id);
     const edited = saveStrategy(copy.id, { params: { ...copy.params, ema_fast: 99 } });
     expect(edited.params.ema_fast).toBe(99);
     const restored = restoreCloneFromSource(copy.id);
-    expect(restored.params.ema_fast).toBe(getStrategyById(SAFE_STRATEGY_ID)!.params.ema_fast);
+    expect(restored.params.ema_fast).toBe(getStrategyById(source.id)!.params.ema_fast);
   });
 
   it("builder signal FLAT when empty groups", () => {

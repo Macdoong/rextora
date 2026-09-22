@@ -567,9 +567,7 @@ describe("P3-A8.3.4 Paper runtime continuity + Pattern warmup diagnosis", () => 
   });
 
   it("48. SAFE unchanged", () => {
-    expect(productionRecordHashes().safeSha256).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(productionRecordHashes().safeSha256).toBeNull();
     expect(productionRecordHashes().safeSha256).toBe(hashesBefore.safeSha256);
   });
 });

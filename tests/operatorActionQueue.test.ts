@@ -43,6 +43,24 @@ describe("operator action queue", () => {
     });
     expect(items.some((item) => item.source === "backtest")).toBe(false);
   });
+
+  it("surfaces multiple terminal research jobs independently", () => {
+    const items = buildOperatorActionQueue({
+      completedRecent: { id: "latest", status: "completed" },
+      terminalResearch: [
+        { id: "latest", status: "completed" },
+        { id: "older", status: "failed" },
+      ],
+    });
+    const research = items.filter((item) => item.source === "research");
+    expect(research).toHaveLength(2);
+    expect(research.some((item) => item.targetRoute === "/results?jobId=older")).toBe(
+      true,
+    );
+    expect(research.some((item) => item.targetRoute === "/results?jobId=latest")).toBe(
+      true,
+    );
+  });
 });
 
 describe("operator pipeline", () => {

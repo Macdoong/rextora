@@ -4,7 +4,10 @@
  */
 
 import { buildBacktestReport } from "../backtest/backtestReport";
-import { runSafeV44Backtest } from "../backtest/backtestEngine";
+import {
+  runSafeV44Backtest,
+  runSafeV44BacktestCooperative,
+} from "../backtest/backtestEngine";
 import type { BacktestReport } from "../backtest/backtestTypes";
 import { loadHistoricalCandles } from "../data/historicalCandleLoader";
 import {
@@ -12,16 +15,28 @@ import {
   pickPrimaryCoverageReason,
 } from "../data/historicalDataCoverage";
 import type { OhlcvCandle } from "../data/ohlcvTypes";
-import { runEventSequenceBacktest } from "../strategy/eventSequenceBacktest";
+import {
+  runEventSequenceBacktest,
+  runEventSequenceBacktestCooperative,
+} from "../strategy/eventSequenceBacktest";
 import {
   EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1,
   resolveEventSequenceCostModel,
   type EventSequenceCostModel,
 } from "../strategy/eventSequenceCostModel";
-import { isLockedSafeHash } from "../strategy/strategyHash";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { buildPatternSearchDefinition } from "./patternEventSequence";
 import { isPatternCandidateParams } from "./patternSearchSpaces";
+import {
+  throwIfEvaluationCancelled,
+  throwIfEvaluationInterrupted,
+  type StrategySearchShouldCancel,
+} from "./evaluationCancellation";
+import {
+  buildBacktestCooperativeCheckpoint,
+  throwIfSearchEvaluationControlRequested,
+  type StrategySearchEvaluationControl,
+} from "./searchEvaluationControl";
 import type {
   StrategySearchBacktestCostConfig,
   StrategySearchCandidate,
@@ -31,9 +46,6 @@ import type {
   StrategySearchWindowEvaluation,
   StrategySearchWindowMetrics,
 } from "./types";
-
-const PROTECTED_STRATEGY_ID = "SAFE_v44_i4060";
-const PROTECTED_HASH = "7893ca3f0e30";
 
 export type StrategySearchAdapterErrorCode =
   | "INVALID_CANDIDATE"
@@ -100,6 +112,9 @@ export interface EvaluateCandidateAcrossWindowsInput {
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   /** Explicit Pattern Event-Sequence cost model. Omitted → ledger_v0. */
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: StrategySearchEvaluationControl;
 }
 
 /** Stress-only across-windows input — constructed by costStress.ts only. */
@@ -112,6 +127,9 @@ export interface EvaluateCandidateAcrossWindowsForStressInput {
   costConfig: StrategySearchStressRuntimeCostConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: StrategySearchEvaluationControl;
 }
 
 function preloadedKey(symbol: string, windowId: string): string {
@@ -138,32 +156,12 @@ function assertCandidate(
     );
   }
   if (
-    candidate.candidateId === PROTECTED_STRATEGY_ID ||
-    /SAFE_v44_i4060/i.test(candidate.candidateId)
-  ) {
-    throw new StrategySearchAdapterError(
-      "INVALID_CANDIDATE",
-      "candidateId must not reference the protected SAFE strategy",
-      { candidateId: candidate.candidateId },
-    );
-  }
-  if (
     typeof candidate.paramsHash !== "string" ||
     candidate.paramsHash.trim() === ""
   ) {
     throw new StrategySearchAdapterError(
       "INVALID_CANDIDATE",
       "paramsHash must be a non-empty string",
-      { candidateId: candidate.candidateId },
-    );
-  }
-  if (
-    isLockedSafeHash(candidate.paramsHash) ||
-    candidate.paramsHash === PROTECTED_HASH
-  ) {
-    throw new StrategySearchAdapterError(
-      "PROTECTED_HASH_COLLISION",
-      "candidate paramsHash collides with protected SAFE hash",
       { candidateId: candidate.candidateId },
     );
   }
@@ -466,6 +464,7 @@ async function runCandidateWindowEvaluation(input: {
   stressCostGuardKOverride?: number;
   preloadedCandles?: OhlcvCandle[];
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  evaluationControl?: StrategySearchEvaluationControl;
 }): Promise<StrategySearchWindowEvaluation> {
   const started = Date.now();
   assertCandidate(input.candidate);
@@ -562,22 +561,41 @@ async function runCandidateWindowEvaluation(input: {
     );
     const canonical =
       eventSequenceCostModel === EVENT_SEQUENCE_COST_MODEL_EXECUTION_PRICE_V1;
+    const cooperativeCheckpoint = buildBacktestCooperativeCheckpoint(
+      input.evaluationControl,
+    );
     let obResult;
     try {
-      obResult = runEventSequenceBacktest({
-        def,
-        symbol: input.symbol,
-        candles,
-        balance: input.balance,
-        feeRate: input.feeRate,
-        slippageRate: input.slippageRate,
-        costModel: eventSequenceCostModel,
-        applyFunding: canonical ? input.applyFunding : false,
-        fundingRate: canonical ? input.fundingRate : 0,
-        applySpread: canonical ? input.applySpread : false,
-        spreadRate: canonical ? input.spreadRate : 0,
-        params: input.candidate.params as Record<string, unknown>,
-      });
+      obResult = cooperativeCheckpoint
+        ? await runEventSequenceBacktestCooperative({
+            def,
+            symbol: input.symbol,
+            candles,
+            balance: input.balance,
+            feeRate: input.feeRate,
+            slippageRate: input.slippageRate,
+            costModel: eventSequenceCostModel,
+            applyFunding: canonical ? input.applyFunding : false,
+            fundingRate: canonical ? input.fundingRate : 0,
+            applySpread: canonical ? input.applySpread : false,
+            spreadRate: canonical ? input.spreadRate : 0,
+            params: input.candidate.params as Record<string, unknown>,
+            cooperativeCheckpoint,
+          })
+        : runEventSequenceBacktest({
+            def,
+            symbol: input.symbol,
+            candles,
+            balance: input.balance,
+            feeRate: input.feeRate,
+            slippageRate: input.slippageRate,
+            costModel: eventSequenceCostModel,
+            applyFunding: canonical ? input.applyFunding : false,
+            fundingRate: canonical ? input.fundingRate : 0,
+            applySpread: canonical ? input.applySpread : false,
+            spreadRate: canonical ? input.spreadRate : 0,
+            params: input.candidate.params as Record<string, unknown>,
+          });
     } catch (err) {
       if (err instanceof StrategySearchAdapterError) throw err;
       const message = err instanceof Error ? err.message : "backtest failed";
@@ -662,9 +680,17 @@ async function runCandidateWindowEvaluation(input: {
     engineInput.costGuardK = input.stressCostGuardKOverride;
   }
 
+  const cooperativeCheckpoint = buildBacktestCooperativeCheckpoint(
+    input.evaluationControl,
+  );
   let engineResult;
   try {
-    engineResult = runSafeV44Backtest(engineInput);
+    engineResult = cooperativeCheckpoint
+      ? await runSafeV44BacktestCooperative({
+          ...engineInput,
+          cooperativeCheckpoint,
+        })
+      : runSafeV44Backtest(engineInput);
   } catch (err) {
     if (err instanceof StrategySearchAdapterError) throw err;
     const message = err instanceof Error ? err.message : "backtest failed";
@@ -734,6 +760,9 @@ async function evaluateAcrossWindowsCore(input: {
   /** Stored on the result for serialization (base or stress rates). */
   resultCostConfig: StrategySearchBacktestCostConfig;
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: StrategySearchEvaluationControl;
 }): Promise<StrategySearchCandidateEvaluation> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -763,6 +792,13 @@ async function evaluateAcrossWindowsCore(input: {
 
   for (const symbol of input.symbols) {
     for (const window of input.windows) {
+      await throwIfEvaluationInterrupted(
+        input.shouldCancel,
+        input.shouldPause,
+      );
+      if (input.evaluationControl) {
+        await throwIfSearchEvaluationControlRequested(input.evaluationControl);
+      }
       const key = preloadedKey(symbol, window.id);
       const preloaded = input.preloadedCandlesByKey?.[key];
       const evaluation = await runCandidateWindowEvaluation({
@@ -780,6 +816,7 @@ async function evaluateAcrossWindowsCore(input: {
         stressCostGuardKOverride: input.stressCostGuardKOverride,
         preloadedCandles: preloaded,
         eventSequenceCostModel: input.eventSequenceCostModel,
+        evaluationControl: input.evaluationControl,
       });
       windows.push(evaluation);
     }
@@ -820,6 +857,9 @@ export async function evaluateCandidateAcrossWindows(
     spreadRate: input.costConfig.spreadRate,
     preloadedCandlesByKey: input.preloadedCandlesByKey,
     eventSequenceCostModel: input.eventSequenceCostModel,
+    shouldCancel: input.shouldCancel,
+    shouldPause: input.shouldPause,
+    evaluationControl: input.evaluationControl,
     resultCostConfig: {
       feeRate: input.costConfig.feeRate,
       slippageRate: input.costConfig.slippageRate,
@@ -855,6 +895,9 @@ export async function evaluateCandidateAcrossWindowsForStress(
     stressCostGuardKOverride: input.costConfig.costGuardKOverride,
     preloadedCandlesByKey: input.preloadedCandlesByKey,
     eventSequenceCostModel: input.eventSequenceCostModel,
+    shouldCancel: input.shouldCancel,
+    shouldPause: input.shouldPause,
+    evaluationControl: input.evaluationControl,
     resultCostConfig: {
       feeRate: input.costConfig.feeRate,
       slippageRate: input.costConfig.slippageRate,

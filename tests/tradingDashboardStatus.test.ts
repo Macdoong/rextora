@@ -19,10 +19,9 @@ describe("tradingDashboardStatus", () => {
     closeAllPositions();
   });
 
-  it("includes active SAFE strategy metadata", () => {
+  it("does not invent a SAFE fallback as active strategy", () => {
     const status = buildTradingDashboardStatus(null);
-    expect(status.activeStrategy.name).toBe("SAFE_v44_i4060");
-    expect(status.activeStrategy.paramsHash).toBe("7893ca3f0e30");
+    expect(status.activeStrategy).toBeNull();
     expect(status.aiReports).toBeDefined();
   });
 

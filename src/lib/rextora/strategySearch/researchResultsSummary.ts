@@ -15,7 +15,6 @@ import {
   type StrategyRoleBadge,
 } from "../results/researchDisplay";
 import { listStrategies } from "../strategy/strategyStore";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../strategy/strategyTypes";
 import {
   getSearchJob,
   getSearchTrial,
@@ -727,9 +726,7 @@ export function buildResearchResultsSummary(
     (t) =>
       t.passed &&
       t.paramsHash &&
-      !t.paramsHash.startsWith("invalid_") &&
-      t.paramsHash !== EXPECTED_SAFE_PARAMS_HASH &&
-      t.paramsHash !== "7893ca3f0e30",
+      !t.paramsHash.startsWith("invalid_"),
   );
 
   const strategies = listStrategies();
@@ -1109,7 +1106,6 @@ export function buildResearchResultsSummary(
   whyExcluded.push(
     "구조 지문이 다른 전략은 성과가 비슷해도 클러스터하지 않습니다.",
   );
-  whyExcluded.push("SAFE 원본·보호 해시는 이번 탐색 결과에서 제외됩니다.");
 
   const liveSearchBest: BestReturnView = {
     labelKo: "실시간 탐색 최고",
@@ -1254,12 +1250,6 @@ export function validateResearchResultsIntegrity(
     if (card.sourceResearchJobId !== summary.jobId) {
       issues.push(`sourceResearchJobId mismatch on ${card.paramsHash}`);
     }
-    if (
-      card.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-      card.paramsHash === "7893ca3f0e30"
-    ) {
-      issues.push("SAFE hash appeared in current Research results");
-    }
   }
   const clusterIds = new Set(summary.clusters.map((cl) => cl.clusterId));
   for (const card of summary.representatives) {
@@ -1273,7 +1263,11 @@ export function validateResearchResultsIntegrity(
 /** Bounded top promotion — never registers all qualified trials. */
 export function promoteTopResearchResults(
   jobId: string,
-  input?: { limit?: number; storeOptions?: StrategySearchStoreOptions },
+  input?: {
+    limit?: number;
+    storeOptions?: StrategySearchStoreOptions;
+    ownerUserId?: string | null;
+  },
 ): {
   summary: ResearchResultsSummary;
   promoted: ReturnType<typeof promoteSelectedTrialsFromJob>;
@@ -1296,7 +1290,12 @@ export function promoteTopResearchResults(
   }
   const promoted =
     iterations.length > 0
-      ? promoteSelectedTrialsFromJob(jobId, iterations, input?.storeOptions)
+      ? promoteSelectedTrialsFromJob(
+          jobId,
+          iterations,
+          input?.storeOptions,
+          input?.ownerUserId,
+        )
       : [];
   return {
     summary: buildResearchResultsSummary(jobId, input?.storeOptions),
@@ -1312,6 +1311,7 @@ export function registerTrialForBacktest(
   jobId: string,
   iteration: number,
   storeOptions?: StrategySearchStoreOptions,
+  ownerUserId?: string | null,
 ): {
   result: ReturnType<typeof promoteSearchCandidateToStrategy>;
   clusterId: string | null;
@@ -1329,6 +1329,7 @@ export function registerTrialForBacktest(
     iteration,
     storeOptions,
     clusterId: clusterId ?? undefined,
+    ownerUserId,
   });
   const summary = buildResearchResultsSummary(jobId, storeOptions);
   const symbol = summary.symbol;
@@ -1366,8 +1367,7 @@ export function refreshLiveResearchTop10(
     (t) =>
       t.passed &&
       t.paramsHash &&
-      !t.paramsHash.startsWith("invalid_") &&
-      t.paramsHash !== EXPECTED_SAFE_PARAMS_HASH,
+      !t.paramsHash.startsWith("invalid_"),
   );
   if (!hasQualified) return getResearchTop10(jobId, options);
   buildResearchResultsSummary(jobId, options);

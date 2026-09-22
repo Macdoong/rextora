@@ -17,7 +17,7 @@ import {
 
 export function StrategyManagerPanel() {
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
-  const [selectedId, setSelectedId] = useState<string>("SAFE_v44_i4060");
+  const [selectedId, setSelectedId] = useState<string>("");
   const [message, setMessage] = useState("");
   const [editParams, setEditParams] = useState<SafeV44Params | null>(null);
   const [editName, setEditName] = useState("");
@@ -153,14 +153,6 @@ export function StrategyManagerPanel() {
         )}
       </div>
       {message && <p className="text-sm text-slate-300">{message}</p>}
-      {selected?.locked && (
-        <p
-          className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-100"
-          data-testid="strategy-locked-hint"
-        >
-          SAFE_v44_i4060은 잠긴 원본입니다. 수정하려면 복사본을 만드세요.
-        </p>
-      )}
 
       <Card title="전략 목록" data-testid="strategy-list">
         <div className="overflow-x-auto">
@@ -269,7 +261,7 @@ export function StrategyManagerPanel() {
                 <span className="font-mono">{selected.paramsHash}</span>
               </div>
               <div>
-                전략 유형: {selected.locked ? "SAFE 원본" : "사용자 전략"}
+                전략 유형: {selected.locked ? "잠긴 전략" : "사용자 전략"}
               </div>
               <div>출처: {displaySourceStatus(selected.sourceStatus)}</div>
             </div>

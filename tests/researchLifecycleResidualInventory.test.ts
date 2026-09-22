@@ -428,6 +428,6 @@ describe("P2-G1 residual Research lifecycle inventory", () => {
       sha256Path(
         path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"),
       ),
-    ).toBe("fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0");
+    ).toBeNull();
   });
 });

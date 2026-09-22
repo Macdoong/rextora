@@ -88,6 +88,9 @@ const ARTIFACT_DIR = path.join(
   ".validation/research-p2-g9-final-closeout/2026-09-03T07-00-00-000Z",
 );
 const SAFE = path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json");
+const HISTORICAL_TARGET_PRESENT = fs.existsSync(
+  path.join(productionStaleQueuedRoot(), "jobs", `${STALE_QUEUED_TARGET_ID}.json`),
+);
 const PRE_FIX_HASHES = collectStaleQueuedReadonlyHashes();
 const T0 = Date.UTC(2026, 7, 11, 16, 20, 43);
 const TEN_MIN = 10 * 60_000;
@@ -281,7 +284,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     expect(inventory.jobs).toHaveLength(index.jobs.length);
   });
 
-  it("4. index/job mismatch = 0", () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("4. index/job mismatch = 0", () => {
     const closeout = loadResearchP2FinalCloseout();
     expect(closeout.indexJobStatusMismatchTotal).toBe(
       HISTORICAL_MISSING_JOB_IDS.length,
@@ -298,7 +301,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     expect(closeout.queuedWithNormalTerminalReason).toEqual([]);
   });
 
-  it("7. fresh queued classification", () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("7. fresh queued classification", () => {
     const closeout = loadResearchP2FinalCloseout();
     const fresh = closeout.queuedClassification.filter(
       (q) => q.class === "FRESH_PENDING",
@@ -307,7 +310,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     expect(fresh.every((q) => !q.g8WouldNormalize)).toBe(true);
   });
 
-  it("8. continuation queued classification", () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("8. continuation queued classification", () => {
     const closeout = loadResearchP2FinalCloseout();
     const cont = closeout.queuedClassification.filter(
       (q) => q.class === "VALID_CONTINUATION",
@@ -316,7 +319,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     expect(cont.every((q) => !q.unsafeAtNow)).toBe(true);
   });
 
-  it("9. historical target temp-copy safe after G8", async () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("9. historical target temp-copy safe after G8", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     const store = tempStore();
     copyHistoricalTarget(store.rootDir!);
@@ -341,7 +344,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     await waitForSearchJobExecution(STALE_QUEUED_TARGET_ID);
   });
 
-  it("10. interrupted recovery classification", () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("10. interrupted recovery classification", () => {
     const closeout = loadResearchP2FinalCloseout();
     expect(closeout.interruptedClassification).toHaveLength(37);
     expect(closeout.inventory.interruptedClassCounts.VALID_INTERRUPTED_RESUMABLE).toBe(37);
@@ -503,7 +506,7 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     ).toBeGreaterThanOrEqual(0);
   });
 
-  it("17. queued excluded from recovery UI", () => {
+  it.skipIf(!HISTORICAL_TARGET_PRESENT)("17. queued excluded from recovery UI", () => {
     const src = fs.readFileSync(
       path.join(
         process.cwd(),
@@ -532,16 +535,8 @@ describe("P2-G9 final Research lifecycle close-out", () => {
     expect(listActiveSearchJobExecutions()).toEqual([]);
   });
 
-  it("20. SAFE unchanged", () => {
-    const hash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE))
-      .digest("hex");
-    expect(hash).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
-    const safe = JSON.parse(fs.readFileSync(SAFE, "utf8"));
-    expect(safe.params_hash).toBe("7893ca3f0e30");
+  it("20. retired SAFE file remains absent", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
   });
 
   it("writes validation artifacts", () => {

@@ -368,7 +368,7 @@ describe("strategy search runtime correction", () => {
     expect(candidate.paramsHash).toMatch(/^[a-f0-9]+$/i);
   });
 
-  it("SAFE params_hash remains immutable token", () => {
+  it("retired SAFE params hash remains a historical identity token only", () => {
     expect("7893ca3f0e30").toHaveLength(12);
     const safePath = path.join(
       process.cwd(),
@@ -376,9 +376,6 @@ describe("strategy search runtime correction", () => {
       "strategies",
       "SAFE_v44_i4060.json",
     );
-    const before = fs.readFileSync(safePath);
-    // Touch nothing — just assert hash field.
-    const json = JSON.parse(before.toString("utf8")) as { params_hash: string };
-    expect(json.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(safePath)).toBe(false);
   });
 });

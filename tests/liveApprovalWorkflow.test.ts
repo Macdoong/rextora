@@ -18,8 +18,9 @@ import {
 } from "../src/lib/rextora/strategyLiveApproval";
 import { invalidateJsonStoreCache } from "../src/lib/rextora/storage/jsonStore";
 import { loadSettings } from "../src/lib/rextora/settings/settingsStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategyRepository";
+import { createStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import { authedRequest } from "./helpers/authSession";
+import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
 const ROOT = path.resolve(__dirname, "..");
 const SAFE_PATH = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -27,8 +28,11 @@ const SAFE_SHA =
   "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
 const CONFIRM = "temp-live-approval-confirm";
 const PREV_CONFIRM = process.env.REXTORA_LIVE_CONFIRMATION_TEXT;
+let knownStrategyId = "";
+let storeCleanup: (() => void) | undefined;
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -69,6 +73,9 @@ async function jsonResponse(res: Response): Promise<{
 describe("Live approval workflow", () => {
   beforeEach(async () => {
     process.env.REXTORA_LIVE_CONFIRMATION_TEXT = CONFIRM;
+    storeCleanup?.();
+    storeCleanup = installIsolatedStrategyStore().cleanup;
+    knownStrategyId = createStrategy({ name: "Approval Candidate" }).id;
     invalidateJsonStoreCache();
     revokeStrategyLiveApproval();
     const historyFile = path.join(
@@ -87,13 +94,15 @@ describe("Live approval workflow", () => {
   });
 
   afterEach(() => {
+    storeCleanup?.();
+    storeCleanup = undefined;
     if (PREV_CONFIRM === undefined) delete process.env.REXTORA_LIVE_CONFIRMATION_TEXT;
     else process.env.REXTORA_LIVE_CONFIRMATION_TEXT = PREV_CONFIRM;
   });
 
   it("1-8. request creates pending without Live or exchange side effects", async () => {
     const created = await requestLiveApproval({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       backtestRunId: "bt_mt1kh58k_762ad9",
       paperSessionId: "paper_temp_session",
       symbol: "btcusdt",
@@ -108,14 +117,14 @@ describe("Live approval workflow", () => {
       allowLiveTrading: false,
     });
     expect(workflowSource()).not.toMatch(/fapi\.binance\.com|\/fapi\/v1\/order/);
-    expect(created.request?.strategyId).toBe(SAFE_STRATEGY_ID);
+    expect(created.request?.strategyId).toBe(knownStrategyId);
     expect(created.request?.backtestRunId).toBe("bt_mt1kh58k_762ad9");
     expect(created.request?.paperSessionId).toBe("paper_temp_session");
     expect(created.request?.symbol).toBe("BTCUSDT");
     expect(created.request?.requestedBy).toBeNull();
 
     const duplicate = await requestLiveApproval({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       backtestRunId: "bt_mt1kh58k_762ad9",
       paperSessionId: "paper_temp_session",
       symbol: "BTCUSDT",
@@ -132,7 +141,7 @@ describe("Live approval workflow", () => {
   });
 
   it("9-15. pending approve updates canonical snapshot once and not Live flags", async () => {
-    const created = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const created = await requestLiveApproval({ strategyId: knownStrategyId });
     const requestId = created.request?.requestId;
     expect(requestId).toBeTruthy();
     const approved = await approveLiveApprovalRequest({
@@ -162,7 +171,7 @@ describe("Live approval workflow", () => {
 
   it("15b. approvedBy persists only when an identity is supplied", async () => {
     const created = await requestLiveApproval({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       requestedBy: "reviewer-fixture",
     });
     const approved = await approveLiveApprovalRequest({
@@ -176,7 +185,7 @@ describe("Live approval workflow", () => {
   });
 
   it("16-19. reject stays in history and never grants verifiedForLive", async () => {
-    const created = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const created = await requestLiveApproval({ strategyId: knownStrategyId });
     const rejected = await rejectLiveApprovalRequest({
       requestId: created.request?.requestId,
       reviewReason: "not enough evidence",
@@ -189,7 +198,7 @@ describe("Live approval workflow", () => {
   });
 
   it("20-23. revoke updates canonical approval and keeps history", async () => {
-    const created = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const created = await requestLiveApproval({ strategyId: knownStrategyId });
     const approved = await approveLiveApprovalRequest({
       requestId: created.request?.requestId,
       confirmationText: CONFIRM,
@@ -208,7 +217,7 @@ describe("Live approval workflow", () => {
   });
 
   it("24-29. invalid transitions stay blocked and new requests get new IDs", async () => {
-    const first = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const first = await requestLiveApproval({ strategyId: knownStrategyId });
     const rejected = await rejectLiveApprovalRequest({
       requestId: first.request?.requestId,
     });
@@ -225,7 +234,7 @@ describe("Live approval workflow", () => {
     expect(rejectedAgain.idempotent).toBe(true);
     expect(rejectedAgain.request?.reviewedAt).toBe(rejected.request?.reviewedAt);
 
-    const afterReject = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const afterReject = await requestLiveApproval({ strategyId: knownStrategyId });
     expect(afterReject.request?.requestId).not.toBe(first.request?.requestId);
 
     const approved = await approveLiveApprovalRequest({
@@ -241,18 +250,18 @@ describe("Live approval workflow", () => {
     });
     expect(revokedApprove.ok).toBe(false);
     expect(revokedApprove.code).toBe("invalid_transition");
-    const afterRevoke = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const afterRevoke = await requestLiveApproval({ strategyId: knownStrategyId });
     expect(afterRevoke.request?.requestId).not.toBe(revoked.request?.requestId);
   });
 
   it("30-33. history is append-preserving and snapshot stays separate", async () => {
     const a = await requestLiveApproval({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       requestReason: "first",
     });
     await rejectLiveApprovalRequest({ requestId: a.request?.requestId });
     const b = await requestLiveApproval({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       requestReason: "second",
     });
     const before = JSON.stringify(listLiveApprovalHistory().find((row) => row.requestId === a.request?.requestId));
@@ -280,7 +289,7 @@ describe("Live approval workflow", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "request",
-            strategyId: SAFE_STRATEGY_ID,
+            strategyId: knownStrategyId,
             requestReason: "api",
           }),
         }, "ceo"),
@@ -330,19 +339,19 @@ describe("Live approval workflow", () => {
     expect(path.resolve(process.env.REXTORA_DATA_DIR!)).not.toContain(
       path.join("data", "rextora"),
     );
-    const created = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
+    const created = await requestLiveApproval({ strategyId: knownStrategyId });
     await approveLiveApprovalRequest({
       requestId: created.request?.requestId,
       confirmationText: CONFIRM,
     });
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(liveFlags()).toEqual({
       liveTradingEnabled: false,
       allowLiveTrading: false,
     });
     expect(workflowSource()).not.toMatch(/runSearchJob|createPaperSession|resumePaper/);
     expect(findPendingLiveApprovalRequest({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: knownStrategyId,
       backtestRunId: null,
       paperSessionId: null,
       symbol: null,

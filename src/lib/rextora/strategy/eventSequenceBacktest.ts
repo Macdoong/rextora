@@ -10,6 +10,10 @@
 
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import type { BacktestTrade } from "../backtest/backtestEngine";
+import {
+  assertNoCooperativeCheckpointOnSyncPath,
+  type BacktestCooperativeCheckpoint,
+} from "../backtest/cooperativeCheckpoint";
 import { computeAtrSeries } from "../indicator/indicatorEngine";
 import {
   detectOrderBlocks,
@@ -1408,7 +1412,39 @@ function comboContextFromEvidence(
   };
 }
 
-export function runEventSequenceBacktest(input: {
+type EventSequenceBarLoopDriver = {
+  run: (
+    fromInclusive: number,
+    toExclusive: number,
+    processBar: (barIndex: number) => void,
+  ) => void | Promise<void>;
+};
+
+const syncEventSequenceBarLoopDriver: EventSequenceBarLoopDriver = {
+  run(fromInclusive, toExclusive, processBar) {
+    for (let i = fromInclusive; i < toExclusive; i += 1) {
+      processBar(i);
+    }
+  },
+};
+
+function cooperativeEventSequenceBarLoopDriver(
+  checkpoint: BacktestCooperativeCheckpoint,
+): EventSequenceBarLoopDriver {
+  return {
+    async run(fromInclusive, toExclusive, processBar) {
+      for (let i = fromInclusive; i < toExclusive; i += 1) {
+        if ((i - fromInclusive) % checkpoint.barInterval === 0) {
+          await checkpoint.onBarCheckpoint(i);
+        }
+        processBar(i);
+      }
+    },
+  };
+}
+
+function runEventSequenceBacktestWithDriver(
+  input: {
   def: CanonicalStrategyDefinition;
   symbol: string;
   candles: OhlcvCandle[];
@@ -1426,7 +1462,10 @@ export function runEventSequenceBacktest(input: {
   spreadRate?: number;
   /** Optional Search candidate params (lev_*, direction passthrough already in def). */
   params?: Record<string, unknown> | null;
-}): EventSequenceBacktestResult {
+  cooperativeCheckpoint?: BacktestCooperativeCheckpoint;
+},
+  driver: EventSequenceBarLoopDriver,
+): EventSequenceBacktestResult | Promise<EventSequenceBacktestResult> {
   const seq = input.def.eventSequence;
   const entryStepEarly = seq?.steps.find((step) => step.kind === "entry");
   const triggerParamsValidation = validateEntryTriggerParams(
@@ -1594,7 +1633,7 @@ export function runEventSequenceBacktest(input: {
 
   const warmUp = EVENT_SEQUENCE_WALKER_WARMUP_BARS;
 
-  for (let i = warmUp; i < candles.length; i += 1) {
+  const processEventSequenceWalkerBar = (i: number) => {
     // No look-ahead: detectors only see completed bars through i
     const window = candles.slice(0, i + 1);
     const c = window[i];
@@ -2722,15 +2761,71 @@ export function runEventSequenceBacktest(input: {
       combinationPriority: m.combinationPriority,
     });
     equityCurve.push(equity);
-  }
+  };
 
-  return {
+  const loopResult = driver.run(
+    warmUp,
+    candles.length,
+    processEventSequenceWalkerBar,
+  );
+  const finalize = (): EventSequenceBacktestResult => ({
     trades,
     equityCurve,
     endingBalance: equity,
     rejectedSetups,
     assumptionsKo: ASSUMPTIONS_KO,
-  };
+  });
+  if (loopResult && typeof (loopResult as Promise<void>).then === "function") {
+    return (loopResult as Promise<void>).then(finalize);
+  }
+  return finalize();
+}
+
+export function runEventSequenceBacktest(input: {
+  def: CanonicalStrategyDefinition;
+  symbol: string;
+  candles: OhlcvCandle[];
+  balance: number;
+  feeRate: number;
+  slippageRate: number;
+  costModel?: EventSequenceCostModel | null;
+  applyFunding?: boolean;
+  fundingRate?: number;
+  applySpread?: boolean;
+  spreadRate?: number;
+  params?: Record<string, unknown> | null;
+  cooperativeCheckpoint?: BacktestCooperativeCheckpoint;
+}): EventSequenceBacktestResult {
+  assertNoCooperativeCheckpointOnSyncPath(
+    input.cooperativeCheckpoint,
+    "runEventSequenceBacktest",
+    "runEventSequenceBacktestCooperative",
+  );
+  const result = runEventSequenceBacktestWithDriver(
+    input,
+    syncEventSequenceBarLoopDriver,
+  );
+  if (result instanceof Promise) {
+    throw new Error(
+      "runEventSequenceBacktest received an async driver — use runEventSequenceBacktestCooperative",
+    );
+  }
+  return result;
+}
+
+export async function runEventSequenceBacktestCooperative(
+  input: Parameters<typeof runEventSequenceBacktest>[0] & {
+    cooperativeCheckpoint: BacktestCooperativeCheckpoint;
+  },
+): Promise<EventSequenceBacktestResult> {
+  const result = runEventSequenceBacktestWithDriver(
+    input,
+    cooperativeEventSequenceBarLoopDriver(input.cooperativeCheckpoint),
+  );
+  if (result instanceof Promise) {
+    return result;
+  }
+  return result;
 }
 
 export interface EventSequencePaperSignal {

@@ -6,7 +6,6 @@ import { generateAiTradeReport } from "./report/aiTradeReport";
 import { buildUnifiedTradeResult } from "./metrics/tradeResult";
 import { appendUnifiedTradeResult } from "./metrics/tradeResultStore";
 import { applySafePaperSessionCloseAccounting } from "./paper/paperSessionStore";
-import { SAFE_STRATEGY_ID } from "./strategy/strategyTypes";
 import type { AiCandidate, OrderRecord, Position, SignalType, TradeDirection } from "./types";
 
 export interface SafePaperEntryPayload {
@@ -148,7 +147,7 @@ export function recordPaperExit(symbol: string, exitPrice: number, exitReason: s
     id: `safe-close-${closed.id}`,
     symbol,
     side: tradeSide,
-    strategyId: closed.strategyName ?? SAFE_STRATEGY_ID,
+    strategyId: closed.strategyName ?? closed.paperStrategyId ?? "unknown",
     entryPrice: closed.entryPrice,
     exitPrice,
     quantity: closed.quantity,

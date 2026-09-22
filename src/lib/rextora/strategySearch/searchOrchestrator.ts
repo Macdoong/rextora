@@ -3,7 +3,7 @@
  * Advances verified SafeV44 + Order Block search spaces; never invents families.
  */
 
-import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
+import { GENERIC_SEARCH_BASELINE_PARAMS } from "../strategy/safeV44Params";
 import {
   encodeRunnerCheckpointPayload,
   readRunnerPayloadFromCheckpoint,
@@ -60,6 +60,10 @@ import {
   type StrategySearchCompletionReason,
   type StrategySearchPlan,
 } from "./searchPlan";
+import { appendPersistedSearchActivityEvents } from "./activityTelemetryStore";
+import {
+  familyHandoffActivityEvents,
+} from "./activityTelemetry";
 import { rangesForSpace, getSearchSpaceById } from "./searchSpaces";
 import {
   runSearchJob,
@@ -99,6 +103,26 @@ export interface OrchestratedSearchResult {
 
 function remainingBudget(plan: StrategySearchPlan): number {
   return Math.max(0, plan.candidateBudget - plan.candidateBudgetUsed);
+}
+
+function emitFamilyStartedEvent(
+  jobId: string,
+  plan: StrategySearchPlan,
+  store?: StrategySearchStoreOptions,
+): void {
+  const familyLabel = plan.spaces[plan.currentSpaceIndex]?.labelKo?.trim();
+  if (!familyLabel) return;
+  appendPersistedSearchActivityEvents(
+    jobId,
+    [
+      {
+        type: "family_started",
+        at: new Date().toISOString(),
+        familyLabel,
+      },
+    ],
+    store,
+  );
 }
 
 function runtimeExceeded(plan: StrategySearchPlan): boolean {
@@ -221,7 +245,7 @@ function resolveStageBaseParams(plan: StrategySearchPlan) {
     );
     return applyLeverageModeToParams(withPattern, plan);
   }
-  return applyLeverageModeToParams(CONTEXT_FALLBACK_PARAMS, plan);
+  return applyLeverageModeToParams(GENERIC_SEARCH_BASELINE_PARAMS, plan);
 }
 
 class StageConfigurationInvalidError extends Error {
@@ -429,6 +453,8 @@ function handoffToNextFamily(
 ): StrategySearchPlan | null {
   let working = plan;
   const leaving = working.spaces[working.currentSpaceIndex];
+  const leavingLabel = leaving?.labelKo?.trim() || null;
+  const completedAt = new Date().toISOString();
   let leavingAdjustment = working.lastMutation;
   if (jobId && leaving) {
     try {
@@ -448,10 +474,35 @@ function handoffToNextFamily(
     next.completionReason === "SEARCH_SPACE_EXHAUSTED" ||
     next.currentSpaceIndex === before
   ) {
+    if (jobId && leavingLabel) {
+      appendPersistedSearchActivityEvents(
+        jobId,
+        familyHandoffActivityEvents({
+          leavingLabel,
+          nextLabel: null,
+          completedAt,
+        }),
+        store,
+      );
+    }
     return null;
   }
   // Fresh allocation for the newly active family from remaining global budget.
   next = allocateCurrentFamilyBudget(next);
+  const nextLabel =
+    next.spaces[next.currentSpaceIndex]?.labelKo?.trim() || null;
+  if (jobId && leavingLabel) {
+    appendPersistedSearchActivityEvents(
+      jobId,
+      familyHandoffActivityEvents({
+        leavingLabel,
+        nextLabel,
+        completedAt,
+        startedAt: new Date().toISOString(),
+      }),
+      store,
+    );
+  }
   // Re-apply weakness mutations against the next family's base ranges so
   // overlapping keys carry forward; non-overlapping keys stay at catalog defaults.
   if (leavingAdjustment && next.spaces[next.currentSpaceIndex]) {
@@ -592,12 +643,27 @@ function recordQualifiedPasses(
   plan: StrategySearchPlan,
   store?: StrategySearchStoreOptions,
 ): StrategySearchPlan {
+  const beforeCount = plan.qualifiedHashes.length;
   const trials = listSearchTrials(jobId, store).filter((t) => t.passed);
   const qualified = new Set(nextQualified(plan, trials));
-  return {
+  const next: StrategySearchPlan = {
     ...plan,
     qualifiedHashes: [...qualified],
   };
+  if (next.qualifiedHashes.length > beforeCount) {
+    appendPersistedSearchActivityEvents(
+      jobId,
+      [
+        {
+          type: "campaign_qualified",
+          at: new Date().toISOString(),
+          qualifiedCount: next.qualifiedHashes.length,
+        },
+      ],
+      store,
+    );
+  }
+  return next;
 }
 
 export function nextQualified(
@@ -697,6 +763,20 @@ async function runOrchestratedSearchJobInner(
       now,
     );
     saveSearchPlan(jobId, plan, store);
+    const firstFamily = plan.spaces[plan.currentSpaceIndex]?.labelKo?.trim();
+    if (firstFamily) {
+      appendPersistedSearchActivityEvents(
+        jobId,
+        [
+          {
+            type: "family_started",
+            at: new Date(now).toISOString(),
+            familyLabel: firstFamily,
+          },
+        ],
+        store,
+      );
+    }
   }
 
   // Fair-share family allocation so EMA cannot consume the whole global budget.
@@ -756,6 +836,7 @@ async function runOrchestratedSearchJobInner(
             );
             plan = { ...outcome.plan, spaces, completionReason: null };
             saveSearchPlan(jobId, plan, store);
+            emitFamilyStartedEvent(jobId, plan, store);
             reopenSearchJobForNextSpace(jobId, store);
             applyStageConfig(jobId, plan, store);
             continue;
@@ -897,6 +978,7 @@ async function runOrchestratedSearchJobInner(
             );
             plan = { ...outcome.plan, spaces, completionReason: null };
             saveSearchPlan(jobId, plan, store);
+            emitFamilyStartedEvent(jobId, plan, store);
             reopenSearchJobForNextSpace(jobId, store);
             applyStageConfig(jobId, plan, store);
             continue;
@@ -941,6 +1023,7 @@ async function runOrchestratedSearchJobInner(
               );
               plan = { ...outcome.plan, spaces, completionReason: null };
               saveSearchPlan(jobId, plan, store);
+              emitFamilyStartedEvent(jobId, plan, store);
               reopenSearchJobForNextSpace(jobId, store);
               applyStageConfig(jobId, plan, store);
               continue;

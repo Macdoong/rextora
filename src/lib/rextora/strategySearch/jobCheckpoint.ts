@@ -10,6 +10,8 @@ import {
   createEmptyJobStatistics,
   type StrategySearchJobStatistics,
 } from "./jobStatistics";
+import type { StrategySearchActivityEvent } from "./activityTelemetry";
+import { sanitizeRecentActivityEvents } from "./activityTelemetry";
 import type {
   StrategySearchBestCandidateReference,
   StrategySearchCheckpoint,
@@ -355,8 +357,12 @@ export function buildPersistedCheckpoint(input: {
   bestCandidate: StrategySearchBestCandidateReference | null;
   bestPassedCandidate: StrategySearchBestCandidateReference | null;
   bestByCompatibilityGroup?: StrategySearchCheckpoint["bestByCompatibilityGroup"];
+  recentActivityEvents?: StrategySearchActivityEvent[];
   updatedAt?: string;
 }): StrategySearchCheckpoint {
+  const recentActivityEvents = sanitizeRecentActivityEvents(
+    input.recentActivityEvents,
+  );
   return {
     completedIterations: input.completedIterations,
     nextIteration: input.nextIteration,
@@ -370,6 +376,7 @@ export function buildPersistedCheckpoint(input: {
     ...(input.bestByCompatibilityGroup
       ? { bestByCompatibilityGroup: input.bestByCompatibilityGroup }
       : {}),
+    recentActivityEvents,
     updatedAt: input.updatedAt ?? new Date().toISOString(),
   };
 }

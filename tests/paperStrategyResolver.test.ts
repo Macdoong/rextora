@@ -10,7 +10,7 @@ import {
   setLiveActiveStrategy,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   resolveLiveDryRunExecutionStrategy,
   resolvePaperExecutionStrategy,
@@ -19,6 +19,8 @@ import { createPaperSession } from "../src/lib/rextora/paper/paperSessionStore";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { buildPatternSearchDefinition } from "../src/lib/rextora/strategySearch/patternEventSequence";
 import { ORDER_BLOCK_BASE_PARAMS } from "../src/lib/rextora/strategySearch/patternSearchSpaces";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("paperStrategyResolver", () => {
   let cleanup: (() => void) | undefined;
@@ -48,12 +50,12 @@ describe("paperStrategyResolver", () => {
   });
 
   it("when non-SAFE paperActive, resolve returns that strategy id", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "resolver_non_safe");
+    const copy = createStrategy({ name: "resolver_non_safe" });
     setPaperActiveStrategy(copy.id);
 
     const resolved = resolvePaperExecutionStrategy();
     expect(resolved.strategyId).toBe(copy.id);
-    expect(resolved.strategyId).not.toBe(SAFE_STRATEGY_ID);
+    expect(resolved.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(resolved.isProtectedSafe).toBe(false);
     expect(resolved.paramsHash).toBe(copy.paramsHash);
     expect(resolved.strategyHash).toHaveLength(64);
@@ -62,13 +64,13 @@ describe("paperStrategyResolver", () => {
   });
 
   it("active paper session identity wins over stale paperActive registry", () => {
-    const sessionOwner = copyStrategy(SAFE_STRATEGY_ID, "session_owner");
-    const staleFlag = copyStrategy(SAFE_STRATEGY_ID, "stale_paper_flag");
+    const sessionOwner = createStrategy({ name: "session_owner" });
+    const staleFlag = createStrategy({ name: "stale_paper_flag" });
 
     createPaperSession({ strategyId: sessionOwner.id });
     // Intentionally leave registry pointing at a different strategy.
     setPaperActiveStrategy(staleFlag.id);
-    expect(getPaperActiveStrategy().id).toBe(staleFlag.id);
+    expect(getPaperActiveStrategy()?.id).toBe(staleFlag.id);
 
     const resolved = resolvePaperExecutionStrategy();
     expect(resolved.strategyId).toBe(sessionOwner.id);
@@ -76,11 +78,8 @@ describe("paperStrategyResolver", () => {
     expect(resolved.paramsHash).toBe(sessionOwner.paramsHash);
   });
 
-  it("when SAFE is paperActive, resolve returns SAFE", () => {
-    setPaperActiveStrategy(SAFE_STRATEGY_ID);
-    const resolved = resolvePaperExecutionStrategy();
-    expect(resolved.strategyId).toBe(SAFE_STRATEGY_ID);
-    expect(resolved.isProtectedSafe).toBe(true);
+  it("when no strategy is selected, paper resolve fails closed", () => {
+    expect(() => resolvePaperExecutionStrategy()).toThrow(/전략이 없습니다/);
   });
 
   it("paper and live dry-run resolve the same stored eventSequence identity", () => {

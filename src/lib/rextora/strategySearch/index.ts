@@ -184,6 +184,24 @@ export {
   evaluateCompleteCandidate,
 } from "./candidateEvaluator";
 
+export type { StrategySearchShouldCancel } from "./evaluationCancellation";
+export {
+  StrategySearchEvaluationCancelledError,
+  StrategySearchEvaluationPausedError,
+  isEvaluationCancellationStatus,
+  isEvaluationCancelledError,
+  isEvaluationPausedError,
+  throwIfEvaluationCancelled,
+  throwIfEvaluationInterrupted,
+} from "./evaluationCancellation";
+export type { SearchEvaluationControlState } from "./searchEvaluationControl";
+export {
+  STRATEGY_SEARCH_CONTROL_CHECK_BAR_INTERVAL,
+  buildBacktestCooperativeCheckpoint,
+  createJobEvaluationControl,
+  yieldToEventLoop,
+} from "./searchEvaluationControl";
+
 export type { StrategySearchJobStateLabel } from "./jobState";
 export {
   StrategySearchJobStateError,
@@ -266,6 +284,25 @@ export type {
 } from "./researchOutcome";
 
 export type { StrategySearchRunnerCheckpointPayload } from "./jobCheckpoint";
+export {
+  SEARCH_ACTIVITY_BUFFER_SIZE,
+  SEARCH_ACTIVITY_FEED_LIMIT,
+  appendSearchActivityEvent,
+  appendSearchActivityEvents,
+  customerMetricsFromEvaluation,
+  familyHandoffActivityEvents,
+  formatActivityEventLineKo,
+  formatCustomerFailureReasonKo,
+  mapCustomerFailureReasonCodes,
+  sanitizeCustomerActivityEvent,
+  sanitizeRecentActivityEvents,
+} from "./activityTelemetry";
+export type {
+  CustomerCandidateMetrics,
+  StrategySearchActivityEvent,
+  StrategySearchCustomerFailureReasonCode,
+} from "./activityTelemetry";
+export { appendPersistedSearchActivityEvents } from "./activityTelemetryStore";
 export {
   RUNNER_CHECKPOINT_VERSION,
   StrategySearchCheckpointError,

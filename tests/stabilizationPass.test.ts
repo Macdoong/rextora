@@ -9,9 +9,11 @@ import { isPollutionCloneName, isTestStrategyRecord } from "../src/lib/rextora/s
 import { generateAiTradeReport } from "../src/lib/rextora/report/aiTradeReport";
 import { backtestResultHash } from "../src/lib/rextora/backtest/backtestStore";
 import { getStrategyPublicMeta } from "../src/lib/rextora/strategy/strategyMetadata";
-import { ensureStrategyStore, copyStrategy, deleteStrategy, setLiveActiveStrategy } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+import { ensureStrategyStore, copyStrategy, createStrategy, deleteStrategy, setLiveActiveStrategy } from "../src/lib/rextora/strategy/strategyStore";
+
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("riskFormulas stabilization", () => {
   it("zero loss produces 0% usage", () => {
@@ -62,10 +64,11 @@ describe("strategy metadata consistency", () => {
     const { cleanup } = installIsolatedStrategyStore();
     try {
       ensureStrategyStore();
-      const meta = getStrategyPublicMeta(SAFE_STRATEGY_ID);
+      const created = createStrategy({ name: "Stabilization Source" });
+      const meta = getStrategyPublicMeta(created.id);
       expect(meta?.timeframe).toBe("15m");
       expect(meta?.timeframeLabel).toBe("15분봉");
-      expect(meta?.sourceStatusLabel).toBe("기본 설정 사용 중");
+      expect(getStrategyPublicMeta(RETIRED_SAFE_STRATEGY_ID) == null).toBe(true);
     } finally {
       cleanup();
     }
@@ -75,12 +78,13 @@ describe("strategy metadata consistency", () => {
     const { cleanup } = installIsolatedStrategyStore();
     try {
       ensureStrategyStore();
-      const a = copyStrategy(SAFE_STRATEGY_ID);
-      const b = copyStrategy(SAFE_STRATEGY_ID);
+      const source = createStrategy({ name: "Stabilization Clone Source" });
+      const a = copyStrategy(source.id);
+      const b = copyStrategy(source.id);
       expect(a.name).toMatch(/복사본 \d+$/);
       expect(b.name).toMatch(/복사본 \d+$/);
       expect(a.name).not.toBe(b.name);
-      const testCopy = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
+      const testCopy = copyStrategy(source.id, "SAFE_copy_test");
       expect(isTestStrategyRecord(testCopy as never)).toBe(true);
       expect(() => setLiveActiveStrategy(testCopy.id)).toThrow(/테스트 전략/);
       deleteStrategy(a.id);
@@ -122,7 +126,7 @@ describe("backtest result hash", () => {
   it("stable hash for identical result payload", () => {
     const payload = {
       config: {
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         balance: 10000,
@@ -138,7 +142,7 @@ describe("backtest result hash", () => {
       report: {
         strategyName: "SAFE",
         strategyHash: "abc",
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
         sourceStatus: "context_fallback",
         symbol: "BTCUSDT",
         symbols: ["BTCUSDT"],

@@ -8,7 +8,7 @@
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { loadHistoricalCandles } from "../data/historicalCandleLoader";
 import { assertHistoricalDataCoverage } from "../data/historicalDataCoverage";
-import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
+import { GENERIC_SEARCH_BASELINE_PARAMS } from "../strategy/safeV44Params";
 import {
   classifyEngineError,
   isResearchMarketDataError,
@@ -548,7 +548,7 @@ export function startSearchJobExecution(
 
     const planForLev = getSearchPlan(jobId, store);
     const baseParams = applyLeverageModeToParams(
-      CONTEXT_FALLBACK_PARAMS,
+      GENERIC_SEARCH_BASELINE_PARAMS,
       planForLev,
     );
     const orch = await runOrchestratedSearchJob({

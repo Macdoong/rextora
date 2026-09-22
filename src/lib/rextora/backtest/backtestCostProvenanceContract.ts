@@ -17,7 +17,7 @@ import { computeCostRatios } from "./costRatios";
 import { resolveSlippageModelVersion } from "./executionSlippage";
 import { backtestResultHash } from "./backtestStore";
 import type { SavedBacktestResult } from "./backtestTypes";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../strategy/strategyTypes";
+import { RETIRED_SAFE_FILE_NAME, RETIRED_SAFE_PARAMS_HASH } from "../strategy/retiredSafeBaseline";
 
 export const P3A61_ARTIFACT_TS = "2026-09-03T14-20-00-000Z";
 
@@ -900,7 +900,7 @@ export function buildP3A61Contract(cwd = process.cwd()) {
     frozen: getFrozenP3A62Contract(),
     filePlan: getP3A62FilePlan(),
     identityNow: getCurrentIdentityBehavior(),
-    expectedSafeParamsHash: EXPECTED_SAFE_PARAMS_HASH,
+    expectedSafeParamsHash: RETIRED_SAFE_PARAMS_HASH,
     safety: {
       researchExecutions: 0,
       paperLive: 0,
@@ -955,7 +955,7 @@ export function writeP3A61Artifacts(cwd = process.cwd()) {
   write("p3-a6-2-frozen-contract.json", payload.frozen);
   write("production-readonly-hashes.json", {
     ...payload.hashes,
-    safeFileSha: sha256File(path.join(cwd, "data/strategies/SAFE_v44_i4060.json")),
+    safeFileSha: sha256File(path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME)),
     legacyRecordShas: payload.legacy.rows.map((r) => ({
       id: r.id,
       fileSha256: r.fileSha256,

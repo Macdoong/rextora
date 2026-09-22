@@ -1,40 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { LoadingState } from "@/components/rextora/LoadingState";
 import { ErrorState } from "@/components/rextora/ErrorState";
 import { Button } from "@/components/ui/primitives";
 import type { StrategySearchJobStatus, StrategySearchJobSummary } from "./types";
+import { displayJobSearchTitle, jobSearchNameTooltip } from "./jobDisplayName";
 import {
   formatCount,
   formatPct,
   formatTimeKo,
   historyStatusLabelKo,
 } from "./formatters";
+import { buildSearchCompareHref } from "./searchJobComparison";
 
-/** Mirrors server visible/retention default. */
+/** Mirrors server visible-history default (list display, not physical storage). */
 export const STRATEGY_SEARCH_HISTORY_RETENTION_NOTE = 20;
-
-function looksLikeTemplateName(name: string | undefined | null): boolean {
-  if (!name || !name.trim()) return true;
-  const t = name.trim();
-  return (
-    /^template_search/i.test(t) ||
-    /^SAFE_v44/i.test(t) ||
-    t === "strategy_search_base"
-  );
-}
-
-function displaySearchName(job: StrategySearchJobSummary): string {
-  if (!looksLikeTemplateName(job.searchName)) {
-    return job.searchName!.trim();
-  }
-  const market = job.symbols.join(", ") || "—";
-  const date = formatTimeKo(job.startedAt ?? job.createdAt);
-  return date
-    ? `${market} ${job.timeframe} · ${date}`
-    : `${market} ${job.timeframe}`;
-}
 
 function statusToneClass(status: string, historyLabel: string): string {
   if (historyLabel === "조기 종료") return "text-amber-200";
@@ -105,8 +87,15 @@ export function JobList(props: {
             data-testid="ss-history-retention-note"
           >
             최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를
-            보관합니다.
+            표시합니다.
           </p>
+          <Link
+            href={buildSearchCompareHref({})}
+            className="mt-2 inline-block text-sm text-[var(--v3-text-secondary)] underline-offset-2 hover:underline"
+            data-testid="ss-compare-entry"
+          >
+            탐색 결과 비교
+          </Link>
         </div>
         <EmptyState
           message="탐색 기록이 아직 없습니다."
@@ -123,13 +112,26 @@ export function JobList(props: {
       aria-label="탐색 기록"
     >
       <div className="border-b border-[var(--border)] px-5 py-4">
-        <h3 className="ss-section-title">탐색 기록</h3>
-        <p
-          className="mt-1 text-xs text-[var(--text-muted)]"
-          data-testid="ss-history-retention-note"
-        >
-          최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h3 className="ss-section-title">탐색 기록</h3>
+            <p
+              className="mt-1 text-xs text-[var(--text-muted)]"
+              data-testid="ss-history-retention-note"
+            >
+              최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 표시합니다.
+            </p>
+          </div>
+          <Link
+            href={buildSearchCompareHref({
+              left: selectedId,
+            })}
+            className="text-sm text-[var(--v3-text-secondary)] underline-offset-2 hover:underline"
+            data-testid="ss-compare-entry"
+          >
+            탐색 결과 비교
+          </Link>
+        </div>
       </div>
       {error ? (
         <p className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-100">
@@ -169,8 +171,11 @@ export function JobList(props: {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="truncate font-medium text-slate-100">
-                        {displaySearchName(job)}
+                      <div
+                        className="truncate font-medium text-slate-100"
+                        title={jobSearchNameTooltip(job)}
+                      >
+                        {displayJobSearchTitle(job)}
                       </div>
                       <div className="mt-1 text-xs text-slate-400">
                         {job.symbols.join(", ")} · {job.timeframe}
@@ -279,7 +284,9 @@ export function JobList(props: {
                     className="cursor-pointer px-4 py-3 font-medium text-slate-100"
                     onClick={() => onSelect(job.id)}
                   >
-                    {displaySearchName(job)}
+                    <span className="block max-w-[18rem] truncate" title={jobSearchNameTooltip(job)}>
+                      {displayJobSearchTitle(job)}
+                    </span>
                   </td>
                   <td
                     className="cursor-pointer px-4 py-3 text-slate-300"

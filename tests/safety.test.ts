@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultApiStatus, defaultChecklist, defaultRiskStatus, safeBaselineStrategy, strategies } from "../lib/mock-data";
+import { defaultApiStatus, defaultChecklist, defaultRiskStatus, sampleStrategy, strategies } from "../lib/mock-data";
 import { getBacktestValidation } from "../src/lib/rextora/backtestEngine";
 import { getApiStatus } from "../src/lib/rextora/apiStatusService";
 import { getTopCandidates } from "../src/lib/rextora/aiRanker";
@@ -23,16 +23,13 @@ import {
 import { ApiStatusService, BacktestEngine, EmergencyService, LiveTradingEngine, PaperTradingEngine, createEngineForMode } from "../lib/services";
 
 describe("Rextora safety MVP", () => {
-  it("includes SAFE_v44_i4060 as legacy reference", () => {
-    expect(strategies.some((strategy) => strategy.name === "SAFE_v44_i4060")).toBe(true);
-  });
-
-  it("preserves SAFE_v44_i4060 params_hash", () => {
-    expect(safeBaselineStrategy.paramsHash).toBe("7893ca3f0e30");
+  it("does not treat retired SAFE as a current strategy", () => {
+    expect(strategies.every((strategy) => strategy.name !== "SAFE_v44_i4060")).toBe(true);
+    expect(sampleStrategy?.id).not.toBe("SAFE_v44_i4060");
   });
 
   it("blocks LIVE mode without the full safety checklist", () => {
-    expect(canStartLiveTrading(defaultChecklist, safeBaselineStrategy, defaultRiskStatus, defaultApiStatus)).toBe(false);
+    expect(canStartLiveTrading(defaultChecklist, sampleStrategy, defaultRiskStatus, defaultApiStatus)).toBe(false);
   });
 
   it("blocks LIVE via liveSafetyGate", () => {
@@ -52,7 +49,7 @@ describe("Rextora safety MVP", () => {
 
   it("allows PAPER mode without real order permission", () => {
     expect(defaultApiStatus.orderPermission).toBe("차단");
-    expect(canUsePaperMode(safeBaselineStrategy, defaultRiskStatus)).toBe(true);
+    expect(canUsePaperMode(sampleStrategy, defaultRiskStatus)).toBe(true);
   });
 
   it("blocks Binance trade without LiveExecutionContext", async () => {
@@ -68,7 +65,7 @@ describe("Rextora safety MVP", () => {
   it("blocks trading when a risk limit is breached", () => {
     const breachedRisk = { ...defaultRiskStatus, dailyLossPct: -5.1 };
     expect(isRiskLimitBreached(breachedRisk)).toBe(true);
-    expect(canUsePaperMode(safeBaselineStrategy, breachedRisk)).toBe(false);
+    expect(canUsePaperMode(sampleStrategy, breachedRisk)).toBe(false);
   });
 
   it("reports Telegram mock or configured status", async () => {

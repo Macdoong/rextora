@@ -4,7 +4,7 @@ import { classifyFirstRunStatus } from "@/src/lib/rextora/firstRun/firstRunStatu
 import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
 
 /**
- * Reset ONLY reserved demo records. Never deletes SAFE or real user data.
+ * Reset ONLY reserved demo records. Never deletes real user research data.
  */
 export async function POST(request: Request) {
   const denied = await denyUnlessPermitted(request, "settings:write");
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       {
         removed,
         status,
-        noticeKo: "데모 레코드만 삭제했습니다. 실제 연구 데이터와 SAFE는 유지됩니다.",
+        noticeKo: "데모 레코드만 삭제했습니다. 실제 연구 데이터는 유지됩니다.",
       },
       { source: "first-run-demo-reset", cached: false, durationMs: Date.now() - start },
     );

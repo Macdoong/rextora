@@ -15,6 +15,69 @@ export type StrategySearchJobStatus =
   | "completed"
   | "failed";
 
+export type StrategySearchCustomerFailureReasonCode =
+  | "MIN_TOTAL_RETURN"
+  | "MIN_TRADE_COUNT"
+  | "MIN_WIN_RATE"
+  | "MIN_PROFIT_FACTOR"
+  | "MIN_ENDING_BALANCE"
+  | "MAX_NEGATIVE_MONTHS"
+  | "MAX_MDD"
+  | "MIN_MONTHLY_RETURN"
+  | "MAX_MONTHLY_RETURN_DISPERSION";
+
+export type StrategySearchActivityMetrics = {
+  netReturn?: number;
+  mdd?: number;
+  tradeCount?: number;
+  winRate?: number;
+  profitFactor?: number;
+  score?: number;
+};
+
+export type StrategySearchActivityEvent =
+  | {
+      type: "family_started";
+      at: string;
+      familyLabel: string;
+    }
+  | {
+      type: "family_completed";
+      at: string;
+      familyLabel: string;
+    }
+  | {
+      type: "candidate_evaluated";
+      at: string;
+      familyLabel?: string;
+      evaluatedCount: number;
+      metrics?: StrategySearchActivityMetrics;
+    }
+  | {
+      type: "candidate_rejected";
+      at: string;
+      familyLabel?: string;
+      evaluatedCount: number;
+      reasonCodes?: StrategySearchCustomerFailureReasonCode[];
+      metrics?: StrategySearchActivityMetrics;
+    }
+  | {
+      type: "candidate_gate_passed";
+      at: string;
+      familyLabel?: string;
+      evaluatedCount: number;
+      metrics?: StrategySearchActivityMetrics;
+    }
+  | {
+      type: "campaign_qualified";
+      at: string;
+      qualifiedCount: number;
+    }
+  | {
+      type: "top10_refreshed";
+      at: string;
+    };
+
 export type StrategySearchApiErrorCode =
   | "INVALID_REQUEST"
   | "JOB_NOT_FOUND"
@@ -184,6 +247,9 @@ export interface StrategySearchJobSummary {
   accumulatedInterruptionMs?: number | null;
   recoveryBlocker?: string | null;
   resumedAtMs?: number | null;
+  ownerUserId?: string | null;
+  legacyUnspecifiedOwner?: boolean;
+  ownershipLabelKo?: string | null;
   expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
   completedIterations: number;
@@ -242,7 +308,13 @@ export interface StrategySearchJobSummary {
   depthProfile?: string | null;
   qualificationProfile?: string | null;
   qualifiedTarget?: number | null;
+  /** Campaign/final qualified count. Distinct from gatePassedCount. */
   qualifiedCount?: number | null;
+  evaluatedCount?: number | null;
+  gatePassedCount?: number | null;
+  rejectedCount?: number | null;
+  errorCount?: number | null;
+  recentActivityEvents?: StrategySearchActivityEvent[];
   uniqueEvaluatedCount?: number | null;
   duplicateSkippedCount?: number | null;
   exhaustedSpaceCount?: number | null;

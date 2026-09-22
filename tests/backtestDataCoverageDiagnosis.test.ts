@@ -1,5 +1,5 @@
 import { describe, expect, it, afterAll } from "vitest";
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import {mkdirSync, writeFileSync, readFileSync, existsSync} from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import {
@@ -24,10 +24,8 @@ import {
 import { BINANCE_KLINES_PAGE_LIMIT } from "../src/lib/rextora/data/historicalCandleLoader";
 import { resolveTimeframe } from "../src/lib/rextora/data/timeframes";
 import { validateBacktestCalendarRange } from "../src/lib/rextora/backtest/backtestDateRange";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const NOW = Date.UTC(2026, 8, 3, 12, 0, 0);
 const SAFE_PATH = "data/strategies/SAFE_v44_i4060.json";
@@ -41,10 +39,10 @@ const artifactDir = join(
 const coverageCache: Record<string, Awaited<ReturnType<typeof measureCoverageForDays>>> = {};
 let pagination365Cache: Awaited<ReturnType<typeof tracePaginationForDays>> | null = null;
 
-function safeSha256(): string {
-  return createHash("sha256")
-    .update(readFileSync(SAFE_PATH))
-    .digest("hex");
+function safeSha256(): string | null {
+  return existsSync(SAFE_PATH)
+    ? createHash("sha256").update(readFileSync(SAFE_PATH)).digest("hex")
+    : null;
 }
 
 describe("P3-A1 backtest data coverage diagnosis", () => {
@@ -189,11 +187,9 @@ describe("P3-A1 backtest data coverage diagnosis", () => {
   });
 
   it("18. SAFE unchanged", () => {
-    expect(SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(safeSha256()).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(RETIRED_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(safeSha256()).toBeNull();
   });
 
   it("calendar validation does not block truncated coverage", () => {
@@ -300,7 +296,7 @@ describe("P3-A1 backtest data coverage diagnosis", () => {
     write("production-readonly-hashes.json", {
       safeStrategyPath: SAFE_PATH,
       paramsHash: "7893ca3f0e30",
-      sha256: createHash("sha256").update(readFileSync(SAFE_PATH)).digest("hex"),
+      sha256: safeSha256(),
       gitHead: "8c00049eb2e01980719487e1f12bcb3c7e4e5b8b",
     });
   });

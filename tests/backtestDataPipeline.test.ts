@@ -15,11 +15,8 @@ import {
   runConfiguredBacktest,
 } from "../src/lib/rextora/backtest/backtestRunner";
 import { runSafeV44Backtest } from "../src/lib/rextora/backtest/backtestEngine";
-import { ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+import { createStrategy, ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
+import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { loadSafeV44Strategy } from "../src/lib/rextora/strategy/safeV44Strategy";
 import { authedRequest } from "./helpers/authSession";
 import * as marketDataStore from "../src/lib/rextora/marketDataStore";
@@ -144,9 +141,16 @@ describe("historical candle loader (mocked Binance)", () => {
 
 describe("backtest data pipeline", () => {
   let cleanupIsolated: (() => void) | undefined;
+  let fixtureId = "";
 
   beforeAll(() => {
     cleanupIsolated = installIsolatedStrategyStore().cleanup;
+    ensureStrategyStore();
+    fixtureId = createStrategy({
+      name: "pipeline-fixture",
+      timeframe: "15m",
+      strategyType: "safe_params",
+    }).id;
   });
 
   afterAll(() => {
@@ -172,7 +176,7 @@ describe("backtest data pipeline", () => {
 
     await expect(
       runConfiguredBacktest({
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: fixtureId,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         fromOpenTime: Date.UTC(2026, 5, 21),
@@ -211,7 +215,7 @@ describe("backtest data pipeline", () => {
 
     const to = from + interval * 249;
     const result = await runConfiguredBacktest({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: fixtureId,
       symbols: ["BTCUSDT"],
       timeframe: "15m",
       fromOpenTime: from,
@@ -240,7 +244,7 @@ describe("backtest data pipeline", () => {
     const from = Date.UTC(2026, 5, 21);
     const to = Date.UTC(2026, 6, 21, 23, 59, 59, 999);
     const result = await runConfiguredBacktest({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: fixtureId,
       symbols: ["BTCUSDT"],
       timeframe: "15m",
       fromOpenTime: from,
@@ -275,7 +279,7 @@ describe("backtest data pipeline", () => {
     const from = Date.UTC(2026, 3, 1);
     const to = Date.UTC(2026, 5, 30, 23, 59, 59, 999);
     const result = await runConfiguredBacktest({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: fixtureId,
       symbols: ["BTCUSDT"],
       timeframe: "15m",
       fromOpenTime: from,
@@ -316,7 +320,7 @@ describe("backtest data pipeline", () => {
 
     await expect(
       runConfiguredBacktest({
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: fixtureId,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         fromOpenTime: Date.UTC(2026, 5, 21),
@@ -349,7 +353,7 @@ describe("backtest data pipeline", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: fixtureId,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         fromOpenTime: Date.UTC(2026, 5, 21),
@@ -377,6 +381,7 @@ describe("backtest data pipeline", () => {
       dataSource: "synthetic-test",
       applySpread: false,
       spreadRate: 0,
+      params: CONTEXT_FALLBACK_PARAMS,
     });
     if (result.trades.length === 0) {
       expect(result.report.zeroTradeDiagnostics).toBeTruthy();
@@ -401,6 +406,7 @@ describe("backtest data pipeline", () => {
       feeRate: 0.0004,
       slippageRate: 0.0002,
       dataSource: "synthetic-test",
+      params: CONTEXT_FALLBACK_PARAMS,
     });
     expect(noSpread.report.spreadTotal).toBe(0);
     expect(noSpread.report.costs.spread).toBe(0);
@@ -414,6 +420,7 @@ describe("backtest data pipeline", () => {
       feeRate: 0.0004,
       slippageRate: 0.0002,
       dataSource: "synthetic-test",
+      params: CONTEXT_FALLBACK_PARAMS,
     });
     expect(withSpread.report.validation.spreadApplied).toBe(true);
     if (withSpread.trades.length > 0) {
@@ -428,17 +435,18 @@ describe("backtest data pipeline", () => {
     }
   });
 
-  it("12-13. protected SAFE hash and params unchanged", () => {
+  it("12-13. retired SAFE loader does not expose a current strategy hash", () => {
     const meta = loadSafeV44Strategy({ throwOnHashMismatch: false });
-    expect(meta.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(meta.paramsHash).toBe("7893ca3f0e30");
+    expect(meta.paramsHash).toBe("");
+    expect(meta.dataStrategyFileFound).toBe(false);
+    expect(meta.notes.some((note) => note.includes("retired"))).toBe(true);
   });
 
   it("1h timeframe controls candle spacing in synthetic-test", async () => {
     const from = Date.UTC(2026, 5, 21);
     const to = Date.UTC(2026, 5, 28);
     const result = await runConfiguredBacktest({
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: fixtureId,
       symbols: ["BTCUSDT"],
       timeframe: "1h",
       fromOpenTime: from,

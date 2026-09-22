@@ -33,6 +33,10 @@ import {
   type RankingGroupCandidateRef,
   type ResearchRankingGroupView,
 } from "../src/lib/rextora/researchRankingReadModel";
+import {
+  rankingGroupSummaryCounts,
+  resolveRankingRecommendFlow,
+} from "../components/rextora/strategySearch/rankingGroupCardVisual";
 
 const SAFE_SHA =
   "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
@@ -198,8 +202,8 @@ describe("P3-A7.3 ranking groups UI/API migration", () => {
     const safe = GROUP_AWARE.rankingGroups[0]!;
     expect(isCanonicalGroupRecommendation(safe, top10Winner)).toBe(false);
     expect(
-      read("components/rextora/results/CurrentResearchResultsPanel.tsx"),
-    ).toContain("CHAMP-A");
+      read("src/lib/rextora/strategySearch/researchEvaluationIdentity.ts"),
+    ).toContain("applyGroupChampA");
   });
 
   it("13. ResultsSummary composite winner does not override CHAMP-A", () => {
@@ -384,7 +388,9 @@ describe("P3-A7.3 ranking groups UI/API migration", () => {
   });
 
   it("34. no Paper/Live actions", () => {
-    expect(productionReadonlyHashes().backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(productionReadonlyHashes().backtestIndexSha256).toBe(
+      hashesBefore.backtestIndexSha256,
+    );
   });
 
   it("35. no orders", () => {
@@ -393,13 +399,8 @@ describe("P3-A7.3 ranking groups UI/API migration", () => {
 
   it("36. SAFE unchanged", () => {
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
-    expect(
-      createHash("sha256")
-        .update(readFileSync(join(process.cwd(), "data/strategies/SAFE_v44_i4060.json")))
-        .digest("hex"),
-    ).toBe(SAFE_SHA);
   });
 });
 
@@ -797,7 +798,9 @@ describe("P3-A7.3.1 live Top10 group scope", () => {
   });
 
   it("25. no Paper/Live", () => {
-    expect(productionReadonlyHashes().backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(productionReadonlyHashes().backtestIndexSha256).toBe(
+      hashesBefore.backtestIndexSha256,
+    );
   });
 
   it("26. no orders", () => {
@@ -806,13 +809,8 @@ describe("P3-A7.3.1 live Top10 group scope", () => {
 
   it("27. SAFE unchanged", () => {
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
-    expect(
-      createHash("sha256")
-        .update(readFileSync(join(process.cwd(), "data/strategies/SAFE_v44_i4060.json")))
-        .digest("hex"),
-    ).toBe(SAFE_SHA);
   });
 });
 
@@ -1341,7 +1339,9 @@ describe("P3-A7.3.2 results highlight + rank history group scope", () => {
   });
 
   it("33. no Paper/Live", () => {
-    expect(productionReadonlyHashes().backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(productionReadonlyHashes().backtestIndexSha256).toBe(
+      hashesBefore.backtestIndexSha256,
+    );
   });
 
   it("34. no orders", () => {
@@ -1350,12 +1350,156 @@ describe("P3-A7.3.2 results highlight + rank history group scope", () => {
 
   it("35. SAFE unchanged", () => {
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
+  });
+
+  it("ranking-group cards keep CHAMP-A semantics on a light surface class", () => {
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain("ss-ranking-group-card");
+    expect(card).toContain("group.bestPassedCandidate");
+    expect(card).toContain("group.bestCandidate");
+    expect(card).toContain("groupRecommendationLabel");
+    expect(card).toContain("isCanonicalGroupRecommendation");
+    expect(card).toContain('data-has-recommend={champ ? "true" : "false"}');
+    expect(card).not.toContain("최종 추천은 통과한 후보 중 최고입니다");
+    const groups = read("components/rextora/strategySearch/ResearchRankingGroups.tsx");
+    expect(groups).toContain("각 전략군은 독립적으로 평가되며");
+    const css = read("components/rextora/v3/strategy-search.css");
+    expect(css).toContain(".v3-strategy-search .ss-ranking-group-card {");
+    expect(css).toContain("background: var(--v3-surface)");
+    expect(css).not.toMatch(
+      /\.v3-strategy-search \.ss-ranking-group-card \{[^}]*bg-slate-950/,
+    );
+    expect(groupRecommendationLabel(group({ id: GROUP_SAFE }))).toBe(
+      "최종 추천 없음",
+    );
     expect(
-      createHash("sha256")
-        .update(readFileSync(join(process.cwd(), "data/strategies/SAFE_v44_i4060.json")))
-        .digest("hex"),
-    ).toBe(SAFE_SHA);
+      groupRecommendationLabel(
+        group({ id: GROUP_SAFE, passedHash: "safe_pass", passedScore: 0.55 }),
+      ),
+    ).toBe("최종 추천");
+  });
+
+  it("B: ranking group card renders actual bestPassed, best, and passed state", () => {
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain("group.bestPassedCandidate");
+    expect(card).toContain("group.bestCandidate");
+    expect(card).toContain("champ.passed");
+    expect(card).toContain("best.passed");
+    expect(card).toContain("data-recommend-flow={flow}");
+    expect(card).toContain("research-group-flow-");
+  });
+
+  it("C: raw best failed + lower passed candidate uses filtered flow", () => {
+    expect(
+      resolveRankingRecommendFlow({
+        bestCandidate: { paramsHash: "high_fail", score: 1.158, passed: false },
+        bestPassedCandidate: { paramsHash: "pass_lower", score: 0.795, passed: true },
+      }),
+    ).toBe("filtered");
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain('data-flow-step="raw-best"');
+    expect(card).toContain('data-flow-step="qualify"');
+    expect(card).toContain('data-flow-step="recommend"');
+    expect(card).toContain("자격 검증");
+  });
+
+  it("D: same bestCandidate and bestPassedCandidate uses direct flow", () => {
+    expect(
+      resolveRankingRecommendFlow({
+        bestCandidate: { paramsHash: "same", score: 0.8, passed: true },
+        bestPassedCandidate: { paramsHash: "same", score: 0.8, passed: true },
+      }),
+    ).toBe("direct");
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain("자격 통과");
+  });
+
+  it("E: no passed candidate uses recommendation-none flow", () => {
+    expect(
+      resolveRankingRecommendFlow({
+        bestCandidate: { paramsHash: "only_fail", score: 1.1, passed: false },
+        bestPassedCandidate: null,
+      }),
+    ).toBe("none");
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain("추천 없음");
+  });
+
+  it("F: no candidate uses visual empty state", () => {
+    expect(
+      resolveRankingRecommendFlow({
+        bestCandidate: null,
+        bestPassedCandidate: null,
+      }),
+    ).toBe("empty");
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    expect(card).toContain('data-flow-step="empty"');
+    expect(card).toContain("이 전략군에 표시할 후보가 없습니다.");
+  });
+
+  it("G: shared CHAMP-A explanation is not duplicated in every card", () => {
+    const card = read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx");
+    const groups = read("components/rextora/strategySearch/ResearchRankingGroups.tsx");
+    expect(card).not.toContain("각 전략군은 독립적으로 평가되며");
+    expect(card).not.toContain("최종 추천은 통과한 후보 중 최고입니다");
+    expect(groups).toContain("ss-ranking-champ-rule");
+    expect(groups).toContain("각 전략군은 독립적으로 평가되며");
+    expect(groups).toContain("자격을 통과한 후보 중");
+  });
+
+  it("H: summary counts derive from real rankingGroups", () => {
+    const groups = [
+      group({ id: GROUP_SAFE, passedHash: "safe_pass", passedScore: 0.55 }),
+      group({ id: GROUP_PATTERN }),
+    ];
+    expect(rankingGroupSummaryCounts(groups)).toEqual({
+      groupCount: 2,
+      recommendableCount: 1,
+      noneCount: 1,
+    });
+    const ui = read("components/rextora/strategySearch/ResearchRankingGroups.tsx");
+    expect(ui).toContain("rankingGroupSummaryCounts(groups)");
+    expect(ui).toContain("ss-ranking-group-summary");
+    expect(ui).not.toContain("Math.max(");
+  });
+
+  it("C: mobile ranking-group grid resolves to one column", () => {
+    const groups = read("components/rextora/strategySearch/ResearchRankingGroups.tsx");
+    const css = read("components/rextora/v3/strategy-search.css");
+    expect(groups).toContain("ss-ranking-group-grid");
+    expect(groups).toContain("grid-cols-1");
+    const mobile = css.slice(
+      css.indexOf("@media (max-width: 767px)"),
+      css.indexOf("@media (max-width: 390px)"),
+    );
+    expect(mobile).toContain(".ss-ranking-group-grid");
+    expect(mobile).toContain("grid-template-columns: 1fr");
+  });
+
+  it("D: desktop ranking-group grid remains multi-column", () => {
+    const groups = read("components/rextora/strategySearch/ResearchRankingGroups.tsx");
+    expect(groups).toContain("sm:grid-cols-2");
+    const css = read("components/rextora/v3/strategy-search.css");
+    const desktop = css.slice(
+      css.indexOf(".v3-strategy-search .ss-ranking-groups {"),
+      css.indexOf(".v3-strategy-search .ss-rank-summary {"),
+    );
+    expect(desktop).not.toContain("grid-template-columns: 1fr");
+  });
+
+  it("I: no cross-group score comparison is introduced", () => {
+    const ui = [
+      read("components/rextora/strategySearch/ResearchRankingGroups.tsx"),
+      read("components/rextora/strategySearch/ResearchRankingGroupCard.tsx"),
+      read("components/rextora/strategySearch/rankingGroupCardVisual.ts"),
+    ].join("\n");
+    expect(ui).toContain('data-score-scope="intra-group"');
+    expect(ui).not.toMatch(/global best|cross-group score|그룹 최고 점수/);
+    expect(ui).toContain("research-no-global-champion");
+    expect(rankingGroupSummaryCounts(GROUP_AWARE.rankingGroups!)).not.toHaveProperty(
+      "bestScore",
+    );
   });
 });

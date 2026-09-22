@@ -71,11 +71,10 @@ import {
 } from "../src/lib/rextora/paper/paperSessionStore";
 import { manageEventSequencePaperPositions } from "../src/lib/rextora/paper/paperEventSequenceLifecycle";
 import {
-  copyStrategy,
+  createStrategy,
   getStrategyById,
   saveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import {
   recordPaperEntryFromSafe,
   recordPaperExit,
@@ -118,7 +117,7 @@ function isolate() {
 }
 
 function prepareSafeBtcSession(symbol: string | null = "BTCUSDT") {
-  const copy = copyStrategy(SAFE_STRATEGY_ID, "integrity-safe-btc");
+  const copy = createStrategy({ name: "integrity-safe-btc", timeframe: "15m", strategyType: "safe_params" });
   const prepared = preparePaperSession({
     strategyId: copy.id,
     symbol,
@@ -450,7 +449,7 @@ describe("SAFETY", () => {
   it("38-46: SAFE file, Live, production hashes, no production Paper start", () => {
     isolate();
     const safePath = path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json");
-    expect(fs.existsSync(safePath)).toBe(true);
+    expect(fs.existsSync(safePath)).toBe(false);
     expect(productionRecordHashes().safeSha256).toBe(hashesBefore.safeSha256);
     expect(getRuntimeState().mode).not.toBe("LIVE");
     expect(buildUnifiedTradeResult).toBeTypeOf("function");

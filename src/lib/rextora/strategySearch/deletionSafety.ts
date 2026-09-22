@@ -1,7 +1,7 @@
 /**
  * Deletion safety service for Strategy Search artifacts.
  * Builds a reference graph and classifies deletable / archive-only / protected.
- * Never deletes SAFE. Never uses substring-only matching.
+ * Never uses substring-only matching.
  */
 
 import fs from "node:fs";
@@ -19,7 +19,6 @@ import {
   manualDeleteBlockMessageKo,
 } from "./historyRetention";
 import { listStrategies } from "../strategy/strategyStore";
-import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
 import { parseSourceResearchJobId } from "./researchResultsSummary";
 import { listSavedBacktests } from "../backtest/backtestStore";
 import { listPaperSessions } from "../paper/paperSessionStore";
@@ -103,9 +102,6 @@ export function previewResearchJobDeletion(
   const strategies = listStrategies();
   const registeredStrategyRefs = strategies
     .filter((s) => {
-      if (s.id === SAFE_STRATEGY_ID || s.paramsHash === EXPECTED_SAFE_PARAMS_HASH) {
-        return false;
-      }
       // Detached provenance keeps snapshot but no longer blocks job deletion.
       if (isProvenanceDetached(s.description)) return false;
       return parseSourceResearchJobId(s.description) === jobId;

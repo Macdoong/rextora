@@ -60,7 +60,7 @@ export function evaluateToolPolicy(
     return {
       allow: false,
       code: "POLICY_SAFE_MUTATION",
-      reasonKo: "SAFE 전략 변경은 허용되지 않습니다.",
+      reasonKo: "폐기된 기준 전략은 사용할 수 없습니다.",
     };
   }
 

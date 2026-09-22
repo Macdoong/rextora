@@ -17,16 +17,18 @@ import { SUPPORTED_TIMEFRAMES, resolveTimeframe } from "./timeframes";
 import { StrategySearchAdapterError } from "../strategySearch/backtestAdapter";
 import { StrategySearchGenerationError } from "../strategySearch/candidateGenerator";
 import { classifyEngineError } from "../strategySearch/engineErrorClassification";
+import {
+  RETIRED_SAFE_FILE_NAME,
+  RETIRED_SAFE_PARAMS_HASH,
+} from "../strategy/retiredSafeBaseline";
 
 export const EXPECTED_GIT_HEAD =
   "8c00049eb2e01980719487e1f12bcb3c7e4e5b8b";
-export const EXPECTED_SAFE_SHA256 =
-  "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
-export const EXPECTED_SAFE_PARAMS_HASH = "7893ca3f0e30";
+export const EXPECTED_SAFE_SHA256 = null;
 export const EXPECTED_RESEARCH_INDEX_SHA256 =
   "9395b5faaff412abb59fba81deb419871574324d812d7cdc293272d9aced3437";
 
-export const SAFE_PATH = "data/strategies/SAFE_v44_i4060.json";
+export const SAFE_PATH = `data/strategies/${RETIRED_SAFE_FILE_NAME}`;
 export const RESEARCH_INDEX_PATH = "data/rextora/strategy-search/index.json";
 export const BACKTEST_INDEX_PATH = "data/rextora/backtests/index.json";
 
@@ -133,7 +135,7 @@ export function captureProductionReadonlyHashes(cwd = process.cwd()) {
   const backtestIndex = join(cwd, BACKTEST_INDEX_PATH);
   return {
     safeSha256: sha256File(safe),
-    paramsHash: EXPECTED_SAFE_PARAMS_HASH,
+    paramsHash: RETIRED_SAFE_PARAMS_HASH,
     researchIndexSha256: sha256File(index),
     backtestIndexSha256: sha256File(backtestIndex),
     productionWrites: 0,

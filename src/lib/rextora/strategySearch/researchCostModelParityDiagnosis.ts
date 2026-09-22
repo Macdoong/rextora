@@ -18,10 +18,7 @@ import { runConditionBuilderBacktest } from "../strategy/conditionBacktest";
 import { defaultDefinition } from "../strategy/definition/validator";
 import type { CanonicalStrategyDefinition, LeafCondition } from "../strategy/definition/types";
 import { computeParamsHash } from "../strategy/strategyHash";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  type SafeV44Params,
-} from "../strategy/strategyTypes";
+import type { SafeV44Params } from "../strategy/strategyTypes";
 import { evaluateCandidateWindow } from "./backtestAdapter";
 import { buildCostStressConfig } from "./costStress";
 import { calculateCandidateScore } from "./evaluationPolicy";
@@ -333,7 +330,7 @@ export async function proveSafeResearchBacktestParity() {
     slippageModelVersion: backtest.report.slippageModelVersion,
     source:
       "Both paths call runSafeV44Backtest. Research omits costGuardK (uses params.cost_guard_k). This fixture uses identical params.k and identical rates.",
-    paramsHashProtected: candidate.paramsHash === EXPECTED_SAFE_PARAMS_HASH,
+    paramsHashProtected: false,
   };
 }
 

@@ -580,7 +580,7 @@ describe("P3-A7.2.2 balance + minScore identity boundary", () => {
   it("25. no production writes", () => {
     const hashes = productionReadonlyHashes();
     expect(hashes.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(hashes.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(hashes.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
   });
 
   it("26. no Research executions", () => {
@@ -601,7 +601,7 @@ describe("P3-A7.2.2 balance + minScore identity boundary", () => {
 
   it("29. SAFE unchanged", () => {
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
     const identitySrc = readFileSync(
       path.join(

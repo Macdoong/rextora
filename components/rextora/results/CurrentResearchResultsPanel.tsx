@@ -454,7 +454,7 @@ function RowDetail(props: { card: ResearchResultCard; cluster?: ResearchCluster 
       </p>
       <p className="font-mono">hash {card.paramsHash}</p>
       <p className="font-mono">job {card.sourceResearchJobId}</p>
-      <p className="font-mono">iteration {card.iteration}</p>
+      <p>후보 번호 {card.iteration}</p>
       <p className="font-mono">
         cluster {card.clusterId}
         {cluster ? ` · 멤버 ${cluster.memberCount}` : ""}
@@ -1038,7 +1038,7 @@ export function CurrentResearchResultsPanel(props: {
               </div>
             </div>
             <p className="mt-2" data-testid="current-research-qualified-note">
-              합격 전략 {formatCount(c.qualifiedStrategies)}개는 탐색 trial 기록입니다.
+              합격 전략 {formatCount(c.qualifiedStrategies)}개는 이번 탐색의 통과 후보입니다.
               전략 라이브러리 등록({formatCount(c.registeredStrategies)}개)과 다릅니다.
             </p>
           </details>
@@ -1084,12 +1084,13 @@ export function CurrentResearchResultsPanel(props: {
       >
         <Card title="그룹별 최종 추천">
           <p className="mb-3 text-xs text-slate-400">
-            각 평가 그룹의 최종 추천은 CHAMP-A bestPassedCandidate입니다.
+            각 전략군은 독립적으로 평가되며, 자격을 통과한 후보 중 최종 추천을 선택합니다.
             TOP 10·종합 점수는 참고용입니다.
           </p>
           <ResearchRankingGroups
             source={summary}
             unknownLegacy={summary.unknownLegacy}
+            operatorFacing
           />
         </Card>
       </section>
@@ -1099,7 +1100,7 @@ export function CurrentResearchResultsPanel(props: {
           <div className="space-y-3" data-testid="results-group-highlights">
             <p className="text-xs text-slate-400">
               수익·안정 표시는 같은 평가 그룹 안에서만 비교합니다. 최종 추천은
-              CHAMP-A입니다.
+              자격 통과 후보 중에서 선택합니다.
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {groupHighlights.map((group) => (
@@ -1640,7 +1641,7 @@ export function CurrentResearchResultsPanel(props: {
                               tip={
                                 card.totalCost != null
                                   ? `총 비용 ${card.totalCost.toFixed(4)} (수수료·슬리피지 합산)`
-                                  : "이 탐색 trial에는 절대 비용 금액이 저장되지 않았습니다. 스트레스 통과 여부만 별도 확인하세요."
+                                  : "이 평가 결과에는 절대 비용 금액이 저장되지 않았습니다. 스트레스 통과 여부만 별도 확인하세요."
                               }
                               tone={
                                 card.costStatus === "비용 계산 완료"

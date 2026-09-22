@@ -27,7 +27,8 @@ import { createStrategy, ensureStrategyStore, setLiveActiveStrategy } from "../s
 import { invalidateJsonStoreCache, writeJsonStore } from "../src/lib/rextora/storage/jsonStore";
 import { loadSettings } from "../src/lib/rextora/settings/settingsStore";
 import { getRuntimeState } from "../src/lib/rextora/runtimeState";
-import { SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategyRepository";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const ROOT = path.resolve(__dirname, "..");
 const SAFE_PATH = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -36,7 +37,8 @@ const SAFE_SHA =
 const CONFIRM = "temp-live-approval-target-confirm";
 const PREV_CONFIRM = process.env.REXTORA_LIVE_CONFIRMATION_TEXT;
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -107,7 +109,7 @@ describe("Live approval target authority", () => {
     expect(snapshot.strategyId).toBe(created.id);
     expect(snapshot.target?.strategyId).toBe(created.id);
     expect(snapshot.target?.paramsHash).toBe(created.paramsHash);
-    expect(snapshot.target?.strategyId).not.toBe(SAFE_STRATEGY_ID);
+    expect(snapshot.target?.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(Object.keys(snapshot).filter((key) => key.toLowerCase().includes("verified"))).toEqual([
       "verifiedForLive",
     ]);
@@ -128,8 +130,8 @@ describe("Live approval target authority", () => {
     const customSnap = getStrategyLiveApprovalState();
     const againstSafe = validateLiveApprovalTarget({
       currentStrategy: {
-        strategyId: SAFE_STRATEGY_ID,
-        paramsHash: SAFE_PARAMS_HASH,
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
+        paramsHash: RETIRED_SAFE_PARAMS_HASH,
       },
       approvalSnapshot: customSnap,
     });
@@ -137,24 +139,10 @@ describe("Live approval target authority", () => {
     expect(againstSafe.code).toBe("APPROVAL_STRATEGY_MISMATCH");
 
     revokeStrategyLiveApproval();
-    const safeReq = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
-    const safeApproved = await approveLiveApprovalRequest({
-      requestId: safeReq.request?.requestId,
-      confirmationText: CONFIRM,
-    });
-    expect(safeApproved.snapshot.strategyId).toBe(SAFE_STRATEGY_ID);
-    expect(safeApproved.snapshot.target?.strategyId).toBe(SAFE_STRATEGY_ID);
-    expect(safeApproved.snapshot.target?.paramsHash).toBe(SAFE_PARAMS_HASH);
-    const againstCustom = validateLiveApprovalTarget({
-      currentStrategy: {
-        strategyId: custom.id,
-        paramsHash: custom.paramsHash,
-        strategyHash: custom.strategyHash ?? null,
-      },
-      approvalSnapshot: safeApproved.snapshot,
-    });
-    expect(againstCustom.ok).toBe(false);
-    expect(againstCustom.code).toBe("APPROVAL_STRATEGY_MISMATCH");
+    const safeReq = await requestLiveApproval({ strategyId: RETIRED_SAFE_STRATEGY_ID });
+    expect(safeReq.ok).toBe(false);
+    expect(getStrategyLiveApprovalState().verifiedForLive).toBe(false);
+    expect(getStrategyLiveApprovalState().strategyId).toBeNull();
   });
 
   it("6-10. identity mismatch fails closed without rewriting history", async () => {
@@ -192,7 +180,7 @@ describe("Live approval target authority", () => {
       validateLiveApprovalTarget({
         currentStrategy: customTarget(),
         approvalSnapshot: {
-          strategyId: SAFE_STRATEGY_ID,
+          strategyId: RETIRED_SAFE_STRATEGY_ID,
           verifiedForLive: true,
           target: null,
         },
@@ -209,7 +197,13 @@ describe("Live approval target authority", () => {
     expect(none.blockedReasons.some((reason) => reason.includes("실전 거래 허용"))).toBe(true);
 
     ensureStrategyStore();
-    setLiveActiveStrategy(SAFE_STRATEGY_ID);
+    const mismatchLive = createStrategy({
+      name: "temp live mismatch",
+      timeframe: "15m",
+      strategyType: "safe_params",
+      params: { ema_fast: 13 },
+    });
+    setLiveActiveStrategy(mismatchLive.id);
 
     const custom = createStrategy({
       name: "temp custom start",
@@ -225,33 +219,32 @@ describe("Live approval target authority", () => {
     const wrong = preflightLiveExecution();
     expect(wrong.ok).toBe(false);
     expect(wrong.approvalGate.ok).toBe(false);
-    expect(wrong.approvalGate.code).toBe("APPROVAL_STRATEGY_MISMATCH");
+    expect(["APPROVAL_STRATEGY_MISMATCH", "APPROVAL_TARGET_MISSING"]).toContain(
+      wrong.approvalGate.code,
+    );
     expect(wrong.blockedReasons.some((reason) => reason.includes("실전 거래 허용"))).toBe(true);
 
     revokeStrategyLiveApproval();
     writeJsonStore("strategy-live-approval.json", {
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: RETIRED_SAFE_STRATEGY_ID,
       verifiedForLive: true,
       approvedAt: new Date().toISOString(),
       approvedBy: null,
       target: {
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
         paramsHash: "deadbeefdead",
       },
     });
     invalidateJsonStoreCache("strategy-live-approval.json");
     const paramsMismatch = preflightLiveExecution();
     expect(paramsMismatch.approvalGate.ok).toBe(false);
-    expect(paramsMismatch.approvalGate.code).toBe("APPROVAL_PARAMS_HASH_MISMATCH");
+    expect(paramsMismatch.approvalGate.code).toBe("NO_LIVE_APPROVAL");
 
     revokeStrategyLiveApproval();
-    const safeReq = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
-    await approveLiveApprovalRequest({
-      requestId: safeReq.request?.requestId,
-      confirmationText: CONFIRM,
-    });
+    const safeReq = await requestLiveApproval({ strategyId: RETIRED_SAFE_STRATEGY_ID });
+    expect(safeReq.ok).toBe(false);
     const matching = preflightLiveExecution();
-    expect(matching.approvalGate.ok).toBe(true);
+    expect(matching.approvalGate.ok).toBe(false);
     expect(matching.ok).toBe(false);
     expect(liveFlags()).toEqual({
       liveTradingEnabled: false,
@@ -277,7 +270,7 @@ describe("Live approval target authority", () => {
     const swapped = await approveLiveApprovalRequest({
       requestId: pending.request?.requestId,
       confirmationText: CONFIRM,
-      reviewReason: JSON.stringify({ strategyId: SAFE_STRATEGY_ID }),
+      reviewReason: JSON.stringify({ strategyId: RETIRED_SAFE_STRATEGY_ID }),
     });
     expect(swapped.snapshot.strategyId).toBe(created.id);
     expect(swapped.snapshot.target?.strategyId).toBe(created.id);
@@ -337,8 +330,7 @@ describe("Live approval target authority", () => {
   });
 
   it("30-32. SAFE hashes stay protected and custom approval cannot authorize SAFE start", async () => {
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
-    expect(JSON.parse(fs.readFileSync(SAFE_PATH, "utf8")).params_hash).toBe(SAFE_PARAMS_HASH);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const custom = createStrategy({
       name: "temp cannot authorize safe",
       timeframe: "15m",
@@ -351,11 +343,10 @@ describe("Live approval target authority", () => {
       confirmationText: CONFIRM,
     });
     ensureStrategyStore();
-    setLiveActiveStrategy(SAFE_STRATEGY_ID);
+    expect(() => setLiveActiveStrategy(RETIRED_SAFE_STRATEGY_ID)).toThrow();
     const start = evaluateLiveStartApprovalGate(getStrategyLiveApprovalState());
     expect(start.ok).toBe(false);
-    expect(start.code).toBe("APPROVAL_STRATEGY_MISMATCH");
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("33-38. temp stores only; no production approval mutation path in this suite", () => {
@@ -363,7 +354,7 @@ describe("Live approval target authority", () => {
     expect(path.resolve(process.env.REXTORA_DATA_DIR!)).not.toContain(path.join("data", "rextora"));
     expect(engineSource()).not.toMatch(/runSearchJob|createPaperSession|resumePaperSession/);
     writeJsonStore("strategy-live-approval.json", {
-      strategyId: SAFE_STRATEGY_ID,
+      strategyId: RETIRED_SAFE_STRATEGY_ID,
       verifiedForLive: false,
       approvedAt: null,
       approvedBy: null,

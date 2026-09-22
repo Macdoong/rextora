@@ -8,12 +8,16 @@ import { startPaperBot, stopPaperBot } from "@/src/lib/rextora/paperTradingEngin
 import { getRiskStatus, updateRiskSettings } from "@/src/lib/rextora/riskManager";
 import { shouldEmergencyStop } from "@/src/lib/rextora/safety";
 import { blockUnverifiedStrategies, generateRandomStrategies, rankStrategies } from "@/src/lib/rextora/strategyDiscoveryEngine";
-import { getPreservedSafeStrategy, getStrategies, getStrategyById } from "@/src/lib/rextora/strategyRepository";
+import { getStrategies, getStrategyById } from "@/src/lib/rextora/strategyRepository";
+import { NO_SELECTED_STRATEGY } from "@/src/lib/rextora/strategy/retiredSafeBaseline";
 import { getTpSlStatus } from "@/src/lib/rextora/tpSlManager";
 import type { AlertRule, EngineResult, RiskStatus, TradingMode } from "../types";
 
 export class BacktestEngine {
-  async run(strategyId = getPreservedSafeStrategy().id) {
+  async run(strategyId?: string) {
+    if (!strategyId) {
+      throw new Error(NO_SELECTED_STRATEGY);
+    }
     return runBacktest(strategyId);
   }
 }
@@ -113,7 +117,10 @@ export class StrategyDiscoveryService {
 
 export class StrategyValidationService {
   validate(strategyId: string) {
-    const strategy = getStrategyById(strategyId) ?? getPreservedSafeStrategy();
+    const strategy = getStrategyById(strategyId);
+    if (!strategy) {
+      throw new Error("전략을 찾을 수 없습니다.");
+    }
     return {
       strategy,
       liveEligible: strategy.liveEligible,

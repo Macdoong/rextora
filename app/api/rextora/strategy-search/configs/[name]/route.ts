@@ -7,19 +7,25 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import {
+  requireAuthenticatedUser,
+  requirePermission,
+} from "@/src/lib/rextora/auth/requireUser";
 
 type RouteContext = { params: Promise<{ name: string }> };
 
 /** GET /api/rextora/strategy-search/configs/[name] */
-export async function GET(_request: Request, context: RouteContext) {
-  const denied = await denyUnlessAuthenticated(_request);
-  if (denied) return denied;
+export async function GET(request: Request, context: RouteContext) {
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   const start = Date.now();
   try {
     const { name } = await context.params;
-    const data = loadStrategySearchConfig(decodeURIComponent(name));
+    const data = loadStrategySearchConfig(decodeURIComponent(name), {
+      ownerUserId: auth.user.userId,
+      viewerRole: auth.user.role,
+    });
     if (!data) {
       throw new StrategySearchApiError("JOB_NOT_FOUND", "config not found", 404);
     }
@@ -30,13 +36,15 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 /** DELETE /api/rextora/strategy-search/configs/[name] */
-export async function DELETE(_request: Request, context: RouteContext) {
-  const denied = await denyUnlessPermitted(_request, "research:run");
-  if (denied) return denied;
+export async function DELETE(request: Request, context: RouteContext) {
+  const auth = requirePermission(request, "research:run");
+  if (!auth.ok) return auth.response;
   const start = Date.now();
   try {
     const { name } = await context.params;
-    const deleted = deleteStrategySearchConfig(decodeURIComponent(name));
+    const deleted = deleteStrategySearchConfig(decodeURIComponent(name), {
+      ownerUserId: auth.user.userId,
+    });
     if (!deleted) {
       throw new StrategySearchApiError("JOB_NOT_FOUND", "config not found", 404);
     }

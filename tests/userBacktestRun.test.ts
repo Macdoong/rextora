@@ -45,14 +45,11 @@ function stubReport(
 }
 
 describe("user Backtest Run workflow", () => {
-  let prevCwd: string;
   let tmp: string;
   let restoreDataDir: (() => void) | undefined;
 
   beforeEach(() => {
     tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-bt-run-"));
-    prevCwd = process.cwd();
-    process.chdir(tmp);
     const dataRoot = path.join(tmp, "data", "rextora");
     fs.mkdirSync(path.join(dataRoot, "backtests"), { recursive: true });
     restoreDataDir = overrideRextoraDataDir(dataRoot);
@@ -61,7 +58,6 @@ describe("user Backtest Run workflow", () => {
   afterEach(() => {
     restoreDataDir?.();
     restoreDataDir = undefined;
-    process.chdir(prevCwd);
     fs.rmSync(tmp, { recursive: true, force: true });
   });
 
@@ -109,9 +105,9 @@ describe("user Backtest Run workflow", () => {
     expect(a.sourceType).toBe("user_backtest_run");
     const listed = listSavedBacktestsForStrategy("custom_non_safe");
     expect(listed.length).toBeGreaterThanOrEqual(2);
-    // Must not write under production repo storage
-    expect(fs.realpathSync(process.cwd())).toBe(fs.realpathSync(tmp));
-    expect(fs.realpathSync(process.cwd())).not.toBe(fs.realpathSync(ROOT));
+    // Isolation is via REXTORA_DATA_DIR, not process.chdir (chdir made
+    // productionRextoraDataRootCanonical() collide with the temp write path).
+    expect(fs.realpathSync(process.cwd())).toBe(fs.realpathSync(ROOT));
     expect(
       fs.existsSync(path.join(tmp, "data", "rextora", "backtests", "index.json")),
     ).toBe(true);
@@ -199,7 +195,7 @@ describe("user Backtest Run workflow", () => {
       "utf8",
     );
     expect(wb).toContain("최근 탐색 기록");
-    expect(wb).toContain("개를 보관합니다");
+    expect(wb).toContain("개를 표시합니다");
     expect(wb).not.toMatch(
       /<p className="text-xs text-slate-500">\s*\{STRATEGY_SEARCH_HISTORY_RETENTION_NOTE\}\s*<\/p>/,
     );

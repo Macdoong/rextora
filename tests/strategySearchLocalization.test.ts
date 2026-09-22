@@ -103,16 +103,17 @@ describe("strategy search Korean localization polish", () => {
 
   it("Korean field labels and primary CTA render", () => {
     const form = read("JobCreateForm.tsx");
-    expect(form).toContain("탐색 목표 설정");
+    expect(form).toContain("탐색 범위 설정");
     expect(form).toContain("탐색 대상");
     expect(form).toContain("탐색 시간");
-    expect(form).toContain("초보자 프리셋");
+    expect(form).toContain("탐색 프리셋");
     expect(form).toContain("최대 허용 낙폭");
     expect(form).toContain("탐색 기준");
     expect(form).toContain("고급 탐색 설정");
-    expect(form).toContain("연구 시작");
+    expect(form).toContain("자동 탐색 시작");
+    expect(form).toContain("선택 범위로 탐색 시작");
     expect(form).toContain("탐색 이름");
-    expect(form).toContain("목표 합격 전략 수");
+    expect(form).toContain("목표 합격 후보");
     expect(form).toContain("비용 검증");
     expect(form).toContain("안정성 검증");
     expect(form).toContain("전문가 조건");
@@ -123,14 +124,14 @@ describe("strategy search Korean localization polish", () => {
     const form = read("JobCreateForm.tsx");
     for (const title of [
       "핵심 탐색 설정",
-      "전략 범위",
+      "패턴 · 조합 조건",
       "패턴 탐색",
       "데이터 및 기간",
       "위험 및 레버리지",
       "검증 강도",
       "실행 및 자원 제한",
       "전문가 조건",
-      "적용 설정 요약",
+      "현재 적용 설정",
     ]) {
       expect(form).toContain(title);
     }
@@ -155,18 +156,18 @@ describe("strategy search Korean localization polish", () => {
     expect(src).toContain("일시정지");
     expect(src).toContain("연구 시간");
     expect(src).toContain("평가");
-    expect(src).toContain("기본 합격");
+    expect(src).toContain("통과 후보");
     expect(src).toContain("최종 적격");
-    expect(src).toContain("TOP 10");
+    expect(src).toContain("저장 후보 목록");
     expect(src).toContain("등록");
     expect(src).toContain("백테스트 추천");
     expect(src).toContain("최종 정리 후 최고");
     expect(src).toContain("실시간 탐색 최고");
     expect(src).toContain("최고 안정");
-    expect(src).toContain("최종 TOP 10 검토");
+    expect(src).toContain("이 탐색 결과");
     expect(src).toContain("개선 탐색");
     expect(src).toContain("새 탐색 시작");
-    expect(src).toContain("개발자 정보");
+    expect(src).not.toContain("개발자 정보");
     expect(src).toContain("ss-completion-primary-metrics");
     expect(src).toContain("ss-completion-top10-saved");
     expect(src).not.toMatch(/\bcancelled\b.*ss-completion-status-line/);
@@ -176,14 +177,15 @@ describe("strategy search Korean localization polish", () => {
   it("history list shows Korean retention note and delete label", () => {
     const src = read("JobList.tsx");
     expect(src).toContain("최근 탐색 기록");
-    expect(src).toContain("개를 보관합니다");
+    expect(src).toContain("개를 표시합니다");
     expect(src).toContain("ss-history-retention-note");
     expect(src).toContain("기록 삭제");
     expect(src).toContain("이전 기록 보기");
     const wb = read("StrategySearchWorkbench.tsx");
     expect(wb).toContain("STRATEGY_SEARCH_HISTORY_RETENTION_NOTE");
     expect(wb).toContain("ss-open-results");
-    expect(wb).toContain("탐색 결과 열기");
+    expect(wb).toContain("전체 결과");
+    expect(wb).toContain("이 탐색 결과");
   });
 
   it("API payload behavior remains unchanged", () => {
@@ -208,11 +210,7 @@ describe("strategy search Korean localization polish", () => {
     expect(wb).toContain("ConfirmDialog");
   });
 
-  it("SAFE research file preserves locked params_hash", () => {
-    const raw = fs.readFileSync(SAFE, "utf8");
-    expect(raw).toContain("7893ca3f0e30");
-    expect(raw).toContain("SAFE_v44_i4060");
-    const buf = fs.readFileSync(SAFE);
-    expect(buf.length).toBeGreaterThan(100);
+  it("retired SAFE research file is not present", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
   });
 });

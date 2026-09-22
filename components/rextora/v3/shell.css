@@ -499,8 +499,10 @@
 .v3-shell-bottom-link {
   min-height: 44px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   padding: 0 2px;
   border: 0;
   background: transparent;
@@ -594,7 +596,11 @@
   .v3-shell-sidebar [data-testid="shell-lifecycle-nav-backtest"]::after,
   .v3-shell-sidebar [data-testid="shell-lifecycle-nav-paper"]::after,
   .v3-shell-sidebar [data-testid="shell-lifecycle-nav-live-gate"]::after {
-    position: static;
+    content: none;
+    display: none;
+  }
+
+  .v3-shell-sidebar [data-testid="shell-lifecycle-navigation"] .v3-shell-nav-ico {
     display: grid;
     place-items: center;
     width: 25px;
@@ -603,14 +609,7 @@
     border: 1px solid #aeb9c8;
     border-radius: 7px;
     color: #aeb9c8;
-    font-size: 10px;
   }
-
-  .v3-shell-sidebar [data-testid="shell-lifecycle-nav-research"]::after { content: "탐"; }
-  .v3-shell-sidebar [data-testid="shell-lifecycle-nav-strategy"]::after { content: "전"; }
-  .v3-shell-sidebar [data-testid="shell-lifecycle-nav-backtest"]::after { content: "백"; }
-  .v3-shell-sidebar [data-testid="shell-lifecycle-nav-paper"]::after { content: "모"; }
-  .v3-shell-sidebar [data-testid="shell-lifecycle-nav-live-gate"]::after { content: "실"; }
 
   .v3-shell-mode-card.rextora-sidebar-mode {
     padding: 8px;

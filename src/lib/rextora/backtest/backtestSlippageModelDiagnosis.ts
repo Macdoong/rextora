@@ -9,6 +9,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { computeSlippageCost } from "../metrics/unifiedCost";
 import { evaluateCostGuard } from "../cost/costGuard";
@@ -1023,7 +1024,7 @@ export function getImplementationPlan() {
       "funding math",
       "spread math (leave spreadPct deduction)",
       "evaluateCostGuard formula (keep rate*2 estimate)",
-      "SAFE_v44_i4060",
+      "retired SAFE identity",
       "signal/trigger comparisons (high/low vs raw TP/SL)",
       "eventSequenceBacktest / conditionBacktest (parity later)",
       "production saved JSON rewrite",
@@ -1100,7 +1101,7 @@ export function writeP3A51Artifacts(cwd = process.cwd()) {
   write("implementation-plan.json", getImplementationPlan());
   write("production-readonly-hashes.json", {
     ...hashes,
-    safeFileSha: sha256File(path.join(cwd, "data/strategies/SAFE_v44_i4060.json")),
+    safeFileSha: sha256File(path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME)),
   });
   return { dir, hashes };
 }

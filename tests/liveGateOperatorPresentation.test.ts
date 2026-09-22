@@ -11,7 +11,6 @@ import {
   LIVE_GATE_APPROVAL_REQUEST_ACTION,
   LIVE_GATE_APPROVAL_REQUEST_UNAVAILABLE,
   LIVE_GATE_IDENTITY_UNAVAILABLE,
-  LIVE_GATE_OPERATOR_SAFE_STRATEGY_ID,
   LIVE_GATE_PERMISSION_UNAVAILABLE,
   LIVE_GATE_UNAVAILABLE,
   LIVE_GATE_UNKNOWN_FAILURE_TITLE,
@@ -55,7 +54,8 @@ const SAFE_PATH = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
 const SAFE_SHA =
   "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -362,15 +362,14 @@ describe("Live Gate operator presentation", () => {
   });
 
   it("31-36. presentation helpers stay read-only and do not mutate production", () => {
-    const beforeSafe = sha256(SAFE_PATH);
+    const beforeSafe = fs.existsSync(SAFE_PATH) ? sha256(SAFE_PATH) : null;
     const orders = path.join(ROOT, "data/rextora/orders.json");
     const beforeOrders = sha256(orders);
     const livePage = fs.readFileSync(
       path.join(ROOT, "app/live-trading/page.tsx"),
       "utf8",
     );
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
-    expect(LIVE_GATE_OPERATOR_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(livePage).not.toContain("runSearchJob(");
     expect(livePage).not.toContain("createPaperSession");
     expect(livePage).not.toContain("resumePaper");
@@ -420,7 +419,8 @@ describe("Live Gate operator presentation", () => {
       liveTradingEnabled: false,
       allowLiveTrading: false,
     });
-    expect(sha256(SAFE_PATH)).toBe(beforeSafe);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
+    expect(beforeSafe).toBeNull();
     expect(sha256(orders)).toBe(beforeOrders);
   });
 });

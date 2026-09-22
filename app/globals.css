@@ -2435,8 +2435,7 @@ a {
     #ss-section-validation,
     #ss-section-execution,
     #ss-section-engine,
-    #ss-section-expert,
-    #ss-section-config
+    #ss-section-expert
   ) {
   display: none;
 }
@@ -2446,8 +2445,7 @@ a {
     #ss-section-data,
     #ss-section-execution,
     #ss-section-engine,
-    #ss-section-expert,
-    #ss-section-config
+    #ss-section-expert
   ) {
   display: none;
 }
@@ -3386,6 +3384,34 @@ a {
 .v3-oc .op-pipeline-step.v3-oc-stage {
   min-width: 0;
   flex: initial;
+}
+
+@media (max-width: 767px) {
+  .v3-oc .op-pipeline-track.v3-oc-pipeline {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(148px, 52%);
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    min-width: 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .v3-oc .op-pipeline-track.v3-oc-pipeline::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .v3-oc .op-pipeline-step.v3-oc-stage {
+    min-width: 148px;
+    scroll-snap-align: start;
+  }
 }
 
 .v3-oc .op-pipeline-link {

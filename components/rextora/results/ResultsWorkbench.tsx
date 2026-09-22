@@ -8,8 +8,9 @@ import type { StatusBannerStatus } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/rextora/EmptyState";
 import { CurrentResearchResultsPanel } from "@/components/rextora/results/CurrentResearchResultsPanel";
 import { historyStatusLabelKo } from "@/components/rextora/strategySearch/formatters";
+import { buildSearchCompareHref } from "@/components/rextora/strategySearch/searchJobComparison";
+import { SearchJobExportMenu } from "@/components/rextora/strategySearch/SearchJobExportMenu";
 import type { StrategySearchJobStatus } from "@/components/rextora/strategySearch/types";
-import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
 import {
   recommendStrategyAction,
   type StrategyRecommendation,
@@ -174,14 +175,13 @@ const RESULTS_TABS: ReadonlyArray<{
   { id: "explorer", label: "후보 탐색", section: "results-section-top10" },
   { id: "library", label: "전략 보관함", section: "results-section-library" },
   { id: "history", label: "탐색 이력", section: "results-section-history" },
-  { id: "advanced", label: "고급", section: "results-section-safe" },
+  { id: "advanced", label: "고급", section: "results-storage-summary" },
 ];
 
 function sectionToTab(id: string): ResultsTabId {
   if (id === "results-section-library") return "library";
   if (id === "results-section-history") return "history";
   if (
-    id === "results-section-safe" ||
     id === "results-section-raw-mgmt" ||
     id === "results-storage-summary"
   ) {
@@ -383,7 +383,6 @@ export function ResultsWorkbench() {
   const [relatedRunsBusy, setRelatedRunsBusy] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [safeOpen, setSafeOpen] = useState(false);
   const [storageOpen, setStorageOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("results-section-outcome");
   const LIBRARY_PREVIEW_LIMIT = 5;
@@ -613,9 +612,7 @@ export function ResultsWorkbench() {
   }
 
   const ranked = useMemo(() => {
-    const withBt = strategies.filter(
-      (s) => s.id !== SAFE_STRATEGY_ID && s.lastBacktest,
-    );
+    const withBt = strategies.filter((s) => s.lastBacktest);
     const baseEligible = withBt.filter((s) => {
       const bt = s.lastBacktest!;
       return evaluateHighlightEligibility({
@@ -719,11 +716,7 @@ export function ResultsWorkbench() {
     };
   }, [strategies, loading]);
 
-  const libraryStrategies = useMemo(() => {
-    return strategies.filter(
-      (s) => s.id !== SAFE_STRATEGY_ID || category === "safe",
-    );
-  }, [strategies, category]);
+  const libraryStrategies = useMemo(() => strategies, [strategies]);
 
   const libraryCategoryCounts = useMemo(
     () =>
@@ -752,10 +745,6 @@ export function ResultsWorkbench() {
   }, [libraryStrategies, category, selectedJobId, librarySearch]);
 
   async function setPaper(id: string) {
-    if (id === SAFE_STRATEGY_ID) {
-      setMessage("SAFE는 모의 활성으로 덮어쓰지 않습니다. 복사본을 사용하세요.");
-      return;
-    }
     const row = strategies.find((s) => s.id === id);
     const provenance = parseLibraryProvenance(row?.description);
     setBusyId(id);
@@ -797,10 +786,6 @@ export function ResultsWorkbench() {
   }
 
   function renameDisplay(id: string) {
-    if (id === SAFE_STRATEGY_ID) {
-      setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
-      return;
-    }
     const s = strategies.find((x) => x.id === id);
     const current =
       (s as { displayAlias?: string | null } | undefined)?.displayAlias ||
@@ -845,10 +830,6 @@ export function ResultsWorkbench() {
     id: string,
     action: "restore_alias" | "regenerate_auto_name",
   ) {
-    if (id === SAFE_STRATEGY_ID) {
-      setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
-      return;
-    }
     setBusyId(id);
     try {
       const res = await fetch("/api/rextora/strategies", {
@@ -871,10 +852,6 @@ export function ResultsWorkbench() {
   }
 
   async function setLibraryArchive(id: string, archived: boolean) {
-    if (id === SAFE_STRATEGY_ID) {
-      setMessage("SAFE 전략은 보관할 수 없습니다.");
-      return;
-    }
     setBusyId(id);
     try {
       const res = await fetch("/api/rextora/strategies", {
@@ -953,10 +930,6 @@ export function ResultsWorkbench() {
   }
 
   async function deleteStrategy(id: string) {
-    if (id === SAFE_STRATEGY_ID) {
-      setMessage("SAFE 전략은 삭제할 수 없습니다.");
-      return;
-    }
     const s = strategies.find((x) => x.id === id);
     if (s?.liveActive) {
       setMessage("실전 활성 전략은 삭제할 수 없습니다. 먼저 비활성화하세요.");
@@ -1056,7 +1029,6 @@ export function ResultsWorkbench() {
       passed: s.lastBacktest?.passed ?? null,
       paperActive: Boolean(s.paperActive),
       liveActive: Boolean(s.liveActive),
-      isSafe: s.id === SAFE_STRATEGY_ID,
     });
     const metricState = metricStatusKo({
       hasBacktest: Boolean(s.lastBacktest),
@@ -1069,7 +1041,6 @@ export function ResultsWorkbench() {
     const paperAction = paperActionForStrategy(paperSession, s.id);
     const liveGate = evaluateLiveCandidateRegistration({
       strategyId: s.id,
-      isSafe: s.id === SAFE_STRATEGY_ID,
       paperActive: Boolean(s.paperActive),
       liveActive: Boolean(s.liveActive),
       liveEligible: s.liveEligible,
@@ -1159,7 +1130,7 @@ export function ResultsWorkbench() {
               <Button
                 size="sm"
                 tone="success"
-                disabled={busyId === s.id || s.id === SAFE_STRATEGY_ID}
+                disabled={busyId === s.id}
                 onClick={() => void setPaper(s.id)}
               >
                 {paperAction.label}
@@ -1235,10 +1206,8 @@ export function ResultsWorkbench() {
     });
     return sorted;
   }, [jobs, historySearch, historySort]);
-  const safe = strategies.find((s) => s.id === SAFE_STRATEGY_ID) ?? null;
-  const nonSafe = strategies.filter((s) => s.id !== SAFE_STRATEGY_ID);
-  const paperCount = nonSafe.filter((s) => s.paperActive).length;
-  const liveCount = nonSafe.filter((s) => s.liveActive || s.liveEligible).length;
+  const paperCount = strategies.filter((s) => s.paperActive).length;
+  const liveCount = strategies.filter((s) => s.liveActive || s.liveEligible).length;
 
   async function previewJobImpact(jobId: string) {
     setHistoryBusyJobId(jobId);
@@ -1337,7 +1306,7 @@ export function ResultsWorkbench() {
     }
     setConfirmState({
       title: "원본 후보 정리",
-      description: "보호되지 않은 원본 trial만 삭제합니다. TOP 10·등록·참조 trial은 유지됩니다. 계속할까요?",
+      description: "보호되지 않은 원본 평가 기록만 삭제합니다. TOP 10·등록·참조 후보는 유지됩니다. 계속할까요?",
       confirmLabel: "정리 실행",
       onConfirm: async () => {
         await _doCleanupRawTrials(jobId, false);
@@ -1390,7 +1359,7 @@ export function ResultsWorkbench() {
     }
     setConfirmState({
       title: "탐색 작업 삭제",
-      description: `trial ${impact.trialCount}개 · TOP 10 ${impact.top10Count}개 · ${formatBytes(impact.bytesToRemove)}를 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+      description: `평가 기록 ${impact.trialCount}개 · TOP 10 ${impact.top10Count}개 · ${formatBytes(impact.bytesToRemove)}를 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
       confirmLabel: "삭제",
       onConfirm: async () => {
         setHistoryBusyJobId(jobId);
@@ -1576,16 +1545,13 @@ export function ResultsWorkbench() {
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
-  }, [selectedJobId, libraryOpen, historyOpen, safeOpen, loading]);
+  }, [selectedJobId, libraryOpen, historyOpen, loading]);
 
   function goToSection(id: string) {
     const nextTab = sectionToTab(id);
     setResultsTab(nextTab);
     if (id === "results-section-library" || nextTab === "library") {
       setLibraryOpen(true);
-    }
-    if (id === "results-section-safe" || nextTab === "advanced") {
-      setSafeOpen(true);
     }
     if (id === "results-raw-candidates" || nextTab === "explorer") {
       window.setTimeout(() => {
@@ -1718,6 +1684,21 @@ export function ResultsWorkbench() {
               요약 다시 불러오기
             </button>
           </div>
+          <div className="v3-res-status-cell">
+            <Link
+              href={buildSearchCompareHref({ left: selectedJobId })}
+              className="v3-res-btn-ghost"
+              data-testid="ss-compare-entry"
+            >
+              탐색 결과 비교
+            </Link>
+          </div>
+          <div className="v3-res-status-cell">
+            <SearchJobExportMenu
+              jobId={selectedJobId}
+              status={selectedJob?.status}
+            />
+          </div>
         </section>
       ) : null}
 
@@ -1743,14 +1724,14 @@ export function ResultsWorkbench() {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Metric label="탐색 작업" value={storageSummary.activeJobs} />
               <Metric label="보관됨" value={storageSummary.archivedJobs} />
-              <Metric label="trial 파일" value={storageSummary.totalTrialFiles} />
+              <Metric label="평가 기록 파일" value={storageSummary.totalTrialFiles} />
               <Metric
                 label="디스크 사용"
                 value={formatBytes(storageSummary.totalBytes)}
               />
             </div>
             <p className="mt-2 text-xs text-slate-500">
-              TOP 10 {storageSummary.top10Files}개 · 원본 trial 보존 정책{" "}
+              TOP 10 {storageSummary.top10Files}개 · 원본 평가 기록 보존 정책{" "}
               {storageSummary.rawTrialRetentionPolicy}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -1845,19 +1826,19 @@ export function ResultsWorkbench() {
           }
         >
           <p className="text-xs text-slate-400" data-testid="library-summary">
-            등록 전략 {nonSafe.length}개 · 모의매매 {paperCount}개 · 실전 검토{" "}
+            등록 전략 {strategies.length}개 · 모의매매 {paperCount}개 · 실전 검토{" "}
             {liveCount}개 · 백테스트 완료 {libraryCategoryCounts.backtested}개 ·
             검토 대기 {libraryCategoryCounts.review}개 · 보관{" "}
             {libraryCategoryCounts.archive}개
           </p>
           {!libraryOpen ? (
             <p className="mt-2 text-xs text-slate-500">
-              이미 등록된 전략입니다. 이번 탐색의 합격 trial과는 별도입니다.
+              이미 등록된 전략입니다. 이번 탐색의 통과 후보와는 별도입니다.
             </p>
           ) : (
             <>
               <p className="mb-3 mt-2 text-xs text-slate-400">
-                이미 등록된 전략입니다. 이번 탐색의 합격 trial과는 별도입니다.
+                이미 등록된 전략입니다. 이번 탐색의 통과 후보와는 별도입니다.
                 기본 {LIBRARY_PREVIEW_LIMIT}개만 미리보기합니다.
               </p>
               <label className="mb-3 block">
@@ -2007,7 +1988,7 @@ export function ResultsWorkbench() {
                                   role="menuitem"
                                   className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
                                   disabled={
-                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                    busyId === s.id
                                   }
                                   onClick={() => {
                                     setOpenMenuId(null);
@@ -2022,7 +2003,7 @@ export function ResultsWorkbench() {
                                   role="menuitem"
                                   className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
                                   disabled={
-                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                    busyId === s.id
                                   }
                                   onClick={() => {
                                     setOpenMenuId(null);
@@ -2055,7 +2036,7 @@ export function ResultsWorkbench() {
                                   role="menuitem"
                                   className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
                                   disabled={
-                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                    busyId === s.id
                                   }
                                   onClick={() => {
                                     setOpenMenuId(null);
@@ -2070,7 +2051,7 @@ export function ResultsWorkbench() {
                                   role="menuitem"
                                   className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
                                   disabled={
-                                    busyId === s.id || s.id === SAFE_STRATEGY_ID
+                                    busyId === s.id
                                   }
                                   onClick={() => {
                                     setOpenMenuId(null);
@@ -2102,8 +2083,7 @@ export function ResultsWorkbench() {
                                       role="menuitem"
                                       className="w-full rounded-md px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800 disabled:opacity-40"
                                       disabled={
-                                        busyId === s.id ||
-                                        s.id === SAFE_STRATEGY_ID
+                                        busyId === s.id
                                       }
                                       onClick={() => {
                                         setOpenMenuId(null);
@@ -2121,7 +2101,6 @@ export function ResultsWorkbench() {
                                   className="w-full rounded-md px-3 py-2 text-left text-sm text-rose-300 hover:bg-rose-950/50 disabled:opacity-40"
                                   disabled={
                                     busyId === s.id ||
-                                    s.id === SAFE_STRATEGY_ID ||
                                     Boolean(s.paperActive) ||
                                     Boolean(s.liveActive)
                                   }
@@ -2253,7 +2232,7 @@ export function ResultsWorkbench() {
       <section id="results-section-raw-mgmt" data-testid="results-raw-trial-mgmt">
         <Card title="원본 후보 관리">
           <p className="mb-3 text-sm text-slate-400">
-            원본 trial은 재현용 증거입니다. 기본 화면에는 TOP 10만 표시하며, 정리는
+            원본 평가 기록은 재현용 증거입니다. 기본 화면에는 TOP 10만 표시하며, 정리는
             미리보기 후 보호되지 않은 항목만 삭제합니다. 기본 보존 정책:{" "}
             <span className="text-slate-200">
               {storageSummary?.rawTrialRetentionPolicy ?? "keep_30_days"}
@@ -2299,8 +2278,8 @@ export function ResultsWorkbench() {
                   className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
                   data-testid="raw-trial-preview-stats"
                 >
-                  <Metric label="유지 trial" value={rawPreview.retainedTrialCount} />
-                  <Metric label="보호 trial" value={rawPreview.protectedTrialCount} />
+                  <Metric label="유지 기록" value={rawPreview.retainedTrialCount} />
+                  <Metric label="보호 기록" value={rawPreview.protectedTrialCount} />
                   <Metric
                     label="삭제 가능"
                     value={rawPreview.deletableTrialCount}
@@ -2312,7 +2291,7 @@ export function ResultsWorkbench() {
                 </div>
               ) : (
                 <p className="text-xs text-slate-500">
-                  선택한 연구 작업의 원본 trial 정리 미리보기를 실행하세요.
+                  선택한 연구의 원본 평가 기록 정리 미리보기를 실행하세요.
                 </p>
               )}
             </div>
@@ -2625,7 +2604,7 @@ export function ResultsWorkbench() {
                               </p>
                             ) : null}
                             <p className="mt-1">
-                              작업 {impact.researchJobCount} · trial{" "}
+                              작업 {impact.researchJobCount} · 평가 기록{" "}
                               {impact.trialCount} · TOP 10 {impact.top10Count} ·
                               등록 전략 {impact.registeredStrategyRefs.length} ·
                               Backtest {impact.backtestRefs.length} · Paper{" "}
@@ -2657,57 +2636,6 @@ export function ResultsWorkbench() {
               <Button size="sm">새 탐색 시작</Button>
             </Link>
           </div>
-        </Card>
-      </section>
-      </div>
-
-      <div hidden={resultsTab !== "advanced"}>
-      <section id="results-section-safe" data-testid="results-safe-baseline">
-        <Card
-          title="SAFE 기준 전략"
-          action={
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSafeOpen((v) => !v)}
-              data-testid="safe-toggle"
-              aria-expanded={safeOpen}
-            >
-              {safeOpen ? "접기" : "펼치기"}
-            </Button>
-          }
-        >
-          <p className="text-xs text-slate-400">
-            보호 기준선 · 읽기 전용 · 자동 탐색/수정 금지
-          </p>
-          {safeOpen ? (
-            loading && !safe ? (
-              <EmptyState
-                message="보호 전략을 확인하는 중입니다…"
-                hint="잠시만 기다려 주세요."
-              />
-            ) : safe ? (
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="font-semibold text-slate-100">{safe.name}</div>
-                  <details className="mt-1 text-xs text-slate-500">
-                    <summary className="cursor-pointer select-none">기술 정보</summary>
-                    <p className="mt-1">해시 {safe.paramsHash}</p>
-                  </details>
-                </div>
-                <Link href={`/backtest?strategyId=${SAFE_STRATEGY_ID}`}>
-                  <Button size="sm" variant="outline">
-                    기준 백테스트
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <EmptyState
-                message="보호 전략(SAFE)을 불러오지 못했습니다."
-                hint="페이지를 새로고침하거나 시스템 설정의 데이터 상태를 확인하세요."
-              />
-            )
-          ) : null}
         </Card>
       </section>
       </div>

@@ -4,7 +4,6 @@
  * Client-safe: no Node/fs.
  */
 
-export const BACKTEST_OPERATOR_SAFE_STRATEGY_ID = "SAFE_v44_i4060";
 export const BACKTEST_OPERATOR_UNAVAILABLE = "데이터 없음";
 export const BACKTEST_OPERATOR_UNKNOWN_FAILURE_TITLE = "검증 실패";
 
@@ -335,12 +334,6 @@ export function backtestOperatorStrategyTypeLabel(input: {
   hasEventSequence?: boolean | null;
   patternCombination?: string | null;
 }): string {
-  if (
-    input.strategyId === BACKTEST_OPERATOR_SAFE_STRATEGY_ID ||
-    input.locked === true
-  ) {
-    return "SAFE";
-  }
   if (input.patternCombination) return "패턴 조합";
   if (input.hasEventSequence) return "패턴";
   return "일반";
@@ -725,8 +718,6 @@ export function backtestOperatorValidationChecks(input: {
   const coverageOk = report?.dataCoverage == null || report.dataCoverage.sufficient !== false;
   const futureBlocked = input.failureCode === "FUTURE_DATA_BLOCKED";
   const tradeCount = finiteOrNull(report?.tradeCount);
-  const safe =
-    input.strategyId === BACKTEST_OPERATOR_SAFE_STRATEGY_ID;
 
   return [
     {
@@ -746,16 +737,6 @@ export function backtestOperatorValidationChecks(input: {
       statusLabelKo: validation?.paramsHashVerified ? "일치" : "불일치",
       explanationKo: params.explanationKo,
       technical: input.paramsHash ?? report?.sourceParamsHash ?? null,
-    },
-    {
-      id: "safe_protection",
-      labelKo: "SAFE 보호",
-      status: "info",
-      statusLabelKo: safe ? "보호 대상" : "해당 없음",
-      explanationKo: safe
-        ? "이 전략은 보호 기준 SAFE입니다. 백테스트 화면에서 정의를 바꾸지 않습니다."
-        : "선택한 전략은 SAFE가 아닙니다. SAFE 정의는 이 화면에서 변경되지 않습니다.",
-      technical: BACKTEST_OPERATOR_SAFE_STRATEGY_ID,
     },
     {
       id: "fee_model",

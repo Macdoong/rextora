@@ -67,13 +67,13 @@ describe("lifecycle redesign fixes", () => {
       path.join(ROOT, "components/rextora/strategySearch/JobCreateForm.tsx"),
       "utf8",
     );
-    expect(form).toContain("ss-advanced-settings-link");
-    expect(form).toContain("고급 탐색 설정");
+    expect(form).toContain("ss-validation-advanced-trigger");
+    expect(form).not.toContain("ss-advanced-settings-link");
     expect(form).toContain("#ss-section-engine");
     expect(form).not.toMatch(/open=\{form\.showAdvanced\}/);
     expect(form).toContain("탐색 대상");
     expect(form).toContain("탐색 시간");
-    expect(form).toContain("초보자 프리셋");
+    expect(form).toContain("탐색 프리셋");
     expect(form).toContain("최대 허용 낙폭");
     expect(form).toContain("탐색 기준");
     expect(form).toContain("ss-section-expert");
@@ -157,7 +157,7 @@ describe("lifecycle redesign fixes", () => {
     expect(src).toContain("expertMode || expertQuery");
     expect(src).toContain("backtest-paper-action");
     expect(src).toContain("backtest-live-action");
-    expect(src).toContain("선택된 전략이 없어 보호 기준 전략 SAFE를 표시합니다.");
+    expect(src).toContain("전략 미선택");
   });
 
   it("paper page has one control bar and canonical status mapping", () => {

@@ -3,17 +3,17 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { restoreStrategySearchJobApi } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
+import { requireSearchJobAccess } from "@/src/lib/rextora/auth/requireSearchJobAccess";
 
 type Ctx = { params: Promise<{ jobId: string }> };
 
 /** POST /api/rextora/strategy-search/[jobId]/restore — restore archived job to history */
-export async function POST(_request: Request, context: Ctx) {
-  const denied = await denyUnlessPermitted(_request, "research:run");
-  if (denied) return denied;
+export async function POST(request: Request, context: Ctx) {
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "write", "research:run");
+    if (!access.ok) return access.response;
     const data = restoreStrategySearchJobApi(jobId);
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {

@@ -94,6 +94,11 @@ export interface StoredStrategy {
   liveEligible: boolean;
   createdAt: string;
   updatedAt: string;
+  /**
+   * Customer user who created/registered this strategy.
+   * Absent/null on pre-ownership records. Locked SAFE remains product-shared.
+   */
+  ownerUserId?: string | null;
   lastBacktest?: {
     totalReturn: number;
     mdd: number;
@@ -140,7 +145,3 @@ export interface SafeV44StrategyMetadata {
   hashVerified: boolean;
   notes: string[];
 }
-
-export const EXPECTED_SAFE_PARAMS_HASH = "7893ca3f0e30";
-export const SAFE_STRATEGY_NAME = "SAFE_v44_i4060";
-export const SAFE_STRATEGY_ID = "SAFE_v44_i4060";

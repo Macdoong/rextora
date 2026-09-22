@@ -583,9 +583,9 @@ describe("P3-A7.2.1 evaluation identity completeness", () => {
     expect(src).toMatch(/export function computeParamsHash/);
     expect(src).toMatch(/digest\("hex"\)\.slice\(0, 12\)/);
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
     expect(hashes.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(hashes.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(hashes.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
   });
 });

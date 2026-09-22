@@ -1,7 +1,11 @@
 /**
- * Bounded Strategy Search history retention.
+ * Strategy Search history visibility vs explicit physical cleanup.
  *
- * Keeps newest terminal eligible jobs up to a fixed limit.
+ * Visible history lists default to the newest 20 jobs (list/API limit).
+ * Creating a job must not physically delete older completed research.
+ * enforceHistoryRetention is explicit cleanup only — not an automatic
+ * create-time policy. Manual deleteSearchJob remains the customer path.
+ *
  * Never deletes active/transitional jobs or strategy-referenced provenance jobs.
  * Does not touch Strategy Management records or SAFE strategy files.
  */
@@ -20,7 +24,10 @@ import { isProvenanceDetached } from "./researchProvenance";
 import { parseSourceResearchJobId } from "./researchResultsSummary";
 import type { StrategySearchJob, StrategySearchJobStatus } from "./types";
 
-/** Default maximum retained eligible (terminal, deletable) jobs on disk. */
+/**
+ * Default maxRetained only when enforceHistoryRetention is invoked explicitly.
+ * Not applied on job create. Not a customer-facing automatic storage policy.
+ */
 export const STRATEGY_SEARCH_HISTORY_RETENTION_DEFAULT = 20;
 
 /** Default maximum jobs returned/shown in history UI (newest first). */
@@ -352,7 +359,8 @@ export function classifyJobForRetention(
 }
 
 /**
- * Enforce retention: delete oldest eligible terminal jobs until count ≤ limit.
+ * Explicit physical cleanup: delete oldest eligible terminal jobs until count ≤ limit.
+ * Must not be called from normal job create.
  * Failures are collected as warnings; never throws for cleanup errors.
  */
 export function enforceHistoryRetention(
@@ -443,7 +451,10 @@ export function enforceHistoryRetention(
   };
 }
 
-/** Non-fatal wrapper used after successful job create. */
+/**
+ * Explicit non-fatal wrapper around enforceHistoryRetention.
+ * Kept for tests/manual cleanup. Normal job create must not call this.
+ */
 export function runHistoryRetentionAfterCreate(
   options?: StrategySearchStoreOptions & { maxRetained?: number },
 ): HistoryRetentionResult {

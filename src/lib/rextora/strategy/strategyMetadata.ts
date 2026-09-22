@@ -1,6 +1,6 @@
 import { getStrategyById, listStrategies } from "./strategyStore";
 import type { StoredStrategyV1 } from "./definition/bridge";
-import { SAFE_STRATEGY_ID, type StoredStrategy } from "./strategyTypes";
+import type { StoredStrategy } from "./strategyTypes";
 import { displaySourceStatus, displayTimeframeLabel } from "../displayLabels";
 import { isPollutionCloneName, isTestStrategyRecord } from "./strategyTestFilter";
 
@@ -36,7 +36,7 @@ export function listProductionStrategies(): StoredStrategy[] {
 export function getStrategyPublicMeta(id: string): StrategyPublicMeta | null {
   const s = getStrategyById(id) as StoredStrategyV1 | undefined;
   if (!s) return null;
-  const tf = s.id === SAFE_STRATEGY_ID && (s.timeframe === "unknown" || !s.timeframe) ? "15m" : s.timeframe;
+  const tf = s.timeframe;
   return {
     id: s.id,
     name: s.name,

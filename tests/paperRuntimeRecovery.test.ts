@@ -6,11 +6,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
-  copyStrategy,
+  createStrategy,
   ensureStrategyStore,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import {
   applyActivePaperSessionRealizedPnl,
@@ -256,7 +255,7 @@ describe("recoverPaperRuntimeAfterBoot", () => {
     const iso = installIsolatedStrategyStore();
     cleanupStrategies = iso.cleanup;
     ensureStrategyStore();
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "paper_recovery_test");
+    const copy = createStrategy({ name: "paper_recovery_test", timeframe: "15m" });
     strategyId = copy.id;
     setPaperActiveStrategy(strategyId);
     rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-paper-recovery-"));

@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
 import { V3Card } from "@/components/rextora/v3/V3Card";
 import type { LiveReadinessChecklistItem } from "@/src/lib/rextora/liveReadinessChecklist";
-import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
 import {
   LIVE_GATE_APPROVAL_NOT_LIVE_START,
   LIVE_GATE_APPROVAL_REQUEST_UNAVAILABLE,
@@ -271,17 +270,13 @@ export function LiveActivationGates({
         : null;
       const selected =
         fromQuery ??
-        list.find((s) => s.liveActive && s.id !== SAFE_STRATEGY_ID) ??
-        list.find((s) => s.paperActive && s.id !== SAFE_STRATEGY_ID) ??
+        list.find((s) => s.liveActive) ??
+        list.find((s) => s.paperActive) ??
         null;
       if (!selected?.id || !selected.paramsHash) {
         setMessage(
-          "드라이런에 사용할 비-SAFE 전략을 찾지 못했습니다. 탐색 결과/백테스트에서 전략을 선택하세요.",
+          "드라이런에 사용할 전략을 찾지 못했습니다. 탐색 결과/백테스트에서 전략을 선택하세요.",
         );
-        return;
-      }
-      if (selected.id === SAFE_STRATEGY_ID) {
-        setMessage("SAFE 원본으로는 드라이런 검토 대상을 등록하지 않습니다.");
         return;
       }
       let strategyHash = selected.strategyHash ?? null;

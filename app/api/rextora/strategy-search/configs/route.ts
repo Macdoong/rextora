@@ -10,16 +10,22 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import {
+  requireAuthenticatedUser,
+  requirePermission,
+} from "@/src/lib/rextora/auth/requireUser";
 
 /** GET /api/rextora/strategy-search/configs — list saved operator configs */
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   const start = Date.now();
   try {
-    const data = listStrategySearchConfigs();
+    const data = listStrategySearchConfigs({
+      ownerUserId: auth.user.userId,
+      viewerRole: auth.user.role,
+    });
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {
     return strategySearchError(err, Date.now() - start);
@@ -28,14 +34,15 @@ export async function GET(request: Request) {
 
 /** POST /api/rextora/strategy-search/configs — save or manage named operator config */
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "research:run");
-  if (denied) return denied;
+  const auth = requirePermission(request, "research:run");
+  if (!auth.ok) return auth.response;
   const start = Date.now();
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object") {
       throw new StrategySearchApiError("INVALID_REQUEST", "body required", 400);
     }
+    const ownerOpts = { ownerUserId: auth.user.userId };
     const action = (body as { action?: unknown }).action;
     const name = (body as { name?: unknown }).name;
     const newName = (body as { newName?: unknown }).newName;
@@ -48,7 +55,7 @@ export async function POST(request: Request) {
           400,
         );
       }
-      const data = renameStrategySearchConfig(name, newName);
+      const data = renameStrategySearchConfig(name, newName, ownerOpts);
       return strategySearchJson(data, Date.now() - start);
     }
 
@@ -60,7 +67,7 @@ export async function POST(request: Request) {
           400,
         );
       }
-      const data = duplicateStrategySearchConfig(name, newName);
+      const data = duplicateStrategySearchConfig(name, newName, ownerOpts);
       return strategySearchJson(data, Date.now() - start, { status: 201 });
     }
 
@@ -72,7 +79,7 @@ export async function POST(request: Request) {
           400,
         );
       }
-      const data = setDefaultStrategySearchConfig(name);
+      const data = setDefaultStrategySearchConfig(name, ownerOpts);
       return strategySearchJson(data, Date.now() - start);
     }
 
@@ -86,6 +93,7 @@ export async function POST(request: Request) {
     }
     const overwrite = (body as { overwrite?: unknown }).overwrite;
     const data = saveStrategySearchConfig(name, form as never, {
+      ...ownerOpts,
       overwrite: overwrite === false ? false : true,
     });
     return strategySearchJson(data, Date.now() - start, { status: 201 });

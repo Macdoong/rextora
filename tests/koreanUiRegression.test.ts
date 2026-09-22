@@ -70,6 +70,6 @@ describe("Korean UI terminology contract", () => {
     expect(INTENTIONAL_ENGLISH_ALLOWLIST).toContain("API");
     expect(INTENTIONAL_ENGLISH_ALLOWLIST).toContain("AI");
     expect(INTENTIONAL_ENGLISH_ALLOWLIST).toContain("BTCUSDT");
-    expect(INTENTIONAL_ENGLISH_ALLOWLIST).toContain("SAFE_v44_i4060");
+    expect(INTENTIONAL_ENGLISH_ALLOWLIST).not.toContain("SAFE_v44_i4060");
   });
 });

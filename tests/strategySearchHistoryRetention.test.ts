@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -17,6 +16,7 @@ import {
   descriptionReferencesSearchJob,
   enforceHistoryRetention,
   getSearchJob,
+  getStrategySearchJobApi,
   listSearchJobs,
   listStrategySearchJobsApi,
   markSearchJobCancelled,
@@ -35,8 +35,9 @@ import {
 } from "../src/lib/rextora/strategySearch";
 import { getJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import { getSearchPlan } from "../src/lib/rextora/strategySearch/searchPlan";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
-import { getStrategyById, listStrategies } from "../src/lib/rextora/strategy/strategyStore";
+import { createStrategy, getStrategyById, listStrategies } from "../src/lib/rextora/strategy/strategyStore";
+import { buildResearchResultsSummary } from "../src/lib/rextora/strategySearch/researchResultsSummary";
+import { STRATEGY_SEARCH_HISTORY_VISIBLE_DEFAULT } from "../src/lib/rextora/strategySearch/historyRetention";
 
 const SAFE_PATH = path.join(
   process.cwd(),
@@ -434,6 +435,10 @@ describe("strategy search history retention", () => {
       );
     }
     const protectedId = ids[0]!;
+    const registered = createStrategy({
+      name: "retention-anchor",
+      timeframe: "15m",
+    });
     const plan = getSearchPlan(protectedId, { rootDir: root })!;
     saveSearchPlan(
       protectedId,
@@ -444,8 +449,8 @@ describe("strategy search history retention", () => {
             paramsHash: "abc",
             iteration: 0,
             status: "promoted",
-            strategyId: SAFE_STRATEGY_ID,
-            strategyName: "SAFE",
+            strategyId: registered.id,
+            strategyName: registered.name,
             error: null,
             updatedAt: new Date().toISOString(),
           },
@@ -458,7 +463,7 @@ describe("strategy search history retention", () => {
     const result = enforceHistoryRetention({ rootDir: root, maxRetained: 20 });
     expect(result.deletedJobIds).not.toContain(protectedId);
     expect(getSearchJob(protectedId, { rootDir: root })).not.toBeNull();
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.id).toBe(SAFE_STRATEGY_ID);
+    expect(getStrategyById(registered.id)?.id).toBe(registered.id);
   });
 
   it("deletes job-owned trials, checkpoint job file, execution, plan, and index entry", () => {
@@ -528,7 +533,7 @@ describe("strategy search history retention", () => {
     expect(result.deletedJobIds).toEqual([sorted[0]!]);
   });
 
-  it("runs cleanup after successful create and not after failed create", () => {
+  it("create does not physically prune older completed jobs", () => {
     const root = makeTempRoot();
     for (let i = 0; i < 21; i++) {
       seedTerminalJob(
@@ -544,8 +549,9 @@ describe("strategy search history retention", () => {
       rootDir: root,
     });
     expect(created.id).toBeTruthy();
-    expect(getSearchJob(oldest.id, { rootDir: root })).toBeNull();
+    expect(getSearchJob(oldest.id, { rootDir: root })).not.toBeNull();
     expect(getSearchJob(created.id, { rootDir: root })).not.toBeNull();
+    expect(listSearchJobs({ rootDir: root })).toHaveLength(22);
 
     const before = listSearchJobs({ rootDir: root }).length;
     expect(() =>
@@ -631,6 +637,10 @@ describe("strategy search history retention", () => {
     requestCancelSearchJob(cancelling.id, opts);
 
     const protectedId = seedTerminalJob(root, "2026-09-09T00:00:00.000Z");
+    const registered = createStrategy({
+      name: "retention-manual-anchor",
+      timeframe: "15m",
+    });
     const plan = getSearchPlan(protectedId, opts)!;
     saveSearchPlan(
       protectedId,
@@ -641,8 +651,8 @@ describe("strategy search history retention", () => {
             paramsHash: "abc",
             iteration: 0,
             status: "promoted",
-            strategyId: SAFE_STRATEGY_ID,
-            strategyName: "SAFE",
+            strategyId: registered.id,
+            strategyName: registered.name,
             error: null,
             updatedAt: new Date().toISOString(),
           },
@@ -672,11 +682,8 @@ describe("strategy search history retention", () => {
     expect(getSearchJob(protectedId, opts)).not.toBeNull();
   });
 
-  it("SAFE and Strategy Management records remain unchanged", () => {
-    const beforeHash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
+  it("retired SAFE file stays absent and strategy records remain unchanged", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const strategiesBefore = listStrategies()
       .map((s) => s.id)
       .sort();
@@ -690,11 +697,7 @@ describe("strategy search history retention", () => {
     }
     enforceHistoryRetention({ rootDir: root, maxRetained: 20 });
 
-    const afterHash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
-    expect(afterHash).toBe(beforeHash);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(
       listStrategies()
         .map((s) => s.id)
@@ -714,7 +717,8 @@ describe("strategy search history retention", () => {
       "utf8",
     );
     expect(src).toContain("최근 탐색 기록");
-    expect(src).toContain("개를 보관합니다");
+    expect(src).toContain("개를 표시합니다");
+    expect(src).not.toContain("개를 보관합니다");
     expect(src).toContain("ss-history-retention-note");
     expect(src).toContain(String(STRATEGY_SEARCH_HISTORY_RETENTION_DEFAULT));
   });
@@ -742,6 +746,10 @@ describe("strategy search history retention", () => {
       );
     }
     const protectedId = terminalIds[0]!;
+    const registered = createStrategy({
+      name: "retention-integration-anchor",
+      timeframe: "15m",
+    });
     const plan = getSearchPlan(protectedId, opts)!;
     saveSearchPlan(
       protectedId,
@@ -752,8 +760,8 @@ describe("strategy search history retention", () => {
             paramsHash: "prot",
             iteration: 0,
             status: "promoted",
-            strategyId: SAFE_STRATEGY_ID,
-            strategyName: "SAFE",
+            strategyId: registered.id,
+            strategyName: registered.name,
             error: null,
             updatedAt: new Date().toISOString(),
           },
@@ -772,23 +780,256 @@ describe("strategy search history retention", () => {
     expect(remaining.some((j) => j.id === active.id)).toBe(true);
     expect(remaining.some((j) => j.id === protectedId)).toBe(true);
     expect(remaining.some((j) => j.id === created.id)).toBe(true);
+    expect(remaining.length).toBe(24);
 
     const eligible = remaining.filter((j) => {
       const c = classifyJobForRetention(j, opts);
       return c.eligible;
     });
-    expect(eligible.length).toBeLessThanOrEqual(20);
+    expect(eligible.length).toBeGreaterThan(20);
 
-    // Oldest unprotected terminal should be gone
-    expect(getSearchJob(terminalIds[1]!, opts)).toBeNull();
+    expect(getSearchJob(terminalIds[1]!, opts)).not.toBeNull();
     expect(
       fs.existsSync(path.join(root, "trials", terminalIds[1]!)),
-    ).toBe(false);
+    ).toBe(true);
+    expect(listStrategySearchJobsApi(opts)).toHaveLength(20);
 
     const index = JSON.parse(
       fs.readFileSync(path.join(root, "index.json"), "utf8"),
     ) as { version: number; jobs: unknown[] };
     expect(index.version).toBe(1);
     expect(Array.isArray(index.jobs)).toBe(true);
+  });
+});
+
+describe("strategy search visibility vs physical storage", () => {
+  function jobArtifactsExist(root: string, jobId: string): boolean {
+    return (
+      fs.existsSync(path.join(root, "jobs", `${jobId}.json`)) &&
+      fs.existsSync(path.join(root, "jobs", `${jobId}.plan.json`)) &&
+      fs.existsSync(path.join(root, "jobs", `${jobId}.execution.json`)) &&
+      fs.existsSync(path.join(root, "trials", jobId))
+    );
+  }
+
+  it("A: more than 20 eligible completed jobs keep oldest files on disk", () => {
+    const root = makeTempRoot();
+    const ids: string[] = [];
+    for (let i = 0; i < 25; i++) {
+      ids.push(
+        seedTerminalJob(
+          root,
+          `2026-01-15T00:${String(i).padStart(2, "0")}:00.000Z`,
+        ),
+      );
+    }
+    expect(listSearchJobs({ rootDir: root })).toHaveLength(25);
+    expect(jobArtifactsExist(root, ids[0]!)).toBe(true);
+    expect(getSearchJob(ids[0]!, { rootDir: root })).not.toBeNull();
+  });
+
+  it("B: recent visible list still defaults to 20", () => {
+    expect(STRATEGY_SEARCH_HISTORY_VISIBLE_DEFAULT).toBe(20);
+    const root = makeTempRoot();
+    for (let i = 0; i < 25; i++) {
+      seedTerminalJob(
+        root,
+        `2026-01-16T00:${String(i).padStart(2, "0")}:00.000Z`,
+      );
+    }
+    expect(listStrategySearchJobsApi({ rootDir: root })).toHaveLength(20);
+  });
+
+  it("C: 21st job creation does not physically delete by visible-history count", () => {
+    const apiSrc = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src",
+        "lib",
+        "rextora",
+        "strategySearch",
+        "jobApiService.ts",
+      ),
+      "utf8",
+    );
+    expect(apiSrc).not.toContain("runHistoryRetentionAfterCreate");
+    expect(apiSrc).not.toContain("enforceHistoryRetention");
+
+    const root = makeTempRoot();
+    const ids: string[] = [];
+    for (let i = 0; i < 20; i++) {
+      ids.push(
+        seedTerminalJob(
+          root,
+          `2026-01-17T00:${String(i).padStart(2, "0")}:00.000Z`,
+        ),
+      );
+    }
+    const created = createStrategySearchJobApi(validCreateBody({ seed: 21 }), {
+      rootDir: root,
+    });
+    expect(created.id).toBeTruthy();
+    expect(listSearchJobs({ rootDir: root })).toHaveLength(21);
+    expect(jobArtifactsExist(root, ids[0]!)).toBe(true);
+    expect(getSearchJob(ids[0]!, { rootDir: root })).not.toBeNull();
+  });
+
+  it("D: 50+ jobs are not count-pruned on create", () => {
+    const root = makeTempRoot();
+    const ids: string[] = [];
+    for (let i = 0; i < 49; i++) {
+      ids.push(
+        seedTerminalJob(
+          root,
+          `2026-01-18T00:${String(i).padStart(2, "0")}:00.000Z`,
+        ),
+      );
+    }
+    const created = createStrategySearchJobApi(validCreateBody({ seed: 50 }), {
+      rootDir: root,
+    });
+    expect(listSearchJobs({ rootDir: root })).toHaveLength(50);
+    expect(getSearchJob(ids[0]!, { rootDir: root })).not.toBeNull();
+    expect(jobArtifactsExist(root, ids[0]!)).toBe(true);
+    expect(getSearchJob(created.id, { rootDir: root })).not.toBeNull();
+    expect(listStrategySearchJobsApi({ rootDir: root })).toHaveLength(20);
+  });
+
+  it("E: explicit manual delete still removes the requested job artifacts", () => {
+    const root = makeTempRoot();
+    const keep = seedTerminalJob(root, "2026-01-19T00:00:00.000Z");
+    const victim = seedTerminalJob(root, "2026-01-19T01:00:00.000Z");
+    expect(jobArtifactsExist(root, victim)).toBe(true);
+    deleteSearchJob(victim, { rootDir: root });
+    expect(getSearchJob(victim, { rootDir: root })).toBeNull();
+    expect(fs.existsSync(path.join(root, "jobs", `${victim}.json`))).toBe(false);
+    expect(fs.existsSync(path.join(root, "jobs", `${victim}.plan.json`))).toBe(
+      false,
+    );
+    expect(
+      fs.existsSync(path.join(root, "jobs", `${victim}.execution.json`)),
+    ).toBe(false);
+    expect(fs.existsSync(path.join(root, "trials", victim))).toBe(false);
+    expect(jobArtifactsExist(root, keep)).toBe(true);
+  });
+
+  it("F: protected-job behavior is not weakened", () => {
+    const root = makeTempRoot();
+    const opts = { rootDir: root };
+    const protectedId = seedTerminalJob(root, "2026-01-20T00:00:00.000Z");
+    const registered = createStrategy({
+      name: "visibility-anchor",
+      timeframe: "15m",
+    });
+    const plan = getSearchPlan(protectedId, opts)!;
+    saveSearchPlan(
+      protectedId,
+      {
+        ...plan,
+        promotions: [
+          {
+            paramsHash: "vis",
+            iteration: 0,
+            status: "promoted",
+            strategyId: registered.id,
+            strategyName: registered.name,
+            error: null,
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+      },
+      opts,
+    );
+    for (let i = 0; i < 22; i++) {
+      seedTerminalJob(
+        root,
+        `2026-01-20T01:${String(i).padStart(2, "0")}:00.000Z`,
+      );
+    }
+    createStrategySearchJobApi(validCreateBody({ seed: 88 }), opts);
+    expect(getSearchJob(protectedId, opts)).not.toBeNull();
+    expect(classifyJobForRetention(protectedId, opts).eligible).toBe(false);
+    expect(() => deleteStrategySearchJobApi(protectedId, opts)).toThrow(
+      /출처 기록/,
+    );
+  });
+
+  it("G/H: old persisted job remains readable by jobId including results-summary", () => {
+    const root = makeTempRoot();
+    const oldest = seedTerminalJob(root, "2026-01-21T00:00:00.000Z");
+    for (let i = 1; i < 25; i++) {
+      seedTerminalJob(
+        root,
+        `2026-01-21T00:${String(i).padStart(2, "0")}:00.000Z`,
+      );
+    }
+    const listedIds = new Set(
+      listStrategySearchJobsApi({ rootDir: root }).map((j) => j.id),
+    );
+    expect(listedIds.has(oldest)).toBe(false);
+
+    const detail = getStrategySearchJobApi(oldest, { rootDir: root });
+    expect(detail.id).toBe(oldest);
+    const summary = buildResearchResultsSummary(oldest, { rootDir: root });
+    expect(summary.jobId).toBe(oldest);
+  });
+
+  it("I: history customer copy describes display, not false physical retention", () => {
+    const jobList = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components",
+        "rextora",
+        "strategySearch",
+        "JobList.tsx",
+      ),
+      "utf8",
+    );
+    const workbench = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components",
+        "rextora",
+        "strategySearch",
+        "StrategySearchWorkbench.tsx",
+      ),
+      "utf8",
+    );
+    expect(jobList).toContain("개를 표시합니다");
+    expect(workbench).toContain("개를 표시합니다");
+    expect(jobList).not.toContain("개를 보관합니다");
+    expect(workbench).not.toContain("개를 보관합니다");
+  });
+
+  it("J: persistence format is unchanged (index version 1 + job file)", () => {
+    const root = makeTempRoot();
+    const id = seedTerminalJob(root, "2026-01-22T00:00:00.000Z");
+    const index = JSON.parse(
+      fs.readFileSync(path.join(root, "index.json"), "utf8"),
+    ) as { version: number; jobs: Array<{ id: string }> };
+    expect(index.version).toBe(1);
+    const jobRaw = JSON.parse(
+      fs.readFileSync(path.join(root, "jobs", `${id}.json`), "utf8"),
+    ) as { id: string; config: unknown; status: string };
+    expect(jobRaw.id).toBe(id);
+    expect(jobRaw.config).toBeTruthy();
+    expect(typeof jobRaw.status).toBe("string");
+  });
+
+  it("K: create-path change does not import search/ranking/recommendation modules", () => {
+    const apiSrc = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src",
+        "lib",
+        "rextora",
+        "strategySearch",
+        "jobApiService.ts",
+      ),
+      "utf8",
+    );
+    expect(apiSrc).not.toMatch(/from "\.\/candidateEvaluator"/);
+    expect(apiSrc).not.toMatch(/from "\.\/candidateGenerator"/);
+    expect(apiSrc).not.toMatch(/from "\.\.\/results\/recommendation"/);
   });
 });

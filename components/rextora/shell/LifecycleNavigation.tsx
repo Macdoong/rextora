@@ -8,6 +8,7 @@ import {
   SIDEBAR_NAV_ITEMS,
   type LifecycleNavigationItem,
 } from "./navigationModel";
+import { NavIcon } from "./NavIcons";
 
 export type { LifecycleNavigationItem };
 
@@ -145,7 +146,12 @@ export function LifecycleNavigation({
                   : `${presentation.link} ${linkStateClassName(destinationSelected)}`
               }
             >
-              {visibleLabel}
+              {compact ? (
+                <span className="v3-shell-nav-ico" aria-hidden="true">
+                  <NavIcon id={item.id} />
+                </span>
+              ) : null}
+              <span className="v3-shell-nav-label">{visibleLabel}</span>
             </Link>
           </div>
         );

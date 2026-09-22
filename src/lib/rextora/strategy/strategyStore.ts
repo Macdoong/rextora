@@ -1,17 +1,19 @@
 import crypto from "node:crypto";
 import strategyRuntimeIo from "@rextora/strategy-runtime-io";
-import { CONTEXT_FALLBACK_PARAMS, mergeSafeParams } from "./safeV44Params";
+import { GENERIC_SEARCH_BASELINE_PARAMS, mergeSafeParams } from "./safeV44Params";
 import { computeParamsHash, computeStrategyHash } from "./strategyHash";
-import { loadSafeV44Strategy } from "./safeV44Strategy";
 import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-  SAFE_STRATEGY_NAME,
   type SafeV44Params,
   type StoredStrategy,
   type StrategyIndexFile,
   type StrategyTimeframe
 } from "./strategyTypes";
+import {
+  isRetiredSafeFileName,
+  isRetiredSafeId,
+  isRetiredSafeHash,
+  NO_SELECTED_STRATEGY,
+} from "./retiredSafeBaseline";
 import { STRATEGY_SCHEMA_VERSION, type StrategyKind } from "./definition/types";
 import { assertSafeStrategyId, StrategyValidationError, validateCanonicalDefinition } from "./definition/validator";
 import { definitionToStoredPatch, storedToDefinition, type StoredStrategyV1 } from "./definition/bridge";
@@ -102,13 +104,6 @@ function ensureDir(): void {
 
 function assertDestructiveTargetAllowed(targetFile: string): void {
   const resolved = strategyRuntimeIo.absolutePath(targetFile);
-  if (strategyRuntimeIo.baseName(resolved) === `${SAFE_STRATEGY_ID}.json`) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
-  }
-  const canonicalSafeFile = strategyRuntimeIo.canonicalSafeFile(process.cwd(), SAFE_STRATEGY_ID);
-  if (resolved === strategyRuntimeIo.absolutePath(canonicalSafeFile)) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
-  }
   const root = ROOT();
   if (!isPathInside(resolved, root)) {
     if (isStrategyStoreTestRuntime()) {
@@ -141,70 +136,13 @@ function summariesFromParams(params: SafeV44Params) {
   };
 }
 
-function buildLockedSafeStrategy(): StoredStrategyV1 {
-  const meta = loadSafeV44Strategy({ throwOnHashMismatch: false });
-  const params = meta.params;
-  const now = new Date().toISOString();
-  const summary = summariesFromParams(params);
-  return {
-    id: SAFE_STRATEGY_ID,
-    name: SAFE_STRATEGY_NAME,
-    description: "검증된 SAFE 기준 전략. 원본은 잠금 상태이며 직접 수정할 수 없습니다.",
-    type: "안정형",
-    timeframe: "15m",
-    paramsHash: EXPECTED_SAFE_PARAMS_HASH,
-    params,
-    locked: true,
-    sourceFile: meta.sourceFile,
-    sourceStatus: meta.sourceStatus,
-    paperActive: true,
-    liveActive: false,
-    liveEligible: true,
-    createdAt: now,
-    updatedAt: now,
-    lastBacktest: {
-      totalReturn: 0.2228,
-      mdd: -0.17,
-      trades: 201,
-      winRate: 0.6189,
-      at: now
-    },
-    schemaVersion: STRATEGY_SCHEMA_VERSION,
-    strategyType: "safe_params",
-    sourceStrategyId: null,
-    version: "44.i4060",
-    symbols: ["BTCUSDT"],
-    longEnabled: true,
-    shortEnabled: params.confirm_bear,
-    ...summary
-  };
-}
-
-function assertExistingSafeIntegrity(filePath: string): StoredStrategyV1 {
-  let parsed: StoredStrategyV1;
-  try {
-    parsed = JSON.parse(strategyRuntimeIo.readText(filePath)) as StoredStrategyV1;
-  } catch {
-    throw new StrategyValidationError(
-      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE strategy file is corrupt and will not be overwritten.`
-    );
+function retireStoreSafeArtifact(filePath: string): void {
+  const resolved = strategyRuntimeIo.absolutePath(filePath);
+  const root = ROOT();
+  if (!isPathInside(resolved, root)) return;
+  if (strategyRuntimeIo.hasPath(resolved)) {
+    strategyRuntimeIo.removeFile(resolved);
   }
-  if (parsed.id !== SAFE_STRATEGY_ID || parsed.name !== SAFE_STRATEGY_NAME) {
-    throw new StrategyValidationError(
-      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE identity mismatch.`
-    );
-  }
-  if (parsed.paramsHash !== EXPECTED_SAFE_PARAMS_HASH) {
-    throw new StrategyValidationError(
-      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE params hash mismatch (expected ${EXPECTED_SAFE_PARAMS_HASH}).`
-    );
-  }
-  if (!parsed.locked) {
-    throw new StrategyValidationError(
-      `${PROTECTED_STRATEGY_INTEGRITY}: SAFE must remain locked.`
-    );
-  }
-  return parsed;
 }
 
 function indexStrategiesEqual(
@@ -252,20 +190,11 @@ function buildIndexPayload(strategies: StoredStrategy[]): StrategyIndexFile {
 
 function writeStrategyFile(strategy: StoredStrategy): void {
   ensureDir();
+  if (isRetiredSafeId(strategy.id)) {
+    throw new StrategyValidationError(NO_SELECTED_STRATEGY);
+  }
   const file = strategyFilePath(strategy.id);
-  if (strategy.id === SAFE_STRATEGY_ID && strategyRuntimeIo.hasPath(file)) {
-    throw new StrategyValidationError(
-      `${PROTECTED_STRATEGY_INTEGRITY}: existing SAFE strategy file must not be rewritten.`
-    );
-  }
-  if (strategy.id !== SAFE_STRATEGY_ID) {
-    assertDestructiveTargetAllowed(file);
-  } else if (isStrategyStoreTestRuntime()) {
-    const root = ROOT();
-    if (!isPathInside(file, root)) {
-      throw new StrategyValidationError(UNSAFE_TEST_STRATEGY_STORE);
-    }
-  }
+  assertDestructiveTargetAllowed(file);
   strategyRuntimeIo.writeText(file, JSON.stringify(strategy, null, 2));
 }
 
@@ -289,18 +218,6 @@ function writeIndexIfChanged(strategies: StoredStrategy[]): void {
     }
   }
   writeIndex(strategies);
-}
-
-function overlaySafeActivationFromIndex(
-  strategy: StoredStrategyV1,
-  row: StrategyIndexFile["strategies"][number] | undefined
-): StoredStrategyV1 {
-  if (strategy.id !== SAFE_STRATEGY_ID || !row) return strategy;
-  return {
-    ...strategy,
-    paperActive: row.paperActive,
-    liveActive: row.liveActive
-  };
 }
 
 function hydrateStrategyIdentity(strategy: StoredStrategyV1): StoredStrategyV1 {
@@ -329,18 +246,17 @@ function readAllStrategyFiles(): StoredStrategyV1[] {
       } catch {
         continue;
       }
+      if (isRetiredSafeId(row.id)) {
+        retireStoreSafeArtifact(strategyFilePath(row.id));
+        continue;
+      }
       const full = strategyFilePath(row.id);
       if (!strategyRuntimeIo.hasPath(full)) continue;
-      if (row.id === SAFE_STRATEGY_ID) {
-        const safe = assertExistingSafeIntegrity(full);
-        out.push(overlaySafeActivationFromIndex(safe, row));
-      } else {
-        out.push(
-          hydrateStrategyIdentity(
-            JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
-          ),
-        );
-      }
+      out.push(
+        hydrateStrategyIdentity(
+          JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
+        ),
+      );
     }
     return out;
   } catch (error) {
@@ -361,70 +277,41 @@ function discoverStrategyFilesOnDisk(): StoredStrategyV1[] {
     } catch {
       continue;
     }
-    const full = strategyFilePath(id);
-    if (id === SAFE_STRATEGY_ID) {
-      out.push(assertExistingSafeIntegrity(full));
-    } else {
-      out.push(
-        hydrateStrategyIdentity(
-          JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
-        ),
-      );
+    if (isRetiredSafeId(id) || isRetiredSafeFileName(name)) {
+      retireStoreSafeArtifact(strategyFilePath(id));
+      continue;
     }
+    const full = strategyFilePath(id);
+    out.push(
+      hydrateStrategyIdentity(
+        JSON.parse(strategyRuntimeIo.readText(full)) as StoredStrategyV1,
+      ),
+    );
   }
   return out;
 }
 
 /**
- * Ensure the management store exists. Never rewrite an existing valid SAFE file.
- * Index is written only when missing or missing the SAFE entry.
+ * Ensure the management store exists. An empty store is valid.
+ * Retired SAFE rows are dropped and never re-injected.
  */
 export function ensureStrategyStore(): StoredStrategy[] {
   ensureDir();
-  const safePath = strategyFilePath(SAFE_STRATEGY_ID);
-
-  if (!strategyRuntimeIo.hasPath(safePath)) {
-    writeStrategyFile(buildLockedSafeStrategy());
-  } else {
-    assertExistingSafeIntegrity(safePath);
-  }
-
+  migrateRetiredSafeStore();
   let loaded = readAllStrategyFiles();
   let indexNeedsRepair = !strategyRuntimeIo.hasPath(INDEX());
 
   if (!loaded.length && strategyRuntimeIo.hasPath(INDEX())) {
-    // Index present but empty/unreadable entries — discover from disk once
     loaded = discoverStrategyFilesOnDisk();
-    indexNeedsRepair = true;
-  }
-
-  if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
-    const safe = assertExistingSafeIntegrity(safePath);
-    let paperActive = true;
-    let liveActive = false;
-    if (strategyRuntimeIo.hasPath(INDEX())) {
-      try {
-        const index = JSON.parse(strategyRuntimeIo.readText(INDEX())) as StrategyIndexFile;
-        const row = index.strategies.find((r) => r.id === SAFE_STRATEGY_ID);
-        if (row) {
-          paperActive = row.paperActive;
-          liveActive = row.liveActive;
-        }
-      } catch {
-        /* keep defaults */
-      }
-    }
-    loaded = [{ ...safe, paperActive, liveActive }, ...loaded.filter((s) => s.id !== SAFE_STRATEGY_ID)];
     indexNeedsRepair = true;
   }
 
   if (!strategyRuntimeIo.hasPath(INDEX())) {
     loaded = discoverStrategyFilesOnDisk();
-    if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
-      loaded = [assertExistingSafeIntegrity(safePath), ...loaded];
-    }
     indexNeedsRepair = true;
   }
+
+  loaded = loaded.filter((s) => !isRetiredSafeId(s.id));
 
   if (indexNeedsRepair) {
     writeIndexIfChanged(loaded);
@@ -433,18 +320,40 @@ export function ensureStrategyStore(): StoredStrategy[] {
   return loaded;
 }
 
+function migrateRetiredSafeStore(): void {
+  ensureDir();
+  const names = strategyRuntimeIo.hasPath(ROOT())
+    ? strategyRuntimeIo.listNames(ROOT())
+    : [];
+  for (const name of names) {
+    if (isRetiredSafeFileName(name)) {
+      retireStoreSafeArtifact(
+        strategyRuntimeIo.resolveStrategyPath(ROOT(), name.replace(/\.json$/, "")),
+      );
+    }
+  }
+  if (!strategyRuntimeIo.hasPath(INDEX())) return;
+  try {
+    const index = JSON.parse(strategyRuntimeIo.readText(INDEX())) as StrategyIndexFile;
+    const next = (index.strategies ?? []).filter((row) => !isRetiredSafeId(row.id));
+    if (next.length !== (index.strategies ?? []).length) {
+      strategyRuntimeIo.writeText(
+        INDEX(),
+        JSON.stringify({ ...index, strategies: next }, null, 2),
+      );
+    }
+  } catch {
+    /* rewrite on next ensure */
+  }
+}
+
 export function listStrategies(): StoredStrategy[] {
   ensureDir();
-  if (!strategyRuntimeIo.hasPath(INDEX()) || !strategyRuntimeIo.hasPath(strategyFilePath(SAFE_STRATEGY_ID))) {
+  if (!strategyRuntimeIo.hasPath(INDEX())) {
     return ensureStrategyStore();
   }
-  // Validate SAFE in place without rewriting
-  assertExistingSafeIntegrity(strategyFilePath(SAFE_STRATEGY_ID));
-  const loaded = readAllStrategyFiles();
-  if (!loaded.some((s) => s.id === SAFE_STRATEGY_ID)) {
-    return ensureStrategyStore();
-  }
-  return loaded;
+  migrateRetiredSafeStore();
+  return readAllStrategyFiles().filter((s) => !isRetiredSafeId(s.id));
 }
 
 export function getStrategyById(id: string): StoredStrategyV1 | undefined {
@@ -452,16 +361,20 @@ export function getStrategyById(id: string): StoredStrategyV1 | undefined {
   return listStrategies().find((s) => s.id === id) as StoredStrategyV1 | undefined;
 }
 
-export function getPaperActiveStrategy(): StoredStrategy {
+export function getPaperActiveStrategy(): StoredStrategy | null {
   const list = listStrategies();
-  return list.find((s) => s.paperActive) ?? list.find((s) => s.id === SAFE_STRATEGY_ID) ?? ensureStrategyStore()[0];
+  return list.find((s) => s.paperActive && !isRetiredSafeId(s.id)) ?? null;
 }
 
 export function getLiveActiveStrategy(): StoredStrategy | undefined {
   return listStrategies().find((s) => s.liveActive);
 }
 
-export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
+export function copyStrategy(
+  id: string,
+  newName?: string,
+  ownerUserId?: string | null,
+): StoredStrategyV1 {
   assertSafeStrategyId(id);
   const source = getStrategyById(id);
   if (!source) throw new StrategyValidationError("복사할 전략이 없습니다.");
@@ -471,8 +384,10 @@ export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
   const copyId = `copy_${Date.now().toString(36)}_${crypto.randomBytes(3).toString("hex")}`;
   assertSafeStrategyId(copyId);
   const summary = summariesFromParams(params);
-  const sourceStrategyId = source.id === SAFE_STRATEGY_ID ? SAFE_STRATEGY_ID : source.sourceStrategyId ?? source.id;
-  if (paramsHash === EXPECTED_SAFE_PARAMS_HASH) {
+  const sourceStrategyId = isRetiredSafeId(source.id)
+    ? null
+    : source.sourceStrategyId ?? source.id;
+  if (isRetiredSafeHash(paramsHash)) {
     paramsHash = computeParamsHash({ ...params, clone_id: copyId } as unknown as Record<string, unknown>);
   }
 
@@ -503,6 +418,7 @@ export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
     liveEligible: false,
     createdAt: now,
     updatedAt: now,
+    ownerUserId: ownerUserId?.trim() || null,
     schemaVersion: STRATEGY_SCHEMA_VERSION,
     strategyType: (source.strategyType as StrategyKind) ?? "safe_params",
     sourceStrategyId,
@@ -529,6 +445,7 @@ export function copyStrategy(id: string, newName?: string): StoredStrategyV1 {
 }
 
 export function createStrategy(input: {
+  ownerUserId?: string | null;
   name: string;
   /** Editable alias — never hashed into identity. */
   displayAlias?: string | null;
@@ -553,8 +470,8 @@ export function createStrategy(input: {
   const requestedId = input.id?.trim();
   if (requestedId) {
     assertSafeStrategyId(requestedId);
-    if (requestedId === SAFE_STRATEGY_ID || requestedId.includes("SAFE")) {
-      throw new StrategyValidationError("보호 전략 ID는 생성할 수 없습니다.");
+    if (isRetiredSafeId(requestedId)) {
+      throw new StrategyValidationError("폐기된 기준 전략 ID는 생성할 수 없습니다.");
     }
     if (!requestedId.startsWith("demo_strategy_")) {
       throw new StrategyValidationError(
@@ -594,6 +511,7 @@ export function createStrategy(input: {
     liveEligible: false,
     createdAt: now,
     updatedAt: now,
+    ownerUserId: input.ownerUserId?.trim() || null,
     schemaVersion: STRATEGY_SCHEMA_VERSION,
     strategyType,
     sourceStrategyId: null,
@@ -639,17 +557,13 @@ export function updateStrategyDisplayMeta(
   },
 ): StoredStrategyV1 {
   assertSafeStrategyId(id);
-  if (id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError(
-      "잠긴 원본 보호 전략의 표시 이름은 변경할 수 없습니다.",
-    );
+  if (isRetiredSafeId(id)) {
+    throw new StrategyValidationError(NO_SELECTED_STRATEGY);
   }
   const current = getStrategyById(id);
   if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
-  if (current.locked || current.id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError(
-      "잠긴 원본 보호 전략의 표시 이름은 변경할 수 없습니다.",
-    );
+  if (current.locked) {
+    throw new StrategyValidationError("잠긴 전략의 표시 이름은 변경할 수 없습니다.");
   }
   const nextAlias =
     patch.displayAlias !== undefined
@@ -712,13 +626,13 @@ export function saveStrategy(
   patch: Partial<StoredStrategyV1> & { params?: SafeV44Params; definition?: CanonicalStrategyDefinition }
 ): StoredStrategyV1 {
   assertSafeStrategyId(id);
-  if (id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 직접 저장할 수 없습니다. 먼저 복사본을 만드세요.");
+  if (isRetiredSafeId(id)) {
+    throw new StrategyValidationError(NO_SELECTED_STRATEGY);
   }
   const current = getStrategyById(id);
   if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
-  if (current.locked || current.id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 직접 저장할 수 없습니다. 먼저 복사본을 만드세요.");
+  if (current.locked) {
+    throw new StrategyValidationError("잠긴 전략은 직접 저장할 수 없습니다.");
   }
   let nextDef = patch.definition;
   if (nextDef) {
@@ -762,13 +676,15 @@ export function saveStrategy(
 
 export function deleteStrategy(id: string): void {
   assertSafeStrategyId(id);
-  if (id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
+  if (isRetiredSafeId(id)) {
+    retireStoreSafeArtifact(strategyFilePath(id));
+    writeIndex(listStrategies().filter((s) => !isRetiredSafeId(s.id)));
+    return;
   }
   const current = getStrategyById(id);
   if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
-  if (current.locked || current.id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError("잠긴 원본 보호 전략은 삭제할 수 없습니다.");
+  if (current.locked) {
+    throw new StrategyValidationError("잠긴 전략은 삭제할 수 없습니다.");
   }
   const file = strategyFilePath(id);
   assertDestructiveTargetAllowed(file);
@@ -779,7 +695,7 @@ export function deleteStrategy(id: string): void {
 
 function writeNonSafeStrategyFiles(all: StoredStrategy[]): void {
   for (const s of all) {
-    if (s.id === SAFE_STRATEGY_ID) continue;
+    if (isRetiredSafeId(s.id)) continue;
     writeStrategyFile(s);
   }
 }
@@ -798,8 +714,13 @@ export function setPaperActiveStrategy(id: string): StoredStrategy {
     const v = validateCanonicalDefinition(storedToDefinition(target));
     if (!v.ok) throw new StrategyValidationError(`설정 오류: ${v.errors.join(" · ")}`);
   }
-  const all = listStrategies().map((s) => ({ ...s, paperActive: s.id === id }));
-  // Never rewrite the protected SAFE file; activation for SAFE lives in the index overlay.
+  if (isRetiredSafeId(id)) {
+    throw new StrategyValidationError(NO_SELECTED_STRATEGY);
+  }
+  const all = listStrategies().map((s) => ({
+    ...s,
+    paperActive: s.id === id && !isRetiredSafeId(s.id),
+  }));
   writeNonSafeStrategyFiles(all);
   writeIndex(all);
   const active = all.find((s) => s.id === id);
@@ -826,9 +747,12 @@ export function setLiveActiveStrategy(id: string): StoredStrategy {
     const v = validateCanonicalDefinition(storedToDefinition(target));
     if (!v.ok) throw new StrategyValidationError(`설정 오류: ${v.errors.join(" · ")}`);
   }
+  if (isRetiredSafeId(id)) {
+    throw new StrategyValidationError(NO_SELECTED_STRATEGY);
+  }
   const all = listStrategies().map((s) => ({
     ...s,
-    liveActive: s.id === id,
+    liveActive: s.id === id && !isRetiredSafeId(s.id),
     liveEligible: s.id === id ? true : s.liveEligible
   }));
   writeNonSafeStrategyFiles(all);
@@ -836,15 +760,17 @@ export function setLiveActiveStrategy(id: string): StoredStrategy {
   return all.find((s) => s.id === id)!;
 }
 
-/** Remove confirmed test/pollution strategy files. Never deletes SAFE original. */
+/** Remove confirmed test/pollution strategy files. Empty store is valid. */
 export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
   ensureDir();
+  migrateRetiredSafeStore();
   const all = readAllStrategyFiles();
   const removed: string[] = [];
   const kept: StoredStrategyV1[] = [];
   for (const s of all) {
-    if (s.id === SAFE_STRATEGY_ID) {
-      kept.push(s);
+    if (isRetiredSafeId(s.id)) {
+      retireStoreSafeArtifact(strategyFilePath(s.id));
+      removed.push(s.id);
       continue;
     }
     if (isTestStrategyRecord(s as StoredStrategyV1 & { testData?: boolean })) {
@@ -856,13 +782,6 @@ export function purgeTestStrategies(): { removed: string[]; kept: string[] } {
       kept.push(s);
     }
   }
-  if (!kept.some((s) => s.id === SAFE_STRATEGY_ID)) {
-    const safePath = strategyFilePath(SAFE_STRATEGY_ID);
-    if (!strategyRuntimeIo.hasPath(safePath)) {
-      writeStrategyFile(buildLockedSafeStrategy());
-    }
-    kept.unshift(assertExistingSafeIntegrity(strategyFilePath(SAFE_STRATEGY_ID)));
-  }
   writeIndex(kept);
   return { removed, kept: kept.map((s) => s.id) };
 }
@@ -871,7 +790,7 @@ export function updateStrategyLastBacktest(
   id: string,
   stats: { totalReturn: number; mdd: number; trades: number; winRate: number }
 ): void {
-  if (id === SAFE_STRATEGY_ID) return;
+  if (isRetiredSafeId(id)) return;
   const current = getStrategyById(id);
   if (!current) return;
   const next: StoredStrategy = {
@@ -884,7 +803,7 @@ export function updateStrategyLastBacktest(
 }
 
 export function getDefaultParams(): SafeV44Params {
-  return { ...CONTEXT_FALLBACK_PARAMS };
+  return { ...GENERIC_SEARCH_BASELINE_PARAMS };
 }
 
 export function validateStrategyById(
@@ -901,10 +820,13 @@ export function validateStrategyById(
 export function restoreCloneFromSource(id: string): StoredStrategyV1 {
   const clone = getStrategyById(id);
   if (!clone) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
-  if (clone.locked || clone.id === SAFE_STRATEGY_ID) {
-    throw new StrategyValidationError("원본 보호 전략은 복원할 수 없습니다.");
+  if (clone.locked || isRetiredSafeId(clone.id)) {
+    throw new StrategyValidationError("잠긴 전략은 복원할 수 없습니다.");
   }
-  const sourceId = clone.sourceStrategyId ?? SAFE_STRATEGY_ID;
+  const sourceId = clone.sourceStrategyId;
+  if (!sourceId || isRetiredSafeId(sourceId)) {
+    throw new StrategyValidationError("원본 전략을 찾을 수 없습니다.");
+  }
   const source = getStrategyById(sourceId);
   if (!source) throw new StrategyValidationError("원본 전략을 찾을 수 없습니다.");
   return saveStrategy(id, {

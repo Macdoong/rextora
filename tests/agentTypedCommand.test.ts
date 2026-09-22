@@ -177,7 +177,7 @@ describe("UI wiring source contracts", () => {
       ),
       "utf8",
     );
-    expect(manage).toContain("SAFE");
+    expect(manage).not.toContain("SAFE_v44_i4060");
     expect(manage).toContain("archive");
     expect(manage).toContain("delete");
 

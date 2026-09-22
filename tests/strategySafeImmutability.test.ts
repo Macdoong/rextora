@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  PROTECTED_STRATEGY_INTEGRITY,
   copyStrategy,
+  createStrategy,
   ensureStrategyStore,
   getStrategyById,
   listStrategies,
@@ -11,18 +11,15 @@ import {
   deleteStrategy,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
+
 import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
-import {
-  hashFile,
   installIsolatedStrategyStore,
-  productionStrategiesDir,
   canonicalSafeSourcePath,
 } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
 
-describe("SAFE immutability", () => {
+
+describe("SAFE retirement immutability", () => {
   let cleanup: (() => void) | undefined;
   let root = "";
 
@@ -38,110 +35,60 @@ describe("SAFE immutability", () => {
     ensureStrategyStore();
   }
 
-  function safePath() {
-    return path.join(root, `${SAFE_STRATEGY_ID}.json`);
-  }
-
-  it("1-3. ensure/list do not rewrite existing SAFE bytes or mtime", () => {
+  it("1-3. empty store stays empty and never injects SAFE", () => {
     boot();
-    const p = safePath();
-    const h1 = hashFile(p);
-    const m1 = fs.statSync(p).mtimeMs;
+    expect(listStrategies()).toEqual([]);
     ensureStrategyStore();
     listStrategies();
-    ensureStrategyStore();
-    listStrategies();
-    expect(hashFile(p)).toBe(h1);
-    expect(fs.statSync(p).mtimeMs).toBe(m1);
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(fs.existsSync(path.join(root, `${RETIRED_SAFE_STRATEGY_ID}.json`))).toBe(false);
   });
 
-  it("6-7. missing SAFE is created once; second ensure does not rewrite", () => {
-    const iso = installIsolatedStrategyStore();
-    cleanup = iso.cleanup;
-    root = iso.root;
-    expect(fs.existsSync(safePath())).toBe(false);
-    ensureStrategyStore();
-    expect(fs.existsSync(safePath())).toBe(true);
-    const h1 = hashFile(safePath());
-    const m1 = fs.statSync(safePath()).mtimeMs;
-    ensureStrategyStore();
-    expect(hashFile(safePath())).toBe(h1);
-    expect(fs.statSync(safePath()).mtimeMs).toBe(m1);
-  });
-
-  it("8. invalid SAFE hash causes protected integrity error without overwrite", () => {
+  it("6-7. missing SAFE is not created by ensure", () => {
     boot();
-    const p = safePath();
-    const original = fs.readFileSync(p, "utf8");
-    const bad = JSON.parse(original);
-    bad.paramsHash = "deadbeefdead";
-    fs.writeFileSync(p, JSON.stringify(bad, null, 2), "utf8");
-    const badBytes = fs.readFileSync(p);
-    expect(() => listStrategies()).toThrow(
-      new RegExp(PROTECTED_STRATEGY_INTEGRITY),
-    );
-    expect(Buffer.compare(fs.readFileSync(p), badBytes)).toBe(0);
-    fs.writeFileSync(p, original, "utf8");
+    expect(fs.existsSync(path.join(root, `${RETIRED_SAFE_STRATEGY_ID}.json`))).toBe(false);
+    ensureStrategyStore();
+    expect(fs.existsSync(path.join(root, `${RETIRED_SAFE_STRATEGY_ID}.json`))).toBe(false);
   });
 
-  it("9. save/delete against SAFE are rejected", () => {
+  it("9. save against retired SAFE fails; delete retires without resurrecting", () => {
     boot();
-    const p = safePath();
-    const h1 = hashFile(p);
     expect(() =>
-      saveStrategy(SAFE_STRATEGY_ID, { name: "hacked" }),
-    ).toThrow(/잠긴/);
-    expect(() => deleteStrategy(SAFE_STRATEGY_ID)).toThrow(/잠긴/);
-    expect(hashFile(p)).toBe(h1);
+      saveStrategy(RETIRED_SAFE_STRATEGY_ID, { name: "hacked" }),
+    ).toThrow();
+    deleteStrategy(RETIRED_SAFE_STRATEGY_ID);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(listStrategies().some((s) => s.id === RETIRED_SAFE_STRATEGY_ID)).toBe(false);
   });
 
-  it("10-11. copy creates separate editable strategy without mutating SAFE", () => {
+  it("10-11. copy works from an explicit user strategy", () => {
     boot();
-    const p = safePath();
-    const h1 = hashFile(p);
-    const m1 = fs.statSync(p).mtimeMs;
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "Editable Copy");
-    expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
+    const source = createStrategy({ name: "Editable Source" });
+    const copy = copyStrategy(source.id, "Editable Copy");
+    expect(copy.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(copy.locked).toBe(false);
     expect(fs.existsSync(path.join(root, `${copy.id}.json`))).toBe(true);
     saveStrategy(copy.id, { name: "Edited Copy Name" });
     expect(getStrategyById(copy.id)?.name).toBe("Edited Copy Name");
-    expect(hashFile(p)).toBe(h1);
-    expect(fs.statSync(p).mtimeMs).toBe(m1);
   });
 
-  it("paper activation updates index overlay without rewriting SAFE file", () => {
+  it("paper activation never falls back to SAFE", () => {
     boot();
-    const p = safePath();
-    const h1 = hashFile(p);
-    const m1 = fs.statSync(p).mtimeMs;
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "Paper Target");
+    const source = createStrategy({ name: "Paper Source" });
+    const copy = copyStrategy(source.id, "Paper Target");
     setPaperActiveStrategy(copy.id);
-    expect(hashFile(p)).toBe(h1);
-    expect(fs.statSync(p).mtimeMs).toBe(m1);
     expect(getStrategyById(copy.id)?.paperActive).toBe(true);
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.paperActive).toBe(false);
-    setPaperActiveStrategy(SAFE_STRATEGY_ID);
-    expect(hashFile(p)).toBe(h1);
-    expect(fs.statSync(p).mtimeMs).toBe(m1);
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.paperActive).toBe(true);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(() => setPaperActiveStrategy(RETIRED_SAFE_STRATEGY_ID)).toThrow();
   });
 
-  it("production SAFE and canonical source remain untouched by isolated ops", () => {
-    const prodSafe = path.join(productionStrategiesDir(), `${SAFE_STRATEGY_ID}.json`);
-    const canonical = canonicalSafeSourcePath();
-    const prodHash = hashFile(prodSafe);
-    const prodMtime = fs.statSync(prodSafe).mtimeMs;
-    const canonHash = hashFile(canonical);
-    const canonMtime = fs.statSync(canonical).mtimeMs;
+  it("canonical SAFE source file is retired", () => {
+    expect(fs.existsSync(canonicalSafeSourcePath())).toBe(false);
     boot();
-    copyStrategy(SAFE_STRATEGY_ID);
+    createStrategy({ name: "Iso Source" });
     listStrategies();
     ensureStrategyStore();
-    expect(hashFile(prodSafe)).toBe(prodHash);
-    expect(fs.statSync(prodSafe).mtimeMs).toBe(prodMtime);
-    expect(hashFile(canonical)).toBe(canonHash);
-    expect(fs.statSync(canonical).mtimeMs).toBe(canonMtime);
+    expect(fs.existsSync(canonicalSafeSourcePath())).toBe(false);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
   });
 });

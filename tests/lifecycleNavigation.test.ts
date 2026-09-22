@@ -6,12 +6,14 @@ import {
   buildOrderBlockLongSequence,
   validateEventSequence,
 } from "../src/lib/rextora/strategy/definition/eventSequence";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   LIFECYCLE_NAVIGATION_ITEMS,
   shellPageLocationLabel,
 } from "../components/rextora/shell/navigationModel";
 import { getLifecycleStageForRoute } from "../components/rextora/shell/routeLifecycle";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("lifecycle navigation", () => {
   it("shell navigation uses shared model with lifecycle-first desktop sidebar", () => {
@@ -166,6 +168,11 @@ describe("lifecycle navigation", () => {
     expect(src).toContain('data-testid="shell-context-breadcrumb"');
     expect(src).not.toContain("getCurrentPaperSession");
     expect(src).not.toContain("getExecutablePaperSession");
+    expect(src).toContain("OPERATOR_STATUS.noStrategy");
+    expect(src).toContain("strategyChipLabel");
+    expect(src).toContain("primarySymbolTimeframe?.trim()");
+    expect(src).not.toMatch(/displayValue\(primaryStrategy\)/);
+    expect(src).not.toMatch(/displayValue\(primarySymbolTimeframe\)/);
   });
 
   it("settings hash tabs exist and are applied from location.hash", () => {
@@ -218,7 +225,7 @@ describe("lifecycle navigation", () => {
 });
 
 describe("results recommendation", () => {
-  it("protects SAFE and ranks paper/live correctly", () => {
+  it("ranks paper/live correctly without a protected baseline", () => {
     expect(
       recommendStrategyAction({
         totalReturn: 1,
@@ -229,7 +236,7 @@ describe("results recommendation", () => {
         liveActive: false,
         isSafe: true,
       }).code,
-    ).toBe("protected_safe");
+    ).toBe("paper_candidate");
     expect(
       recommendStrategyAction({
         totalReturn: 0.2,
@@ -263,19 +270,14 @@ describe("event sequence schema", () => {
 });
 
 describe("SAFE hash fingerprint", () => {
-  it("matches expected protected hash on disk", () => {
+  it("retired SAFE file is no longer a runtime dependency", () => {
     const file = path.join(
       process.cwd(),
       "data",
       "strategies",
       "SAFE_v44_i4060.json",
     );
-    const json = JSON.parse(fs.readFileSync(file, "utf8")) as {
-      params_hash?: string;
-      paramsHash?: string;
-    };
-    const hash = json.params_hash ?? json.paramsHash;
-    expect(hash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(file)).toBe(false);
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
   });
 });

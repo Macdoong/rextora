@@ -11,7 +11,7 @@ import {
   registerTrialForBacktest,
 } from "@/src/lib/rextora/strategySearch/researchResultsSummary";
 import { StrategySearchApiError } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
+import { requireSearchJobAccess } from "@/src/lib/rextora/auth/requireSearchJobAccess";
 
 type Ctx = { params: Promise<{ jobId: string }> };
 
@@ -24,11 +24,12 @@ type Ctx = { params: Promise<{ jobId: string }> };
  * Never auto-registers all qualified trials.
  */
 export async function POST(request: Request, context: Ctx) {
-  const denied = await denyUnlessPermitted(request, "strategy:write");
-  if (denied) return denied;
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "write", "strategy:write");
+    if (!access.ok) return access.response;
+    const ownerUserId = access.user.userId;
     let body: {
       iteration?: number;
       iterations?: number[];
@@ -46,6 +47,7 @@ export async function POST(request: Request, context: Ctx) {
     if (body.mode === "top") {
       const data = promoteTopResearchResults(jobId, {
         limit: body.limit,
+        ownerUserId,
       });
       return strategySearchJson(
         {
@@ -65,7 +67,7 @@ export async function POST(request: Request, context: Ctx) {
           400,
         );
       }
-      const data = registerTrialForBacktest(jobId, body.iteration);
+      const data = registerTrialForBacktest(jobId, body.iteration, undefined, ownerUserId);
       return strategySearchJson(
         {
           mode: "register_for_backtest",
@@ -83,7 +85,12 @@ export async function POST(request: Request, context: Ctx) {
     }
 
     if (Array.isArray(body.iterations) && body.iterations.length > 0) {
-      const data = promoteSelectedTrialsFromJob(jobId, body.iterations);
+      const data = promoteSelectedTrialsFromJob(
+        jobId,
+        body.iterations,
+        undefined,
+        ownerUserId,
+      );
       return strategySearchJson({ promoted: data }, Date.now() - start);
     }
 
@@ -100,6 +107,7 @@ export async function POST(request: Request, context: Ctx) {
       iteration: body.iteration,
       name: body.name,
       clusterId: body.clusterId,
+      ownerUserId,
     });
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {

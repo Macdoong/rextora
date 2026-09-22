@@ -47,7 +47,8 @@ function sampleConfig(): StrategySearchConfig {
   };
 }
 
-function sha256File(filePath: string): string {
+function sha256File(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 

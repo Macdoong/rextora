@@ -4,13 +4,9 @@ export * from "./env";
 export * from "./config";
 export * from "./security";
 export {
-  SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-  getPreservedSafeStrategy,
   getStrategies,
   getStrategyById,
   isStrategyLiveEligible as isRepositoryStrategyLiveEligible,
-  loadSafeStrategyFile,
   validateSafeStrategyHash
 } from "./strategyRepository";
 export * from "./safety";

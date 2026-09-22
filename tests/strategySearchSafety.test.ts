@@ -65,17 +65,12 @@ function sampleConfig(): StrategySearchConfig {
 }
 
 describe("strategySearch SAFE integrity", () => {
-  it("preserves SAFE_v44_i4060 name and hash", () => {
-    const raw = JSON.parse(fs.readFileSync(SAFE_PATH, "utf8")) as {
-      name: string;
-      params_hash: string;
-    };
-    expect(raw.name).toBe("SAFE_v44_i4060");
-    expect(raw.params_hash).toBe("7893ca3f0e30");
+  it("retired SAFE file is not present", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
-  it("keeps protected SAFE bytes identical across store ops and recovery", () => {
-    const before = fs.readFileSync(SAFE_PATH);
+  it("search store ops do not resurrect retired SAFE", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const strategiesDirBefore = new Set(
       fs.readdirSync(path.join(process.cwd(), "data", "strategies")),
     );
@@ -134,15 +129,7 @@ describe("strategySearch SAFE integrity", () => {
     expect(recovered?.id).toBe(job.id);
     expect(recovered?.status).toBe("cancelled");
 
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(before, after)).toBe(0);
-
-    const safeJson = JSON.parse(after.toString("utf8")) as {
-      name: string;
-      params_hash: string;
-    };
-    expect(safeJson.name).toBe("SAFE_v44_i4060");
-    expect(safeJson.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
 
     const strategiesDirAfter = new Set(
       fs.readdirSync(path.join(process.cwd(), "data", "strategies")),

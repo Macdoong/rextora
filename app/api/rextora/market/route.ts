@@ -13,7 +13,7 @@ import {
 } from "@/src/lib/rextora/marketWatcherService";
 import { getLastSafeSignals } from "@/src/lib/rextora/execution/safePaperLoop";
 import { calculateSafeV44Risk } from "@/src/lib/rextora/risk/safeV44RiskEngine";
-import { loadSafeV44Strategy } from "@/src/lib/rextora/strategy/safeV44Strategy";
+import { GENERIC_SEARCH_BASELINE_PARAMS } from "@/src/lib/rextora/strategy/safeV44Params";
 import { getAccountState } from "@/src/lib/rextora/accountStateStore";
 import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
 
@@ -39,7 +39,6 @@ export async function GET(request: Request) {
 
     const snapshot = getMarketSnapshot();
     const cacheMeta = getMarketCacheMeta();
-    const strategy = loadSafeV44Strategy({ throwOnHashMismatch: false });
     const balance = getAccountState().balanceUsdt;
     const signals = getLastSafeSignals(50).map((row) => {
       const indicator = row.signal.indicators;
@@ -52,7 +51,7 @@ export async function GET(request: Request) {
               side: row.signal.side,
               signalType: row.signal.signalType,
               balance,
-              params: strategy.params,
+              params: GENERIC_SEARCH_BASELINE_PARAMS,
             })
           : null;
       const expectedRr =

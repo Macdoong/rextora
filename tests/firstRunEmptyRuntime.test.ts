@@ -30,25 +30,21 @@ import {
 } from "../src/lib/rextora/strategy/strategyStore";
 import { listSavedBacktests } from "../src/lib/rextora/backtest/backtestStore";
 import { listPaperSessions } from "../src/lib/rextora/paper/paperSessionStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { parseIntent } from "../src/lib/rextora/agent/intentParser";
 import { fetchFactsForIntent } from "../src/lib/rextora/agent/agentDataFetcher";
 import {
   buildAgentResponse,
   buildLocalInterpretation,
 } from "../src/lib/rextora/agent/agentResponseBuilder";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const REAL_DATA_DIR = path.join(process.cwd(), "data", "rextora");
 const REAL_SAFE = path.join(process.cwd(), "data", "strategies", "SAFE_v44_i4060.json");
 
-function snapshotSafe(): { mtimeMs: number; size: number; hashSnippet: string } {
-  const buf = fs.readFileSync(REAL_SAFE);
-  const st = fs.statSync(REAL_SAFE);
-  return {
-    mtimeMs: st.mtimeMs,
-    size: st.size,
-    hashSnippet: buf.subarray(0, 32).toString("hex"),
-  };
+function snapshotSafeAbsent(): boolean {
+  return !fs.existsSync(REAL_SAFE);
 }
 
 describe("first-run empty-runtime lifecycle", () => {
@@ -60,7 +56,7 @@ describe("first-run empty-runtime lifecycle", () => {
     SEARCH?: string;
     BT?: string;
   } = {};
-  let safeBefore = { mtimeMs: 0, size: 0, hashSnippet: "" };
+  let safeAbsentBefore = true;
   let realDataListingBefore: string[] = [];
 
   beforeEach(() => {
@@ -78,7 +74,7 @@ describe("first-run empty-runtime lifecycle", () => {
     process.env.REXTORA_STRATEGY_SEARCH_DIR = path.join(tmpRoot, "strategy-search");
     process.env.REXTORA_BACKTESTS_DIR = path.join(tmpRoot, "backtests");
     fs.mkdirSync(process.env.REXTORA_STRATEGIES_DIR, { recursive: true });
-    safeBefore = snapshotSafe();
+    safeAbsentBefore = snapshotSafeAbsent();
     realDataListingBefore = fs.existsSync(REAL_DATA_DIR)
       ? fs.readdirSync(REAL_DATA_DIR).sort()
       : [];
@@ -111,7 +107,7 @@ describe("first-run empty-runtime lifecycle", () => {
 
   it("does not invent strategies on empty runtime", () => {
     ensureStrategyStore();
-    const nonSafe = listStrategies().filter((s) => s.id !== SAFE_STRATEGY_ID);
+    const nonSafe = listStrategies().filter((s) => s.id !== RETIRED_SAFE_STRATEGY_ID);
     expect(nonSafe).toHaveLength(0);
   });
 
@@ -186,15 +182,13 @@ describe("first-run empty-runtime lifecycle", () => {
     expect(after.hasRealStrategies).toBe(true);
   });
 
-  it("preserves real data/rextora and SAFE during isolated lifecycle", () => {
+  it("does not recreate retired SAFE during isolated first-run lifecycle", () => {
     initializeDemoWorkspace();
     resetDemoWorkspace();
     initializeDemoWorkspace();
 
-    const safeAfter = snapshotSafe();
-    expect(safeAfter.size).toBe(safeBefore.size);
-    expect(safeAfter.hashSnippet).toBe(safeBefore.hashSnippet);
-    expect(Math.abs(safeAfter.mtimeMs - safeBefore.mtimeMs)).toBeLessThan(1);
+    expect(safeAbsentBefore).toBe(true);
+    expect(snapshotSafeAbsent()).toBe(true);
 
     const listingAfter = fs.existsSync(REAL_DATA_DIR)
       ? fs.readdirSync(REAL_DATA_DIR).sort()

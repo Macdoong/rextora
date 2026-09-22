@@ -1,6 +1,6 @@
 import { botStatusSeed, riskStatusSeed } from "./seedData";
 import { canUsePaperMode } from "./safety";
-import { getPreservedSafeStrategy } from "./strategyRepository";
+import { NO_PAPER_STRATEGY } from "./strategy/retiredSafeBaseline";
 import { saveBotMode } from "./localStore";
 import { appendPaperOrder, cancelPendingOrders, closeAllPositions, getOpenPositions, getPaperOrderHistory, upsertPosition } from "./positionManager";
 import {
@@ -111,7 +111,10 @@ export function getPaperPosition(): Position {
   return { ...positions[0], side: "Flat", quantity: 0, unrealizedPnl: 0, serviceState: "paper" };
 }
 
-export async function startPaperBot(strategy: Strategy = getPreservedSafeStrategy()): Promise<EngineResult> {
+export async function startPaperBot(strategy?: Strategy): Promise<EngineResult> {
+  if (!strategy) {
+    return { ok: false, mode: "PAPER", serviceState: "paper", message: NO_PAPER_STRATEGY };
+  }
   if (!canUsePaperMode(strategy, riskStatusSeed)) {
     return { ok: false, mode: "PAPER", serviceState: "paper", message: "PAPER 모드 시작 조건을 만족하지 못했습니다." };
   }
@@ -125,9 +128,9 @@ export async function stopPaperBot(): Promise<EngineResult> {
   return { ok: true, mode: "PAPER", serviceState: "paper", message: "PAPER 모의 감시가 중지되었습니다." };
 }
 
-export async function restartPaperBot(): Promise<EngineResult> {
+export async function restartPaperBot(strategy?: Strategy): Promise<EngineResult> {
   await stopPaperBot();
-  return startPaperBot();
+  return startPaperBot(strategy);
 }
 
 export async function executePaperEntry(symbolOrCandidate?: string | AiCandidate): Promise<EngineResult> {

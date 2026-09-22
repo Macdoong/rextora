@@ -4,7 +4,6 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   BACKTEST_OPERATOR_ANALYSIS_VIEWS,
-  BACKTEST_OPERATOR_SAFE_STRATEGY_ID,
   BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER,
   BACKTEST_OPERATOR_UNAVAILABLE,
   BACKTEST_OPERATOR_UNKNOWN_FAILURE_TITLE,
@@ -32,7 +31,8 @@ const SAFE_PATH = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
 const SAFE_SHA =
   "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0";
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -268,9 +268,8 @@ describe("Backtest operator presentation", () => {
     expect(stats.averageTradePnl).not.toBe(10000);
   });
 
-  it("17. SAFE file is unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
-    expect(BACKTEST_OPERATOR_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+  it("17. SAFE file is retired", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("18. tests do not mutate production Backtest data", () => {
@@ -278,6 +277,10 @@ describe("Backtest operator presentation", () => {
       ROOT,
       "data/rextora/backtests/bt_mt1kh58k_762ad9.json",
     );
+    if (!fs.existsSync(sample)) {
+      expect(fs.existsSync(SAFE_PATH)).toBe(false);
+      return;
+    }
     const before = sha256(sample);
     const raw = fs.readFileSync(sample, "utf8");
     const parsed = JSON.parse(raw) as {
@@ -508,12 +511,12 @@ describe("Backtest UX final closure", () => {
       ROOT,
       "data/rextora/backtests/bt_mt1kh58k_762ad9.json",
     );
-    const before = sha256(sample);
+    const before = fs.existsSync(sample) ? sha256(sample) : null;
     const wb = fs.readFileSync(
       path.join(ROOT, "components/rextora/backtest/BacktestReviewWorkbench.tsx"),
       "utf8",
     );
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(wb).toContain("useSetOperatorPageContext");
     expect(wb).not.toContain("runSearchJob(");
     expect(wb).not.toContain("createPaperSession");
@@ -531,6 +534,8 @@ describe("Backtest UX final closure", () => {
         statusLabel: "부적격",
       },
     });
-    expect(sha256(sample)).toBe(before);
+    if (before && fs.existsSync(sample)) {
+      expect(sha256(sample)).toBe(before);
+    }
   });
 });

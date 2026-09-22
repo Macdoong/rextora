@@ -9,7 +9,7 @@
 
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import type { SafeV44Params } from "../strategy/strategyTypes";
-import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
+import { GENERIC_SEARCH_BASELINE_PARAMS } from "../strategy/safeV44Params";
 import { isPatternCandidateParams } from "./patternSearchSpaces";
 import {
   getJobExecutionProfile,
@@ -21,6 +21,17 @@ import {
   evaluateCompleteCandidate,
   type EvaluateCompleteCandidateInput,
 } from "./candidateEvaluator";
+import {
+  isEvaluationCancellationStatus,
+  isEvaluationCancelledError,
+  isEvaluationPausedError,
+  throwIfEvaluationCancelled,
+  type StrategySearchShouldCancel,
+} from "./evaluationCancellation";
+import {
+  createJobEvaluationControl,
+  type StrategySearchEvaluationControl,
+} from "./searchEvaluationControl";
 import {
   StrategySearchGenerationError,
   generateUniqueCandidate,
@@ -55,6 +66,12 @@ import {
 } from "./searchPlan";
 import { refreshLiveResearchTop10 } from "./researchResultsSummary";
 import { finalizeResearchTop10 } from "./researchTop10";
+import {
+  appendSearchActivityEvent,
+  customerMetricsFromEvaluation,
+  mapCustomerFailureReasonCodes,
+  sanitizeRecentActivityEvents,
+} from "./activityTelemetry";
 import {
   createEmptyJobStatistics,
   recordDuplicate,
@@ -176,6 +193,61 @@ function freezeLiveTop10OnTerminal(
   } catch {
     /* non-fatal — live snapshot remains usable */
   }
+}
+
+function createJobShouldCancel(
+  jobId: string,
+  store?: StrategySearchStoreOptions,
+): StrategySearchShouldCancel {
+  const control = createJobEvaluationControl(jobId, store);
+  return async () => (await control()) === "cancel";
+}
+
+function createJobShouldPause(
+  jobId: string,
+  store?: StrategySearchStoreOptions,
+): StrategySearchShouldCancel {
+  const control = createJobEvaluationControl(jobId, store);
+  return async () => (await control()) === "pause";
+}
+
+function finalizeRunnerCancellation(
+  jobId: string,
+  store: StrategySearchStoreOptions | undefined,
+  statistics: StrategySearchJobStatistics,
+  iterationsThisRun: number,
+): RunSearchJobResult {
+  const latest = getSearchJob(jobId, store);
+  if (!latest) {
+    throw new StrategySearchJobRunnerError(
+      "NOT_FOUND",
+      `strategy-search job not found during cancellation: ${jobId}`,
+    );
+  }
+  if (latest.status === "cancelled") {
+    freezeLiveTop10OnTerminal(jobId, store);
+    return {
+      job: latest,
+      statistics,
+      iterationsCompletedThisRun: iterationsThisRun,
+      stopReason: "cancelled",
+    };
+  }
+  if (latest.status === "cancel_requested") {
+    try {
+      transitionJobToCancelling(jobId, store);
+    } catch {
+      /* race with external finalize — still settle cancelled */
+    }
+  }
+  const cancelled = transitionJobToCancelled(jobId, store);
+  freezeLiveTop10OnTerminal(jobId, store);
+  return {
+    job: cancelled,
+    statistics,
+    iterationsCompletedThisRun: iterationsThisRun,
+    stopReason: "cancelled",
+  };
 }
 
 function cloneBest(
@@ -326,6 +398,14 @@ function trialFromEvaluation(input: {
     rankingCompatibilityGroup: stamped.classification.rankingCompatibilityGroup,
     rankingEligible: stamped.classification.rankingEligible,
     promotionEligible: stamped.classification.promotionEligible,
+    ...(ev
+      ? (() => {
+          const codes = mapCustomerFailureReasonCodes(ev.basePass.issues);
+          return codes.length > 0
+            ? { customerFailureReasonCodes: codes }
+            : {};
+        })()
+      : {}),
   };
 }
 
@@ -383,7 +463,7 @@ export async function runSearchJob(
   const honorPause = input.honorPause !== false;
   const maxCheckpointRetries = input.maxCheckpointRetries ?? 3;
   const evaluate = input.evaluate ?? evaluateCompleteCandidate;
-  const baseParams = input.baseParams ?? CONTEXT_FALLBACK_PARAMS;
+  const baseParams = input.baseParams ?? GENERIC_SEARCH_BASELINE_PARAMS;
   const persistedProfile = getJobExecutionProfile(input.jobId, store);
   const eventSequenceCostModel = resolveEventSequenceCostModel(
     input.eventSequenceCostModel ??
@@ -405,22 +485,13 @@ export async function runSearchJob(
   }
 
   // Cancel requested before the runner loop starts (e.g. during candle load).
-  if (job.status === "cancel_requested" || job.status === "cancelling") {
-    if (job.status === "cancel_requested") {
-      try {
-        transitionJobToCancelling(job.id, store);
-      } catch {
-        /* race with external finalize — still settle cancelled */
-      }
-    }
-    job = transitionJobToCancelled(job.id, store);
-    freezeLiveTop10OnTerminal(job.id, store);
-    return {
-      job,
-      statistics: createEmptyJobStatistics(),
-      iterationsCompletedThisRun: 0,
-      stopReason: "cancelled",
-    };
+  if (isEvaluationCancellationStatus(job.status) || job.status === "cancelled") {
+    return finalizeRunnerCancellation(
+      job.id,
+      store,
+      createEmptyJobStatistics(),
+      0,
+    );
   }
 
   // Start: queued → running. If already running, continue (resume mid-flight).
@@ -510,6 +581,37 @@ export async function runSearchJob(
   let lastLiveTop10Passed = 0;
   const LIVE_TOP10_EVERY_PASSED = 5;
   const startedMs = Date.now() - statistics.elapsedMs;
+  const evaluationControl: StrategySearchEvaluationControl =
+    createJobEvaluationControl(job.id, store);
+  const shouldCancel = createJobShouldCancel(job.id, store);
+  const shouldPause = createJobShouldPause(job.id, store);
+  let activityEvents = sanitizeRecentActivityEvents(
+    job.checkpoint.recentActivityEvents,
+  );
+
+  const persistWithActivity = async (
+    nextPayload: StrategySearchRunnerCheckpointPayload,
+  ) =>
+    persistCheckpointWithRetry(
+      input.jobId,
+      buildPersistedCheckpoint({
+        completedIterations: completed,
+        nextIteration: iteration,
+        payload: nextPayload,
+        bestCandidate,
+        bestPassedCandidate,
+        bestByCompatibilityGroup: groupBest,
+        recentActivityEvents: activityEvents,
+      }),
+      store,
+      maxCheckpointRetries,
+    );
+
+  const currentFamilyLabel = (): string | undefined => {
+    const plan = getSearchPlan(input.jobId, store);
+    const label = plan?.spaces[plan.currentSpaceIndex]?.labelKo?.trim();
+    return label ? label : undefined;
+  };
 
   const maxIterations = job.config.maxIterations;
 
@@ -528,31 +630,16 @@ export async function runSearchJob(
       }
       job = latest;
 
-      if (job.status === "cancelled") {
-        freezeLiveTop10OnTerminal(job.id, store);
-        return {
-          job,
+      if (
+        job.status === "cancelled" ||
+        isEvaluationCancellationStatus(job.status)
+      ) {
+        return finalizeRunnerCancellation(
+          job.id,
+          store,
           statistics,
-          iterationsCompletedThisRun: iterationsThisRun,
-          stopReason: "cancelled",
-        };
-      }
-      if (job.status === "cancel_requested" || job.status === "cancelling") {
-        if (job.status === "cancel_requested") {
-          try {
-            transitionJobToCancelling(job.id, store);
-          } catch {
-            /* race with external finalize — still settle cancelled */
-          }
-        }
-        job = transitionJobToCancelled(job.id, store);
-        freezeLiveTop10OnTerminal(job.id, store);
-        return {
-          job,
-          statistics,
-          iterationsCompletedThisRun: iterationsThisRun,
-          stopReason: "cancelled",
-        };
+          iterationsThisRun,
+        );
       }
       if (honorPause && job.status === "pause_requested") {
         // Persist checkpoint before pausing
@@ -563,19 +650,7 @@ export async function runSearchJob(
           seenHashes: [...seenHashes],
           jobStatus: "paused",
         };
-        job = await persistCheckpointWithRetry(
-          job.id,
-          buildPersistedCheckpoint({
-            completedIterations: completed,
-            nextIteration: iteration,
-            payload,
-            bestCandidate,
-            bestPassedCandidate,
-            bestByCompatibilityGroup: groupBest,
-          }),
-          store,
-          maxCheckpointRetries,
-        );
+        job = await persistWithActivity(payload);
         job = transitionJobCooperativelyPaused(job.id, store);
         return {
           job,
@@ -600,19 +675,7 @@ export async function runSearchJob(
           stopReason: "max_iterations",
         };
         statistics = payload.statistics;
-        job = await persistCheckpointWithRetry(
-          job.id,
-          buildPersistedCheckpoint({
-            completedIterations: completed,
-            nextIteration: iteration,
-            payload,
-            bestCandidate,
-            bestPassedCandidate,
-            bestByCompatibilityGroup: groupBest,
-          }),
-          store,
-          maxCheckpointRetries,
-        );
+        job = await persistWithActivity(payload);
         job = transitionJobToCompleted(job.id, store);
         freezeLiveTop10OnTerminal(job.id, store);
         return {
@@ -754,19 +817,7 @@ export async function runSearchJob(
             jobStatus: "completed",
             stopReason: "search_space_exhausted",
           };
-          job = await persistCheckpointWithRetry(
-            job.id,
-            buildPersistedCheckpoint({
-              completedIterations: completed,
-              nextIteration: iteration,
-              payload,
-              bestCandidate,
-              bestPassedCandidate,
-              bestByCompatibilityGroup: groupBest,
-            }),
-            store,
-            maxCheckpointRetries,
-          );
+          job = await persistWithActivity(payload);
           job = transitionJobToCompleted(job.id, store);
           freezeLiveTop10OnTerminal(job.id, store);
           return {
@@ -796,19 +847,7 @@ export async function runSearchJob(
             jobStatus: "failed",
             stopReason: "failed",
           };
-          job = await persistCheckpointWithRetry(
-            job.id,
-            buildPersistedCheckpoint({
-              completedIterations: completed,
-              nextIteration: iteration,
-              payload,
-              bestCandidate,
-              bestPassedCandidate,
-              bestByCompatibilityGroup: groupBest,
-            }),
-            store,
-            maxCheckpointRetries,
-          );
+          job = await persistWithActivity(payload);
           const plan = getSearchPlan(job.id, store);
           if (plan) {
             saveSearchPlan(
@@ -899,19 +938,7 @@ export async function runSearchJob(
               ? { stopReason: "repeated_signature_auto_pause" as const }
               : {}),
           };
-          job = await persistCheckpointWithRetry(
-            job.id,
-            buildPersistedCheckpoint({
-              completedIterations: completed,
-              nextIteration: iteration,
-              payload,
-              bestCandidate,
-              bestPassedCandidate,
-              bestByCompatibilityGroup: groupBest,
-            }),
-            store,
-            maxCheckpointRetries,
-          );
+          job = await persistWithActivity(payload);
           if (hitRepeatedSignature) {
             job = transitionJobCooperativelyPaused(job.id, store);
             if (plan) {
@@ -938,6 +965,7 @@ export async function runSearchJob(
       let evaluation: StrategySearchCompleteCandidateEvaluation | null = null;
       const failureReasons: Array<{ code: string; message: string }> = [];
       try {
+        await throwIfEvaluationCancelled(shouldCancel);
         evaluation = await evaluate({
           candidate,
           symbols: job.config.symbols,
@@ -951,7 +979,12 @@ export async function runSearchJob(
           jitterConfig: input.jitterConfig,
           preloadedCandlesByKey: input.preloadedCandlesByKey,
           eventSequenceCostModel,
+          shouldCancel,
+          shouldPause,
+          evaluationControl,
         });
+        // Close the race: evaluate finished, user clicked stop, persist not yet run.
+        await throwIfEvaluationCancelled(shouldCancel);
         statistics = recordEvaluationCompat(
           statistics,
           {
@@ -971,6 +1004,23 @@ export async function runSearchJob(
           });
         }
       } catch (err) {
+        if (isEvaluationCancelledError(err)) {
+          return finalizeRunnerCancellation(
+            job.id,
+            store,
+            statistics,
+            iterationsThisRun,
+          );
+        }
+        if (isEvaluationPausedError(err)) {
+          job = transitionJobCooperativelyPaused(job.id, store);
+          return {
+            job,
+            statistics,
+            iterationsCompletedThisRun: iterationsThisRun,
+            stopReason: "paused",
+          };
+        }
         const classified = classifyEngineError(err, "evaluation");
         const jitterCode =
           err instanceof StrategySearchJitterError ? err.code : null;
@@ -1041,20 +1091,48 @@ export async function runSearchJob(
           jobStatus: "running",
           repeatedErrorSignatures: { ...repeatedErrorSignatures },
         };
-        job = await persistCheckpointWithRetry(
-          job.id,
-          buildPersistedCheckpoint({
-            completedIterations: completed,
-            nextIteration: iteration,
-            payload,
-            bestCandidate,
-            bestPassedCandidate,
-            bestByCompatibilityGroup: groupBest,
-          }),
-          store,
-          maxCheckpointRetries,
-        );
+        job = await persistWithActivity(payload);
         continue;
+      }
+
+      const activityAt = new Date().toISOString();
+      const familyLabel = currentFamilyLabel();
+      const primaryWindow = evaluation?.baseEvaluation.windows[0]?.metrics;
+      const metrics = customerMetricsFromEvaluation({
+        totalReturn: primaryWindow?.totalReturn,
+        mdd: primaryWindow?.mdd,
+        trades: primaryWindow?.trades,
+        winRate: primaryWindow?.winRate,
+        profitFactor: primaryWindow?.profitFactor,
+        score: evaluation?.baseScore.finalScore ?? trial.score,
+      });
+      activityEvents = appendSearchActivityEvent(activityEvents, {
+        type: "candidate_evaluated",
+        at: activityAt,
+        evaluatedCount: statistics.evaluated,
+        ...(familyLabel ? { familyLabel } : {}),
+        ...(metrics ? { metrics } : {}),
+      });
+      if (evaluation?.finalPassed) {
+        activityEvents = appendSearchActivityEvent(activityEvents, {
+          type: "candidate_gate_passed",
+          at: activityAt,
+          evaluatedCount: statistics.evaluated,
+          ...(familyLabel ? { familyLabel } : {}),
+          ...(metrics ? { metrics } : {}),
+        });
+      } else {
+        const reasonCodes = mapCustomerFailureReasonCodes(
+          evaluation?.basePass.issues ?? [],
+        );
+        activityEvents = appendSearchActivityEvent(activityEvents, {
+          type: "candidate_rejected",
+          at: activityAt,
+          evaluatedCount: statistics.evaluated,
+          ...(familyLabel ? { familyLabel } : {}),
+          ...(reasonCodes.length > 0 ? { reasonCodes } : {}),
+          ...(metrics ? { metrics } : {}),
+        });
       }
 
       // Live Top-10: refresh when enough new qualified candidates appear.
@@ -1066,6 +1144,10 @@ export async function runSearchJob(
         try {
           refreshLiveResearchTop10(job.id, store);
           lastLiveTop10Passed = statistics.passed;
+          activityEvents = appendSearchActivityEvent(activityEvents, {
+            type: "top10_refreshed",
+            at: new Date().toISOString(),
+          });
         } catch {
           /* non-fatal — UI can still show current best */
         }
@@ -1109,19 +1191,7 @@ export async function runSearchJob(
         repeatedErrorSignatures: { ...repeatedErrorSignatures },
       };
 
-      job = await persistCheckpointWithRetry(
-        job.id,
-        buildPersistedCheckpoint({
-          completedIterations: completed,
-          nextIteration: iteration,
-          payload,
-          bestCandidate,
-          bestPassedCandidate,
-          bestByCompatibilityGroup: groupBest,
-        }),
-        store,
-        maxCheckpointRetries,
-      );
+      job = await persistWithActivity(payload);
 
       // Configurable error-rate auto-pause (Advanced Settings). Never silent stop.
       const plan = getSearchPlan(job.id, store);
@@ -1140,19 +1210,7 @@ export async function runSearchJob(
           jobStatus: "paused",
           stopReason: "error_rate_auto_pause",
         };
-        job = await persistCheckpointWithRetry(
-          job.id,
-          buildPersistedCheckpoint({
-            completedIterations: completed,
-            nextIteration: iteration,
-            payload,
-            bestCandidate,
-            bestPassedCandidate,
-            bestByCompatibilityGroup: groupBest,
-          }),
-          store,
-          maxCheckpointRetries,
-        );
+        job = await persistWithActivity(payload);
         job = transitionJobCooperativelyPaused(job.id, store);
         if (plan) {
           saveSearchPlan(job.id, markPlanPaused(plan), store);
@@ -1166,6 +1224,14 @@ export async function runSearchJob(
       }
     }
   } catch (err) {
+    if (isEvaluationCancelledError(err)) {
+      return finalizeRunnerCancellation(
+        input.jobId,
+        store,
+        statistics,
+        iterationsThisRun,
+      );
+    }
     if (err instanceof StrategySearchJobRunnerError) {
       if (err.code === "FATAL" || err.code === "CORRUPT_CHECKPOINT") {
         try {

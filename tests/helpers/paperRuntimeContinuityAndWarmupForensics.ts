@@ -35,6 +35,7 @@ import {
   type EventSequenceCostModel,
 } from "../../src/lib/rextora/strategy/eventSequenceCostModel";
 import { CONTEXT_FALLBACK_PARAMS } from "../../src/lib/rextora/strategy/safeV44Params";
+import { RETIRED_SAFE_FILE_NAME } from "../../src/lib/rextora/strategy/retiredSafeBaseline";
 import {
   createStrategy,
   ensureStrategyStore,
@@ -69,7 +70,8 @@ const ASSUMPTIONS = {
   spreadRate: SPREAD,
 };
 
-export function sha256File(filePath: string): string {
+export function sha256File(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -80,7 +82,7 @@ export function productionRecordHashes(cwd = process.cwd()) {
     .filter((e) => /account|balance/i.test(e.name))
     .map((e) => e.name);
   return {
-    safeSha256: sha256File(path.join(cwd, "data/strategies/SAFE_v44_i4060.json")),
+    safeSha256: sha256File(path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME)),
     researchIndexSha256: sha256File(
       path.join(cwd, "data/rextora/strategy-search/index.json"),
     ),

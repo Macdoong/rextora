@@ -8,11 +8,7 @@
 import { getSavedBacktest } from "../backtest/backtestStore";
 import { getPaperSession } from "../paper/paperSessionStore";
 import { getStrategyById } from "../strategy/strategyStore";
-import { loadSafeV44Strategy } from "../strategy/safeV44Strategy";
-import {
-  SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../strategyRepository";
+import { isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import {
   resolveLiveExecutionKind,
   resolveLiveExecutionTarget,
@@ -64,7 +60,7 @@ const REASON_BY_CODE: Record<Exclude<LiveApprovalValidationCode, "ok">, string> 
 };
 
 export type LiveApprovalSnapshotView = {
-  strategyId: string;
+  strategyId: string | null;
   verifiedForLive: boolean;
   target?: LiveApprovalTarget | null;
 };
@@ -140,11 +136,8 @@ export function captureLiveApprovalTargetIdentity(input: {
   let executionKind: LiveExecutionKind | null = stored
     ? resolveLiveExecutionKind(stored)
     : null;
-  if (strategyId === SAFE_STRATEGY_ID) {
-    const loaded = loadSafeV44Strategy({ throwOnHashMismatch: false });
-    paramsHash = paramsHash || loaded.paramsHash || SAFE_PARAMS_HASH;
-    strategyHash = strategyHash || stored?.strategyHash?.trim() || null;
-    executionKind = "safe_params";
+  if (isRetiredSafeId(strategyId)) {
+    return { ok: false, message: "폐기된 기준 전략은 실전 승인 대상이 아닙니다." };
   }
   if (!paramsHash) {
     return { ok: false, message: "전략 파라미터 신원을 확인할 수 없습니다." };
@@ -215,26 +208,11 @@ function snapshotApprovedTarget(
   return null;
 }
 
-/**
- * Legacy SAFE snapshot (no `target`) may authorize SAFE only.
- * Missing target identity fails closed for any custom Live target.
- */
+/** Retired SAFE snapshots never authorize Live. */
 function legacySafeTarget(
-  snapshot: LiveApprovalSnapshotView,
+  _snapshot: LiveApprovalSnapshotView,
 ): LiveApprovalTarget | null {
-  if (snapshot.target) return null;
-  if (snapshot.strategyId !== SAFE_STRATEGY_ID) return null;
-  if (snapshot.verifiedForLive !== true) return null;
-  return {
-    strategyId: SAFE_STRATEGY_ID,
-    paramsHash: SAFE_PARAMS_HASH,
-    strategyHash: null,
-    symbol: null,
-    executionKind: "safe_params",
-    backtestRunId: null,
-    backtestResultHash: null,
-    paperSessionId: null,
-  };
+  return null;
 }
 
 export function validateLiveApprovalTarget(input: {
@@ -267,10 +245,9 @@ export function validateLiveApprovalTarget(input: {
 
   const explicit = snapshotApprovedTarget(input.approvalSnapshot);
   const approved =
-    explicit ??
-    (current?.strategyId === SAFE_STRATEGY_ID
-      ? legacySafeTarget(input.approvalSnapshot)
-      : null);
+    explicit && !isRetiredSafeId(explicit.strategyId)
+      ? explicit
+      : legacySafeTarget(input.approvalSnapshot);
 
   if (!approved) {
     return fail("APPROVAL_TARGET_MISSING", null, current);

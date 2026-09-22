@@ -1,4 +1,5 @@
 import type { StrategySearchJobStatus } from "./types";
+import { presentSearchFamilyLabelKo } from "./visual/searchScopeVisual";
 
 export type StrategySearchCompletionReason =
   | "QUALIFIED_TARGET_REACHED"
@@ -135,15 +136,13 @@ export function researchStatusLabelKo(
     return "연구 중";
   }
   if (status === "interrupted") return "실행 중단";
-  if (status === "cancel_requested") {
-    return opts?.executionActive ? "중지 요청 중" : "결과 정리 중";
-  }
-  if (status === "cancelling") return "결과 정리 중";
+  if (status === "cancel_requested") return "중지 요청 중";
+  if (status === "cancelling") return "안전하게 탐색을 종료하고 있습니다.";
   if (status === "paused") return "일시정지";
   if (status === "queued") {
     return opts?.executionActive ? "준비 중" : "준비";
   }
-  if (status === "cancelled") return "사용자 중지";
+  if (status === "cancelled") return "탐색이 중지되었습니다.";
   if (status === "failed") {
     if ((opts?.preservedCandidateCount ?? 0) > 0) return "부분 완료";
     return "실패";
@@ -153,6 +152,32 @@ export function researchStatusLabelKo(
     return "완료";
   }
   return status;
+}
+
+/** Pending cooperative cancel only — never for terminal statuses. */
+export function isSearchCancellationPending(
+  status: StrategySearchJobStatus | string | null | undefined,
+): boolean {
+  return status === "cancel_requested" || status === "cancelling";
+}
+
+/** Customer copy while cancel is still in flight (authoritative job.status only). */
+export function searchCancellationPendingCopy(
+  status: StrategySearchJobStatus | string | null | undefined,
+): string | null {
+  if (status === "cancel_requested") return "중지 요청 중";
+  if (status === "cancelling") return "안전하게 탐색을 종료하고 있습니다.";
+  return null;
+}
+
+/** Live Strategy Search cancellation-phase copy. Canonical persisted states only. */
+export function searchCancellationPhaseCopy(
+  status: StrategySearchJobStatus | string | null | undefined,
+): string | null {
+  const pending = searchCancellationPendingCopy(status);
+  if (pending) return pending;
+  if (status === "cancelled") return "탐색이 중지되었습니다.";
+  return null;
 }
 
 /**
@@ -263,9 +288,21 @@ export function resolveCurrentStageLabelKo(input: {
   status: StrategySearchJobStatus | string;
 }): string {
   const active = input.searchProgression?.find((s) => s.status === "active");
-  if (active?.labelKo) return active.labelKo;
-  if (input.currentSearchFamily) return input.currentSearchFamily;
-  if (input.currentImprovementStage) return input.currentImprovementStage;
+  if (active?.labelKo) {
+    return presentSearchFamilyLabelKo(active.labelKo) ?? active.labelKo;
+  }
+  if (input.currentSearchFamily) {
+    return (
+      presentSearchFamilyLabelKo(input.currentSearchFamily) ??
+      input.currentSearchFamily
+    );
+  }
+  if (input.currentImprovementStage) {
+    return (
+      presentSearchFamilyLabelKo(input.currentImprovementStage) ??
+      input.currentImprovementStage
+    );
+  }
   if (input.failedStage) return input.failedStage;
   if (input.status === "queued") return "시장 데이터 준비";
   if (
@@ -278,7 +315,7 @@ export function resolveCurrentStageLabelKo(input: {
   if (input.status === "paused") return "일시정지";
   if (input.status === "interrupted") return "실행 중단";
   if (input.status === "completed") return "정상 완료";
-  if (input.status === "cancelled") return "사용자 중지";
+  if (input.status === "cancelled") return "탐색이 중지되었습니다.";
   if (input.status === "failed") return "실패";
   return "—";
 }

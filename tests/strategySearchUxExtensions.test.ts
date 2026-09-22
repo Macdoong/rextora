@@ -113,12 +113,11 @@ describe("library filter utils", () => {
           d?.match(/sourceResearchJobId=([^\s·]+)/)?.[1] ?? null,
       },
     );
-    expect(counts.all).toBe(3);
-    expect(counts.newest).toBe(3);
+    expect(counts.all).toBe(4);
+    expect(counts.newest).toBe(4);
     expect(counts.current).toBe(1);
     expect(counts.backtested).toBe(1);
-    expect(counts.review).toBe(2);
-    expect(counts.safe).toBe(1);
+    expect(counts.review).toBe(3);
     expect(LIBRARY_CATEGORY_LABELS.all).toBe("전체");
     expect(LIBRARY_CATEGORY_LABELS.newest).toBe("최신");
     expect(LIBRARY_CATEGORY_LABELS.recommended).toBe("추천");
@@ -134,7 +133,7 @@ describe("library filter utils", () => {
       ],
       "newest",
     );
-    expect(rows.map((r) => r.id)).toEqual(["new", "old"]);
+    expect(rows.map((r) => r.id)).toEqual(["new", "old", "SAFE_v44_i4060"]);
   });
 });
 

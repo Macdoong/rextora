@@ -147,7 +147,6 @@ function buildRecommendDecision(
   const running = fv(facts, "실행 중");
   const top =
     fv(facts, "현재 주목 전략") ??
-    fv(facts, "SAFE 전략") ??
     entities?.strategyLabel ??
     null;
   const activePaper = fv(facts, "활성 Paper 세션");

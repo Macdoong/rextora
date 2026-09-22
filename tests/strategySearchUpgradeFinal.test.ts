@@ -25,7 +25,6 @@ import {
   validateStrategySearchForm,
 } from "../components/rextora/strategySearch/formValidation";
 import { createEmptySearchPlan, replenishDeadlineBudget } from "../src/lib/rextora/strategySearch/searchPlan";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 
 describe("strategy search upgrade — config + mutation defaults", () => {
   it("blocks defaultValue outside min/max at range validation", () => {
@@ -256,8 +255,8 @@ describe("strategy search upgrade — UI contracts + SAFE", () => {
     expect(status).toContain("검증된 전략");
     expect(completion).toContain("부분 완료");
     expect(completion).toContain("정상 완료");
-    expect(completion).toContain("최종 TOP 10 검토");
-    expect(completion).toContain("개발자 정보");
+    expect(completion).toContain("이 탐색 결과");
+    expect(completion).not.toContain("개발자 정보");
     expect(completion).not.toMatch(/\$\{formatCount\(budgetUsed\)\} \/ \$\{formatCount\(budget\)\}/);
     expect(completion).not.toContain("summary.registeredStrategies");
     expect(currentResearch).toContain("새 기간으로 백테스트");
@@ -268,14 +267,12 @@ describe("strategy search upgrade — UI contracts + SAFE", () => {
     expect(results).toContain("추천 가능한 안정 전략 없음");
   });
 
-  it("SAFE remains immutable and tests use isolated temp roots", () => {
+  it("retired SAFE file is absent and tests use isolated temp roots", () => {
     const safePath = path.join(
       process.cwd(),
       "data/rextora/strategies/SAFE_v44_i4060.json",
     );
-    const raw = fs.readFileSync(safePath, "utf8");
-    expect(raw).toContain('"paramsHash": "7893ca3f0e30"');
-    expect(raw).toContain(SAFE_STRATEGY_ID);
+    expect(fs.existsSync(safePath)).toBe(false);
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-ss-upgrade-"));
     expect(tmp.includes("data/rextora")).toBe(false);
     fs.rmSync(tmp, { recursive: true, force: true });

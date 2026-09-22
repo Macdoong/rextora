@@ -3,8 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   copyStrategy,
+  createStrategy,
   deleteStrategy,
   ensureStrategyStore,
+  getPaperActiveStrategy,
   getStrategiesRoot,
   getStrategyById,
   listStrategies,
@@ -12,10 +14,12 @@ import {
   setPaperActiveStrategy
 } from "../src/lib/rextora/strategy/strategyStore";
 import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
-import { EXPECTED_SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { runConfiguredBacktest } from "../src/lib/rextora/backtest/backtestRunner";
 import { isTestStrategyRecord } from "../src/lib/rextora/strategy/strategyTestFilter";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const createdIds: string[] = [];
 let cleanupIsolated: (() => void) | undefined;
@@ -36,9 +40,7 @@ describe("strategyStore", () => {
         /* already gone */
       }
     }
-    // Sweep leftover pollution clones from interrupted runs (isolated root only)
     for (const s of listStrategies()) {
-      if (s.id === SAFE_STRATEGY_ID) continue;
       if (isTestStrategyRecord(s as never)) {
         try {
           deleteStrategy(s.id);
@@ -51,42 +53,43 @@ describe("strategyStore", () => {
     cleanupIsolated = undefined;
   });
 
-  it("lists protected SAFE_v44_i4060 with verified hash", () => {
+  it("starts empty with no SAFE injection", () => {
     const list = listStrategies();
-    const safe = list.find((s) => s.id === SAFE_STRATEGY_ID);
-    expect(safe).toBeDefined();
-    expect(safe!.locked).toBe(true);
-    expect(safe!.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(safe!.timeframe).toBe("15m");
+    expect(list.find((s) => s.id === RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(getPaperActiveStrategy()).toBeNull();
     expect(fs.existsSync(path.join(getStrategiesRoot(), "index.json"))).toBe(true);
   });
 
   it("copy creates editable strategy with new hash", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "SAFE_copy_test");
+    const source = createStrategy({ name: "Persist Base" });
+    createdIds.push(source.id);
+    const copy = copyStrategy(source.id, "SAFE_copy_test");
     createdIds.push(copy.id);
     expect(copy.locked).toBe(false);
-    expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
+    expect(copy.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     const edited = saveStrategy(copy.id, {
       params: { ...copy.params, ema_fast: copy.params.ema_fast + 1 }
     });
-    expect(edited.paramsHash).not.toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(edited.paramsHash).not.toBe(source.paramsHash);
     expect(edited.paramsHash).toBe(computeParamsHash(edited.params));
   });
 
-  it("refuses direct save of locked SAFE", () => {
-    const safe = getStrategyById(SAFE_STRATEGY_ID)!;
-    expect(() => saveStrategy(SAFE_STRATEGY_ID, { params: safe.params })).toThrow(/잠긴/);
+  it("retired SAFE cannot be saved as a store identity", () => {
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
+    expect(() => saveStrategy(RETIRED_SAFE_STRATEGY_ID, { name: "hacked" })).toThrow();
   });
 
-  it("can set paper active strategy", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID);
+  it("can set paper active strategy without SAFE fallback", () => {
+    const source = createStrategy({ name: "Paper Source" });
+    createdIds.push(source.id);
+    const copy = copyStrategy(source.id);
     createdIds.push(copy.id);
     const active = setPaperActiveStrategy(copy.id);
     expect(active.paperActive).toBe(true);
     const list = listStrategies();
     expect(list.find((s) => s.id === copy.id)?.paperActive).toBe(true);
     expect(list.filter((s) => s.paperActive).length).toBe(1);
-    setPaperActiveStrategy(SAFE_STRATEGY_ID);
+    expect(getPaperActiveStrategy()?.id).toBe(copy.id);
   });
 });
 
@@ -95,8 +98,9 @@ describe("backtestRunner", () => {
     const { cleanup } = installIsolatedStrategyStore();
     try {
       ensureStrategyStore();
+      const source = createStrategy({ name: "Backtest Source" });
       const result = await runConfiguredBacktest({
-        strategyId: SAFE_STRATEGY_ID,
+        strategyId: source.id,
         symbols: ["BTCUSDT"],
         timeframe: "15m",
         balance: 10000,
@@ -113,7 +117,6 @@ describe("backtestRunner", () => {
       expect(result.report.validation.noRealOrders).toBe(true);
       expect(result.report.costStress?.length).toBe(3);
       expect(result.report.strategyHash).toHaveLength(64);
-      expect(result.report.sourceParamsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
       expect(result.report.dataSource).toBe("synthetic-test");
       expect(result.candles.length).toBe(result.report.candleCount);
     } finally {

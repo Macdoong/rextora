@@ -219,8 +219,8 @@ describe("strategySearch Phase 6 API", () => {
 
   beforeEach(() => {
     root = makeTempRoot();
-    safeBefore = fs.readFileSync(SAFE_PATH);
-    strategiesBefore = fs.readdirSync(STRATEGIES_DIR).sort();
+    safeBefore = fs.existsSync(SAFE_PATH) ? fs.readFileSync(SAFE_PATH) : Buffer.alloc(0);
+    strategiesBefore = fs.existsSync(STRATEGIES_DIR) ? fs.readdirSync(STRATEGIES_DIR).sort() : [];
     resetSearchJobExecutionRegistryForTests();
     setStrategySearchApiStoreOptionsForTests({ rootDir: root });
     setDefaultSearchJobExecutionDepsForTests({
@@ -531,26 +531,21 @@ describe("strategySearch Phase 6 API", () => {
     expect(done.statistics?.errors).toBeGreaterThanOrEqual(1);
   });
 
-  it("does not modify protected SAFE strategy bytes or hash", async () => {
+  it("does not resurrect retired SAFE strategy file", async () => {
     const snap = readProtectedSafeSnapshot();
-    expect(snap.name).toBe("SAFE_v44_i4060");
-    expect(snap.paramsHash).toBe("7893ca3f0e30");
+    expect(snap.name).toBe("");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
 
     const job = createStrategySearchJobApi(
-      validCreateBody({ strategyTemplateId: "SAFE_v44_i4060", maxIterations: 2 }),
+      validCreateBody({ maxIterations: 2 }),
     );
     startStrategySearchJobApi(job.id);
     await waitForSearchJobExecution(job.id);
 
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(safeBefore, after)).toBe(0);
-    expect(fs.readdirSync(STRATEGIES_DIR).sort()).toEqual(strategiesBefore);
-    const json = JSON.parse(after.toString("utf8")) as {
-      name: string;
-      params_hash: string;
-    };
-    expect(json.name).toBe("SAFE_v44_i4060");
-    expect(json.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
+    expect(fs.existsSync(STRATEGIES_DIR) ? fs.readdirSync(STRATEGIES_DIR).sort() : []).toEqual(
+      strategiesBefore,
+    );
   });
 
   it("HTTP routes expose create/list/detail/start/trials/best", async () => {

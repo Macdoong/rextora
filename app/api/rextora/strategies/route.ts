@@ -32,9 +32,12 @@ import {
   forbiddenResponse,
   originRejectedResponse,
   requireAuthenticatedUser,
-  denyUnlessAuthenticated,
 } from "@/src/lib/rextora/auth/requireUser";
 import { isSameOriginMutation } from "@/src/lib/rextora/auth/requestSecurity";
+import {
+  canReadStoredStrategy,
+  canWriteStoredStrategy,
+} from "@/src/lib/rextora/auth/searchResourceAccess";
 
 function koreanError(error: unknown): string {
   if (error instanceof StrategyValidationError) return error.message;
@@ -49,8 +52,8 @@ function koreanError(error: unknown): string {
 }
 
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   ensureStrategyStore();
   const { searchParams } = new URL(request.url);
@@ -63,13 +66,17 @@ export async function GET(request: Request) {
   if (id) {
     try {
       const strategy = getStrategyById(id);
-      if (!strategy) return NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+      if (!strategy || !canReadStoredStrategy(auth.user, strategy)) {
+        return NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+      }
       return NextResponse.json({ ok: true, data: strategy });
     } catch (error) {
       return NextResponse.json({ ok: false, error: koreanError(error) }, { status: 400 });
     }
   }
-  const data = includeTest ? listStrategies() : listProductionStrategies();
+  const data = (includeTest ? listStrategies() : listProductionStrategies()).filter(
+    (strategy) => canReadStoredStrategy(auth.user, strategy),
+  );
   return NextResponse.json({ ok: true, data });
 }
 
@@ -111,6 +118,18 @@ export async function POST(request: Request) {
     return forbiddenResponse();
   }
 
+  const hidden = NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+  const assertReadable = (id: string) => {
+    const current = getStrategyById(id);
+    if (!current || !canReadStoredStrategy(auth.user, current)) return hidden;
+    return null;
+  };
+  const assertWritable = (id: string) => {
+    const current = getStrategyById(id);
+    if (!current || !canWriteStoredStrategy(auth.user, current)) return hidden;
+    return null;
+  };
+
   try {
     switch (body.action) {
       case "create": {
@@ -127,6 +146,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
           ok: true,
           data: createStrategy({
+            ownerUserId: auth.user.userId,
             name: body.name ?? "새 전략",
             description: body.description,
             params: body.params,
@@ -137,18 +157,29 @@ export async function POST(request: Request) {
         });
       }
       case "copy":
-      case "clone":
+      case "clone": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
-        return NextResponse.json({ ok: true, data: copyStrategy(body.id, body.name) });
-      case "save":
+        const blocked = assertReadable(body.id);
+        if (blocked) return blocked;
+        return NextResponse.json({
+          ok: true,
+          data: copyStrategy(body.id, body.name, auth.user.userId),
+        });
+      }
+      case "save": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const blocked = assertWritable(body.id);
+        if (blocked) return blocked;
         return NextResponse.json({
           ok: true,
           data: saveStrategy(body.id, body.patch ?? { params: body.params, definition: body.definition })
         });
+      }
       case "library_archive":
       case "library_restore": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const blockedArchive = assertWritable(body.id);
+        if (blockedArchive) return blockedArchive;
         const current = getStrategyById(body.id);
         if (!current) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
         const archived = body.action === "library_archive";
@@ -165,6 +196,8 @@ export async function POST(request: Request) {
       }
       case "rename_display": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const blocked = assertWritable(body.id);
+        if (blocked) return blocked;
         return NextResponse.json({
           ok: true,
           data: updateStrategyDisplayMeta(body.id, {
@@ -183,6 +216,8 @@ export async function POST(request: Request) {
       }
       case "restore_alias": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const blocked = assertWritable(body.id);
+        if (blocked) return blocked;
         return NextResponse.json({
           ok: true,
           data: updateStrategyDisplayMeta(body.id, { displayAlias: null }),
@@ -190,6 +225,8 @@ export async function POST(request: Request) {
       }
       case "regenerate_auto_name": {
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        const blocked = assertWritable(body.id);
+        if (blocked) return blocked;
         const strategy = getStrategyById(body.id);
         if (!strategy) throw new StrategyValidationError("전략을 찾을 수 없습니다.");
         const automaticName = buildComboAwareStrategyName({
@@ -207,6 +244,10 @@ export async function POST(request: Request) {
       }
       case "delete":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertWritable(body.id);
+          if (blocked) return blocked;
+        }
         if (body.detachRefsFirst === true || body.includeRelatedRecords === true) {
           deleteStrategyWithSafety(body.id, {
             detachRefsFirst: body.detachRefsFirst === true,
@@ -227,18 +268,30 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true });
       case "deletion_impact":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertReadable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({
           ok: true,
           data: previewStrategyDeletion(body.id),
         });
       case "detach_research_provenance":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertWritable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({
           ok: true,
           data: detachResearchProvenance(body.id),
         });
       case "apply_paper":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertWritable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({
           ok: true,
           data: preparePaperFromResults({
@@ -254,12 +307,24 @@ export async function POST(request: Request) {
       case "apply_live":
       case "mark_live_candidate":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertWritable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({ ok: true, data: setLiveActiveStrategy(body.id) });
       case "validate":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertReadable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({ ok: true, data: validateStrategyById(body.id) });
       case "restore":
         if (!body.id) throw new StrategyValidationError("전략 고유번호가 필요합니다.");
+        {
+          const blocked = assertWritable(body.id);
+          if (blocked) return blocked;
+        }
         return NextResponse.json({ ok: true, data: restoreCloneFromSource(body.id) });
       default:
         throw new StrategyValidationError("알 수 없는 요청입니다.");

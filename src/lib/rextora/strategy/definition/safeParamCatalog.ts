@@ -15,12 +15,12 @@ export interface SafeParamCatalogEntry {
   explanation: string;
   increaseEffect: string;
   decreaseEffect: string;
-  /** Whether the immutable SAFE snapshot confirms this parameter. */
+  /** Whether this parameter is in the static confirmed catalog. */
   confirmedInDataFile: boolean;
   sourceLabel: string;
 }
 
-/** Keys confirmed by the immutable SAFE snapshot. */
+/** Keys confirmed in the generic parameter catalog. */
 export const SNAPSHOT_CONFIRMED_KEYS = [
   "ema_fast",
   "ema_mid",
@@ -470,25 +470,8 @@ let cachedSnapshotKeys: Set<string> | null = null;
 
 export function loadSnapshotConfirmedKeys(): Set<string> {
   if (cachedSnapshotKeys) return cachedSnapshotKeys;
-  const keys = new Set<string>(SNAPSHOT_CONFIRMED_KEYS);
-  try {
-    const p = path.join(
-      /* turbopackIgnore: true */ process.cwd(),
-      "data",
-      "strategies",
-      "SAFE_v44_i4060.json",
-    );
-    if (fs.existsSync(p)) {
-      const raw = JSON.parse(fs.readFileSync(p, "utf8")) as {
-        params?: Record<string, unknown>;
-      };
-      for (const k of Object.keys(raw.params ?? {})) keys.add(k);
-    }
-  } catch {
-    /* keep static list */
-  }
-  cachedSnapshotKeys = keys;
-  return keys;
+  cachedSnapshotKeys = new Set<string>(SNAPSHOT_CONFIRMED_KEYS);
+  return cachedSnapshotKeys;
 }
 
 export function getSafeParamCatalog(): SafeParamCatalogEntry[] {

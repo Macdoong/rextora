@@ -18,12 +18,15 @@ import {
   resolveDisplayTerminationReason,
   type PipelineUiStatus,
 } from "./formatters";
+import { isOperationallyActiveStatus } from "./apiClient";
 import { cleanStrategyDisplayName } from "./displayNames";
 import { ResearchRankingGroups } from "./ResearchRankingGroups";
 import {
   formatGroupAwareStatus,
   hasAuthoritativeRankingGroups,
 } from "@/src/lib/rextora/researchRankingReadModel";
+import { liveTop10EmptyPresentation, presentSearchFamilyLabelKo } from "./visual/searchScopeVisual";
+import { isStrategySearchDeveloperDiagnosticsVisible } from "./completionCustomerView";
 
 function formatClock(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -161,9 +164,12 @@ function buildAiWorkNarrative(input: {
   const sections: Array<{ label: string; value: string }> = [];
 
   const currentTask =
-    job.currentSearchFamily ??
-    job.searchProgression?.find((s) => s.status === "active")?.labelKo ??
-    job.currentImprovementStage ??
+    job.currentCombinationLabel ??
+    presentSearchFamilyLabelKo(job.currentSearchFamily) ??
+    presentSearchFamilyLabelKo(
+      job.searchProgression?.find((s) => s.status === "active")?.labelKo,
+    ) ??
+    presentSearchFamilyLabelKo(job.currentImprovementStage) ??
     null;
   if (currentTask) {
     sections.push({ label: "현재 AI 작업", value: currentTask });
@@ -179,7 +185,10 @@ function buildAiWorkNarrative(input: {
 
   const nextSpace = job.searchProgression?.find((s) => s.status === "pending");
   if (nextSpace?.labelKo) {
-    sections.push({ label: "다음 단계", value: nextSpace.labelKo });
+    sections.push({
+      label: "다음 단계",
+      value: presentSearchFamilyLabelKo(nextSpace.labelKo) ?? nextSpace.labelKo,
+    });
   } else if (job.status === "running" && job.currentSearchFamily) {
     sections.push({
       label: "다음 단계",
@@ -255,8 +264,15 @@ export function SearchStatusCard(props: {
   generationCount?: number | null;
   latestWeaknessKo?: string | null;
   latestAdjustmentKo?: string | null;
+  operatorFacing?: boolean;
 }) {
-  const { job, generationCount, latestWeaknessKo, latestAdjustmentKo } = props;
+  const {
+    job,
+    generationCount,
+    latestWeaknessKo,
+    latestAdjustmentKo,
+    operatorFacing = false,
+  } = props;
   const [top10Expanded, setTop10Expanded] = useState(false);
   const stats = job.statistics;
   const qualifiedTarget = job.qualifiedTarget ?? null;
@@ -274,10 +290,13 @@ export function SearchStatusCard(props: {
     stats?.evaluated ??
     tested;
 
+  const stopping =
+    job.status === "cancel_requested" || job.status === "cancelling";
   const researching =
-    job.status === "running" ||
-    job.executionActive ||
-    job.status === "pause_requested";
+    !stopping &&
+    (job.status === "running" ||
+      job.executionActive ||
+      job.status === "pause_requested");
 
   const preserved =
     job.preservedCandidateCount ??
@@ -320,16 +339,21 @@ export function SearchStatusCard(props: {
         : null;
   const progressLine =
     progressPct != null
-      ? "탐색 진행 " + String(progressPct) + "%"
+      ? `최대 실행시간 사용률 ${progressPct}%`
       : researching
         ? "시간 정보를 복구하는 중입니다."
         : null;
   const bestReturn = formatPct(job.bestReturn);
   const progression = job.searchProgression ?? [];
   const groupAware = hasAuthoritativeRankingGroups(job);
+  const liveTop10Empty = liveTop10EmptyPresentation({
+    running: isOperationallyActiveStatus(job.status, job.executionActive),
+    candidateCount: job.liveTop10?.entries.length ?? 0,
+  });
   const bestSummary = job.currentBestSummary
     ? cleanStrategyDisplayName(job.currentBestSummary)
     : null;
+  const familyLabel = presentSearchFamilyLabelKo(job.currentSearchFamily);
   const combinationLabel =
     job.currentCombinationLabel ??
     (job.patternCombinationFamilies &&
@@ -454,15 +478,19 @@ export function SearchStatusCard(props: {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h3 id="ss-live-status-title" className="ss-section-title">
-            {researching ? "AI가 연구 중입니다…" : "현재 AI 연구"}
+            {stopping
+              ? researchStatus
+              : researching
+                ? "AI가 연구 중입니다…"
+                : "현재 AI 연구"}
           </h3>
           <p
             className="mt-1 text-sm text-sky-100"
             data-testid="ss-live-status-label"
           >
             {researchStatus}
-            {researching && (combinationLabel ?? job.currentSearchFamily)
-              ? ` · ${combinationLabel ?? job.currentSearchFamily}`
+            {researching && (combinationLabel ?? familyLabel)
+              ? ` · ${combinationLabel ?? familyLabel}`
               : ""}
           </p>
           {job.status === "interrupted" && job.recoveryBlocker ? (
@@ -478,7 +506,7 @@ export function SearchStatusCard(props: {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatBlock
-          label="탐색 진행"
+          label="최대 실행시간 사용률"
           value={
             progressPct != null
               ? `${progressPct}%`
@@ -525,12 +553,19 @@ export function SearchStatusCard(props: {
           label={groupAware ? "평가 그룹" : "현재 최고"}
           value={
             groupAware
-              ? formatGroupAwareStatus(job)
+              ? (operatorFacing
+                  ? formatGroupAwareStatus(job).replace(
+                      /SAFE 전략/g,
+                      "통합 기술 전략",
+                    )
+                  : formatGroupAwareStatus(job))
               : (bestSummary ?? bestReturn ?? "—")
           }
           hint={
             groupAware
-              ? "SAFE와 패턴은 따로 평가합니다."
+              ? operatorFacing
+                ? "통합 기술 전략과 패턴은 따로 평가합니다."
+                : "SAFE와 패턴은 따로 평가합니다."
               : bestSummary && bestReturn
                 ? bestReturn
                 : "기존 평가 형식"
@@ -555,8 +590,8 @@ export function SearchStatusCard(props: {
           hint={
             combinationLabel
               ? `현재 조합: ${combinationLabel}`
-              : job.currentSearchFamily
-                ? `패밀리: ${job.currentSearchFamily}`
+              : familyLabel
+                ? `패밀리: ${familyLabel}`
                 : null
           }
           testId="ss-current-iteration"
@@ -610,6 +645,7 @@ export function SearchStatusCard(props: {
       <ResearchRankingGroups
         source={job}
         unknownLegacy={job.unknownLegacy}
+        operatorFacing={operatorFacing}
       />
       {errorWarningActive ? (
         <div
@@ -684,12 +720,28 @@ export function SearchStatusCard(props: {
           </div>
         </div>
         {!job.liveTop10 || job.liveTop10.entries.length === 0 ? (
-          <p
-            className="mt-2 text-sm text-[var(--text-muted)]"
+          <div
+            className={
+              "mt-2 text-sm text-[var(--text-muted)]" +
+              (liveTop10Empty.evaluating ? " ss-top10-evaluating" : "")
+            }
             data-testid="ss-live-top10-empty"
+            aria-label={liveTop10Empty.evaluating ? "후보 평가 중" : undefined}
           >
-            아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다.
-          </p>
+            {liveTop10Empty.evaluating ? (
+              <>
+                <span className="ss-top10-dots" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <p>{liveTop10Empty.title}</p>
+                <p>{liveTop10Empty.detail}</p>
+              </>
+            ) : (
+              <p>아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다.</p>
+            )}
+          </div>
         ) : (
           <>
             <div
@@ -966,6 +1018,7 @@ export function SearchStatusCard(props: {
               value={`${formatCount(counters?.evaluationErrors ?? stats?.errors ?? 0)}개`}
               testId="ss-counter-errors"
             />
+            {isStrategySearchDeveloperDiagnosticsVisible() ? (
             <StatBlock
               label="연구 세대"
               value={
@@ -975,6 +1028,7 @@ export function SearchStatusCard(props: {
               }
               testId="ss-generation-count"
             />
+            ) : null}
             <StatBlock
               label="최소 확보 기준"
               value={
@@ -1144,7 +1198,7 @@ export function SearchStatusCard(props: {
                   value={formatCount(job.config.maxIterations)}
                 />
               ) : null}
-              {job.seed != null ? (
+              {isStrategySearchDeveloperDiagnosticsVisible() && job.seed != null ? (
                 <Metric label="시드" value={String(job.seed)} />
               ) : null}
             </div>

@@ -1,5 +1,5 @@
 import { listStrategySearchTrialsApi } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireSearchJobAccess } from "@/src/lib/rextora/auth/requireSearchJobAccess";
 import {
   strategySearchError,
   strategySearchJson,
@@ -9,12 +9,11 @@ type Ctx = { params: Promise<{ jobId: string }> };
 
 /** GET /api/rextora/strategy-search/[jobId]/trials?limit=&offset=&passedOnly= */
 export async function GET(request: Request, context: Ctx) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
-
   const start = Date.now();
   try {
     const { jobId } = await context.params;
+    const access = requireSearchJobAccess(request, jobId, "read");
+    if (!access.ok) return access.response;
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get("limit") ?? "50");
     const offset = Number(url.searchParams.get("offset") ?? "0");

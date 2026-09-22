@@ -17,6 +17,11 @@ import {
 import { createSeededRandom } from "./random";
 import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
 import { validateSearchParameterRanges } from "./paramSpace";
+import {
+  isEvaluationCancelledError,
+  throwIfEvaluationInterrupted,
+  type StrategySearchShouldCancel,
+} from "./evaluationCancellation";
 import type {
   StrategySearchBacktestCostConfig,
   StrategySearchCandidate,
@@ -81,9 +86,11 @@ export interface EvaluateCandidateJitterInput {
   config: StrategySearchJitterConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: import("./searchEvaluationControl").StrategySearchEvaluationControl;
 }
 
-const PROTECTED_HASH = "7893ca3f0e30";
 const JITTER_ITERATION_BASE = 900_000_000;
 
 /**
@@ -230,20 +237,6 @@ export function generateJitterCandidate(
         },
       );
     }
-    if (
-      err instanceof StrategySearchGenerationError &&
-      err.code === "PROTECTED_HASH_COLLISION"
-    ) {
-      throw new StrategySearchJitterError(
-        "PROTECTED_HASH_COLLISION",
-        "jitter sample collided with protected SAFE hash",
-        {
-          candidateId: input.parentCandidate.candidateId,
-          sampleIndex: input.sampleIndex,
-          cause: err,
-        },
-      );
-    }
     throw new StrategySearchJitterError(
       "JITTER_EVALUATION_FAILED",
       err instanceof Error ? err.message : "jitter candidate generation failed",
@@ -283,23 +276,16 @@ export async function evaluateCandidateJitter(
     return emptyDisabledResult(input.baseScore.finalScore);
   }
 
-  if (
-    input.parentCandidate.paramsHash === PROTECTED_HASH ||
-    /SAFE_v44_i4060/i.test(input.parentCandidate.candidateId)
-  ) {
-    throw new StrategySearchJitterError(
-      "PROTECTED_HASH_COLLISION",
-      "parent candidate must not use protected SAFE identity",
-      { candidateId: input.parentCandidate.candidateId },
-    );
-  }
-
   const random = createSeededRandom(input.config.seed);
   const existingHashes = new Set<string>([input.parentCandidate.paramsHash]);
   const samples: StrategySearchJitterSampleResult[] = [];
   const maxUniqueAttempts = Math.max(64, input.config.sampleCount * 16);
 
   for (let sampleIndex = 0; sampleIndex < input.config.sampleCount; sampleIndex += 1) {
+    await throwIfEvaluationInterrupted(
+      input.shouldCancel,
+      input.shouldPause,
+    );
     const jitterCandidate = generateJitterCandidate({
       parentCandidate: input.parentCandidate,
       config: input.config,
@@ -320,6 +306,9 @@ export async function evaluateCandidateJitter(
         costConfig: input.baseCostConfig,
         preloadedCandlesByKey: input.preloadedCandlesByKey,
         eventSequenceCostModel: input.eventSequenceCostModel,
+        shouldCancel: input.shouldCancel,
+        shouldPause: input.shouldPause,
+        evaluationControl: input.evaluationControl,
       });
       const pass = evaluateCandidatePass({
         evaluation,
@@ -360,6 +349,7 @@ export async function evaluateCandidateJitter(
         },
       });
     } catch (err) {
+      if (isEvaluationCancelledError(err)) throw err;
       if (err instanceof StrategySearchJitterError) throw err;
       throw new StrategySearchJitterError(
         "JITTER_EVALUATION_FAILED",

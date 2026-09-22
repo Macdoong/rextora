@@ -28,8 +28,6 @@ export function isValidStrategySearchJobId(jobId: string): boolean {
     return false;
   }
   if (jobId.includes("\0")) return false;
-  if (/SAFE_v44_i4060/i.test(jobId)) return false;
-  if (jobId.toLowerCase().startsWith("safe")) return false;
   return JOB_ID_RE.test(jobId);
 }
 

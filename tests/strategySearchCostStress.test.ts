@@ -294,8 +294,8 @@ describe("strategySearch costStress", () => {
     expect(opt.scenario.requiredForPass).toBe(false);
   });
 
-  it("does not persist and keeps SAFE bytes identical", async () => {
-    const before = fs.readFileSync(SAFE_PATH);
+  it("does not persist and does not resurrect retired SAFE", async () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const writeSpy = vi.spyOn(fs, "writeFileSync");
     await evaluateCostStress({
       candidate: candidate(),
@@ -313,11 +313,6 @@ describe("strategySearch costStress", () => {
       String(call[0]).includes(`${path.sep}strategies${path.sep}`),
     );
     expect(strategyWrites).toHaveLength(0);
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(before, after)).toBe(0);
-    expect(
-      (JSON.parse(after.toString("utf8")) as { params_hash: string })
-        .params_hash,
-    ).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 });

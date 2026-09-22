@@ -4,14 +4,16 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { executeTool } from "../src/lib/rextora/agent/v2/tools/toolExecutor";
 import { getToolById, listWriteToolIds } from "../src/lib/rextora/agent/v2/tools";
-import { copyStrategy, getStrategyById } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+import { copyStrategy, createStrategy, getStrategyById } from "../src/lib/rextora/strategy/strategyStore";
+
 import { descriptionHasLibraryArchive } from "../src/lib/rextora/strategy/libraryArchive";
 import { preparePaperFromResults } from "../src/lib/rextora/paper/paperSessionService";
 import { getPaperSession } from "../src/lib/rextora/paper/paperSessionStore";
 import { readToolAuditLines } from "../src/lib/rextora/agent/v2/tools/toolAudit";
 import { recordToolResultLifecycle } from "../src/lib/rextora/agent/v2/lifecycle/lifecycleService";
 import { replayAgentEvents } from "../src/lib/rextora/agent/v2/events/eventStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 let root = "";
 
@@ -73,7 +75,7 @@ describe("Agent V2 expanded safe employee tools", () => {
   });
 
   it("renames, archives, restores and idempotently replays without changing params identity", async () => {
-    const clone = copyStrategy(SAFE_STRATEGY_ID, "Employee candidate");
+    const clone = copyStrategy(createStrategy({ name: "Employee Source" }).id, "Employee candidate");
     const storedClone = getStrategyById(clone.id)!;
     const identity = { paramsHash: storedClone.paramsHash, strategyHash: storedClone.strategyHash };
     const rename = await approved("strategy.rename", {
@@ -96,7 +98,7 @@ describe("Agent V2 expanded safe employee tools", () => {
   });
 
   it("runs the canonical Paper lifecycle with exchangeCalled=false and persists lifecycle events", async () => {
-    const clone = copyStrategy(SAFE_STRATEGY_ID, "Paper candidate");
+    const clone = copyStrategy(createStrategy({ name: "Paper Source" }).id, "Paper candidate");
     const prepared = preparePaperFromResults({ strategyId: clone.id });
     const sessionId = prepared.session.id;
     const sequence = [
@@ -124,12 +126,12 @@ describe("Agent V2 expanded safe employee tools", () => {
 
   it("blocks protected deletion, permits dependency-safe deletion, and audits outcomes", async () => {
     const protectedResult = await approved("strategy.delete", {
-      strategyId: SAFE_STRATEGY_ID, idempotencyKey: "never_delete_safe",
+      strategyId: RETIRED_SAFE_STRATEGY_ID, idempotencyKey: "never_delete_safe",
     });
     expect(protectedResult.ok).toBe(false);
-    expect(getStrategyById(SAFE_STRATEGY_ID)?.id).toBe(SAFE_STRATEGY_ID);
+    expect(getStrategyById(RETIRED_SAFE_STRATEGY_ID)).toBeUndefined();
 
-    const clone = copyStrategy(SAFE_STRATEGY_ID, "Disposable candidate");
+    const clone = copyStrategy(createStrategy({ name: "Disposable Source" }).id, "Disposable candidate");
     const deleted = await approved("strategy.delete", {
       strategyId: clone.id, idempotencyKey: "delete_candidate_once",
     });

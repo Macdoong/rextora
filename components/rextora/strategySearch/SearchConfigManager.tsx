@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/primitives";
 import type { StrategySearchOperatorFormState } from "./formDefaults";
-import {
-  loadOperatorFormSession,
-  saveOperatorFormSession,
-} from "./operatorFormSession";
+import { formatCustomerSearchValue } from "./customerDisplay";
+import { saveOperatorFormSession } from "./operatorFormSession";
+import { applySavedOperatorForm } from "./searchConfigApply";
 
 type SavedConfigSummary = {
   name: string;
@@ -24,8 +23,9 @@ export function SearchConfigManager(props: {
   form: StrategySearchOperatorFormState;
   readOnly?: boolean;
   onChange: (next: StrategySearchOperatorFormState) => void;
+  onConfigLoaded?: (next: StrategySearchOperatorFormState) => void;
 }) {
-  const { form, readOnly = false, onChange } = props;
+  const { form, readOnly = false, onChange, onConfigLoaded } = props;
   const disabled = readOnly;
 
   const [configName, setConfigName] = useState("");
@@ -35,6 +35,7 @@ export function SearchConfigManager(props: {
   const [duplicateTo, setDuplicateTo] = useState("");
   const [savedConfigs, setSavedConfigs] = useState<SavedConfigSummary[]>([]);
   const [configFeedback, setConfigFeedback] = useState<string | null>(null);
+  const [loadedConfigName, setLoadedConfigName] = useState<string | null>(null);
 
   const refreshConfigList = useCallback(async () => {
     try {
@@ -84,6 +85,7 @@ export function SearchConfigManager(props: {
     setConfigFeedback(null);
     try {
       await postConfigAction({ name, form, overwrite: true });
+      setLoadedConfigName(name);
       setConfigFeedback(`"${name}" 설정을 저장했습니다.`);
       await refreshConfigList();
     } catch (err) {
@@ -105,13 +107,13 @@ export function SearchConfigManager(props: {
         setConfigFeedback("불러오기에 실패했습니다.");
         return;
       }
-      const stored = loadOperatorFormSession();
-      const next = {
-        ...(stored ?? form),
-        ...json.data.form,
-      };
+      const next = applySavedOperatorForm(json.data.form, {
+        showAdvanced: form.showAdvanced,
+      });
       onChange(next);
+      onConfigLoaded?.(next);
       saveOperatorFormSession(next);
+      setLoadedConfigName(name);
       setConfigFeedback(`"${name}" 설정을 불러왔습니다.`);
     } catch {
       setConfigFeedback("불러오기에 실패했습니다.");
@@ -136,6 +138,9 @@ export function SearchConfigManager(props: {
         return;
       }
       setConfigFeedback(`"${name}" 설정을 삭제했습니다.`);
+      if (loadedConfigName === name) {
+        setLoadedConfigName(null);
+      }
       await refreshConfigList();
     } catch {
       setConfigFeedback("삭제에 실패했습니다.");
@@ -155,6 +160,9 @@ export function SearchConfigManager(props: {
         newName: renameTo.trim(),
       });
       setConfigFeedback(`"${renameFrom.trim()}" → "${renameTo.trim()}" 이름 변경 완료`);
+      if (loadedConfigName === renameFrom.trim()) {
+        setLoadedConfigName(renameTo.trim());
+      }
       setRenameFrom("");
       setRenameTo("");
       await refreshConfigList();
@@ -203,12 +211,17 @@ export function SearchConfigManager(props: {
   }
 
   return (
-    <div data-testid="ss-config-manager">
+    <div className="ss-config-manager" data-testid="ss-config-manager">
       <p className="ss-helper">
-        자주 쓰는 탐색 설정을 이름으로 저장·불러오기·관리할 수 있습니다.
+        자주 쓰는 탐색 설정을 이름으로 저장하고 다시 불러올 수 있습니다. 탐색은 자동으로 시작되지 않습니다.
       </p>
-      <div className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="block min-w-[12rem] flex-1" htmlFor="ss-config-name">
+      {loadedConfigName ? (
+        <p className="ss-config-loaded" data-testid="ss-config-loaded-name">
+          불러온 설정: {loadedConfigName}
+        </p>
+      ) : null}
+      <div className="ss-config-toolbar mt-3 flex flex-wrap items-end gap-2">
+        <label className="block min-w-0 flex-1" htmlFor="ss-config-name">
           <span className="ss-field-label mb-1 block">설정 이름</span>
           <input
             id="ss-config-name"
@@ -227,26 +240,27 @@ export function SearchConfigManager(props: {
           disabled={disabled}
           onClick={() => void handleSaveConfig()}
         >
-          저장
+          설정 저장
         </Button>
       </div>
 
       {savedConfigs.length > 0 ? (
-        <div className="mt-4 space-y-3">
+        <div className="ss-config-saved mt-4 space-y-3">
+          <h4 className="ss-field-label">저장된 설정</h4>
           <ul
-            className="space-y-2"
+            className="ss-config-list space-y-2"
             data-testid="ss-config-list"
-            aria-label="탐색 설정 관리"
+            aria-label="저장된 설정"
           >
             {savedConfigs.map((c) => (
               <li
                 key={c.name}
-                className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-3"
+                className="ss-config-row rounded-lg border border-[var(--v3-border)] bg-[var(--v3-surface)] px-3 py-3"
                 data-testid={`ss-config-row-${c.name}`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <div className="text-base font-medium text-slate-100">
+                  <div className="min-w-0 flex-1">
+                    <div className="ss-config-row__name text-base font-medium text-[var(--v3-text-primary)]">
                       {c.name}
                       {c.isDefault ? (
                         <span className="ml-2 text-xs text-emerald-300">
@@ -254,15 +268,18 @@ export function SearchConfigManager(props: {
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">
-                      프리셋 {c.sourcePreset ?? "—"} · 고급 재정의{" "}
-                      {c.advancedOverrideCount ?? 0}개 · 최근 사용{" "}
+                    <p className="mt-1 text-xs text-[var(--v3-text-muted)]">
+                      탐색 프리셋{" "}
+                      {c.sourcePreset
+                        ? formatCustomerSearchValue(c.sourcePreset)
+                        : "—"}{" "}
+                      · 고급 재정의 {c.advancedOverrideCount ?? 0}개 · 최근 사용{" "}
                       {c.lastUsedAt
                         ? new Date(c.lastUsedAt).toLocaleString("ko-KR")
                         : "없음"}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="ss-config-row__actions flex flex-wrap gap-2">
                     <Button
                       type="button"
                       size="sm"
@@ -281,7 +298,7 @@ export function SearchConfigManager(props: {
                       data-testid={`ss-config-default-${c.name}`}
                       onClick={() => void handleSetDefault(c.name)}
                     >
-                      기본
+                      기본으로 지정
                     </Button>
                     <Button
                       type="button"
@@ -298,7 +315,7 @@ export function SearchConfigManager(props: {
               </li>
             ))}
           </ul>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="ss-config-selects flex flex-wrap items-center gap-2">
             <select
               data-testid="ss-config-select"
               className={inputClass}
@@ -347,7 +364,7 @@ export function SearchConfigManager(props: {
                 e.target.value = "";
               }}
             >
-              <option value="">기본 설정으로 지정…</option>
+              <option value="">기본으로 지정…</option>
               {savedConfigs.map((c) => (
                 <option key={c.name} value={c.name}>
                   {c.name}
@@ -356,9 +373,9 @@ export function SearchConfigManager(props: {
             </select>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="ss-config-manage grid gap-3 md:grid-cols-2">
             <div className="flex flex-wrap items-end gap-2">
-              <label className="block min-w-[8rem] flex-1" htmlFor="ss-config-rename-from">
+              <label className="block min-w-0 flex-1" htmlFor="ss-config-rename-from">
                 <span className="ss-field-label mb-1 block">이름 변경 (원본)</span>
                 <input
                   id="ss-config-rename-from"
@@ -370,7 +387,7 @@ export function SearchConfigManager(props: {
                   placeholder="원본 이름"
                 />
               </label>
-              <label className="block min-w-[8rem] flex-1" htmlFor="ss-config-rename-to">
+              <label className="block min-w-0 flex-1" htmlFor="ss-config-rename-to">
                 <span className="ss-field-label mb-1 block">새 이름</span>
                 <input
                   id="ss-config-rename-to"
@@ -393,7 +410,7 @@ export function SearchConfigManager(props: {
               </Button>
             </div>
             <div className="flex flex-wrap items-end gap-2">
-              <label className="block min-w-[8rem] flex-1" htmlFor="ss-config-dup-from">
+              <label className="block min-w-0 flex-1" htmlFor="ss-config-dup-from">
                 <span className="ss-field-label mb-1 block">복제 (원본)</span>
                 <input
                   id="ss-config-dup-from"
@@ -405,7 +422,7 @@ export function SearchConfigManager(props: {
                   placeholder="원본 이름"
                 />
               </label>
-              <label className="block min-w-[8rem] flex-1" htmlFor="ss-config-dup-to">
+              <label className="block min-w-0 flex-1" htmlFor="ss-config-dup-to">
                 <span className="ss-field-label mb-1 block">복제 이름</span>
                 <input
                   id="ss-config-dup-to"
@@ -434,7 +451,7 @@ export function SearchConfigManager(props: {
       )}
 
       {configFeedback ? (
-        <p className="mt-2 text-sm text-slate-300" data-testid="ss-config-feedback">
+        <p className="mt-2 text-sm text-[var(--v3-text-secondary)]" data-testid="ss-config-feedback">
           {configFeedback}
         </p>
       ) : null}

@@ -41,12 +41,8 @@ import {
 import { buildAndPersistResearchTop10 } from "@/src/lib/rextora/strategySearch/researchTop10";
 import { createStrategy, listStrategies } from "@/src/lib/rextora/strategy/strategyStore";
 import {
-  EXPECTED_SAFE_PARAMS_HASH,
-} from "@/src/lib/rextora/strategy/strategyTypes";
-import {
   installIsolatedStrategyStore,
 } from "./helpers/isolatedStrategyStore";
-import crypto from "node:crypto";
 
 const SAFE_PATH = path.join(
   process.cwd(),
@@ -310,26 +306,14 @@ describe("research history archive/delete management", () => {
     expect(selectUserStoppedJobIds(jobs)).toEqual(["b"]);
   });
 
-  it("does not touch SAFE during deletion operations", () => {
+  it("does not resurrect retired SAFE during deletion operations", () => {
     const store = tempStore();
-    const beforeHash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const jobId = seedTerminalJob(store);
     executeResearchJobDeletion(jobId, store);
-    const afterHash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
-    expect(afterHash).toBe(beforeHash);
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     writeDeletionAudit({ action: "test_safe_check", jobId }, store);
-    const afterAuditHash = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
-    expect(afterAuditHash).toBe(beforeHash);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("restore archive writes audit event", () => {

@@ -224,7 +224,8 @@ describe("strategySearch Phase 5.1 checkpoint corruption", () => {
   });
 
   it("runSearchJob fails gracefully on corrupt checkpoint without FS/SAFE corruption", async () => {
-    const safeBefore = fs.readFileSync(SAFE_PATH);
+    const safeBeforeExists = fs.existsSync(SAFE_PATH);
+    expect(safeBeforeExists).toBe(false);
     const root = makeTempRoot();
     const opts = { rootDir: root };
     const job = createSearchJob(sampleConfig(), opts);
@@ -261,14 +262,7 @@ describe("strategySearch Phase 5.1 checkpoint corruption", () => {
       true,
     );
 
-    const safeAfter = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(safeBefore, safeAfter)).toBe(0);
-    const safeJson = JSON.parse(safeAfter.toString("utf8")) as {
-      name: string;
-      params_hash: string;
-    };
-    expect(safeJson.name).toBe("SAFE_v44_i4060");
-    expect(safeJson.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("runSearchJob fails on invalid statistics / unknown job state in persisted payload", async () => {

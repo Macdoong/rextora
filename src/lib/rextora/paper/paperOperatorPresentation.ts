@@ -4,7 +4,6 @@
  * Client-safe: no Node/fs.
  */
 
-export const PAPER_OPERATOR_SAFE_STRATEGY_ID = "SAFE_v44_i4060";
 export const PAPER_OPERATOR_COST_EXECUTION_PRICE_V1 =
   "event_sequence_execution_price_v1";
 export const PAPER_OPERATOR_COST_LEDGER_V0 = "event_sequence_ledger_v0";
@@ -172,9 +171,6 @@ export function paperOperatorExecutionKind(input: {
   kind: PaperOperatorExecutionKind;
   label: string;
 } {
-  if (input.strategyId === PAPER_OPERATOR_SAFE_STRATEGY_ID) {
-    return { kind: "safe", label: "SAFE" };
-  }
   if (
     input.hasEventSequenceDefinition === true ||
     input.paperLifecycleModel === "event_sequence_paper_v1" ||

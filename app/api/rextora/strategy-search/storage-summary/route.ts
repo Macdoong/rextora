@@ -3,12 +3,16 @@ import {
   strategySearchJson,
 } from "@/src/lib/rextora/strategySearch/jobApiHttp";
 import { buildStorageSummary } from "@/src/lib/rextora/strategySearch/storageSummary";
-import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireAdmin } from "@/src/lib/rextora/auth/requireUser";
 
-/** GET /api/rextora/strategy-search/storage-summary */
+/**
+ * GET /api/rextora/strategy-search/storage-summary
+ * Global operational storage diagnostics. CEO/admin maintenance only.
+ * Does not include job IDs, strategy IDs, names, or per-user counts.
+ */
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAdmin(request);
+  if (!auth.ok) return auth.response;
 
   const start = Date.now();
   try {

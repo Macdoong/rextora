@@ -20,9 +20,22 @@
 }
 
 .v3-card--interactive:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--v3-shadow-hover);
   border-color: #ccd5df;
+}
+
+@media (hover: hover) {
+  .v3-card--interactive:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.rextora-btn-text:active,
+.v3-oc-ai-open:active,
+.v3-drawer__close:active,
+.v3-dialog__close:active {
+  transform: translateY(1px) scale(0.99);
 }
 
 .v3-gate.v3-hover:hover {
@@ -51,7 +64,7 @@
 }
 
 @keyframes v3-screen-in {
-  from { opacity: 0.55; transform: translateY(4px); }
+  from { opacity: 0.55; transform: translateY(7px); }
   to { opacity: 1; transform: none; }
 }
 

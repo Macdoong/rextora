@@ -1,11 +1,21 @@
 import { BacktestValidationPanel, CostStressPanel, JitterTestPanel, MonthlyReturnsTable } from "@/components/rextora/backtest/BacktestPanels";
 import { PageHeader } from "@/components/rextora/dashboard/DashboardCards";
 import { StrategyDetailPanel } from "@/components/rextora/strategy/StrategyPanels";
-import { safeBaselineStrategy, strategies } from "@/lib/mock-data";
+import { strategies } from "@/lib/mock-data";
+import { NO_SELECTED_STRATEGY } from "@/src/lib/rextora/strategy/retiredSafeBaseline";
 
 export default async function StrategyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const strategy = strategies.find((item) => item.id === id) ?? safeBaselineStrategy;
+  const strategy = strategies.find((item) => item.id === id);
+
+  if (!strategy) {
+    return (
+      <>
+        <PageHeader title="전략 상세" description={NO_SELECTED_STRATEGY} />
+        <p className="text-sm text-slate-400">{NO_SELECTED_STRATEGY}</p>
+      </>
+    );
+  }
 
   return (
     <>

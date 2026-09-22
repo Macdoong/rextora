@@ -4,7 +4,6 @@
  */
 
 import type { OhlcvCandle } from "../data/ohlcvTypes";
-import { isLockedSafeHash } from "../strategy/strategyHash";
 import {
   StrategySearchAdapterError,
   evaluateCandidateAcrossWindows,
@@ -37,9 +36,13 @@ import type {
   StrategySearchScoreWeights,
 } from "./types";
 import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
-
-const PROTECTED_STRATEGY_ID = "SAFE_v44_i4060";
-const PROTECTED_HASH = "7893ca3f0e30";
+import {
+  isEvaluationCancelledError,
+  isEvaluationPausedError,
+  throwIfEvaluationInterrupted,
+  type StrategySearchShouldCancel,
+} from "./evaluationCancellation";
+import type { StrategySearchEvaluationControl } from "./searchEvaluationControl";
 
 export class StrategySearchCompleteEvaluationError extends Error {
   readonly code:
@@ -78,6 +81,9 @@ export interface EvaluateCompleteCandidateInput {
   jitterConfig: StrategySearchJitterConfig;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: StrategySearchEvaluationControl;
 }
 
 function assertCandidateIdentity(candidate: StrategySearchCandidate): void {
@@ -85,26 +91,6 @@ function assertCandidateIdentity(candidate: StrategySearchCandidate): void {
     throw new StrategySearchCompleteEvaluationError(
       "COMPLETE_EVALUATION_FAILED",
       "candidate must be an object",
-    );
-  }
-  if (
-    candidate.candidateId === PROTECTED_STRATEGY_ID ||
-    /SAFE_v44_i4060/i.test(candidate.candidateId)
-  ) {
-    throw new StrategySearchCompleteEvaluationError(
-      "PROTECTED_HASH_COLLISION",
-      "candidateId must not reference the protected SAFE strategy",
-      { candidateId: candidate.candidateId },
-    );
-  }
-  if (
-    isLockedSafeHash(candidate.paramsHash) ||
-    candidate.paramsHash === PROTECTED_HASH
-  ) {
-    throw new StrategySearchCompleteEvaluationError(
-      "PROTECTED_HASH_COLLISION",
-      "candidate paramsHash collides with protected SAFE hash",
-      { candidateId: candidate.candidateId },
     );
   }
 }
@@ -137,6 +123,10 @@ export async function evaluateCompleteCandidate(
     validateScoreWeights(input.scoreWeights);
     validateCostStressScenarios(input.costStressScenarios);
     validateJitterConfig(input.jitterConfig);
+    await throwIfEvaluationInterrupted(
+      input.shouldCancel,
+      input.shouldPause,
+    );
 
     // 2. Base evaluation
     const baseEvaluation = await evaluateCandidateAcrossWindows({
@@ -148,6 +138,9 @@ export async function evaluateCompleteCandidate(
       costConfig: input.baseCostConfig,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
       eventSequenceCostModel: input.eventSequenceCostModel,
+      shouldCancel: input.shouldCancel,
+      shouldPause: input.shouldPause,
+      evaluationControl: input.evaluationControl,
     });
 
     // 3. Required-window gate (short-circuits score / stress / jitter)
@@ -165,6 +158,11 @@ export async function evaluateCompleteCandidate(
       weights: input.scoreWeights,
     });
 
+    await throwIfEvaluationInterrupted(
+      input.shouldCancel,
+      input.shouldPause,
+    );
+
     // 6. Cost stress
     const costStressResults = await evaluateCostStress({
       candidate: input.candidate,
@@ -178,10 +176,18 @@ export async function evaluateCompleteCandidate(
       scoreWeights: input.scoreWeights,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
       eventSequenceCostModel: input.eventSequenceCostModel,
+      shouldCancel: input.shouldCancel,
+      shouldPause: input.shouldPause,
+      evaluationControl: input.evaluationControl,
     });
 
     const costStressPassed = costStressResults.every(
       (r) => !r.scenario.requiredForPass || r.passed,
+    );
+
+    await throwIfEvaluationInterrupted(
+      input.shouldCancel,
+      input.shouldPause,
     );
 
     // 7. Jitter (optional)
@@ -199,6 +205,9 @@ export async function evaluateCompleteCandidate(
       config: input.jitterConfig,
       preloadedCandlesByKey: input.preloadedCandlesByKey,
       eventSequenceCostModel: input.eventSequenceCostModel,
+      shouldCancel: input.shouldCancel,
+      shouldPause: input.shouldPause,
+      evaluationControl: input.evaluationControl,
     });
 
     // 8. Final decision
@@ -223,6 +232,8 @@ export async function evaluateCompleteCandidate(
       durationMs: completedAtMs - startedAtMs,
     };
   } catch (err) {
+    if (isEvaluationCancelledError(err)) throw err;
+    if (isEvaluationPausedError(err)) throw err;
     if (err instanceof StrategySearchCompleteEvaluationError) throw err;
     if (err instanceof StrategySearchAdapterError) throw err;
     if (err instanceof StrategySearchEvaluationPolicyError) throw err;

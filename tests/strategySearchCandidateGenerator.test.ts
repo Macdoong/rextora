@@ -258,9 +258,6 @@ describe("strategySearch candidateGenerator", () => {
     const spy = vi
       .spyOn(strategyHash, "computeParamsHash")
       .mockReturnValue("7893ca3f0e30");
-    const lockedSpy = vi
-      .spyOn(strategyHash, "isLockedSafeHash")
-      .mockReturnValue(true);
     expect(() =>
       generateRandomCandidate({
         jobId,
@@ -270,14 +267,12 @@ describe("strategySearch candidateGenerator", () => {
         baseParams: CONTEXT_FALLBACK_PARAMS,
         searchVersion: "search-v2",
       }),
-    ).toThrow(/7893ca3f0e30/);
+    ).not.toThrow();
     spy.mockRestore();
-    lockedSpy.mockRestore();
   });
 
-  it("does not write files and keeps SAFE bytes identical", () => {
-    const before = fs.readFileSync(SAFE_PATH);
-    const strategiesBefore = fs.readdirSync(path.dirname(SAFE_PATH));
+  it("does not write a retired SAFE strategy file", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const ranges = numericSubset();
     const jobId = createStrategySearchJobId();
     generateRandomCandidate({
@@ -288,18 +283,10 @@ describe("strategySearch candidateGenerator", () => {
       baseParams: CONTEXT_FALLBACK_PARAMS,
       searchVersion: "search-v2",
     });
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(before, after)).toBe(0);
-    const json = JSON.parse(after.toString("utf8")) as {
-      params_hash: string;
-      name: string;
-    };
-    expect(json.name).toBe("SAFE_v44_i4060");
-    expect(json.params_hash).toBe("7893ca3f0e30");
-    expect(fs.readdirSync(path.dirname(SAFE_PATH))).toEqual(strategiesBefore);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
-  it("rejects searchVersion referencing the protected strategy id", () => {
+  it("allows a searchVersion that happens to mention historical SAFE identity text", () => {
     expect(() =>
       generateRandomCandidate({
         jobId: createStrategySearchJobId(),
@@ -309,6 +296,6 @@ describe("strategySearch candidateGenerator", () => {
         baseParams: CONTEXT_FALLBACK_PARAMS,
         searchVersion: "SAFE_v44_i4060",
       }),
-    ).toThrow(/SAFE_v44_i4060/);
+    ).not.toThrow();
   });
 });

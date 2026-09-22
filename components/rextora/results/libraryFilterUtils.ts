@@ -1,4 +1,3 @@
-import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
 import { descriptionHasLibraryArchive } from "@/src/lib/rextora/strategy/libraryArchive";
 import { isDemoStrategyRecord } from "@/src/lib/rextora/firstRun/demoIdentity";
 
@@ -11,8 +10,7 @@ export type LibraryCategory =
   | "backtested"
   | "paper"
   | "live"
-  | "archive"
-  | "safe";
+  | "archive";
 
 export type LibraryStrategyRow = {
   id: string;
@@ -38,7 +36,6 @@ export const LIBRARY_CATEGORY_LABELS: Record<LibraryCategory, string> = {
   paper: "모의매매",
   live: "실전 후보",
   archive: "보관",
-  safe: "SAFE",
 };
 
 export const LIBRARY_FILTER_BUTTONS: Array<{
@@ -52,7 +49,6 @@ export const LIBRARY_FILTER_BUTTONS: Array<{
   { id: "backtested", label: LIBRARY_CATEGORY_LABELS.backtested },
   { id: "paper", label: LIBRARY_CATEGORY_LABELS.paper },
   { id: "live", label: LIBRARY_CATEGORY_LABELS.live },
-  { id: "safe", label: LIBRARY_CATEGORY_LABELS.safe },
   { id: "archive", label: LIBRARY_CATEGORY_LABELS.archive },
   { id: "all", label: LIBRARY_CATEGORY_LABELS.all },
 ];
@@ -98,7 +94,6 @@ export function libraryCategoryOf(s: LibraryStrategyRow): Exclude<
   LibraryCategory,
   "all" | "current" | "newest" | "recommended"
 > {
-  if (s.id === SAFE_STRATEGY_ID) return "safe";
   if (s.liveActive) return "live";
   if (s.paperActive) return "paper";
   if (isExplicitlyArchived(s)) return "archive";
@@ -107,7 +102,6 @@ export function libraryCategoryOf(s: LibraryStrategyRow): Exclude<
 }
 
 function isRecommendedRow(s: LibraryStrategyRow): boolean {
-  if (s.id === SAFE_STRATEGY_ID) return false;
   if (isDemoStrategyRecord(s)) return false;
   if (isExplicitlyArchived(s)) return false;
   if (!s.lastBacktest || typeof s.lastBacktest !== "object") return false;
@@ -144,28 +138,25 @@ export function countLibraryCategories(
     parseSourceResearchJobId?: (description: string | null | undefined) => string | null;
   },
 ): Record<LibraryCategory, number> {
-  const nonSafe = strategies.filter((s) => s.id !== SAFE_STRATEGY_ID);
-  const safeCount = strategies.length - nonSafe.length;
   const counts: Record<LibraryCategory, number> = {
-    all: nonSafe.length,
-    newest: nonSafe.length,
+    all: strategies.length,
+    newest: strategies.length,
     current: 0,
-    recommended: nonSafe.filter(isRecommendedRow).length,
+    recommended: strategies.filter(isRecommendedRow).length,
     review: 0,
     backtested: 0,
     paper: 0,
     live: 0,
     archive: 0,
-    safe: safeCount,
   };
 
-  for (const s of nonSafe) {
+  for (const s of strategies) {
     const cat = libraryCategoryOf(s);
     counts[cat] += 1;
   }
 
   if (opts?.selectedJobId && opts.parseSourceResearchJobId) {
-    counts.current = nonSafe.filter(
+    counts.current = strategies.filter(
       (s) => opts.parseSourceResearchJobId!(s.description) === opts.selectedJobId,
     ).length;
   }
@@ -181,11 +172,7 @@ export function filterLibraryStrategies<T extends LibraryStrategyRow>(
     parseSourceResearchJobId?: (description: string | null | undefined) => string | null;
   },
 ): T[] {
-  if (category === "safe") {
-    return strategies.filter((s) => s.id === SAFE_STRATEGY_ID);
-  }
-
-  const library = strategies.filter((s) => s.id !== SAFE_STRATEGY_ID);
+  const library = strategies;
 
   if (category === "current") {
     if (!opts?.selectedJobId || !opts.parseSourceResearchJobId) return [];

@@ -8,6 +8,8 @@ import path from "node:path";
 import type { StrategySearchOperatorFormState } from "@/components/rextora/strategySearch/formDefaults";
 import { createDefaultOperatorFormState } from "@/components/rextora/strategySearch/formDefaults";
 import { strategySearchRoot } from "../storage/runtimePaths";
+import { assertSafeOwnerPathSegment, isMaintenanceInspector, legacyOwnershipMarker } from "../auth/searchResourceAccess";
+import type { RextoraRole } from "../auth/authTypes";
 
 const CONFIG_SCHEMA_VERSION = 1 as const;
 
@@ -26,6 +28,7 @@ export type StrategySearchSavedConfig = {
   isDefault: boolean;
   advancedOverrideCount: number;
   form: StrategySearchOperatorFormState;
+  ownerUserId?: string | null;
 };
 
 export type StrategySearchConfigSummary = {
@@ -36,12 +39,17 @@ export type StrategySearchConfigSummary = {
   sourcePreset: string | null;
   isDefault: boolean;
   advancedOverrideCount: number;
+  ownerUserId?: string | null;
+  legacyUnspecifiedOwner?: boolean;
+  ownershipLabelKo?: string | null;
 };
 
 const NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/;
 
 export interface StrategySearchConfigStoreOptions {
   rootDir?: string;
+  ownerUserId?: string | null;
+  viewerRole?: RextoraRole | null;
 }
 
 function configsDir(options?: StrategySearchConfigStoreOptions): string {
@@ -75,11 +83,54 @@ export function validateConfigName(name: string): string {
   return trimmed;
 }
 
+function ownerConfigsDir(
+  ownerUserId: string,
+  options?: StrategySearchConfigStoreOptions,
+): string {
+  const segment = assertSafeOwnerPathSegment(ownerUserId);
+  const dir = path.join(ensureConfigsDir(options), "by-owner", segment);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
 function configPath(
   name: string,
   options?: StrategySearchConfigStoreOptions,
 ): string {
+  const owner = options?.ownerUserId?.trim();
+  if (owner) {
+    return path.join(ownerConfigsDir(owner, options), `${name}.json`);
+  }
   return path.join(ensureConfigsDir(options), `${name}.json`);
+}
+
+function toSummary(parsed: StrategySearchSavedConfig): StrategySearchConfigSummary {
+  return {
+    name: parsed.name,
+    savedAt: parsed.savedAt,
+    updatedAt: parsed.updatedAt,
+    lastUsedAt: parsed.lastUsedAt,
+    sourcePreset: parsed.sourcePreset,
+    isDefault: parsed.isDefault,
+    advancedOverrideCount: parsed.advancedOverrideCount,
+    ownerUserId: parsed.ownerUserId ?? null,
+    ...legacyOwnershipMarker({ ownerUserId: parsed.ownerUserId ?? null }),
+  };
+}
+
+function readConfigFile(
+  name: string,
+  fp: string,
+): StrategySearchSavedConfig | null {
+  if (!fs.existsSync(fp)) return null;
+  try {
+    const parsed = JSON.parse(
+      fs.readFileSync(fp, "utf8"),
+    ) as StrategySearchSavedConfig;
+    return normalizeRecord(name, parsed);
+  } catch {
+    return null;
+  }
 }
 
 function countAdvancedOverrides(form: StrategySearchOperatorFormState): number {
@@ -122,46 +173,46 @@ function normalizeRecord(
     advancedOverrideCount:
       parsed.advancedOverrideCount ?? countAdvancedOverrides(parsed.form),
     form: parsed.form,
+    ownerUserId: parsed.ownerUserId ?? null,
   };
+}
+
+function listJsonConfigsInDir(dir: string): StrategySearchConfigSummary[] {
+  if (!fs.existsSync(dir)) return [];
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
+  const items: StrategySearchConfigSummary[] = [];
+  for (const file of files) {
+    const name = file.slice(0, -".json".length);
+    const parsed = readConfigFile(name, path.join(dir, file));
+    if (parsed) items.push(toSummary(parsed));
+  }
+  return items;
 }
 
 export function listStrategySearchConfigs(
   options?: StrategySearchConfigStoreOptions,
 ): StrategySearchConfigSummary[] {
-  const dir = ensureConfigsDir(options);
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
-  const items: StrategySearchConfigSummary[] = [];
-  for (const file of files) {
-    const name = file.slice(0, -".json".length);
-    try {
-      const raw = fs.readFileSync(path.join(dir, file), "utf8");
-      const parsed = normalizeRecord(
-        name,
-        JSON.parse(raw) as StrategySearchSavedConfig,
-      );
-      if (!parsed) continue;
-      items.push({
-        name: parsed.name,
-        savedAt: parsed.savedAt,
-        updatedAt: parsed.updatedAt,
-        lastUsedAt: parsed.lastUsedAt,
-        sourcePreset: parsed.sourcePreset,
-        isDefault: parsed.isDefault,
-        advancedOverrideCount: parsed.advancedOverrideCount,
-      });
-    } catch {
-      items.push({
-        name,
-        savedAt: new Date(0).toISOString(),
-        updatedAt: new Date(0).toISOString(),
-        lastUsedAt: null,
-        sourcePreset: null,
-        isDefault: false,
-        advancedOverrideCount: 0,
-      });
-    }
+  const owner = options?.ownerUserId?.trim() || null;
+  const includeLegacy =
+    !owner || isMaintenanceInspector({ userId: owner, role: options?.viewerRole ?? undefined });
+  const items = owner
+    ? listJsonConfigsInDir(ownerConfigsDir(owner, options))
+    : [];
+  const legacy = includeLegacy
+    ? listJsonConfigsInDir(ensureConfigsDir(options)).filter((item) => !item.ownerUserId)
+    : [];
+  const merged = owner
+    ? [...items, ...legacy]
+    : listJsonConfigsInDir(ensureConfigsDir(options));
+  const seen = new Set<string>();
+  const unique: StrategySearchConfigSummary[] = [];
+  for (const item of merged) {
+    const key = `${item.ownerUserId ?? "legacy"}:${item.name}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(item);
   }
-  return items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return unique.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export function loadStrategySearchConfig(
@@ -169,16 +220,25 @@ export function loadStrategySearchConfig(
   options?: StrategySearchConfigStoreOptions,
 ): StrategySearchSavedConfig | null {
   const safeName = validateConfigName(name);
-  const fp = configPath(safeName, options);
-  if (!fs.existsSync(fp)) return null;
-  try {
-    const parsed = JSON.parse(
-      fs.readFileSync(fp, "utf8"),
-    ) as StrategySearchSavedConfig;
-    return normalizeRecord(safeName, parsed);
-  } catch {
+  const owner = options?.ownerUserId?.trim() || null;
+  if (owner) {
+    const owned = readConfigFile(safeName, configPath(safeName, options));
+    if (owned && (!owned.ownerUserId || owned.ownerUserId === owner)) {
+      return owned;
+    }
+    const allowLegacy = isMaintenanceInspector({
+      userId: owner,
+      role: options?.viewerRole ?? undefined,
+    });
+    if (!allowLegacy) return null;
+    const legacy = readConfigFile(
+      safeName,
+      path.join(ensureConfigsDir(options), `${safeName}.json`),
+    );
+    if (legacy && !legacy.ownerUserId) return legacy;
     return null;
   }
+  return readConfigFile(safeName, configPath(safeName, options));
 }
 
 export function saveStrategySearchConfig(
@@ -216,6 +276,7 @@ export function saveStrategySearchConfig(
     isDefault: options?.setDefault === true ? true : existing?.isDefault === true,
     advancedOverrideCount: countAdvancedOverrides(form),
     form,
+    ownerUserId: options?.ownerUserId?.trim() || existing?.ownerUserId || null,
   };
   if (record.isDefault) {
     clearDefaultFlags(safeName, options);

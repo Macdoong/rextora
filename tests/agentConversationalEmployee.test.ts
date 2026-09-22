@@ -273,7 +273,7 @@ describe("Conversation F — SAFE modify block", () => {
     const intent = parseIntent("SAFE 수정해");
     expect(intent.type).toBe("modify_safe");
     expect(checkIntentSafety(intent.type).allowed).toBe(false);
-    expect(checkIntentSafety(intent.type).reasonKo).toMatch(/SAFE/);
+    expect(checkIntentSafety(intent.type).reasonKo).toMatch(/폐기|사용할 수 없습니다/);
   });
 });
 

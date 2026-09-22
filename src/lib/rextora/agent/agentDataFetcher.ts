@@ -306,13 +306,6 @@ export async function fetchStrategyFacts(strategyHint?: string): Promise<FactIte
     const total = all.length;
     const liveReady = all.filter((s) => s.liveEligible).length;
     const paperReady = all.filter((s) => s.paperActive);
-    const safeStrategy = all.find(
-      (s) =>
-        s.name === "SAFE_v44" ||
-        s.id === "safe_v44" ||
-        s.id === "SAFE_v44_i4060" ||
-        s.name.includes("SAFE_v44"),
-    );
 
     const facts: FactItem[] = [
       fact("등록된 전략 수", `${total}개`, "strategy_store"),
@@ -332,21 +325,12 @@ export async function fetchStrategyFacts(strategyHint?: string): Promise<FactIte
       );
     }
 
-    if (safeStrategy) {
-      facts.push(
-        fact("SAFE 전략", "활성 (보호됨)", "strategy_store"),
-        fact("SAFE 전략 ID", safeStrategy.id, "strategy_store"),
-        fact("SAFE 전략 이름", safeStrategy.name, "strategy_store"),
-      );
-    }
-
     if (strategyHint) {
       const needle = strategyHint.toLowerCase();
       const matched = all.find(
         (s) =>
           s.name.toLowerCase().includes(needle) ||
-          s.id.toLowerCase().includes(needle) ||
-          needle.includes("safe"),
+          s.id.toLowerCase().includes(needle),
       );
       if (matched) {
         facts.push(

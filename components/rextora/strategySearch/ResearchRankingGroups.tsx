@@ -10,6 +10,7 @@ import {
   type ResearchRankingGroupView,
   type ResearchUnknownLegacyView,
 } from "@/src/lib/rextora/researchRankingReadModel";
+import { rankingGroupSummaryCounts } from "./rankingGroupCardVisual";
 import { ResearchRankingGroupCard } from "./ResearchRankingGroupCard";
 
 function asGroup(
@@ -49,7 +50,9 @@ function asGroup(
 export function ResearchRankingGroups(props: {
   source: ResearchRankingAuthoritySource;
   unknownLegacy?: ResearchUnknownLegacyView | null;
+  operatorFacing?: boolean;
 }) {
+  const operatorFacing = props.operatorFacing === true;
   const authoritative = hasAuthoritativeRankingGroups(props.source);
   if (!authoritative) {
     return (
@@ -74,13 +77,48 @@ export function ResearchRankingGroups(props: {
     .map(asGroup)
     .filter((row): row is ResearchRankingGroupView => row != null);
 
+  const summary = rankingGroupSummaryCounts(groups);
+
   return (
-    <section className="min-w-0 space-y-3" data-testid="research-ranking-groups">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <section
+      className="ss-ranking-groups min-w-0 space-y-3"
+      data-testid="research-ranking-groups"
+    >
+      <aside
+        className="ss-rank-principle"
+        data-testid="ss-ranking-champ-rule"
+      >
+        <strong>평가 원칙</strong>
+        <p>
+          전략군끼리 점수를 직접 비교하지 않습니다. 각 전략군은 독립적으로 평가되며, 각 전략군 안에서 자격을 통과한 후보 중 최종 추천을 선택합니다.
+        </p>
+      </aside>
+      <ul
+        className="ss-rank-summary"
+        data-testid="ss-ranking-group-summary"
+        data-group-count={summary.groupCount}
+        data-recommendable-count={summary.recommendableCount}
+        data-none-count={summary.noneCount}
+      >
+        <li>
+          <span>전략군</span>
+          <strong>{summary.groupCount}</strong>
+        </li>
+        <li data-summary="recommendable">
+          <span>추천 가능</span>
+          <strong>{summary.recommendableCount}</strong>
+        </li>
+        <li data-summary="none">
+          <span>추천 없음</span>
+          <strong>{summary.noneCount}</strong>
+        </li>
+      </ul>
+      <div className="ss-ranking-group-grid grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((group) => (
           <ResearchRankingGroupCard
             key={group.rankingCompatibilityGroup}
             group={group}
+            operatorFacing={operatorFacing}
           />
         ))}
       </div>
@@ -88,12 +126,13 @@ export function ResearchRankingGroups(props: {
         className="text-xs text-slate-500"
         data-testid="research-no-global-champion"
       >
-        SAFE와 패턴 점수는 서로 비교하지 않습니다. 그룹을 한데 모아 순위를
-        만들지 않습니다.
+        {operatorFacing
+          ? "통합 기술 전략과 패턴 점수는 서로 비교하지 않습니다. 그룹을 한데 모아 순위를 만들지 않습니다."
+          : "SAFE와 패턴 점수는 서로 비교하지 않습니다. 그룹을 한데 모아 순위를 만들지 않습니다."}
       </p>
       {props.unknownLegacy && props.unknownLegacy.count > 0 ? (
         <aside
-          className="min-w-0 overflow-hidden rounded-xl border border-slate-700 p-4"
+          className="ss-ranking-legacy-note min-w-0 overflow-hidden rounded-xl border border-slate-700 p-4"
           data-testid="research-unknown-legacy"
         >
           <h3 className="text-sm font-semibold text-slate-200">

@@ -11,28 +11,31 @@ import {
 import { generateSyntheticCandles } from "../src/lib/rextora/data/ohlcvTypes";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { loadSafeV44Strategy, validateSafeV44ParamsHash } from "../src/lib/rextora/strategy/safeV44Strategy";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { evaluateSafeV44Signal } from "../src/lib/rextora/signal/safeV44SignalEngine";
 import { evaluateCostGuard } from "../src/lib/rextora/cost/costGuard";
 import { calculateSafeV44Risk } from "../src/lib/rextora/risk/safeV44RiskEngine";
 import { runSafeV44Backtest } from "../src/lib/rextora/backtest/backtestEngine";
 import { generateAiTradeReport } from "../src/lib/rextora/report/aiTradeReport";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("SAFE strategy loader", () => {
-  it("verifies params_hash 7893ca3f0e30", () => {
+  it("reports retired identity and does not verify a live hash", () => {
     const validation = validateSafeV44ParamsHash();
-    expect(validation.expected).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(validation.ok).toBe(true);
-    expect(validation.metadata.hashVerified).toBe(true);
+    expect(validation.ok).toBe(false);
+    expect(validation.notes.some((note) => note.includes("retired"))).toBe(true);
   });
 
-  it("marks missing research files and exposes full params", () => {
+  it("marks missing research files and exposes generic search-space params only", () => {
     const meta = loadSafeV44Strategy({ throwOnHashMismatch: false });
     expect(meta.lockedResearchFilesFound).toBe(false);
+    expect(meta.dataStrategyFileFound).toBe(false);
+    expect(meta.hashVerified).toBe(false);
     expect(meta.params.ema_fast).toBe(20);
     expect(meta.params.cost_guard_k).toBe(3);
     expect(meta.params.base_bal_pct).toBe(0.02);
-    expect(["context_fallback", "data_file", "locked_file"]).toContain(meta.sourceStatus);
+    expect(meta.sourceStatus).toBe("context_fallback");
   });
 });
 
@@ -81,16 +84,16 @@ describe("safeV44SignalEngine", () => {
       symbol: "BTCUSDT",
       series,
       params: CONTEXT_FALLBACK_PARAMS,
-      paramsHash: EXPECTED_SAFE_PARAMS_HASH
+      paramsHash: RETIRED_SAFE_PARAMS_HASH
     });
     const b = evaluateSafeV44Signal({
       symbol: "BTCUSDT",
       series,
       params: CONTEXT_FALLBACK_PARAMS,
-      paramsHash: EXPECTED_SAFE_PARAMS_HASH
+      paramsHash: RETIRED_SAFE_PARAMS_HASH
     });
     expect(a).toEqual(b);
-    expect(a.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(a.paramsHash).toBe(RETIRED_SAFE_PARAMS_HASH);
   });
 });
 
@@ -133,12 +136,13 @@ describe("costGuard + riskEngine", () => {
 });
 
 describe("backtestEngine", () => {
-  it("runs SAFE backtest without live orders", () => {
+  it("runs explicit-params backtest without live orders", () => {
     const result = runSafeV44Backtest({
       symbol: "BTCUSDT",
-      candles: generateSyntheticCandles(320, 100, 0.00025)
+      candles: generateSyntheticCandles(320, 100, 0.00025),
+      params: CONTEXT_FALLBACK_PARAMS,
     });
-    expect(result.report.strategyHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(result.report.strategyHash).toBe("explicit");
     expect(result.report.tradeCount).toBeGreaterThanOrEqual(0);
     expect(Array.isArray(result.trades)).toBe(true);
   });
@@ -155,7 +159,7 @@ describe("aiTradeReport", () => {
       exitPrice: 102,
       realizedPnlPct: 2,
       mode: "PAPER",
-      paramsHash: EXPECTED_SAFE_PARAMS_HASH
+      paramsHash: RETIRED_SAFE_PARAMS_HASH
     });
     expect(report.whyEntered).toContain("trend_long");
     expect(report.summary).toContain("ETHUSDT");

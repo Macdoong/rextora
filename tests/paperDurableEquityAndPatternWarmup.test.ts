@@ -54,7 +54,7 @@ import {
   createStrategy,
   ensureStrategyStore,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { buildPatternSearchDefinition } from "../src/lib/rextora/strategySearch/patternEventSequence";
 import {
   FVG_BASE_PARAMS,
@@ -77,6 +77,8 @@ import {
   snapshotEsContinuity,
   tpBar,
 } from "./helpers/paperRuntimeContinuityAndWarmupForensics";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 import {
   buildObLongCandles,
   FEE,
@@ -548,22 +550,15 @@ describe("P3-A8.3.5 durable Pattern Paper equity + Pattern warmup", () => {
     );
   });
 
-  it("24. SAFE account path unchanged", () => {
+  it("24. retired SAFE identity cannot open a Paper session", () => {
     isolate();
     ensureStrategyStore();
-    const prepared = preparePaperSession({
-      strategyId: SAFE_STRATEGY_ID,
-      requireApproval: false,
-    });
-    activatePaperSession(prepared.id);
-    resetAccountStateForTests({
-      balanceUsdt: PROCESS_START_BALANCE_USDT,
-      availableBalanceUsdt: PROCESS_START_AVAILABLE_USDT,
-    });
-    const result = reconcileEventSequencePaperAccountState();
-    expect(result.applied).toBe(false);
-    expect(result.reason).toBe("not_event_sequence");
-    expect(getAccountState().balanceUsdt).toBe(PROCESS_START_BALANCE_USDT);
+    expect(() =>
+      preparePaperSession({
+        strategyId: RETIRED_SAFE_STRATEGY_ID,
+        requireApproval: false,
+      }),
+    ).toThrow(/strategy not found: SAFE_v44_i4060|retired|폐기/);
   });
 
   it("25. Event-Sequence base history requirement source identified", () => {
@@ -768,9 +763,7 @@ describe("P3-A8.3.5 durable Pattern Paper equity + Pattern warmup", () => {
   });
 
   it("48. paramsHash unchanged", () => {
-    expect(hashesBefore.safeSha256).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(hashesBefore.safeSha256).toBeNull();
     expect(productionRecordHashes().strategyIndexSha256).toBe(hashesBefore.strategyIndexSha256);
   });
 
@@ -802,8 +795,7 @@ describe("P3-A8.3.5 durable Pattern Paper equity + Pattern warmup", () => {
     );
   });
 
-  it("53. Live behavior unchanged", () => {
-    expect(source("src/lib/rextora/botRuntime.ts")).toContain("ema_slow + 5");
+  it("53. Live behavior stays off Pattern Paper helpers", () => {
     expect(source("src/lib/rextora/paper/paperEventSequenceAccountReconcile.ts")).toContain(
       "live_mode",
     );
@@ -838,8 +830,6 @@ describe("P3-A8.3.5 durable Pattern Paper equity + Pattern warmup", () => {
   });
 
   it("60. SAFE unchanged", () => {
-    expect(productionRecordHashes().safeSha256).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(productionRecordHashes().safeSha256).toBeNull();
   });
 });

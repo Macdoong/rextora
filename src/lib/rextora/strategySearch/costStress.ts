@@ -7,6 +7,11 @@
 
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import type { EventSequenceCostModel } from "../strategy/eventSequenceCostModel";
+import {
+  isEvaluationCancelledError,
+  throwIfEvaluationInterrupted,
+  type StrategySearchShouldCancel,
+} from "./evaluationCancellation";
 import { evaluateCandidateAcrossWindowsForStress } from "./backtestAdapter";
 import {
   calculateCandidateScore,
@@ -60,6 +65,9 @@ export interface EvaluateCostStressInput {
   scoreWeights: StrategySearchScoreWeights;
   preloadedCandlesByKey?: Record<string, OhlcvCandle[]>;
   eventSequenceCostModel?: EventSequenceCostModel | null;
+  shouldCancel?: StrategySearchShouldCancel;
+  shouldPause?: StrategySearchShouldCancel;
+  evaluationControl?: import("./searchEvaluationControl").StrategySearchEvaluationControl;
 }
 
 function isFiniteNumber(n: unknown): n is number {
@@ -241,6 +249,10 @@ export async function evaluateCostStress(
   const results: StrategySearchCostStressResult[] = [];
 
   for (const scenario of input.scenarios) {
+    await throwIfEvaluationInterrupted(
+      input.shouldCancel,
+      input.shouldPause,
+    );
     const costConfig = buildCostStressConfig(
       baseSnapshot,
       scenario,
@@ -274,6 +286,9 @@ export async function evaluateCostStress(
         costConfig,
         preloadedCandlesByKey: input.preloadedCandlesByKey,
         eventSequenceCostModel: input.eventSequenceCostModel,
+        shouldCancel: input.shouldCancel,
+        shouldPause: input.shouldPause,
+        evaluationControl: input.evaluationControl,
       });
       const pass = evaluateCandidatePass({
         evaluation,
@@ -292,6 +307,7 @@ export async function evaluateCostStress(
         passed: pass.passed,
       });
     } catch (err) {
+      if (isEvaluationCancelledError(err)) throw err;
       if (err instanceof StrategySearchCostStressError) throw err;
       const message = err instanceof Error ? err.message : "cost stress failed";
       throw new StrategySearchCostStressError("COST_STRESS_FAILED", message, {

@@ -111,4 +111,16 @@ describe("mobile shell branding and navigation", () => {
     expect(css).toContain("pointer-events: none");
     expect(css).toContain("min(86vw, 360px)");
   });
+
+  it("operator center CSS covers 320 / 390 / fold / desktop without page overflow", () => {
+    const oc = read("components/rextora/v3/operator-center.css");
+    expect(oc).toContain("@media (max-width: 320px)");
+    expect(oc).toContain("@media (max-width: 390px)");
+    expect(oc).toContain("@media (min-width: 653px) and (max-width: 884px)");
+    expect(oc).toContain("@media (min-width: 1180px) and (max-width: 1399px)");
+    expect(oc).toContain("overflow-x: hidden");
+    expect(oc).toContain("overflow-x: auto");
+    expect(oc).toContain("min-height: 44px");
+    expect(oc).toContain("prefers-reduced-motion");
+  });
 });

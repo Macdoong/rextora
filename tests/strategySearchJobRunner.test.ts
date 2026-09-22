@@ -308,7 +308,10 @@ describe("strategySearch jobRunner", () => {
     });
     expect(result.stopReason).toBe("cancelled");
     expect(result.job.status).toBe("cancelled");
-    expect(result.iterationsCompletedThisRun).toBeGreaterThanOrEqual(2);
+    // Call 2 requested cancel and returned; post-evaluate checkpoint discards it.
+    expect(calls).toBe(2);
+    expect(result.iterationsCompletedThisRun).toBe(1);
+    expect(listSearchTrials(job.id, opts)).toHaveLength(1);
   });
 
   it("pauses cooperatively and leaves job paused", async () => {

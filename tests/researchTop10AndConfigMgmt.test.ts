@@ -98,10 +98,10 @@ function card(
 
 describe("applied settings terminology", () => {
   it("uses initial batch label instead of total evaluation count", () => {
-    const { rows } = buildAppliedSettingsPreview(createDefaultOperatorFormState());
-    expect(rows.some((r) => r.labelKo === "초기 평가 묶음")).toBe(true);
+    const { rows, detailRows } = buildAppliedSettingsPreview(createDefaultOperatorFormState());
+    expect(detailRows.some((r) => r.labelKo === "초기 평가 묶음")).toBe(true);
     expect(rows.some((r) => r.labelKo === "전체 평가 수")).toBe(false);
-    expect(rows.some((r) => r.labelKo === "장기 저장 결과")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "장기 저장 결과")).toBe(true);
   });
 });
 

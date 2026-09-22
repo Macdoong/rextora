@@ -9,10 +9,8 @@ import {
   buildCombinationSpec,
   buildCombinedEventSequence,
 } from "../src/lib/rextora/strategySearch/patternCombination";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 function definition() {
   const eventSequence = buildCombinedEventSequence(
@@ -88,16 +86,16 @@ describe("canonical strategyHash identity", () => {
     expect(computeStrategyHash(renamed)).toBe(computeStrategyHash(baseline));
   });
 
-  it("does not mutate the protected SAFE source", () => {
+  it("does not resurrect the retired SAFE source", () => {
     const safePath = path.join(
       process.cwd(),
       "data",
       "strategies",
-      `${SAFE_STRATEGY_ID}.json`,
+      `${RETIRED_SAFE_STRATEGY_ID}.json`,
     );
-    const before = fs.readFileSync(safePath, "utf8");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(fs.existsSync(safePath)).toBe(false);
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
     computeStrategyHash(definition());
-    expect(fs.readFileSync(safePath, "utf8")).toBe(before);
+    expect(fs.existsSync(safePath)).toBe(false);
   });
 });

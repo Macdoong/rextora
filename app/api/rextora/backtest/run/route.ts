@@ -35,11 +35,17 @@ import {
   resolveStrategySymbolCompatibility,
 } from "@/src/lib/rextora/backtest/strategySymbolCompatibility";
 import type { StoredStrategyV1 } from "@/src/lib/rextora/strategy/definition/bridge";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireAuthenticatedUser, requirePermission } from "@/src/lib/rextora/auth/requireUser";
+import {
+  canExecuteStoredStrategy,
+  canMutateOwnedResource,
+  canReadOwnedResource,
+  canReadStoredStrategy,
+} from "@/src/lib/rextora/auth/searchResourceAccess";
 
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   const { searchParams } = new URL(request.url);
   const strategyId = searchParams.get("strategyId");
@@ -66,7 +72,7 @@ export async function GET(request: Request) {
   }
   if (runId) {
     const one = getSavedBacktest(runId);
-    if (!one) {
+    if (!one || !canReadOwnedResource(auth.user, one)) {
       return NextResponse.json(
         { ok: false, error: "저장된 백테스트 실행을 찾을 수 없습니다." },
         { status: 404 },
@@ -179,16 +185,32 @@ export async function GET(request: Request) {
     }
   }
   if (strategyId) {
+    let strategy;
+    try {
+      strategy = getStrategyById(strategyId);
+    } catch {
+      strategy = null;
+    }
+    if (!strategy || !canReadStoredStrategy(auth.user, strategy)) {
+      return NextResponse.json(
+        { ok: false, error: "전략을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
     const symbolFilter = searchParams.get("symbol");
     const allSymbols = searchParams.get("allSymbols") === "1";
+    const runs = listSavedBacktestsForStrategy(strategyId, 40, {
+      symbol: allSymbols ? null : symbolFilter,
+    }).filter((run) => canReadOwnedResource(auth.user, run));
     return NextResponse.json({
       ok: true,
-      data: listSavedBacktestsForStrategy(strategyId, 40, {
-        symbol: allSymbols ? null : symbolFilter,
-      }),
+      data: runs,
     });
   }
-  return NextResponse.json({ ok: true, data: listSavedBacktests(30) });
+  const visible = listSavedBacktests(200)
+    .filter((run) => canReadOwnedResource(auth.user, run))
+    .slice(0, 30);
+  return NextResponse.json({ ok: true, data: visible });
 }
 
 /** Cap equity points for chart payload; preserve first + last. Trades are never truncated. */
@@ -224,8 +246,8 @@ function serializeSymbolResult(
 }
 
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "backtest:run");
-  if (denied) return denied;
+  const auth = requirePermission(request, "backtest:run");
+  if (!auth.ok) return auth.response;
   const started = Date.now();
   ensureStrategyStore();
   try {
@@ -234,6 +256,7 @@ export async function POST(request: Request) {
       action?: string;
       dataMode?: string;
       strategyHash?: string;
+      ownerUserId?: unknown;
     };
 
     if (body.action === "live_order") {
@@ -264,7 +287,7 @@ export async function POST(request: Request) {
     } catch {
       strategy = null;
     }
-    if (!strategy) {
+    if (!strategy || !canExecuteStoredStrategy(auth.user, strategy)) {
       return NextResponse.json(
         { ok: false, error: "전략을 찾을 수 없습니다.", code: "STRATEGY_NOT_FOUND" },
         { status: 404 },
@@ -402,7 +425,7 @@ export async function POST(request: Request) {
     config.symbols = requestedSymbols;
 
     const result = body.save
-      ? await runAndSaveBacktest(config)
+      ? await runAndSaveBacktest(config, { ownerUserId: auth.user.userId })
       : await runConfiguredBacktest(config);
 
     return NextResponse.json({
@@ -504,8 +527,8 @@ export async function POST(request: Request) {
 
 /** Delete a saved Backtest Run. Never touches SAFE or live order endpoints. */
 export async function DELETE(request: Request) {
-  const denied = await denyUnlessPermitted(request, "backtest:run");
-  if (denied) return denied;
+  const auth = requirePermission(request, "backtest:run");
+  if (!auth.ok) return auth.response;
   const { searchParams } = new URL(request.url);
   const runId = searchParams.get("runId") ?? searchParams.get("id");
   if (!runId) {
@@ -515,7 +538,7 @@ export async function DELETE(request: Request) {
     );
   }
   const existing = getSavedBacktest(runId);
-  if (!existing) {
+  if (!existing || !canMutateOwnedResource(auth.user, existing)) {
     return NextResponse.json(
       { ok: false, error: "저장된 백테스트 실행을 찾을 수 없습니다.", code: "NOT_FOUND" },
       { status: 404 },

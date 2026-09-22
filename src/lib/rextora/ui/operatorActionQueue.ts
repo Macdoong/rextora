@@ -7,6 +7,11 @@
 import { paperOperatorStatusLabel } from "@/src/lib/rextora/paper/paperOperatorPresentation";
 import type { PaperOperatorUiStatus } from "@/src/lib/rextora/paper/paperOperatorPresentation";
 import {
+  buildSearchTerminalNotification,
+  toOperatorTerminalResearch,
+  type SearchTerminalJobView,
+} from "@/src/lib/rextora/strategySearch/searchTerminalNotification";
+import {
   OPERATOR_ACTION_GROUP,
   OPERATOR_EMPTY,
 } from "./operatorTerminology";
@@ -28,6 +33,7 @@ export type OperatorActionItem = {
   title: string;
   description: string;
   targetRoute?: string;
+  actionLabel?: string;
   source: OperatorActionSource;
 };
 
@@ -69,6 +75,8 @@ export type OperatorActionQueueInput = {
     status: string;
     searchName?: string | null;
   } | null;
+  /** Completed/failed research jobs to surface (not latest-only). */
+  terminalResearch?: readonly SearchTerminalJobView[];
   paperSessionStatus?: string | null;
   pendingApproval?: boolean;
   agentPendingSummary?: string | null;
@@ -184,24 +192,23 @@ export function buildOperatorActionQueue(
     });
   }
 
-  if (input.completedRecent?.status === "failed") {
-    items.push({
-      id: `research-failed-${input.completedRecent.id}`,
-      severity: "warning",
-      title: `실패한 탐색: ${researchName(input.completedRecent)}`,
-      description: "실패 원인을 전략 탐색 결과에서 확인하세요.",
-      targetRoute: `/results?jobId=${encodeURIComponent(input.completedRecent.id)}`,
-      source: "research",
-    });
-  }
+  const terminalJobs =
+    input.terminalResearch && input.terminalResearch.length > 0
+      ? toOperatorTerminalResearch(input.terminalResearch)
+      : input.completedRecent
+        ? toOperatorTerminalResearch([input.completedRecent])
+        : [];
 
-  if (input.completedRecent?.status === "completed") {
+  for (const job of terminalJobs) {
+    const notice = buildSearchTerminalNotification(job);
+    if (!notice) continue;
     items.push({
-      id: `research-completed-${input.completedRecent.id}`,
-      severity: "info",
-      title: `완료된 탐색: ${researchName(input.completedRecent)}`,
-      description: "합격 전략을 검토하고 백테스트·모의매매로 이어갈지 결정하세요.",
-      targetRoute: `/results?jobId=${encodeURIComponent(input.completedRecent.id)}`,
+      id: notice.dedupeKey,
+      severity: notice.status === "failed" ? "warning" : "info",
+      title: notice.title,
+      description: notice.description,
+      targetRoute: notice.targetRoute,
+      actionLabel: notice.actionLabel,
       source: "research",
     });
   }

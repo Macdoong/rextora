@@ -108,6 +108,8 @@ const DENY_KEYS = new Set([
   "saveStrategy",
   "strategyPath",
   "strategiesDir",
+  "ownerUserId",
+  "ownerId",
 ]);
 
 function isObject(value: unknown): value is Record<string, unknown> {

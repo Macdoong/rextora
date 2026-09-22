@@ -51,6 +51,19 @@ export type DurationPresetId =
 export type MddPresetId = "10" | "15" | "20" | "25" | "custom";
 export type TradingStyleId = "scalping" | "balanced" | "stable";
 
+/** Same mapping JobCreateForm uses when a beginner preset is applied. */
+export const TRADING_STYLE_MAP: Record<
+  TradingStyleId,
+  {
+    qualification: Exclude<QualificationProfileId, "custom">;
+    depth: SearchDepthProfileId;
+  }
+> = {
+  scalping: { qualification: "aggressive", depth: "fast" },
+  balanced: { qualification: "balanced", depth: "standard" },
+  stable: { qualification: "conservative", depth: "deep" },
+};
+
 /** Beginner-facing preset aliases mapped onto verified trading styles. */
 export type BeginnerPresetId = "safe" | "balanced" | "aggressive";
 
@@ -65,16 +78,16 @@ export const SEARCHABLE_SPACE_OPTIONS = [
   { id: "rsi_pullback", labelKo: "RSI / 되돌림" },
   { id: "breakout", labelKo: "변동성 돌파" },
   { id: "risk_exits", labelKo: "ATR 위험 관리" },
-  { id: "full_safe", labelKo: "통합 SafeV44" },
+  { id: "full_safe", labelKo: "통합 기술 전략" },
 ] as const;
 
-/** Pattern Search spaces selectable from the capability matrix (not SafeV44 families). */
+/** Pattern Search spaces selectable from the capability matrix (not full-stack families). */
 export const SEARCHABLE_PATTERN_SPACE_OPTIONS = [
-  { id: "order_block", labelKo: "Order Block" },
-  { id: "fvg", labelKo: "Fair Value Gap" },
-  { id: "trendline", labelKo: "Trendline" },
-  { id: "support_resistance", labelKo: "Support / Resistance" },
-  { id: "supply_demand", labelKo: "Supply / Demand" },
+  { id: "order_block", labelKo: "오더블럭" },
+  { id: "fvg", labelKo: "FVG" },
+  { id: "trendline", labelKo: "추세선" },
+  { id: "support_resistance", labelKo: "지지·저항" },
+  { id: "supply_demand", labelKo: "공급·수요" },
 ] as const;
 
 export const BEGINNER_PRESET_MAP: Record<

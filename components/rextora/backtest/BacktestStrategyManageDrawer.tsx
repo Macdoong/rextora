@@ -5,8 +5,6 @@ import { X, Archive, ArchiveRestore, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
 import { descriptionHasLibraryArchive } from "@/src/lib/rextora/strategy/libraryArchive";
 
-const SAFE_ID = "SAFE_v44_i4060";
-
 interface StrategyRow {
   id: string;
   name: string;
@@ -73,10 +71,6 @@ export function BacktestStrategyManageDrawer({
   }, [rows, query]);
 
   async function rename(id: string) {
-    if (id === SAFE_ID) {
-      setMessage("SAFE 표시 이름은 변경할 수 없습니다.");
-      return;
-    }
     const current = rows.find((r) => r.id === id);
     const next = window.prompt(
       "표시 이름을 입력하세요",
@@ -104,10 +98,6 @@ export function BacktestStrategyManageDrawer({
   }
 
   async function archive(id: string, archived: boolean) {
-    if (id === SAFE_ID) {
-      setMessage("SAFE 전략은 보관할 수 없습니다.");
-      return;
-    }
     setBusyId(id);
     try {
       const res = await fetch("/api/rextora/strategies", {
@@ -133,10 +123,6 @@ export function BacktestStrategyManageDrawer({
   }
 
   async function previewDelete(id: string) {
-    if (id === SAFE_ID) {
-      setMessage("SAFE 전략은 삭제할 수 없습니다.");
-      return;
-    }
     setBusyId(id);
     try {
       const res = await fetch("/api/rextora/strategies", {
@@ -238,7 +224,6 @@ export function BacktestStrategyManageDrawer({
 
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 py-3">
           {filtered.map((s) => {
-            const safe = s.id === SAFE_ID;
             const archived = isArchived(s);
             return (
               <li
@@ -257,7 +242,6 @@ export function BacktestStrategyManageDrawer({
                 >
                   <p className="text-sm font-medium text-slate-100">
                     {displayOf(s)}
-                    {safe ? " · SAFE" : ""}
                     {archived ? " · 보관됨" : ""}
                   </p>
                   <p className="mt-0.5 text-[11px] text-slate-500">
@@ -266,51 +250,40 @@ export function BacktestStrategyManageDrawer({
                   </p>
                 </button>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {safe ? (
-                    <p
-                      className="text-[11px] text-amber-200/80"
-                      data-testid="strategy-manage-safe-locked"
-                    >
-                      SAFE 보호 · 이름 변경·보관·삭제 불가
-                    </p>
-                  ) : (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busyId === s.id}
-                        onClick={() => void rename(s.id)}
-                        data-testid="strategy-manage-rename"
-                      >
-                        <Pencil className="mr-1 size-3" />
-                        이름
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busyId === s.id}
-                        onClick={() => void archive(s.id, !archived)}
-                        data-testid="strategy-manage-archive"
-                      >
-                        {archived ? (
-                          <ArchiveRestore className="mr-1 size-3" />
-                        ) : (
-                          <Archive className="mr-1 size-3" />
-                        )}
-                        {archived ? "복원" : "보관"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busyId === s.id}
-                        onClick={() => void previewDelete(s.id)}
-                        data-testid="strategy-manage-delete"
-                      >
-                        <Trash2 className="mr-1 size-3" />
-                        삭제
-                      </Button>
-                    </>
-                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busyId === s.id}
+                    onClick={() => void rename(s.id)}
+                    data-testid="strategy-manage-rename"
+                  >
+                    <Pencil className="mr-1 size-3" />
+                    이름
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busyId === s.id}
+                    onClick={() => void archive(s.id, !archived)}
+                    data-testid="strategy-manage-archive"
+                  >
+                    {archived ? (
+                      <ArchiveRestore className="mr-1 size-3" />
+                    ) : (
+                      <Archive className="mr-1 size-3" />
+                    )}
+                    {archived ? "복원" : "보관"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busyId === s.id}
+                    onClick={() => void previewDelete(s.id)}
+                    data-testid="strategy-manage-delete"
+                  >
+                    <Trash2 className="mr-1 size-3" />
+                    삭제
+                  </Button>
                 </div>
               </li>
             );

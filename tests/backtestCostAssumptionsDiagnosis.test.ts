@@ -36,13 +36,13 @@ import {
   runStandardMicroMatrix,
   writeP3A5Artifacts,
 } from "../src/lib/rextora/backtest/backtestCostAssumptionsDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
 
 const ROOT = process.cwd();
 const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
 const hashesBefore = productionReadonlyHashes(ROOT);
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -261,9 +261,7 @@ describe("P3-A5 backtest cost assumptions diagnosis", () => {
     expect(after.safeSha256).toBe(hashesBefore.safeSha256);
     expect(after.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
     expect(after.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
-    expect(after.safeSha256).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(after.safeSha256).toBeNull();
   });
 
   it("29. no Research execution", () => {
@@ -276,14 +274,9 @@ describe("P3-A5 backtest cost assumptions diagnosis", () => {
     expect(afterAllNote.realOrders).toBe(0);
   });
 
-  it("31. SAFE unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
-    const json = JSON.parse(readFileSync(SAFE_PATH, "utf8")) as {
-      params_hash: string;
-    };
-    expect(json.params_hash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+  it("31. retired SAFE file remains absent", () => {
+    expect(sha256(SAFE_PATH)).toBeNull();
+    expect(existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("recommended fix is MODEL C and artifacts exist", () => {

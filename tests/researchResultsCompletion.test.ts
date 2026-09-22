@@ -20,13 +20,12 @@ import {
 } from "../src/lib/rextora/strategySearch/researchResultsSummary";
 import { promoteSearchCandidateToStrategy } from "../src/lib/rextora/strategySearch/promoteFromSearch";
 import { listStrategies } from "../src/lib/rextora/strategy/strategyStore";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+
 import { StrategySearchApiError } from "../src/lib/rextora/strategySearch/jobApiService";
 import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const tempRoots: string[] = [];
 const cleanups: Array<() => void> = [];
@@ -344,8 +343,8 @@ describe("Research → Results completion", () => {
       storeOptions: store,
     });
     expect(promoted.registrationState).toBe("registered");
-    expect(promoted.strategyId).not.toBe(SAFE_STRATEGY_ID);
-    expect(promoted.paramsHash).not.toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(promoted.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
+    expect(promoted.paramsHash).not.toBe(RETIRED_SAFE_PARAMS_HASH);
     expect(promoted.paramsHash).not.toBe("7893ca3f0e30");
     const created = listStrategies().find((s) => s.id === promoted.strategyId);
     expect(created).toBeTruthy();
@@ -376,7 +375,7 @@ describe("Research → Results completion", () => {
     );
     expect(fromJob.length).toBe(summary.counts.registeredStrategies);
     expect(
-      fromJob.every((s) => s.id !== SAFE_STRATEGY_ID),
+      fromJob.every((s) => s.id !== RETIRED_SAFE_STRATEGY_ID),
     ).toBe(true);
   });
 
@@ -422,7 +421,7 @@ describe("Research → Results completion", () => {
     expect(
       summary.representatives.every(
         (r) =>
-          r.paramsHash !== EXPECTED_SAFE_PARAMS_HASH &&
+          r.paramsHash !== RETIRED_SAFE_PARAMS_HASH &&
           r.paramsHash !== "7893ca3f0e30",
       ),
     ).toBe(true);

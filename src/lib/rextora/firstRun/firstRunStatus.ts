@@ -12,7 +12,7 @@ import {
   ensureStrategyStore,
   listStrategies,
 } from "../strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
+import { isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import { listSavedBacktests } from "../backtest/backtestStore";
 import { listPaperSessions } from "../paper/paperSessionStore";
 import {
@@ -128,8 +128,8 @@ export function classifyFirstRunStatus(): FirstRunStatus {
   const realStrategies = strategies.filter(
     (s) =>
       !isDemoStrategyRecord(s) &&
-      s.id !== SAFE_STRATEGY_ID &&
-      !String(s.name).includes("SAFE_v44"),
+      !isRetiredSafeId(s.id) &&
+      !isRetiredSafeId(String(s.name)),
   );
 
   const demoBacktests = backtests.filter((b) => isDemoBacktestRecord(b));

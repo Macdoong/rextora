@@ -1,9 +1,8 @@
 /**
  * Follow-up Strategy Search suggestions from paper/live/backtest/strategy context.
- * Returns a suggested create-job body — never starts a job, never mutates SAFE.
+ * Returns a suggested create-job body — never starts a job.
  */
 
-import { SAFE_STRATEGY_ID } from "../strategyRepository";
 import { buildPaperFeedback, type PaperFeedback } from "./paperFeedback";
 import {
   SEARCH_DEPTH_PROFILES,
@@ -275,14 +274,14 @@ function buildSuggestedCreateJobBody(input: {
     },
     autoStart: false,
     noteKo:
-      "이 본문은 제안만 합니다. POST /api/rextora/strategy-search 로 직접 생성하세요. SAFE는 변경되지 않습니다.",
+      "이 본문은 제안만 합니다. POST /api/rextora/strategy-search 로 직접 생성하세요.",
   };
 
   return { body, searchSpaceMutation: mutationRecord };
 }
 
 /**
- * Build follow-up research suggestion. Fail-closed for SAFE mutation intents.
+ * Build follow-up research suggestion.
  */
 export function buildFollowUpResearch(
   input: FollowUpResearchRequest,
@@ -296,15 +295,6 @@ export function buildFollowUpResearch(
   }
 
   const strategyId = input.strategyId?.trim() || null;
-
-  // Fail closed: never suggest mutating SAFE as a template overwrite intent.
-  if (strategyId === SAFE_STRATEGY_ID) {
-    throw new FollowUpResearchError(
-      "SAFE_v44_i4060은 수정·재작성 대상이 아닙니다. 복사본 전략 ID로 재탐색하세요.",
-      "SAFE_MUTATION_BLOCKED",
-      403,
-    );
-  }
 
   let paperFeedback: PaperFeedback | null = null;
   if (source === "paper") {
@@ -339,6 +329,6 @@ export function buildFollowUpResearch(
     suggestedCreateJobBody,
     searchSpaceMutation,
     messageKo:
-      "재탐색 제안이 준비되었습니다. 작업을 자동 시작하지 않으며 SAFE는 변경되지 않습니다.",
+      "재탐색 제안이 준비되었습니다. 작업을 자동 시작하지 않습니다.",
   };
 }

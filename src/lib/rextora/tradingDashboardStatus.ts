@@ -21,6 +21,7 @@ import { convertAiCandidatesToExecutionCandidates } from "./aiExecutionBridge";
 import { buildLearningSummary } from "./learningEngine";
 import { getSignalWinRates } from "./learningLogger";
 import { getAuditLogs } from "./storage/auditStore";
+import { formatOperatorQueueCopy } from "./ui/operatorCenterPresentation";
 import {
   displayAuditActionLabel,
   displayAuditResultLabel,
@@ -30,13 +31,15 @@ import {
 } from "./displayLabels";
 import { filterUserFacingRecords } from "./dataFilters";
 import { getLastSafeSignals } from "./execution/safePaperLoop";
-import { loadSafeV44Strategy } from "./strategy/safeV44Strategy";
+import { getLiveActiveStrategy, getPaperActiveStrategy } from "./strategy/strategyStore";
+import { isRetiredSafeId } from "./strategy/retiredSafeBaseline";
 import {
   getLatestAiTradeReportSummary,
   listAiTradeReports,
   type AiTradeReport,
 } from "./report/aiTradeReport";
 import { getUnifiedMetrics } from "./metrics/metricsEngine";
+import { getUnifiedRiskView } from "./metrics/riskService";
 import { computePriceReturnFraction } from "./metrics/tradeResult";
 import type { BinanceDiagnosticsReport } from "./binanceDiagnosticsTypes";
 import type { LearningSummary } from "./learningTypes";
@@ -96,8 +99,6 @@ export interface DashboardPositionRow {
   modeLabel: "모의 거래" | "실전 거래";
   protectionLabel: PositionProtectionLabel;
 }
-
-export type { PositionProtectionLabel } from "./displayLabels";
 
 export interface DashboardOpportunityRow {
   symbol: string;
@@ -179,7 +180,7 @@ export interface TradingDashboardStatus {
     name: string;
     paramsHash: string;
     sourceStatus: string;
-  };
+  } | null;
   aiReportSummary: string | null;
   aiReports: Array<{
     id: string;
@@ -236,10 +237,12 @@ export interface TradingDashboardStatus {
       riskLevel?: string;
     }>;
   };
+  emergencyActive?: boolean;
   learningSummary: LearningSummary;
   recentExecutionLogs: DashboardExecutionLogRow[];
   /** Unified metrics snapshot — sole source for PnL/cost/equity fields. */
   metrics: ReturnType<typeof getUnifiedMetrics>;
+  risk: ReturnType<typeof getUnifiedRiskView>;
 }
 
 function mapCandidateStatus(
@@ -590,7 +593,12 @@ export function buildTradingDashboardStatus(
   ).length;
   const queueStatusLabel =
     queueBase.received > 0
-      ? `수신 ${queueBase.received} · 대기 ${queueBase.queued} · 실행 ${executing} · 완료 ${queueBase.executed}`
+      ? formatOperatorQueueCopy({
+          received: queueBase.received,
+          queued: queueBase.queued,
+          executing,
+          executed: queueBase.executed,
+        })
       : "대기 중";
 
   const opportunities: DashboardOpportunityRow[] = (() => {
@@ -604,7 +612,7 @@ export function buildTradingDashboardStatus(
             : row.signal.side === "SHORT"
               ? "숏"
               : "-",
-        strategyLabel: "SAFE_v44_i4060",
+        strategyLabel: "현재 전략",
         score: row.signal.score,
         judgment:
           row.status === "진입" || row.signal.passed
@@ -633,7 +641,18 @@ export function buildTradingDashboardStatus(
     }));
   })();
 
-  const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
+  const selectedStrategy =
+    getPaperActiveStrategy() ??
+    getLiveActiveStrategy() ??
+    null;
+  const strategyMeta =
+    selectedStrategy && !isRetiredSafeId(selectedStrategy.id)
+      ? {
+          name: selectedStrategy.displayAlias ?? selectedStrategy.displayName ?? selectedStrategy.name,
+          paramsHash: selectedStrategy.paramsHash,
+          sourceStatus: selectedStrategy.sourceStatus ?? "user_created",
+        }
+      : null;
   const metrics = getUnifiedMetrics();
   const aiReports = listAiTradeReports(12).map((r) => ({
     id: r.id,
@@ -692,11 +711,7 @@ export function buildTradingDashboardStatus(
     initialSeed: state.initialSeedUsdt ?? "확인 불가",
     opportunities,
     recentTrades: buildRecentTrades(40),
-    activeStrategy: {
-      name: strategyMeta.name,
-      paramsHash: strategyMeta.paramsHash,
-      sourceStatus: strategyMeta.sourceStatus,
-    },
+    activeStrategy: strategyMeta,
     aiReportSummary: getLatestAiTradeReportSummary(),
     aiReports,
     learningView: buildLearningView(learningSummary),
@@ -725,6 +740,8 @@ export function buildTradingDashboardStatus(
     learningSummary,
     recentExecutionLogs: buildRecentExecutionLogs(10),
     metrics,
+    risk: getUnifiedRiskView(),
+    emergencyActive: runtime.emergencyStopped === true,
   };
 }
 

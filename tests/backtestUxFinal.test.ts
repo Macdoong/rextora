@@ -294,11 +294,9 @@ describe("chart evidence persistence", () => {
   });
 });
 
-describe("SAFE immutability fingerprint", () => {
-  it("SAFE update path fingerprint unchanged in fixture", () => {
+describe("retired SAFE file is not a product fixture", () => {
+  it("retired SAFE file remains absent", () => {
     const p = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
-    const raw = fs.readFileSync(p, "utf8");
-    expect(raw).toContain('"params_hash": "7893ca3f0e30"');
-    expect(raw).toContain("SAFE_v44_i4060");
+    expect(fs.existsSync(p)).toBe(false);
   });
 });

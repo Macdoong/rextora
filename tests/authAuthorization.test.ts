@@ -12,8 +12,12 @@ import { POST as paperPost } from "../app/api/rextora/paper/session/route";
 import { AUTH_ERROR } from "../src/lib/rextora/auth/authTypes";
 import { roleHasPermission } from "../src/lib/rextora/auth/permissions";
 import { loadSettings } from "../src/lib/rextora/settings/settingsStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategyRepository";
+
 import { authedRequest } from "./helpers/authSession";
+import { createStrategy, ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+
 
 async function jsonOf(res: Response) {
   return (await res.json()) as { ok?: boolean; code?: string; error?: string; message?: string };
@@ -77,7 +81,7 @@ describe("auth authorization and actor trust", () => {
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "request", strategyId: SAFE_STRATEGY_ID }),
+          body: JSON.stringify({ action: "request", strategyId: RETIRED_SAFE_STRATEGY_ID }),
         },
         "operator",
       ),
@@ -224,71 +228,79 @@ describe("auth authorization and actor trust", () => {
   });
 
   it("31-36. client actor fields are rejected and session identity is used", async () => {
-    const spoof = await approvePost(
-      await authedRequest(
-        "http://localhost/api/rextora/strategy/approve",
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            action: "request",
-            strategyId: SAFE_STRATEGY_ID,
-            requestedBy: "CEO",
-          }),
-        },
-        "operator",
-      ),
-    );
-    expect(spoof.status).toBe(400);
-    const spoofBody = await jsonOf(spoof);
-    expect(spoofBody.code).toBe(AUTH_ERROR.client_actor_rejected);
+    const isolated = installIsolatedStrategyStore();
+    try {
+      ensureStrategyStore();
+      const probe = createStrategy({ name: "auth-actor-identity-probe" });
 
-    const reviewed = await approvePost(
-      await authedRequest(
-        "http://localhost/api/rextora/strategy/approve",
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "approve", requestId: "x", reviewedBy: "CEO" }),
-        },
-        "ceo",
-      ),
-    );
-    expect(reviewed.status).toBe(400);
+      const spoof = await approvePost(
+        await authedRequest(
+          "http://localhost/api/rextora/strategy/approve",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              action: "request",
+              strategyId: probe.id,
+              requestedBy: "CEO",
+            }),
+          },
+          "operator",
+        ),
+      );
+      expect(spoof.status).toBe(400);
+      const spoofBody = await jsonOf(spoof);
+      expect(spoofBody.code).toBe(AUTH_ERROR.client_actor_rejected);
 
-    const revoked = await approvePost(
-      await authedRequest(
-        "http://localhost/api/rextora/strategy/approve",
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "revoke", requestId: "x", revokedBy: "CEO" }),
-        },
-        "ceo",
-      ),
-    );
-    expect(revoked.status).toBe(400);
+      const reviewed = await approvePost(
+        await authedRequest(
+          "http://localhost/api/rextora/strategy/approve",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ action: "approve", requestId: "x", reviewedBy: "CEO" }),
+          },
+          "ceo",
+        ),
+      );
+      expect(reviewed.status).toBe(400);
 
-    const created = await approvePost(
-      await authedRequest(
-        "http://localhost/api/rextora/strategy/approve",
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "request", strategyId: SAFE_STRATEGY_ID }),
-        },
-        "operator",
-      ),
-    );
-    const createdJson = (await created.json()) as {
-      data?: { request?: { requestedBy?: string; requestId?: string } };
-      request?: { requestedBy?: string; requestId?: string };
-    };
-    const request =
-      createdJson.data?.request ?? createdJson.request ?? (createdJson as { request?: { requestedBy?: string } }).request;
-    expect(request?.requestedBy).toBe("temp_operator");
-    expect(request?.requestedBy).not.toBe("CEO");
-    expect(request?.requestedBy).not.toBe("operator");
+      const revoked = await approvePost(
+        await authedRequest(
+          "http://localhost/api/rextora/strategy/approve",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ action: "revoke", requestId: "x", revokedBy: "CEO" }),
+          },
+          "ceo",
+        ),
+      );
+      expect(revoked.status).toBe(400);
+
+      const created = await approvePost(
+        await authedRequest(
+          "http://localhost/api/rextora/strategy/approve",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ action: "request", strategyId: probe.id }),
+          },
+          "operator",
+        ),
+      );
+      const createdJson = (await created.json()) as {
+        data?: { request?: { requestedBy?: string; requestId?: string } };
+        request?: { requestedBy?: string; requestId?: string };
+      };
+      const request =
+        createdJson.data?.request ?? createdJson.request ?? (createdJson as { request?: { requestedBy?: string } }).request;
+      expect(request?.requestedBy).toBe("temp_operator");
+      expect(request?.requestedBy).not.toBe("CEO");
+      expect(request?.requestedBy).not.toBe("operator");
+    } finally {
+      isolated.cleanup();
+    }
   });
 
   it("43-44. CSRF origin is enforced", async () => {

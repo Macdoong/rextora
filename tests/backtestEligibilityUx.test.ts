@@ -265,15 +265,11 @@ describe("backtest eligibility + UX semantics", () => {
     ).toEqual({ fromMs: 1782417600000, toMs: 1782440100000 });
   });
 
-  it("SAFE strategy file remains immutable fingerprint", () => {
+  it("retired SAFE file remains absent", () => {
     const candidates = [
       path.join(ROOT, "data/strategies/SAFE_v44_i4060.json"),
       path.join(ROOT, "data/rextora/strategies/SAFE_v44_i4060.json"),
     ];
-    const safePath = candidates.find((p) => fs.existsSync(p));
-    expect(safePath).toBeTruthy();
-    const raw = fs.readFileSync(safePath!, "utf8");
-    expect(raw).toContain('"params_hash": "7893ca3f0e30"');
-    expect(raw).toContain("SAFE_v44_i4060");
+    expect(candidates.every((p) => !fs.existsSync(p))).toBe(true);
   });
 });

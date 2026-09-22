@@ -65,6 +65,12 @@ describe("strategySearch operator UX", () => {
     expect(workbench).toContain("SearchStatusCard");
     expect(workbench).toContain("ResearchCompletionPanel");
     expect(workbench).toContain("ss-open-results");
+    expect(workbench).toContain("전체 결과");
+    expect(workbench).toContain("이 탐색 결과");
+    expect(workbench).toContain("recoveryJobs.length > 0");
+    expect(workbench).toContain("ss-recovery-probe");
+    expect(workbench).not.toContain("탐색 결과 열기");
+    expect(workbench).not.toContain("이 연구 결과 보기");
     expect(workbench).toContain("ss-results-handoff");
     expect(workbench).not.toContain("<QualifiedResultsPanel");
     expect(workbench).not.toContain("<JobList");
@@ -74,9 +80,8 @@ describe("strategySearch operator UX", () => {
 
   it("create form integrates advanced settings on one page", () => {
     const src = readUi("JobCreateForm.tsx");
-    expect(src).toContain("ss-advanced-settings-link");
-    expect(src).toContain("#ss-section-engine");
-    expect(src).toContain("고급 탐색 설정");
+    expect(src).toContain("ss-validation-advanced-trigger");
+    expect(src).not.toContain("ss-advanced-settings-link");
     expect(src).toContain("ss-intensity");
     expect(src).toContain("ss-goal");
     expect(src).not.toContain("ss-advanced-toggle");
@@ -256,10 +261,7 @@ describe("strategySearch operator UX", () => {
     }
   });
 
-  it("preserves SAFE file bytes", () => {
-    expect(fs.existsSync(SAFE_PATH)).toBe(true);
-    const raw = fs.readFileSync(SAFE_PATH, "utf8");
-    expect(raw).toContain("7893ca3f0e30");
-    expect(fs.readdirSync(STRATEGIES_DIR)).toContain("SAFE_v44_i4060.json");
+  it("does not resurrect the retired SAFE file", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 });

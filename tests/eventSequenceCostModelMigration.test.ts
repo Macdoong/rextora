@@ -1373,9 +1373,9 @@ describe("P3-A8.2 Event-Sequence cost model migration", () => {
     expect(mixed.available).toBe(false);
 
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(hashes.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(hashes.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
   });
 
   it("engine omit costModel falls back to ledger_v0; paramsHash formula files unchanged", () => {

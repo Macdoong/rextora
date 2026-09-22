@@ -5,10 +5,8 @@ import Link from "next/link";
 import { Button, ConfirmDialog } from "@/components/ui/primitives";
 import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
 import { V3Card } from "@/components/rextora/v3/V3Card";
-import { V3Drawer } from "@/components/rextora/v3/V3Drawer";
 import { V3PermissionGate } from "@/components/rextora/v3/V3PermissionGate";
 import {
-  LIVE_DISABLED_LABEL,
   LIVE_ORDERS_BLOCKED_LABEL,
 } from "@/src/lib/rextora/live/liveGateOperatorPresentation";
 import {
@@ -25,6 +23,7 @@ import {
   startStrategySearchJob,
 } from "./apiClient";
 import { STRATEGY_SEARCH_HISTORY_RETENTION_NOTE } from "./JobList";
+import { buildSearchCompareHref } from "./searchJobComparison";
 import {
   InterruptedRecoverySection,
   RECOVERY_COLLAPSED_PREVIEW_COUNT,
@@ -34,12 +33,18 @@ import {
   discoverInterruptedRecoveryJobs,
 } from "./interruptedRecoveryDiscovery";
 import { ExecutionControls } from "./ExecutionControls";
+import { displayJobSearchTitle, jobSearchNameTooltip } from "./jobDisplayName";
 import {
   formatErrorDetails,
   mapStrategySearchErrorCode,
 } from "./errorMessages";
 import { createDefaultOperatorFormState } from "./formDefaults";
 import { buildCreateBodyIfValid, type FormFieldError } from "./formValidation";
+import { SetupResultsCollapsible } from "./guided/SetupResultsCollapsible";
+import {
+  isGuidedSetupActive,
+  resolveStrategySearchPresentationMode,
+} from "./guided/strategySearchPresentation";
 import { JobCreateForm } from "./JobCreateForm";
 import {
   loadOperatorFormSession,
@@ -67,14 +72,35 @@ import {
   formatCount,
   historyStatusLabelKo,
   researchStatusLabelKo,
+  isSearchCancellationPending,
+  searchCancellationPendingCopy,
 } from "./formatters";
 import { hasAuthoritativeRankingGroups } from "@/src/lib/rextora/researchRankingReadModel";
+import {
+  normalizeResultRankPanel,
+  resolveDefaultResultRankPanel,
+  type StrategySearchResultRankPanel,
+} from "./resultRankPanel";
+import { resolvePatternSelectionMode } from "@/src/lib/rextora/patternSelectionMode";
+import {
+  liveTop10EmptyPresentation,
+  presentSearchFamilyLabelKo,
+  visualizedSearchSpaceIds,
+} from "./visual/searchScopeVisual";
+import { StrategySearchRunningVisual, RunningConfigSummary } from "./visual/StrategySearchRunningVisual";
+import {
+  buildRunningConfigSummary,
+  shouldRenderRunningVisual,
+} from "./visual/runningVisualModel";
+import { isValidCompletedBacktestHref } from "./completionCustomerView";
 
 /** Server operatorPlan owns runUntilQualified / multi-space progression. */
 const OPERATOR_RUN_UNTIL_QUALIFIED = true as const;
 void OPERATOR_RUN_UNTIL_QUALIFIED;
 
 const DETAIL_POLL_MS = 2000;
+/** Faster detail refresh only while cancel_requested / cancelling. */
+const DETAIL_POLL_CANCEL_MS = 400;
 const LIST_POLL_MS = 8000;
 /** When no operationally active jobs, list refresh is much less frequent. */
 const LIST_POLL_IDLE_MS = 30_000;
@@ -255,10 +281,12 @@ export function StrategySearchWorkbench() {
     detail: string | null;
     tone: "error" | "info" | "success";
   } | null>(null);
-  const [configOpen, setConfigOpen] = useState(false);
-  const [rankPanel, setRankPanel] = useState<"top10" | "groups" | "completion">(
+  const [outcomeViewPrimary, setOutcomeViewPrimary] = useState(false);
+  const [rankPanel, setRankPanel] = useState<StrategySearchResultRankPanel>(
     "top10",
   );
+  const [runningConfigOpen, setRunningConfigOpen] = useState(false);
+  const rankPanelTouchedRef = useRef(false);
 
   const [strategiesSavedHint, setStrategiesSavedHint] = useState(false);
   const [generationMeta, setGenerationMeta] = useState<{
@@ -274,6 +302,31 @@ export function StrategySearchWorkbench() {
   useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
+
+  useEffect(() => {
+    setRunningConfigOpen(false);
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (!detail) return;
+    if (isSearchCancellationPending(detail.status)) return;
+    setFeedback((prev) => {
+      if (!prev) return prev;
+      const pending =
+        prev.message === "중지 요청 중" ||
+        prev.message === "안전하게 탐색을 종료하고 있습니다.";
+      if (!pending) return prev;
+      if (
+        detail.status === "cancelled" ||
+        detail.status === "completed" ||
+        detail.status === "failed" ||
+        detail.status === "paused"
+      ) {
+        return null;
+      }
+      return prev;
+    });
+  }, [detail?.status]);
 
   useEffect(() => {
     if (!clientReady) return;
@@ -519,6 +572,24 @@ export function StrategySearchWorkbench() {
                   : "목표를 충족한 전략이 없습니다. 탐색 설정을 조정해 보세요.",
               tone: "info",
             });
+          } else if (data.status === "cancelled") {
+            setFeedback({
+              message: researchStatusLabelKo("cancelled"),
+              detail: null,
+              tone: "info",
+            });
+          } else {
+            setFeedback((prev) => {
+              if (
+                prev &&
+                (prev.message === "중지 요청 중" ||
+                  prev.message ===
+                    "안전하게 탐색을 종료하고 있습니다.")
+              ) {
+                return null;
+              }
+              return prev;
+            });
           }
           // Terminal: one final list sync, then detail polling stops via pollActive.
           await refreshList();
@@ -528,12 +599,31 @@ export function StrategySearchWorkbench() {
       })();
     };
     tick();
-    const timer = window.setInterval(tick, DETAIL_POLL_MS);
+    const cancelTransition =
+      detail?.status === "cancel_requested" ||
+      detail?.status === "cancelling";
+    const pollMs = cancelTransition ? DETAIL_POLL_CANCEL_MS : DETAIL_POLL_MS;
+    const timer = window.setInterval(tick, pollMs);
     return () => window.clearInterval(timer);
-  }, [pollActive, selectedId, refreshDetail, refreshList]);
+  }, [pollActive, selectedId, detail?.status, refreshDetail, refreshList]);
 
   function handleSelect(id: string) {
     selectedIdRef.current = id;
+    rankPanelTouchedRef.current = false;
+    const listed = jobs.find((job) => job.id === id);
+    if (listed) {
+      const groupAwareListed = hasAuthoritativeRankingGroups(listed);
+      setRankPanel(
+        normalizeResultRankPanel({
+          current: resolveDefaultResultRankPanel({
+            status: listed.status,
+            groupAware: groupAwareListed,
+            hasVisibleLiveTop10: false,
+          }),
+          groupAware: groupAwareListed,
+        }),
+      );
+    }
     setSelectedId(id);
     setJobMissing(false);
     setMissingJobId(null);
@@ -571,6 +661,26 @@ export function StrategySearchWorkbench() {
   }, []);
 
   useEffect(() => {
+    if (!detail || jobMissing) return;
+    const groupAwareNow = hasAuthoritativeRankingGroups(detail);
+    setRankPanel((current) => {
+      const normalized = normalizeResultRankPanel({
+        current,
+        groupAware: groupAwareNow,
+      });
+      if (normalized !== current) return normalized;
+      if (rankPanelTouchedRef.current) return current;
+      const next = resolveDefaultResultRankPanel({
+        status: detail.status,
+        groupAware: groupAwareNow,
+        hasVisibleLiveTop10:
+          !groupAwareNow && (detail.liveTop10?.entries.length ?? 0) > 0,
+      });
+      return current === next ? current : next;
+    });
+  }, [detail, jobMissing]);
+
+  useEffect(() => {
     let cancelled = false;
     void fetchStrategySearchRecoveryStatus()
       .then((data) => {
@@ -592,7 +702,9 @@ export function StrategySearchWorkbench() {
   useEffect(() => {
     const syncHash = () => {
       if (window.location.hash === "#ss-section-engine") {
-        setConfigOpen(true);
+        document
+          .getElementById("ss-section-engine")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     };
     syncHash();
@@ -677,7 +789,52 @@ export function StrategySearchWorkbench() {
     }
   }
 
+  async function handleRegisterForBacktest(iteration: number) {
+    if (!selectedId || registering) return;
+    if (!Number.isInteger(iteration)) {
+      setFeedback({
+        message: "백테스트로 넘길 추천 후보가 없습니다.",
+        detail: "자격 미통과 최고 점수 후보는 등록하지 않습니다.",
+        tone: "error",
+      });
+      return;
+    }
+    setRegistering(true);
+    setFeedback(null);
+    try {
+      const res = await promoteStrategySearchTrials(selectedId, {
+        mode: "register_for_backtest",
+        iteration,
+      });
+      const strategyId = (res.strategyId ?? "").trim();
+      const href =
+        isValidCompletedBacktestHref(res.backtestHref) && res.backtestHref
+          ? res.backtestHref
+          : null;
+      const hrefStrategyId = href
+        ? new URL(href, "https://rextora.local").searchParams.get("strategyId")
+        : null;
+      if (!strategyId || !href || hrefStrategyId !== strategyId) {
+        setFeedback({
+          message: "백테스트로 이동하지 못했습니다.",
+          detail: "등록 결과는 확인했지만 전략 ID가 없어 백테스트를 열지 않습니다.",
+          tone: "error",
+        });
+        return;
+      }
+      if (typeof window !== "undefined") {
+        window.location.assign(href);
+      }
+    } catch (err) {
+      const mapped = toUserError(err);
+      setFeedback({ ...mapped, tone: "error" });
+    } finally {
+      setRegistering(false);
+    }
+  }
+
   async function handleStartSearch() {
+    setOutcomeViewPrimary(false);
     const validated = buildCreateBodyIfValid(form);
     if (!validated.ok) {
       setFormErrors(validated.errors);
@@ -712,7 +869,6 @@ export function StrategySearchWorkbench() {
         detail: `${created.searchName || form.searchName} · 합격 목표까지 AI가 연구를 이어갑니다.`,
         tone: "info",
       });
-      setConfigOpen(false);
     } catch (err) {
       const mapped = toUserError(err);
       setFeedback({ ...mapped, tone: "error" });
@@ -746,11 +902,14 @@ export function StrategySearchWorkbench() {
       await refreshList();
       await refreshRecovery();
       if (action === "cancel") {
-        setFeedback({
-          message: "중지가 요청되었습니다.",
-          detail: null,
-          tone: "info",
-        });
+        const pendingCopy = searchCancellationPendingCopy(next.status);
+        if (pendingCopy) {
+          setFeedback({
+            message: pendingCopy,
+            detail: null,
+            tone: "info",
+          });
+        }
       }
     } catch (err) {
       const mapped = toUserError(err);
@@ -784,42 +943,14 @@ export function StrategySearchWorkbench() {
           !detail.executionActive)),
   );
 
-  const activeJobSummary =
-    detail &&
-    (detail.status === "running" ||
-      detail.status === "pause_requested" ||
-      detail.status === "queued" ||
-      detail.status === "interrupted" ||
-      detail.executionActive)
-      ? {
-          searchName: detail.searchName || "전략 탐색",
-          symbols: detail.symbols,
-          timeframe: detail.timeframe,
-          maxRuntimeMs: detail.maxRuntimeMs ?? null,
-          status: detail.status,
-          expectedCompletionAtMs: detail.expectedCompletionAtMs ?? null,
-          appliedSummary:
-            (
-              detail as {
-                appliedSearchSummary?: {
-                  titleKo: string;
-                  subtitleKo: string;
-                  sections: Array<{
-                    id: string;
-                    titleKo: string;
-                    rows: Array<{ labelKo: string; valueKo: string }>;
-                  }>;
-                  developerPayload: Record<string, unknown>;
-                } | null;
-              }
-            ).appliedSearchSummary ?? null,
-        }
-      : null;
-
-  const selectedName =
-    detail?.searchName ||
-    jobs.find((job) => job.id === selectedId)?.searchName ||
-    null;
+  const selectedJobForName =
+    detail ?? jobs.find((job) => job.id === selectedId) ?? null;
+  const selectedName = selectedJobForName
+    ? displayJobSearchTitle(selectedJobForName)
+    : null;
+  const selectedNameTooltip = selectedJobForName
+    ? jobSearchNameTooltip(selectedJobForName)
+    : undefined;
   const selectedStatusKo = detail
     ? researchStatusLabelKo(detail.status, {
         completionReason: detail.completionReason ?? null,
@@ -852,7 +983,7 @@ export function StrategySearchWorkbench() {
         detail.patternCombinationFamilies.length > 1
       ) &&
       detail.currentSearchFamily
-        ? ` · ${detail.currentSearchFamily}`
+        ? ` · ${presentSearchFamilyLabelKo(detail.currentSearchFamily) ?? detail.currentSearchFamily}`
         : "")
     : "";
   const activeCount = jobs.filter((job) =>
@@ -867,16 +998,87 @@ export function StrategySearchWorkbench() {
   const groupAware = Boolean(
     detail && !jobMissing && hasAuthoritativeRankingGroups(detail),
   );
+  const demoteNewSearch = Boolean(
+    detail &&
+      !jobMissing &&
+      (detail.status === "completed" ||
+        detail.status === "cancelled" ||
+        ((detail.status === "failed" || detail.status === "paused") &&
+          (detail.qualifiedCount ?? 0) > 0)),
+  );
   const hasLiveTop10 = !groupAware && liveTop10Entries.length > 0;
+  const searchProgress =
+    detail && !jobMissing
+      ? {
+          status: detail.status,
+          qualifiedCount:
+            detail.qualifiedCount ?? qualifiedFromTrials.length,
+          top10Count: hasLiveTop10 ? liveTop10Entries.length : 0,
+          progressRatio: detail.progressRatio,
+          overallProgressPct: detail.overallProgressPct,
+          maxRuntimeMs: detail.maxRuntimeMs,
+          elapsedMs: detail.elapsedMs,
+          uniqueEvaluatedCount: detail.uniqueEvaluatedCount,
+          candidateBudgetUsed: detail.candidateBudgetUsed,
+          completedIterations: detail.completedIterations,
+          evaluatedCount: detail.evaluatedCount ?? detail.statistics?.evaluated,
+          gatePassedCount: detail.gatePassedCount ?? detail.statistics?.passed,
+          rejectedCount: detail.rejectedCount ?? detail.statistics?.failed,
+          errorCount: detail.errorCount ?? detail.statistics?.errors,
+          recentActivityEvents: detail.recentActivityEvents ?? [],
+          searchProgression: detail.searchProgression,
+          currentSearchFamily: detail.currentSearchFamily,
+        }
+      : null;
+  const showRunningVisual = shouldRenderRunningVisual(searchProgress?.status);
+  const presentationMode = resolveStrategySearchPresentationMode({
+    clientReady,
+    showRunningVisual,
+    outcomeViewPrimary,
+  });
+  const guidedSetupActive = isGuidedSetupActive(presentationMode);
+  const runningAutomatic =
+    resolvePatternSelectionMode({
+      patternConfigLevel: form.patternConfigLevel,
+      autoStrategyCombo: form.autoStrategyCombo,
+    }) === "automatic";
+  const progressionFamilyIds = (searchProgress?.searchProgression ?? [])
+    .map((item) => item.id)
+    .filter((id): id is string => typeof id === "string" && id.length > 0);
+  const runningFamilyIds =
+    progressionFamilyIds.length > 0
+      ? progressionFamilyIds
+      : visualizedSearchSpaceIds({
+          automatic: runningAutomatic,
+          selectedSpaceIds: form.selectedSpaceIds,
+        });
+  const runningConfigSummary = buildRunningConfigSummary({
+    symbol: detail?.symbols?.[0] || form.symbol,
+    timeframe: detail?.timeframe || form.timeframe,
+    periodPreset: form.periodPreset,
+    automatic: runningAutomatic,
+    familyCount: runningFamilyIds.length,
+  });
+  const liveTop10Empty = liveTop10EmptyPresentation({
+    running: Boolean(
+      detail &&
+        !jobMissing &&
+        isOperationallyActiveStatus(detail.status, detail.executionActive),
+    ),
+    candidateCount: liveTop10Entries.length,
+  });
+  const top10Evaluating = liveTop10Empty.evaluating;
   const top10EmptyReason = !detail
     ? "탐색을 선택하거나 새 탐색을 시작하세요."
-    : groupAware
-      ? "이 탐색의 순위는 순위 그룹에서 확인합니다."
-      : !detail.liveTop10
-        ? "이 탐색에는 Live TOP10 스냅샷이 없습니다."
-        : liveTop10Entries.length === 0
-          ? "아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다."
-          : null;
+    : top10Evaluating
+      ? liveTop10Empty.detail
+      : groupAware
+        ? "이 탐색의 순위는 순위 그룹에서 확인합니다."
+        : !detail.liveTop10
+          ? "이 탐색에는 Live TOP10 스냅샷이 없습니다."
+          : liveTop10Entries.length === 0
+            ? "아직 TOP 10을 선정할 만큼 검증된 전략이 없습니다."
+            : null;
   const showCompletion = Boolean(
     detail &&
       !jobMissing &&
@@ -912,24 +1114,36 @@ export function StrategySearchWorkbench() {
           : "전문가");
   const symbolChip = detail?.symbols?.join(", ") || form.symbol || "—";
   const timeframeChip = detail?.timeframe || form.timeframe || "—";
-  const generationFact =
-    generationMeta?.generationCount != null
-      ? formatCount(generationMeta.generationCount)
-      : null;
+  const setupResultsSummaryMeta =
+    jobs.length > 0
+      ? `${formatCount(jobs.length)}건 · ${symbolChip} · ${timeframeChip}${selectedStatusKo ? ` · ${selectedStatusKo}` : ""}`
+      : "기록 없음";
 
   const createForm = (
-    <JobCreateForm
-      form={form}
-      errors={formErrors}
-      submitting={creating}
-      onChange={setForm}
-      onSubmit={() => void handleStartSearch()}
-      activeJobSummary={activeJobSummary}
-    />
+    <div
+      className={
+        "v3-ss-create-main" +
+        (showRunningVisual ? " ss-create-main--secondary" : "")
+      }
+      data-testid="ss-visual-builder-host"
+    >
+      <JobCreateForm
+        form={form}
+        errors={formErrors}
+        submitting={creating}
+        searchProgress={searchProgress}
+        readOnly={showRunningVisual}
+        onChange={setForm}
+        onSubmit={() => void handleStartSearch()}
+      />
+    </div>
   );
 
-  const openConfig = () => {
-    setConfigOpen(true);
+  const scrollToCreate = () => {
+    setOutcomeViewPrimary(false);
+    document
+      .getElementById("strategy-search-create")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const probeRecovery = () => {
@@ -940,7 +1154,12 @@ export function StrategySearchWorkbench() {
   };
 
   return (
-    <div className="v3-ss-workbench" data-testid="strategy-search-workbench">
+    <div
+      className="v3-ss-workbench"
+      data-testid="strategy-search-workbench"
+      data-presentation-mode={presentationMode}
+      data-guided-setup-active={guidedSetupActive ? "true" : "false"}
+    >
       {!clientReady ? (
         <div
           className="rextora-card p-4 text-sm text-slate-400"
@@ -950,20 +1169,28 @@ export function StrategySearchWorkbench() {
         </div>
       ) : (
         <>
+          {showRunningVisual ? (
+            <StrategySearchRunningVisual
+              progress={searchProgress}
+              familyIds={runningFamilyIds}
+              symbol={detail?.symbols?.[0] || form.symbol}
+              timeframe={detail?.timeframe || form.timeframe}
+            />
+          ) : (
+            <>{createForm}</>
+          )}
+
           {showOutcomeFirst ? (
-            <details className="v3-ss-config-collapsed" data-testid="ss-config-collapsed">
-              <summary
-                className="cursor-pointer"
-                onClick={(event) => {
-                  event.preventDefault();
-                  openConfig();
-                }}
-              >
-                탐색 설정(접힘) · 새 탐색을 시작할 때만 펼치세요
-              </summary>
-            </details>
+            <p className="ss-helper" data-testid="ss-config-collapsed">
+              완료된 탐색이 있습니다. 아래 결과에서 확인하거나, 위에서 새 탐색을
+              시작하세요.
+            </p>
           ) : null}
 
+          <SetupResultsCollapsible
+            active={guidedSetupActive}
+            summaryMeta={setupResultsSummaryMeta}
+          >
           <section
             className="v3-ss-statusbar"
             data-testid="ss-sticky-status-header"
@@ -971,7 +1198,7 @@ export function StrategySearchWorkbench() {
           >
             <div className="v3-ss-status-main">
               <span>현재 상태</span>
-              <b data-testid="ss-job-user-name">
+              <b data-testid="ss-job-user-name" title={selectedNameTooltip}>
                 {selectedStatusKo}
                 {selectedName ? ` · ${selectedName}` : ""}
               </b>
@@ -987,12 +1214,14 @@ export function StrategySearchWorkbench() {
               <span>진행 중</span>
               <b>{formatCount(activeCount)}</b>
             </div>
-            <div className="v3-ss-status-cell">
+            {recoveryJobs.length > 0 ? (
+            <div className="v3-ss-status-cell" data-testid="ss-recovery-count">
               <span>재개 가능</span>
-              <b className={recoveryJobs.length > 0 ? "v3-ss-tone-warn" : undefined}>
+              <b className="v3-ss-tone-warn">
                 {formatCount(recoveryJobs.length)}
               </b>
             </div>
+            ) : null}
             <div className="v3-ss-status-cell">
               <span>통과 후보</span>
               <b className={qualifiedFact !== "—" && qualifiedFact !== "0" ? "v3-ss-tone-ok" : undefined}>
@@ -1023,14 +1252,19 @@ export function StrategySearchWorkbench() {
             >
               <option value="">선택…</option>
               {jobs.slice(0, 12).map((job) => (
-                <option key={job.id} value={job.id}>
-                  {job.searchName || job.id} ·{" "}
+                <option
+                  key={job.id}
+                  value={job.id}
+                  title={jobSearchNameTooltip(job)}
+                >
+                  {displayJobSearchTitle(job)} ·{" "}
                   {historyStatusLabelKo(job.status, {
                     completionReason: job.completionReason,
                   })}
                 </option>
               ))}
             </select>
+            {detail || jobMissing ? (
             <V3PermissionGate allowed={canRunResearch}>
               <ExecutionControls
                 status={detail?.status ?? "queued"}
@@ -1038,55 +1272,34 @@ export function StrategySearchWorkbench() {
                 retryable={detail?.retryable === true}
                 jobMissing={jobMissing}
                 hasSelection={Boolean(detail)}
+                resultsHref={
+                  detail?.id
+                    ? `/results?jobId=${encodeURIComponent(detail.id)}`
+                    : null
+                }
                 onStart={() => void runAction("start")}
                 onPause={() => void runAction("pause")}
                 onResume={() => void runAction("resume")}
                 onCancel={() => void runAction("cancel")}
               />
             </V3PermissionGate>
+            ) : null}
           </div>
           <p className="v3-ss-perm">
             권한 없는 제어는 흐리게 표시되며 사용 불가로 보입니다.
           </p>
 
-          <section className="v3-ss-command-card">
-            <div className="v3-ss-form-row v3-ss-facts">
-              <div className="v3-ss-chip">
-                <span>종목</span>
-                <b>{symbolChip}</b>
-              </div>
-              <div className="v3-ss-chip">
-                <span>타임프레임</span>
-                <b>{timeframeChip}</b>
-              </div>
-              <div className="v3-ss-chip">
-                <span>분석 기간</span>
-                <b>{periodLabel}</b>
-              </div>
-              <div className="v3-ss-chip">
-                <span>패턴</span>
-                <b>{patternChip}</b>
-              </div>
-              <Button
-                type="button"
-                className="v3-ss-btn-primary"
-                data-testid="ss-open-new-search"
-                onClick={openConfig}
-              >
-                새 탐색
-              </Button>
-            </div>
-          </section>
-
           <div className="v3-ss-toolbar">
             <Button
               type="button"
-              variant="outline"
-              className="v3-ss-btn-secondary"
-              onClick={openConfig}
+              className={demoteNewSearch ? "v3-ss-btn-ghost" : "v3-ss-btn-primary"}
+              data-testid="ss-open-new-search"
+              data-action-rank={demoteNewSearch ? "tertiary" : "primary"}
+              onClick={scrollToCreate}
             >
-              탐색 구성
+              새 탐색
             </Button>
+            {recoveryJobs.length > 0 || recoveryLoading ? (
             <Button
               type="button"
               variant="outline"
@@ -1094,25 +1307,40 @@ export function StrategySearchWorkbench() {
               data-testid="ss-recovery-probe"
               onClick={probeRecovery}
             >
-              복구
+              복구 {formatCount(recoveryJobs.length)}건
             </Button>
+            ) : null}
             <Link
               href="/results"
               className="v3-ss-btn-ghost"
               data-testid="ss-open-results"
+              onClick={() => setOutcomeViewPrimary(true)}
             >
-              탐색 결과 열기
+              전체 결과
             </Link>
             {detail?.id ? (
               <Link
                 href={`/results?jobId=${encodeURIComponent(detail.id)}`}
-                className="v3-ss-btn-ghost"
+                className={demoteNewSearch ? "v3-ss-btn-primary" : "v3-ss-btn-ghost"}
                 data-testid="ss-open-results-job"
+                onClick={() => setOutcomeViewPrimary(true)}
               >
-                이 연구 결과 보기
+                이 탐색 결과
               </Link>
             ) : null}
           </div>
+
+          {showRunningVisual ? (
+            <RunningConfigSummary
+              titleKo={runningConfigSummary.titleKo}
+              marketLine={runningConfigSummary.marketLine}
+              scopeLine={runningConfigSummary.scopeLine}
+              expanded={runningConfigOpen}
+              onToggle={() => setRunningConfigOpen((open) => !open)}
+            >
+              {createForm}
+            </RunningConfigSummary>
+          ) : null}
 
           {recoveryBanner ? (
             <div
@@ -1177,7 +1405,7 @@ export function StrategySearchWorkbench() {
                     setJobMissing(false);
                     setMissingJobId(null);
                     setFeedback(null);
-                    setConfigOpen(true);
+                    scrollToCreate();
                   }}
                 >
                   새 탐색 시작
@@ -1243,7 +1471,9 @@ export function StrategySearchWorkbench() {
                     <div key={job.id} className="v3-ss-activity-row">
                       <span>{index + 1}</span>
                       <div>
-                        <strong>{job.searchName || job.id}</strong>
+                        <strong title={jobSearchNameTooltip(job)}>
+                          {displayJobSearchTitle(job)}
+                        </strong>
                         <small>
                           {historyStatusLabelKo(job.status, {
                             completionReason: job.completionReason,
@@ -1267,24 +1497,34 @@ export function StrategySearchWorkbench() {
 
             <V3Card
               className="v3-ss-s8"
-              title="상위 후보 · Live TOP10"
+              title={groupAware ? "상위 후보 · 순위 그룹" : "상위 후보 · Live TOP10"}
               headerAction={
                 <div className="v3-ss-tabs" role="tablist" aria-label="순위 보기">
+                  {groupAware ? null : (
                   <button
                     type="button"
                     role="tab"
                     className={rankPanel === "top10" ? "is-active" : undefined}
                     aria-selected={rankPanel === "top10"}
-                    onClick={() => setRankPanel("top10")}
+                    data-testid="ss-result-tab-top10"
+                    onClick={() => {
+                      rankPanelTouchedRef.current = true;
+                      setRankPanel("top10");
+                    }}
                   >
                     Live TOP10
                   </button>
+                  )}
                   <button
                     type="button"
                     role="tab"
                     className={rankPanel === "groups" ? "is-active" : undefined}
                     aria-selected={rankPanel === "groups"}
-                    onClick={() => setRankPanel("groups")}
+                    data-testid="ss-result-tab-groups"
+                    onClick={() => {
+                      rankPanelTouchedRef.current = true;
+                      setRankPanel("groups");
+                    }}
                   >
                     순위 그룹
                   </button>
@@ -1293,23 +1533,46 @@ export function StrategySearchWorkbench() {
                     role="tab"
                     className={rankPanel === "completion" ? "is-active" : undefined}
                     aria-selected={rankPanel === "completion"}
-                    onClick={() => setRankPanel("completion")}
+                    data-testid="ss-result-tab-completion"
+                    onClick={() => {
+                      rankPanelTouchedRef.current = true;
+                      setRankPanel("completion");
+                    }}
                   >
                     완료 요약
                   </button>
                 </div>
               }
             >
-              {rankPanel === "top10" && !hasLiveTop10 ? (
-                <div className="v3-ss-top10-empty">
-                  <div className="v3-ss-top10-empty__mark" aria-hidden="true">
-                    10
-                  </div>
-                  <strong>표시할 순위 데이터가 없습니다</strong>
+              {rankPanel === "top10" && !groupAware && !hasLiveTop10 ? (
+                <div
+                  className={
+                    "v3-ss-top10-empty" +
+                    (top10Evaluating ? " v3-ss-top10-empty--evaluating" : "")
+                  }
+                  data-testid="ss-top10-empty-panel"
+                  aria-label={top10Evaluating ? "후보 평가 중" : undefined}
+                >
+                  {top10Evaluating ? (
+                    <div
+                      className="ss-top10-dots"
+                      aria-hidden="true"
+                      data-testid="ss-top10-evaluating"
+                    >
+                      <i />
+                      <i />
+                      <i />
+                    </div>
+                  ) : null}
+                  <strong>
+                    {top10Evaluating
+                      ? liveTop10Empty.title
+                      : "표시할 순위 데이터가 없습니다"}
+                  </strong>
                   <p>{top10EmptyReason}</p>
                   {detail && !jobMissing ? (
-                    <p className="v3-ss-note">
-                      {detail.searchName || "전략 탐색"}
+                    <p className="v3-ss-note" title={jobSearchNameTooltip(detail)}>
+                      {displayJobSearchTitle(detail)}
                       {selectedStatusKo ? ` · ${selectedStatusKo}` : ""}
                     </p>
                   ) : null}
@@ -1318,32 +1581,40 @@ export function StrategySearchWorkbench() {
                       href={`/results?jobId=${encodeURIComponent(detail.id)}`}
                       className="v3-ss-btn-ghost"
                     >
-                      이 연구 결과 보기
+                      이 탐색 결과
                     </Link>
                   ) : (
                     <Link href="/results" className="v3-ss-btn-ghost">
-                      탐색 결과 열기
+                      전체 결과
                     </Link>
                   )}
                 </div>
               ) : null}
               {detail && !jobMissing ? (
                 <>
-                  {rankPanel === "top10" ? (
+                  {rankPanel === "top10" && !groupAware ? (
                     <section
                       data-testid="ss-job-detail"
                       aria-labelledby="ss-job-detail-title"
                     >
-                      <h2 id="ss-job-detail-title" className="v3-ss-sr">
-                        {detail.searchName || "전략 탐색"}
+                      <h2
+                        id="ss-job-detail-title"
+                        className="v3-ss-sr"
+                        title={jobSearchNameTooltip(detail)}
+                      >
+                        {displayJobSearchTitle(detail)}
                       </h2>
-                      <SearchStatusCard
-                        job={detail}
-                        qualifiedCountFallback={qualifiedFromTrials.length}
-                        generationCount={generationMeta?.generationCount ?? null}
-                        latestWeaknessKo={generationMeta?.latestWeaknessKo ?? null}
-                        latestAdjustmentKo={generationMeta?.latestAdjustmentKo ?? null}
-                      />
+                      <details className="ss-research-detail">
+                        <summary>연구 상세</summary>
+                        <SearchStatusCard
+                          job={detail}
+                          qualifiedCountFallback={qualifiedFromTrials.length}
+                          generationCount={generationMeta?.generationCount ?? null}
+                          latestWeaknessKo={generationMeta?.latestWeaknessKo ?? null}
+                          latestAdjustmentKo={generationMeta?.latestAdjustmentKo ?? null}
+                          operatorFacing
+                        />
+                      </details>
                     </section>
                   ) : null}
                   {rankPanel === "groups" ? (
@@ -1351,6 +1622,7 @@ export function StrategySearchWorkbench() {
                       <ResearchRankingGroups
                         source={detail}
                         unknownLegacy={detail.unknownLegacy}
+                        operatorFacing
                       />
                     </div>
                   ) : null}
@@ -1379,6 +1651,10 @@ export function StrategySearchWorkbench() {
                               }
                             : null
                         }
+                        onRegisterForBacktest={(iteration) => {
+                          void handleRegisterForBacktest(iteration);
+                        }}
+                        registeringForBacktest={registering}
                         onPromoteTop={() => {
                           void (async () => {
                             try {
@@ -1424,7 +1700,7 @@ export function StrategySearchWorkbench() {
                           setRegistrationSummary(null);
                           setStrategiesSavedHint(false);
                           setCompletionRegisterIter(null);
-                          setConfigOpen(true);
+                          scrollToCreate();
                         }}
                       />
                     ) : (
@@ -1442,14 +1718,11 @@ export function StrategySearchWorkbench() {
               ) : null}
             </V3Card>
 
+            {recoveryJobs.length > 0 || recoveryLoading ? (
             <V3Card
               className="v3-ss-full v3-ss-recovery-card"
               title="재개 가능한 탐색"
-              meta={
-                recoveryJobs.length > 0
-                  ? `${formatCount(recoveryJobs.length)}건 · 누락 작업 복구 포함`
-                  : "없음"
-              }
+              meta={`${formatCount(recoveryJobs.length)}건 · 누락 작업 복구 포함`}
             >
               <InterruptedRecoverySection
                 jobs={recoveryJobs}
@@ -1468,28 +1741,9 @@ export function StrategySearchWorkbench() {
                 }
               />
             </V3Card>
+            ) : null}
 
             <section className="v3-ss-full v3-ss-runtime-card">
-              <details className="v3-ss-disc">
-                <summary>실행 파이프라인 · 런타임 세부</summary>
-                <p className="v3-ss-note">
-                  {generationFact
-                    ? `세대 ${generationFact}`
-                    : "세대 · 평가 · 합격 필터는 선택된 탐색의 실제 런타임 값만 표시합니다."}
-                  {detail?.completionReason
-                    ? ` · ${completionReasonLabelKo(detail.completionReason ?? null)}`
-                    : ""}
-                  {LIVE_DISABLED_LABEL ? ` · ${LIVE_DISABLED_LABEL}` : ""}
-                </p>
-                {detail ? (
-                  <p className="v3-ss-note">
-                    상태 {selectedStatusKo}
-                    {qualifiedFact !== "—" ? ` · 통과 후보 ${qualifiedFact}` : ""}
-                  </p>
-                ) : (
-                  <p className="v3-ss-note">선택된 탐색이 없습니다.</p>
-                )}
-              </details>
               <div data-testid="ss-results-handoff" className="v3-ss-handoff">
                 {listError ? (
                   <p className="v3-ss-note" role="alert">
@@ -1502,18 +1756,26 @@ export function StrategySearchWorkbench() {
                   </p>
                 ) : null}
                 <p className="v3-ss-note" data-testid="ss-history-retention-note">
-                  최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 보관합니다.
+                  최근 탐색 기록 {STRATEGY_SEARCH_HISTORY_RETENTION_NOTE}개를 표시합니다.
                   합격 전략 카드와 등록·삭제는 탐색 결과에서 확인합니다.
                 </p>
+                <Link
+                  href={buildSearchCompareHref({ left: selectedId })}
+                  className="v3-ss-note underline-offset-2 hover:underline"
+                  data-testid="ss-compare-entry"
+                >
+                  탐색 결과 비교
+                </Link>
               </div>
             </section>
           </div>
+          </SetupResultsCollapsible>
 
           {completionRegisterIter != null ? (
             <ConfirmDialog
               open
-              title="전략 등록"
-              description="이 합격 전략을 전략 관리에 등록할까요? 자동으로 저장되지 않습니다."
+              title="통과 후보 등록"
+              description="이 통과 후보를 전략 관리에 등록할까요? 자격 미통과 최고 점수 후보는 등록하지 않습니다."
               confirmLabel="등록"
               cancelLabel="취소"
               tone="success"
@@ -1527,16 +1789,6 @@ export function StrategySearchWorkbench() {
             />
           ) : null}
 
-          <V3Drawer
-            open={configOpen}
-            onClose={() => setConfigOpen(false)}
-            title="탐색 구성"
-            wide
-            keepMounted
-            className="v3-ss-drawer"
-          >
-            {createForm}
-          </V3Drawer>
         </>
       )}
     </div>

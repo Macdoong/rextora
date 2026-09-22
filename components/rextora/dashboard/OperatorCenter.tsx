@@ -24,6 +24,19 @@ import { V3Card } from "@/components/rextora/v3/V3Card";
 import { V3Kpi } from "@/components/rextora/v3/V3Kpi";
 import { V3PermissionGate } from "@/components/rextora/v3/V3PermissionGate";
 import { requestOpenAssistant } from "@/components/rextora/agent/agentPersistence";
+import { useOperatorPageContext } from "@/components/rextora/shell/OperatorPageContext";
+import {
+  paperSessionVisualState,
+  resolveExplicitCurrentStrategy,
+} from "@/src/lib/rextora/ui/operatorCurrentStrategy";
+import {
+  formatTodayTradingCostLine,
+  hasOperatorSearchResult,
+  hasRelevantPaperSession,
+  normalizeOperatorQueueCopy,
+  resolveOperatorRiskGaugeTone,
+  shouldShowOperatorPrimaryAction,
+} from "@/src/lib/rextora/ui/operatorCenterPresentation";
 import { DashboardActionLink } from "./DashboardActionLink";
 import { DashboardPrimaryAction } from "./DashboardPrimaryAction";
 import {
@@ -33,8 +46,26 @@ import {
   dashboardResearchLifecycleHref,
   dashboardResearchLifecycleLabel,
 } from "./dashboardResearchSelection";
-import { formatUsdt, type DashStatus } from "./dashboardData";
+import {
+  formatDisplayPrice,
+  formatLeverageMultiple,
+} from "@/src/lib/rextora/displayFormat";
+import { formatUsdt, type DashPosition, type DashStatus } from "./dashboardData";
 import { useDashboardData } from "./dashboardData";
+import {
+  CandidateAvailability,
+  CountSegments,
+  FreshnessPulse,
+  LimitGauge,
+  OccupancyIndicator,
+  PaperStateFlow,
+  QueueIndicator,
+  ScalarSignedBar,
+  StatusDot,
+  SystemNodes,
+  WinRateRing,
+  resolveSystemNodeTone,
+} from "./OperatorCenterVisuals";
 
 function SafetyStrip({
   error,
@@ -83,9 +114,18 @@ function SafetyStrip({
           현재 운영 상태 · {roleLabel}
           {readOnly ? " · 조회 전용" : ""}
         </p>
-        <h2 className="v3-oc-hero-title">
-          {displayMode} · {LIVE_DISABLED_LABEL}
-        </h2>
+        <h2 className="v3-oc-hero-title">{displayMode}</h2>
+        <div className="v3-oc-pills" data-testid="operator-status-pills">
+          <span className="v3-oc-pill">{systemLabel}</span>
+          <span className={`v3-oc-pill${liveAllowed && status?.canStartLive ? " is-ok" : " is-bad"}`}>
+            {status?.canStartLive ? OPERATOR_STATUS.liveReady : OPERATOR_STATUS.blocked}
+          </span>
+          <span className="v3-oc-pill">
+            {status?.lastUpdatedAt
+              ? `갱신 ${new Date(status.lastUpdatedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`
+              : "갱신 대기"}
+          </span>
+        </div>
         <p
           className="op-safety-banner v3-oc-hero-copy"
           data-testid="dashboard-operational-status"
@@ -141,6 +181,7 @@ function SafetyStrip({
 
 export function OperatorCenter() {
   const data = useDashboardData();
+  const pageContext = useOperatorPageContext();
   const { user, can } = useAuth();
   const readOnly = !can("research:run") && !can("paper:operate") && !can("backtest:run");
   const roleLabel = authRoleLabelKo(user?.role);
@@ -176,10 +217,12 @@ export function OperatorCenter() {
         liveBlockReason: data.status?.liveBlockReason,
         attentionResearch: data.visibleAttentionResearch,
         completedRecent: data.completedRecent,
+        terminalResearch: data.terminalResearch,
         paperSessionStatus: data.paperSessionStatus,
       }),
     [
       data.completedRecent,
+      data.terminalResearch,
       data.paperSessionStatus,
       data.status,
       data.visibleAttentionResearch,
@@ -192,23 +235,34 @@ export function OperatorCenter() {
   const emptyActions = operatorActionQueueEmptyCopy();
 
   const currentResearch = data.researchSelection.currentResearch;
-  const positions = Array.isArray(data.status?.positions)
+  const positions = (Array.isArray(data.status?.positions)
     ? data.status.positions
-    : [];
+    : []) as DashPosition[];
   const tradeCount = data.status?.todayStats?.trades;
-  const strategyName =
-    data.paperName ||
-    data.status?.activeStrategy?.name ||
-    currentResearch?.searchName ||
-    null;
-  const strategyTech = data.status?.activeStrategy?.paramsHash ?? currentResearch?.id ?? null;
-  const symbolTimeframe = currentResearch
-    ? `${(currentResearch.symbols ?? []).join(", ") || "—"} / ${currentResearch.timeframe ?? "—"}`
-    : null;
-  const pnlLabel = formatUsdt(
-    data.status?.todayStats?.realizedPnlUsdt ??
-      data.status?.metrics?.todayRealizedPnlUsdt,
-  );
+  const explicitStrategy = resolveExplicitCurrentStrategy({
+    pageContextStrategyName:
+      pageContext && "strategyLabel" in pageContext
+        ? pageContext.strategyLabel
+        : null,
+    pageContextStrategyId: pageContext?.strategyId ?? null,
+    paperName: data.paperName,
+    paperSessionStatus: data.paperSessionStatus,
+    activeStrategyName: data.status?.activeStrategy?.name,
+    researchName: currentResearch?.searchName,
+  });
+  const strategyName = explicitStrategy?.name ?? null;
+  const hasSelectedStrategy = Boolean(explicitStrategy);
+  const symbolTimeframe =
+    pageContext?.symbol || pageContext?.timeframe
+      ? `${pageContext.symbol ?? "—"} / ${pageContext.timeframe ?? "—"}`
+      : null;
+  const equity = data.status?.metrics?.accountEquity ?? data.status?.todayStats?.accountEquity;
+  const realized = data.status?.todayStats?.realizedPnlUsdt ?? data.status?.metrics?.todayRealizedPnlUsdt;
+  const unrealized = data.status?.todayStats?.unrealizedPnlUsdt ?? data.status?.metrics?.todayUnrealizedPnlUsdt;
+  const winRate = data.status?.todayStats?.winRate ?? data.status?.metrics?.winRate;
+  const pnlLabel = formatUsdt(realized);
+  const currentStageId =
+    pipeline.find((step) => step.tone === "in_progress")?.id ?? pipeline[0]?.id;
   const approvalLabel = data.status?.canStartLive
     ? OPERATOR_STATUS.completed
     : data.status?.liveBlockReason ?? OPERATOR_STATUS.waiting;
@@ -216,8 +270,29 @@ export function OperatorCenter() {
     ? OPERATOR_STATUS.emergency
     : OPERATOR_STATUS.operatingNormal;
   const liveGateLabel = data.status?.canStartLive ? "준비됨" : "차단";
+  const paperState = paperSessionVisualState(data.paperSessionStatus);
   const paperSummary =
-    data.paperSessionStatus ?? data.paperName ?? OPERATOR_STATUS.waiting;
+    data.paperSessionStatus ?? OPERATOR_STATUS.waiting;
+  const risk = data.status?.risk;
+  const showPrimaryAction = shouldShowOperatorPrimaryAction({
+    hasSelectedStrategy,
+    primaryAction: data.primaryAction,
+  });
+  const showResultsAction = hasOperatorSearchResult(
+    data.completedRecent,
+    data.jobs,
+  );
+  const showPaperAction = hasRelevantPaperSession(data.paperSessionStatus);
+  const riskTone = resolveOperatorRiskGaugeTone({
+    riskState: risk?.riskState,
+    emergencyActive: data.status?.emergencyActive,
+  });
+  const queueCopy = data.status?.operations?.queueStatusLabel
+    ? normalizeOperatorQueueCopy(data.status.operations.queueStatusLabel)
+    : OPERATOR_STATUS.waiting;
+  const todayTradingCostLine = formatTodayTradingCostLine(
+    data.status?.todayStats ?? {},
+  );
 
   return (
     <div
@@ -238,19 +313,40 @@ export function OperatorCenter() {
 
       <div className="v3-oc-kpis" data-testid="operator-trading">
         <V3Kpi
-          label="열린 포지션"
-          value={
-            positions.length === 0 ? (
-              <span data-testid="operator-zero-positions" aria-label={OPERATOR_EMPTY.positions}>
-                0
-              </span>
-            ) : (
-              `${positions.length}건`
-            )
+          label="계좌 자산"
+          value={formatUsdt(equity)}
+          helper="전체 계정 기준"
+          visual={
+            <span className="v3-oc-kpi-vis">
+              <StatusDot tone={equity == null ? "idle" : "ok"} label={equity == null ? "확인 불가" : "잔고"} />
+            </span>
           }
         />
         <V3Kpi
-          label="최근 완료 거래"
+          label="오늘 실현 손익"
+          value={pnlLabel}
+          helper={todayTradingCostLine ?? "전체 계정 기준"}
+          visual={
+            <span className="v3-oc-kpi-vis">
+              {Number.isFinite(risk?.usagePct) ? (
+                <LimitGauge current={risk?.usagePct} limit={100} tone={riskTone} />
+              ) : (
+                <ScalarSignedBar value={realized} />
+              )}
+            </span>
+          }
+        />
+        <V3Kpi
+          label="미실현 손익"
+          value={formatUsdt(unrealized)}
+          visual={
+            <span className="v3-oc-kpi-vis">
+              <ScalarSignedBar value={unrealized} />
+            </span>
+          }
+        />
+        <V3Kpi
+          label="오늘 거래"
           value={
             tradeCount == null || tradeCount === 0 ? (
               <span data-testid="operator-zero-trades" aria-label={OPERATOR_EMPTY.trades}>
@@ -260,26 +356,34 @@ export function OperatorCenter() {
               `${tradeCount}건`
             )
           }
-        />
-        <V3Kpi label="실현 손익" value={pnlLabel} />
-        <V3Kpi
-          label="모의매매"
-          value={data.paperSessionStatus ?? OPERATOR_STATUS.waiting}
-          helper={
-            paperSummary === (data.paperSessionStatus ?? OPERATOR_STATUS.waiting)
-              ? undefined
-              : paperSummary
+          visual={
+            <span className="v3-oc-kpi-vis">
+              {Number.isFinite(risk?.maxDailyTrades) ? (
+                <LimitGauge current={tradeCount ?? risk?.dailyTrades} limit={risk?.maxDailyTrades} tone={riskTone} />
+              ) : (
+                <CountSegments value={tradeCount} />
+              )}
+            </span>
           }
         />
         <V3Kpi
-          label="위험 상태"
-          value={riskSummary}
-          tone={data.status?.emergencyActive ? "danger" : "success"}
+          label="오늘 승률"
+          value={tradeCount === 0 || winRate == null ? "—" : `${winRate}%`}
+          visual={
+            <span className="v3-oc-kpi-vis">
+              <WinRateRing value={winRate} tradeCount={tradeCount} />
+            </span>
+          }
         />
         <V3Kpi
-          label="실전 게이트"
-          value={liveGateLabel}
-          tone={data.status?.canStartLive ? "brand" : "danger"}
+          label="모의매매 상태"
+          value={data.paperSessionStatus ?? OPERATOR_STATUS.waiting}
+          helper={paperSummary}
+          visual={
+            <span className="v3-oc-kpi-vis">
+              <PaperStateFlow state={paperState} />
+            </span>
+          }
         />
       </div>
 
@@ -287,10 +391,10 @@ export function OperatorCenter() {
         <V3Card
           className="v3-oc-s8"
           title="전략 검증 단계"
-          meta={symbolTimeframe ?? OPERATOR_EMPTY.strategy}
+          meta={hasSelectedStrategy ? strategyName : undefined}
         >
-          <p className="v3-oc-strategy-title">
-            {strategyName ?? OPERATOR_EMPTY.strategy}
+          <p className="v3-oc-strategy-title" data-testid="operator-selected-strategy">
+            {hasSelectedStrategy ? strategyName : OPERATOR_EMPTY.strategy}
           </p>
           <div className="v3-oc-tags">
             {symbolTimeframe ? <span className="v3-oc-tag">{symbolTimeframe}</span> : null}
@@ -308,7 +412,7 @@ export function OperatorCenter() {
                 {pipeline.map((step, index) => (
                   <li
                     key={step.id}
-                    className={`op-pipeline-step v3-oc-stage is-${step.tone}`}
+                    className={`op-pipeline-step v3-oc-stage is-${step.tone}${step.id === currentStageId ? " is-current" : ""}`}
                   >
                     <Link
                       href={step.href}
@@ -337,7 +441,7 @@ export function OperatorCenter() {
             <div className="op-strategy-grid" data-testid="dash-current-research">
               <div>
                 <span className="op-kicker">전략 이름</span>
-                <p className="op-metric">{strategyName ?? OPERATOR_EMPTY.strategy}</p>
+                <p className="op-metric">{hasSelectedStrategy ? strategyName : "—"}</p>
               </div>
               <div>
                 <span className="op-kicker">{OPERATOR_LABEL.symbolTimeframe}</span>
@@ -352,18 +456,33 @@ export function OperatorCenter() {
                 <p className="op-metric">{approvalLabel}</p>
               </div>
             </div>
-            <details className="op-tech">
-              <summary>{OPERATOR_LABEL.technicalDetail}</summary>
-              <p className="op-tech-id">{strategyTech ?? OPERATOR_STATUS.unavailable}</p>
-            </details>
+            {!hasSelectedStrategy ? (
+              <div className="v3-oc-empty-strategy" data-testid="operator-no-strategy">
+                <DashboardActionLink
+                  href="/strategy-search"
+                  variant="primary"
+                  size="lg"
+                  className="rextora-dashboard-primary-cta"
+                  data-testid="operator-start-search"
+                >
+                  새 탐색 시작
+                </DashboardActionLink>
+              </div>
+            ) : null}
+            {showResultsAction || showPaperAction ? (
             <div className="v3-oc-inline-links">
+              {showResultsAction ? (
               <DashboardActionLink href="/results" size="sm" data-testid="dash-open-results">
                 탐색 결과
               </DashboardActionLink>
+              ) : null}
+              {showPaperAction ? (
               <DashboardActionLink href="/paper-trading" size="sm" data-testid="dash-open-paper">
                 모의매매 확인
               </DashboardActionLink>
+              ) : null}
             </div>
+            ) : null}
           </section>
         </V3Card>
 
@@ -382,14 +501,14 @@ export function OperatorCenter() {
               <p className="op-section-title">운영 상태를 확인할 수 있습니다.</p>
               <p className="op-section-desc">이 권한에서는 탐색·모의·실전을 시작하지 않습니다.</p>
             </section>
-          ) : (
+          ) : showPrimaryAction ? (
             <V3PermissionGate allowed>
               <DashboardPrimaryAction
                 initialLoading={data.initialLoading}
                 primaryAction={data.primaryAction}
               />
             </V3PermissionGate>
-          )}
+          ) : null}
           <section
             className="op-actions"
             data-testid="dash-review-required"
@@ -420,7 +539,7 @@ export function OperatorCenter() {
                           </div>
                           {item.targetRoute ? (
                             <Link href={item.targetRoute} className="op-action-link">
-                              이동
+                              {item.actionLabel ?? "이동"}
                             </Link>
                           ) : null}
                         </li>
@@ -450,7 +569,92 @@ export function OperatorCenter() {
           </section>
         </V3Card>
 
-        <V3Card className="v3-oc-s7" title="위험 · 실전 준비">
+        <V3Card className="v3-oc-s7" title="시장 · 실행">
+          <section className="op-ops" data-testid="operator-execution-monitor" aria-label="시장 및 실행">
+            <div className="v3-oc-metric-stack v3-oc-ops-grid">
+              <div className="v3-oc-metric">
+                <span>감시 종목</span>
+                <b>{data.status?.operations?.watchedSymbolCount ?? 0}</b>
+                <CountSegments value={data.status?.operations?.watchedSymbolCount} />
+              </div>
+              <div className="v3-oc-metric">
+                <span>진입 가능 후보</span>
+                <b>{data.status?.operations?.eligibleCandidateCount ?? 0}</b>
+                <CandidateAvailability value={data.status?.operations?.eligibleCandidateCount} />
+              </div>
+              <div className="v3-oc-metric">
+                <span>열린 포지션</span>
+                <b>
+                  {positions.length === 0 ? (
+                    <span data-testid="operator-zero-positions" aria-label={OPERATOR_EMPTY.positions}>
+                      0
+                    </span>
+                  ) : Number.isFinite(risk?.maxPositions) ? (
+                    `${positions.length} / ${risk?.maxPositions}`
+                  ) : (
+                    `${positions.length}건`
+                  )}
+                </b>
+                <OccupancyIndicator
+                  value={data.status?.operations?.openPositionCount ?? positions.length}
+                  limit={risk?.maxPositions}
+                />
+              </div>
+              <div className="v3-oc-metric">
+                <span>실행 큐</span>
+                <b className="v3-oc-queue-copy">{queueCopy}</b>
+                <QueueIndicator label={queueCopy} />
+              </div>
+              <div className="v3-oc-metric v3-oc-metric--wide">
+                <span>마지막 갱신</span>
+                <b>
+                  {data.status?.lastUpdatedAt
+                    ? new Date(data.status.lastUpdatedAt).toLocaleTimeString("ko-KR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : OPERATOR_STATUS.waiting}
+                </b>
+                <FreshnessPulse updatedAt={data.status?.lastUpdatedAt} />
+              </div>
+            </div>
+          </section>
+        </V3Card>
+
+        <V3Card className="v3-oc-s5" title="현재 포지션">
+          <section className="op-position" data-testid="operator-current-position" aria-label="현재 포지션">
+            {positions.length === 0 ? (
+              <div className="v3-oc-empty-position">
+                <StatusDot tone="idle" label="" />
+                <p className="v3-oc-empty">{OPERATOR_EMPTY.positions}</p>
+              </div>
+            ) : (
+              <ul className="v3-oc-position-list">
+                {positions.slice(0, 4).map((row, index) => (
+                  <li key={`${row.symbol ?? "pos"}-${index}`} className="v3-oc-position-row">
+                    <div className="v3-oc-position-head">
+                      <strong>{row.symbol ?? "—"}</strong>
+                      <span className="v3-oc-position-side">{row.side ?? "—"}</span>
+                      <b className={Number(row.unrealizedPnl) < 0 ? "v3-oc-tone-bad" : Number(row.unrealizedPnl) > 0 ? "v3-oc-tone-ok" : undefined}>
+                        {formatUsdt(row.unrealizedPnl)}
+                      </b>
+                    </div>
+                    <div className="v3-oc-position-facts">
+                      <span>손익률 {row.pnlPct == null ? "—" : `${row.pnlPct.toFixed(2)}%`}</span>
+                      <span>레버리지 {row.leverage == null ? "—" : `${row.leverage}x`}</span>
+                      <span>진입 {formatDisplayPrice(row.entryPrice)}</span>
+                      <span>현재 {formatDisplayPrice(row.currentPrice)}</span>
+                      <span>{row.protectionLabel ?? "보호 없음"}</span>
+                    </div>
+                    <ScalarSignedBar value={row.unrealizedPnl} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </V3Card>
+
+        <V3Card className="v3-oc-s7" title="위험 · 실전">
           <section
             className="op-risk"
             data-testid="dash-live-summary"
@@ -463,8 +667,65 @@ export function OperatorCenter() {
                 <div className="v3-oc-metric">
                   <span>위험 상태</span>
                   <b className={data.status?.emergencyActive ? "v3-oc-tone-bad" : "v3-oc-tone-ok"}>
-                    {riskSummary}
+                    {risk?.riskState ?? riskSummary}
                   </b>
+                </div>
+                <div className="v3-oc-risk-grid">
+                <div className="v3-oc-metric">
+                  <span>일 손실</span>
+                  <b>
+                    {risk?.currentDailyLossPct == null
+                      ? "—"
+                      : `${risk.currentDailyLossPct}% / ${risk.dailyLossLimitPct ?? "—"}%`}
+                  </b>
+                  <LimitGauge current={risk?.usagePct} limit={100} tone={riskTone} />
+                </div>
+                <div className="v3-oc-metric">
+                  <span>낙폭</span>
+                  <b>
+                    {risk?.accountDrawdownPct == null
+                      ? "—"
+                      : `${risk.accountDrawdownPct}% / ${risk.accountLossLimitPct ?? "—"}%`}
+                  </b>
+                  <LimitGauge
+                    current={risk?.accountDrawdownPct}
+                    limit={risk?.accountLossLimitPct}
+                    invert
+                    tone={riskTone}
+                  />
+                </div>
+                <div className="v3-oc-metric">
+                  <span>포지션</span>
+                  <b>
+                    {risk?.openPositions ?? positions.length} / {risk?.maxPositions ?? "—"}
+                  </b>
+                  <LimitGauge current={risk?.openPositions ?? positions.length} limit={risk?.maxPositions} tone={riskTone} />
+                </div>
+                <div className="v3-oc-metric">
+                  <span>레버리지</span>
+                  <b>
+                    {formatLeverageMultiple(risk?.currentLeverage)} / {formatLeverageMultiple(risk?.maxLeverage)}
+                  </b>
+                  <LimitGauge current={risk?.currentLeverage} limit={risk?.maxLeverage} tone={riskTone} />
+                </div>
+                <div className="v3-oc-metric">
+                  <span>연속 손실</span>
+                  <b>
+                    {risk?.consecutiveLosses ?? "—"} / {risk?.consecutiveLossLimit ?? "—"}
+                  </b>
+                  <LimitGauge
+                    current={risk?.consecutiveLosses}
+                    limit={risk?.consecutiveLossLimit}
+                    tone={riskTone}
+                  />
+                </div>
+                <div className="v3-oc-metric">
+                  <span>오늘 거래 한도</span>
+                  <b>
+                    {risk?.dailyTrades ?? tradeCount ?? "—"} / {risk?.maxDailyTrades ?? "—"}
+                  </b>
+                  <LimitGauge current={risk?.dailyTrades ?? tradeCount} limit={risk?.maxDailyTrades} tone={riskTone} />
+                </div>
                 </div>
                 <div className="v3-oc-metric">
                   <span>실전 게이트</span>
@@ -483,6 +744,9 @@ export function OperatorCenter() {
                   <Link href="/live-trading" className="op-action-link" data-testid="dash-open-live">
                     실전 진입
                   </Link>
+                  <p className="op-section-desc">
+                    승인 조건과 현재 차단 이유를 확인하세요.
+                  </p>
                 </div>
               </div>
             )}
@@ -492,6 +756,28 @@ export function OperatorCenter() {
         <V3Card className="v3-oc-s5" title={OPERATOR_LABEL.systemHealth}>
           <section className="op-health" aria-label={OPERATOR_LABEL.systemHealth}>
             <div className="v3-oc-metric-stack">
+              <div className="v3-oc-metric">
+                <span>시세 · 실행 · 큐 · API</span>
+                <SystemNodes
+                  market={resolveSystemNodeTone({
+                    kind: "market",
+                    lastUpdatedAt: data.status?.lastUpdatedAt,
+                  })}
+                  execution={resolveSystemNodeTone({
+                    kind: "execution",
+                    botStatusLabel: data.status?.botStatusLabel,
+                  })}
+                  queue={resolveSystemNodeTone({
+                    kind: "queue",
+                    queueStatusLabel: data.status?.operations?.queueStatusLabel,
+                  })}
+                  api={resolveSystemNodeTone({
+                    kind: "api",
+                    loadError: data.error,
+                    lastUpdatedAt: data.status?.lastUpdatedAt,
+                  })}
+                />
+              </div>
               <div className="v3-oc-metric">
                 <span>실행 상태</span>
                 <b>{data.status?.botStatusLabel ?? OPERATOR_STATUS.waiting}</b>
@@ -557,9 +843,7 @@ export function OperatorCenter() {
               <div>
                 <dt>현재 분석 대상</dt>
                 <dd>
-                  {currentResearch?.searchName ||
-                    data.paperName ||
-                    OPERATOR_STATUS.unavailable}
+                  {currentResearch?.searchName || OPERATOR_STATUS.unavailable}
                 </dd>
               </div>
               <div>

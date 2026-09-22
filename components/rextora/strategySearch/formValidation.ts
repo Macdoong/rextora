@@ -1,8 +1,10 @@
 import type { StrategySearchCreateJobBody } from "./types";
 import { PATTERN_PARAMETER_CATALOG } from "@/src/lib/rextora/patternParameterCatalog";
 import {
+  HISTORICAL_PERIOD_PRESETS,
   OPERATOR_SUPPORTED_SYMBOLS,
   OPERATOR_SUPPORTED_TIMEFRAMES,
+  QUALIFICATION_PROFILES,
   SEARCHABLE_PATTERN_SPACE_OPTIONS,
   SEARCHABLE_SPACE_OPTIONS,
   getDepthProfile,
@@ -15,11 +17,24 @@ import {
   resolveSymbol,
   type StrategySearchOperatorFormState,
 } from "./formDefaults";
+import { resolvePatternSelectionMode } from "@/src/lib/rextora/patternSelectionMode";
+import {
+  formatCustomerSearchValue,
+  formatCustomerSearchValues,
+  searchModeCustomerLabel,
+  tradingStyleCustomerLabel,
+} from "./customerDisplay";
 
 export interface FormFieldError {
   field: string;
   message: string;
 }
+
+/** Customer-facing copy when direct selection has zero strategy families. */
+export const SELECTED_SPACE_REQUIRED_KO =
+  "탐색할 전략군을 1개 이상 선택하세요.";
+export const LAUNCH_SETTINGS_CHECK_TITLE_KO = "설정 확인 필요";
+export const LAUNCH_READY_TITLE_KO = "탐색 준비 완료";
 
 const ALLOWED_SPACE_IDS = new Set<string>([
   ...SEARCHABLE_SPACE_OPTIONS.map((s) => s.id),
@@ -43,8 +58,7 @@ export function validatePatternCombination(
   if (!Array.isArray(selectedSpaceIds) || selectedSpaceIds.length === 0) {
     errors.push({
       field: "selectedSpaceIds",
-      message:
-        "전략 계열 또는 패턴을 하나 이상 선택하세요. (자동 조합을 켜도 됩니다)",
+      message: SELECTED_SPACE_REQUIRED_KO,
     });
     return errors;
   }
@@ -435,10 +449,44 @@ export function summarizeStrategySearchConfig(
   };
 }
 
+export function selectedSpaceIdsError(
+  errors: readonly FormFieldError[],
+): FormFieldError | undefined {
+  return errors.find((error) => error.field === "selectedSpaceIds");
+}
+
+/**
+ * Idle launch-panel presentation derived from canonical form validation.
+ * Does not introduce a second rule: blocked only when selectedSpaceIds fails.
+ */
+export function launchIdleCopy(summary: ConfigValidationSummary): {
+  titleKo: string;
+  detailKo: string | null;
+  startDisabled: boolean;
+  showReady: boolean;
+} {
+  const blocking = selectedSpaceIdsError(summary.errors);
+  if (blocking) {
+    return {
+      titleKo: LAUNCH_SETTINGS_CHECK_TITLE_KO,
+      detailKo: blocking.message,
+      startDisabled: true,
+      showReady: false,
+    };
+  }
+  return {
+    titleKo: LAUNCH_READY_TITLE_KO,
+    detailKo: null,
+    startDisabled: false,
+    showReady: true,
+  };
+}
+
 export type AppliedSettingsPreviewRow = {
   labelKo: string;
   valueKo: string;
   hintKo?: string;
+  origin?: "editable" | "auto" | "preset" | "readonly";
 };
 
 export function formatRuntimeKo(ms: number | null): string {
@@ -455,103 +503,150 @@ export function formatRuntimeKo(ms: number | null): string {
   return `${minutes}분`;
 }
 
+function qualificationCustomerLabel(id: string): string {
+  if (id === "custom") return "직접 입력";
+  if (id === "conservative" || id === "balanced" || id === "aggressive") {
+    return QUALIFICATION_PROFILES[id].labelKo;
+  }
+  return formatCustomerSearchValue(id);
+}
+
+function periodCustomerLabel(form: StrategySearchOperatorFormState): string {
+  if (form.periodPreset === "custom") {
+    const from = form.availableFromDate.trim() || "—";
+    const to = form.availableToDate.trim() || "—";
+    return `${from} ~ ${to}`;
+  }
+  return HISTORICAL_PERIOD_PRESETS[form.periodPreset].labelKo;
+}
+
+function leverageCustomerLabel(form: StrategySearchOperatorFormState): string {
+  if (form.leverageMode === "fixed") return `고정 ${form.leverageFixed}x`;
+  if (form.leverageMode === "range") {
+    return `범위 ${form.leverageMin}x–${form.leverageMax}x`;
+  }
+  if (form.leverageMode === "disabled") return "사용 안 함 (1x)";
+  return "자동 추천";
+}
+
 /** Operator-facing applied settings preview (no internal resource ceilings). */
 export function buildAppliedSettingsPreview(
   form: StrategySearchOperatorFormState,
 ): {
   summary: ConfigValidationSummary;
   rows: AppliedSettingsPreviewRow[];
+  detailRows: AppliedSettingsPreviewRow[];
 } {
   const summary = summarizeStrategySearchConfig(form);
   const depth = getDepthProfile(resolveDepthProfileId(form));
   const candidateBudget = resolveCandidateBudget(form);
+  const selectionMode = resolvePatternSelectionMode({
+    patternConfigLevel: form.patternConfigLevel,
+    autoStrategyCombo: form.autoStrategyCombo,
+  });
+  const selectedIds =
+    selectionMode === "automatic"
+      ? SEARCHABLE_SPACE_OPTIONS.map((space) => space.id)
+      : form.selectedSpaceIds;
   const rows: AppliedSettingsPreviewRow[] = [
     {
-      labelKo: "심볼",
+      labelKo: "코인",
       valueKo: form.symbol || "—",
+      origin: form.marketMode === "recommended" ? "auto" : "editable",
     },
     {
       labelKo: "타임프레임",
       valueKo: form.timeframe || "—",
     },
     {
+      labelKo: "분석 기간",
+      valueKo: periodCustomerLabel(form),
+    },
+    {
+      labelKo: "탐색 방식",
+      valueKo: searchModeCustomerLabel(selectionMode),
+    },
+    {
+      labelKo: "탐색 프리셋",
+      valueKo: tradingStyleCustomerLabel(form.tradingStyle),
+      origin: "preset",
+    },
+    {
+      labelKo: "전략군 수",
+      valueKo: String(selectedIds.length),
+    },
+    {
+      labelKo: "선택 전략군",
+      valueKo:
+        selectionMode === "automatic"
+          ? "자동 조합"
+          : formatCustomerSearchValues(selectedIds, "선택 없음"),
+      origin: selectionMode === "automatic" ? "auto" : "editable",
+    },
+    {
+      labelKo: "탐색 방향",
+      valueKo: formatCustomerSearchValue(form.patternDirection),
+    },
+    {
+      labelKo: "최대 허용 낙폭",
+      valueKo: form.maxMdd.trim()
+        ? `${Number(form.maxMdd).toFixed(1)}%`
+        : "프리셋 기본",
+      origin: form.mddPreset === "custom" ? "editable" : "preset",
+    },
+    {
+      labelKo: "최소 거래 수",
+      valueKo: form.minTradeCount.trim() || "프리셋 기본",
+    },
+    {
+      labelKo: "최소 수익률",
+      valueKo: form.minTotalReturn.trim()
+        ? `${Number(form.minTotalReturn).toFixed(1)}%`
+        : "프리셋 기본",
+    },
+    {
+      labelKo: "비용 검증",
+      valueKo: form.stressEnabled ? "사용" : "미사용",
+    },
+    {
+      labelKo: "레버리지",
+      valueKo: leverageCustomerLabel(form),
+    },
+    {
+      labelKo: "합격 목표",
+      valueKo: String(resolveQualifiedTarget(form)),
+    },
+  ];
+  const detailRows: AppliedSettingsPreviewRow[] = [
+    {
       labelKo: "연구 시간",
       valueKo: formatRuntimeKo(resolveMaxRuntimeMs(form)),
     },
     {
-      labelKo: "전략 패밀리",
-      valueKo: form.autoStrategyCombo
-        ? "자동 조합 (시스템 관리)"
-        : form.selectedSpaceIds.length > 0
-          ? form.selectedSpaceIds.join(", ")
-          : "깊이 프로필 기본",
+      labelKo: "합격 기준",
+      valueKo: qualificationCustomerLabel(form.qualificationProfile),
     },
     {
-      labelKo: "선택 모드",
-      valueKo:
-        form.patternConfigLevel === "automatic" || form.autoStrategyCombo
-          ? "automatic — 수동 포함 선택 미적용"
-          : "manual — 선택 패밀리 유지",
-    },
-    {
-      labelKo: "레버리지",
-      valueKo:
-        form.leverageMode === "fixed"
-          ? `고정 ${form.leverageFixed}x`
-          : form.leverageMode === "range"
-            ? `범위 ${form.leverageMin}x–${form.leverageMax}x`
-            : form.leverageMode === "disabled"
-              ? "사용 안 함 (1x)"
-              : "자동 추천",
-    },
-    {
-      labelKo: "목표 수익",
-      valueKo: form.minTotalReturn.trim()
-        ? `${Number(form.minTotalReturn).toFixed(1)}%`
-        : "프로필 기본",
-    },
-    {
-      labelKo: "최대 낙폭",
-      valueKo: form.maxMdd.trim()
-        ? `${Number(form.maxMdd).toFixed(1)}%`
-        : "프로필 기본",
-    },
-    {
-      labelKo: "최소 거래",
-      valueKo: form.minTradeCount.trim() || "프로필 기본",
-    },
-    {
-      labelKo: "합격 프로필",
-      valueKo: form.qualificationProfile,
-    },
-    {
-      labelKo: "비용 스트레스",
-      valueKo: form.stressEnabled ? "사용" : "미사용",
-    },
-    {
-      labelKo: "견고성(지터)",
+      labelKo: "안정성 검증",
       valueKo: form.jitterEnabled ? "사용" : "미사용",
     },
     {
       labelKo: "패턴 설정",
       valueKo:
         form.patternConfigLevel === "automatic"
-          ? "자동 추천"
+          ? "자동 적용"
           : [
-              form.patternDirection,
-              `리테스트 ${form.patternRetestMode}`,
-              `강도 ${form.patternStrength}`,
-              `확인 ${form.patternConfirmationMode}${
-                form.patternConfirmationMode === "consecutive_closes" ||
-                form.patternConfirmationMode === "threshold_count"
-                  ? ` N=${form.patternConfirmationCandleCount}`
-                  : ""
-              }`,
+              formatCustomerSearchValue(form.patternDirection),
+              `재시험 ${formatCustomerSearchValue(form.patternRetestMode)}`,
+              `강도 ${formatCustomerSearchValue(form.patternStrength)}`,
+              `확인 ${formatCustomerSearchValue(form.patternConfirmationMode)}`,
             ].join(" · "),
+      origin: form.patternConfigLevel === "automatic" ? "auto" : "editable",
     },
     {
       labelKo: "세대당 생성 수",
       valueKo: String(depth.stageBatchSize),
+      origin: "auto",
     },
     {
       labelKo: "초기 평가 묶음",
@@ -560,21 +655,21 @@ export function buildAppliedSettingsPreview(
         "마감 시간 모드에서는 예산이 소진되면 추가 묶음으로 보충될 수 있습니다. 총 평가 수가 아닙니다.",
     },
     {
-      labelKo: "합격 목표",
-      valueKo: String(resolveQualifiedTarget(form)),
-    },
-    {
       labelKo: "장기 저장 결과",
       valueKo: "TOP 10",
     },
   ];
   if (form.candidateBudgetOverride.trim() !== "") {
-    rows.splice(rows.findIndex((r) => r.labelKo === "초기 평가 묶음") + 1, 0, {
-      labelKo: "초기 평가 묶음(재정의)",
-      valueKo: form.candidateBudgetOverride.trim(),
-    });
+    detailRows.splice(
+      detailRows.findIndex((r) => r.labelKo === "초기 평가 묶음") + 1,
+      0,
+      {
+        labelKo: "초기 평가 묶음(재정의)",
+        valueKo: form.candidateBudgetOverride.trim(),
+      },
+    );
   }
-  return { summary, rows };
+  return { summary, rows, detailRows };
 }
 
 export function buildCreateBodyIfValid(

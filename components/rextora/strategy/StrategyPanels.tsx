@@ -1,7 +1,6 @@
 import { Badge, Card, Metric } from "@/components/ui/primitives";
 import { evaluateLiveSafetyGate } from "@/src/lib/rextora/liveSafetyGate";
 import { getApiStatus } from "@/src/lib/rextora/apiStatusService";
-import { validateSafeStrategyHash } from "@/src/lib/rextora/strategyRepository";
 import type { Strategy } from "@/lib/types";
 
 export function StrategyRankingTable({
@@ -72,7 +71,6 @@ export function StrategyRankingTable({
 export function StrategyDetailPanel({ strategy }: { strategy: Strategy }) {
   const api = getApiStatus();
   const gate = evaluateLiveSafetyGate({ readinessOnly: true, api });
-  const hash = validateSafeStrategyHash();
   const reasons = gate.blockedReasons;
 
   return (
@@ -96,9 +94,8 @@ export function StrategyDetailPanel({ strategy }: { strategy: Strategy }) {
             }
           />
           <Metric
-            label="해시 검증"
-            value={hash.ok ? "일치" : hash.message}
-            tone={hash.ok ? "success" : "danger"}
+            label="파라미터 해시"
+            value={strategy.paramsHash?.slice(0, 12) ?? "—"}
           />
           <Metric label="서비스 상태" value={strategy.serviceState} />
           <Metric label="해석" value={strategy.interpretation} />

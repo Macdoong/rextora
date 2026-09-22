@@ -21,8 +21,10 @@ import {
 import { resolveResearchOutcome } from "../src/lib/rextora/strategySearch/researchOutcome";
 import { saveJobExecutionProfile } from "../src/lib/rextora/strategySearch/jobExecutionProfile";
 import { listStrategies } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const tempRoots: string[] = [];
 const cleanups: Array<() => void> = [];
@@ -307,7 +309,7 @@ describe("register then backtest", () => {
     expect(summary0.finalizedBest.labelKo).toBe("최종 정리 후 최고");
 
     const first = registerTrialForBacktest(job.id, 1, store);
-    expect(first.result.strategyId).not.toBe(SAFE_STRATEGY_ID);
+    expect(first.result.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(first.backtestHref).toContain(`strategyId=${first.result.strategyId}`);
     expect(first.backtestHref).toContain(
       `strategyHash=${first.result.strategyHash}`,

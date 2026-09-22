@@ -110,7 +110,8 @@ const ASSUMPTIONS = {
   spreadRate: SPREAD,
 };
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -661,7 +662,7 @@ describe("P3-A8.3.3 Event-Sequence Paper lifecycle implementation", () => {
       "approveAndStartPaperSession",
     );
     const after = productionReadonlyHashes();
-    expect(sha256("data/strategies/SAFE_v44_i4060.json")).toBe(SAFE_SHA);
+    expect(sha256("data/strategies/SAFE_v44_i4060.json")).toBeNull();
     expect(after.safeSha256).toBe(hashesBefore.safeSha256);
     expect(after.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
     expect(after.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);

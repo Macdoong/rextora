@@ -1,10 +1,10 @@
-import { notifyBotStarted, notifyBotStopped, notifyRiskBlock } from "./telegramOperation";
+import { notifyBotStarted, notifyBotStopped } from "./telegramOperation";
 import { appendAuditLog } from "./storage/auditStore";
 import { runBinanceDiagnostics } from "./binance/binanceDiagnosticsService";
 import { cacheDiagnosticsReport } from "./systemStatusSyncService";
 import { initializeServerTpSlManagerReadiness } from "./serverTpSlReadiness";
 import { evaluateLiveSafetyGate } from "./liveSafetyGate";
-import { executeLiveEntry, preflightLiveExecution } from "./liveExecutionEngine";
+import { preflightLiveExecution } from "./liveExecutionEngine";
 import {
   dispatchLiveExecution,
   liveExecutionDispatchRoute,
@@ -28,15 +28,8 @@ import {
   startPaperBot,
   stopPaperBot
 } from "./paperExecutionEngine";
-import { runSafePaperScanLoop, getLastSafeSignals } from "./execution/safePaperLoop";
-import { loadSafeV44Strategy } from "./strategy/safeV44Strategy";
-import { loadOhlcvCandles } from "./data/candleLoader";
-import { computeIndicators } from "./indicator/indicatorEngine";
-import { evaluateSafeV44Signal } from "./signal/safeV44SignalEngine";
-import { evaluateCostGuard } from "./cost/costGuard";
-import { calculateSafeV44Risk } from "./risk/safeV44RiskEngine";
-import { getWatchedSymbols } from "./marketWatcherService";
-import { getAccountState } from "./accountStateStore";
+import { runSafePaperScanLoop } from "./execution/safePaperLoop";
+import { getPaperActiveStrategy } from "./strategy/strategyStore";
 import { markRiskAlertStateNormal, sendRiskAlertIfNeeded } from "./telegramAssistant";
 import { logSystemEvent } from "./learningLogger";
 import {
@@ -53,7 +46,7 @@ import {
   setRuntimeState
 } from "./runtimeState";
 import { isEmergencyActive } from "./emergencyControls";
-import type { AiCandidate, EngineResult, TradingMode } from "./types";
+import type { EngineResult, TradingMode } from "./types";
 
 export { PAPER_SCAN_TASK_ID };
 const SCAN_TASK_ID = PAPER_SCAN_TASK_ID;
@@ -62,127 +55,8 @@ const HEARTBEAT_TASK_ID = "rextora-heartbeat";
 let scanLock = false;
 let liveEntryInProgress = false;
 
-function toLiveCandidateFromSafe(input: {
-  symbol: string;
-  side: "LONG" | "SHORT";
-  score: number;
-  entryReason: string;
-  signalType: string;
-  leverage: number;
-  expectedProfitPct: number;
-  stopLossDistancePct: number;
-}): AiCandidate {
-  return {
-    rank: 1,
-    symbol: input.symbol,
-    direction: input.side === "LONG" ? "롱" : "숏",
-    signalType: input.side === "LONG" ? "long_candidate" : "short_candidate",
-    aiScore: input.score,
-    finalScore: input.score,
-    expectedProfitPct: input.expectedProfitPct,
-    expectedCostPct: 0.08,
-    stopLossDistancePct: input.stopLossDistancePct,
-    riskGrade: "중간",
-    status: "진입 가능",
-    entryReason: input.entryReason,
-    signalReason: `SAFE ${input.signalType}`,
-    costPassed: true,
-    riskPassed: true,
-    serviceState: "live-ready",
-    leverage: input.leverage
-  };
-}
-
-async function runSafeLiveEntries(maxEntries = 1): Promise<number> {
-  const strategy = loadSafeV44Strategy({ throwOnHashMismatch: false });
-  if (!strategy.hashVerified) return 0;
-
-  const balance = getAccountState().availableBalanceUsdt || 10_000;
-  const symbols = getWatchedSymbols().slice(0, 30);
-  let entered = 0;
-
-  for (const symbol of symbols) {
-    if (entered >= maxEntries) break;
-    const { candles, source } = await loadOhlcvCandles(symbol, { limit: 250, allowSynthetic: false });
-    if (source !== "binance" || candles.length < strategy.params.ema_slow + 5) continue;
-
-    const series = computeIndicators(candles, strategy.params);
-    const signal = evaluateSafeV44Signal({
-      symbol,
-      series,
-      params: strategy.params,
-      paramsHash: strategy.paramsHash
-    });
-    if (!signal.passed || signal.side === "NONE" || !signal.indicators) continue;
-
-    const risk = calculateSafeV44Risk({
-      entryPrice: signal.indicators.close,
-      atr: signal.indicators.atr,
-      atrPct: signal.indicators.atrPct,
-      side: signal.side,
-      signalType: signal.signalType,
-      balance,
-      params: strategy.params
-    });
-    const cost = evaluateCostGuard({
-      entryPrice: risk.entryPrice,
-      takeProfitPrice: risk.takeProfitPrice,
-      side: signal.side,
-      atr: signal.indicators.atr,
-      params: strategy.params
-    });
-    if (!cost.passed) continue;
-
-    const tpDist =
-      signal.side === "LONG"
-        ? (risk.takeProfitPrice - risk.entryPrice) / risk.entryPrice
-        : (risk.entryPrice - risk.takeProfitPrice) / risk.entryPrice;
-    const slDist =
-      signal.side === "LONG"
-        ? (risk.entryPrice - risk.stopLossPrice) / risk.entryPrice
-        : (risk.stopLossPrice - risk.entryPrice) / risk.entryPrice;
-
-    const candidate = toLiveCandidateFromSafe({
-      symbol,
-      side: signal.side,
-      score: signal.score,
-      entryReason: signal.entryReason,
-      signalType: signal.signalType,
-      leverage: risk.leverage,
-      expectedProfitPct: tpDist * 100,
-      stopLossDistancePct: slDist * 100
-    });
-
-    const gate = evaluateLiveSafetyGate({
-      mode: "LIVE",
-      operatorLiveStartRequested: true,
-      candidate,
-      executionInProgress: true
-    });
-    if (!gate.passed) {
-      await notifyRiskBlock(gate.blockedReasons[0] ?? "실전 거래 조건 미통과");
-      continue;
-    }
-
-    liveEntryInProgress = true;
-    try {
-      const result = await executeLiveEntry(candidate);
-      appendAuditLog({
-        type: result.ok ? "live_entry" : "candidate_block",
-        actor: "botRuntime",
-        message: result.message,
-        mode: "LIVE",
-        correlationId: `safe-live-${Date.now()}`,
-        symbol,
-        details: { paramsHash: strategy.paramsHash, signalType: signal.signalType }
-      });
-      if (result.ok) entered += 1;
-    } finally {
-      liveEntryInProgress = false;
-    }
-  }
-
-  return entered;
+async function runSafeLiveEntries(_maxEntries = 1): Promise<number> {
+  return 0;
 }
 
 async function runExecutionScanLoop(mode: TradingMode): Promise<void> {
@@ -197,7 +71,14 @@ async function runExecutionScanLoop(mode: TradingMode): Promise<void> {
   try {
     await refreshMarketData({ force: true });
     invalidateCandidateCache();
-    const strategyMeta = loadSafeV44Strategy({ throwOnHashMismatch: false });
+    const paperStrategy = getPaperActiveStrategy();
+    const strategyMeta = paperStrategy
+      ? {
+          name: paperStrategy.name,
+          paramsHash: paperStrategy.paramsHash,
+          sourceStatus: paperStrategy.sourceStatus ?? "user_created",
+        }
+      : { name: "none", paramsHash: "", sourceStatus: "none" };
 
     if (mode === "PAPER") {
       const risk = getEffectiveRiskState(mode);

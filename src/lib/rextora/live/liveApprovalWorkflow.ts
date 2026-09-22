@@ -14,7 +14,7 @@ import {
 } from "../strategyLiveApproval";
 import { readJsonStore, writeJsonStore } from "../storage/jsonStore";
 import { getStrategyById } from "../strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../strategyRepository";
+import { isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import { loadSettings } from "../settings/settingsStore";
 import {
   captureLiveApprovalTargetIdentity,
@@ -223,7 +223,7 @@ export function parseLiveApprovalTarget(input: {
 }
 
 export function isKnownLiveApprovalStrategy(strategyId: string): boolean {
-  if (strategyId === SAFE_STRATEGY_ID) return true;
+  if (!strategyId || isRetiredSafeId(strategyId)) return false;
   try {
     return Boolean(getStrategyById(strategyId));
   } catch {

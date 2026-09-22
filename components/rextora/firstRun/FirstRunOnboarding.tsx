@@ -271,7 +271,7 @@ export function FirstRunOnboarding({
           <ul className="mt-3 space-y-1.5 text-sm text-slate-300">
             <li>데모 데이터는 예시이며 실전 매매 증거가 아닙니다.</li>
             <li>실전 주문은 실행되지 않습니다. Paper도 자동으로 시작되지 않습니다.</li>
-            <li>SAFE 보호 전략은 변경되지 않습니다.</li>
+            <li>선택된 전략이 없으면 모의매매와 실전은 시작되지 않습니다.</li>
             <li>최종 승인자(Approver)는 항상 사용자입니다.</li>
           </ul>
 
@@ -302,6 +302,17 @@ export function FirstRunOnboarding({
                 가짜 데이터를 만들지 않고 Strategy Search로 이동합니다.
               </p>
             </Link>
+            <button
+              type="button"
+              className="rounded-xl border border-slate-500/50 bg-slate-900/70 p-4 text-left text-slate-100 transition hover:border-slate-300 hover:bg-slate-800"
+              onClick={() => void dismissSetup()}
+              data-testid="first-run-later"
+            >
+              <p className="text-base font-semibold text-white">나중에</p>
+              <p className="mt-1 text-xs text-slate-300">
+                지금 시작하지 않고 운영센터로 돌아갑니다.
+              </p>
+            </button>
           </div>
 
           {initPhase === "working" ? (
@@ -343,7 +354,7 @@ export function FirstRunOnboarding({
       <ConfirmDialog
         open={resetPhase === "confirming"}
         title="데모 데이터만 삭제"
-        description="예약된 데모 ID 레코드만 삭제합니다. 실제 연구 데이터와 SAFE는 유지됩니다."
+        description="예약된 데모 ID 레코드만 삭제합니다. 실제 연구 데이터는 유지됩니다."
         confirmLabel="데모만 삭제"
         cancelLabel="취소"
         tone="danger"

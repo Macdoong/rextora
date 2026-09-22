@@ -2,7 +2,7 @@ import {
   inspectOrphanSearchJobs,
   recoverOrphanSearchJobs,
 } from "@/src/lib/rextora/strategySearch/orphanJobRecovery";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireAdmin } from "@/src/lib/rextora/auth/requireUser";
 import {
   strategySearchError,
   strategySearchJson,
@@ -10,11 +10,13 @@ import {
 
 /**
  * POST /api/rextora/strategy-search/recover
- * Resume disk-marked running/queued jobs that are not active in this process.
+ * Global process-loss recovery. Not a customer-scoped job mutation.
+ * CEO/admin maintenance only (requireAdmin). Ordinary operators cannot
+ * recover another user's jobs or ownerless records through this route.
  */
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "research:run");
-  if (denied) return denied;
+  const auth = requireAdmin(request);
+  if (!auth.ok) return auth.response;
   const start = Date.now();
   try {
     const data = recoverOrphanSearchJobs();
@@ -24,10 +26,10 @@ export async function POST(request: Request) {
   }
 }
 
-/** GET inspects recovery candidates only. Does not mutate. */
+/** GET inspects recovery candidates only. Does not mutate. CEO/admin only. */
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAdmin(request);
+  if (!auth.ok) return auth.response;
 
   const start = Date.now();
   try {

@@ -7,10 +7,11 @@ import os from "node:os";
 import path from "node:path";
 import {
   copyStrategy,
+  createStrategy,
   ensureStrategyStore,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import {
   activatePaperSession,
@@ -36,7 +37,7 @@ describe("preparePaperFromResults (Results apply_paper contract)", () => {
     const iso = installIsolatedStrategyStore();
     cleanupStrategies = iso.cleanup;
     ensureStrategyStore();
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "paper_apply_test");
+    const copy = copyStrategy(createStrategy({ name: "Paper Apply Source" }).id, "paper_apply_test");
     strategyId = copy.id;
     rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-paper-apply-"));
   });
@@ -85,8 +86,9 @@ describe("restartPaperBotGuarded (legacy bot restart gate)", () => {
     const iso = installIsolatedStrategyStore();
     cleanupStrategies = iso.cleanup;
     ensureStrategyStore();
-    strategyId = copyStrategy(SAFE_STRATEGY_ID, "restart_gate_a").id;
-    otherStrategyId = copyStrategy(SAFE_STRATEGY_ID, "restart_gate_b").id;
+    const source = createStrategy({ name: "Restart Gate Source" });
+    strategyId = copyStrategy(source.id, "restart_gate_a").id;
+    otherStrategyId = copyStrategy(source.id, "restart_gate_b").id;
     rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-paper-restart-"));
   });
 

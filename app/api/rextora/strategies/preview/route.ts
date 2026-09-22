@@ -14,12 +14,13 @@ import { evaluateSafeV44Signal } from "@/src/lib/rextora/signal/safeV44SignalEng
 import { computeIndicators } from "@/src/lib/rextora/indicator/indicatorEngine";
 import type { LevelLine, TradeMarker } from "@/src/lib/rextora/charts/types";
 import { CHART_THEME } from "@/src/lib/rextora/charts/theme";
-import { denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import { requireAuthenticatedUser } from "@/src/lib/rextora/auth/requireUser";
+import { canReadStoredStrategy } from "@/src/lib/rextora/auth/searchResourceAccess";
 
 /** Preview strategy signals + structure overlays for Unified Chart Engine. */
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
@@ -28,7 +29,9 @@ export async function GET(request: Request) {
   if (!id) return NextResponse.json({ ok: false, error: "전략 고유번호가 필요합니다." }, { status: 400 });
 
   const strategy = getStrategyById(id);
-  if (!strategy) return NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+  if (!strategy || !canReadStoredStrategy(auth.user, strategy)) {
+    return NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+  }
 
   const def = storedToDefinition(strategy);
   const validation = validateCanonicalDefinition(def);

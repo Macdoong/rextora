@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { LIVE_DISABLED_LABEL, LIVE_ORDERS_BLOCKED_LABEL } from "../src/lib/rextora/live/liveGateOperatorPresentation";
 
 const ROOT = path.resolve(__dirname, "..");
@@ -34,8 +34,11 @@ describe("operator center", () => {
     expect(center).toContain("buildOperatorActionQueue");
     expect(center).toContain("groupOperatorActions");
     expect(center).toContain("operator-current-strategy");
+    expect(center).toContain("resolveExplicitCurrentStrategy");
+    expect(center).toContain("pageContextStrategyName");
     expect(center).toContain("paperName");
     expect(center).toContain("activeStrategy");
+    expect(center).toContain("hasSelectedStrategy ? strategyName : OPERATOR_EMPTY.strategy");
   });
 
   it("8. stale Agent context does not replace operator context", () => {
@@ -68,7 +71,9 @@ describe("operator center", () => {
     expect(center).toContain("OPERATOR_EMPTY.trades");
     expect(center).toContain("operator-zero-positions");
     expect(center).toContain("operator-zero-trades");
-    expect(center).toContain("OPERATOR_LABEL.technicalDetail");
+    expect(center).not.toContain("OPERATOR_LABEL.technicalDetail");
+    expect(center).toContain("OPERATOR_EMPTY.strategy");
+    expect(center).toContain("오늘 거래");
   });
 
   it("17-19. viewer read-only; operator/CEO use existing permissions", () => {
@@ -100,14 +105,17 @@ describe("operator center", () => {
     expect(sidebar).toContain("min-h-11");
   });
 
-  it("28-31. SAFE untouched and no live/exchange mutation from UI files", () => {
-    const safe = JSON.parse(
-      read("data/strategies/SAFE_v44_i4060.json"),
-    ) as { params_hash?: string };
-    expect(safe.params_hash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(safe.params_hash).toBe("7893ca3f0e30");
+  it("28-31. no SAFE default and no live/exchange mutation from UI files", () => {
+    expect(fs.existsSync(path.join(ROOT, "data/strategies/SAFE_v44_i4060.json"))).toBe(false);
+    const store = read("src/lib/rextora/strategy/strategyStore.ts");
+    expect(store).toContain("getPaperActiveStrategy(): StoredStrategy | null");
+    expect(store).not.toContain("buildLockedSafeStrategy");
     const center = read("components/rextora/dashboard/OperatorCenter.tsx");
     expect(center).not.toContain("api.binance");
     expect(center).not.toContain("createOrder");
+    expect(center).not.toContain("SAFE_v44_i4060");
+    const panels = read("components/rextora/dashboard/DashboardPanels.tsx");
+    expect(panels).not.toContain("SAFE_v44_i4060");
+    expect(panels).not.toContain("7893ca3f0e30");
   });
 });

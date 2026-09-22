@@ -15,7 +15,6 @@ import {
   API_DEFAULT_APPLY_FUNDING,
   API_DEFAULT_APPLY_SPREAD,
 } from "../backtest/backtestCostAssumptionsDiagnosis";
-import { SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
 import type { StoredStrategyV1 } from "../strategy/definition/bridge";
 import { parseStrategyExecutionProvenance } from "../strategy/strategyExecutionProvenance";
 import {
@@ -114,10 +113,6 @@ function isEventSequenceStrategy(
   strategy?: StoredStrategyV1 | null,
 ): boolean {
   return Boolean(strategy?.definition?.eventSequence);
-}
-
-function isSafeStrategy(strategy?: StoredStrategyV1 | null): boolean {
-  return strategy?.id === SAFE_STRATEGY_ID;
 }
 
 function descriptionHasResearchProvenance(
@@ -399,7 +394,7 @@ export function resolvePaperEventSequenceCostModel(input: {
     costsFromSession,
   );
 
-  if (isSafeStrategy(input.strategy) || !isEventSequenceStrategy(input.strategy)) {
+  if (!isEventSequenceStrategy(input.strategy)) {
     return notApplicableResolution(costs);
   }
 

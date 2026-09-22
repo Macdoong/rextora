@@ -196,7 +196,7 @@ export function sanitizePrimaryUserText(text: string | null | undefined): string
     .replace(/\bsearch_[a-f0-9-]{8,}\b/gi, "해당 탐색")
     .replace(/\bbt_[a-z0-9_-]{6,}\b/gi, "해당 백테스트")
     .replace(/\bstrat_[a-z0-9_-]{6,}\b/gi, "해당 전략")
-    .replace(/\bSAFE_v\d+_[a-z0-9_-]+\b/gi, "보호된 SAFE 전략")
+    .replace(/\bSAFE_v\d+_[a-z0-9_-]+\b/gi, "과거 전략")
     .replace(/\bpaper_active\b/gi, "모의매매 진행 중")
     .replace(/\bpaper_ready\b/gi, "모의매매 준비")
     .replace(/\bsearch_running\b/gi, "탐색 진행 중")

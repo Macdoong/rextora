@@ -1,13 +1,12 @@
 import { readJsonStore, writeJsonStore } from "./storage/jsonStore";
 import { appendAuditLog } from "./storage/auditStore";
+import { getStrategyById } from "./strategy/strategyStore";
 import {
-  getPreservedSafeStrategy,
-  SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-  validateSafeStrategyHash
-} from "./strategyRepository";
+  isRetiredSafeId,
+  neutralizeRetiredStrategyId,
+  NO_LIVE_APPROVED_STRATEGY,
+} from "./strategy/retiredSafeBaseline";
 import { verifyLiveConfirmationText } from "./security";
-import type { Strategy } from "./types";
 import {
   evaluateLiveStartApprovalGate,
   normalizeLiveApprovalTarget,
@@ -21,16 +20,16 @@ const APPROVAL_FILE = "strategy-live-approval.json";
 export type { LiveApprovalTarget };
 
 export interface StrategyLiveApprovalState {
-  strategyId: string;
+  strategyId: string | null;
   verifiedForLive: boolean;
   approvedAt: string | null;
   approvedBy: string | null;
-  /** Exact approved Live target. Absent on legacy SAFE snapshots. */
+  /** Exact approved Live target. */
   target: LiveApprovalTarget | null;
 }
 
 const DEFAULT_APPROVAL: StrategyLiveApprovalState = {
-  strategyId: SAFE_STRATEGY_ID,
+  strategyId: null,
   verifiedForLive: false,
   approvedAt: null,
   approvedBy: null,
@@ -43,12 +42,26 @@ function readApprovalState(): StrategyLiveApprovalState {
     DEFAULT_APPROVAL,
     { ttlMs: 0 },
   );
+  const strategyId = neutralizeRetiredStrategyId(stored.strategyId);
+  const target = normalizeLiveApprovalTarget(stored.target);
+  const targetId = neutralizeRetiredStrategyId(target?.strategyId);
+  const staleSafe =
+    isRetiredSafeId(stored.strategyId) || isRetiredSafeId(target?.strategyId);
+  if (staleSafe || !strategyId || !targetId) {
+    return {
+      strategyId: staleSafe ? null : strategyId,
+      verifiedForLive: staleSafe ? false : stored.verifiedForLive === true && Boolean(strategyId && targetId),
+      approvedAt: staleSafe ? null : stored.approvedAt ?? null,
+      approvedBy: staleSafe ? null : stored.approvedBy ?? null,
+      target: staleSafe || !targetId ? null : target && targetId ? { ...target, strategyId: targetId } : null,
+    };
+  }
   return {
-    strategyId: stored.strategyId?.trim() || SAFE_STRATEGY_ID,
+    strategyId,
     verifiedForLive: stored.verifiedForLive === true,
     approvedAt: stored.approvedAt ?? null,
     approvedBy: stored.approvedBy ?? null,
-    target: normalizeLiveApprovalTarget(stored.target),
+    target: target && targetId ? { ...target, strategyId: targetId } : null,
   };
 }
 
@@ -56,33 +69,23 @@ export function getStrategyLiveApprovalState(): StrategyLiveApprovalState {
   return readApprovalState();
 }
 
-export function getEffectiveSafeStrategy(): Strategy {
-  const base = getPreservedSafeStrategy();
+export function getEffectiveApprovedStrategy() {
   const approval = getStrategyLiveApprovalState();
-  const approvedId = approval.target?.strategyId ?? approval.strategyId;
-  if (approvedId !== base.id) return base;
-  return {
-    ...base,
-    verifiedForLive: approval.verifiedForLive,
-    liveEligible: approval.verifiedForLive && base.liveEligibleCandidate
-  };
+  const approvedId = neutralizeRetiredStrategyId(
+    approval.target?.strategyId ?? approval.strategyId,
+  );
+  if (!approvedId || !approval.verifiedForLive) return null;
+  return getStrategyById(approvedId) ?? null;
+}
+
+/** @deprecated Retired SAFE identity. Use getEffectiveApprovedStrategy(). */
+export function getEffectiveSafeStrategy() {
+  return getEffectiveApprovedStrategy();
 }
 
 function normalizeApprovalActor(actor?: string | null): string | null {
   const trimmed = actor?.trim();
   return trimmed ? trimmed : null;
-}
-
-function explicitSafeTarget(): LiveApprovalTarget {
-  return {
-    strategyId: SAFE_STRATEGY_ID,
-    paramsHash: SAFE_PARAMS_HASH,
-    strategyHash: null,
-    symbol: null,
-    backtestRunId: null,
-    backtestResultHash: null,
-    paperSessionId: null,
-  };
 }
 
 export function approveStrategyForLive(
@@ -102,25 +105,13 @@ export function approveStrategyForLive(
     };
   }
 
-  const requested = normalizeLiveApprovalTarget(target) ?? (target == null ? explicitSafeTarget() : null);
-  if (!requested) {
+  const requested = normalizeLiveApprovalTarget(target);
+  if (!requested || isRetiredSafeId(requested.strategyId) || !getStrategyById(requested.strategyId)) {
     return {
       ok: false,
-      message: "실전 승인 대상 신원이 없어 승인할 수 없습니다.",
+      message: NO_LIVE_APPROVED_STRATEGY,
       state: getStrategyLiveApprovalState()
     };
-  }
-
-  if (requested.strategyId === SAFE_STRATEGY_ID) {
-    const hash = validateSafeStrategyHash();
-    if (!hash.ok) {
-      return {
-        ok: false,
-        message: "전략 해시 검증에 실패하여 실전 승인할 수 없습니다.",
-        state: getStrategyLiveApprovalState()
-      };
-    }
-    requested.paramsHash = SAFE_PARAMS_HASH;
   }
 
   const approvedBy = normalizeApprovalActor(actor);
@@ -160,7 +151,7 @@ export function revokeStrategyLiveApproval(actor?: string | null): StrategyLiveA
   const previous = getStrategyLiveApprovalState();
   const state: StrategyLiveApprovalState = {
     ...DEFAULT_APPROVAL,
-    strategyId: SAFE_STRATEGY_ID,
+    strategyId: null,
     target: null
   };
   writeJsonStore(APPROVAL_FILE, state);
@@ -180,12 +171,14 @@ export function revokeStrategyLiveApproval(actor?: string | null): StrategyLiveA
 }
 
 export function getStrategyApprovalSummary() {
-  const strategy = getEffectiveSafeStrategy();
+  const strategy = getEffectiveApprovedStrategy();
   const approval = getStrategyLiveApprovalState();
   const execution = resolveLiveExecutionTarget();
   const currentTarget = resolveLiveStartTarget();
   const validation = evaluateLiveStartApprovalGate(approval);
-  const approvedId = approval.target?.strategyId ?? approval.strategyId;
+  const approvedId = neutralizeRetiredStrategyId(
+    approval.target?.strategyId ?? approval.strategyId,
+  );
   const statusLabel = !approval.verifiedForLive
     ? "실전 승인 전"
     : validation.ok
@@ -193,7 +186,7 @@ export function getStrategyApprovalSummary() {
       : validation.message;
   return {
     strategyId: approvedId,
-    strategyName: approvedId === strategy.id ? strategy.name : approvedId,
+    strategyName: strategy && approvedId === strategy.id ? strategy.name : approvedId,
     paramsHash: approval.target?.paramsHash ?? currentTarget?.paramsHash ?? null,
     verifiedForLive: approval.verifiedForLive,
     validForCurrentLiveTarget: validation.ok,

@@ -2,11 +2,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
+import { RETIRED_SAFE_FILE_NAME } from "../../src/lib/rextora/strategy/retiredSafeBaseline";
 
 const ENV_KEY = "REXTORA_STRATEGIES_DIR";
 
 /**
- * Point strategyStore at a fresh temp directory (SAFE will be seeded by ensureStrategyStore).
+ * Point strategyStore at a fresh temp directory (empty store is valid).
  * Restores the previous REXTORA_STRATEGIES_DIR (normally the Vitest worker root) on cleanup.
  */
 export function installIsolatedStrategyStore(): {
@@ -26,7 +27,8 @@ export function installIsolatedStrategyStore(): {
   };
 }
 
-export function hashFile(filePath: string): string {
+export function hashFile(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -35,5 +37,5 @@ export function productionStrategiesDir(): string {
 }
 
 export function canonicalSafeSourcePath(): string {
-  return path.join(process.cwd(), "data", "strategies", "SAFE_v44_i4060.json");
+  return path.join(process.cwd(), "data", "strategies", RETIRED_SAFE_FILE_NAME);
 }

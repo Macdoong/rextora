@@ -3,10 +3,13 @@ import { computeIndicators } from "../indicator/indicatorEngine";
 import { evaluateSafeV44Signal } from "../signal/safeV44SignalEngine";
 import { evaluateCostGuard } from "../cost/costGuard";
 import { calculateSafeV44Risk, updateTrailingStop } from "../risk/safeV44RiskEngine";
-import { loadSafeV44Strategy } from "../strategy/safeV44Strategy";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import { buildBacktestReport, type BacktestReport } from "./backtestReport";
 import type { BacktestZeroTradeDiagnostics } from "./backtestTypes";
+import {
+  assertNoCooperativeCheckpointOnSyncPath,
+  type BacktestCooperativeCheckpoint,
+} from "./cooperativeCheckpoint";
 import {
   SLIPPAGE_MODEL_EXECUTION_PRICE_V1,
   applyAdverseSlippage,
@@ -68,6 +71,8 @@ export interface BacktestRunInput {
   dataSource?: "binance" | "synthetic-test";
   requestedFrom?: string | null;
   requestedTo?: string | null;
+  /** Strategy Search cooperative pause/cancel — sync path rejects this field. */
+  cooperativeCheckpoint?: BacktestCooperativeCheckpoint;
 }
 
 export interface BacktestRunResult {
@@ -139,17 +144,48 @@ function ledgerFields(input: {
   };
 }
 
-export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
-  const strategy = loadSafeV44Strategy({ throwOnHashMismatch: false });
+function runSafeV44BarLoopSync(
+  candleCount: number,
+  processBar: (barIndex: number) => void,
+): void {
+  for (let i = 0; i < candleCount; i += 1) {
+    processBar(i);
+  }
+}
+
+async function runSafeV44BarLoopCooperative(
+  candleCount: number,
+  checkpoint: BacktestCooperativeCheckpoint,
+  processBar: (barIndex: number) => void,
+): Promise<void> {
+  for (let i = 0; i < candleCount; i += 1) {
+    if (i % checkpoint.barInterval === 0) {
+      await checkpoint.onBarCheckpoint(i);
+    }
+    processBar(i);
+  }
+}
+
+interface SafeV44BacktestWalk {
+  candleCount: number;
+  processBar: (barIndex: number) => void;
+  complete: () => BacktestRunResult;
+}
+
+function createSafeV44BacktestWalk(input: BacktestRunInput): SafeV44BacktestWalk {
+  if (!input.params) {
+    throw new Error("backtest requires an explicit strategy params object");
+  }
   const feeRate = input.feeRate ?? 0.0004;
   const slippageRate = input.slippageRate ?? 0.0002;
   const fundingRate = input.applyFunding ? input.fundingRate ?? 0.0001 : 0;
   const spreadRate = input.applySpread ? input.spreadRate ?? 0.0001 : 0;
   const balance0 = input.balance ?? 10_000;
-  const params = input.params
-    ? { ...input.params, cost_guard_k: input.costGuardK ?? input.params.cost_guard_k }
-    : strategy.params;
-  const paramsHash = input.paramsHash ?? strategy.paramsHash;
+  const params = {
+    ...input.params,
+    cost_guard_k: input.costGuardK ?? input.params.cost_guard_k,
+  };
+  const paramsHash = input.paramsHash ?? "explicit";
 
   if (!Array.isArray(input.candles)) {
     throw new Error("backtest requires candles — synthetic fallback disabled");
@@ -185,7 +221,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       }
     | null = null;
 
-  for (let i = 0; i < candles.length; i += 1) {
+  const processBar = (i: number) => {
     const candle = candles[i];
     const ind = series.snapshots[i];
 
@@ -277,7 +313,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       }
     }
 
-    if (open) continue;
+    if (open) return;
 
     evaluatedCandleCount += 1;
     const signal = evaluateSafeV44Signal({
@@ -291,7 +327,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
 
     if (!signal.passed || signal.side === "NONE" || !ind) {
       if (signal.rejectReason) bumpReason(rejectionReasons, signal.rejectReason);
-      continue;
+      return;
     }
 
     if (signal.side === "LONG") longSignalCandidateCount += 1;
@@ -322,7 +358,7 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
     });
     if (!cost.passed) {
       bumpReason(rejectionReasons, cost.reason || "비용 가드 차단");
-      continue;
+      return;
     }
 
     const entrySlipSide = toSlippageSide(signal.side);
@@ -345,8 +381,9 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
       quantity: risk.quantity,
       margin: risk.marginAmount
     };
-  }
+  };
 
+  const complete = (): BacktestRunResult => {
   if (open) {
     const last = candles[candles.length - 1];
     const rawExit = last.close;
@@ -435,9 +472,9 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
   const report = buildBacktestReport({
     symbol: input.symbol,
     paramsHash,
-    strategyName: input.strategyName ?? strategy.name,
-    strategyId: input.strategyId ?? strategy.name,
-    sourceStatus: input.sourceStatus ?? strategy.sourceStatus,
+    strategyName: input.strategyName ?? input.strategyId ?? "explicit",
+    strategyId: input.strategyId ?? input.strategyName ?? "explicit",
+    sourceStatus: input.sourceStatus ?? "user_created",
     timeframe: input.timeframe ?? "15m",
     fromDate: first ? new Date(first.openTime).toISOString().slice(0, 10) : null,
     toDate: last ? new Date(last.openTime).toISOString().slice(0, 10) : null,
@@ -456,10 +493,40 @@ export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
     slippageApplied: true,
     fundingApplied: Boolean(input.applyFunding),
     spreadApplied: Boolean(input.applySpread),
-    paramsHashVerified: paramsHash === strategy.paramsHash || Boolean(input.paramsHash),
+    paramsHashVerified: Boolean(input.paramsHash) || paramsHash === "explicit",
     slippageModelVersion: SLIPPAGE_MODEL_EXECUTION_PRICE_V1,
     zeroTradeDiagnostics
   });
 
   return { report, trades, equityCurve, processedCandles: candles };
+  };
+
+  return {
+    candleCount: candles.length,
+    processBar,
+    complete,
+  };
+}
+
+export function runSafeV44Backtest(input: BacktestRunInput): BacktestRunResult {
+  assertNoCooperativeCheckpointOnSyncPath(
+    input.cooperativeCheckpoint,
+    "runSafeV44Backtest",
+    "runSafeV44BacktestCooperative",
+  );
+  const walk = createSafeV44BacktestWalk(input);
+  runSafeV44BarLoopSync(walk.candleCount, walk.processBar);
+  return walk.complete();
+}
+
+export async function runSafeV44BacktestCooperative(
+  input: BacktestRunInput & { cooperativeCheckpoint: BacktestCooperativeCheckpoint },
+): Promise<BacktestRunResult> {
+  const walk = createSafeV44BacktestWalk(input);
+  await runSafeV44BarLoopCooperative(
+    walk.candleCount,
+    input.cooperativeCheckpoint,
+    walk.processBar,
+  );
+  return walk.complete();
 }

@@ -202,18 +202,16 @@ export function ContextBar() {
       `${session.turns.length}턴`
     : OPERATOR_STATUS.hydrating;
 
-  const liveStateLabel =
-    shellStage === "LIVE_GATE"
-      ? OPERATOR_STAGE.LIVE_GATE
-      : shellStage === "PAPER"
-        ? OPERATOR_STAGE.PAPER
-        : OPERATOR_STATUS.liveInactive;
-
+  const strategyChipLabel = primaryStrategy?.trim()
+    ? primaryStrategy
+    : OPERATOR_STATUS.noStrategy;
   const mobileContextSummary = [
     shellStageLabel,
-    displayValue(primaryStrategy),
-    displayValue(primarySymbolTimeframe),
-  ].join(" · ");
+    strategyChipLabel,
+    primarySymbolTimeframe?.trim() || null,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(" · ");
 
   const showResume =
     session.sessionHydrated && session.canResume && !session.isThinking;
@@ -246,20 +244,22 @@ export function ContextBar() {
             className="rextora-context-primary-value"
             data-testid="shell-context-strategy-primary"
           >
-            {displayValue(primaryStrategy)}
+            {strategyChipLabel}
           </span>
         </div>
 
-        <div className="rextora-context-primary-item v3-shell-chip">
-          <span className="rextora-context-primary-label">
-            {OPERATOR_LABEL.symbolTimeframe}
-          </span>
-          <span className="rextora-context-primary-value">
-            {displayValue(primarySymbolTimeframe)}
-          </span>
-        </div>
+        {primarySymbolTimeframe?.trim() ? (
+          <div className="rextora-context-primary-item v3-shell-chip">
+            <span className="rextora-context-primary-label">
+              {OPERATOR_LABEL.symbolTimeframe}
+            </span>
+            <span className="rextora-context-primary-value">
+              {primarySymbolTimeframe}
+            </span>
+          </div>
+        ) : null}
 
-        {tradingModeLabel ? (
+        {tradingModeLabel && tradingModeLabel !== shellStageLabel ? (
           <div
             className="rextora-context-primary-item rextora-context-trading-mode v3-shell-chip"
             data-testid="shell-context-trading-mode"
@@ -273,15 +273,19 @@ export function ContextBar() {
           </div>
         ) : null}
 
-        <div
-          className="rextora-context-primary-item rextora-context-live v3-shell-chip"
-          data-testid="shell-context-live-status"
-        >
-          <span className="rextora-context-primary-label">
-            {OPERATOR_LABEL.liveState}
-          </span>
-          <span className="rextora-context-primary-value">{liveStateLabel}</span>
-        </div>
+        {shellStage === "LIVE_GATE" && pageReadiness?.trim() ? (
+          <div
+            className="rextora-context-primary-item rextora-context-live v3-shell-chip"
+            data-testid="shell-context-live-status"
+          >
+            <span className="rextora-context-primary-label">
+              {OPERATOR_LABEL.liveState}
+            </span>
+            <span className="rextora-context-primary-value">
+              {pageReadiness.trim()}
+            </span>
+          </div>
+        ) : null}
 
         {riskStatusLabel ? (
           <div

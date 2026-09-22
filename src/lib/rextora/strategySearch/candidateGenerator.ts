@@ -1,4 +1,4 @@
-import { computeParamsHash, isLockedSafeHash } from "../strategy/strategyHash";
+import { computeParamsHash } from "../strategy/strategyHash";
 import type { SafeV44Params } from "../strategy/strategyTypes";
 import {
   assertStrategySearchIteration,
@@ -18,8 +18,6 @@ import type {
   StrategySearchParameterValue,
   StrategySearchParameterValueType,
 } from "./types";
-
-const PROTECTED_STRATEGY_ID = "SAFE_v44_i4060";
 
 export class StrategySearchGenerationError extends Error {
   readonly code:
@@ -64,15 +62,6 @@ export interface GenerateUniqueCandidateInput {
   maxAttempts: number;
   randomInput?: GenerateRandomCandidateInput;
   localInput?: GenerateLocalCandidateInput;
-}
-
-function assertNotProtectedToken(label: string, value: string): void {
-  if (value === PROTECTED_STRATEGY_ID || /SAFE_v44_i4060/i.test(value)) {
-    throw new StrategySearchGenerationError(
-      "INVALID_INPUT",
-      `${label} must not reference ${PROTECTED_STRATEGY_ID}`,
-    );
-  }
 }
 
 function resolveValueType(
@@ -198,19 +187,11 @@ function finalizeCandidate(input: {
   }
 
   const paramsHash = computeParamsHash(normalized);
-  if (isLockedSafeHash(paramsHash) || paramsHash === "7893ca3f0e30") {
-    throw new StrategySearchGenerationError(
-      "PROTECTED_HASH_COLLISION",
-      "generated params_hash collides with protected SAFE hash 7893ca3f0e30",
-    );
-  }
 
   const candidateId = createStrategySearchCandidateId(
     input.jobId,
     input.iteration,
   );
-  assertNotProtectedToken("candidateId", candidateId);
-
   return {
     candidateId,
     jobId: input.jobId,
@@ -246,13 +227,6 @@ function tryFinalize(
       lastError = error;
       if (
         error instanceof StrategySearchGenerationError &&
-        error.code === "PROTECTED_HASH_COLLISION"
-      ) {
-        // Retry with a new draw — collision is rare and regenerable.
-        continue;
-      }
-      if (
-        error instanceof StrategySearchGenerationError &&
         error.code === "VALIDATION_FAILED"
       ) {
         continue;
@@ -272,8 +246,6 @@ export function generateRandomCandidate(
 ): StrategySearchCandidate {
   assertStrategySearchJobId(input.jobId);
   assertStrategySearchIteration(input.iteration);
-  assertNotProtectedToken("searchVersion", input.searchVersion);
-  assertNotProtectedToken("jobId", input.jobId);
 
   const rangeCheck = validateSearchParameterRanges(input.parameterRanges);
   if (!rangeCheck.ok) {
@@ -306,8 +278,6 @@ export function generateLocalCandidate(
 ): StrategySearchCandidate {
   assertStrategySearchJobId(input.jobId);
   assertStrategySearchIteration(input.iteration);
-  assertNotProtectedToken("searchVersion", input.searchVersion);
-  assertNotProtectedToken("jobId", input.jobId);
 
   if (
     !Number.isFinite(input.mutationScale) ||

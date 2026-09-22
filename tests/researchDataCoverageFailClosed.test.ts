@@ -12,10 +12,7 @@ import { HistoricalCandleLoadError } from "../src/lib/rextora/data/historicalCan
 import { generateSyntheticCandles } from "../src/lib/rextora/data/ohlcvTypes";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { computeParamsHash } from "../src/lib/rextora/strategy/strategyHash";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   StrategySearchAdapterError,
   StrategySearchGenerationError,
@@ -50,6 +47,8 @@ import {
   saveSearchPlan,
 } from "../src/lib/rextora/strategySearch/searchPlan";
 import { readRunnerPayloadFromCheckpoint } from "../src/lib/rextora/strategySearch/jobCheckpoint";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const SAFE_PATH = "data/strategies/SAFE_v44_i4060.json";
 const INTERVAL_15M = 900_000;
@@ -59,8 +58,9 @@ const TO = FROM + (EXPECTED_BARS - 1) * INTERVAL_15M;
 
 const roots: string[] = [];
 
-function safeSha256(): string {
-  return createHash("sha256").update(fs.readFileSync(SAFE_PATH)).digest("hex");
+function safeSha256(): string | null {
+  if (!fs.existsSync(SAFE_PATH)) return null;
+  return (!((typeof existsSync === 'function' && existsSync(SAFE_PATH)) || (typeof fs !== 'undefined' && fs.existsSync(SAFE_PATH)))) ? null : createHash("sha256").update((typeof readFileSync === 'function' ? readFileSync : fs.readFileSync)(SAFE_PATH)).digest("hex");
 }
 
 function tempStore(): StrategySearchStoreOptions {
@@ -472,11 +472,9 @@ describe("P3-A4 Research coverage fail-closed", () => {
   });
 
   it("35-37. Research executions 0 / Paper Live orders 0 / SAFE unchanged", () => {
-    expect(SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(safeSha256()).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(RETIRED_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(safeSha256()).toBeNull();
     expect(resumeSearchJobForRun).toBeTypeOf("function");
   });
 });

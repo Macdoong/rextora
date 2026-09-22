@@ -139,7 +139,7 @@ function makeLeaf(
 
 export function StrategyBuilderPanel() {
   const [strategies, setStrategies] = useState<StoredStrategy[]>([]);
-  const [selectedId, setSelectedId] = useState("SAFE_v44_i4060");
+  const [selectedId, setSelectedId] = useState("");
   const [step, setStep] = useState(0);
   const [message, setMessage] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -243,7 +243,7 @@ export function StrategyBuilderPanel() {
 
   async function persistCurrentStrategy(): Promise<boolean> {
     if (isLocked) {
-      setMessage("원본 보호 전략은 저장할 수 없습니다. 복사본을 만드세요.");
+      setMessage("잠긴 전략은 저장할 수 없습니다. 복사본을 만드세요.");
       return false;
     }
     const params = editParams
@@ -280,7 +280,7 @@ export function StrategyBuilderPanel() {
         },
       });
       if (result === "locked") {
-        setMessage("원본 보호 전략은 저장할 수 없습니다. 복사본을 만드세요.");
+        setMessage("잠긴 전략은 저장할 수 없습니다. 복사본을 만드세요.");
         return;
       }
       if (result === "validation") {
@@ -378,9 +378,7 @@ export function StrategyBuilderPanel() {
   }
 
   async function runCompare() {
-    const ids = [selectedId, "SAFE_v44_i4060"].filter(
-      (v, i, a) => a.indexOf(v) === i,
-    );
+    const ids = [selectedId].filter(Boolean);
     const res = await fetch("/api/rextora/strategies/compare", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -428,7 +426,7 @@ export function StrategyBuilderPanel() {
   }
 
   function statusBadge(s: StoredStrategy) {
-    if (s.locked) return <Badge tone="warning">원본 보호 전략</Badge>;
+    if (s.locked) return <Badge tone="warning">잠긴 전략</Badge>;
     if (isSearchStrategy(s)) return <Badge tone="info">탐색 합격 전략</Badge>;
     if (s.liveEligible) return <Badge tone="success">사용 가능</Badge>;
     return <Badge>검증 필요</Badge>;
@@ -443,15 +441,6 @@ export function StrategyBuilderPanel() {
           data-testid="strategy-unsaved-banner"
         >
           저장되지 않은 변경이 있습니다.
-        </div>
-      )}
-      {isLocked && (
-        <div
-          className="rounded-lg border border-orange-500/40 bg-orange-500/10 p-3 text-sm text-orange-100"
-          data-testid="strategy-locked-hint"
-        >
-          원본 보호 전략입니다. 값을 확인할 수 있지만 직접 수정·삭제할 수
-          없습니다. 복사본 전략을 만들어 편집하세요.
         </div>
       )}
 
@@ -702,11 +691,11 @@ export function StrategyBuilderPanel() {
           {step === 0 && (
             <Card title="1. 전략 선택">
               <p className="mb-3 text-sm text-slate-400">
-                원본 보호 전략을 복사하거나, 내 복사본·새 전략을 선택하세요.
+                기존 전략을 복사하거나, 내 전략·새 전략을 선택하세요.
               </p>
               <div className="mb-3 grid gap-2 md:grid-cols-5">
                 {[
-                  "SAFE 원본 선택",
+                  "전략 선택",
                   "복사본 만들기",
                   "백테스트 검증",
                   "모의 매매 적용",
@@ -722,8 +711,8 @@ export function StrategyBuilderPanel() {
                 ))}
               </div>
               <p className="mb-3 text-sm text-slate-300">
-                SAFE 원본은 수정할 수 없습니다. 먼저 복사한 뒤 백테스트 → 모의
-                매매 → 실전 후보 순서로 검증하세요.
+                전략을 선택한 뒤 백테스트 → 모의 매매 → 실전 후보 순서로
+                검증하세요.
               </p>
               <div className="grid gap-3 md:grid-cols-2">
                 <label className="text-sm text-slate-300">
@@ -762,7 +751,7 @@ export function StrategyBuilderPanel() {
                   label="전략 구분"
                   value={
                     isLocked
-                      ? "SAFE 원본"
+                      ? "잠긴 전략"
                       : isSearchStrategy(selected)
                         ? "탐색 합격 전략"
                         : "사용자 복사 전략"
@@ -772,7 +761,7 @@ export function StrategyBuilderPanel() {
                   label="출처"
                   value={
                     isLocked
-                      ? "원본 보호"
+                      ? "잠김"
                       : isSearchStrategy(selected)
                         ? "전략 탐색"
                         : "사용자"
@@ -790,7 +779,7 @@ export function StrategyBuilderPanel() {
               {isSearchStrategy(selected) ? (
                 <p className="mt-3 text-sm text-slate-400">
                   전략 탐색에서 등록된 합격 후보입니다. 백테스트·모의·실전 후보는
-                  별도 단계에서만 진행됩니다. 원본 SAFE와는 다른 전략입니다.
+                  별도 단계에서만 진행됩니다.
                 </p>
               ) : null}
             </Card>
@@ -836,7 +825,7 @@ export function StrategyBuilderPanel() {
               />
               {isLocked && (
                 <p className="mt-2 text-xs text-slate-400">
-                  원본 SAFE는 조건 트리 대신 확인된 파라미터로 동작합니다.
+                  이 전략은 조건 트리 대신 확인된 파라미터로 동작합니다.
                   아래에서 파라미터를 확인하세요.
                 </p>
               )}
@@ -978,11 +967,7 @@ export function StrategyBuilderPanel() {
 
           {advanced && (
             <Card
-              title={
-                isLocked
-                  ? "고급 설정 · 원본 파라미터"
-                  : "고급 설정 · SAFE 파라미터"
-              }
+              title="고급 설정 · 파라미터"
             >
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {catalog.map((entry) => {

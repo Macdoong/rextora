@@ -430,7 +430,7 @@ describe("strategySearch candidateEvaluator", () => {
   it("zero required windows short-circuit before stress and jitter", async () => {
     const stressSpy = vi.spyOn(costStress, "evaluateCostStress");
     const jitterSpy = vi.spyOn(jitter, "evaluateCandidateJitter");
-    const before = fs.readFileSync(SAFE_PATH);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const cand = candidate();
     const candSnap = structuredClone(cand);
     const optionalOnly: StrategySearchEvaluationWindowPlan[] = [
@@ -467,11 +467,7 @@ describe("strategySearch candidateEvaluator", () => {
     expect(jitterSpy).not.toHaveBeenCalled();
     expect(cand).toEqual(candSnap);
     expect(optionalOnly).toEqual(winSnap);
-    expect(Buffer.compare(before, fs.readFileSync(SAFE_PATH))).toBe(0);
-    expect(
-      (JSON.parse(fs.readFileSync(SAFE_PATH, "utf8")) as { params_hash: string })
-        .params_hash,
-    ).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("public complete path cannot inject a runtime cost_guard_k override", async () => {
@@ -576,7 +572,7 @@ describe("strategySearch candidateEvaluator", () => {
     const cSnap = structuredClone(c);
     const jcSnap = structuredClone(jc);
     const candleSnap = structuredClone(preloadMap);
-    const before = fs.readFileSync(SAFE_PATH);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     const beforeNames = new Set(fs.readdirSync(STRATEGIES_DIR));
     const saveSpy = vi.spyOn(strategyStore, "saveStrategy");
     const updateSpy = vi.spyOn(strategyStore, "updateStrategyLastBacktest");
@@ -610,12 +606,7 @@ describe("strategySearch candidateEvaluator", () => {
         String(call[0]).includes(`${path.sep}strategies${path.sep}`),
       ),
     ).toHaveLength(0);
-    const after = fs.readFileSync(SAFE_PATH);
-    expect(Buffer.compare(before, after)).toBe(0);
-    expect(
-      (JSON.parse(after.toString("utf8")) as { params_hash: string })
-        .params_hash,
-    ).toBe("7893ca3f0e30");
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(new Set(fs.readdirSync(STRATEGIES_DIR))).toEqual(beforeNames);
   });
 });

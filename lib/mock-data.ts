@@ -13,7 +13,7 @@ import {
   scalpingDashboardSeed
 } from "@/src/lib/rextora/seedData";
 
-export const safeBaselineStrategy = preservedStrategies[0];
+export const sampleStrategy = preservedStrategies[0];
 export const strategies = preservedStrategies;
 export const defaultRiskStatus = riskStatusSeed;
 export const defaultApiStatus = getApiStatus();

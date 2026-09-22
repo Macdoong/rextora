@@ -265,7 +265,7 @@ export function routeConversationTurn(
       requestedWriteTools: [],
       requiresApproval: false,
       answerIntent: "safe_mutation_refusal",
-      reason: "protected SAFE strategy mutation requested",
+      reason: "retired SAFE identity mutation requested",
       legacyIntent: "modify_safe",
       clarificationQuestionKo: null,
       providerExpected: false,

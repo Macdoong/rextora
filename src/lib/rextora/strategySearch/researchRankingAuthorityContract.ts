@@ -10,6 +10,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { productionReadonlyHashes } from "../backtest/backtestCostAssumptionsDiagnosis";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
 import { isBetterScore } from "./jobStatistics";
 import { isPatternCandidateParams } from "./patternSearchSpaces";
 import type { StrategySearchBestCandidateReference } from "./types";
@@ -1055,7 +1056,7 @@ export function productionSafetySnapshot(cwd = process.cwd()) {
   const hashes = productionReadonlyHashes(cwd);
   return {
     ...hashes,
-    safeSha256Now: sha256File(path.join(cwd, "data/strategies/SAFE_v44_i4060.json")),
+    safeSha256Now: sha256File(path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME)),
     researchExecutions: 0,
     paperLiveActions: 0,
     orders: 0,

@@ -126,7 +126,7 @@ export function getUnifiedMetrics(): UnifiedMetricsSnapshot {
 
   const strategy = getPaperActiveStrategy();
   const strategyReturnPct =
-    strategy.lastBacktest?.totalReturn != null
+    strategy?.lastBacktest?.totalReturn != null
       ? Number((strategy.lastBacktest.totalReturn * 100).toFixed(2))
       : null;
 

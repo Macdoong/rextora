@@ -28,13 +28,13 @@ import {
   writeP3A51Artifacts,
 } from "../src/lib/rextora/backtest/backtestSlippageModelDiagnosis";
 import { productionReadonlyHashes } from "../src/lib/rextora/backtest/backtestCostAssumptionsDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
 
 const ROOT = process.cwd();
 const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
 const hashesBefore = productionReadonlyHashes(ROOT);
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -299,14 +299,8 @@ describe("P3-A5.1 slippage execution model diagnosis", () => {
     expect(safety.orders).toBe(0);
   });
 
-  it("40. SAFE unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
-    expect(
-      (JSON.parse(readFileSync(SAFE_PATH, "utf8")) as { params_hash: string })
-        .params_hash,
-    ).toBe(EXPECTED_SAFE_PARAMS_HASH);
+  it("40. retired SAFE file remains absent", () => {
+    expect(sha256(SAFE_PATH)).toBeNull();
   });
 
   it("artifacts written and trigger/ledger decisions recorded", () => {

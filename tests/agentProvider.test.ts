@@ -37,8 +37,7 @@ describe("safetyGuard: write-blocking", () => {
   it("blocks modify_safe with specific Korean message", () => {
     const result = checkIntentSafety("modify_safe");
     expect(result.allowed).toBe(false);
-    expect(result.reasonKo).toContain("SAFE");
-    expect(result.reasonKo).toContain("수정");
+    expect(result.reasonKo).toMatch(/폐기|사용할 수 없습니다/);
   });
 
   it("blocks execute_trade with approval message", () => {

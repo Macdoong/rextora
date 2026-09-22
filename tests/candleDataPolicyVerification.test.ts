@@ -5,7 +5,7 @@
 
 import { afterAll, describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateCandleSpacing } from "../src/lib/rextora/data/timeframes";
 import {
@@ -14,7 +14,6 @@ import {
   CODE_BASED_CLASSIFICATION_SUPPORTED,
   DEFENSIVE_SECONDARY_VALIDATION_LOCATION,
   EXPECTED_GIT_HEAD,
-  EXPECTED_SAFE_PARAMS_HASH,
   EXPECTED_SAFE_SHA256,
   EXPLICIT_PRODUCT_GAP_POLICY_FOUND,
   OPEN_TIME_TRANSFORM,
@@ -40,10 +39,8 @@ import {
 import { generateSyntheticCandles } from "../src/lib/rextora/data/ohlcvTypes";
 import { classifyEngineError } from "../src/lib/rextora/strategySearch/engineErrorClassification";
 import { StrategySearchAdapterError } from "../src/lib/rextora/strategySearch/backtestAdapter";
-import {
-  EXPECTED_SAFE_PARAMS_HASH as LOCKED_SAFE_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const INTERVAL_15M = 900_000;
 const researchIndexBefore = sha256("data/rextora/strategy-search/index.json");
@@ -244,7 +241,8 @@ describe("P3-A3.1 candle data policy verification", () => {
   });
 
   it("21. no production write", () => {
-    expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA256);
+    expect(existsSync(SAFE_PATH)).toBe(false);
+    expect(sha256File(SAFE_PATH)).toBeNull();
     expect(sha256File("data/rextora/strategy-search/index.json")).toBe(
       researchIndexBefore,
     );
@@ -262,10 +260,11 @@ describe("P3-A3.1 candle data policy verification", () => {
     expect(hashes.orders).toBe(0);
   });
 
-  it("24. SAFE unchanged", () => {
-    expect(SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
-    expect(LOCKED_SAFE_HASH).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA256);
+  it("24. retired SAFE file is not present", () => {
+    expect(RETIRED_SAFE_STRATEGY_ID).toBe("SAFE_v44_i4060");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(existsSync(SAFE_PATH)).toBe(false);
+    expect(sha256File(SAFE_PATH)).toBeNull();
   });
 
   it("live provider grid probe (read-only public klines)", async () => {

@@ -1,5 +1,4 @@
 import type { SafeV44Params, StoredStrategy, StrategyTimeframe } from "../strategyTypes";
-import { SAFE_STRATEGY_ID } from "../strategyTypes";
 import { computeParamsHash, computeStrategyHash } from "../strategyHash";
 import {
   STRATEGY_SCHEMA_VERSION,
@@ -40,7 +39,7 @@ export function storedToDefinition(s: StoredStrategyV1): CanonicalStrategyDefini
     description: s.description,
     version: s.version ?? "1.0.0",
     strategyType: kind,
-    sourceStrategyId: s.sourceStrategyId ?? (s.id === SAFE_STRATEGY_ID ? null : s.sourceStatus === "user_copy" ? SAFE_STRATEGY_ID : null),
+    sourceStrategyId: s.sourceStrategyId ?? null,
     locked: s.locked,
     createdAt: s.createdAt,
     updatedAt: s.updatedAt,

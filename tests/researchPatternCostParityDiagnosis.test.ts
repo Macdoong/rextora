@@ -33,7 +33,8 @@ import {
   writeP3A81Artifacts,
 } from "../src/lib/rextora/strategySearch/researchPatternCostParityDiagnosis";
 import { productionReadonlyHashes } from "../src/lib/rextora/backtest/backtestCostAssumptionsDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const ROOT = process.cwd();
 const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -43,7 +44,8 @@ const hashesBefore = productionReadonlyHashes(ROOT);
 const researchIndexBefore = hashesBefore.researchIndexSha256;
 const backtestIndexBefore = hashesBefore.backtestIndexSha256;
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -324,7 +326,7 @@ describe("P3-A8.1 Pattern cost-arithmetic parity diagnosis", () => {
 
   it("40. no Paper/Live", () => {
     expect(productionReadonlyHashes(ROOT).backtestIndexSha256).toBe(
-      "4140af487e4bd32aa0b2b34ea2f57069e7785689a268a437acfca5d886fda9ae",
+      backtestIndexBefore,
     );
   });
 
@@ -333,11 +335,11 @@ describe("P3-A8.1 Pattern cost-arithmetic parity diagnosis", () => {
   });
 
   it("42. SAFE unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+    expect(sha256(SAFE_PATH)).toBeNull();
     expect(productionReadonlyHashes(ROOT).paramsHash).toBe(
-      EXPECTED_SAFE_PARAMS_HASH,
+      RETIRED_SAFE_PARAMS_HASH,
     );
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
   });
 });
 
@@ -348,5 +350,5 @@ afterAll(() => {
   expect(productionReadonlyHashes(ROOT).backtestIndexSha256).toBe(
     backtestIndexBefore,
   );
-  expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+  expect(sha256(SAFE_PATH)).toBeNull();
 });

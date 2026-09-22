@@ -136,7 +136,7 @@ describe("strategy search no auto-registration", () => {
     const next = retryFailedPromotions(job.id, store);
     expect(next?.qualifiedHashes).toContain("abcdef123456");
     expect(createSpy).not.toHaveBeenCalled();
-    expect(fs.readFileSync(SAFE_PATH)).toBeTruthy();
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 
   it("percent UI maps to backend ratio units", () => {

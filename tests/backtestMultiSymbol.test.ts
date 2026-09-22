@@ -16,13 +16,20 @@ import {
   exitCategoryBuckets,
   holdingBuckets,
 } from "../src/lib/rextora/backtest/visualAnalysis";
-import { ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
+import { createStrategy, ensureStrategyStore, saveStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import * as loader from "../src/lib/rextora/data/historicalCandleLoader";
 import { authedRequest } from "./helpers/authSession";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
 const isolatedStrategies = installIsolatedStrategyStore();
 ensureStrategyStore();
+const fixtureStrategy = saveStrategy(
+  createStrategy({
+    name: "fixture-multi-symbol",
+    timeframe: "15m",
+  }).id,
+  { symbols: ["BTCUSDT", "ETHUSDT", "SOLUSDT"] },
+);
 afterAll(() => {
   isolatedStrategies.cleanup();
 });
@@ -78,7 +85,7 @@ function mockOkLoad(seedBySymbol: Record<string, number>) {
 }
 
 const baseConfig = {
-  strategyId: "SAFE_v44_i4060",
+  strategyId: fixtureStrategy.id,
   timeframe: "15m",
   fromOpenTime: FROM,
   toOpenTime: TO,
@@ -196,7 +203,7 @@ describe("multi-symbol backtest preservation", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        strategyId: "SAFE_v44_i4060",
+        strategyId: fixtureStrategy.id,
         symbols: ["BTCUSDT", "ETHUSDT"],
         timeframe: "15m",
         fromOpenTime: FROM,
@@ -206,7 +213,7 @@ describe("multi-symbol backtest preservation", () => {
     }, "operator");
     const res = await POST(req);
     const json = await res.json();
-    expect(json.ok).toBe(true);
+    expect(json.ok, json.error ?? json.code ?? JSON.stringify(json)).toBe(true);
     expect(json.data.symbolResults).toHaveLength(2);
     expect(json.data.symbolResults[0].symbol).toBe("BTCUSDT");
     expect(json.data.symbolResults[1].symbol).toBe("ETHUSDT");
@@ -302,7 +309,7 @@ describe("distribution and holding reconciliation", () => {
     }
 
     expect(result.report.strategyHash).toHaveLength(64);
-    expect(result.report.sourceParamsHash).toBe("7893ca3f0e30");
+    expect(result.report.sourceParamsHash).toBe(fixtureStrategy.paramsHash);
   });
 });
 

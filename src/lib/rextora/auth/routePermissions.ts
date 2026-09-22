@@ -45,7 +45,7 @@ export const MUTATION_ROUTE_PERMISSIONS: MutationRoutePermission[] = [
   { method: "POST", path: "/api/rextora/strategy-search/[jobId]/promote", permission: "strategy:write", sourceFile: "app/api/rextora/strategy-search/[jobId]/promote/route.ts" },
   { method: "POST", path: "/api/rextora/strategy-search/[jobId]/raw-trials", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/[jobId]/raw-trials/route.ts" },
   { method: "DELETE", path: "/api/rextora/strategy-search/[jobId]", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/[jobId]/route.ts" },
-  { method: "POST", path: "/api/rextora/strategy-search/recover", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/recover/route.ts" },
+  { method: "POST", path: "/api/rextora/strategy-search/recover", permission: "action", sourceFile: "app/api/rextora/strategy-search/recover/route.ts" },
   { method: "POST", path: "/api/rextora/strategy-search/follow-up", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/follow-up/route.ts" },
   { method: "POST", path: "/api/rextora/strategy-search/configs", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/configs/route.ts" },
   { method: "DELETE", path: "/api/rextora/strategy-search/configs/[name]", permission: "research:run", sourceFile: "app/api/rextora/strategy-search/configs/[name]/route.ts" },

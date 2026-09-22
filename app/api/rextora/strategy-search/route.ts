@@ -2,7 +2,10 @@ import {
   createStrategySearchJobApi,
   listStrategySearchJobsApi,
 } from "@/src/lib/rextora/strategySearch/jobApiService";
-import { denyUnlessPermitted, denyUnlessAuthenticated } from "@/src/lib/rextora/auth/requireUser";
+import {
+  requireAuthenticatedUser,
+  requirePermission,
+} from "@/src/lib/rextora/auth/requireUser";
 import {
   strategySearchError,
   strategySearchJson,
@@ -10,8 +13,8 @@ import {
 
 /** GET /api/rextora/strategy-search — list newest jobs (default limit 20) */
 export async function GET(request: Request) {
-  const denied = await denyUnlessAuthenticated(request);
-  if (denied) return denied;
+  const auth = requireAuthenticatedUser(request);
+  if (!auth.ok) return auth.response;
 
   const start = Date.now();
   try {
@@ -33,6 +36,8 @@ export async function GET(request: Request) {
       offset,
       includeArchived,
       archivedOnly,
+      viewerUserId: auth.user.userId,
+      viewerRole: auth.user.role,
     });
     return strategySearchJson(data, Date.now() - start);
   } catch (err) {
@@ -42,12 +47,14 @@ export async function GET(request: Request) {
 
 /** POST /api/rextora/strategy-search — create job */
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "research:run");
-  if (denied) return denied;
+  const auth = requirePermission(request, "research:run");
+  if (!auth.ok) return auth.response;
   const start = Date.now();
   try {
     const body = await request.json().catch(() => null);
-    const data = createStrategySearchJobApi(body);
+    const data = createStrategySearchJobApi(body, {
+      ownerUserId: auth.user.userId,
+    });
     return strategySearchJson(data, Date.now() - start, { status: 201 });
   } catch (err) {
     return strategySearchError(err, Date.now() - start);

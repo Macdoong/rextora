@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/primitives";
+import { Button, ConfirmDialog } from "@/components/ui/primitives";
 import type { StrategySearchJobDetail } from "./types";
 import {
   formatCount,
@@ -17,6 +17,18 @@ import type { ResearchResultsSummaryView } from "./types";
 import { LifecycleNextActionsPanel } from "./LifecycleNextActionsPanel";
 import { ResearchRankingGroups } from "./ResearchRankingGroups";
 import { hasAuthoritativeRankingGroups } from "@/src/lib/rextora/researchRankingReadModel";
+import {
+  buildCompletedBacktestHref,
+  canShowQualifiedRegister,
+  canShowRecommendedRegister,
+  completedActionClass,
+  isValidCompletedBacktestHref,
+  resolveAuthoritativeQualifiedCount,
+  resolveCompletedBacktestHandoffCandidate,
+  resolveCompletedPrimaryAction,
+  resultsReviewAvailable,
+} from "./completionCustomerView";
+import { SearchJobExportMenu } from "./SearchJobExportMenu";
 
 function BigStat(props: {
   label: string;
@@ -26,15 +38,15 @@ function BigStat(props: {
 }) {
   return (
     <div
-      className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3"
+      className="ss-completion-metric rounded-xl px-4 py-3"
       data-testid={props.testId}
     >
-      <div className="ss-field-label text-emerald-100/80">{props.label}</div>
-      <div className="mt-1.5 text-xl font-semibold tabular-nums tracking-tight text-[var(--text-primary)]">
+      <div className="ss-completion-metric__label">{props.label}</div>
+      <div className="ss-completion-metric__value">
         {props.value}
       </div>
       {props.help ? (
-        <p className="mt-1 text-xs text-emerald-100/70">{props.help}</p>
+        <p className="ss-completion-metric__help">{props.help}</p>
       ) : null}
     </div>
   );
@@ -76,12 +88,16 @@ export function ResearchCompletionPanel(props: {
   onResume?: (() => void) | null;
   onRegisterBest?: (() => void) | null;
   onPromoteTop?: (() => void) | null;
+  onRegisterForBacktest?: ((iteration: number) => void) | null;
+  registeringForBacktest?: boolean;
   bestStrategyId?: string | null;
 }) {
   const { job, passCount, onNewResearch } = props;
   const [summary, setSummary] = useState<ResearchResultsSummaryView | null>(
     null,
   );
+  const [confirmPromote, setConfirmPromote] = useState(false);
+  const [confirmBacktestRegister, setConfirmBacktestRegister] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -158,13 +174,64 @@ export function ResearchCompletionPanel(props: {
     job.statistics?.evaluated ??
     job.completedIterations;
   const counts = summary?.counts;
-  const qualified = counts?.qualifiedStrategies ?? passCount;
+  const qualified = resolveAuthoritativeQualifiedCount({
+    summaryQualified: counts?.qualifiedStrategies,
+    jobQualifiedCount: job.qualifiedCount,
+    trialPageCount: passCount,
+  });
   const registered = counts?.registeredStrategies ?? 0;
   const recommendable = counts?.recommendationEligibleStrategies ?? null;
   const backtestRec = counts?.backtestRecommendedStrategies ?? null;
   const top10Saved = counts?.top10Saved ?? null;
   const finalEligible = counts?.stageFinalRecommendable ?? null;
-  const usable = outcome?.usable ?? passCount > 0;
+  const usable = outcome?.usable ?? (passCount > 0 || qualified > 0);
+  const reviewAvailable = resultsReviewAvailable({
+    usable,
+    usableForHandoff,
+  });
+  const showRecommendedRegister = canShowRecommendedRegister({
+    recommendable,
+    finalEligible,
+    hasPromoteHandler: Boolean(props.onPromoteTop),
+  });
+  const showQualifiedRegister = canShowQualifiedRegister({
+    qualifiedCount: qualified,
+    hasRegisterHandler: Boolean(props.onRegisterBest),
+  });
+  const handoffCandidate = resolveCompletedBacktestHandoffCandidate(
+    summary
+      ? {
+          rankingGroups: summary.rankingGroups ?? job.rankingGroups,
+          topRecommend: summary.topRecommend,
+          backtestRecommendations: summary.backtestRecommendations,
+          representatives: summary.representatives,
+          symbol: summary.symbol || job.config.symbols[0],
+          timeframe: summary.timeframe || job.config.timeframe,
+        }
+      : null,
+  );
+  const registeredBacktestHref =
+    handoffCandidate?.registeredStrategyId
+      ? buildCompletedBacktestHref({
+          strategyId: handoffCandidate.registeredStrategyId,
+          sourceParamsHash: handoffCandidate.paramsHash,
+          symbol: handoffCandidate.symbol,
+          timeframe: handoffCandidate.timeframe,
+          sourceResearchJobId: job.id,
+          sourceTrialIteration: handoffCandidate.iteration,
+          sourceClusterId: handoffCandidate.clusterId,
+        })
+      : null;
+  const backtestAvailable =
+    handoffCandidate != null &&
+    (Boolean(registeredBacktestHref) ||
+      Boolean(props.onRegisterForBacktest));
+  const primaryAction = resolveCompletedPrimaryAction({
+    showRecommendedRegister,
+    showQualifiedRegister,
+    backtestAvailable,
+    reviewAvailable,
+  });
 
   const topEntries = (job.liveTop10?.entries ?? []).slice(0, 3);
   const mergedTop = topEntries.map((row) => ({
@@ -176,50 +243,81 @@ export function ResearchCompletionPanel(props: {
     Boolean(props.onResume) &&
     (job.status === "paused" || job.retryable === true);
 
+  const marketSymbol = job.config.symbols[0] ?? "—";
+  const marketTimeframe = job.config.timeframe || "—";
   return (
     <section
-      className="rextora-card space-y-5 border border-emerald-500/30 bg-emerald-500/5 p-6"
+      className="ss-completion-hero rextora-card space-y-5 p-6"
       data-testid="ss-research-completion"
       aria-labelledby="ss-research-completion-title"
     >
-      {/* 1. Completion Header */}
-      <div>
-        <h3 id="ss-research-completion-title" className="ss-section-title">
+      <header className="ss-completion-hero__head">
+        <p className="ss-completion-hero__mark" aria-hidden="true">
+          ✓
+        </p>
+        <h3 id="ss-research-completion-title" className="ss-completion-hero__title">
           {title}
         </h3>
+        <p className="ss-completion-hero__market">
+          {marketSymbol} · {marketTimeframe}
+          {elapsed ? ` · ${elapsed}` : ""}
+        </p>
         <p
-          className="mt-1.5 text-sm text-emerald-100"
+          className="ss-completion-hero__status"
           data-testid="ss-completion-status-line"
         >
           {detail ?? status}
           {reason && !/USER_|cancelled|summary\./i.test(reason)
             ? ` · ${reason}`
             : ""}
-          {elapsed ? ` · ${elapsed}` : ""}
         </p>
         <p
-          className="mt-1 text-sm text-emerald-50/90"
+          className="ss-completion-hero__note"
           data-testid="ss-completion-result-equation"
         >
           {usable
-            ? "결과가 보존되었습니다. 합격 trial은 등록과 별개입니다."
+            ? "결과가 보존되었습니다. 통과 후보는 라이브러리 등록과 별개입니다."
             : "사용 가능한 합격 결과가 없습니다."}
         </p>
-      </div>
+      </header>
 
-      {/* 2. Key Result Summary — max 6 */}
+      <ol className="ss-completion-pipe" data-testid="ss-completion-pipeline">
+        <li>
+          <span>평가</span>
+          <strong>{formatCount(tested)}</strong>
+        </li>
+        <li aria-hidden="true" className="ss-completion-pipe__line" />
+        <li>
+          <span>통과 후보</span>
+          <strong>{formatCount(qualified)}</strong>
+        </li>
+        <li aria-hidden="true" className="ss-completion-pipe__line" />
+        <li>
+          <span>최종 적격</span>
+          <strong>
+            {finalEligible != null
+              ? formatCount(finalEligible)
+              : recommendable != null
+                ? formatCount(recommendable)
+                : formatCount(0)}
+          </strong>
+        </li>
+      </ol>
+
       <div
-        className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+        className="ss-completion-metrics grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
         data-testid="ss-completion-primary-metrics"
       >
         <BigStat
           label="평가"
           value={`${formatCount(tested)}개`}
+          help="실제 평가가 끝난 전략 수입니다."
           testId="ss-completion-tested"
         />
         <BigStat
-          label="기본 합격"
+          label="통과 후보"
           value={`${formatCount(qualified)}개`}
+          help="자격 기준을 통과한 전략 수입니다. 목록 페이지 제한과 다릅니다."
           testId="ss-completion-approved"
         />
         <BigStat
@@ -231,18 +329,21 @@ export function ResearchCompletionPanel(props: {
                 ? `${formatCount(recommendable)}개`
                 : "0개"
           }
+          help="추천 가능하면서 비용 스트레스까지 통과한 대표 전략 수입니다. 그룹별 최종 추천(각 전략군에서 자격을 통과한 대표)과 다른 계약입니다."
           testId="ss-completion-final-eligible"
         />
         <BigStat
-          label="TOP 10"
+          label="저장 후보 목록"
           value={
             top10Saved != null ? `${formatCount(top10Saved)}개` : "0개"
           }
+          help="저장된 최종 후보 목록 크기입니다. 그룹별 추천과 별개입니다."
           testId="ss-completion-top10-saved"
         />
         <BigStat
           label="등록"
           value={`${formatCount(registered)}개`}
+          help="전략 라이브러리에 이미 등록된 수입니다."
           testId="ss-completion-registered"
         />
         <BigStat
@@ -250,24 +351,26 @@ export function ResearchCompletionPanel(props: {
           value={
             backtestRec != null ? `${formatCount(backtestRec)}개` : "0개"
           }
+          help="새 기간 백테스트로 넘길 수 있는 추천 대표 전략 수입니다."
           testId="ss-completion-backtest-rec"
         />
       </div>
 
-      {/* 3. Final Top 3 — only when qualified; else temporary non-qualified best */}
       {hasAuthoritativeRankingGroups(job) ? (
         <div data-testid="ss-completion-ranking-groups">
-          <div className="ss-field-label text-emerald-100/80">그룹별 최종 추천</div>
+          <h4 className="ss-completion-subhead">그룹별 최종 추천</h4>
+          <p className="ss-completion-guidance" data-testid="ss-group-rec-contract">
+            통과 후보는 자격 기준을 통과한 전략입니다. 최종 적격은 그 위에서 추천·비용 필터를 통과한 대표입니다. 그룹별 최종 추천은 각 전략군 안에서 자격을 통과한 대표이며, 최종 적격 수와 같지 않을 수 있습니다.
+          </p>
           <ResearchRankingGroups
             source={job}
             unknownLegacy={job.unknownLegacy}
+            operatorFacing
           />
         </div>
       ) : qualified > 0 && mergedTop.length > 0 ? (
         <div data-testid="ss-completion-final-top3">
-          <div className="ss-field-label text-emerald-100/80">
-            기존 평가 형식 · 최종 TOP 3
-          </div>
+          <h4 className="ss-completion-subhead">기존 평가 형식 · 최종 TOP 3</h4>
           <ul className="mt-2 space-y-2">
             {mergedTop.map((row) => (
               <li
@@ -304,10 +407,8 @@ export function ResearchCompletionPanel(props: {
       ) : qualified === 0 &&
         (job.currentBestSummary || mergedTop.length > 0) ? (
         <div data-testid="ss-completion-temporary-best">
-          <div className="ss-field-label text-amber-100/90">
-            임시 평가 상위 후보 — 합격 아님
-          </div>
-          <p className="mt-1 text-sm text-slate-300">
+          <h4 className="ss-completion-subhead">임시 평가 상위 후보 — 합격 아님</h4>
+          <p className="mt-1 text-sm ss-completion-guidance">
             {cleanStrategyDisplayName(job.currentBestSummary) ||
               (mergedTop[0]
                 ? cleanStrategyDisplayName(mergedTop[0].displayAlias) ||
@@ -317,64 +418,85 @@ export function ResearchCompletionPanel(props: {
         </div>
       ) : null}
 
-      {/* 4. Primary next action */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href={resultsHref}
-          className={`ss-btn-primary inline-flex items-center rounded-lg border px-4 py-3 text-base font-semibold ${
-            usableForHandoff || usable
-              ? "border-emerald-400/60 bg-emerald-500/30 text-emerald-50 ring-2 ring-emerald-400/40"
-              : "border-emerald-500/40 bg-emerald-500/20 text-emerald-50"
-          }`}
-          data-testid="ss-completion-open-results"
-        >
-          최종 TOP 10 검토
-        </Link>
-        {(usableForHandoff || usable) ? (
+      <div className="ss-completion-actions">
+        {reviewAvailable ? (
+          <Link
+            href={resultsHref}
+            className={completedActionClass("review_results", primaryAction)}
+            data-testid="ss-completion-open-results"
+          >
+            이 탐색 결과
+          </Link>
+        ) : (
+          <span
+            className="ss-btn-primary is-disabled"
+            aria-disabled="true"
+            data-testid="ss-completion-open-results"
+          >
+            이 탐색 결과
+          </span>
+        )}
+        {showRecommendedRegister ? (
+          <Button
+            type="button"
+            className={completedActionClass("register_recommended", primaryAction)}
+            data-testid="ss-completion-promote-top"
+            onClick={() => setConfirmPromote(true)}
+          >
+            추천 후보 등록
+          </Button>
+        ) : null}
+        {showQualifiedRegister ? (
+          <Button
+            type="button"
+            className={completedActionClass("register_qualified", primaryAction)}
+            data-testid="ss-completion-register"
+            onClick={props.onRegisterBest ?? undefined}
+          >
+            통과 후보 등록
+          </Button>
+        ) : null}
+        {reviewAvailable ? (
           <p
-            className="text-sm text-emerald-100/80"
+            className="ss-completion-guidance"
             data-testid="ss-completion-handoff-hint"
           >
-            자동 이동하지 않습니다.
+            검토 후 다음 단계를 직접 선택합니다.
           </p>
         ) : null}
       </div>
 
-      {/* 5. Secondary actions */}
-      <div className="flex flex-wrap gap-2">
-        {passCount > 0 && props.onPromoteTop ? (
-          <Button
-            type="button"
-            className="ss-btn-primary"
-            data-testid="ss-completion-promote-top"
-            onClick={props.onPromoteTop}
-          >
-            추천 전략 등록
-          </Button>
+      <div className="ss-completion-actions ss-completion-actions--secondary">
+        {showQualifiedRegister && !showRecommendedRegister ? (
+          <p className="ss-completion-guidance" data-testid="ss-register-qualify-note">
+            통과 후보만 등록할 수 있습니다. 자격 미통과 최고 점수 후보는 등록하지 않습니다.
+          </p>
         ) : null}
-        {passCount > 0 && props.onRegisterBest ? (
-          <Button
-            type="button"
-            className="ss-btn-primary"
-            data-testid="ss-completion-register"
-            onClick={props.onRegisterBest}
-          >
-            최고 전략 등록
-          </Button>
-        ) : null}
-        {recommendable != null && recommendable > 0 ? (
+        {backtestAvailable &&
+        isValidCompletedBacktestHref(registeredBacktestHref) &&
+        registeredBacktestHref ? (
           <Link
-            href={`/backtest?sourceResearchJobId=${encodeURIComponent(job.id)}`}
-            className="ss-btn-primary inline-flex items-center rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sky-100"
+            href={registeredBacktestHref}
+            className={completedActionClass("backtest", primaryAction)}
             data-testid="ss-completion-backtest-recommended"
           >
             새 기간으로 백테스트
           </Link>
+        ) : backtestAvailable && handoffCandidate ? (
+          <Button
+            type="button"
+            className={completedActionClass("backtest", primaryAction)}
+            data-testid="ss-completion-backtest-recommended"
+            disabled={props.registeringForBacktest === true}
+            onClick={() => setConfirmBacktestRegister(true)}
+          >
+            새 기간으로 백테스트
+          </Button>
         ) : null}
         {canResume ? (
           <Button
             type="button"
-            className="ss-btn-primary"
+            className="ss-btn-secondary"
             data-testid="ss-completion-resume"
             onClick={() => props.onResume?.()}
           >
@@ -383,25 +505,23 @@ export function ResearchCompletionPanel(props: {
         ) : null}
         <Button
           type="button"
-          variant="ghost"
-          className="ss-btn-primary"
+          className={completedActionClass("new_search", primaryAction)}
           data-testid="ss-completion-new-research"
           onClick={onNewResearch}
         >
           새 탐색 시작
         </Button>
+        <SearchJobExportMenu jobId={job.id} status={job.status} />
       </div>
 
-      {/* 6. Lifecycle Progress — compact */}
       {usable && counts ? (
         <div data-testid="ss-completion-lifecycle">
-          <LifecycleNextActionsPanel counts={counts} compact />
+          <LifecycleNextActionsPanel counts={counts} />
         </div>
       ) : null}
 
-      {/* 7. Research details — collapsed */}
       <details
-        className="text-xs text-emerald-100/70"
+        className="ss-completion-research-detail"
         data-testid="ss-completion-details"
       >
         <summary className="cursor-pointer select-none">연구 상세</summary>
@@ -457,26 +577,38 @@ export function ResearchCompletionPanel(props: {
         </div>
       </details>
 
-      {/* 8. Technical details — collapsed */}
-      <details
-        className="text-xs text-emerald-100/60"
-        data-testid="ss-completion-tech-details"
-      >
-        <summary className="cursor-pointer select-none">개발자 정보</summary>
-        <div className="mt-2 space-y-1 font-mono">
-          <p>jobId: {job.id}</p>
-          <p>status: {job.status}</p>
-          {job.completionReason ? (
-            <p>completionReason: {job.completionReason}</p>
-          ) : null}
-          {job.terminationReason ? (
-            <p>terminationReason: {job.terminationReason}</p>
-          ) : null}
-          {summary?.finalizedBest?.paramsHash ? (
-            <p>finalizedHash: {summary.finalizedBest.paramsHash}</p>
-          ) : null}
-        </div>
-      </details>
+      {showRecommendedRegister ? (
+        <ConfirmDialog
+          open={confirmPromote}
+          title="추천 후보 등록"
+          description="추천 자격이 있는 후보를 최대 10개까지 전략 라이브러리에 등록합니다. 자격 미통과 최고 점수 후보는 포함하지 않습니다."
+          confirmLabel="등록"
+          cancelLabel="취소"
+          tone="success"
+          onCancel={() => setConfirmPromote(false)}
+          onConfirm={() => {
+            setConfirmPromote(false);
+            props.onPromoteTop?.();
+          }}
+        />
+      ) : null}
+      {handoffCandidate && !registeredBacktestHref ? (
+        <ConfirmDialog
+          open={confirmBacktestRegister}
+          title="새 기간으로 백테스트"
+          description="이 추천 후보를 전략 라이브러리에 등록한 뒤 백테스트를 엽니다. 이미 등록된 전략이면 그대로 사용합니다. 자격 미통과 최고 점수 후보는 등록하지 않습니다."
+          confirmLabel="등록 후 열기"
+          cancelLabel="취소"
+          tone="success"
+          loading={props.registeringForBacktest === true}
+          onCancel={() => setConfirmBacktestRegister(false)}
+          onConfirm={() => {
+            const iteration = handoffCandidate.iteration;
+            setConfirmBacktestRegister(false);
+            props.onRegisterForBacktest?.(iteration);
+          }}
+        />
+      ) : null}
     </section>
   );
 }

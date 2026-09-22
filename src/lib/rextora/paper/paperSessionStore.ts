@@ -18,7 +18,7 @@ import {
   getStrategyById,
   setPaperActiveStrategy,
 } from "../strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
+import { isRetiredSafeFileName, isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import {
   storedToDefinition,
   type StoredStrategyV1,
@@ -251,14 +251,14 @@ function upsertIndexRow(root: string, session: PaperSession): void {
   saveIndex(root, index);
 }
 
-function assertNotSafeFileWrite(filePath: string): void {
-  const base = path.basename(filePath).toLowerCase();
+function assertNotRetiredSafeFileWrite(filePath: string): void {
+  const base = path.basename(filePath);
   if (
-    base === `${SAFE_STRATEGY_ID.toLowerCase()}.json` ||
-    filePath.includes(`${path.sep}strategies${path.sep}${SAFE_STRATEGY_ID}`)
+    isRetiredSafeFileName(base) ||
+    isRetiredSafeId(base.replace(/\.json$/i, ""))
   ) {
     throw new PaperSessionError(
-      "paper session store must never write SAFE strategy file",
+      "paper session store must never write retired SAFE strategy file",
       "SAFE_WRITE_BLOCKED",
     );
   }
@@ -540,7 +540,7 @@ export function migratePaperSessionRecord(
 
 function persistSession(root: string, session: PaperSession): PaperSession {
   const fp = sessionPath(root, session.id);
-  assertNotSafeFileWrite(fp);
+  assertNotRetiredSafeFileWrite(fp);
   const normalized: PaperSession = {
     ...session,
     schemaVersion: PAPER_SESSION_SCHEMA_VERSION,

@@ -51,6 +51,7 @@ import { buildPatternEventSequence } from "../src/lib/rextora/strategySearch/pat
 const SAFE = path.join(process.cwd(), "data", "strategies", "SAFE_v44_i4060.json");
 
 function sha256Snippet(file: string): { size: number; head: string } {
+  if (!fs.existsSync(file)) return { size: 0, head: "" };
   const buf = fs.readFileSync(file);
   return { size: buf.length, head: buf.subarray(0, 32).toString("hex") };
 }
@@ -668,14 +669,9 @@ describe("pattern settings → engine traceability", () => {
     ]);
   });
 
-  it("20. SAFE remains unchanged", () => {
-    const after = sha256Snippet(SAFE);
-    expect(after.size).toBe(safeBefore.size);
-    expect(after.head).toBe(safeBefore.head);
-    const json = JSON.parse(fs.readFileSync(SAFE, "utf8")) as {
-      params_hash?: string;
-    };
-    expect(json.params_hash).toBe("7893ca3f0e30");
+  it("20. retired SAFE file remains absent", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
+    expect(sha256Snippet(SAFE)).toEqual({ size: 0, head: "" });
   });
 
   it("institutional OB quality fields reach pattern_creation", () => {

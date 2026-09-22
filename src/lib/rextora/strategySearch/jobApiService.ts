@@ -5,6 +5,12 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
+import { canReadStrategySearchResource, legacyOwnershipMarker } from "../auth/searchResourceAccess";
+import {
+  sanitizeRecentActivityEvents,
+  type StrategySearchActivityEvent,
+} from "./activityTelemetry";
 import {
   readRunnerPayloadFromCheckpoint,
 } from "./jobCheckpoint";
@@ -63,7 +69,6 @@ import {
   STRATEGY_SEARCH_HISTORY_VISIBLE_DEFAULT,
   compareJobsNewestFirst,
   manualDeleteBlockMessageKo,
-  runHistoryRetentionAfterCreate,
   type ManualDeleteBlockReason,
 } from "./historyRetention";
 import {
@@ -198,6 +203,9 @@ export interface StrategySearchJobSummary {
   accumulatedInterruptionMs?: number | null;
   recoveryBlocker?: string | null;
   resumedAtMs?: number | null;
+  ownerUserId?: string | null;
+  legacyUnspecifiedOwner?: boolean;
+  ownershipLabelKo?: string | null;
   expectedCompletionAtMs?: number | null;
   maxIterations: number | null;
   completedIterations: number;
@@ -273,7 +281,21 @@ export interface StrategySearchJobSummary {
   depthProfile?: string | null;
   qualificationProfile?: string | null;
   qualifiedTarget?: number | null;
+  /**
+   * Campaign/final qualified count from plan.qualifiedHashes.
+   * Distinct from statistics.passed (gate-pass count).
+   */
   qualifiedCount?: number | null;
+  /** Live checkpoint statistics.evaluated. */
+  evaluatedCount?: number | null;
+  /** Live checkpoint statistics.passed (complete evaluation gates). */
+  gatePassedCount?: number | null;
+  /** Live checkpoint statistics.failed. */
+  rejectedCount?: number | null;
+  /** Live checkpoint statistics.errors. */
+  errorCount?: number | null;
+  /** Bounded customer-safe live activity. Never includes params/hashes. */
+  recentActivityEvents?: StrategySearchActivityEvent[];
   uniqueEvaluatedCount?: number | null;
   duplicateSkippedCount?: number | null;
   exhaustedSpaceCount?: number | null;
@@ -578,6 +600,13 @@ function resolveStore(
   return options ?? defaultStoreOptionsForTests ?? undefined;
 }
 
+export function getSearchJobForApi(
+  jobId: string,
+  options?: StrategySearchStoreOptions,
+): StrategySearchJob | null {
+  return getSearchJob(jobId, resolveStore(options));
+}
+
 function mapCaught(err: unknown): never {
   if (err instanceof StrategySearchApiError) throw err;
   if (err instanceof StrategySearchApiValidationError) {
@@ -824,6 +853,8 @@ function summarizeJob(
           })()
         : null,
     resumedAtMs: plan?.resumedAtMs ?? null,
+    ownerUserId: job.ownerUserId ?? null,
+    ...legacyOwnershipMarker(job),
     expectedCompletionAtMs: expectedCompletionAtMs ?? null,
     maxIterations: job.config.maxIterations,
     completedIterations: job.checkpoint.completedIterations,
@@ -853,6 +884,13 @@ function summarizeJob(
     qualifiedTarget: plan?.qualifiedTarget ?? null,
     // Never fall back to statistics.passed — that is total PASS trials, not target-qualified.
     qualifiedCount: plan?.qualifiedHashes.length ?? 0,
+    evaluatedCount: statistics?.evaluated ?? null,
+    gatePassedCount: statistics?.passed ?? null,
+    rejectedCount: statistics?.failed ?? null,
+    errorCount: statistics?.errors ?? null,
+    recentActivityEvents: sanitizeRecentActivityEvents(
+      job.checkpoint.recentActivityEvents,
+    ),
     uniqueEvaluatedCount:
       plan?.uniqueEvaluatedCount ?? statistics?.evaluated ?? null,
     duplicateSkippedCount:
@@ -1242,7 +1280,7 @@ function detailJob(
 
 export function createStrategySearchJobApi(
   body: unknown,
-  options?: StrategySearchStoreOptions,
+  options?: StrategySearchStoreOptions & { ownerUserId?: string | null },
 ): StrategySearchJobDetail {
   try {
     const store = resolveStore(options);
@@ -1285,7 +1323,10 @@ export function createStrategySearchJobApi(
         }
       }
     }
-    const job = createSearchJob(config, store);
+    const job = createSearchJob(config, {
+      ...store,
+      ownerUserId: options?.ownerUserId ?? null,
+    });
     // Jitter ranges must match the search space. The UI/API create body uses a
     // SafeV44 placeholder (ema_fast); leaving it causes every pattern candidate
     // to fail jitter with UNKNOWN_PARAMETER and zero qualification.
@@ -1384,10 +1425,9 @@ export function createStrategySearchJobApi(
         store,
       );
     }
-    // Retention runs only after the new job is fully persisted.
-    // Cleanup failures are non-fatal and never roll back this create.
-    runHistoryRetentionAfterCreate(store);
     // Canonical create contract: return only after job + plan read-back succeed.
+    // Do not physically prune older completed research from the create path.
+    // Visible history is limited at list time; explicit delete remains manual.
     const readBack = getSearchJob(job.id, store);
     if (!readBack) {
       throw new StrategySearchApiError(
@@ -1421,6 +1461,8 @@ export function listStrategySearchJobsApi(
     includeArchived?: boolean;
     /** When true, only archived (non-restored) jobs are returned. */
     archivedOnly?: boolean;
+    viewerUserId?: string | null;
+    viewerRole?: import("../auth/authTypes").RextoraRole | null;
   },
 ): StrategySearchJobSummary[] {
   const offsetRaw = options?.offset;
@@ -1457,7 +1499,17 @@ export function listStrategySearchJobsApi(
     sourceJobs = listVisibleResearchJobs(store);
   }
 
-  return sourceJobs
+  const viewerUserId = options?.viewerUserId?.trim() || null;
+  const visibleJobs = viewerUserId
+    ? sourceJobs.filter((job) =>
+        canReadStrategySearchResource(
+          { userId: viewerUserId, role: options?.viewerRole ?? undefined },
+          job,
+        ),
+      )
+    : sourceJobs;
+
+  return visibleJobs
     .slice()
     .sort(compareJobsNewestFirst)
     .slice(offset, offset + limit)
@@ -1973,7 +2025,7 @@ export function getStrategySearchBestApi(
   }
 }
 
-/** Assert SAFE strategy file bytes for API tests / safeguards. */
+/** Retired identity probe. Never loads or privileges the historical SAFE file. */
 export function readProtectedSafeSnapshot(): {
   path: string;
   bytes: Buffer;
@@ -1984,17 +2036,7 @@ export function readProtectedSafeSnapshot(): {
     /* turbopackIgnore: true */ process.cwd(),
     "data",
     "strategies",
-    "SAFE_v44_i4060.json",
+    RETIRED_SAFE_FILE_NAME,
   );
-  const bytes = fs.readFileSync(safePath);
-  const json = JSON.parse(bytes.toString("utf8")) as {
-    name: string;
-    params_hash: string;
-  };
-  return {
-    path: safePath,
-    bytes,
-    name: json.name,
-    paramsHash: json.params_hash,
-  };
+  return { path: safePath, bytes: Buffer.alloc(0), name: "", paramsHash: "" };
 }

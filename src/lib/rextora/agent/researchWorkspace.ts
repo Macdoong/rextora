@@ -82,7 +82,6 @@ export async function buildResearchWorkspaceSummary(input?: {
     entities?.strategyLabel ??
     fv(btFacts, "전략 ID") ??
     fv(stratFacts, "모의매매 전략 이름") ??
-    fv(stratFacts, "SAFE 전략") ??
     null;
   const mdd = fv(btFacts, "최대 낙폭(MDD)");
   const totalReturn = fv(btFacts, "총 수익률");

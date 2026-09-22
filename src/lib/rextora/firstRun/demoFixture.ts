@@ -1,7 +1,6 @@
 /**
  * Deterministic demo fixture initializer.
- * Uses public store APIs where possible. Never touches SAFE.
- * Never starts Paper. Never marks Live eligible.
+ * Uses public store APIs where possible. Never starts Paper. Never marks Live eligible.
  * Idempotent: second call returns existing demo records.
  */
 
@@ -33,7 +32,7 @@ import {
   listStrategies,
   updateStrategyLastBacktest,
 } from "../strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../strategy/strategyTypes";
+import { isRetiredSafeId } from "../strategy/retiredSafeBaseline";
 import {
   listSavedBacktests,
   saveBacktestResult,
@@ -308,7 +307,7 @@ export function initializeDemoWorkspace(
         timeframe: "15m",
         params: { ema_fast: 16, ema_slow: 48 },
       });
-      if (created.id === SAFE_STRATEGY_ID || created.id !== DEMO_STRATEGY_ID) {
+      if (isRetiredSafeId(created.id) || created.id !== DEMO_STRATEGY_ID) {
         throw new Error("demo fixture refused unexpected strategy id");
       }
       strategyId = created.id;
@@ -458,7 +457,7 @@ export function initializeDemoWorkspace(
 }
 
 /**
- * Reset ONLY demo-owned records. Never deletes SAFE or real user data.
+ * Reset ONLY demo-owned records. Never deletes real user research data.
  */
 export function resetDemoWorkspace(
   options?: StrategySearchStoreOptions,
@@ -478,7 +477,7 @@ export function resetDemoWorkspace(
   ensureStrategyStore();
   for (const s of listStrategies()) {
     if (!isDemoStrategyRecord(s)) continue;
-    if (s.id === SAFE_STRATEGY_ID) continue;
+    if (isRetiredSafeId(s.id)) continue;
     try {
       deleteStrategy(s.id);
       removedStrategies += 1;

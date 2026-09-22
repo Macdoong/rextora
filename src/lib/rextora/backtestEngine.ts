@@ -1,19 +1,25 @@
 import { BACKTEST_SNAPSHOT_WARNING, backtestValidationSeed, dashboardDataSeed } from "./seedData";
-import { getStrategyById, getPreservedSafeStrategy } from "./strategyRepository";
+import { getStrategyById } from "./strategyRepository";
+import { isRetiredSafeId, NO_SELECTED_STRATEGY } from "./strategy/retiredSafeBaseline";
 
-export function getBacktestValidation(strategyId = "SAFE_v44_i4060") {
-  return (getStrategyById(strategyId) ?? getPreservedSafeStrategy()).validation;
+export function getBacktestValidation(strategyId?: string) {
+  if (!strategyId || isRetiredSafeId(strategyId)) {
+    throw new Error(NO_SELECTED_STRATEGY);
+  }
+  const strategy = getStrategyById(strategyId);
+  if (!strategy) throw new Error(NO_SELECTED_STRATEGY);
+  return strategy.validation;
 }
 
-export function getCostStressResults(strategyId = "SAFE_v44_i4060") {
+export function getCostStressResults(strategyId?: string) {
   return getBacktestValidation(strategyId).costStress;
 }
 
-export function getJitterResults(strategyId = "SAFE_v44_i4060") {
+export function getJitterResults(strategyId?: string) {
   return getBacktestValidation(strategyId).jitter;
 }
 
-export function getPeriodSplitResults(strategyId = "SAFE_v44_i4060") {
+export function getPeriodSplitResults(strategyId?: string) {
   const validation = getBacktestValidation(strategyId);
   return {
     recent_3m: validation.recent3m,
@@ -27,8 +33,24 @@ export function getEquityCurve() {
   return dashboardDataSeed.equityCurve;
 }
 
-export async function runBacktest(strategyId = "SAFE_v44_i4060") {
-  const strategy = getStrategyById(strategyId) ?? getPreservedSafeStrategy();
+export async function runBacktest(strategyId?: string) {
+  if (!strategyId || isRetiredSafeId(strategyId)) {
+    return {
+      ok: false,
+      mode: "BACKTEST" as const,
+      serviceState: "simulated" as const,
+      message: NO_SELECTED_STRATEGY,
+    };
+  }
+  const strategy = getStrategyById(strategyId);
+  if (!strategy) {
+    return {
+      ok: false,
+      mode: "BACKTEST" as const,
+      serviceState: "simulated" as const,
+      message: NO_SELECTED_STRATEGY,
+    };
+  }
 
   return {
     ok: true,
@@ -38,6 +60,5 @@ export async function runBacktest(strategyId = "SAFE_v44_i4060") {
     data_source: backtestValidationSeed.dataSource,
     strategy,
     validation: strategy.validation,
-    equityCurve: getEquityCurve()
   };
 }

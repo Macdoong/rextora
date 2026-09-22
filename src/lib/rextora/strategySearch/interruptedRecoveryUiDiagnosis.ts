@@ -7,6 +7,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { productionStrategySearchRootCanonical } from "./historicalDeadlineCompletionDryRun";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
 import {
   classifyInterruptedJob,
   classifyQueuedJob,
@@ -244,7 +245,7 @@ export function collectProductionReadonlyHashes(rootDir?: string): {
     ownershipAudit: sha256File(path.join(root, "execution-ownership-audit.jsonl")),
     recoveryAudit: sha256File(path.join(root, "recovery-audit.jsonl")),
     safe: sha256File(
-      path.join(process.cwd(), "data", "strategies", "SAFE_v44_i4060.json"),
+      path.join(process.cwd(), "data", "strategies", RETIRED_SAFE_FILE_NAME),
     ),
     nonTerminalJobs,
   };

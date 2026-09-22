@@ -418,8 +418,7 @@ export async function runConfiguredBacktest(
           endingBalance: es.endingBalance,
           equityCurve: es.equityCurve,
           trades: es.trades,
-          paramsHashVerified:
-            strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
+          paramsHashVerified: Boolean(strategy.paramsHash),
           feesApplied: true,
           slippageApplied: true,
           fundingApplied: config.applyFunding,
@@ -466,8 +465,7 @@ export async function runConfiguredBacktest(
           endingBalance: cb.endingBalance,
           equityCurve: cb.equityCurve,
           trades: cb.trades,
-          paramsHashVerified:
-            strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
+          paramsHashVerified: Boolean(strategy.paramsHash),
           feesApplied: true,
           slippageApplied: true,
           fundingApplied: config.applyFunding,
@@ -733,8 +731,7 @@ export async function runConfiguredBacktest(
       endingBalance: ending,
       equityCurve,
       trades: allTrades,
-      paramsHashVerified:
-        strategy.paramsHash === "7893ca3f0e30" || !strategy.locked,
+      paramsHashVerified: Boolean(strategy.paramsHash),
       feesApplied: true,
       slippageApplied: true,
       fundingApplied: config.applyFunding,
@@ -775,7 +772,10 @@ export async function runConfiguredBacktest(
   };
 }
 
-export async function runAndSaveBacktest(config: BacktestConfig) {
+export async function runAndSaveBacktest(
+  config: BacktestConfig,
+  options?: { ownerUserId?: string | null },
+) {
   const requestedAt = new Date().toISOString();
   const startedAt = new Date().toISOString();
   const result = await runConfiguredBacktest(config);
@@ -804,6 +804,7 @@ export async function runAndSaveBacktest(config: BacktestConfig) {
     dataVersion: result.report.dataSource ?? null,
     hasChartEvidence: true,
     chartEvidenceSchemaVersion: 1,
+    ownerUserId: options?.ownerUserId ?? null,
   });
   // Sidecar chart evidence — write only when this execution owns the artifact.
   // Deduplicated runs reuse chartEvidenceRef to the prior identical sidecar.

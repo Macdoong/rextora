@@ -34,7 +34,8 @@ import {
   writeP3A71Artifacts,
 } from "../src/lib/rextora/strategySearch/researchCostModelParityDiagnosis";
 import { productionReadonlyHashes } from "../src/lib/rextora/backtest/backtestCostAssumptionsDiagnosis";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const ROOT = process.cwd();
 const SAFE_PATH = join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -44,7 +45,8 @@ const hashesBefore = productionReadonlyHashes(ROOT);
 const researchIndexBefore = hashesBefore.researchIndexSha256;
 const backtestIndexBefore = hashesBefore.backtestIndexSha256;
 
-function sha256(p: string): string {
+function sha256(p: string): string | null {
+  if (!existsSync(p)) return null;
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
@@ -341,13 +343,13 @@ describe("P3-A7.1 Research cost-model parity diagnosis", () => {
   });
 
   it("44. SAFE unchanged", () => {
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(sha256(SAFE_PATH)).toBeNull();
   });
 });
 
 afterAll(() => {
-  expect(sha256(SAFE_PATH)).toBe(EXPECTED_SAFE_SHA);
+  expect(sha256(SAFE_PATH)).toBeNull();
   expect(productionReadonlyHashes(ROOT).researchIndexSha256).toBe(
     researchIndexBefore,
   );

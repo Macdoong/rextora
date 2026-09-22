@@ -11,7 +11,7 @@ export function ExpertStrategiesPage() {
           <a href="/strategy-search" className="text-sky-300 underline">
             전략 탐색
           </a>
-          입니다. 이 화면은 디버깅·고급 편집 전용입니다. SAFE는 수정할 수 없습니다.
+          입니다. 이 화면은 디버깅·고급 편집 전용입니다.
         </p>
       </div>
       <details open className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">

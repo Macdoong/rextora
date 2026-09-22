@@ -18,7 +18,7 @@ import {
   evaluateStrategyVerdict,
   VERDICT_THRESHOLDS,
 } from "../src/lib/rextora/backtest/strategyVerdict";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { loadSafeV44Strategy } from "../src/lib/rextora/strategy/safeV44Strategy";
 
 function runFixture(opts?: {
@@ -46,6 +46,7 @@ function runFixture(opts?: {
     dataSource: "synthetic-test",
     requestedFrom: new Date(from).toISOString(),
     requestedTo: new Date(from + count * 900_000).toISOString(),
+    params: CONTEXT_FALLBACK_PARAMS,
   });
 }
 
@@ -65,7 +66,7 @@ describe("backtest visual analysis", () => {
     expect(model.equitySeries.id).toBe("equity");
     expect(model.drawdownSeries.id).toBe("drawdown");
     expect(model.priceCandles.length).toBe(result.processedCandles.length);
-    expect(model.report.strategyHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(model.report.strategyHash).toBe("explicit");
 
     // Monthly returns are calendar YYYY-MM, not T## trade buckets
     for (const m of model.monthlyReturns) {
@@ -213,6 +214,7 @@ describe("backtest visual analysis", () => {
       applySpread: true,
       spreadRate: 0.0001,
       dataSource: "synthetic-test",
+      params: CONTEXT_FALLBACK_PARAMS,
     });
     const model = buildVisualAnalysisModel({
       report: result.report,
@@ -228,10 +230,10 @@ describe("backtest visual analysis", () => {
     );
   });
 
-  it("protected SAFE hash unchanged", () => {
+  it("retired SAFE loader does not expose a current strategy hash", () => {
     const meta = loadSafeV44Strategy({ throwOnHashMismatch: false });
-    expect(meta.paramsHash).toBe("7893ca3f0e30");
-    expect(meta.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
+    expect(meta.paramsHash).toBe("");
+    expect(meta.dataStrategyFileFound).toBe(false);
   });
 
   it("aggregateCalendarMonthly matches report monthly for same trades", () => {

@@ -7,7 +7,8 @@ import { evaluateHighlightEligibility } from "./eligibility";
 
 export interface LiveCandidateGateInput {
   strategyId: string;
-  isSafe: boolean;
+  /** @deprecated Retired SAFE identity is not a product privilege. Ignored. */
+  isSafe?: boolean;
   paperActive: boolean;
   liveActive: boolean;
   liveEligible?: boolean;
@@ -27,12 +28,6 @@ export interface LiveCandidateGateResult {
 export function evaluateLiveCandidateRegistration(
   input: LiveCandidateGateInput,
 ): LiveCandidateGateResult {
-  if (input.isSafe) {
-    return {
-      allowed: false,
-      reasonKo: "SAFE 원본은 실전매매 검토 대상으로 등록할 수 없습니다.",
-    };
-  }
   if (input.liveActive) {
     return { allowed: true, reasonKo: null };
   }

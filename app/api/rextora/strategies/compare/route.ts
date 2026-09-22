@@ -3,19 +3,28 @@ import { getStrategyById, listStrategies } from "@/src/lib/rextora/strategy/stra
 import { listSavedBacktests } from "@/src/lib/rextora/backtest/backtestStore";
 import { equityCurveToSeries, drawdownFromEquity, strategyScatter } from "@/src/lib/rextora/charts/adapters";
 import { SERIES_PALETTE } from "@/src/lib/rextora/charts/theme";
-import { denyUnlessPermitted } from "@/src/lib/rextora/auth/requireUser";
+import { requirePermission } from "@/src/lib/rextora/auth/requireUser";
+import { canReadOwnedResource, canReadStoredStrategy } from "@/src/lib/rextora/auth/searchResourceAccess";
 
 /** Compare strategies using only actual saved backtest results. */
 export async function POST(request: Request) {
-  const denied = await denyUnlessPermitted(request, "strategy:write");
-  if (denied) return denied;
+  const auth = requirePermission(request, "strategy:write");
+  if (!auth.ok) return auth.response;
   const body = (await request.json()) as { ids?: string[] };
   const ids = (body.ids ?? []).slice(0, 5);
   if (ids.length < 1) {
     return NextResponse.json({ ok: false, error: "비교할 전략을 선택하세요." }, { status: 400 });
   }
+  for (const id of ids) {
+    const strategy = getStrategyById(id);
+    if (!strategy || !canReadStoredStrategy(auth.user, strategy)) {
+      return NextResponse.json({ ok: false, error: "전략을 찾을 수 없습니다." }, { status: 404 });
+    }
+  }
 
-  const saved = listSavedBacktests();
+  const saved = listSavedBacktests().filter((b) =>
+    canReadOwnedResource(auth.user, b),
+  );
   const rows = ids.map((id, i) => {
     const s = getStrategyById(id);
     const latest = saved.filter((b) => b.config.strategyId === id).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
@@ -63,7 +72,9 @@ export async function POST(request: Request) {
     data: {
       rows,
       scatter,
-      available: listStrategies().map((s) => ({ id: s.id, name: s.name, locked: s.locked }))
+      available: listStrategies()
+        .filter((s) => canReadStoredStrategy(auth.user, s))
+        .map((s) => ({ id: s.id, name: s.name, locked: s.locked })),
     }
   });
 }

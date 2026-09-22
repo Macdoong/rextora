@@ -7,11 +7,12 @@ import os from "node:os";
 import path from "node:path";
 import {
   copyStrategy,
+  createStrategy,
   ensureStrategyStore,
   getPaperActiveStrategy,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import {
   PaperSessionError,
@@ -50,7 +51,7 @@ describe("paper single source of truth", () => {
     const iso = installIsolatedStrategyStore();
     cleanupStrategies = iso.cleanup;
     ensureStrategyStore();
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "paper_ssot_test");
+    const copy = copyStrategy(createStrategy({ name: "Paper SSOT Source" }).id, "paper_ssot_test");
     strategyId = copy.id;
     setPaperActiveStrategy(strategyId);
     rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-paper-ssot-"));
@@ -158,7 +159,7 @@ describe("paper single source of truth", () => {
     expect(getPaperSession(a.id, opts())?.status).toBe("stopped");
     expect(recoveryStopped.notes.some((n) => n.includes("stopped"))).toBe(true);
 
-    const other = copyStrategy(SAFE_STRATEGY_ID, "paper_ssot_paused");
+    const other = copyStrategy(createStrategy({ name: "Paper SSOT Paused" }).id, "paper_ssot_paused");
     const b = await startPaperSessionFromStrategy(
       { strategyId: other.id },
       opts(),
@@ -187,7 +188,7 @@ describe("paper single source of truth", () => {
   });
 
   it("12. stale paperActive ignored when paused session owns identity", async () => {
-    const other = copyStrategy(SAFE_STRATEGY_ID, "paper_stale_flag");
+    const other = copyStrategy(createStrategy({ name: "Paper SSOT Stale" }).id, "paper_stale_flag");
     const started = await startPaperSessionFromStrategy(
       { strategyId },
       opts(),
@@ -301,11 +302,8 @@ describe("paper single source of truth", () => {
     ).toThrow(PaperSessionError);
   });
 
-  it("24. SAFE unchanged", () => {
-    const safe = JSON.parse(fs.readFileSync(SAFE, "utf8")) as {
-      params_hash: string;
-    };
-    expect(safe.params_hash).toBe("7893ca3f0e30");
+  it("24. SAFE file stays retired", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
   });
 
   it("resume then activate identity preserved", async () => {

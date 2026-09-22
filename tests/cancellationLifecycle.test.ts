@@ -44,7 +44,8 @@ import {
   setStrategySearchApiStoreOptionsForTests,
 } from "@/src/lib/rextora/strategySearch/jobApiService";
 import type { StrategySearchTrial } from "@/src/lib/rextora/strategySearch/types";
-import { EXPECTED_SAFE_PARAMS_HASH } from "@/src/lib/rextora/strategy/strategyTypes";
+import { RETIRED_SAFE_PARAMS_HASH } from "@/src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const tempRoots: string[] = [];
 const FROM = Date.UTC(2024, 0, 1);
@@ -225,6 +226,12 @@ describe("cancellation lifecycle", () => {
     expect(result.blockReason).toBe("active_worker");
     expect(getSearchJob(job.id, store)?.status).toBe("cancel_requested");
 
+    const second = requestCancelWithFinalization(job.id, store);
+    expect(second.finalized).toBe(false);
+    expect(second.blockReason).toBe("active_worker");
+    expect(getSearchJob(job.id, store)?.status).toBe("cancel_requested");
+    expect(isSearchJobExecutionActive(job.id)).toBe(true);
+
     release?.();
     await waitForSearchJobExecution(job.id);
   });
@@ -352,7 +359,7 @@ describe("cancellation lifecycle", () => {
   });
 
   it("SAFE params hash remains immutable constant", () => {
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
   });
 
   it("running → cancel_requested → cancelled stamps acknowledgement", () => {
@@ -503,7 +510,7 @@ describe("cancellation lifecycle", () => {
     const job = createSearchJob(sampleConfig(), store);
     markSearchJobRunning(job.id, store);
     requestCancelWithFinalization(job.id, store);
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
     expect(store.rootDir).not.toContain(`${path.sep}data${path.sep}strategies`);
   });
 });

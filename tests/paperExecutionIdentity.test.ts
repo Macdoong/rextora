@@ -6,17 +6,17 @@ import {
   installIsolatedStrategyStore,
 } from "./helpers/isolatedStrategyStore";
 import {
+  createStrategy,
   copyStrategy,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../src/lib/rextora/strategy/strategyTypes";
+
 import {
   resolvePaperExecutionStrategy,
   assertPaperStrategyIntegrity,
 } from "../src/lib/rextora/execution/paperStrategyResolver";
+import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 describe("paper execution strategy identity", () => {
   let cleanup: (() => void) | undefined;
@@ -41,9 +41,10 @@ describe("paper execution strategy identity", () => {
   });
 
   it("uses paperActive copy — does not substitute SAFE", () => {
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "paper_exec_copy");
-    expect(copy.id).not.toBe(SAFE_STRATEGY_ID);
-    expect(copy.paramsHash).not.toBe(EXPECTED_SAFE_PARAMS_HASH);
+    const source = createStrategy({ name: "Paper Exec Source", params: { ema_fast: 21 } });
+    const copy = copyStrategy(source.id, "paper_exec_copy");
+    expect(copy.id).not.toBe(RETIRED_SAFE_STRATEGY_ID);
+    expect(copy.paramsHash).not.toBe(RETIRED_SAFE_PARAMS_HASH);
     setPaperActiveStrategy(copy.id);
 
     const resolved = resolvePaperExecutionStrategy();
@@ -53,12 +54,8 @@ describe("paper execution strategy identity", () => {
     expect(resolved.name).toContain("paper_exec_copy");
   });
 
-  it("uses SAFE only when SAFE is paperActive", () => {
-    setPaperActiveStrategy(SAFE_STRATEGY_ID);
-    const resolved = resolvePaperExecutionStrategy();
-    expect(resolved.strategyId).toBe(SAFE_STRATEGY_ID);
-    expect(resolved.paramsHash).toBe(EXPECTED_SAFE_PARAMS_HASH);
-    expect(resolved.isProtectedSafe).toBe(true);
-    assertPaperStrategyIntegrity(resolved);
+  it("fails closed when SAFE is requested as paperActive", () => {
+    expect(() => setPaperActiveStrategy(RETIRED_SAFE_STRATEGY_ID)).toThrow();
+    expect(() => resolvePaperExecutionStrategy()).toThrow(/전략이 없습니다/);
   });
 });

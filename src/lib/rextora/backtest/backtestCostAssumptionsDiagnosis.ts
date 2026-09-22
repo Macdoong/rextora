@@ -10,11 +10,12 @@ import fs from "node:fs";
 import path from "node:path";
 import type { OhlcvCandle } from "../data/ohlcvTypes";
 import { CONTEXT_FALLBACK_PARAMS } from "../strategy/safeV44Params";
-import type { SafeV44Params } from "../strategy/strategyTypes";
 import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../strategy/strategyTypes";
+  RETIRED_SAFE_FILE_NAME,
+  RETIRED_SAFE_PARAMS_HASH,
+  RETIRED_SAFE_STRATEGY_ID,
+} from "../strategy/retiredSafeBaseline";
+import type { SafeV44Params } from "../strategy/strategyTypes";
 import { runSafeV44Backtest, type BacktestTrade } from "./backtestEngine";
 import { buildBacktestReport } from "./backtestReport";
 import { backtestResultHash } from "./backtestStore";
@@ -91,7 +92,7 @@ function sha256File(filePath: string): string | null {
 }
 
 export function productionReadonlyHashes(cwd = process.cwd()) {
-  const safePath = path.join(cwd, "data/strategies/SAFE_v44_i4060.json");
+  const safePath = path.join(cwd, "data/strategies", RETIRED_SAFE_FILE_NAME);
   const researchIndex = path.join(
     cwd,
     "data/rextora/strategy-search/index.json",
@@ -101,11 +102,11 @@ export function productionReadonlyHashes(cwd = process.cwd()) {
   return {
     safePath,
     safeSha256: sha256File(safePath),
-    paramsHash: EXPECTED_SAFE_PARAMS_HASH,
+    paramsHash: RETIRED_SAFE_PARAMS_HASH,
     researchIndexSha256: sha256File(researchIndex),
     backtestIndexSha256: sha256File(backtestIndex),
     paperSessionsDirExists: fs.existsSync(paperDir),
-    safeStrategyId: SAFE_STRATEGY_ID,
+    safeStrategyId: RETIRED_SAFE_STRATEGY_ID,
   };
 }
 
@@ -981,7 +982,7 @@ export function getRecommendedFix() {
     doNotInP3A6: [
       "Do not change fee/slip/funding arithmetic",
       "Do not enable historical Binance funding",
-      "Do not modify SAFE_v44_i4060",
+      "Do not recreate the retired SAFE identity",
       "Do not change rerun-result preservation (separate debt)",
       "Split model-accuracy (double slip, TP unslipped, shorts paying funding) to a later phase unless PnL identity is being documented as the current frozen model",
     ],

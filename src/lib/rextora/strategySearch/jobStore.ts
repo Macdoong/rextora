@@ -524,7 +524,7 @@ function trialsEqual(a: StrategySearchTrial, b: StrategySearchTrial): boolean {
 
 export function createSearchJob(
   config: StrategySearchConfig,
-  options?: StrategySearchStoreOptions,
+  options?: StrategySearchStoreOptions & { ownerUserId?: string | null },
 ): StrategySearchJob {
   assertConfig(config);
   const root = resolveRoot(options);
@@ -541,6 +541,7 @@ export function createSearchJob(
     startedAt: null,
     finishedAt: null,
     failureMessage: null,
+    ownerUserId: options?.ownerUserId?.trim() || null,
   };
   if (!isValidStrategySearchJobId(job.id)) {
     throw new StrategySearchPersistenceError(
@@ -589,6 +590,7 @@ export function saveSearchJob(
     createdAt: existing?.createdAt ?? job.createdAt,
     updatedAt: at,
     failureMessage: job.status === "failed" ? job.failureMessage : null,
+    ownerUserId: existing?.ownerUserId ?? job.ownerUserId ?? null,
   };
   return persistJob(root, next);
 }

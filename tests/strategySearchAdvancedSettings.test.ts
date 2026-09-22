@@ -16,14 +16,15 @@ describe("strategy search advanced settings helpers", () => {
   it("applied settings preview shows operator labels", () => {
     const form = createDefaultOperatorFormState();
     form.candidateBudgetOverride = "120";
-    const { rows, summary } = buildAppliedSettingsPreview(form);
+    const { rows, detailRows, summary } = buildAppliedSettingsPreview(form);
     expect(summary.labelKo).toBe("정상");
-    expect(rows.some((r) => r.labelKo === "세대당 생성 수")).toBe(true);
-    expect(rows.some((r) => r.labelKo === "초기 평가 묶음")).toBe(true);
     expect(rows.some((r) => r.labelKo === "합격 목표")).toBe(true);
-    expect(rows.some((r) => r.labelKo === "초기 평가 묶음(재정의)")).toBe(true);
-    expect(rows.some((r) => r.labelKo === "연구 시간")).toBe(true);
-    expect(rows.some((r) => r.labelKo === "장기 저장 결과")).toBe(true);
+    expect(rows.some((r) => r.labelKo === "탐색 프리셋")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "세대당 생성 수")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "초기 평가 묶음")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "초기 평가 묶음(재정의)")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "연구 시간")).toBe(true);
+    expect(detailRows.some((r) => r.labelKo === "장기 저장 결과")).toBe(true);
     expect(rows.some((r) => r.labelKo === "전체 평가 수")).toBe(false);
   });
 });

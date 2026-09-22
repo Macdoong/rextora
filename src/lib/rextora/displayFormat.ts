@@ -29,6 +29,31 @@ export function formatPrice(value: number): string {
   return roundTo(value, decimals).toFixed(decimals);
 }
 
+/**
+ * Display-only price formatter. Does not mutate stored numeric values or
+ * execution math. Trims IEEE float noise while keeping small-asset precision.
+ * Not a tick-size / order-rounding helper.
+ */
+export function formatDisplayPrice(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "—";
+  const sign = value < 0 ? "-" : "";
+  const abs = Math.abs(value);
+  if (abs === 0) return "0";
+  const decimals =
+    abs >= 1000 ? 2 : abs >= 0.01 ? 8 : abs >= 0.0001 ? 10 : 12;
+  let out = roundTo(abs, decimals).toFixed(decimals);
+  if (out.includes(".")) {
+    out = out.replace(/0+$/, "").replace(/\.$/, "");
+  }
+  return sign + out;
+}
+
+/** Display-only leverage multiple, e.g. 2 → 2.0x. */
+export function formatLeverageMultiple(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(Number(value))) return "—";
+  return `${Number(value).toFixed(1)}x`;
+}
+
 export function formatVolumeChange(value: number): string {
   return formatPercent(value, 2);
 }

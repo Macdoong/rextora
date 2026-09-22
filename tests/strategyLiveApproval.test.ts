@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   approveStrategyForLive,
-  getEffectiveSafeStrategy,
+  getEffectiveApprovedStrategy,
   getStrategyLiveApprovalState,
   revokeStrategyLiveApproval
 } from "../src/lib/rextora/strategyLiveApproval";
@@ -17,15 +17,14 @@ describe("strategyLiveApproval", () => {
   });
 
   it("keeps verifiedForLive false by default", () => {
-    const strategy = getEffectiveSafeStrategy();
-    expect(strategy.verifiedForLive).toBe(false);
+    expect(getEffectiveApprovedStrategy()).toBeNull();
     expect(getStrategyLiveApprovalState().verifiedForLive).toBe(false);
   });
 
   it("rejects approval without matching confirmation text", () => {
     const result = approveStrategyForLive("wrong-phrase");
     expect(result.ok).toBe(false);
-    expect(getEffectiveSafeStrategy().verifiedForLive).toBe(false);
+    expect(getEffectiveApprovedStrategy()).toBeNull();
   });
 
   it("does not start trading when approval succeeds without full LIVE gate", () => {

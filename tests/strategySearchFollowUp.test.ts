@@ -5,16 +5,14 @@ import {
 } from "../src/lib/rextora/strategySearch/followUpResearch";
 
 describe("follow-up research API helper", () => {
-  it("fail-closes SAFE mutation intents", () => {
-    expect(() =>
-      buildFollowUpResearch({ source: "paper", strategyId: "SAFE_v44_i4060" }),
-    ).toThrow(FollowUpResearchError);
-    try {
-      buildFollowUpResearch({ source: "strategy", strategyId: "SAFE_v44_i4060" });
-      expect.unreachable();
-    } catch (err) {
-      expect(err).toMatchObject({ code: "SAFE_MUTATION_BLOCKED", httpStatus: 403 });
-    }
+  it("accepts a retired historical strategy id as ordinary follow-up context", () => {
+    const result = buildFollowUpResearch({
+      source: "strategy",
+      strategyId: "SAFE_v44_i4060",
+    });
+    expect(result.ok).toBe(true);
+    expect(result.suggestedCreateJobBody).toBeTruthy();
+    expect(result.mutationBlocked).toBe(false);
   });
 
   it("returns paper feedback and suggested body without auto-start", () => {

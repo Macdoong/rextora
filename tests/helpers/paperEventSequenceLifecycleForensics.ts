@@ -47,7 +47,8 @@ export function source(rel: string): string {
   return fs.readFileSync(path.join(process.cwd(), rel), "utf8");
 }
 
-export function sha256File(filePath: string): string {
+export function sha256File(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 

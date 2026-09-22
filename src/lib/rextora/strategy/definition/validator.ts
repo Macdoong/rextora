@@ -124,8 +124,8 @@ export function validateCanonicalDefinition(def: CanonicalStrategyDefinition): {
   if (def.strategyType !== "safe_params" && def.strategyType !== "condition_builder") {
     errors.push("전략 유형이 올바르지 않습니다.");
   }
-  if (def.locked && def.strategyId !== "SAFE_v44_i4060") {
-    errors.push("잠금 전략은 SAFE 원본만 허용됩니다.");
+  if (def.locked) {
+    errors.push("잠금 전략은 허용되지 않습니다.");
   }
   errors.push(...validateConditionTree(def.entryConditions.long, "매수 진입"));
   errors.push(...validateConditionTree(def.entryConditions.short, "매도 진입"));

@@ -82,7 +82,6 @@ describe("strategySearch operator profiles + spaces + names", () => {
       "strategies",
       "SAFE_v44_i4060.json",
     );
-    expect(fs.existsSync(p)).toBe(true);
-    expect(fs.readFileSync(p, "utf8")).toContain("7893ca3f0e30");
+    expect(fs.existsSync(p)).toBe(false);
   });
 });

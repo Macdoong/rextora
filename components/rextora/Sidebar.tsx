@@ -19,6 +19,7 @@ import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
 import { isAdminConsoleNavVisible } from "@/src/lib/rextora/auth/adminUserPolicy";
 import type { RextoraRole } from "@/src/lib/rextora/auth/authTypes";
 import { OPERATOR_LABEL } from "@/src/lib/rextora/ui/operatorTerminology";
+import { NavIcon } from "@/components/rextora/shell/NavIcons";
 
 const sidebarNavigationGroups = SHELL_NAVIGATION_GROUPS;
 
@@ -27,17 +28,6 @@ function visibleShellNavItems(role: RextoraRole | null): ShellNavigationItem[] {
     (item) => item.id !== "admin-users" || isAdminConsoleNavVisible(role),
   );
 }
-
-const NAV_ICO: Record<string, string> = {
-  dashboard: "운",
-  "strategy-search": "탐",
-  backtest: "백",
-  "paper-trading": "모",
-  "live-trading": "실",
-  risk: "위",
-  settings: "설",
-  "admin-users": "회",
-};
 
 function sidebarNavTestId(href: string): string {
   return `nav-${href.slice(1).replace(/\//g, "-")}`;
@@ -71,7 +61,7 @@ function SidebarNavLink({
         onClick={onNavigate}
       >
         <span className="v3-shell-nav-ico" aria-hidden="true">
-          {NAV_ICO[item.id] ?? item.label.slice(0, 1)}
+          <NavIcon id={item.id} />
         </span>
         <span className="v3-shell-nav-label">{item.label}</span>
       </Link>
@@ -88,6 +78,9 @@ function SidebarNavLink({
         aria-current={active ? "page" : undefined}
         className={`v3-shell-bottom-link${active ? " is-active" : ""}`}
       >
+        <span className="v3-shell-bottom-ico" aria-hidden="true">
+          <NavIcon id={item.id} size={16} />
+        </span>
         {label}
       </Link>
     );
@@ -103,7 +96,7 @@ function SidebarNavLink({
       onClick={onNavigate}
     >
       <span className="v3-shell-nav-ico" aria-hidden="true">
-        {NAV_ICO[item.id] ?? item.label.slice(0, 1)}
+        <NavIcon id={item.id} />
       </span>
       <span className="v3-shell-nav-label">{item.label}</span>
     </Link>
@@ -336,6 +329,9 @@ export function Sidebar() {
           aria-controls="rextora-mobile-drawer"
           onClick={() => setMenuOpen((open) => !open)}
         >
+          <span className="v3-shell-bottom-ico" aria-hidden="true">
+            <NavIcon id="menu" size={16} />
+          </span>
           전체 메뉴
         </button>
       </nav>

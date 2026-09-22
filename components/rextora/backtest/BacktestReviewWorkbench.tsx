@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Badge, Button, Card, Metric, Skeleton, StatusBanner } from "@/components/ui/primitives";
 import type { StatusBannerStatus } from "@/components/ui/primitives";
 import type { StoredStrategy } from "@/src/lib/rextora/strategy/strategyTypes";
-import { SAFE_STRATEGY_ID } from "@/src/lib/rextora/strategy/strategyTypes";
 import type {
   BacktestReport,
   SavedBacktestResult,
@@ -300,7 +299,7 @@ export function BacktestReviewWorkbench() {
   );
   const [strategyPickerQuery, setStrategyPickerQuery] = useState("");
   const [strategyPickerFamily, setStrategyPickerFamily] = useState<
-    "all" | "combo" | "pattern" | "general" | "safe" | "research" | "registered"
+    "all" | "combo" | "pattern" | "general" | "research" | "registered"
   >("all");
   const [symbol, setSymbol] = useState(
     () => urlSymbol || (sessionBoot?.symbol ?? "").toUpperCase() || "BTCUSDT",
@@ -340,7 +339,6 @@ export function BacktestReviewWorkbench() {
   >(null);
   const [actionBusy, setActionBusy] = useState(false);
   const [expertMode, setExpertMode] = useState(false);
-  const [safeFallbackNotice, setSafeFallbackNotice] = useState(false);
   const [paperSessionStrategyId, setPaperSessionStrategyId] = useState<
     string | null
   >(null);
@@ -557,7 +555,6 @@ export function BacktestReviewWorkbench() {
               initialStrategyId &&
               list.some((s) => s.id === initialStrategyId)
             ) {
-              setSafeFallbackNotice(false);
               setHydrationState(initialRunId ? "loading_runs" : "idle");
               return initialStrategyId;
             }
@@ -568,7 +565,6 @@ export function BacktestReviewWorkbench() {
               );
             }
             if (prev && list.some((s) => s.id === prev)) {
-              setSafeFallbackNotice(false);
               return prev;
             }
             try {
@@ -576,32 +572,19 @@ export function BacktestReviewWorkbench() {
                 "rextora.lastBacktestStrategyId",
               );
               if (last && list.some((s) => s.id === last)) {
-                setSafeFallbackNotice(false);
                 return last;
               }
             } catch {
               /* ignore */
             }
-            const paper = list.find(
-              (s) => s.paperActive && s.id !== SAFE_STRATEGY_ID,
-            );
+            const paper = list.find((s) => s.paperActive);
             if (paper) {
-              setSafeFallbackNotice(false);
               return paper.id;
             }
-            const withBt = list.find(
-              (s) => s.lastBacktest && s.id !== SAFE_STRATEGY_ID,
-            );
+            const withBt = list.find((s) => s.lastBacktest);
             if (withBt) {
-              setSafeFallbackNotice(false);
               return withBt.id;
             }
-            const safe = list.find((s) => s.id === SAFE_STRATEGY_ID);
-            if (safe && !initialStrategyId) {
-              setSafeFallbackNotice(true);
-              return safe.id;
-            }
-            setSafeFallbackNotice(false);
             return "";
           });
         })
@@ -648,7 +631,6 @@ export function BacktestReviewWorkbench() {
   function selectStrategy(nextId: string) {
     setStrategyId(nextId);
     clearResultState();
-    setSafeFallbackNotice(false);
     setRunFeedback("");
     setRunStatus("idle");
     setSymbolQuery("");
@@ -1010,10 +992,8 @@ export function BacktestReviewWorkbench() {
   }
 
   async function registerPaper() {
-    if (!strategyId || strategyId === SAFE_STRATEGY_ID) {
-      setActionMessage(
-        "SAFE는 모의 활성으로 덮어쓰지 않습니다. 다른 전략을 선택하세요.",
-      );
+    if (!strategyId) {
+      setActionMessage("모의매매에 적용할 전략을 선택하세요.");
       setActionStatus("error");
       return;
     }
@@ -1446,7 +1426,6 @@ export function BacktestReviewWorkbench() {
                 <option value="combo">패턴 조합</option>
                 <option value="pattern">단일 패턴</option>
                 <option value="general">일반</option>
-                <option value="safe">SAFE</option>
                 <option value="research">Research 등록</option>
                 <option value="registered">등록 전략</option>
               </select>
@@ -1484,8 +1463,6 @@ export function BacktestReviewWorkbench() {
                       ? `${base}${tf}${comboBit} · ${hash}…`
                       : `${base}${tf}${comboBit}`;
                   };
-                  const isSafe = (s: (typeof strategies)[number]) =>
-                    s.id === "SAFE_v44_i4060" || s.locked;
                   const isPattern = (s: (typeof strategies)[number]) => {
                     const def = (
                       s as {
@@ -1544,8 +1521,7 @@ export function BacktestReviewWorkbench() {
                   };
                   const matchesFamily = (s: (typeof strategies)[number]) => {
                     if (strategyPickerFamily === "all") return true;
-                    if (strategyPickerFamily === "safe") return isSafe(s);
-                    if (strategyPickerFamily === "registered") return !isSafe(s);
+                    if (strategyPickerFamily === "registered") return true;
                     if (strategyPickerFamily === "research") {
                       return Boolean(
                         (s as { sourceResearchJobId?: string | null })
@@ -1554,10 +1530,10 @@ export function BacktestReviewWorkbench() {
                       );
                     }
                     if (strategyPickerFamily === "combo")
-                      return !isSafe(s) && isCombo(s);
+                      return isCombo(s);
                     if (strategyPickerFamily === "pattern")
-                      return !isSafe(s) && isPattern(s) && !isCombo(s);
-                    return !isSafe(s) && !isPattern(s);
+                      return isPattern(s) && !isCombo(s);
+                    return !isPattern(s);
                   };
                   const filtered = strategies.filter(
                     (s) => matchesQuery(s) && matchesFamily(s),
@@ -1567,26 +1543,18 @@ export function BacktestReviewWorkbench() {
                     items: typeof strategies;
                   }> = [
                     {
-                      label: "SAFE",
-                      items: filtered.filter(isSafe),
-                    },
-                    {
                       label: "패턴 조합 전략",
-                      items: filtered.filter(
-                        (s) => !isSafe(s) && isCombo(s),
-                      ),
+                      items: filtered.filter((s) => isCombo(s)),
                     },
                     {
                       label: "단일 패턴 전략",
                       items: filtered.filter(
-                        (s) => !isSafe(s) && isPattern(s) && !isCombo(s),
+                        (s) => isPattern(s) && !isCombo(s),
                       ),
                     },
                     {
                       label: "일반 전략",
-                      items: filtered.filter(
-                        (s) => !isSafe(s) && !isPattern(s),
-                      ),
+                      items: filtered.filter((s) => !isPattern(s)),
                     },
                   ];
                   return groups
@@ -1722,15 +1690,6 @@ export function BacktestReviewWorkbench() {
             </Button>
           ))}
         </div>
-
-        {safeFallbackNotice ? (
-          <p
-            className="mt-3 text-sm text-amber-200"
-            data-testid="backtest-safe-fallback-note"
-          >
-            선택된 전략이 없어 보호 기준 전략 SAFE를 표시합니다.
-          </p>
-        ) : null}
       </Card>
       </details>
 

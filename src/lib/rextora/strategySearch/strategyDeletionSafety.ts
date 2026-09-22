@@ -1,6 +1,6 @@
 /**
  * Strategy library deletion safety — reference-aware classifications.
- * Never deletes SAFE. Never sends exchange orders.
+ * Never sends exchange orders.
  */
 
 import fs from "node:fs";
@@ -12,10 +12,6 @@ import {
   saveStrategy,
 } from "../strategy/strategyStore";
 import type { StoredStrategyV1 } from "../strategy/definition/bridge";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../strategy/strategyTypes";
 import { listSavedBacktests } from "../backtest/backtestStore";
 import { listPaperSessions } from "../paper/paperSessionStore";
 import {
@@ -98,25 +94,6 @@ export function previewStrategyDeletion(
       sourceResearchJobId: null,
       provenanceDetached: false,
       protectedItems: ["missing"],
-    };
-  }
-
-  if (
-    strategy.id === SAFE_STRATEGY_ID ||
-    strategy.paramsHash === EXPECTED_SAFE_PARAMS_HASH ||
-    strategy.locked
-  ) {
-    return {
-      strategyId,
-      classification: "absolute_protect",
-      reasonsKo: ["SAFE·잠금 전략은 삭제할 수 없습니다."],
-      nextActionKo: "다른 사용자 전략만 삭제할 수 있습니다.",
-      backtestRefs: [],
-      paperRefs: [],
-      liveRefs: [],
-      sourceResearchJobId: parseSourceResearchJobId(strategy.description),
-      provenanceDetached: isProvenanceDetached(strategy.description),
-      protectedItems: ["SAFE"],
     };
   }
 
@@ -215,9 +192,6 @@ export function previewStrategyDeletion(
 export function detachResearchProvenance(strategyId: string): StoredStrategyV1 {
   const strategy = getStrategyById(strategyId);
   if (!strategy) throw new Error(`strategy not found: ${strategyId}`);
-  if (strategy.id === SAFE_STRATEGY_ID || strategy.locked) {
-    throw new Error("SAFE 전략의 출처를 해제할 수 없습니다.");
-  }
   const jobId = parseSourceResearchJobId(strategy.description);
   const iteration = parseSourceTrialIteration(strategy.description);
   if (!jobId) {
@@ -309,9 +283,6 @@ export function deleteStrategyWithSafety(
 export function strategiesBlockingResearchJob(jobId: string): string[] {
   return listStrategies()
     .filter((s) => {
-      if (s.id === SAFE_STRATEGY_ID || s.paramsHash === EXPECTED_SAFE_PARAMS_HASH) {
-        return false;
-      }
       if (isProvenanceDetached(s.description)) return false;
       return parseSourceResearchJobId(s.description) === jobId;
     })

@@ -35,11 +35,13 @@ import {
   saveSearchPlan,
 } from "../src/lib/rextora/strategySearch/searchPlan";
 import { createStrategy, listStrategies } from "../src/lib/rextora/strategy/strategyStore";
-import { EXPECTED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/strategyTypes";
+
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { previewResearchJobDeletion } from "../src/lib/rextora/strategySearch/deletionSafety";
 import type { ResearchResultCard } from "../src/lib/rextora/strategySearch/researchResultsSummary";
 import type { StrategySearchTrial } from "../src/lib/rextora/strategySearch/types";
+import { RETIRED_SAFE_PARAMS_HASH } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const tempRoots: string[] = [];
 const cleanups: Array<() => void> = [];
@@ -289,20 +291,12 @@ describe("strategy detach unlocks research job deletion", () => {
     );
   });
 
-  it("SAFE remains absolute_protect", () => {
-    const before = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
-    expect(EXPECTED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
-    expect(previewStrategyDeletion("SAFE_v44_i4060").classification).toBe(
-      "absolute_protect",
-    );
-    const after = crypto
-      .createHash("sha256")
-      .update(fs.readFileSync(SAFE_PATH))
-      .digest("hex");
-    expect(after).toBe(before);
+  it("retired SAFE file is gone; missing identity is not a privileged strategy", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
+    expect(RETIRED_SAFE_PARAMS_HASH).toBe("7893ca3f0e30");
+    const preview = previewStrategyDeletion("SAFE_v44_i4060");
+    expect(preview.reasonsKo.join(" ")).toMatch(/찾을 수 없습니다/);
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
   });
 });
 

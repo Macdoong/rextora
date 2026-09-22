@@ -46,15 +46,17 @@
   --v3-content: 1580px;
 
   --v3-motion-instant: 80ms;
-  --v3-motion-fast: 120ms;
-  --v3-motion-base: 180ms;
-  --v3-motion-medium: 200ms;
+  --v3-motion-fast: 160ms;
+  --v3-motion-base: 240ms;
+  --v3-motion-medium: 220ms;
   --v3-motion-panel: 240ms;
-  --v3-motion-drawer: 280ms;
-  --v3-motion-slow: 320ms;
+  --v3-motion-drawer: 300ms;
+  --v3-motion-slow: 420ms;
   --v3-motion-chart: 800ms;
-  --v3-ease-micro: cubic-bezier(0.2, 0, 0, 1);
-  --v3-ease-panel: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --v3-ease-micro: cubic-bezier(0.22, 1, 0.36, 1);
+  --v3-ease-panel: cubic-bezier(0.22, 1, 0.36, 1);
+  --v3-ease-shared: cubic-bezier(0.22, 1, 0.36, 1);
+  --v3-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   --v3-bp-phone: 420px;
   --v3-bp-mobile: 767px;

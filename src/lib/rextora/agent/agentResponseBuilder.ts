@@ -105,7 +105,6 @@ function buildSearchStatusInterpretation(facts: FactItem[]): string {
 function buildExplainStrategyInterpretation(facts: FactItem[]): string {
   const total = factValue(facts, "등록된 전략 수");
   const liveReady = factValue(facts, "실전 가능 후보");
-  const safeStatus = factValue(facts, "SAFE 전략");
   const matched = factValue(facts, "매칭된 전략");
   const matchedStatus = factValue(facts, "전략 상태");
   const paperNames = factValue(facts, "모의매매 전략 이름");
@@ -115,12 +114,8 @@ function buildExplainStrategyInterpretation(facts: FactItem[]): string {
     return `"${matched}" 전략이 확인되었습니다. 현재 상태는 "${matchedStatus}"입니다. 백테스트 페이지에서 이 전략의 상세 성과를 확인하실 수 있습니다.`;
   }
 
-  if (paperNames && !safeStatus) {
+  if (paperNames) {
     return `모의매매 가능 전략은 ${paperCount ?? "확인된"}입니다: ${paperNames}. Paper 화면에서 승인 후 시작할 수 있습니다.`;
-  }
-
-  if (safeStatus) {
-    return `SAFE 전략은 Rextora의 핵심 기준 전략으로, 항상 보호 상태로 유지됩니다. 수정되거나 삭제될 수 없습니다. 현재 총 ${total} 전략 중 ${liveReady}이 실전 가능 후보로 평가되어 있습니다.`;
   }
 
   return `총 ${total ?? "알 수 없음"} 개의 전략이 등록되어 있으며, ${liveReady ?? "0"}개가 실전 가능 후보로 분류되어 있습니다.`;
@@ -370,7 +365,7 @@ function buildFirstRunInterpretation(facts: FactItem[]): string {
   return [
     `검증된 최초 실행 상태: ${mode}.`,
     "Rextora는 AI Trading Employee이며, 데모는 예시일 뿐 실전 증거가 아닙니다.",
-    "실전 주문은 실행되지 않으며 SAFE는 보호됩니다. 최종 승인자는 사용자입니다.",
+    "실전 주문은 실행되지 않습니다. 최종 승인자는 사용자입니다.",
     auto ? `데모 생성: ${auto}.` : "",
     next ? `권장 다음 작업은 단 하나: ${next}.` : "",
   ]
@@ -398,7 +393,7 @@ function buildUnknownInterpretation(): string {
     "• 지금 뭘 해야 해",
     "• 새로운 전략 탐색해",
     "• 최근 백테스트 결과 보여줘",
-    "• SAFE 전략 설명해줘",
+    "• 현재 전략 설명해줘",
     "• BTC와 ETH 중 뭐가 더 좋아",
     "• Paper 시작해줘",
   ].join("\n");
@@ -691,7 +686,6 @@ function resolveScope(
     strategyId:
       factIdValue(facts, "후보 전략 ID") ??
       factIdValue(facts, "전략 ID") ??
-      factIdValue(facts, "SAFE 전략 ID") ??
       null,
     runId:
       factIdValue(facts, "최근 실행 ID") ??

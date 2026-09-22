@@ -265,9 +265,7 @@ describe("P3-A8.3.2 Paper Event-Sequence closed-trade lifecycle diagnosis", () =
   it("41-42. production stores and SAFE unchanged", () => {
     const after = productionSafetySnapshot();
     expect(after.safeSha256).toBe(hashesBefore.safeSha256);
-    expect(after.safeSha256).toBe(
-      "fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0",
-    );
+    expect(after.safeSha256).toBeNull();
     expect(after.paramsHash).toBe("7893ca3f0e30");
     expect(after.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
     expect(after.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);

@@ -213,7 +213,7 @@ export function TradingDashboard() {
           />
           <Metric
             label="활성 전략"
-            value={status?.activeStrategy?.name ?? "SAFE_v44_i4060"}
+            value={status?.activeStrategy?.name ?? "—"}
           />
           <Metric
             label="전략 해시"
@@ -396,7 +396,7 @@ export function TradingDashboard() {
           className="rextora-helper mb-3 rx-text-muted"
           data-testid="opportunity-guide"
         >
-          SAFE_v44 수학 시그널입니다. AI는 진입을 결정하지 않습니다. 진입 가능:
+          수학 시그널입니다. AI는 진입을 결정하지 않습니다. 진입 가능:
           조건 통과 · 관찰: 미충족 · 제외: 비용/필터 차단
         </p>
         {(status?.opportunities.length ?? 0) > 0 ? (

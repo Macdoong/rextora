@@ -190,18 +190,14 @@ describe("immutable combination Search Plan persistence", () => {
     expect(first.patternCombinationSpec).not.toBe(second.patternCombinationSpec);
   });
 
-  it("persists API block configs and preserves the protected SAFE snapshot", () => {
+  it("persists API block configs without resurrecting retired SAFE", () => {
     const safePath = path.join(
       process.cwd(),
       "data",
       "strategies",
       "SAFE_v44_i4060.json",
     );
-    const safeBefore = fs.readFileSync(safePath);
-    const safeJson = JSON.parse(safeBefore.toString("utf8")) as {
-      params_hash: string;
-    };
-    expect(safeJson.params_hash).toBe("7893ca3f0e30");
+    expect(fs.existsSync(safePath)).toBe(false);
 
     const form = createDefaultOperatorFormState();
     form.autoStrategyCombo = false;
@@ -232,6 +228,6 @@ describe("immutable combination Search Plan persistence", () => {
     expect(persisted?.patternCombinationSpec?.blocks[1]?.params).toEqual({
       baseCandleCount: 3,
     });
-    expect(fs.readFileSync(safePath)).toEqual(safeBefore);
+    expect(fs.existsSync(safePath)).toBe(false);
   });
 });

@@ -139,13 +139,9 @@ describe("chart shell contracts for range reset", () => {
     expect(g.cornerRadius).toBe(0);
   });
 
-  it("SAFE hash remains 7893ca3f0e30", () => {
-    const safe = JSON.parse(
-      fs.readFileSync(
-        path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"),
-        "utf8",
-      ),
-    );
-    expect(safe.params_hash).toBe("7893ca3f0e30");
+  it("retired SAFE file remains absent", () => {
+    expect(
+      fs.existsSync(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json")),
+    ).toBe(false);
   });
 });

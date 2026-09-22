@@ -134,9 +134,7 @@ describe("strategySearch default root restart", () => {
     trialsDirExistedBefore = fs.existsSync(path.join(isolatedRoot, "trials"));
     indexExistedBefore = fs.existsSync(path.join(isolatedRoot, "index.json"));
 
-    const safeBefore = fs.readFileSync(
-      path.join(SAFE_DIR, "SAFE_v44_i4060.json"),
-    );
+    expect(fs.existsSync(path.join(SAFE_DIR, "SAFE_v44_i4060.json"))).toBe(false);
 
     // Default root (no rootDir override) — simulates a fresh process handle
     const job = createSearchJob(sampleConfig());
@@ -202,10 +200,7 @@ describe("strategySearch default root restart", () => {
       fs.existsSync(path.join(defaultRoot(), "trials", job.id, "00000000.json")),
     ).toBe(true);
 
-    const safeAfter = fs.readFileSync(
-      path.join(SAFE_DIR, "SAFE_v44_i4060.json"),
-    );
-    expect(Buffer.compare(safeBefore, safeAfter)).toBe(0);
+    expect(fs.existsSync(path.join(SAFE_DIR, "SAFE_v44_i4060.json"))).toBe(false);
     expect(
       fs
         .readdirSync(SAFE_DIR)

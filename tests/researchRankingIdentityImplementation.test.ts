@@ -1087,10 +1087,10 @@ describe("P3-A7.2 promotion provenance", () => {
 describe("P3-A7.2 production safety and arithmetic isolation", () => {
   it("does not rewrite production indexes or SAFE", () => {
     const hashes = productionReadonlyHashes();
-    expect(hashes.safeSha256).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
     expect(hashes.paramsHash).toBe("7893ca3f0e30");
     expect(hashes.researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
-    expect(hashes.backtestIndexSha256).toBe(BACKTEST_INDEX_SHA);
+    expect(hashes.backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);
     const runner = fs.readFileSync(
       path.join(process.cwd(), "src/lib/rextora/strategySearch/jobRunner.ts"),
       "utf8",
@@ -1104,11 +1104,7 @@ describe("P3-A7.2 production safety and arithmetic isolation", () => {
       "utf8",
     );
     expect(identity).toMatch(/research_evaluation_identity_v1/);
-    expect(
-      createHash("sha256")
-        .update(fs.readFileSync("data/strategies/SAFE_v44_i4060.json"))
-        .digest("hex"),
-    ).toBe(SAFE_SHA);
+    expect(hashes.safeSha256).toBeNull();
   });
 
   it("leaves seenHashes as paramsHash uniqueness only", () => {

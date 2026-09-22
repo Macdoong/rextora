@@ -7,7 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { OhlcvCandle } from "../src/lib/rextora/data/ohlcvTypes";
 import type { SafeV44Params } from "../src/lib/rextora/strategy/strategyTypes";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
+import { createStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import { sha256File } from "./helpers/paperRuntimeContinuityAndWarmupForensics";
 
 const INTERVAL = 15 * 60_000;
@@ -103,7 +103,6 @@ import { getOpenPositions } from "../src/lib/rextora/positionManager";
 import { managePaperPositions as managePaperPositionsActual } from "../src/lib/rextora/paperExecutionEngine";
 import { PAPER_MAX_CONSECUTIVE_LOSSES } from "../src/lib/rextora/riskStateStore";
 import { getConfig } from "../src/lib/rextora/config";
-import { copyStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import {
   isolateA834,
@@ -181,7 +180,7 @@ function passingSignal(barIndex: number) {
 }
 
 function prepareBtc() {
-  const copy = copyStrategy(SAFE_STRATEGY_ID, "candle-time-btc");
+  const copy = createStrategy({ name: "candle-time-btc", timeframe: "15m", strategyType: "safe_params" });
   const prepared = preparePaperSession({
     strategyId: copy.id,
     symbol: "BTCUSDT",
@@ -645,16 +644,17 @@ describe("ACCOUNTING / SAFETY", () => {
     expect(es).toContain('export { isCandleFinalized } from "../data/candleTime"');
   });
 
-  it("29-30: SAFE arithmetic and protected file unchanged", () => {
+  it("29-30: SAFE arithmetic unchanged; retired file remains absent", () => {
     const engine = fs.readFileSync(
       path.join(process.cwd(), "src/lib/rextora/signal/safeV44SignalEngine.ts"),
       "utf8",
     );
     expect(engine).toContain("거래량 비율 부족");
     expect(engine).toContain("idx - lastEntry < params.cooldown_bars");
+    expect(fs.existsSync(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json"))).toBe(false);
     expect(
       sha256File(path.join(process.cwd(), "data/strategies/SAFE_v44_i4060.json")),
-    ).toBe("fb3f19169c8911fe041f3f8cb1d9e654f9166078f0c5cd8e29f04ec02a56dfc0");
+    ).toBeNull();
   });
 });
 

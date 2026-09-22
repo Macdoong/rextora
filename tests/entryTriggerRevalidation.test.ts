@@ -256,9 +256,8 @@ describe("triggerMode commercial contract", () => {
     expect(validateCanonicalDefinition(def).ok).toBe(true);
   });
 
-  it("SAFE remains unchanged", () => {
-    const safe = JSON.parse(fs.readFileSync(SAFE, "utf8")) as { params_hash: string };
-    expect(safe.params_hash).toBe("7893ca3f0e30");
+  it("retired SAFE file remains absent", () => {
+    expect(fs.existsSync(SAFE)).toBe(false);
   });
 });
 

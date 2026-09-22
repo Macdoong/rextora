@@ -37,10 +37,12 @@ import {
   ensureStrategyStore,
   setLiveActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_PARAMS_HASH, SAFE_STRATEGY_ID } from "../src/lib/rextora/strategyRepository";
+
 import { buildPatternSearchDefinition } from "../src/lib/rextora/strategySearch/patternEventSequence";
 import { ORDER_BLOCK_BASE_PARAMS } from "../src/lib/rextora/strategySearch/patternSearchSpaces";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
+import { RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
+
 
 const ROOT = path.resolve(__dirname, "..");
 const SAFE_PATH = path.join(ROOT, "data/strategies/SAFE_v44_i4060.json");
@@ -54,7 +56,8 @@ const hashesBefore = productionReadonlyHashes();
 const ordersHashBefore = sha256(ORDERS_PATH);
 const strategyIndexHashBefore = sha256(STRATEGY_INDEX);
 
-function sha256(filePath: string): string {
+function sha256(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
   return createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
@@ -121,18 +124,15 @@ describe("Live execution target dispatch", () => {
     expect(resolved.strategyHash).toBe(created.strategyHash ?? null);
     expect(resolved.executionKind).toBe("event_sequence");
     expect(resolved.isProtectedSafe).toBe(false);
-    expect(resolved.strategyId).not.toBe(SAFE_STRATEGY_ID);
+    expect(resolved.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
   });
 
-  it("2. exact SAFE target resolution", () => {
-    setLiveActiveStrategy(SAFE_STRATEGY_ID);
+  it("2. retired SAFE target fails closed", () => {
+    expect(() => setLiveActiveStrategy(RETIRED_SAFE_STRATEGY_ID)).toThrow();
     const resolved = resolveLiveExecutionTarget();
-    expect(resolved.ok).toBe(true);
-    if (!resolved.ok) return;
-    expect(resolved.strategyId).toBe(SAFE_STRATEGY_ID);
-    expect(resolved.paramsHash).toBe(SAFE_PARAMS_HASH);
-    expect(resolved.executionKind).toBe("safe_params");
-    expect(resolved.isProtectedSafe).toBe(true);
+    expect(resolved.ok).toBe(false);
+    if (resolved.ok) return;
+    expect(resolved.code).toBe(LIVE_TARGET_NO_SELECTION);
   });
 
   it("3. explicit custom does not fall back to SAFE", () => {
@@ -142,10 +142,11 @@ describe("Live execution target dispatch", () => {
     expect(resolved.ok).toBe(true);
     if (!resolved.ok) return;
     expect(resolved.strategyId).toBe(created.id);
-    expect(resolved.strategyId).not.toBe(SAFE_STRATEGY_ID);
+    expect(resolved.strategyId).not.toBe(RETIRED_SAFE_STRATEGY_ID);
     expect(liveExecutionDispatchRoute(resolved)).toBe("event_sequence");
 
-    const copy = copyStrategy(SAFE_STRATEGY_ID, "live exec custom copy");
+    const seed = createStrategy({ name: "live exec custom seed" });
+    const copy = copyStrategy(seed.id, "live exec custom copy");
     setLiveActiveStrategy(copy.id);
     const copyResolved = resolveLiveExecutionTarget();
     expect(copyResolved.ok).toBe(false);
@@ -204,31 +205,28 @@ describe("Live execution target dispatch", () => {
     ).toBe(true);
   });
 
-  it("6. custom approval + SAFE target blocks", async () => {
+  it("6. custom approval + missing live target blocks", async () => {
     const created = createEventSequenceStrategy();
+    const other = createEventSequenceStrategy();
     const requested = await requestLiveApproval({ strategyId: created.id });
     await approveLiveApprovalRequest({
       requestId: requested.request?.requestId,
       confirmationText: CONFIRM,
     });
-    setLiveActiveStrategy(SAFE_STRATEGY_ID);
+    setLiveActiveStrategy(other.id);
     const gate = evaluateLiveStartApprovalGate(getStrategyLiveApprovalState());
     expect(gate.ok).toBe(false);
     expect(gate.code).toBe("APPROVAL_STRATEGY_MISMATCH");
-    expect(gate.currentTarget?.strategyId).toBe(SAFE_STRATEGY_ID);
+    expect(gate.currentTarget?.strategyId).toBe(other.id);
   });
 
-  it("7. SAFE approval + custom target blocks", async () => {
+  it("7. retired SAFE approval is rejected", async () => {
     const created = createEventSequenceStrategy();
-    const safeReq = await requestLiveApproval({ strategyId: SAFE_STRATEGY_ID });
-    await approveLiveApprovalRequest({
-      requestId: safeReq.request?.requestId,
-      confirmationText: CONFIRM,
-    });
+    const safeReq = await requestLiveApproval({ strategyId: RETIRED_SAFE_STRATEGY_ID });
+    expect(safeReq.ok).toBe(false);
     setLiveActiveStrategy(created.id);
     const gate = evaluateLiveStartApprovalGate(getStrategyLiveApprovalState());
     expect(gate.ok).toBe(false);
-    expect(gate.code).toBe("APPROVAL_STRATEGY_MISMATCH");
     expect(gate.currentTarget?.strategyId).toBe(created.id);
   });
 
@@ -268,13 +266,12 @@ describe("Live execution target dispatch", () => {
     ).toBe("APPROVAL_BACKTEST_MISMATCH");
   });
 
-  it("11-12. SAFE dispatch vs custom Event-Sequence dispatch never cross", () => {
-    setLiveActiveStrategy(SAFE_STRATEGY_ID);
-    const safeTarget = resolveLiveExecutionTarget();
-    expect(liveExecutionDispatchRoute(safeTarget)).toBe("safe_params");
+  it("11-12. retired SAFE dispatch vs custom Event-Sequence dispatch never cross", () => {
+    const safeTarget = resolveLiveExecutionTargetById(RETIRED_SAFE_STRATEGY_ID);
+    expect(liveExecutionDispatchRoute(safeTarget)).toBe("blocked");
     let safeCalls = 0;
     let esCalls = 0;
-    dispatchLiveExecution(safeTarget, {
+    const blockedSafe = dispatchLiveExecution(safeTarget, {
       runSafe: () => {
         safeCalls += 1;
         return "safe";
@@ -285,7 +282,8 @@ describe("Live execution target dispatch", () => {
       },
       failClosed: () => "blocked",
     });
-    expect(safeCalls).toBe(1);
+    expect(blockedSafe).toBe("blocked");
+    expect(safeCalls).toBe(0);
     expect(esCalls).toBe(0);
 
     const created = createEventSequenceStrategy();
@@ -354,16 +352,15 @@ describe("Live execution target dispatch", () => {
     expect(scanSrc).not.toContain("loadSafeV44Strategy");
     expect(scanSrc).not.toContain("runSafeLiveEntries");
     expect(runtimeSrc).toContain("async function runSafeLiveEntries");
-    expect(runtimeSrc).toContain("loadSafeV44Strategy");
-    expect(runtimeSrc).toContain("evaluateSafeV44Signal");
+    expect(runtimeSrc).not.toContain("loadSafeV44Strategy");
+    expect(runtimeSrc).not.toContain("evaluateSafeV44Signal");
     const missing = await runEventSequenceLiveEntries({ strategyId: "custom_missing_scan" });
     expect(missing.entered).toBe(0);
     expect(missing.blockedReason).toBeTruthy();
   });
 
-  it("17-18. SAFE file and production stores unchanged", () => {
-    expect(sha256(SAFE_PATH)).toBe(SAFE_SHA);
-    expect(JSON.parse(fs.readFileSync(SAFE_PATH, "utf8")).params_hash).toBe(SAFE_PARAMS_HASH);
+  it("17-18. SAFE file is retired and production stores unchanged", () => {
+    expect(fs.existsSync(SAFE_PATH)).toBe(false);
     expect(productionReadonlyHashes().safeSha256).toBe(hashesBefore.safeSha256);
     expect(productionReadonlyHashes().researchIndexSha256).toBe(hashesBefore.researchIndexSha256);
     expect(productionReadonlyHashes().backtestIndexSha256).toBe(hashesBefore.backtestIndexSha256);

@@ -1,9 +1,8 @@
 /**
- * Paper strategy resolution — executes ONLY an active Paper session strategy.
+ * Paper strategy resolution — executes ONLY an explicit selected strategy.
  * Paused/ready/pending sessions never execute.
- * paperActive registry is fallback only when no current session exists,
- * and never overrides an active/paused session identity.
- * SAFE is used only when it is the selected paper strategy.
+ * paperActive registry is fallback only when no current session exists.
+ * Missing strategy fails closed. Retired SAFE is never used.
  */
 
 import {
@@ -11,10 +10,6 @@ import {
   getPaperActiveStrategy,
   getStrategyById,
 } from "../strategy/strategyStore";
-import {
-  EXPECTED_SAFE_PARAMS_HASH,
-  SAFE_STRATEGY_ID,
-} from "../strategy/strategyTypes";
 import {
   storedToDefinition,
   type StoredStrategyV1,
@@ -24,6 +19,10 @@ import {
   getCurrentPaperSession,
   getExecutablePaperSession,
 } from "../paper/paperSessionStore";
+import {
+  isRetiredSafeId,
+  NO_PAPER_STRATEGY,
+} from "../strategy/retiredSafeBaseline";
 
 export interface ResolvedPaperStrategy {
   strategy: StoredStrategyV1;
@@ -33,8 +32,8 @@ export interface ResolvedPaperStrategy {
   name: string;
   sessionId: string | null;
   sessionStatus: string | null;
-  /** True only when the resolved strategy is the protected SAFE original. */
-  isProtectedSafe: boolean;
+  /** Always false. Retired SAFE is never executable. */
+  isProtectedSafe: false;
   executionKind: "safe_params" | "condition_builder" | "event_sequence";
   exchangeCalled: false;
 }
@@ -55,11 +54,15 @@ export function resolvePaperExecutionStrategy(): ResolvedPaperStrategy {
     );
   }
 
-  const fromSession = executable?.strategyId
-    ? getStrategyById(executable.strategyId)
-    : null;
-  const strategy = (fromSession ?? getPaperActiveStrategy()) as StoredStrategyV1;
-  const isProtectedSafe = strategy.id === SAFE_STRATEGY_ID;
+  const fromSession =
+    executable?.strategyId && !isRetiredSafeId(executable.strategyId)
+      ? getStrategyById(executable.strategyId)
+      : null;
+  const strategy = (fromSession ?? getPaperActiveStrategy()) as StoredStrategyV1 | null;
+  if (!strategy || isRetiredSafeId(strategy.id)) {
+    throw new Error(NO_PAPER_STRATEGY);
+  }
+  const isProtectedSafe = false as const;
   let executionKind: ResolvedPaperStrategy["executionKind"] = "safe_params";
   if (strategy.strategyType === "condition_builder") {
     executionKind = "condition_builder";
@@ -98,8 +101,11 @@ export function resolveLiveDryRunExecutionStrategy(
   if (!selected) {
     throw new Error("live dry-run strategy not found");
   }
+  if (isRetiredSafeId(selected.id)) {
+    throw new Error("live dry-run strategy not found");
+  }
   const strategy = selected as StoredStrategyV1;
-  const isProtectedSafe = strategy.id === SAFE_STRATEGY_ID;
+  const isProtectedSafe = false as const;
   return {
     strategy,
     strategyId: strategy.id,
@@ -119,14 +125,11 @@ export function resolveLiveDryRunExecutionStrategy(
   };
 }
 
-/** Fail closed if protected SAFE hash is wrong. */
+/** Fail closed when no explicit executable strategy remains. */
 export function assertPaperStrategyIntegrity(
   resolved: ResolvedPaperStrategy,
 ): void {
-  if (
-    resolved.isProtectedSafe &&
-    resolved.paramsHash !== EXPECTED_SAFE_PARAMS_HASH
-  ) {
-    throw new Error("SAFE params_hash mismatch — refusing paper scan");
+  if (!resolved.strategyId || isRetiredSafeId(resolved.strategyId)) {
+    throw new Error(NO_PAPER_STRATEGY);
   }
 }

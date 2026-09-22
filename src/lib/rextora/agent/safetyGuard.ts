@@ -57,7 +57,7 @@ const READ_ONLY_INTENTS: AgentIntentType[] = [
 // Intent types that are explicitly blocked — write or execution operations.
 const BLOCKED_INTENT_MESSAGES: Partial<Record<AgentIntentType, string>> = {
   modify_safe:
-    "SAFE 전략은 보호된 기준 전략으로 에이전트가 수정할 수 없습니다. 이 전략은 절대 변경되지 않습니다.",
+    "그 식별값은 폐기된 과거 기준 전략입니다. 현재 전략으로 사용할 수 없습니다.",
   execute_trade:
     "실전 매매는 에이전트가 자동으로 실행할 수 없습니다. 모든 주문은 명시적인 인간 승인 후에만 실행됩니다.",
   start_live:

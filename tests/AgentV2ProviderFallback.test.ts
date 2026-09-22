@@ -106,13 +106,13 @@ describe("AgentV2ProviderFallback", () => {
       facts: [
         {
           labelKo: "후보 전략 ID",
-          value: "SAFE_v44_i4060",
+          value: "custom_fixture",
           source: "strategy_store",
           fetchedAt: new Date().toISOString(),
         },
         {
           labelKo: "후보 전략",
-          value: "보호된 SAFE 전략",
+          value: "테스트 전략",
           source: "strategy_store",
           fetchedAt: new Date().toISOString(),
         },
@@ -127,13 +127,13 @@ describe("AgentV2ProviderFallback", () => {
     expect(artifact.toolPlan).toHaveLength(1);
     expect(artifact.toolPlan[0]?.toolId).toBe("paper.prepare");
     expect(artifact.toolPlan[0]?.arguments).toMatchObject({
-      strategyId: "SAFE_v44_i4060",
+      strategyId: "custom_fixture",
     });
     expect(artifact.toolPlan[0]?.arguments).not.toHaveProperty("requireApproval");
     expect(reasoningToProposedAction(artifact)).toMatchObject({
       actionType: "open_paper_approval",
       targetRoute: "/paper-trading",
-      strategyId: "SAFE_v44_i4060",
+      strategyId: "custom_fixture",
       requiresApproval: true,
     });
   });

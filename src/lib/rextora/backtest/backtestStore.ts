@@ -11,6 +11,7 @@ import {
 
 import { backtestsRoot } from "../storage/runtimePaths";
 import { assertTestStoreIsNotProduction } from "../storage/testStoreGuard";
+import { normalizeOwnerUserId } from "../auth/searchResourceAccess";
 
 export const IDENTITY_SCHEMA_LEGACY_ORIGINAL = "legacy_original" as const;
 export const IDENTITY_SCHEMA_P3A52 = "p3a52" as const;
@@ -291,6 +292,7 @@ export function saveBacktestResult(
     hasChartEvidence: hasChart || Boolean(result.hasChartEvidence),
     chartEvidenceSchemaVersion:
       result.chartEvidenceSchemaVersion ?? (hasChart ? 1 : undefined),
+    ownerUserId: normalizeOwnerUserId(result.ownerUserId) ?? null,
   };
 
   const savedPath = path.join(DIR(), `${saved.id}.json`);

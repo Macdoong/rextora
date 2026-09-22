@@ -2521,21 +2521,7 @@ function ValidationGrid({
           title: "파라미터 해시 검증",
           status: report.validation.paramsHashVerified ? "pass" : "warning",
           value: report.validation.paramsHashVerified ? "검증됨" : "확인 필요",
-          explain: "보호 전략 파라미터 해시가 저장된 값과 일치하는지 확인합니다.",
-        },
-        {
-          title: "SAFE 무결성",
-          status:
-            report.strategyId === "SAFE_v44_i4060"
-              ? report.strategyHash?.startsWith("7893ca3f0e30")
-                ? "pass"
-                : "fail"
-              : "pass",
-          value:
-            report.strategyId === "SAFE_v44_i4060"
-              ? report.strategyHash?.slice(0, 12) ?? "-"
-              : "비SAFE 실행(해당 없음)",
-          explain: "SAFE 원본 해시 7893ca3f0e30 무결성입니다.",
+          explain: "저장된 파라미터 해시가 실행 리포트와 일치하는지 확인합니다.",
         },
       ],
     },

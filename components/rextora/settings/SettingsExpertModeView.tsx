@@ -4,14 +4,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/primitives";
 import {
   SETTINGS_EXPERT_LEDE,
-  SETTINGS_EXPERT_SAFE_NOTE,
   SETTINGS_EXPERT_TECHNICAL_KEYS,
   SETTINGS_EXPERT_WIZARD_HREF,
   settingsExpertBacktestStatus,
   settingsExpertBuilderStatus,
   settingsExpertGateLabel,
   settingsExpertGateTone,
-  settingsExpertSafeLockLabel,
   settingsExpertServerSettingsLabel,
   settingsExpertStoreLabel,
   settingsExpertTechnicalKeyLabel,
@@ -66,9 +64,7 @@ export function SettingsExpertModeView(props: SettingsExpertModeViewProps) {
           />
           <Fact label="저장 위치" value={settingsExpertStoreLabel()} />
           <Fact label="서버 설정" value={settingsExpertServerSettingsLabel()} />
-          <Fact label="SAFE" value={settingsExpertSafeLockLabel()} />
         </div>
-        <p className="v3-st-note">{SETTINGS_EXPERT_SAFE_NOTE}</p>
       </section>
 
       <section className="v3-st-group" data-testid="settings-expert-surfaces">

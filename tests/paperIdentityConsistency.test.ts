@@ -3,12 +3,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
-  copyStrategy,
+  createStrategy,
   ensureStrategyStore,
   getStrategyById,
   setPaperActiveStrategy,
 } from "../src/lib/rextora/strategy/strategyStore";
-import { SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/strategyTypes";
 import { createPaperSession } from "../src/lib/rextora/paper/paperSessionStore";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { computeStrategyHash } from "../src/lib/rextora/strategy/strategyHash";
@@ -47,7 +46,7 @@ describe("paper identity consistency", () => {
   });
 
   it("hydrates strategyHash for legacy rows without definition", () => {
-    const created = copyStrategy(SAFE_STRATEGY_ID, "legacy_no_def");
+    const created = createStrategy({ name: "legacy_no_def", timeframe: "15m" });
     const file = path.join(strategiesRoot!, `${created.id}.json`);
     const raw = JSON.parse(fs.readFileSync(file, "utf8"));
     delete raw.definition;
@@ -64,7 +63,7 @@ describe("paper identity consistency", () => {
   });
 
   it("paper session identity matches library strategyHash and paramsHash", () => {
-    const created = copyStrategy(SAFE_STRATEGY_ID, "paper_id_match");
+    const created = createStrategy({ name: "paper_id_match", timeframe: "15m" });
     const session = createPaperSession({ strategyId: created.id });
     const lib = getStrategyById(created.id)!;
     expect(session.strategyId).toBe(lib.id);
@@ -74,8 +73,8 @@ describe("paper identity consistency", () => {
   });
 
   it("setPaperActiveStrategy clears other paperActive flags", () => {
-    const a = copyStrategy(SAFE_STRATEGY_ID, "paper_a");
-    const b = copyStrategy(SAFE_STRATEGY_ID, "paper_b");
+    const a = createStrategy({ name: "paper_a", timeframe: "15m" });
+    const b = createStrategy({ name: "paper_b", timeframe: "15m" });
     setPaperActiveStrategy(a.id);
     setPaperActiveStrategy(b.id);
     expect(getStrategyById(a.id)?.paperActive).toBe(false);

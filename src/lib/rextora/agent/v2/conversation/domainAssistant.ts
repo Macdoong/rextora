@@ -84,9 +84,9 @@ export function deterministicConversationAnswer(input: {
     if (input.route.answerIntent === "safe_mutation_refusal") {
       return {
         conclusionKo:
-          "보호된 SAFE 전략은 에이전트가 수정할 수 없습니다.",
+          "그 식별값은 폐기되어 현재 전략으로 사용할 수 없습니다.",
         explanationKo:
-          "SAFE는 비교와 복구를 위한 기준 전략이므로 별도의 명시적 변경 절차 없이는 그대로 유지됩니다.",
+          "과거 기준 전략 기록은 유지될 수 있지만, 더 이상 선택된 전략이나 수정 대상이 아닙니다.",
         recommendedActionKo: null,
       };
     }

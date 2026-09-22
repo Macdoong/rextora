@@ -8,6 +8,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { writeDurableJsonPayload } from "./durableJsonWrite";
+import { RETIRED_SAFE_FILE_NAME } from "../strategy/retiredSafeBaseline";
 import {
   APPROVED_P2_F2B_IDS,
   lastTrialCreatedAt,
@@ -428,7 +429,7 @@ export function writeDedicatedApplyBackup(input: {
     ownershipAudit: sha256File(path.join(root, "execution-ownership-audit.jsonl")),
     recoveryAudit: sha256File(path.join(root, "recovery-audit.jsonl")),
     safeHash: sha256File(
-      path.join(process.cwd(), "data", "strategies", "SAFE_v44_i4060.json"),
+      path.join(process.cwd(), "data", "strategies", RETIRED_SAFE_FILE_NAME),
     ),
     proposedFinishedAt: { ...APPROVED_HISTORICAL_FINISHED_AT },
     artifactDir: input.artifactDir,

@@ -225,4 +225,6 @@ export interface SavedBacktestResult {
    */
   hasChartEvidence?: boolean;
   chartEvidenceSchemaVersion?: number;
+  /** Customer owner. Distinct from process/PID execution ownership. */
+  ownerUserId?: string | null;
 }
