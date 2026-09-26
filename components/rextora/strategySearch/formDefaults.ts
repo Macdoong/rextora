@@ -308,6 +308,12 @@ export const QUALIFICATION_PROFILES: Record<
   },
 };
 
+export type AutoSearchObjective = "time_budget" | "qualified_target";
+
+export function normalizeAutoSearchObjective(value: unknown): AutoSearchObjective {
+  return value === "qualified_target" ? "qualified_target" : "time_budget";
+}
+
 export const HISTORICAL_PERIOD_PRESETS: Record<
   Exclude<HistoricalPeriodPresetId, "custom">,
   { labelKo: string; days: number }
@@ -328,6 +334,12 @@ export interface StrategySearchOperatorFormState {
   qualifiedTargetCustom: string;
   /** Explicit hard stop when qualified target is met (default false). */
   stopWhenQualifiedTarget: boolean;
+  /**
+   * Customer automatic-search objective.
+   * time_budget keeps stopWhenQualifiedTarget false.
+   * qualified_target sets it true only while selection mode is automatic.
+   */
+  autoSearchObjective: AutoSearchObjective;
   minTradeCount: string;
   minTotalReturn: string;
   maxMdd: string;
@@ -648,6 +660,28 @@ export function resolveCandidateBudget(
   return depth.candidateBudget;
 }
 
+export function isAutomaticQualifiedTargetMode(
+  form: Pick<
+    StrategySearchOperatorFormState,
+    "autoSearchObjective" | "patternConfigLevel" | "autoStrategyCombo"
+  >,
+): boolean {
+  return (
+    resolvePatternSelectionMode({
+      patternConfigLevel: form.patternConfigLevel,
+      autoStrategyCombo: form.autoStrategyCombo,
+    }) === "automatic" &&
+    normalizeAutoSearchObjective(form.autoSearchObjective) === "qualified_target"
+  );
+}
+
+/** Request flag: true only for automatic target-outcome mode. */
+export function resolveStopWhenQualifiedTarget(
+  form: StrategySearchOperatorFormState,
+): boolean {
+  return isAutomaticQualifiedTargetMode(form);
+}
+
 export function resolveMaxRuntimeMs(
   form: StrategySearchOperatorFormState,
 ): number | null {
@@ -691,6 +725,7 @@ export function createDefaultOperatorFormState(): StrategySearchOperatorFormStat
     qualifiedTargetCustom: "3",
     /** Soft goal only — research continues until time budget by default. */
     stopWhenQualifiedTarget: false,
+    autoSearchObjective: "time_budget",
     minTradeCount: qual.minTradeCount,
     minTotalReturn: qual.minTotalReturn,
     maxMdd: qual.maxMdd,
@@ -801,7 +836,9 @@ export function operatorFormToCreateBody(
   const candidateBudget = resolveCandidateBudget(form);
   const stageBatchSize = depth.stageBatchSize;
   const maxRuntimeMs = resolveMaxRuntimeMs(form);
-  const qualifiedTarget = resolveQualifiedTarget(form);
+  const qualifiedTarget = isAutomaticQualifiedTargetMode(form)
+    ? 1
+    : resolveQualifiedTarget(form);
   const minScore = optionalNum(form.minScore);
   const minTotalReturn = resolveMinTotalReturn(form);
   const searchName =
@@ -829,8 +866,7 @@ export function operatorFormToCreateBody(
     depthProfile: depthId,
     qualificationProfile: qualId,
     qualifiedTarget,
-    // Standard lifecycle never stops at qualified target (Expert Mode only).
-    stopWhenQualifiedTarget: false,
+    stopWhenQualifiedTarget: resolveStopWhenQualifiedTarget(form),
     candidateBudget,
     stageBatchSize,
     maxRuntimeMs,

@@ -1,5 +1,6 @@
 import {
   createDefaultOperatorFormState,
+  normalizeAutoSearchObjective,
   type StrategySearchOperatorFormState,
 } from "./formDefaults";
 
@@ -23,10 +24,14 @@ export function loadOperatorFormSession(): StrategySearchOperatorFormState | nul
     const parsed: unknown = JSON.parse(raw);
     if (!isRecord(parsed) || parsed.schemaVersion !== 1) return null;
     if (!isRecord(parsed.form)) return null;
-    return {
+    const merged = {
       ...createDefaultOperatorFormState(),
       ...(parsed.form as unknown as StrategySearchOperatorFormState),
     };
+    merged.autoSearchObjective = normalizeAutoSearchObjective(
+      merged.autoSearchObjective,
+    );
+    return merged;
   } catch {
     return null;
   }

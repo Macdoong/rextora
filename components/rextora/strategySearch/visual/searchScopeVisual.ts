@@ -1,5 +1,6 @@
 import {
   HISTORICAL_PERIOD_PRESETS,
+  isAutomaticQualifiedTargetMode,
   SEARCHABLE_PATTERN_SPACE_OPTIONS,
   SEARCHABLE_SPACE_OPTIONS,
   resolveQualifiedTarget,
@@ -156,7 +157,9 @@ export function qualificationTargetCopy(
   return {
     target,
     title: `목표 합격 후보 ${target}개`,
-    hint: "진행 상황을 확인하기 위한 목표이며 자동 종료 조건이 아닙니다.",
+    hint: isAutomaticQualifiedTargetMode(form)
+      ? "조건을 만족하는 후보가 이 수에 도달하면 탐색을 종료합니다."
+      : "진행 상황을 확인하기 위한 목표이며 자동 종료 조건이 아닙니다.",
   };
 }
 

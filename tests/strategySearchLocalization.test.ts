@@ -103,15 +103,31 @@ describe("strategy search Korean localization polish", () => {
 
   it("Korean field labels and primary CTA render", () => {
     const form = read("JobCreateForm.tsx");
-    expect(form).toContain("탐색 범위 설정");
-    expect(form).toContain("탐색 대상");
-    expect(form).toContain("탐색 시간");
+    const guidedUi = [
+      "guided/GuidedApproachEssentials.tsx",
+      "guided/GuidedStrategyScopeSummary.tsx",
+      "guided/GuidedMobileScopeSummary.tsx",
+      "visual/StrategySearchScopeMap.tsx",
+    ]
+      .map((f) => read(f))
+      .join("\n");
+    const labels = form + guidedUi;
+    expect(labels).toContain("탐색 대상");
+    expect(labels).toContain("탐색 시간");
     expect(form).toContain("탐색 프리셋");
     expect(form).toContain("최대 허용 낙폭");
     expect(form).toContain("탐색 기준");
-    expect(form).toContain("고급 탐색 설정");
-    expect(form).toContain("자동 탐색 시작");
-    expect(form).toContain("선택 범위로 탐색 시작");
+    expect(form).toContain("고급 설정");
+    expect(form).toContain("추가 탐색 설정");
+    expect(read("guided/GuidedAutomaticObjectivePanel.tsx")).toContain(
+      "시간 기준 자동 탐색",
+    );
+    expect(read("guided/GuidedAutomaticObjectivePanel.tsx")).toContain(
+      "목표 기준 자동 탐색",
+    );
+    expect(form).toContain("탐색 시작");
+    expect(form).not.toContain("자동 탐색 시작");
+    expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).toContain("탐색 이름");
     expect(form).toContain("목표 합격 후보");
     expect(form).toContain("비용 검증");
@@ -121,12 +137,14 @@ describe("strategy search Korean localization polish", () => {
   });
 
   it("settings sections use Korean titles on unified form", () => {
-    const form = read("JobCreateForm.tsx");
+    const form =
+      read("JobCreateForm.tsx") +
+      read("guided/GuidedApproachEssentials.tsx");
     for (const title of [
-      "핵심 탐색 설정",
+      "탐색 깊이 · 시간",
       "패턴 · 조합 조건",
       "패턴 탐색",
-      "데이터 및 기간",
+      "패턴 세부 설정",
       "위험 및 레버리지",
       "검증 강도",
       "실행 및 자원 제한",
@@ -166,7 +184,7 @@ describe("strategy search Korean localization polish", () => {
     expect(src).toContain("최고 안정");
     expect(src).toContain("이 탐색 결과");
     expect(src).toContain("개선 탐색");
-    expect(src).toContain("새 탐색 시작");
+    expect(src).toContain("새 탐색");
     expect(src).not.toContain("개발자 정보");
     expect(src).toContain("ss-completion-primary-metrics");
     expect(src).toContain("ss-completion-top10-saved");

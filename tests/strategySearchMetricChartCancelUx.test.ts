@@ -134,7 +134,9 @@ describe("Strategy Search metric chart + cancel copy UX", () => {
     );
     const css = read("components/rextora/v3/strategy-search.css");
     expect(spark).toContain("표시할 최근 후보 데이터가 없습니다.");
-    expect(spark).toContain("ss-spark__zero");
+    expect(spark).toContain("ss-spark__line");
+    expect(spark).not.toContain("ss-spark__zero");
+    expect(spark).not.toContain("-zero-line");
     expect(spark).toContain("ss-spark__foot");
     expect(spark).not.toContain("candlestick");
     expect(css).toContain(".ss-spark__plot");

@@ -176,7 +176,7 @@ describe("UI workflow wiring", () => {
       "utf8",
     );
     expect(search).toContain(
-      "연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다",
+      "새 탐색, 재개 작업, 후보 비교를 한 화면에서 처리합니다.",
     );
   });
 });

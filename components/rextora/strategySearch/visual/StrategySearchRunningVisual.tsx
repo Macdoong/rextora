@@ -74,6 +74,7 @@ export function StrategySearchRunningVisual({
 
   return (
     <section
+      id="ss-running-view-anchor"
       className="ss-run-visual"
       data-testid="ss-running-visual"
       data-run-mode={mode}

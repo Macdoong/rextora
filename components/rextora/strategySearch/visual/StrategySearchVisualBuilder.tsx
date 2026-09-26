@@ -30,6 +30,8 @@ const guidedMarketSelect = `${guidedSelectClass} ss-visual-select`;
 
 export type StrategySearchVisualBuilderPanels = {
   mode?: boolean;
+  /** When false, hides the post-mode selection summary (automatic time-budget step uses its own). */
+  modeOutcome?: boolean;
   market?: boolean;
   /** Shorthand: both workspaceControls and scopeMap. */
   workspace?: boolean;
@@ -50,11 +52,12 @@ export function resolveVisualBuilderPanels(
   panelsProp?: StrategySearchVisualBuilderPanels,
 ): {
   mode: boolean;
+  modeOutcome: boolean;
   market: boolean;
   workspaceControls: boolean;
   scopeMap: boolean;
 } {
-  const merged = { ...DEFAULT_PANELS, ...panelsProp };
+  const merged = { ...DEFAULT_PANELS, ...panelsProp, modeOutcome: panelsProp?.modeOutcome ?? true };
   if (panelsProp?.workspace === false) {
     if (panelsProp.workspaceControls === undefined) {
       merged.workspaceControls = false;
@@ -72,6 +75,7 @@ export function resolveVisualBuilderPanels(
   }
   return {
     mode: merged.mode,
+    modeOutcome: merged.modeOutcome ?? true,
     market: merged.market,
     workspaceControls: merged.workspaceControls,
     scopeMap: merged.scopeMap,
@@ -135,7 +139,9 @@ export function StrategySearchVisualBuilder({
             onSelectAutomatic={onSelectAutomatic}
             onSelectDirect={onSelectDirect}
           />
-          <GuidedModeOutcomePanel mode={automatic ? "automatic" : "manual"} />
+          {panels.modeOutcome !== false ? (
+            <GuidedModeOutcomePanel mode={automatic ? "automatic" : "manual"} />
+          ) : null}
         </>
       ) : null}
 

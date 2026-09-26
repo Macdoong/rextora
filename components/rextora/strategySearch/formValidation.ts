@@ -9,6 +9,7 @@ import {
   SEARCHABLE_SPACE_OPTIONS,
   getDepthProfile,
   isPatternFamilyId,
+  isAutomaticQualifiedTargetMode,
   operatorFormToCreateBody,
   resolveCandidateBudget,
   resolveDepthProfileId,
@@ -196,6 +197,45 @@ export function validateStrategySearchForm(
       errors.push({
         field: "maxRuntime",
         message: `탐색 시간(${expected}분)과 고급 실행 시간(${actual}분)이 일치하지 않습니다.`,
+      });
+    }
+  }
+
+  if (isAutomaticQualifiedTargetMode(form)) {
+    const runtimeMs = resolveMaxRuntimeMs(form);
+    if (runtimeMs == null || !Number.isFinite(runtimeMs) || runtimeMs <= 0) {
+      errors.push({
+        field: "maxRuntime",
+        message: "목표 기준 탐색에는 유한한 최대 탐색 시간이 필요합니다.",
+      });
+    }
+    if (
+      form.durationPreset === "custom" &&
+      (form.maxRuntimeMinutesOverride.trim() === "" ||
+        !isFiniteNumber(Number(form.maxRuntimeMinutesOverride)) ||
+        Number(form.maxRuntimeMinutesOverride) <= 0)
+    ) {
+      errors.push({
+        field: "maxRuntime",
+        message: "직접 설정한 최대 탐색 시간(분)은 0보다 커야 합니다.",
+      });
+    }
+    if (form.minTotalReturn.trim() === "") {
+      errors.push({
+        field: "minTotalReturn",
+        message: "목표 기준 탐색에는 최소 수익률이 필요합니다.",
+      });
+    }
+    if (form.maxMdd.trim() === "") {
+      errors.push({
+        field: "maxMdd",
+        message: "목표 기준 탐색에는 최대 낙폭이 필요합니다.",
+      });
+    }
+    if (form.minTradeCount.trim() === "") {
+      errors.push({
+        field: "minTradeCount",
+        message: "목표 기준 탐색에는 최소 거래 수가 필요합니다.",
       });
     }
   }

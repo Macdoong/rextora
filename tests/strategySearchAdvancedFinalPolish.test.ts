@@ -29,10 +29,14 @@ describe("Strategy Search advanced final polish", () => {
       chevronGlyph: "▲",
     });
     const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
-    expect(form).toContain("advancedDisclosureControl(detailsOpen)");
+    const disclosure = read(
+      "components/rextora/strategySearch/guided/GuidedDisclosure.tsx",
+    );
+    expect(form).toContain("GuidedDisclosure");
     expect(form).toContain("aria-expanded={detailsOpen}");
-    expect(form).toContain("data-chevron={disclosure.chevron}");
     expect(form).toContain("hidden={!detailsOpen}");
+    expect(disclosure).toContain("<details");
+    expect(disclosure).toContain("ss-guided-disclosure__chevron");
     const css = read("components/rextora/v3/strategy-search.css");
     expect(css).not.toContain(
       ".ss-advanced-disclosure[data-open=\"true\"] .ss-advanced-trigger__chevron",

@@ -5,6 +5,7 @@
 
 import {
   createDefaultOperatorFormState,
+  normalizeAutoSearchObjective,
   type StrategySearchOperatorFormState,
 } from "./formDefaults";
 
@@ -57,6 +58,7 @@ export function applySavedOperatorForm(
   if (session) {
     next.showAdvanced = session.showAdvanced;
   }
+  next.autoSearchObjective = normalizeAutoSearchObjective(next.autoSearchObjective);
   return next;
 }
 

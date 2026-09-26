@@ -16,7 +16,8 @@ export function StrategySearchModeSelector({
       <button
         type="button"
         className={
-          "ss-mode-card" + (automatic ? " ss-mode-card--active" : "")
+          "ss-mode-card ss-selection-card ss-mode-card--automatic" +
+          (automatic ? " ss-mode-card--active" : "")
         }
         disabled={disabled}
         data-testid="ss-search-mode-automatic"
@@ -26,16 +27,17 @@ export function StrategySearchModeSelector({
         <span className="ss-mode-card__badge">권장</span>
         <strong className="ss-mode-card__title">자동 탐색</strong>
         <p className="ss-mode-card__copy">
-          Rextora가 탐색 전략군과 조합 범위를 자동 구성합니다.
+          정해진 시간 동안 Rextora가 전략 조합과 설정을 자동으로 탐색합니다.
         </p>
         <p className="ss-mode-card__flow">
-          이번 흐름: 다음 단계에서 자동 구성된 범위를 확인합니다.
+          이번 흐름: 탐색 시간을 정한 뒤 시작합니다.
         </p>
       </button>
       <button
         type="button"
         className={
-          "ss-mode-card" + (!automatic ? " ss-mode-card--active" : "")
+          "ss-mode-card ss-selection-card ss-mode-card--direct" +
+          (!automatic ? " ss-mode-card--active" : "")
         }
         disabled={disabled}
         data-testid="ss-search-mode-direct"

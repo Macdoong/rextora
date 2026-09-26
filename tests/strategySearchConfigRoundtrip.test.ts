@@ -212,7 +212,7 @@ describe("Strategy Search saved-configuration roundtrip and discoverability", ()
     const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
     expect(formSrc).toContain('value={form.patternConfigLevel}');
     expect(formSrc).toContain("buildAppliedSettingsPreview(form)");
-    expect(formSrc).toContain("advancedConditionsStateLabel(form)");
+    expect(formSrc).toContain("ss-guided-step2-deep");
     const original = nonDefaultForm();
     const restored = applySavedOperatorForm(original, { showAdvanced: false });
     expect(restored.patternConfigLevel).toBe("expert");

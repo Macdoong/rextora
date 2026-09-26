@@ -7,10 +7,7 @@ import {
   StickyActionBar,
 } from "@/components/ui/primitives";
 import { AdvancedLevelSelector } from "./visual/AdvancedLevelSelector";
-import {
-  advancedDisclosureControl,
-  isStrategySearchDeveloperDiagnosticsVisible,
-} from "./completionCustomerView";
+import { isStrategySearchDeveloperDiagnosticsVisible } from "./completionCustomerView";
 import type { StrategySearchOperatorFormState } from "./formDefaults";
 import {
   BEGINNER_PRESET_MAP,
@@ -57,9 +54,18 @@ import {
   fieldOriginLabel,
 } from "./customerDisplay";
 import { SearchConfigManager } from "./SearchConfigManager";
-import { advancedConditionsStateLabel } from "./advancedConditionsState";
-import { GuidedApproachEssentials } from "./guided/GuidedApproachEssentials";
+import { GuidedApproachEssentials, GuidedDurationControl } from "./guided/GuidedApproachEssentials";
+import { GuidedAutomaticSearchObjective } from "./guided/GuidedAutomaticSearchObjective";
+import { GuidedAutomaticObjectivePanel } from "./guided/GuidedAutomaticObjectivePanel";
+import { automaticAnalysisSummaryLine, GuidedAutomaticTimeBudget } from "./guided/GuidedAutomaticTimeBudget";
+import { GuidedQualificationTargets } from "./guided/GuidedQualificationTargets";
 import { GuidedDisclosure } from "./guided/GuidedDisclosure";
+import { GuidedStrategyScopeSummary } from "./guided/GuidedStrategyScopeSummary";
+import {
+  showGuidedPatternDetailDisclosure,
+  showGuidedValidationAdvancedBand,
+} from "./guided/strategySearchGuidedVisibility";
+import { GuidedMobileScopeSummary } from "./guided/GuidedMobileScopeSummary";
 import { GuidedSectionCoach } from "./guided/GuidedSectionCoach";
 import { GuidedStepMount } from "./guided/GuidedStepMount";
 import {
@@ -67,6 +73,7 @@ import {
   guidedNumberClass,
   guidedSelectClass,
 } from "./guided/guidedFieldClass";
+import { StrategySearchFieldHelp } from "./guided/StrategySearchFieldHelp";
 import { StrategySearchFinalReview } from "./guided/StrategySearchFinalReview";
 import { StrategySearchGuidedSetup } from "./guided/StrategySearchGuidedSetup";
 import { useStrategySearchGuidedSetup } from "./guided/useStrategySearchGuidedSetup";
@@ -206,12 +213,14 @@ function Field({
   error,
   children,
   hint,
+  helpFieldId,
   origin = "editable",
 }: {
   id: string;
   label: string;
   error?: string;
   hint?: string;
+  helpFieldId?: string;
   origin?: "editable" | "auto" | "preset" | "readonly";
   children: React.ReactNode;
 }) {
@@ -227,6 +236,9 @@ function Field({
     >
       <span className="ss-field-label mb-1 flex items-center gap-2">
         {label}
+        {helpFieldId ? (
+          <StrategySearchFieldHelp fieldId={helpFieldId} />
+        ) : null}
         {originText ? (
           <em className="ss-field-origin">{originText}</em>
         ) : null}
@@ -353,7 +365,6 @@ export function JobCreateForm(props: {
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   useEffect(() => {
-    setDetailsOpen(true);
     const sync = () => {
       const hash = window.location.hash;
       if (
@@ -708,6 +719,20 @@ export function JobCreateForm(props: {
     patternConfigLevel: form.patternConfigLevel,
     autoStrategyCombo: form.autoStrategyCombo,
   });
+  const automaticTargetMode =
+    resolvedSelectionMode === "automatic" &&
+    form.autoSearchObjective === "qualified_target";
+  const showPatternDetailDisclosure = showGuidedPatternDetailDisclosure({
+    selectionMode: resolvedSelectionMode,
+    patternConfigLevel: form.patternConfigLevel,
+  });
+  const showValidationAdvancedBand = showGuidedValidationAdvancedBand({
+    selectionMode: resolvedSelectionMode,
+    patternConfigLevel: form.patternConfigLevel,
+  });
+  const patternDefaultsNotice =
+    resolvedSelectionMode === "automatic" &&
+    form.patternConfigLevel === "automatic";
   const selectionLocked =
     inputDisabled || resolvedSelectionMode === "automatic";
   const familyLabel = (family: string) =>
@@ -738,15 +763,24 @@ export function JobCreateForm(props: {
     props.searchProgress?.qualifiedCount ?? null,
   );
   const runningElapsed = formatElapsedCompact(props.searchProgress?.elapsedMs);
-  const disclosure = advancedDisclosureControl(detailsOpen);
   const guided = useStrategySearchGuidedSetup(form);
   const guidedStep = guided.currentStepId;
-  const guidedAdvancedStep =
-    guidedStep === "approach" ||
-    guidedStep === "strategy" ||
-    guidedStep === "validation";
   const [stepValidationAdvancedOpen, setStepValidationAdvancedOpen] =
     useState(false);
+
+  useEffect(() => {
+    const hash =
+      typeof window !== "undefined" ? window.location.hash : "";
+    if (
+      hash === "#ss-section-engine" ||
+      hash === "#ss-section-core" ||
+      hash === "#ss-section-expert"
+    ) {
+      setDetailsOpen(true);
+      return;
+    }
+    setDetailsOpen(guided.currentStepId === "validation");
+  }, [guided.currentStepId]);
 
   const visualBuilderProps = {
     form,
@@ -862,307 +896,257 @@ export function JobCreateForm(props: {
             {...visualBuilderProps}
             panels={{
               mode: true,
+              modeOutcome: resolvedSelectionMode !== "automatic",
               market: false,
               workspace: false,
               workspaceControls: false,
               scopeMap: false,
             }}
           />
-          <GuidedApproachEssentials
-            depthProfile={form.depthProfile}
-            depthHint={depthHint}
-            durationPreset={form.durationPreset}
-            maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
-            maxRuntimeError={err("maxRuntime")}
-            disabled={inputDisabled}
-            onDepth={applyDepth}
-            onDurationPreset={applyDurationPreset}
-            onMaxRuntime={(value) => set("maxRuntimeMinutesOverride", value)}
-          />
+          {resolvedSelectionMode === "automatic" ? (
+            <>
+              <GuidedAutomaticSearchObjective
+                value={form.autoSearchObjective}
+                disabled={inputDisabled}
+                onChange={(next) => set("autoSearchObjective", next)}
+              />
+              {automaticTargetMode ? (
+                <GuidedAutomaticObjectivePanel
+                  objective="qualified_target"
+                  testId="ss-guided-auto-target"
+                  compactGuidanceTestId="ss-auto-target-notice"
+                  analysisLine={
+                    <p
+                      className="ss-guided-auto-time-budget__analysis-line"
+                      data-testid="ss-auto-analysis-summary-compact"
+                    >
+                      <span className="ss-guided-auto-time-budget__analysis-label">
+                        분석 조건
+                      </span>
+                      {automaticAnalysisSummaryLine(form)}
+                    </p>
+                  }
+                >
+                  <GuidedQualificationTargets
+                    variant="edit"
+                    form={form}
+                    disabled={inputDisabled}
+                    minReturnError={err("minTotalReturn")}
+                    maxMddError={err("maxMdd")}
+                    minTradeError={err("minTradeCount")}
+                    minWinRateError={err("minWinRate")}
+                    minScoreError={err("minScore")}
+                    onMinReturn={(value) => set("minTotalReturn", value)}
+                    onMddPreset={applyMddPreset}
+                    onMaxMdd={(value) => set("maxMdd", value)}
+                    onMinTrades={(value) => set("minTradeCount", value)}
+                    onMinWinRate={(value) => set("minWinRate", value)}
+                    onMinScore={(value) => set("minScore", value)}
+                  />
+                  <GuidedDurationControl
+                    durationPreset={form.durationPreset}
+                    maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
+                    maxRuntimeError={err("maxRuntime")}
+                    disabled={inputDisabled}
+                    onDurationPreset={applyDurationPreset}
+                    onMaxRuntime={(value) => set("maxRuntimeMinutesOverride", value)}
+                    prominent
+                    suppressPresetNote
+                    label="최대 탐색 시간"
+                  />
+                </GuidedAutomaticObjectivePanel>
+              ) : (
+                <GuidedAutomaticTimeBudget
+                  symbol={form.symbol}
+                  timeframe={form.timeframe}
+                  periodPreset={form.periodPreset}
+                  durationPreset={form.durationPreset}
+                  maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
+                  maxRuntimeError={err("maxRuntime")}
+                  disabled={inputDisabled}
+                  onDurationPreset={applyDurationPreset}
+                  onMaxRuntime={(value) => set("maxRuntimeMinutesOverride", value)}
+                />
+              )}
+            </>
+          ) : (
+            <GuidedApproachEssentials
+              depthProfile={form.depthProfile}
+              depthHint={depthHint}
+              durationPreset={form.durationPreset}
+              maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
+              maxRuntimeError={err("maxRuntime")}
+              disabled={inputDisabled}
+              onDepth={applyDepth}
+              onDurationPreset={applyDurationPreset}
+              onMaxRuntime={(value) => set("maxRuntimeMinutesOverride", value)}
+            />
+          )}
+          <GuidedDisclosure
+            title={
+              resolvedSelectionMode === "automatic" ? "고급 설정" : "추가 탐색 설정"
+            }
+            summaryMeta={
+              resolvedSelectionMode === "automatic"
+                ? "탐색 수준 · 프리셋 · 기준"
+                : "프리셋 · 기준 · 설정 수준"
+            }
+            defaultOpen={false}
+            testId="ss-guided-step2-deep"
+          >
+            {resolvedSelectionMode === "automatic" ? (
+              <GuidedApproachEssentials
+                layout="depthOnly"
+                depthProfile={form.depthProfile}
+                depthHint={depthHint}
+                durationPreset={form.durationPreset}
+                maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
+                maxRuntimeError={err("maxRuntime")}
+                disabled={inputDisabled}
+                onDepth={applyDepth}
+                onDurationPreset={applyDurationPreset}
+                onMaxRuntime={(value) => set("maxRuntimeMinutesOverride", value)}
+              />
+            ) : null}
+            <div className="ss-adv-section ss-adv-group" data-adv-group="method">
+              <header className="ss-adv-section__head">
+                <span className="ss-adv-section__icon" aria-hidden="true">
+                  ⚙
+                </span>
+                <div>
+                  <h3 className="ss-adv-section__title">설정 수준</h3>
+                  <p className="ss-adv-section__desc">
+                    화면에 보이는 설정의 깊이를 정합니다. 탐색 방식(자동 탐색 /
+                    직접 선택)과는 다릅니다.
+                  </p>
+                </div>
+              </header>
+              <AdvancedLevelSelector
+                value={form.patternConfigLevel}
+                disabled={inputDisabled}
+                onChange={(value) => set("patternConfigLevel", value)}
+              />
+            </div>
+
+            {form.patternConfigLevel === "automatic" ? (
+              <section
+                className="ss-section-card space-y-2"
+                data-testid="ss-automatic-summary"
+                data-field-origin="auto"
+              >
+                <h3 className="ss-subsection-title">
+                  추천 전략 구성
+                  <em className="ss-field-origin">자동 적용</em>
+                </h3>
+                <p className="text-sm text-slate-200">{combinationSentence}</p>
+                <p className="ss-helper">
+                  선택한 프리셋에 맞춰 패턴 조합·위험 기준·비용 검증을 자동
+                  적용합니다.
+                </p>
+              </section>
+            ) : null}
+
+            <div className="ss-adv-section ss-adv-group" data-adv-group="approach-extra">
+              <div data-testid="ss-intensity">
+                <Field
+                  id="ss-trading-style"
+                  label="탐색 프리셋"
+                  helpFieldId="tradingStyle"
+                  hint="선택한 프리셋의 핵심 기준이 아래에 표시됩니다."
+                >
+                  <select
+                    id="ss-trading-style"
+                    data-testid="ss-goal"
+                    className={selectClass}
+                    value={form.tradingStyle}
+                    disabled={inputDisabled}
+                    onChange={(e) =>
+                      applyTradingStyle(e.target.value as TradingStyleId)
+                    }
+                  >
+                    <option value="stable">안전형</option>
+                    <option value="balanced">균형형</option>
+                    <option value="scalping">공격형</option>
+                  </select>
+                </Field>
+                <div
+                  className="mt-2 flex flex-wrap gap-1.5"
+                  data-testid="ss-beginner-preset-criteria"
+                  aria-label="탐색 프리셋 기준"
+                >
+                  {(form.tradingStyle === "scalping"
+                    ? BEGINNER_PRESET_MAP.aggressive
+                    : form.tradingStyle === "stable"
+                      ? BEGINNER_PRESET_MAP.safe
+                      : BEGINNER_PRESET_MAP.balanced
+                  ).criteriaChips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="inline-flex items-center rounded-md border border-slate-600/80 bg-slate-900/80 px-2 py-1 text-[11px] font-medium text-slate-200"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <Field
+                id="ss-research-basis"
+                label="탐색 기준"
+                helpFieldId="researchBasis"
+              >
+                <select
+                  id="ss-research-basis"
+                  data-testid="ss-research-basis"
+                  className={inputClass}
+                  value={form.researchBasis}
+                  disabled={inputDisabled}
+                  onChange={(e) =>
+                    set("researchBasis", e.target.value as ResearchBasisId)
+                  }
+                >
+                  <option value="fresh">완전 신규 탐색</option>
+                  <option value="improve_best">현재 최고 전략 개선</option>
+                  <option value="backtest_supplement">백테스트 결과 보완</option>
+                  <option value="paper_supplement">모의매매 결과 보완</option>
+                  <option value="live_supplement">실전매매 결과 보완</option>
+                </select>
+              </Field>
+            </div>
+          </GuidedDisclosure>
         </GuidedStepMount>
 
-      {guidedAdvancedStep ? (
-      <section
-        className="ss-advanced-disclosure ss-legacy-details ss-guided-advanced-host"
-        data-testid="ss-legacy-details"
-        data-open="true"
-      >
-        <button
-          type="button"
-          className="ss-advanced-trigger ss-guided-hide-trigger"
-          data-testid="ss-advanced-trigger"
-          aria-expanded={detailsOpen}
-          aria-controls="ss-advanced-body"
-          onClick={() => setDetailsOpen((open) => !open)}
-          hidden
-        >
-          <span className="ss-advanced-trigger__icon" aria-hidden="true">
-            <svg viewBox="0 0 20 20" width="18" height="18">
-              <path
-                d="M8 3.6h4l.6 2.1 2.1.6v4l-2.1.6-.6 2.1H8l-.6-2.1-2.1-.6V6.3l2.1-.6L8 3.6Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-              <circle cx="10" cy="10" r="1.6" fill="currentColor" />
-            </svg>
-          </span>
-          <span className="ss-advanced-trigger__copy">
-            <strong>고급 탐색 조건</strong>
-            <em data-testid="ss-advanced-state">
-              {advancedConditionsStateLabel(form).label}
-            </em>
-            <span>
-              탐색 대상·기준·깊이·시간·조합 설정을 조정합니다.
-            </span>
-          </span>
-          <span
-            className="ss-advanced-trigger__affordance"
-            data-testid="ss-advanced-affordance"
-            data-open={detailsOpen ? "true" : "false"}
-            data-chevron={disclosure.chevron}
-          >
-            <span data-testid="ss-advanced-copy">{disclosure.copy}</span>
-            <span
-              className="ss-advanced-trigger__chevron"
-              data-testid="ss-advanced-chevron"
-              data-direction={disclosure.chevron}
-              aria-hidden="true"
-            >
-              {disclosure.chevronGlyph}
-            </span>
-          </span>
-        </button>
-        <div
-          id="ss-advanced-body"
-          className={
-            "ss-advanced-body" + (detailsOpen ? " is-open" : "")
-          }
-          hidden={!detailsOpen}
-        >
-        <div className="ss-advanced-body__inner">
-      {guided.isStepActive("approach") ? (
-      <>
-      <div className="ss-adv-section ss-adv-group" data-adv-group="method">
-        <header className="ss-adv-section__head">
-          <span className="ss-adv-section__icon" aria-hidden="true">⚙</span>
-          <div>
-            <h3 className="ss-adv-section__title">설정 수준</h3>
-            <p className="ss-adv-section__desc">
-              화면에 보이는 설정의 깊이를 정합니다. 탐색 방식(자동 탐색 / 직접 선택)과는 다릅니다.
-            </p>
-          </div>
-        </header>
-        <AdvancedLevelSelector
-          value={form.patternConfigLevel}
-          disabled={inputDisabled}
-          onChange={(value) => set("patternConfigLevel", value)}
-        />
-      </div>
-
-      {form.patternConfigLevel === "automatic" ? (
-        <section className="ss-section-card space-y-2" data-testid="ss-automatic-summary" data-field-origin="auto">
-          <h3 className="ss-subsection-title">
-            추천 전략 구성
-            <em className="ss-field-origin">자동 적용</em>
-          </h3>
-          <p className="text-sm text-slate-200">{combinationSentence}</p>
-          <p className="ss-helper">
-            선택한 프리셋에 맞춰 패턴 조합·위험 기준·비용 검증을 자동 적용합니다.
-            세부값은 기본 또는 전문가 수준에서 확인할 수 있습니다.
-          </p>
-        </section>
-      ) : null}
-
-      <div className="ss-adv-section ss-adv-group" data-adv-group="target">
-        <header className="ss-adv-section__head">
-          <span className="ss-adv-section__icon" aria-hidden="true">◎</span>
-          <div>
-            <h3 className="ss-adv-section__title">탐색 대상</h3>
-            <p className="ss-adv-section__desc">
-              시장·이름·기간을 정합니다.
-            </p>
-          </div>
-        </header>
-      <SettingsSection
-        id="ss-section-core"
-        title="핵심 탐색 설정"
-        description="시장·시간·탐색 방향을 정합니다."
-      >
-        <Field id="ss-market-mode" label="탐색 대상" error={err("symbol")}>
-          <select
-            id="ss-market-mode"
-            data-testid="ss-market-mode"
-            className={selectClass}
-            value={form.marketMode}
-            disabled={inputDisabled}
-            onChange={(e) => applyMarketMode(e.target.value as MarketMode)}
-          >
-            <option value="recommended">추천 코인 자동 선택</option>
-            <option value="manual">직접 선택</option>
-          </select>
-          <div
-            className="ss-readonly-summary mt-2 rounded-lg px-3 py-2 text-xs"
-            data-testid="ss-symbol-selection-summary"
-          >
-            <div>
-              탐색 대상 설정:{" "}
-              {form.marketMode === "recommended"
-                ? "추천 코인 자동 선택"
-                : "직접 선택"}
-            </div>
-            <div className="mt-1 font-medium text-slate-100">
-              실제 선택 결과: {form.symbol || RECOMMENDED_SYMBOL}
-            </div>
-            {form.marketMode === "recommended" ? (
-              <div className="mt-1 text-slate-500" data-testid="ss-symbol-selection-reason">
-                자동 선택 결과: {form.symbol || RECOMMENDED_SYMBOL}
-                <br />
-                선택 이유: 충분한 거래량 · 데이터 정상 · 변동성 기준 충족
-              </div>
-            ) : null}
-          </div>
-        </Field>
-
-        {form.marketMode === "recommended" ? (
-          <input type="hidden" value={form.symbol} readOnly />
-        ) : null}
-
-        <div data-testid="ss-intensity">
-          <Field
-            id="ss-trading-style"
-            label="탐색 프리셋"
-            hint="선택한 프리셋의 핵심 기준이 아래에 표시됩니다."
-          >
-            <select
-              id="ss-trading-style"
-              data-testid="ss-goal"
-              className={selectClass}
-              value={form.tradingStyle}
-              disabled={inputDisabled}
-              onChange={(e) =>
-                applyTradingStyle(e.target.value as TradingStyleId)
-              }
-            >
-              <option value="stable">안전형</option>
-              <option value="balanced">균형형</option>
-              <option value="scalping">공격형</option>
-            </select>
-          </Field>
-          <div
-            className="mt-2 flex flex-wrap gap-1.5 md:col-span-2 xl:col-span-3"
-            data-testid="ss-beginner-preset-criteria"
-            aria-label="탐색 프리셋 기준"
-          >
-            {(form.tradingStyle === "scalping"
-              ? BEGINNER_PRESET_MAP.aggressive
-              : form.tradingStyle === "stable"
-                ? BEGINNER_PRESET_MAP.safe
-                : BEGINNER_PRESET_MAP.balanced
-            ).criteriaChips.map((chip) => (
-              <span
-                key={chip}
-                className="inline-flex items-center rounded-md border border-slate-600/80 bg-slate-900/80 px-2 py-1 text-[11px] font-medium text-slate-200"
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <Field id="ss-research-basis" label="탐색 기준">
-          <select
-            id="ss-research-basis"
-            data-testid="ss-research-basis"
-            className={inputClass}
-            value={form.researchBasis}
-            disabled={inputDisabled}
-            onChange={(e) =>
-              set("researchBasis", e.target.value as ResearchBasisId)
-            }
-          >
-            <option value="fresh">완전 신규 탐색</option>
-            <option value="improve_best">현재 최고 전략 개선</option>
-            <option value="backtest_supplement">백테스트 결과 보완</option>
-            <option value="paper_supplement">모의매매 결과 보완</option>
-            <option value="live_supplement">실전매매 결과 보완</option>
-          </select>
-        </Field>
-
-        <Field id="ss-depth" label="탐색 수준" hint={depthHint}>
-          <select
-            id="ss-depth"
-            className={inputClass}
-            value={form.depthProfile}
-            disabled={inputDisabled}
-            onChange={(e) => applyDepth(e.target.value as SearchDepthProfileId)}
-          >
-            {(Object.keys(SEARCH_DEPTH_PROFILES) as SearchDepthProfileId[]).map(
-              (id) => (
-                <option key={id} value={id}>
-                  {SEARCH_DEPTH_PROFILES[id].labelKo}
-                </option>
-              ),
-            )}
-          </select>
-        </Field>
-
-        <Field id="ss-duration" label="탐색 시간">
-          <select
-            id="ss-duration"
-            data-testid="ss-duration"
-            className={inputClass}
-            value={form.durationPreset}
-            disabled={inputDisabled}
-            onChange={(e) =>
-              applyDurationPreset(e.target.value as DurationPresetId)
-            }
-          >
-            <option value="60">1시간</option>
-            <option value="180">3시간</option>
-            <option value="360">6시간</option>
-            <option value="720">12시간</option>
-            <option value="1440">24시간</option>
-            <option value="custom">직접 설정</option>
-          </select>
-        </Field>
-
-        {form.durationPreset === "custom" ? (
-          <Field
-            id="ss-max-runtime-primary"
-            label="최대 실행 시간 (분)"
-            error={err("maxRuntime")}
-          >
-            <input
-              id="ss-max-runtime-primary"
-              data-testid="ss-max-runtime-primary"
-              className={inputClass}
-              type="number"
-              min={1}
-              value={form.maxRuntimeMinutesOverride}
-              disabled={inputDisabled}
-              onChange={(e) =>
-                set("maxRuntimeMinutesOverride", e.target.value)
-              }
+        <GuidedStepMount active={guided.isStepActive("strategy")} stepId="strategy">
+          <div className="ss-guided-scope-summary-desktop">
+            <GuidedStrategyScopeSummary
+              form={form}
+              selectionMode={resolvedSelectionMode}
+              combinationSentence={combinationSentence}
+              patternDefaultsNotice={patternDefaultsNotice}
             />
-          </Field>
-        ) : null}
-      </SettingsSection>
-      </div>
-      </>
-      ) : null}
+          </div>
+          <GuidedMobileScopeSummary
+            form={form}
+            selectionMode={resolvedSelectionMode}
+            combinationSentence={combinationSentence}
+          />
+          <GuidedDisclosure
+            title="범위 지도 · 워크스페이스"
+            summaryMeta="전략군 · 탐색 지도 · 조합 패널"
+            defaultOpen={false}
+            testId="ss-guided-step3-workspace-deep"
+          >
+            <StrategySearchVisualBuilder
+              {...visualBuilderProps}
+              panels={{
+                mode: false,
+                market: false,
+                workspaceControls: true,
+                scopeMap: true,
+              }}
+            />
+          </GuidedDisclosure>
 
-      {guided.isStepActive("strategy") ? (
-      <>
-      <StrategySearchVisualBuilder
-        {...visualBuilderProps}
-        panels={{
-          mode: false,
-          market: false,
-          workspaceControls: true,
-          scopeMap: true,
-        }}
-      />
       <section
         id="ss-section-strategy-scope"
         className="ss-section-card ss-guided-hide-duplicate scroll-mt-24 space-y-3"
@@ -1248,6 +1232,7 @@ export function JobCreateForm(props: {
         </div>
       </section>
 
+      {showPatternDetailDisclosure ? (
       <GuidedDisclosure
         title="패턴 세부 설정"
         summaryMeta={
@@ -1255,7 +1240,7 @@ export function JobCreateForm(props: {
             ? "기본값 사용"
             : `${form.patternConfigLevel === "expert" ? "전문가" : "기본"} 수준`
         }
-        defaultOpen={form.patternConfigLevel === "expert"}
+        defaultOpen={false}
         testId="ss-guided-step3-deep"
         coach={
           <GuidedSectionCoach
@@ -1278,7 +1263,7 @@ export function JobCreateForm(props: {
         </p>
         {resolvedSelectionMode === "automatic" ? (
           <p
-            className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-300"
+            className="ss-guided-notice ss-guided-notice--info px-3 py-2 text-xs"
             data-testid="ss-pattern-matrix-system-managed"
           >
             패턴 포함 선택은 시스템 관리입니다. 자동 탐색일 때 수동 포함 토글은
@@ -1750,7 +1735,11 @@ export function JobCreateForm(props: {
                 <option value="invalidation_composite">복합 무효화</option>
               </select>
             </Field>
-            <Field id="ss-combo-failure-policy" label="실패 정책">
+            <Field
+              id="ss-combo-failure-policy"
+              label="실패 정책"
+              helpFieldId="comboFailurePolicy"
+            >
               <select
                 id="ss-combo-failure-policy"
                 className={inputClass}
@@ -1784,6 +1773,7 @@ export function JobCreateForm(props: {
               <Field
                 id="ss-combo-weighted-threshold"
                 label="가중 점수 임계값"
+                helpFieldId="patternCombinationWeightedThreshold"
                 error={err("patternCombinationWeightedThreshold")}
               >
                 <input
@@ -2058,11 +2048,17 @@ export function JobCreateForm(props: {
                             form.patternConfigLevel === "expert"
                               ? `min ${String(entry.min)} · default ${String(entry.default)} · max ${String(entry.max)}${entry.step != null ? ` · step ${entry.step}` : ""}`
                               : entry.explanationLabel;
+                          const helpFieldId =
+                            entry.key === "zoneBasis" &&
+                            block.family === "order_block"
+                              ? "orderBlockZoneBasis"
+                              : undefined;
                           return (
                             <Field
                               key={entry.key}
                               id={id}
                               label={entry.labelKo}
+                              helpFieldId={helpFieldId}
                               hint={hint}
                               error={err(
                                 `patternBlock.${block.id}.${entry.key}`,
@@ -2177,27 +2173,151 @@ export function JobCreateForm(props: {
         </div>
       </section>
       </GuidedDisclosure>
-      </>
       ) : null}
+        </GuidedStepMount>
 
       {guided.isStepActive("validation") ? (
-      <>
-      <div className="ss-adv-section ss-adv-group" data-adv-group="criteria">
+      <section
+        className="ss-advanced-disclosure ss-legacy-details ss-guided-advanced-host"
+        data-testid="ss-legacy-details"
+        data-open={detailsOpen ? "true" : "false"}
+      >
+        <button
+          type="button"
+          className="ss-advanced-trigger ss-guided-hide-trigger"
+          data-testid="ss-advanced-trigger"
+          aria-expanded={detailsOpen}
+          aria-controls="ss-advanced-body"
+          onClick={() => setDetailsOpen((open) => !open)}
+          hidden
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+        <div
+          id="ss-advanced-body"
+          className={"ss-advanced-body" + (detailsOpen ? " is-open" : "")}
+          hidden={!detailsOpen}
+        >
+          <div className="ss-advanced-body__inner">
+      <div
+        className="ss-adv-section ss-adv-group ss-guided-validation-layout"
+        data-adv-group="criteria"
+      >
         <header className="ss-adv-section__head">
           <span className="ss-adv-section__icon" aria-hidden="true">▣</span>
           <div>
-            <h3 className="ss-adv-section__title">평가 · 자격 기준</h3>
+            <h3 className="ss-adv-section__title">검증 · 위험 기준</h3>
             <p className="ss-adv-section__desc">
-              합격 낙폭·레버리지·검증 강도를 정합니다.
+              합격 기준·낙폭·비용 검증을 단계별로 조정합니다.
             </p>
           </div>
         </header>
+      {automaticTargetMode ? (
+        <GuidedQualificationTargets
+          variant="summary"
+          form={form}
+          onMinReturn={() => {}}
+          onMddPreset={() => {}}
+          onMaxMdd={() => {}}
+          onMinTrades={() => {}}
+          onMinWinRate={() => {}}
+          onMinScore={() => {}}
+          onEditStep={() => guided.goToStep("approach")}
+        />
+      ) : null}
+      <p className="ss-guided-validation-band__title" data-band="evaluation">
+        A. 평가 기준
+      </p>
+      <SettingsSection
+        id="ss-section-validation"
+        title="검증 강도"
+        description="합격 기준 프로필과 안정성 검증을 조정합니다."
+      >
+        <Field id="ss-qualification" label="합격 기준" hint={qualHint}>
+          <select
+            id="ss-qualification"
+            className={inputClass}
+            value={form.qualificationProfile}
+            disabled={inputDisabled}
+            onChange={(e) =>
+              applyQualification(e.target.value as QualificationProfileId)
+            }
+          >
+            <option value="conservative">
+              {QUALIFICATION_PROFILES.conservative.labelKo}
+            </option>
+            <option value="balanced">
+              {QUALIFICATION_PROFILES.balanced.labelKo}
+            </option>
+            <option value="aggressive">
+              {QUALIFICATION_PROFILES.aggressive.labelKo}
+            </option>
+            <option value="custom">직접 설정</option>
+          </select>
+        </Field>
+
+        {automaticTargetMode ? null : (
+        <Field id="ss-min-trades" label="최소 거래 수" error={err("minTradeCount")}>
+          <input
+            id="ss-min-trades"
+            data-testid="ss-min-trades"
+            className={`${inputClass} ss-guided-field-primary`}
+            type="number"
+            value={form.minTradeCount}
+            disabled={inputDisabled}
+            onChange={(e) => set("minTradeCount", e.target.value)}
+          />
+        </Field>
+        )}
+
+        {automaticTargetMode ? null : (
+        <Field
+          id="ss-min-return"
+          label="최소 수익률(%)"
+          error={err("minTotalReturn")}
+          hint="비우면 제한 없음 · 예: 10 = 10%"
+        >
+          <input
+            id="ss-min-return"
+            data-testid="ss-target-return"
+            className={`${inputClass} ss-guided-field-primary`}
+            type="number"
+            step="0.01"
+            value={form.minTotalReturn}
+            disabled={inputDisabled}
+            onChange={(e) => set("minTotalReturn", e.target.value)}
+          />
+        </Field>
+        )}
+
+        <label className="ss-field-label flex items-center gap-2.5 self-end">
+          <input
+            data-testid="ss-jitter-enabled"
+            type="checkbox"
+            className="h-4 w-4 accent-[var(--accent)]"
+            checked={form.jitterEnabled}
+            disabled={inputDisabled}
+            onChange={(e) => set("jitterEnabled", e.target.checked)}
+          />
+          안정성 검증 (파라미터 변동)
+          <StrategySearchFieldHelp fieldId="jitterEnabled" />
+        </label>
+      </SettingsSection>
+
+      <p className="ss-guided-validation-band__title" data-band="risk">
+        B. 위험 조건
+      </p>
       <SettingsSection
         id="ss-section-risk"
         title="위험 및 레버리지"
         description="합격 낙폭 기준과 레버리지 모드를 설정합니다."
       >
-        <Field id="ss-leverage-mode" label="레버리지" origin="editable">
+        <Field
+          id="ss-leverage-mode"
+          label="레버리지"
+          helpFieldId="leverageMode"
+          origin="editable"
+        >
           <select
             id="ss-leverage-mode"
             data-testid="ss-leverage-mode"
@@ -2215,8 +2335,9 @@ export function JobCreateForm(props: {
           </select>
         </Field>
         <p
-          className="text-xs text-amber-200/90 sm:col-span-2 xl:col-span-3"
+          className="ss-guided-notice ss-guided-notice--compact sm:col-span-2 xl:col-span-3"
           data-testid="ss-leverage-warning"
+          role="note"
         >
           레버리지는 수익과 손실을 동시에 확대합니다.
         </p>
@@ -2271,6 +2392,8 @@ export function JobCreateForm(props: {
             레버리지 사용 안 함 — 모든 후보를 1x로 고정합니다.
           </p>
         ) : null}
+        {automaticTargetMode ? null : (
+        <>
         <Field
           id="ss-max-mdd"
           label="최대 허용 낙폭"
@@ -2312,38 +2435,24 @@ export function JobCreateForm(props: {
             />
           </Field>
         ) : null}
+        </>
+        )}
+      </SettingsSection>
 
-        <Field id="ss-min-trades" label="최소 거래 수" error={err("minTradeCount")}>
-          <input
-            id="ss-min-trades"
-            data-testid="ss-min-trades"
-            className={inputClass}
-            type="number"
-            value={form.minTradeCount}
-            disabled={inputDisabled}
-            onChange={(e) => set("minTradeCount", e.target.value)}
-          />
-        </Field>
-
+      <p className="ss-guided-validation-band__title" data-band="cost">
+        C. 비용 조건
+      </p>
+      <SettingsSection
+        id="ss-section-cost-guided"
+        title="비용 · 스트레스 검증"
+        description="수수료·슬리피지와 보수적 비용 재검증을 설정합니다."
+      >
         <Field
-          id="ss-min-return"
-          label="최소 수익률(%)"
-          error={err("minTotalReturn")}
-          hint="비우면 제한 없음 · 예: 10 = 10%"
+          id="ss-fee"
+          label="수수료"
+          helpFieldId="feeRate"
+          error={err("feeRate")}
         >
-          <input
-            id="ss-min-return"
-            data-testid="ss-target-return"
-            className={inputClass}
-            type="number"
-            step="0.01"
-            value={form.minTotalReturn}
-            disabled={inputDisabled}
-            onChange={(e) => set("minTotalReturn", e.target.value)}
-          />
-        </Field>
-
-        <Field id="ss-fee" label="수수료" error={err("feeRate")}>
           <input
             id="ss-fee"
             data-testid="ss-fee"
@@ -2356,7 +2465,12 @@ export function JobCreateForm(props: {
           />
         </Field>
 
-        <Field id="ss-slippage" label="슬리피지" error={err("slippageRate")}>
+        <Field
+          id="ss-slippage"
+          label="슬리피지"
+          helpFieldId="slippageRate"
+          error={err("slippageRate")}
+        >
           <input
             id="ss-slippage"
             data-testid="ss-slippage"
@@ -2379,54 +2493,19 @@ export function JobCreateForm(props: {
             onChange={(e) => set("stressEnabled", e.target.checked)}
           />
           {COST_STRESS_LABEL}
+          <StrategySearchFieldHelp fieldId="stressEnabled" />
         </label>
         <p className="ss-helper md:col-span-2 xl:col-span-3">
           {COST_STRESS_HELP}
         </p>
       </SettingsSection>
-
-      <SettingsSection
-        id="ss-section-validation"
-        title="검증 강도"
-        description="합격 기준 프로필과 안정성 검증을 조정합니다."
-      >
-        <Field id="ss-qualification" label="합격 기준" hint={qualHint}>
-          <select
-            id="ss-qualification"
-            className={inputClass}
-            value={form.qualificationProfile}
-            disabled={inputDisabled}
-            onChange={(e) =>
-              applyQualification(e.target.value as QualificationProfileId)
-            }
-          >
-            <option value="conservative">
-              {QUALIFICATION_PROFILES.conservative.labelKo}
-            </option>
-            <option value="balanced">
-              {QUALIFICATION_PROFILES.balanced.labelKo}
-            </option>
-            <option value="aggressive">
-              {QUALIFICATION_PROFILES.aggressive.labelKo}
-            </option>
-            <option value="custom">직접 설정</option>
-          </select>
-        </Field>
-
-        <label className="ss-field-label flex items-center gap-2.5 self-end">
-          <input
-            data-testid="ss-jitter-enabled"
-            type="checkbox"
-            className="h-4 w-4 accent-[var(--accent)]"
-            checked={form.jitterEnabled}
-            disabled={inputDisabled}
-            onChange={(e) => set("jitterEnabled", e.target.checked)}
-          />
-          안정성 검증 (파라미터 변동)
-        </label>
-      </SettingsSection>
       </div>
 
+      {showValidationAdvancedBand ? (
+      <>
+      <p className="ss-guided-validation-band__title ss-guided-validation-band__title--advanced" data-band="advanced">
+        D. 고급 검증
+      </p>
       <button
         type="button"
         className="ss-guided-validation-advanced-trigger"
@@ -2436,7 +2515,7 @@ export function JobCreateForm(props: {
       >
         {stepValidationAdvancedOpen ? "고급 설정 접기 ▴" : "고급 설정 ▾"}
         <span className="ss-guided-validation-advanced-trigger__meta">
-          스트레스 · 지터 · 세부 임계값
+          실행 한도 · 전문 임계값 · 시드
         </span>
       </button>
 
@@ -2558,6 +2637,7 @@ export function JobCreateForm(props: {
         <Field
           id="ss-candidate-budget"
           label="초기 평가 묶음"
+          helpFieldId="candidateBudgetOverride"
           error={err("candidateBudget")}
           hint={`비우면 수준 기본값 (${depthProfile.candidateBudget}) · 정상 종료 조건 아님`}
         >
@@ -2655,6 +2735,8 @@ export function JobCreateForm(props: {
         description="승률·연구 점수 하한 (선택)"
         defaultOpen={false}
       >
+        {automaticTargetMode ? null : (
+        <>
         <Field
           id="ss-min-winrate"
           label="최소 승률(%)"
@@ -2690,12 +2772,14 @@ export function JobCreateForm(props: {
             onChange={(e) => set("minScore", e.target.value)}
           />
         </Field>
+        </>
+        )}
       </SettingsSection>
       </div>
       </div>
       </>
       ) : null}
-        </div>
+          </div>
         </div>
       </section>
       ) : null}
@@ -2802,18 +2886,18 @@ export function JobCreateForm(props: {
               </dl>
             </details>
           ) : null}
-          <div
-            className={
-              preview.summary.status === "ok"
-                ? "mt-3 text-emerald-200"
-                : preview.summary.status === "auto_correctable"
+          {preview.summary.status !== "ok" ? (
+            <div
+              className={
+                preview.summary.status === "auto_correctable"
                   ? "mt-3 text-amber-200"
                   : "mt-3 text-red-200"
-            }
-            data-testid="ss-config-validation-status"
-          >
-            {preview.summary.labelKo}
-          </div>
+              }
+              data-testid="ss-config-validation-status"
+            >
+              {preview.summary.labelKo}
+            </div>
+          ) : null}
         </div>
       </div>
       </GuidedStepMount>
@@ -3057,11 +3141,7 @@ export function JobCreateForm(props: {
             onSubmit();
           }}
         >
-          {submitting
-            ? "시작 중…"
-            : resolvedSelectionMode === "automatic"
-              ? "자동 탐색 시작"
-              : "선택 범위로 탐색 시작"}
+          {submitting ? "시작 중…" : "탐색 시작"}
         </Button>
         ) : null}
       </StickyActionBar>

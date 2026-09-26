@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { fireEvent, render, screen, cleanup } from "@testing-library/react";
+import { act, fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useState } from "react";
 import { buildCreateBodyIfValid } from "@/components/rextora/strategySearch/formValidation";
@@ -22,6 +22,9 @@ import {
   StrategySearchVisualBuilder,
   resolveVisualBuilderPanels,
 } from "@/components/rextora/strategySearch/visual/StrategySearchVisualBuilder";
+import { GuidedApproachEssentials } from "@/components/rextora/strategySearch/guided/GuidedApproachEssentials";
+import { GuidedDisclosure } from "@/components/rextora/strategySearch/guided/GuidedDisclosure";
+import { SEARCH_DEPTH_PROFILES } from "@/components/rextora/strategySearch/formDefaults";
 
 describe("Strategy Search guided integration (DOM)", () => {
   afterEach(() => cleanup());
@@ -347,6 +350,149 @@ describe("Strategy Search guided integration (DOM)", () => {
     expect(screen.getByTestId("ss-guided-mode-outcome-current").textContent).toContain(
       "직접",
     );
+  });
+
+  it("automatic Step 2 can hide mode outcome when time-budget panel is primary", () => {
+    const form = createDefaultOperatorFormState();
+    render(
+      <StrategySearchVisualBuilder
+        form={{ ...form, autoStrategyCombo: true }}
+        automatic
+        panels={{ mode: true, modeOutcome: false, market: false, workspace: false }}
+        onSelectAutomatic={noop}
+        onSelectDirect={noop}
+        onSymbol={noop}
+        onTimeframe={noop}
+        onPeriod={noop}
+        onTradingStyle={noop}
+        onDirection={noop}
+        onToggleLayer={noop}
+      />,
+    );
+    expect(screen.queryByTestId("ss-guided-mode-outcome")).toBeNull();
+  });
+
+  it("guided goNext advances Step 1 to Step 2", () => {
+    function Harness() {
+      const form = createDefaultOperatorFormState();
+      const guided = useStrategySearchGuidedSetup(form);
+      return (
+        <>
+          <span data-testid="current-step">{guided.currentStepId}</span>
+          <button type="button" data-testid="go-next" onClick={() => guided.goNext()}>
+            next
+          </button>
+        </>
+      );
+    }
+    render(<Harness />);
+    expect(screen.getByTestId("current-step").textContent).toBe("market");
+    act(() => {
+      fireEvent.click(screen.getByTestId("go-next"));
+    });
+    expect(screen.getByTestId("current-step").textContent).toBe("approach");
+  });
+
+  it("Step 2 runtime minutes field is a number input", () => {
+    const form = createDefaultOperatorFormState();
+    render(
+      <GuidedApproachEssentials
+        depthProfile={form.depthProfile}
+        depthHint={SEARCH_DEPTH_PROFILES[form.depthProfile].descriptionKo}
+        durationPreset="custom"
+        maxRuntimeMinutesOverride={form.maxRuntimeMinutesOverride}
+        maxRuntimeError={undefined}
+        disabled={false}
+        onDepth={noop}
+        onDurationPreset={noop}
+        onMaxRuntime={noop}
+      />,
+    );
+    const runtime = screen.getByTestId("ss-max-runtime-primary");
+    expect(runtime.tagName.toLowerCase()).toBe("input");
+    expect(runtime.getAttribute("type")).toBe("number");
+  });
+
+  it("Step 3 deep disclosure is collapsed by default for automatic config level", () => {
+    render(
+      <GuidedDisclosure title="패턴 세부 설정" testId="ss-guided-step3-deep">
+        <div data-testid="inner">deep</div>
+      </GuidedDisclosure>,
+    );
+    const details = screen.getByTestId("ss-guided-step3-deep");
+    expect(details.hasAttribute("open")).toBe(false);
+  });
+
+  it("세부 조정 expands disclosure and preserves field values after collapse", () => {
+    function Inner() {
+      const [value, setValue] = useState("42");
+      return (
+        <input
+          data-testid="preserved-field"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      );
+    }
+    render(
+      <GuidedDisclosure title="패턴 세부 설정" testId="ss-guided-step3-deep">
+        <Inner />
+      </GuidedDisclosure>,
+    );
+    const details = screen.getByTestId("ss-guided-step3-deep");
+    fireEvent.click(details.querySelector("summary")!);
+    const field = screen.getByTestId("preserved-field") as HTMLInputElement;
+    fireEvent.change(field, { target: { value: "99" } });
+    fireEvent.click(details.querySelector("summary")!);
+    fireEvent.click(details.querySelector("summary")!);
+    expect((screen.getByTestId("preserved-field") as HTMLInputElement).value).toBe(
+      "99",
+    );
+  });
+
+  it("Step 5 edit jump invokes onEditStep with source step id", () => {
+    const onEdit = vi.fn();
+    render(
+      <StrategySearchFinalReview
+        form={createDefaultOperatorFormState()}
+        onEditStep={onEdit}
+      />,
+    );
+    screen.getByTestId("ss-guided-review-edit-strategy").click();
+    expect(onEdit).toHaveBeenCalledWith("strategy");
+  });
+
+  it("mobile step menu toggles aria-expanded", () => {
+    const visited = new Set([
+      "market" as const,
+      "approach" as const,
+      "strategy" as const,
+      "validation" as const,
+      "review" as const,
+    ]);
+    const stepStates = Object.fromEntries(
+      STRATEGY_SEARCH_SETUP_STEPS.map((s) => [
+        s.id,
+        resolveStepUiState(s.id, {
+          currentStepId: "market",
+          visited,
+          completed: new Set(["market" as const]),
+          needsReview: new Set(),
+        }),
+      ]),
+    ) as Record<(typeof STRATEGY_SEARCH_SETUP_STEPS)[number]["id"], string>;
+
+    render(
+      <StrategySearchStepNavigation
+        currentStepId="market"
+        stepStates={stepStates as never}
+        onGoToStep={() => {}}
+      />,
+    );
+    const menu = screen.getByTestId("ss-guided-nav-mobile-menu");
+    expect(menu.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(menu);
+    expect(menu.getAttribute("aria-expanded")).toBe("true");
   });
 
   it("direct navigation to earlier step updates current marker only once", () => {

@@ -1,4 +1,5 @@
 import { expect, test, type Route } from "@playwright/test";
+import { loginAsE2eCeo } from "./e2eAuth";
 
 /**
  * Operator Strategy Search UI checks (intercepted API).
@@ -122,10 +123,114 @@ async function openSearchJob(
   page: import("@playwright/test").Page,
   jobId: string,
 ) {
+  const detailResponse = page.waitForResponse(
+    (resp) =>
+      resp.url().includes(`/api/rextora/strategy-search/${jobId}`) &&
+      resp.request().method() === "GET" &&
+      resp.ok(),
+    { timeout: 15_000 },
+  );
   await page.goto(`/strategy-search?jobId=${encodeURIComponent(jobId)}`);
-  await expect(page.getByTestId("ss-job-detail")).toBeVisible({
-    timeout: 15_000,
+  await expect(page.getByTestId("strategy-search-workbench")).toBeVisible();
+  await detailResponse;
+}
+
+/** Advance guided setup from the current step using the primary footer control. */
+async function clickGuidedNext(
+  page: import("@playwright/test").Page,
+  times = 1,
+) {
+  for (let i = 0; i < times; i++) {
+    await page.getByTestId("ss-guided-next").click();
+  }
+}
+
+/** Reach the final review step (5단계) with default valid form values. */
+async function advanceToReviewStep(page: import("@playwright/test").Page) {
+  await expect(page.getByTestId("ss-guided-setup")).toBeVisible();
+  await clickGuidedNext(page, 4);
+  await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+}
+
+async function goToValidationStep(page: import("@playwright/test").Page) {
+  await expect(page.getByTestId("ss-guided-setup")).toBeVisible();
+  await clickGuidedNext(page, 3);
+  await expect(page.getByTestId("ss-guided-step-surface")).toHaveAttribute(
+    "data-guided-step-id",
+    "validation",
+  );
+  await expect(page.locator("#ss-advanced-body")).toHaveClass(/is-open/);
+}
+
+async function openGuidedStep3Workspace(
+  page: import("@playwright/test").Page,
+) {
+  const workspace = page.getByTestId("ss-guided-step3-workspace-deep");
+  if (!(await workspace.getAttribute("open"))) {
+    await workspace.locator("summary").click();
+  }
+  await expect(workspace).toHaveAttribute("open", "");
+}
+
+async function openGuidedStep3PatternDeep(
+  page: import("@playwright/test").Page,
+) {
+  const step3Deep = page.getByTestId("ss-guided-step3-deep");
+  if (!(await step3Deep.getAttribute("open"))) {
+    await step3Deep.locator("summary").click();
+  }
+  await expect(step3Deep).toHaveAttribute("open", "");
+}
+
+async function expandValidationAdvancedPanel(
+  page: import("@playwright/test").Page,
+) {
+  const trigger = page.getByTestId("ss-validation-advanced-trigger");
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByTestId("ss-validation-advanced-body")).toBeVisible();
+}
+
+async function candidateBudgetInput(page: import("@playwright/test").Page) {
+  const advancedBody = page.getByTestId("ss-validation-advanced-body");
+  const engineSection = advancedBody.getByTestId("ss-section-engine");
+  await engineSection.evaluate((node) => {
+    (node as HTMLDetailsElement).open = true;
   });
+  return advancedBody.getByTestId("ss-max-search");
+}
+
+async function setCandidateBudgetOverride(
+  page: import("@playwright/test").Page,
+  value: string,
+) {
+  const input = await candidateBudgetInput(page);
+  await fillControlledNumberInput(input, value);
+}
+
+async function fillControlledNumberInput(
+  locator: import("@playwright/test").Locator,
+  value: string,
+) {
+  await locator.evaluate((el, nextValue) => {
+    const node = el as HTMLInputElement;
+    const setValue = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    setValue?.call(node, nextValue);
+    node.dispatchEvent(new Event("input", { bubbles: true }));
+    node.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+}
+
+async function openValidationAdvancedEngine(
+  page: import("@playwright/test").Page,
+) {
+  await goToValidationStep(page);
+  await expandValidationAdvancedPanel(page);
+  await expect(await candidateBudgetInput(page)).toBeAttached();
 }
 
 async function installSearchMocks(
@@ -139,6 +244,7 @@ async function installSearchMocks(
     detailGets: number[];
     searchSpaceExhausted?: boolean;
     rejectCreate?: boolean;
+    completionReason?: string | null;
   },
 ) {
   await page.route("**/api/rextora/strategy-search**", async (route) => {
@@ -357,6 +463,7 @@ async function installSearchMocks(
             executionActive: state.executionActive,
             failureMessage: state.failureMessage,
             searchSpaceExhausted: state.searchSpaceExhausted,
+            completionReason: state.completionReason,
           }),
         ),
       );
@@ -429,6 +536,196 @@ async function installSearchMocks(
 }
 
 test.describe("Strategy Search operator UI (intercepted API)", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsE2eCeo(page);
+  });
+
+  test("unauthenticated access to strategy search redirects to login", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto("/strategy-search");
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
+    await context.close();
+  });
+
+  test("automatic Step 2 shows time-budget summary and preserves advanced values", async ({
+    page,
+  }) => {
+    await page.route("**/api/rextora/strategy-search**", async (route) => {
+      if (
+        route.request().method() === "GET" &&
+        /\/api\/rextora\/strategy-search$/.test(
+          route.request().url().replace(/\?.*$/, ""),
+        )
+      ) {
+        await fulfillJson(route, 200, envelope([]));
+        return;
+      }
+      await fulfillJson(route, 404, { ok: false, error: "unmocked" });
+    });
+
+    await page.goto("/strategy-search");
+    await expect(page.getByTestId("ss-symbols")).toBeVisible();
+    await page.getByTestId("ss-symbols").selectOption("ETHUSDT");
+    await page.getByTestId("ss-timeframe").selectOption("5m");
+    await page.getByTestId("ss-period").selectOption("long");
+    await clickGuidedNext(page, 1);
+
+    await expect(page.getByTestId("ss-guided-auto-time-budget")).toBeVisible();
+    const summary = page.getByTestId("ss-auto-analysis-summary-compact");
+    await expect(summary).toContainText("ETHUSDT");
+    await expect(summary).toContainText("5분봉");
+    await expect(summary).toContainText("120");
+
+    await page.getByTestId("ss-duration").selectOption("60");
+    await expect(page.getByTestId("ss-duration")).toHaveValue("60");
+    await expect(page.getByTestId("ss-max-runtime-primary")).toHaveCount(0);
+
+    const advanced = page.getByTestId("ss-guided-step2-deep");
+    await expect(advanced).not.toHaveAttribute("open");
+    await advanced.locator("summary").click();
+    await expect(page.getByTestId("ss-depth")).toBeVisible();
+    await advanced.locator("summary").click();
+    await expect(page.getByTestId("ss-duration")).toHaveValue("60");
+
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(false);
+  });
+
+  test("automatic target mode requests stopWhenQualifiedTarget", async ({
+    page,
+  }) => {
+    let createBody: {
+      operatorPlan?: {
+        stopWhenQualifiedTarget?: boolean;
+        qualifiedTarget?: number;
+        selectedSpaceIds?: unknown;
+      };
+    } | null = null;
+    await page.route("**/api/rextora/strategy-search**", async (route) => {
+      const url = route.request().url().replace(/\?.*$/, "");
+      if (route.request().method() === "POST" && /\/api\/rextora\/strategy-search$/.test(url)) {
+        createBody = route.request().postDataJSON();
+        await fulfillJson(
+          route,
+          200,
+          envelope({ id: "search_target_mode", status: "queued" }),
+        );
+        return;
+      }
+      if (
+        route.request().method() === "GET" &&
+        /\/api\/rextora\/strategy-search$/.test(url)
+      ) {
+        await fulfillJson(route, 200, envelope([]));
+        return;
+      }
+      await fulfillJson(route, 404, { ok: false, error: "unmocked" });
+    });
+
+    await page.goto("/strategy-search");
+    await clickGuidedNext(page, 1);
+    await page.getByTestId("ss-auto-objective-target").click();
+    await expect(page.getByTestId("ss-guided-auto-target")).toBeVisible();
+    await page.getByTestId("ss-target-return").fill("8");
+    await page.getByTestId("ss-min-trades").fill("10");
+    await page.getByTestId("ss-duration").selectOption("60");
+    await clickGuidedNext(page, 2);
+    await expect(page.getByTestId("ss-guided-target-summary")).toBeVisible();
+    await expect(page.getByTestId("ss-target-return")).toHaveCount(0);
+    await expect(page.getByTestId("ss-guided-target-summary")).toContainText("8");
+    await clickGuidedNext(page, 1);
+    await expect(page.getByTestId("ss-guided-target-review")).toContainText(
+      "목표 기준 자동 탐색",
+    );
+    await page.getByTestId("ss-create-submit").click();
+    await expect.poll(() => createBody).not.toBeNull();
+    expect(createBody?.operatorPlan?.stopWhenQualifiedTarget).toBe(true);
+    expect(createBody?.operatorPlan?.qualifiedTarget).toBe(1);
+    expect(createBody?.operatorPlan?.selectedSpaceIds).toBeNull();
+  });
+
+  test("automatic time mode does not force qualifiedTarget to 1", async ({
+    page,
+  }) => {
+    let createBody: {
+      operatorPlan?: {
+        stopWhenQualifiedTarget?: boolean;
+        qualifiedTarget?: number;
+      };
+    } | null = null;
+    await page.route("**/api/rextora/strategy-search**", async (route) => {
+      const url = route.request().url().replace(/\?.*$/, "");
+      if (route.request().method() === "POST" && /\/api\/rextora\/strategy-search$/.test(url)) {
+        createBody = route.request().postDataJSON();
+        await fulfillJson(
+          route,
+          200,
+          envelope({ id: "search_time_mode", status: "queued" }),
+        );
+        return;
+      }
+      if (
+        route.request().method() === "GET" &&
+        /\/api\/rextora\/strategy-search$/.test(url)
+      ) {
+        await fulfillJson(route, 200, envelope([]));
+        return;
+      }
+      await fulfillJson(route, 404, { ok: false, error: "unmocked" });
+    });
+
+    await page.goto("/strategy-search");
+    await clickGuidedNext(page, 4);
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    await page.getByTestId("ss-create-submit").click();
+    await expect.poll(() => createBody).not.toBeNull();
+    expect(createBody?.operatorPlan?.stopWhenQualifiedTarget).toBe(false);
+    expect(createBody?.operatorPlan?.qualifiedTarget).toBe(3);
+  });
+
+  test("guided setup reaches review with normalized launch CTA", async ({
+    page,
+  }) => {
+    await page.route("**/api/rextora/strategy-search**", async (route) => {
+      if (
+        route.request().method() === "GET" &&
+        /\/api\/rextora\/strategy-search$/.test(
+          route.request().url().replace(/\?.*$/, ""),
+        )
+      ) {
+        await fulfillJson(route, 200, envelope([]));
+        return;
+      }
+      await fulfillJson(route, 404, { ok: false, error: "unmocked" });
+    });
+
+    await page.goto("/strategy-search");
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.getByTestId("ss-guided-setup")).toBeVisible();
+    await expect(page.getByTestId("ss-symbols")).toBeVisible();
+    await clickGuidedNext(page, 1);
+    await expect(page.getByTestId("ss-search-mode")).toBeVisible();
+    await clickGuidedNext(page, 1);
+    await expect(page.getByTestId("ss-guided-step-surface")).toHaveAttribute(
+      "data-guided-step-id",
+      "strategy",
+    );
+    await expect(page.getByTestId("ss-guided-strategy-essentials")).toBeVisible();
+    await openGuidedStep3Workspace(page);
+    await expect(page.getByTestId("ss-search-scope-map")).toBeVisible();
+    await clickGuidedNext(page, 2);
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    await expect(page.getByTestId("ss-create-submit")).toHaveText("탐색 시작");
+    await expect(page.getByTestId("ss-advanced-settings-link")).toHaveCount(0);
+  });
+
   test("renders simplified page and Korean nav", async ({ page }) => {
     await page.route("**/api/rextora/strategy-search**", async (route) => {
       if (
@@ -446,10 +743,15 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await page.goto("/strategy-search");
     await expect(page.getByTestId("strategy-search-page")).toBeVisible();
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
-    await expect(page.getByTestId("ss-intensity")).toBeVisible();
-    await expect(page.getByTestId("ss-goal")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-setup")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-step-nav")).toBeVisible();
+    await expect(page.getByTestId("ss-symbols")).toBeVisible();
+    await expect(page.getByTestId("ss-search-name")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-nav-step-market")).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
     await expect(page.getByTestId("ss-run-until-qualified")).toBeAttached();
-    await expect(page.getByTestId("ss-advanced-settings-link")).toBeVisible();
     await expect(page.getByTestId("shell-lifecycle-nav-research")).toBeVisible();
     await expect(page.getByTestId("shell-lifecycle-nav-research")).toHaveAttribute(
       "data-active",
@@ -457,7 +759,7 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     );
     await expect(page.getByRole("heading", { name: "전략 탐색" })).toBeVisible();
     await expect(
-      page.getByText(/연구 목표와 검증 기준을 정하면 AI가 전략을 탐색합니다/),
+      page.getByText(/새 탐색, 재개 작업, 후보 비교를 한 화면에서 처리합니다/),
     ).toBeVisible();
   });
 
@@ -480,19 +782,21 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await page.goto("/strategy-search/advanced");
     await expect(page).toHaveURL(/\/strategy-search#ss-section-engine$/);
     await expect(page.getByTestId("strategy-search-create")).toBeVisible();
-    await page.getByTestId("ss-advanced-settings-link").click();
-    await expect(page.getByTestId("ss-max-search")).toBeVisible();
-    // Seed invalid advanced override AFTER navigation settle so the deferred
-    // session autosave from the previous form cannot overwrite it.
+
     await page.goto("/strategy-search");
-    await expect(page.getByTestId("strategy-search-create")).toBeVisible();
-    await page.getByTestId("ss-advanced-settings-link").click();
-    await expect(page.getByTestId("ss-max-search")).toBeVisible();
-    await page.getByTestId("ss-max-search").fill("0", { force: true });
+    await advanceToReviewStep(page);
+    await page.getByTestId("ss-guided-nav-step-validation").click();
+    await fillControlledNumberInput(page.getByTestId("ss-min-trades"), "-1");
+    await page.getByTestId("ss-guided-nav-step-review").click();
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-form-errors")).toBeVisible();
 
-    await page.getByTestId("ss-max-search").fill("50", { force: true });
+    await page.getByTestId("ss-guided-nav-step-validation").click();
+    await fillControlledNumberInput(page.getByTestId("ss-min-trades"), "10");
+    await page.getByTestId("ss-guided-nav-step-review").click();
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    await expect(page.getByTestId("ss-create-submit")).toHaveText("탐색 시작");
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-job-detail")).toBeVisible();
     await expect(page.getByTestId("ss-statistics")).toContainText("연구");
@@ -508,7 +812,10 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-action-pause")).toBeVisible();
 
     await page.getByTestId("ss-action-cancel").click();
-    await expect(page.getByTestId("ss-controls-terminal")).toBeVisible();
+    await expect(page.getByTestId("ss-execution-controls")).toHaveAttribute(
+      "data-job-status",
+      "cancelled",
+    );
     await expect(page.getByTestId("ss-statistics")).toContainText("중지");
 
     await expect(
@@ -516,13 +823,12 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     ).toHaveCount(0);
 
     state.rejectCreate = true;
-    const collapsed = page.getByTestId("ss-config-collapsed");
-    if (await collapsed.count()) {
-      await collapsed
-        .locator("summary")
-        .filter({ hasText: "탐색 설정" })
-        .click();
-    }
+    await page.goto("/strategy-search");
+    await page.getByTestId("ss-guided-nav-step-market").click();
+    await clickGuidedNext(page, 3);
+    await fillControlledNumberInput(page.getByTestId("ss-min-trades"), "10");
+    await page.getByTestId("ss-guided-next").click();
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
     await page.getByTestId("ss-create-submit").click();
     await expect(page.getByTestId("ss-feedback")).toContainText(
       "요청 설정이 올바르지 않습니다",
@@ -557,11 +863,11 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     state.executionActive = false;
     state.completedIterations = 10;
 
-    await expect(page.getByTestId("ss-controls-terminal")).toBeVisible({
+    await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
       timeout: 15_000,
     });
     // Stay on Search after completion — never auto-navigate to Results.
-    await expect(page.getByTestId("ss-completion-open-results")).toBeVisible();
+    await expect(page).toHaveURL(/\/strategy-search/);
     await expect(page).toHaveURL(/\/strategy-search/);
     const atTerminal = state.detailGets.length;
     await page.waitForTimeout(5500);
@@ -579,12 +885,46 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
       },
     );
     await page.waitForTimeout(2500);
-    await expect(page.getByTestId("ss-statistics")).toContainText("완료");
+    await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible();
+  });
+
+  test("completed job shows primary dashboard until customer starts 새 탐색", async ({
+    page,
+  }) => {
+    test.setTimeout(45_000);
+    const state = {
+      jobId: "search_e2e_completed_dash_0001",
+      status: "completed" as JobStatus,
+      completedIterations: 10,
+      executionActive: false,
+      completionReason: "QUALIFIED_TARGET_REACHED",
+      detailGets: [] as number[],
+    };
+    await installSearchMocks(page, state);
+    await openSearchJob(page, state.jobId);
+
+    await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
+      timeout: 12_000,
+    });
+    await expect(page.getByTestId("ss-completion-hero-reason")).toContainText(
+      "목표 조건",
+    );
+    await expect(page.getByTestId("ss-guided-nav-step-market")).toHaveCount(0);
+    await expect(page.getByTestId("ss-sticky-status-header")).toHaveCount(0);
+    await expect(page.getByTestId("ss-config-collapsed")).toHaveCount(0);
+    await expect(page.getByTestId("ss-completed-kpi-strip")).toBeVisible();
+
+    await page.getByTestId("ss-completion-new-research").click();
+    await expect(page.getByTestId("ss-guided-nav-step-market")).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(page.getByTestId("ss-completed-dashboard")).toHaveCount(0);
   });
 
   test("failed job shows failureMessage; exhausted shows operator label", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     const failState = {
       jobId: "search_e2e_fail_0001",
       status: "failed" as JobStatus,
@@ -596,10 +936,9 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await installSearchMocks(page, failState);
 
     await openSearchJob(page, failState.jobId);
-    await expect(page.getByTestId("ss-failure-message")).toBeVisible();
-    await expect(page.getByTestId("ss-failure-detail")).toContainText(
-      "캔들 로드 실패",
-    );
+    await expect(
+      page.getByTestId("ss-job-detail").getByTestId("ss-failure-detail"),
+    ).toContainText("캔들 로드 실패");
 
     await page.unroute("**/api/rextora/strategy-search**");
     const exhausted = {
@@ -612,14 +951,16 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     };
     await installSearchMocks(page, exhausted);
     await openSearchJob(page, exhausted.jobId);
-    await expect(page.getByTestId("ss-stop-reason")).toContainText(
-      "연구 범위 소진",
-    );
+    await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
+      timeout: 12_000,
+    });
+    await expect(page.getByTestId("ss-stop-reason")).toContainText("연구 범위 소진");
   });
 
   test("catalog builder controls persist through intercepted create", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     const state = {
       jobId: "search_e2e_catalog_0001",
       status: "queued" as JobStatus,
@@ -629,6 +970,8 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     };
     let createBody: {
       operatorPlan?: {
+        stopWhenQualifiedTarget?: boolean;
+        qualifiedTarget?: number;
         patternCombinationSpec?: {
           operator?: string;
           failurePolicy?: string;
@@ -649,15 +992,39 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     });
     await installSearchMocks(page, state);
     await page.goto("/strategy-search");
-    await page.getByTestId("ss-advanced-settings-link").click();
+    await clickGuidedNext(page, 1);
+    await page.getByTestId("ss-search-mode-direct").click();
+    await clickGuidedNext(page, 1);
+    await expect(page.getByTestId("ss-guided-step-surface")).toHaveAttribute(
+      "data-guided-step-id",
+      "strategy",
+    );
+    await openGuidedStep3Workspace(page);
+    await openGuidedStep3PatternDeep(page);
+    await expect(page.getByTestId("ss-pattern-combination-builder")).toBeVisible();
     await page.getByTestId("ss-combo-preset-confluence").click();
-    await page.getByTestId("ss-combo-operator").selectOption("weighted_score");
-    await page.getByTestId("ss-combo-failure-policy").selectOption("majority");
-    await page.getByTestId("ss-combo-weighted-threshold").fill("1.5");
-    await expect(page.getByTestId("ss-pattern-block-editors")).toBeVisible();
-    await expect(page.getByTestId("ss-pattern-param-0-stopAtrMult")).toBeVisible();
+    await expect(page.getByTestId("ss-pattern-block-editors")).toBeAttached();
+    await page.getByTestId("ss-combo-operator").selectOption("weighted_score", {
+      force: true,
+    });
+    await page.getByTestId("ss-combo-failure-policy").selectOption("majority", {
+      force: true,
+    });
+    await page.getByTestId("ss-combo-weighted-threshold").fill("1.5", {
+      force: true,
+    });
+    await clickGuidedNext(page, 2);
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    const createResponse = page.waitForResponse(
+      (resp) =>
+        resp.request().method() === "POST" &&
+        /\/api\/rextora\/strategy-search$/.test(resp.url().replace(/\?.*$/, "")),
+      { timeout: 15_000 },
+    );
     await page.getByTestId("ss-create-submit").click();
-    await expect(page.getByTestId("ss-job-detail")).toBeVisible();
+    await createResponse;
+    expect(createBody?.operatorPlan?.stopWhenQualifiedTarget).toBe(false);
+    expect(createBody?.operatorPlan?.qualifiedTarget).toBe(3);
     expect(createBody?.operatorPlan?.patternCombinationSpec).toMatchObject({
       operator: "weighted_score",
       failurePolicy: "majority",

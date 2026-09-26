@@ -5,10 +5,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 const e2eDataRoot = fs.mkdtempSync(path.join(os.tmpdir(), "rextora-e2e-data-"));
 fs.mkdirSync(path.join(e2eDataRoot, "strategies"), { recursive: true });
+process.env.REXTORA_E2E_DATA_ROOT = e2eDataRoot;
 
 export default defineConfig({
   testDir: "./tests/e2e",
   testIgnore: ["**/release/**"],
+  globalSetup: "./tests/e2e/global-setup.ts",
   globalTeardown: "./tests/e2e/teardown.ts",
   timeout: 30_000,
   expect: {

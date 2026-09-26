@@ -100,10 +100,11 @@ describe("Strategy Search UX refinement", () => {
     expect(controls).toContain("status !== \"completed\"");
   });
 
-  it("uses mode-aware primary CTA wording", () => {
+  it("uses a single normalized primary launch CTA label", () => {
     const form = readUi("JobCreateForm.tsx");
-    expect(form).toContain("자동 탐색 시작");
-    expect(form).toContain("선택 범위로 탐색 시작");
+    expect(form).toContain("탐색 시작");
+    expect(form).not.toContain("자동 탐색 시작");
+    expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).toContain("resolvedSelectionMode === \"automatic\"");
     expect(form).not.toContain("연구 시작");
     expect(form).not.toContain("직접 전략 탐색 시작");
@@ -213,10 +214,13 @@ describe("Strategy Search UX refinement", () => {
 
   it("B: advanced disclosure has an explicit button, aria-expanded, and state label", () => {
     const form = readUi("JobCreateForm.tsx");
-    expect(form).toContain("고급 탐색 조건");
+    const guidedDisclosure = readUi("guided/GuidedDisclosure.tsx");
+    expect(form).toContain("추가 탐색 설정");
     expect(form).toContain('data-testid="ss-advanced-trigger"');
     expect(form).toContain("aria-expanded={detailsOpen}");
-    expect(form).toContain('data-testid="ss-advanced-state"');
+    expect(form).toContain('data-testid="ss-validation-advanced-trigger"');
+    expect(form).toContain("aria-expanded={stepValidationAdvancedOpen}");
+    expect(guidedDisclosure).toContain("<summary");
     expect(advancedConditionsStateLabel(createDefaultOperatorFormState()).label).toBe(
       "기본값 사용 중",
     );

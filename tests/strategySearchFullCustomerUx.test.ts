@@ -38,14 +38,16 @@ describe("Strategy Search full customer UX", () => {
     const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
     const css = read("components/rextora/v3/strategy-search.css");
     expect(form).toContain("ss-adv-section");
-    expect(form).toContain("탐색 대상");
     expect(form).toContain("설정 수준");
     expect(form).toContain("탐색 방식");
-    expect(form).toContain("평가 · 자격 기준");
+    expect(form).toContain("검증 · 위험 기준");
     expect(form).toContain("패턴 · 조합 조건");
     expect(form).toContain("위험 · 비용 조건");
     expect(form).toContain("현재 적용 설정");
-    expect(form).toContain("ss-field-select");
+    const builder = read(
+      "components/rextora/strategySearch/visual/StrategySearchVisualBuilder.tsx",
+    );
+    expect(builder).toContain("ss-field-select");
     expect(css).toContain(".ss-adv-section");
     expect(css).toContain("background: var(--v3-surface)");
     expect(css).toContain("min-height: 44px");
@@ -162,9 +164,12 @@ describe("Strategy Search advanced final polish", () => {
       chevronGlyph: "▲",
     });
     const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
-    expect(form).toContain("advancedDisclosureControl(detailsOpen)");
+    const disclosure = read(
+      "components/rextora/strategySearch/guided/GuidedDisclosure.tsx",
+    );
+    expect(form).toContain("GuidedDisclosure");
     expect(form).toContain("aria-expanded={detailsOpen}");
-    expect(form).toContain("data-direction={disclosure.chevron}");
+    expect(disclosure).toContain("ss-guided-disclosure__chevron");
   });
 
   it("D/E/F/I: unified radius hierarchy and one light applied-settings surface", () => {

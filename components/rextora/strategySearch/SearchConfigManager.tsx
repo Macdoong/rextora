@@ -17,7 +17,7 @@ type SavedConfigSummary = {
   advancedOverrideCount?: number;
 };
 
-const inputClass = "ss-input mt-1";
+const inputClass = "ss-input ss-strategy-search-control mt-1";
 
 export function SearchConfigManager(props: {
   form: StrategySearchOperatorFormState;
@@ -220,8 +220,8 @@ export function SearchConfigManager(props: {
           불러온 설정: {loadedConfigName}
         </p>
       ) : null}
-      <div className="ss-config-toolbar mt-3 flex flex-wrap items-end gap-2">
-        <label className="block min-w-0 flex-1" htmlFor="ss-config-name">
+      <div className="ss-config-save-row mt-3">
+        <label className="ss-config-save-row__field" htmlFor="ss-config-name">
           <span className="ss-field-label mb-1 block">설정 이름</span>
           <input
             id="ss-config-name"
@@ -235,7 +235,7 @@ export function SearchConfigManager(props: {
         </label>
         <Button
           type="button"
-          className="ss-btn-secondary"
+          className="ss-btn-secondary ss-config-save-row__action"
           data-testid="ss-config-save"
           disabled={disabled}
           onClick={() => void handleSaveConfig()}

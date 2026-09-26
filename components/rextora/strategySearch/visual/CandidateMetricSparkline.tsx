@@ -23,10 +23,14 @@ export function CandidateMetricSparkline({
   const latest = points[points.length - 1];
   const latestText = latest ? formatValue(latest.value) : null;
   const chart = buildCandidateMetricChart(values, kind);
+  const footerValues =
+    kind === "mdd" ? values.map((value) => Math.abs(value)) : values;
+  const footerMin = footerValues.length > 0 ? Math.min(...footerValues) : null;
+  const footerMax = footerValues.length > 0 ? Math.max(...footerValues) : null;
   const minText =
-    chart && Number.isFinite(chart.min) ? formatValue(chart.min) : null;
+    footerMin != null && Number.isFinite(footerMin) ? formatValue(footerMin) : null;
   const maxText =
-    chart && Number.isFinite(chart.max) ? formatValue(chart.max) : null;
+    footerMax != null && Number.isFinite(footerMax) ? formatValue(footerMax) : null;
   const minFooterLabel = kind === "mdd" ? "최저" : "최저";
   const maxFooterLabel = kind === "mdd" ? "최대" : "최고";
   const latestTone =
@@ -90,16 +94,6 @@ export function CandidateMetricSparkline({
                 y2={10 + (chart.height - 20) * ratio}
               />
             ))}
-            {chart.zeroY != null ? (
-              <line
-                className="ss-spark__zero"
-                x1={10}
-                x2={chart.width - 10}
-                y1={chart.zeroY}
-                y2={chart.zeroY}
-                data-testid={`${testId}-zero-line`}
-              />
-            ) : null}
             {chart.linePoints ? (
               <polyline
                 className="ss-spark__line"

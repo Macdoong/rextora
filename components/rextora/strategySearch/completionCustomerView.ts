@@ -11,6 +11,31 @@ export function isStrategySearchDeveloperDiagnosticsVisible(): boolean {
   return false;
 }
 
+/** Customer hero copy for completed jobs (presentation only). */
+export function completionReasonHeroMessageKo(
+  reason: string | null | undefined,
+): string | null {
+  switch (reason) {
+    case "QUALIFIED_TARGET_REACHED":
+      return "목표 조건을 만족하는 후보를 찾았습니다.";
+    case "DEADLINE_REACHED":
+    case "MAX_RUNTIME":
+      return "최대 탐색 시간에 도달해 현재까지의 결과를 정리했습니다.";
+    case "SEARCH_SPACE_EXHAUSTED":
+      return "탐색 범위를 모두 확인했습니다.";
+    case "MAX_CANDIDATE_BUDGET":
+    case "MAX_ITERATIONS":
+    case "HARD_SAFETY_LIMIT":
+    case "RESOURCE_SAFETY_LIMIT":
+      return "안전 한도에 도달해 탐색을 마쳤습니다.";
+    case "USER_CANCELLED":
+    case "USER_STOPPED":
+      return "탐색이 중지되었습니다. 지금까지의 결과를 확인할 수 있습니다.";
+    default:
+      return null;
+  }
+}
+
 export function advancedDisclosureControl(open: boolean): {
   copy: "펼치기" | "접기";
   chevron: "down" | "up";

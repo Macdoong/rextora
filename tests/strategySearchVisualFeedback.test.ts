@@ -48,7 +48,7 @@ describe("Strategy Search visual feedback", () => {
     expect(form).toContain("추천 패턴을 자동으로 조합");
     expect(form).toContain('data-testid="ss-create-submit"');
     expect(form).toContain("className=\"ss-btn-primary\"");
-    expect(form).toContain("자동 탐색 시작");
+    expect(form).toContain("탐색 시작");
     const launchSlice = form.slice(
       form.indexOf("ss-launch-panel"),
       form.indexOf("ss-create-submit") + 80,
@@ -152,10 +152,12 @@ describe("Strategy Search visual feedback", () => {
     expect(form).toContain("탐색 실행 중");
     expect(form).toContain("탐색 일시정지");
     expect(form).toContain("중지 요청 중");
-    expect(form).toContain("안전하게 탐색을 종료하고 있습니다.");
+    expect(readUi("formatters.ts")).toContain(
+      "안전하게 탐색을 종료하고 있습니다.",
+    );
     expect(form).toContain('{launchState === "ready" ? (');
     expect(form).toContain('data-testid="ss-create-submit"');
-    expect(form).toContain("자동 탐색 시작");
+    expect(form).toContain("탐색 시작");
     const submitIdx = form.indexOf('data-testid="ss-create-submit"');
     const readyGuardIdx = form.lastIndexOf(
       '{launchState === "ready" ? (',

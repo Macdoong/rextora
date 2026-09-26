@@ -27,6 +27,7 @@ import {
   resolveCompletedBacktestHandoffCandidate,
   resolveCompletedPrimaryAction,
   resultsReviewAvailable,
+  completionReasonHeroMessageKo,
 } from "./completionCustomerView";
 import { SearchJobExportMenu } from "./SearchJobExportMenu";
 
@@ -91,6 +92,8 @@ export function ResearchCompletionPanel(props: {
   onRegisterForBacktest?: ((iteration: number) => void) | null;
   registeringForBacktest?: boolean;
   bestStrategyId?: string | null;
+  primaryDashboard?: boolean;
+  onRetryWithSettings?: (() => void) | null;
 }) {
   const { job, passCount, onNewResearch } = props;
   const [summary, setSummary] = useState<ResearchResultsSummaryView | null>(
@@ -245,19 +248,37 @@ export function ResearchCompletionPanel(props: {
 
   const marketSymbol = job.config.symbols[0] ?? "—";
   const marketTimeframe = job.config.timeframe || "—";
+  const heroReason =
+    completionReasonHeroMessageKo(job.completionReason) ??
+    (reason && !/USER_|cancelled|summary\./i.test(reason) ? reason : null);
+  const dashboardTitle =
+    props.primaryDashboard && job.status === "completed"
+      ? "✓ 전략 탐색 완료"
+      : title;
   return (
     <section
-      className="ss-completion-hero rextora-card space-y-5 p-6"
+      className={
+        "ss-completion-hero rextora-card space-y-5 p-6" +
+        (props.primaryDashboard ? " ss-completion-hero--dashboard" : "")
+      }
       data-testid="ss-research-completion"
       aria-labelledby="ss-research-completion-title"
     >
-      <header className="ss-completion-hero__head">
+      <header className="ss-completion-hero__head ss-completion-hero__head--enter">
         <p className="ss-completion-hero__mark" aria-hidden="true">
           ✓
         </p>
         <h3 id="ss-research-completion-title" className="ss-completion-hero__title">
-          {title}
+          {dashboardTitle}
         </h3>
+        {heroReason ? (
+          <p
+            className="ss-completion-hero__reason"
+            data-testid="ss-completion-hero-reason"
+          >
+            {heroReason}
+          </p>
+        ) : null}
         <p className="ss-completion-hero__market">
           {marketSymbol} · {marketTimeframe}
           {elapsed ? ` · ${elapsed}` : ""}
@@ -503,13 +524,23 @@ export function ResearchCompletionPanel(props: {
             개선 탐색
           </Button>
         ) : null}
+        {props.onRetryWithSettings ? (
+          <Button
+            type="button"
+            className="ss-btn-secondary"
+            data-testid="ss-completed-retry-settings"
+            onClick={props.onRetryWithSettings}
+          >
+            설정 수정 후 다시 탐색
+          </Button>
+        ) : null}
         <Button
           type="button"
           className={completedActionClass("new_search", primaryAction)}
           data-testid="ss-completion-new-research"
           onClick={onNewResearch}
         >
-          새 탐색 시작
+          새 탐색
         </Button>
         <SearchJobExportMenu jobId={job.id} status={job.status} />
       </div>

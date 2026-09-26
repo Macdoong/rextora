@@ -32,8 +32,9 @@ describe("Strategy Search progressive disclosure", () => {
     expect(css).toContain('[data-config-level="automatic"]');
     expect(css).toContain('[data-config-level="basic"]');
     expect(form).toContain("StickyActionBar");
-    expect(form).toContain("자동 탐색 시작");
-    expect(form).toContain("선택 범위로 탐색 시작");
+    expect(form).toContain("탐색 시작");
+    expect(form).not.toContain("자동 탐색 시작");
+    expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).toContain("ss-combo-summary");
   });
 
@@ -48,10 +49,20 @@ describe("Strategy Search progressive disclosure", () => {
       chevron: "up",
       chevronGlyph: "▲",
     });
-    expect(form).toContain("advancedDisclosureControl(detailsOpen)");
     expect(form).toContain("aria-expanded={detailsOpen}");
-    expect(form).toContain("data-direction={disclosure.chevron}");
     expect(form).toContain("hidden={!detailsOpen}");
+    expect(form).toContain('testId="ss-guided-step2-deep"');
+    expect(form).toContain("defaultOpen={false}");
+    expect(form).toContain("aria-expanded={stepValidationAdvancedOpen}");
+    const guidedDisclosure = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "components/rextora/strategySearch/guided/GuidedDisclosure.tsx",
+      ),
+      "utf8",
+    );
+    expect(guidedDisclosure).toContain("<details");
+    expect(guidedDisclosure).toContain("<summary");
   });
 
   it("disables manual pattern matrix under automatic selection", () => {
@@ -59,5 +70,13 @@ describe("Strategy Search progressive disclosure", () => {
     expect(form).toContain("ss-pattern-matrix-system-managed");
     expect(form).toContain("시스템 관리");
     expect(form).toContain("form.autoStrategyCombo");
+    const notice = form.slice(
+      form.indexOf('data-testid="ss-pattern-matrix-system-managed"') - 220,
+      form.indexOf('data-testid="ss-pattern-matrix-system-managed"'),
+    );
+    expect(notice).toContain("ss-guided-notice--info");
+    expect(notice).not.toContain("bg-slate-900");
+    expect(form).toContain("disabled={selectionLocked}");
+    expect(form).toContain('resolvedSelectionMode === "automatic"');
   });
 });

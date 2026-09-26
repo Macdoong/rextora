@@ -56,6 +56,7 @@ import {
   type RegistrationSummary,
 } from "./QualifiedResultsPanel";
 import { ResearchCompletionPanel } from "./ResearchCompletionPanel";
+import { StrategySearchCompletedDashboard } from "./StrategySearchCompletedDashboard";
 import { ResearchRankingGroups } from "./ResearchRankingGroups";
 import { SearchStatusCard } from "./SearchStatusCard";
 import { StrategySearchClientError } from "./types";
@@ -287,6 +288,7 @@ export function StrategySearchWorkbench() {
   );
   const [runningConfigOpen, setRunningConfigOpen] = useState(false);
   const rankPanelTouchedRef = useRef(false);
+  const pendingScrollToRunningRef = useRef<string | null>(null);
 
   const [strategiesSavedHint, setStrategiesSavedHint] = useState(false);
   const [generationMeta, setGenerationMeta] = useState<{
@@ -681,6 +683,25 @@ export function StrategySearchWorkbench() {
   }, [detail, jobMissing]);
 
   useEffect(() => {
+    if (detail?.status === "completed" && selectedId && !jobMissing) {
+      setOutcomeViewPrimary(true);
+    }
+  }, [detail?.id, detail?.status, selectedId, jobMissing]);
+
+  useEffect(() => {
+    if (!detail?.id || !shouldRenderRunningVisual(detail.status)) return;
+    if (pendingScrollToRunningRef.current !== detail.id) return;
+    pendingScrollToRunningRef.current = null;
+    requestAnimationFrame(() => {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.getElementById("ss-running-view-anchor")?.scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "start",
+      });
+    });
+  }, [detail?.id, detail?.status]);
+
+  useEffect(() => {
     let cancelled = false;
     void fetchStrategySearchRecoveryStatus()
       .then((data) => {
@@ -863,6 +884,7 @@ export function StrategySearchWorkbench() {
       await startStrategySearchJob(created.id);
       const started = await getStrategySearchJobWithRetry(created.id);
       setDetail(started);
+      pendingScrollToRunningRef.current = created.id;
       await refreshList();
       setFeedback({
         message: "탐색을 시작했습니다.",
@@ -1037,6 +1059,12 @@ export function StrategySearchWorkbench() {
     outcomeViewPrimary,
   });
   const guidedSetupActive = isGuidedSetupActive(presentationMode);
+  const showCompletedDashboardPrimary = Boolean(
+    detail &&
+      !jobMissing &&
+      detail.status === "completed" &&
+      outcomeViewPrimary,
+  );
   const runningAutomatic =
     resolvePatternSelectionMode({
       patternConfigLevel: form.patternConfigLevel,
@@ -1146,6 +1174,18 @@ export function StrategySearchWorkbench() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const beginFreshSearch = () => {
+    setOutcomeViewPrimary(false);
+    setForm(createDefaultOperatorFormState());
+    saveOperatorFormSession(createDefaultOperatorFormState());
+    window.setTimeout(() => scrollToCreate(), 0);
+  };
+
+  const retrySearchWithCurrentSettings = () => {
+    setOutcomeViewPrimary(false);
+    scrollToCreate();
+  };
+
   const probeRecovery = () => {
     void refreshRecovery();
     document
@@ -1176,17 +1216,63 @@ export function StrategySearchWorkbench() {
               symbol={detail?.symbols?.[0] || form.symbol}
               timeframe={detail?.timeframe || form.timeframe}
             />
+          ) : showCompletedDashboardPrimary && detail ? (
+            <StrategySearchCompletedDashboard
+              job={detail}
+              passCount={qualifiedFromTrials.length}
+              bestStrategyName={
+                qualifiedFromTrials[0]?.name ?? detail.currentBestSummary
+              }
+              bestStrategyId={
+                qualifiedFromTrials.find((q) => q.strategyId)?.strategyId ?? null
+              }
+              onNewSearch={beginFreshSearch}
+              onRetryWithSettings={retrySearchWithCurrentSettings}
+              onRegisterBest={
+                qualifiedFromTrials.some(
+                  (q) => q.registrationState === "not_registered",
+                )
+                  ? () => {
+                      const first = qualifiedFromTrials.find(
+                        (q) => q.registrationState === "not_registered",
+                      );
+                      if (first) setCompletionRegisterIter(first.iteration);
+                    }
+                  : null
+              }
+              onPromoteTop={() => {
+                void (async () => {
+                  try {
+                    setRegistering(true);
+                    const { promoteStrategySearchTrials } = await import(
+                      "./apiClient"
+                    );
+                    await promoteStrategySearchTrials(detail.id, {
+                      mode: "top",
+                      limit: 10,
+                    });
+                  } finally {
+                    setRegistering(false);
+                  }
+                })();
+              }}
+              onRegisterForBacktest={(iteration) => {
+                void handleRegisterForBacktest(iteration);
+              }}
+              registeringForBacktest={registering}
+            />
           ) : (
             <>{createForm}</>
           )}
 
-          {showOutcomeFirst ? (
+          {showOutcomeFirst && !showCompletedDashboardPrimary ? (
             <p className="ss-helper" data-testid="ss-config-collapsed">
               완료된 탐색이 있습니다. 아래 결과에서 확인하거나, 위에서 새 탐색을
               시작하세요.
             </p>
           ) : null}
 
+          {showCompletedDashboardPrimary ? null : (
           <SetupResultsCollapsible
             active={guidedSetupActive}
             summaryMeta={setupResultsSummaryMeta}
@@ -1295,7 +1381,7 @@ export function StrategySearchWorkbench() {
               className={demoteNewSearch ? "v3-ss-btn-ghost" : "v3-ss-btn-primary"}
               data-testid="ss-open-new-search"
               data-action-rank={demoteNewSearch ? "tertiary" : "primary"}
-              onClick={scrollToCreate}
+              onClick={demoteNewSearch ? beginFreshSearch : scrollToCreate}
             >
               새 탐색
             </Button>
@@ -1770,6 +1856,7 @@ export function StrategySearchWorkbench() {
             </section>
           </div>
           </SetupResultsCollapsible>
+          )}
 
           {completionRegisterIter != null ? (
             <ConfirmDialog

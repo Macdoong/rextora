@@ -183,6 +183,42 @@ describe("Strategy Search guided visual polish (semantics)", () => {
     expect(guideSrc).not.toMatch(/fetch\(|openai|anthropic|llm/i);
   });
 
+  it("Step 1 search name uses a visible text input", () => {
+    const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    expect(formSrc).toContain('data-testid="ss-search-name"');
+    expect(formSrc).toMatch(
+      /data-testid="ss-search-name"[\s\S]{0,200}type="text"/,
+    );
+  });
+
+  it("customer-facing advanced engine entry is only on validation step", () => {
+    const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    expect(formSrc).toContain('data-testid="ss-validation-advanced-trigger"');
+    expect(formSrc).not.toContain("ss-advanced-settings-link");
+    expect(formSrc).toContain("GuidedStrategyScopeSummary");
+    expect(formSrc).toContain("GuidedMobileScopeSummary");
+    expect(formSrc).toContain("ss-guided-step2-deep");
+    expect(formSrc).toContain("ss-guided-step3-workspace-deep");
+    expect(formSrc).toContain("ss-guided-validation-band__title");
+    const essentialsSrc = read(
+      "components/rextora/strategySearch/guided/GuidedStrategyScopeSummary.tsx",
+    );
+    expect(essentialsSrc).toContain('data-testid="ss-guided-strategy-essentials"');
+    expect(formSrc).toContain("ss-guided-hide-trigger");
+    expect(
+      (formSrc.match(/data-testid="ss-validation-advanced-trigger"/g) ?? [])
+        .length,
+    ).toBe(1);
+  });
+
+  it("Step 4 numeric fields use guided control input styling", () => {
+    const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    expect(formSrc).toContain("const inputClass = guidedControlClass");
+    expect(formSrc).toMatch(
+      /data-testid="ss-min-trades"[\s\S]{0,120}type="number"/,
+    );
+  });
+
   it("recent results disclosure stays collapsed by default", () => {
     const collapsibleSrc = read(
       "components/rextora/strategySearch/guided/SetupResultsCollapsible.tsx",

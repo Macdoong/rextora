@@ -200,10 +200,13 @@ describe("Strategy Search scope visualizer", () => {
     const mode = readUi("visual/StrategySearchModeSelector.tsx");
     const form = readUi("JobCreateForm.tsx");
     expect(mode).toContain("탐색 범위 직접 선택");
-    expect(mode).toContain("후보 생성과 검증은 Rextora가");
-    expect(form).toContain("선택 범위로 탐색 시작");
+    expect(mode).toContain(
+      "정해진 시간 동안 Rextora가 전략 조합과 설정을 자동으로 탐색합니다.",
+    );
+    expect(form).toContain("탐색 시작");
+    expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).not.toContain("직접 전략 탐색 시작");
-    expect(form).toContain("고급 탐색 조건");
+    expect(form).toContain("범위 지도 · 워크스페이스");
     expect(form).not.toContain("전략 작성");
     expect(searchFamilyLabelKo("full_safe")).not.toMatch(/SAFE|SafeV44/);
   });
