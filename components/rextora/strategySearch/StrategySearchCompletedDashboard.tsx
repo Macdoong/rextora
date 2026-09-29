@@ -1,6 +1,6 @@
 "use client";
 
-import type { StrategySearchJobDetail } from "./types";
+import type { StrategySearchJobDetail, StrategySearchTrialsPage } from "./types";
 import { CompletedDashboard } from "./completed/CompletedDashboard";
 
 /**
@@ -8,14 +8,11 @@ import { CompletedDashboard } from "./completed/CompletedDashboard";
  */
 export function StrategySearchCompletedDashboard(props: {
   job: StrategySearchJobDetail;
-  passCount: number;
-  bestStrategyName?: string | null;
-  bestStrategyId?: string | null;
+  payloadReady: boolean;
+  trials: StrategySearchTrialsPage | null;
   onNewSearch: () => void;
   onRegisterBest?: (() => void) | null;
   onPromoteTop?: (() => void) | null;
-  onRegisterForBacktest?: ((iteration: number) => void) | null;
-  registeringForBacktest?: boolean;
   onRetryWithSettings?: (() => void) | null;
 }) {
   return (
@@ -26,7 +23,8 @@ export function StrategySearchCompletedDashboard(props: {
     >
       <CompletedDashboard
         job={props.job}
-        passCount={props.passCount}
+        payloadReady={props.payloadReady}
+        trials={props.trials}
         onNewSearch={props.onNewSearch}
         onRetryWithSettings={props.onRetryWithSettings}
         onRegisterBest={props.onRegisterBest}

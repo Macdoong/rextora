@@ -127,7 +127,8 @@ describe("Strategy Search completed result view", () => {
       workbench.indexOf('aria-label="순위 보기"'),
       workbench.indexOf('data-testid="ss-result-tab-completion"') + 220,
     );
-    expect(tabs).toContain("{groupAware ? null : (");
+    expect(tabs).toContain("{showLiveTop10RankChrome ? (");
+    expect(workbench).toContain("!groupAware || operationallyActiveDetail");
     expect(tabs).toContain('data-testid="ss-result-tab-top10"');
     expect(tabs).toContain('data-testid="ss-result-tab-groups"');
     expect(tabs).toContain('data-testid="ss-result-tab-completion"');
@@ -194,7 +195,7 @@ describe("Strategy Search completed result view", () => {
     );
     expect(emptySlice).not.toMatch(/>\s*10\s*</);
     expect(workbench).toContain(
-      '{rankPanel === "top10" && !groupAware && !hasLiveTop10 ? (',
+      "{liveTop10RankSurfaceActive && !hasLiveTop10 ? (",
     );
   });
 
@@ -210,9 +211,11 @@ describe("Strategy Search completed result view", () => {
     expect(workbench).toContain(
       "top10Count: hasLiveTop10 ? liveTop10Entries.length : 0",
     );
-    expect(workbench).toContain("hasLiveTop10 = !groupAware && liveTop10Entries.length > 0");
+    expect(workbench).toContain(
+      "showLiveTop10RankChrome && liveTop10Entries.length > 0",
+    );
     expect(workbench).toContain('data-testid="ss-result-tab-top10"');
-    expect(workbench).toContain("{groupAware ? null : (");
+    expect(workbench).toContain("{showLiveTop10RankChrome ? (");
   });
 
   it("E/F: final recommendation is bestPassed; best score may be a failed candidate", () => {
@@ -355,7 +358,7 @@ describe("Strategy Search completed result view", () => {
 
   it("F/G: recommendation contract and group-aware tabs stay unchanged after mobile layout fix", () => {
     const workbench = readUi("StrategySearchWorkbench.tsx");
-    expect(workbench).toContain("{groupAware ? null : (");
+    expect(workbench).toContain("{showLiveTop10RankChrome ? (");
     expect(workbench).toContain('data-testid="ss-result-tab-groups"');
     expect(
       normalizeResultRankPanel({
@@ -371,7 +374,7 @@ describe("Strategy Search completed result view", () => {
 
   it("E: group-aware tab contract and SAFE operator label stay unchanged", () => {
     const workbench = readUi("StrategySearchWorkbench.tsx");
-    expect(workbench).toContain("{groupAware ? null : (");
+    expect(workbench).toContain("{showLiveTop10RankChrome ? (");
     expect(workbench).toContain('data-testid="ss-result-tab-top10"');
     expect(workbench).toContain('data-testid="ss-result-tab-groups"');
     expect(workbench).toContain("normalizeResultRankPanel");

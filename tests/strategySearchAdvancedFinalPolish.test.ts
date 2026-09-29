@@ -64,10 +64,12 @@ describe("Strategy Search advanced final polish", () => {
     expect(selector).toContain('value: "basic"');
     expect(selector).toContain('value: "expert"');
     expect(selector).toContain("aria-checked");
-    const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    const form =
+      read("components/rextora/strategySearch/JobCreateForm.tsx") +
+      read("components/rextora/strategySearch/guided/GuidedValidationStep.tsx");
     expect(form).toContain("ss-leverage-mode");
-    expect(form).toContain("위험 및 레버리지");
-    expect(form).toContain("비용 검증");
+    expect(form).toContain("위험 · 레버리지");
+    expect(form).toContain("COST_STRESS_LABEL");
     expect(form).toContain('set("patternConfigLevel", value)');
   });
 

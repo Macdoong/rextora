@@ -2,6 +2,7 @@
 
 import { Target } from "lucide-react";
 import type { ReactNode } from "react";
+import { Step5FinalCheckStrip } from "./Step5FinalCheckStrip";
 import { StrategySearchStepGuide } from "./StrategySearchStepGuide";
 import { StrategySearchStepNavigation } from "./StrategySearchStepNavigation";
 import {
@@ -24,8 +25,9 @@ export function StrategySearchGuidedSetup(props: {
   allErrors: FormFieldError[];
   children: ReactNode;
   footer?: ReactNode;
+  validationGuideCopy?: (typeof GUIDE_COPY)["validation"];
 }) {
-  const { guided, allErrors, children, footer } = props;
+  const { guided, allErrors, children, footer, validationGuideCopy } = props;
   const stepIndex = STRATEGY_SEARCH_SETUP_STEPS.findIndex(
     (s) => s.id === guided.currentStepId,
   );
@@ -36,6 +38,16 @@ export function StrategySearchGuidedSetup(props: {
   const warning =
     guided.stepErrors[0]?.message ??
     guideWarningForStep(guided.currentStepId, allErrors);
+  const guideAfterContent = guided.currentStepId === "review";
+  const stepGuide = (
+    <StrategySearchStepGuide
+      stepId={guided.currentStepId}
+      warningKo={guided.stepErrors.length > 0 ? warning : undefined}
+      copyOverride={
+        guided.currentStepId === "validation" ? validationGuideCopy : undefined
+      }
+    />
+  );
 
   return (
     <div className="ss-guided-setup-root" data-testid="ss-guided-setup">
@@ -44,13 +56,15 @@ export function StrategySearchGuidedSetup(props: {
         stepStates={guided.stepStates}
         onGoToStep={guided.goToStep}
       />
-      <div className="ss-guided-setup__body">
-        <StrategySearchStepGuide
-          stepId={guided.currentStepId}
-          warningKo={
-            guided.stepErrors.length > 0 ? warning : undefined
-          }
-        />
+      <div
+        className={
+          "ss-guided-setup__body ss-guided-setup__body--balanced" +
+          (guideAfterContent
+            ? " ss-guided-setup__body--guide-after-content"
+            : "")
+        }
+      >
+        {!guideAfterContent ? stepGuide : null}
         <div className="ss-guided-setup__content">
           <div
             key={guided.currentStepId}
@@ -90,7 +104,21 @@ export function StrategySearchGuidedSetup(props: {
               </p>
             ) : null}
             <div className="ss-guided-step-surface__divider" aria-hidden="true" />
-            <div className="ss-guided-step-surface__body">{children}</div>
+            <div className="ss-guided-step-surface__body">
+              {children}
+              {guideAfterContent ? (
+                <div
+                  className="ss-guided-step-surface__review-guide"
+                  data-testid="ss-guided-review-ai-guide"
+                >
+                  <Step5FinalCheckStrip
+                    warningKo={
+                      guided.stepErrors.length > 0 ? warning : undefined
+                    }
+                  />
+                </div>
+              ) : null}
+            </div>
             {footer ? (
               <div
                 className="ss-guided-step-surface__footer"

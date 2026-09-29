@@ -31,6 +31,13 @@ describe("Strategy Search progressive disclosure", () => {
   it("hides advanced density in simpler modes and keeps a sticky review action", () => {
     expect(css).toContain('[data-config-level="automatic"]');
     expect(css).toContain('[data-config-level="basic"]');
+    const autoStart = css.indexOf(
+      '[data-testid="strategy-search-create"][data-config-level="automatic"]',
+    );
+    const autoBlock = css.slice(autoStart, autoStart + 500);
+    expect(autoBlock).not.toContain("#ss-section-validation");
+    expect(autoBlock).not.toContain("#ss-section-risk");
+    expect(autoBlock).toContain("#ss-section-patterns");
     expect(form).toContain("StickyActionBar");
     expect(form).toContain("탐색 시작");
     expect(form).not.toContain("자동 탐색 시작");

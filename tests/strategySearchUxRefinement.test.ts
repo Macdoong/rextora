@@ -162,8 +162,8 @@ describe("Strategy Search UX refinement", () => {
       symbols: ["BTCUSDT"],
       timeframe: "15m",
     };
-    expect(displayJobSearchTitle(developer)).toBe("BTCUSDT · 15m");
-    expect(composedJobMarketTitle(developer)).toBe("BTCUSDT · 15m");
+    expect(displayJobSearchTitle(developer)).toBe("BTCUSDT · 15분봉");
+    expect(composedJobMarketTitle(developer)).toBe("BTCUSDT · 15분봉");
     const named = {
       id: "job_2",
       searchName: "아침 변동성 점검",

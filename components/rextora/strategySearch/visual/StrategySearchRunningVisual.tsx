@@ -42,11 +42,13 @@ export function StrategySearchRunningVisual({
   familyIds,
   symbol,
   timeframe,
+  headerActions,
 }: {
   progress?: SearchScopeProgress | null;
   familyIds: readonly string[];
   symbol?: string | null;
   timeframe?: string | null;
+  headerActions?: ReactNode;
 }) {
   const mode = resolveRunningVisualMode(progress?.status);
   const events = progress?.recentActivityEvents;
@@ -109,6 +111,14 @@ export function StrategySearchRunningVisual({
         <span className="ss-sr-only" aria-live="polite">
           {statusSummary}
         </span>
+        {headerActions ? (
+          <div
+            className="ss-run-visual__head-actions"
+            data-testid="ss-running-header-controls"
+          >
+            {headerActions}
+          </div>
+        ) : null}
       </header>
 
       <div className="ss-run-visual__stage">
@@ -232,15 +242,6 @@ export function StrategySearchRunningVisual({
             </ul>
           </div>
 
-          {metrics.family ? (
-            <p
-              className="ss-run-visual__activity"
-              data-testid="ss-running-visual-activity"
-            >
-              현재 분석
-              <strong>{metrics.family}</strong>
-            </p>
-          ) : null}
         </div>
 
         <CandidateFlowVisual
@@ -358,7 +359,7 @@ export function StrategySearchRunningVisual({
       <div
         className="ss-run-flow"
         data-testid="ss-running-workflow"
-        data-workflow="ambient"
+        data-workflow="static"
       >
         <p className="ss-run-flow__label">{WORKFLOW_LABEL_KO}</p>
         <ol className="ss-run-flow__list">

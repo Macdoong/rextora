@@ -190,8 +190,11 @@ describe("automatic target-outcome mode", () => {
     form.timeframe = "15m";
     form.periodPreset = "standard";
     render(<StrategySearchFinalReview form={form} onEditStep={() => {}} />);
-    expect(screen.getByTestId("ss-guided-launch-compact").textContent).toContain(
+    expect(screen.getByTestId("ss-guided-launch-summary").textContent).toContain(
       "시간 기준 자동 탐색",
+    );
+    expect(screen.getByTestId("ss-guided-launch-compact").textContent).toContain(
+      "15분봉",
     );
     expect(
       screen.getByTestId("ss-guided-launch-summary").querySelector("ul"),
@@ -268,12 +271,13 @@ describe("automatic target-outcome mode", () => {
     form.minTradeCount = "8";
     render(<StrategySearchFinalReview form={form} onEditStep={() => {}} />);
     const review = screen.getByTestId("ss-guided-target-review");
-    expect(review.textContent).toContain("목표 기준 자동 탐색");
-    expect(review.textContent).toContain("수익률 ≥ 10%");
-    expect(review.textContent).toContain("최대 낙폭 ≤ 20%");
-    expect(review.textContent).toContain("최소 거래수 ≥ 8회");
-    expect(review.textContent).toContain(
-      "검증 조건을 만족하는 후보를 찾으면 종료합니다",
+    expect(review.textContent).toContain("목표 조건");
+    expect(review.textContent).toContain("≥ 10%");
+    expect(review.textContent).toContain("≤ 20%");
+    expect(review.textContent).toContain("≥ 8회");
+    expect(review.textContent).toContain("목표 조건 충족 후보 발견 시 종료");
+    expect(screen.getByTestId("ss-guided-review-탐색 방식").textContent).toContain(
+      "목표 기준 자동 탐색",
     );
   });
 
@@ -322,13 +326,13 @@ describe("automatic target-outcome mode", () => {
     expect(validationCard.textContent).not.toMatch(/최대\s*낙폭\s*≤/);
     expect(validationCard.textContent).not.toContain("최소 거래수 ≥");
     expect(screen.getByTestId("ss-guided-target-review").textContent).toContain(
-      "수익률 ≥ 10%",
+      "≥ 10%",
     );
 
     form.minTotalReturn = "12";
     rerender(<StrategySearchFinalReview form={form} onEditStep={() => {}} />);
     expect(screen.getByTestId("ss-guided-target-review").textContent).toContain(
-      "수익률 ≥ 12%",
+      "≥ 12%",
     );
     expect(
       screen.getByTestId("ss-guided-review-검증 · 위험").textContent,

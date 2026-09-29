@@ -145,6 +145,21 @@ export function stepIndex(id: StrategySearchSetupStepId): number {
   return STEP_INDEX[id];
 }
 
+/** Earliest guided step that owns any of the given validation fields. */
+export function earliestGuidedStepForErrors(
+  errors: ReadonlyArray<FormFieldError>,
+): StrategySearchSetupStepId | null {
+  let best: StrategySearchSetupStepId | null = null;
+  for (const error of errors) {
+    const owner = (Object.keys(STEP_FIELD_GROUPS) as StrategySearchSetupStepId[]).find(
+      (stepId) => stepId !== "review" && STEP_FIELD_GROUPS[stepId].has(error.field),
+    );
+    if (!owner) continue;
+    if (!best || stepIndex(owner) < stepIndex(best)) best = owner;
+  }
+  return best;
+}
+
 export function filterErrorsForStep(
   errors: FormFieldError[],
   stepId: StrategySearchSetupStepId,
@@ -352,7 +367,7 @@ export function buildStepCompactSummaries(
     {
       stepId: "validation",
       titleKo: "검증",
-      lineKo: `최소 거래 ${form.minTradeCount || "—"}회 · 최대 MDD ${form.maxMdd.trim() ? `${form.maxMdd}%` : "프리셋"}`,
+      lineKo: `최소 거래 ${form.minTradeCount || "—"}회 · 최대 낙폭 ${form.maxMdd.trim() ? `${form.maxMdd}%` : "프리셋"}`,
     },
     {
       stepId: "review",
@@ -384,7 +399,7 @@ export const GUIDE_COPY: Record<
       "Rextora가 탐색 범위를 자동으로 구성할지, 직접 전략군을 선택할지 정합니다.",
     recommendationKo:
       "자동 탐색은 여러 전략군을 폭넓게 탐색합니다. 직접 선택은 원하는 전략군에 집중합니다.",
-    impactKo: "탐색 수준·시간·프리셋은 후보 생성량과 연구 깊이에 영향을 줍니다.",
+    impactKo: "탐색 깊이·시간·프리셋은 후보 생성량과 연구 범위에 영향을 줍니다.",
   },
   strategy: {
     statusKo: "범위 구성",

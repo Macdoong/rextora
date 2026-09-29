@@ -204,7 +204,8 @@ describe("Strategy Search visual builder", () => {
       "수수료 1.5× · 슬리피지 1.5× · 스프레드 1.5×",
     );
     const formSrc = readUi("JobCreateForm.tsx");
-    expect(formSrc).toContain("COST_STRESS_LABEL");
+    const step4 = readUi("guided/GuidedValidationStep.tsx");
+    expect(step4).toContain("COST_STRESS_LABEL");
     expect(formSrc).not.toContain("ss-spread-stress");
   });
 

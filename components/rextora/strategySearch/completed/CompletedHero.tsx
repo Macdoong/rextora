@@ -2,6 +2,7 @@
 
 import { formatMs } from "../formatters";
 import type { CompletedDashboardViewModel } from "./completedViewModel";
+import { formatTimeframeCustomerKo } from "./completedDisplayFormat";
 
 export function CompletedHero(props: { model: CompletedDashboardViewModel }) {
   const { model } = props;
@@ -45,15 +46,18 @@ export function CompletedHero(props: { model: CompletedDashboardViewModel }) {
         </span>
       </div>
       <div className="ss-completed-hero__copy">
-        <h2 className="ss-completed-hero__title">{model.heroTitle}</h2>
+        <h2 className="ss-completed-hero__title ss-completed-type-major">{model.heroTitle}</h2>
         <p
-          className="ss-completed-hero__message"
+          className="ss-completed-hero__message ss-completed-type-body"
           data-testid="ss-completion-hero-reason"
         >
           {model.heroMessage}
         </p>
-        <p className="ss-completed-hero__market">
-          {model.symbol} · {model.timeframe}
+        <p
+          className="ss-completed-hero__market"
+          data-testid="ss-completed-hero-market"
+        >
+          {model.symbol} · {formatTimeframeCustomerKo(model.timeframe)}
           {elapsed ? ` · ${elapsed}` : ""}
           {model.qualifiedCount > 0
             ? ` · 최종 적격 ${model.qualifiedCount}개`

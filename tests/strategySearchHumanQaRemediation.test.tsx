@@ -87,13 +87,13 @@ describe("Strategy Search human QA remediation", () => {
     expect(screen.queryByTestId("ss-field-help-popover-minTotalReturn")).toBeNull();
   });
 
-  it("E–F: automatic mode hides empty pattern-detail shell; expert keeps disclosure path", () => {
+  it("E–F: automatic config shows pattern-detail disclosure; expert keeps disclosure path", () => {
     expect(
       showGuidedPatternDetailDisclosure({
         selectionMode: "automatic",
         patternConfigLevel: "automatic",
       }),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       showGuidedPatternDetailDisclosure({
         selectionMode: "direct",
@@ -103,6 +103,14 @@ describe("Strategy Search human QA remediation", () => {
     const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
     expect(formSrc).toContain("showPatternDetailDisclosure");
     expect(formSrc).toContain("patternDefaultsNotice");
+    expect(formSrc).toContain("ss-pattern-detail-automatic-managed");
+    expect(formSrc).toContain("ss-pattern-max-hold-automatic");
+    expect(formSrc).toMatch(
+      /patternConfigLevel === "automatic"[\s\S]*ss-pattern-detail-automatic-managed/,
+    );
+    expect(formSrc).toMatch(
+      /patternConfigLevel === "basic"[\s\S]*ss-pattern-expiry/,
+    );
   });
 
   it("G–H: automatic+basic hides empty advanced-validation band", () => {

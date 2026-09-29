@@ -5,8 +5,19 @@
 
 import { hasAuthoritativeRankingGroups } from "@/src/lib/rextora/researchRankingReadModel";
 import { completionReasonLabelKo } from "../formatters";
-import type { StrategySearchJobDetail } from "../types";
-import type { ResearchResultsSummaryView } from "../types";
+import type {
+  CompletedAnalysisContextView,
+  ResearchResultsSummaryView,
+  StrategySearchJobDetail,
+  StrategySearchTrialsPage,
+} from "../types";
+import {
+  buildCustomerCandidateLabel,
+  formatTimeframeCustomerKo,
+  strategyDescriptorWithoutMarket,
+} from "./completedDisplayFormat";
+import { finalizeCompareRowPresentation } from "./completedComparePresentation";
+import { resolveCompletedQualifiedCount } from "./completedLoadingGate";
 
 export type CompletedHeroTone =
   | "success"
@@ -37,18 +48,37 @@ export type CompletedRecommendationView = {
 export type CompletedCandidateCompareRow = {
   id: string;
   label: string;
+  displayPrimary: string;
+  displaySecondary: string | null;
+  differentiatorChips: string[];
   netReturn: number | null;
   maxDrawdown: number | null;
+  tradeCount: number | null;
   score: number | null;
   rankingCompatibilityGroup: string;
   rank: number;
   isRecommended: boolean;
 };
 
+export type CompletedQualificationCriterion = {
+  id: string;
+  label: string;
+  thresholdLabel: string;
+  resultLabel: string;
+  met: boolean;
+};
+
+export type CompletedGroupRankingSummary = {
+  totalGroups: number;
+  withRecommendation: number;
+  withoutRecommendation: number;
+};
+
 export type CompletedDashboardViewModel = {
   jobId: string;
   symbol: string;
   timeframe: string;
+  analysisContext: CompletedAnalysisContextView | null;
   completionReason: string | null;
   completionReasonLabel: string | null;
   heroTone: CompletedHeroTone;
@@ -63,12 +93,18 @@ export type CompletedDashboardViewModel = {
     qualified: number;
   };
   passFail: { passed: number | null; failed: number | null };
+  passRatePct: number | null;
   recommendation: CompletedRecommendationView | null;
+  qualificationCriteria: CompletedQualificationCriterion[];
+  minScoreEnabled: boolean;
   compareCandidates: CompletedCandidateCompareRow[];
+  compareCommonStrategyContext: string | null;
   primaryRankingGroup: string | null;
   groupAware: boolean;
+  groupRankingSummary: CompletedGroupRankingSummary | null;
   resultsHref: string;
   reviewAvailable: boolean;
+  dataStable: boolean;
 };
 
 const STOP_REASONS = new Set([
@@ -163,7 +199,7 @@ export function buildCompletedRecommendationView(
     iteration: resolved.ref.iteration,
     paramsHash: resolved.ref.paramsHash,
     readableName: row?.readableName ?? row?.displayAlias ?? "추천 후보",
-    strategyFamily: row?.strategyFamily ?? null,
+    strategyFamily: null,
     netReturn: row?.netReturn ?? null,
     maxDrawdown: row?.maxDrawdown ?? null,
     tradeCount: row?.tradeCount ?? null,
@@ -275,50 +311,185 @@ export function buildCompareCandidatesForGroup(input: {
     (g) => g.rankingCompatibilityGroup === input.groupId,
   );
   const fromTop = (group?.topCandidates ?? []).slice(0, limit);
+  const seenNames = new Map<string, number>();
+  const meta: Array<{
+    readableName?: string | null;
+    displayAlias?: string | null;
+    iteration?: number | null;
+  }> = [];
+  let baseRows: Omit<
+    CompletedCandidateCompareRow,
+    "displayPrimary" | "displaySecondary" | "differentiatorChips"
+  >[] = [];
+
   if (fromTop.length > 0) {
-    return fromTop.map((c, index) => {
+    baseRows = fromTop.map((c, index) => {
       const row = joinTop10Entry(catalog, c.paramsHash);
+      const rank = index + 1;
+      meta.push({
+        readableName: row?.readableName,
+        displayAlias: row?.displayAlias,
+        iteration: c.iteration,
+      });
       return {
         id: `${c.iteration}-${c.paramsHash}`,
-        label:
-          row?.readableName?.slice(0, 48) ??
-          row?.displayAlias?.slice(0, 48) ??
-          `#${c.iteration}`,
+        label: buildCustomerCandidateLabel({
+          readableName: row?.readableName,
+          displayAlias: row?.displayAlias,
+          rank,
+          seenNames,
+        }),
         netReturn: row?.netReturn ?? null,
         maxDrawdown: row?.maxDrawdown ?? null,
+        tradeCount: row?.tradeCount ?? null,
         score: c.score ?? row?.score ?? null,
         rankingCompatibilityGroup: input.groupId,
-        rank: index + 1,
+        rank,
         isRecommended: recHash != null && c.paramsHash === recHash,
       };
     });
+  } else {
+    baseRows = catalog.slice(0, limit).map((row, index) => {
+      const rank = index + 1;
+      meta.push({
+        readableName: row.readableName,
+        displayAlias: row.displayAlias,
+        iteration: null,
+      });
+      return {
+        id: row.strategyHash || String(index),
+        label: buildCustomerCandidateLabel({
+          readableName: row.readableName,
+          displayAlias: row.displayAlias,
+          rank,
+          seenNames,
+        }),
+        netReturn: row.netReturn,
+        maxDrawdown: row.maxDrawdown,
+        tradeCount: row.tradeCount ?? null,
+        score: row.score ?? null,
+        rankingCompatibilityGroup: input.groupId,
+        rank,
+        isRecommended: recHash != null && row.strategyHash === recHash,
+      };
+    });
   }
-  return catalog.slice(0, limit).map((row, index) => ({
-    id: row.strategyHash || String(index),
-    label: row.readableName?.slice(0, 48) ?? row.displayAlias ?? `#${index + 1}`,
-    netReturn: row.netReturn,
-    maxDrawdown: row.maxDrawdown,
-    score: row.score ?? null,
-    rankingCompatibilityGroup: input.groupId,
-    rank: index + 1,
-    isRecommended: recHash != null && row.strategyHash === recHash,
-  }));
+
+  return finalizeCompareRowPresentation(
+    baseRows as CompletedCandidateCompareRow[],
+    meta,
+  );
+}
+
+function buildQualificationCriteria(
+  job: StrategySearchJobDetail,
+  recommendation: CompletedRecommendationView | null,
+): CompletedQualificationCriterion[] {
+  const ctx = job.completedAnalysisContext;
+  const t = ctx?.passThresholds;
+  const r = recommendation;
+  if (!t || !r) return [];
+  const rows: CompletedQualificationCriterion[] = [];
+  if (t.minTotalReturn != null && r.netReturn != null) {
+    rows.push({
+      id: "minTotalReturn",
+      label: "최소 수익률",
+      thresholdLabel: `기준 ${(t.minTotalReturn * 100).toFixed(2)}%`,
+      resultLabel: `결과 ${(r.netReturn * 100).toFixed(2)}%`,
+      met: r.netReturn >= t.minTotalReturn,
+    });
+  }
+  if (t.maxMdd != null && r.maxDrawdown != null) {
+    const met = r.maxDrawdown >= t.maxMdd;
+    rows.push({
+      id: "maxMdd",
+      label: "최대 낙폭",
+      thresholdLabel: `기준 ${(Math.abs(t.maxMdd) * 100).toFixed(2)}%`,
+      resultLabel: `결과 ${(Math.abs(r.maxDrawdown) * 100).toFixed(2)}%`,
+      met,
+    });
+  }
+  if (t.minTradeCount != null && r.tradeCount != null) {
+    rows.push({
+      id: "minTradeCount",
+      label: "최소 거래수",
+      thresholdLabel: `기준 ${t.minTradeCount}회`,
+      resultLabel: `결과 ${r.tradeCount}회`,
+      met: r.tradeCount >= t.minTradeCount,
+    });
+  }
+  if (t.minWinRate != null && r.winRate != null) {
+    rows.push({
+      id: "minWinRate",
+      label: "최소 승률",
+      thresholdLabel: `기준 ${(t.minWinRate * 100).toFixed(2)}%`,
+      resultLabel: `결과 ${(r.winRate * 100).toFixed(2)}%`,
+      met: r.winRate >= t.minWinRate,
+    });
+  }
+  if (ctx?.jitterEnabled === true && r.passed) {
+    rows.push({
+      id: "jitter",
+      label: "안정성 검증",
+      thresholdLabel: "지터 검증",
+      resultLabel: "지터 검증 통과",
+      met: true,
+    });
+  }
+  return rows;
+}
+
+function buildCompareCommonStrategyContext(input: {
+  symbol: string;
+  timeframe: string;
+  rows: CompletedCandidateCompareRow[];
+}): string | null {
+  const secondaries = input.rows
+    .map((r) => r.displaySecondary?.trim())
+    .filter((s): s is string => Boolean(s));
+  if (secondaries.length < 2) return null;
+  const first = secondaries[0];
+  if (!secondaries.every((s) => s === first)) return null;
+  const tf = formatTimeframeCustomerKo(input.timeframe);
+  const descriptor = strategyDescriptorWithoutMarket({
+    readableName: first,
+    symbol: input.symbol,
+    timeframe: input.timeframe,
+  });
+  return `${input.symbol} · ${tf} · ${descriptor}`;
+}
+
+function buildGroupRankingSummary(
+  job: StrategySearchJobDetail,
+): CompletedGroupRankingSummary | null {
+  const groups = job.rankingGroups ?? [];
+  if (groups.length === 0) return null;
+  let withRecommendation = 0;
+  for (const g of groups) {
+    if (g.bestPassedCandidate?.passed === true) withRecommendation += 1;
+  }
+  return {
+    totalGroups: groups.length,
+    withRecommendation,
+    withoutRecommendation: groups.length - withRecommendation,
+  };
 }
 
 export function buildCompletedDashboardViewModel(input: {
   job: StrategySearchJobDetail;
-  qualifiedCount: number;
+  qualifiedCount?: number | null;
+  payloadReady: boolean;
+  trials?: StrategySearchTrialsPage | null;
   summary?: ResearchResultsSummaryView | null;
 }): CompletedDashboardViewModel {
   const { job } = input;
   const stats = job.statistics;
-  const qualifiedCount = Math.max(
-    0,
-    input.qualifiedCount ??
-      job.qualifiedCount ??
-      input.summary?.counts?.qualifiedStrategies ??
-      0,
-  );
+  const resolvedQualified = resolveCompletedQualifiedCount({
+    job,
+    trials: input.trials ?? null,
+    payloadReady: input.payloadReady,
+  });
+  const qualifiedCount = Math.max(0, resolvedQualified ?? 0);
   const recommendation = buildCompletedRecommendationView(job);
   const primaryRankingGroup =
     recommendation?.rankingCompatibilityGroup ??
@@ -342,11 +513,17 @@ export function buildCompletedDashboardViewModel(input: {
     null;
   const passed = job.gatePassedCount ?? stats?.passed ?? null;
   const failed = job.rejectedCount ?? stats?.failed ?? null;
+  const evaluatedForRate = evaluated ?? 0;
+  const passedForRate = passed ?? 0;
+  const passRatePct =
+    evaluatedForRate > 0 ? (passedForRate / evaluatedForRate) * 100 : null;
+  const thresholds = job.completedAnalysisContext?.passThresholds;
 
   return {
     jobId: job.id,
     symbol: job.symbols?.[0] ?? "—",
     timeframe: job.timeframe ?? "—",
+    analysisContext: job.completedAnalysisContext ?? null,
     completionReason: job.completionReason ?? null,
     completionReasonLabel: completionReasonLabelKo(job.completionReason ?? null),
     ...hero,
@@ -359,11 +536,21 @@ export function buildCompletedDashboardViewModel(input: {
       qualified: qualifiedCount,
     },
     passFail: { passed, failed },
+    passRatePct,
     recommendation,
+    qualificationCriteria: buildQualificationCriteria(job, recommendation),
+    minScoreEnabled: thresholds?.minScore != null,
     compareCandidates,
+    compareCommonStrategyContext: buildCompareCommonStrategyContext({
+      symbol: job.symbols?.[0] ?? "—",
+      timeframe: job.timeframe ?? "—",
+      rows: compareCandidates,
+    }),
     primaryRankingGroup,
     groupAware: hasAuthoritativeRankingGroups(job),
+    groupRankingSummary: buildGroupRankingSummary(job),
     resultsHref: `/results?jobId=${encodeURIComponent(job.id)}`,
     reviewAvailable: true,
+    dataStable: input.payloadReady,
   };
 }

@@ -23,3 +23,27 @@ export function isGuidedSetupActive(
 ): boolean {
   return mode === "guided_setup";
 }
+
+/** Compact “최근 작업” strip under Step 1 — not when a non-completed job is in context. */
+export function shouldShowGuidedCompactSecondary(input: {
+  guidedSetupActive: boolean;
+  guidedOperationalExpanded: boolean;
+  selectedJobStatus?: string | null;
+  jobMissing?: boolean;
+  hasSelectedJob: boolean;
+}): boolean {
+  if (!input.guidedSetupActive || input.guidedOperationalExpanded) {
+    return false;
+  }
+  if (input.jobMissing) {
+    return false;
+  }
+  if (!input.hasSelectedJob) {
+    return true;
+  }
+  const status = input.selectedJobStatus ?? "";
+  if (!status) {
+    return false;
+  }
+  return status === "completed";
+}

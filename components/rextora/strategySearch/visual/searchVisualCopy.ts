@@ -158,7 +158,7 @@ export function mergeDirectVisualSpaceIds(
   return merged;
 }
 
-export const COST_STRESS_LABEL = "보수적 비용 검증";
+export const COST_STRESS_LABEL = "비용 1.5배 추가 검증";
 export const COST_STRESS_HELP =
-  "수수료·슬리피지·스프레드를 높여 전략을 재검증합니다.";
+  "수수료·슬리피지·스프레드를 평소보다 높여 결과가 얼마나 버티는지 추가로 확인합니다. 이 추가 검증 결과는 참고 자료이며 현재 합격 여부를 직접 바꾸지는 않습니다.";
 export const COST_STRESS_SUMMARY = "수수료 1.5× · 슬리피지 1.5× · 스프레드 1.5×";

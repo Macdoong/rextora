@@ -25,9 +25,11 @@ export default function StrategySearchPage() {
           />
         }
       >
-        <AgentContextStrip pageLabelKo="전략 탐색" />
-        <div id="results" className="scroll-mt-20">
-          <StrategySearchWorkbench />
+        <div className="v3-ss-main-stack">
+          <AgentContextStrip pageLabelKo="전략 탐색" />
+          <div id="results" className="scroll-mt-20">
+            <StrategySearchWorkbench />
+          </div>
         </div>
       </ClientHydrated>
     </div>

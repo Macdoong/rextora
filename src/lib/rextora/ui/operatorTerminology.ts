@@ -55,7 +55,7 @@ export const OPERATOR_STATUS = {
   emergency: "긴급 정지",
   none: "없음",
   unavailable: "선택 없음",
-  noStrategy: "전략 없음",
+  noStrategy: "적용 전략 없음",
   paperIdle: "Paper 대기",
   liveBlockedShort: "실전 차단",
   loading: "불러오는 중",
@@ -63,7 +63,7 @@ export const OPERATOR_STATUS = {
   thinking: "분석 중",
   approvalPending: "승인 대기",
   resumeAvailable: "재개 가능",
-  ready: "대기",
+  ready: "AI 대기",
 } as const;
 
 export const OPERATOR_ACTION_GROUP = {

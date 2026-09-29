@@ -3,7 +3,7 @@
 import type { PatternSelectionMode } from "@/src/lib/rextora/patternSelectionMode";
 import { patternSelectionModeLabelKo } from "@/src/lib/rextora/patternSelectionMode";
 import type { StrategySearchOperatorFormState } from "../formDefaults";
-import { SEARCHABLE_SPACE_OPTIONS } from "../formDefaults";
+import { formatCustomerSearchValue } from "../customerDisplay";
 
 const DIRECTION_KO: Record<string, string> = {
   both: "롱·숏",
@@ -18,10 +18,7 @@ const CONFIG_LEVEL_KO: Record<string, string> = {
 };
 
 function familyLabels(ids: readonly string[]): string[] {
-  return ids.map(
-    (id) =>
-      SEARCHABLE_SPACE_OPTIONS.find((s) => s.id === id)?.labelKo ?? id,
-  );
+  return ids.map((id) => formatCustomerSearchValue(id));
 }
 
 export function GuidedStrategyScopeSummary(props: {

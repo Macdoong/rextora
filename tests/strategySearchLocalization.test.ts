@@ -102,7 +102,10 @@ describe("strategy search Korean localization polish", () => {
   });
 
   it("Korean field labels and primary CTA render", () => {
-    const form = read("JobCreateForm.tsx");
+    const form =
+      read("JobCreateForm.tsx") +
+      read("guided/GuidedValidationStep.tsx") +
+      read("visual/searchVisualCopy.ts");
     const guidedUi = [
       "guided/GuidedApproachEssentials.tsx",
       "guided/GuidedStrategyScopeSummary.tsx",
@@ -116,7 +119,7 @@ describe("strategy search Korean localization polish", () => {
     expect(labels).toContain("탐색 시간");
     expect(form).toContain("탐색 프리셋");
     expect(form).toContain("최대 허용 낙폭");
-    expect(form).toContain("탐색 기준");
+    expect(form).toContain("탐색 출발점");
     expect(form).toContain("고급 설정");
     expect(form).toContain("추가 탐색 설정");
     expect(read("guided/GuidedAutomaticObjectivePanel.tsx")).toContain(
@@ -130,23 +133,24 @@ describe("strategy search Korean localization polish", () => {
     expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).toContain("탐색 이름");
     expect(form).toContain("목표 합격 후보");
-    expect(form).toContain("비용 검증");
-    expect(form).toContain("안정성 검증");
+    expect(form).toContain("비용 1.5배 추가 검증");
+    expect(form).toContain("파라미터를 조금 바꿔 다시 확인");
     expect(form).toContain("전문가 조건");
-    expect(form).toContain("설정 저장 및 관리");
+    expect(form).toContain("설정 저장 (선택)");
   });
 
   it("settings sections use Korean titles on unified form", () => {
     const form =
       read("JobCreateForm.tsx") +
-      read("guided/GuidedApproachEssentials.tsx");
+      read("guided/GuidedApproachEssentials.tsx") +
+      read("guided/GuidedValidationStep.tsx");
     for (const title of [
       "탐색 깊이 · 시간",
       "패턴 · 조합 조건",
       "패턴 탐색",
       "패턴 세부 설정",
-      "위험 및 레버리지",
-      "검증 강도",
+      "위험 · 레버리지",
+      "후보 평가",
       "실행 및 자원 제한",
       "전문가 조건",
       "현재 적용 설정",

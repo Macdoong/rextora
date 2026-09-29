@@ -58,7 +58,7 @@ describe("Strategy Search live QA fixes", () => {
       />,
     );
     expect(
-      screen.getByTestId("ss-guided-launch-compact").textContent,
+      screen.getByTestId("ss-guided-launch-summary").textContent,
     ).toContain("시간 기준 자동 탐색");
     const details = screen.getByText("상세 보기").closest("details")!;
     fireEvent.click(details.querySelector("summary")!);

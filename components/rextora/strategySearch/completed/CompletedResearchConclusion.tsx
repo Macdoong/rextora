@@ -1,7 +1,8 @@
 "use client";
 
 import type { CompletedDashboardViewModel } from "./completedViewModel";
-import { formatPct } from "../formatters";
+import { formatMddAbsPct, formatPct } from "../formatters";
+import { formatCompositeScore } from "./completedDisplayFormat";
 
 export function CompletedResearchConclusion(props: {
   model: CompletedDashboardViewModel;
@@ -44,7 +45,11 @@ export function CompletedResearchConclusion(props: {
                 <li>승률 {formatPct(r.winRate)}</li>
               ) : null}
               {r.tradeCount != null ? <li>거래 {r.tradeCount}회</li> : null}
-              {r.score != null ? <li>점수 {r.score.toFixed(3)}</li> : null}
+              {r.score != null ? (
+                <li data-testid="ss-briefing-chip-score">
+                  종합 평가 {formatCompositeScore(r.score)}
+                </li>
+              ) : null}
             </ul>
           </div>
           <div className="ss-completed-briefing__block">
@@ -52,7 +57,7 @@ export function CompletedResearchConclusion(props: {
             <ul className="ss-completed-briefing__list">
               <li>
                 최대 낙폭{" "}
-                {r.maxDrawdown != null ? formatPct(r.maxDrawdown) : "—"}
+                {r.maxDrawdown != null ? formatMddAbsPct(r.maxDrawdown) : "—"}
               </li>
               <li>거래수 {r.tradeCount ?? "—"}회</li>
               <li>과거 검증 결과이며 미래 성과를 보장하지 않습니다.</li>

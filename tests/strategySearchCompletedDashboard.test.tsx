@@ -14,10 +14,41 @@ import {
 } from "../components/rextora/strategySearch/completed/completedViewModel";
 import type { StrategySearchJobDetail } from "../components/rextora/strategySearch/types";
 
+vi.mock("../components/rextora/strategySearch/completed/useCompletedMotion", () => ({
+  useCompletedMotion: () => false,
+}));
+
 const ROOT = process.cwd();
 
 function read(rel: string): string {
   return fs.readFileSync(path.join(ROOT, rel), "utf8");
+}
+
+function emptyTrials(jobId: string) {
+  return { jobId, total: 0, limit: 200, offset: 0, trials: [] };
+}
+
+function vm(job: StrategySearchJobDetail) {
+  return buildCompletedDashboardViewModel({
+    job,
+    payloadReady: true,
+    trials: emptyTrials(job.id),
+  });
+}
+
+function renderDashboard(
+  job: StrategySearchJobDetail = baseJob(),
+  extra?: { onNewSearch?: () => void; onRetryWithSettings?: () => void },
+) {
+  return render(
+    <CompletedDashboard
+      job={job}
+      payloadReady
+      trials={emptyTrials(job.id)}
+      onNewSearch={extra?.onNewSearch ?? (() => {})}
+      onRetryWithSettings={extra?.onRetryWithSettings}
+    />,
+  );
 }
 
 function baseJob(
@@ -31,6 +62,9 @@ function baseJob(
     completionReason: "QUALIFIED_TARGET_REACHED",
     elapsedMs: 120_000,
     qualifiedCount: 1,
+    gatePassedCount: 5,
+    evaluatedCount: 30,
+    rejectedCount: 25,
     statistics: {
       generated: 40,
       evaluated: 30,
@@ -114,24 +148,20 @@ describe("Strategy Search completed dashboard", () => {
 
   it("A–B: workbench hides legacy stack when primary completed dashboard is shown", () => {
     const workbench = read("components/rextora/strategySearch/StrategySearchWorkbench.tsx");
-    expect(workbench).toContain("showCompletedDashboardPrimary ? null : (");
-    expect(workbench).toContain("showOutcomeFirst && !showCompletedDashboardPrimary");
+    expect(workbench).toContain(
+      "hideLegacyWorkbenchSurfaces ? null : showGuidedCompactSecondary",
+    );
+    expect(workbench).not.toContain("완료된 탐색이 있습니다. 아래 결과에서");
   });
 
   it("C: QUALIFIED_TARGET_REACHED with qualified uses success hero", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob(),
-      qualifiedCount: 1,
-    });
+    const model = vm(baseJob());
     expect(model.heroTone).toBe("success");
     expect(model.heroMessage).toContain("목표 조건");
   });
 
   it("hero title has no duplicate literal checkmark; integrated visual check remains", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob(),
-      qualifiedCount: 1,
-    });
+    const model = vm(baseJob());
     expect(model.heroTitle).toBe("전략 탐색 완료");
     expect(model.heroTitle).not.toContain("✓");
     render(<CompletedHero model={model} />);
@@ -143,19 +173,17 @@ describe("Strategy Search completed dashboard", () => {
   });
 
   it("D: DEADLINE_REACHED uses neutral completion copy", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob({ completionReason: "DEADLINE_REACHED" }),
-      qualifiedCount: 2,
-    });
+    const model = vm(
+      baseJob({ completionReason: "DEADLINE_REACHED", qualifiedCount: 2 }),
+    );
     expect(model.heroTone).toBe("neutral");
     expect(model.heroMessage).toContain("탐색 한도");
   });
 
   it("E: zero qualified does not use success tone", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob({ completionReason: "DEADLINE_REACHED" }),
-      qualifiedCount: 0,
-    });
+    const model = vm(
+      baseJob({ completionReason: "DEADLINE_REACHED", qualifiedCount: 0 }),
+    );
     expect(model.heroTone).toBe("no-qualified");
     expect(model.heroMessage).toContain("충족한 후보는 없습니다");
   });
@@ -164,8 +192,7 @@ describe("Strategy Search completed dashboard", () => {
     const job = baseJob();
     const resolved = resolveCompletedRecommendation(job);
     expect(resolved?.ref.paramsHash).toBe("hash_pass");
-    const rec = buildCompletedDashboardViewModel({ job, qualifiedCount: 1 })
-      .recommendation;
+    const rec = vm(job).recommendation;
     expect(rec?.readableName).toBe("EMA Cross Pass");
     expect(rec?.netReturn).toBe(0.12);
     expect(rec?.score).toBe(0.82);
@@ -189,7 +216,7 @@ describe("Strategy Search completed dashboard", () => {
         },
       ],
     });
-    const model = buildCompletedDashboardViewModel({ job, qualifiedCount: 0 });
+    const model = vm({ ...job, qualifiedCount: 0 });
     expect(model.recommendation).toBeNull();
     render(<CompletedReturnRiskChart model={model} />);
     expect(screen.queryByTestId("ss-completed-risk-point-recommended")).toBeNull();
@@ -197,10 +224,7 @@ describe("Strategy Search completed dashboard", () => {
   });
 
   it("I: funnel uses canonical statistics", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob(),
-      qualifiedCount: 1,
-    });
+    const model = vm(baseJob());
     expect(model.funnel).toEqual({
       generated: 40,
       evaluated: 30,
@@ -211,16 +235,15 @@ describe("Strategy Search completed dashboard", () => {
 
   it("J: return/MDD comparison uses top10 within one group", () => {
     const job = baseJob();
-    const model = buildCompletedDashboardViewModel({ job, qualifiedCount: 1 });
+    const model = vm(job);
     expect(model.compareCandidates.every(
       (c) => c.rankingCompatibilityGroup === "safe_execution_price_v1",
     )).toBe(true);
     expect(model.compareCandidates.some((c) => c.netReturn === 0.12)).toBe(true);
-    render(<CompletedReturnRiskChart model={model} />);
-    expect(screen.getByTestId("ss-completed-return-mdd-scatter")).toBeTruthy();
-    const point = screen.getByTestId("ss-completed-risk-point-recommended");
-    expect(point.getAttribute("data-net-return")).toBe("0.12");
-    expect(point.getAttribute("data-mdd-abs")).toBeTruthy();
+    renderDashboard(job);
+    expect(screen.queryByTestId("ss-completed-return-risk-section")).toBeNull();
+    expect(screen.getByTestId("ss-completed-candidate-matrix")).toBeTruthy();
+    expect(screen.getByTestId("ss-completed-chart-return")).toBeTruthy();
   });
 
   it("K: no equity or timestamp chart components in completed surface", () => {
@@ -284,34 +307,29 @@ describe("Strategy Search completed dashboard", () => {
     const motion = read("components/rextora/strategySearch/completed/useCompletedMotion.ts");
     expect(motion).toContain("prefers-reduced-motion: reduce");
     const kpi = read("components/rextora/strategySearch/completed/CompletedKpiStrip.tsx");
-    expect(kpi).toContain("prefers-reduced-motion: reduce");
+    expect(kpi).not.toContain("useCountUpDisplay");
   });
 
   it("P: mobile overflow guard and scatter fallback in completed layout CSS", () => {
     const css = read("components/rextora/v3/strategy-search.css");
     expect(css).toContain("ss-completed-dashboard-layout");
     expect(css).toMatch(/max-width:\s*100%/);
-    expect(css).toContain("@media (max-width: 390px)");
+    expect(css).toContain("@media (max-width: 767px)");
     expect(css).toContain("ss-completed-risk-chart__desktop");
     expect(css).toContain("ss-completed-risk-chart__mobile");
   });
 
   it("renders primary dashboard with hierarchy: upper summary before recommendation", () => {
-    const { container } = render(
-      <CompletedDashboard
-        job={baseJob()}
-        passCount={1}
-        onNewSearch={() => {}}
-        onRetryWithSettings={() => {}}
-      />,
-    );
+    const { container } = renderDashboard(baseJob(), {
+      onRetryWithSettings: () => {},
+    });
     expect(screen.getByTestId("ss-completed-dashboard-layout")).toBeTruthy();
     expect(screen.getByTestId("ss-completed-upper-summary")).toBeTruthy();
-    expect(screen.getByTestId("ss-completed-passfail-donut")).toBeTruthy();
+    expect(screen.getByTestId("ss-completed-verification-flow")).toBeTruthy();
     expect(screen.getByTestId("ss-completed-rec-briefing-row")).toBeTruthy();
     expect(screen.getByTestId("ss-completed-recommendation")).toBeTruthy();
     expect(screen.getByTestId("ss-completed-ai-briefing")).toBeTruthy();
-    expect(screen.getByTestId("ss-completed-funnel")).toBeTruthy();
+    expect(screen.getByTestId("ss-completed-verification-flow")).toBeTruthy();
 
     const layout = container.querySelector(".ss-completed-dashboard-layout");
     const children = layout
@@ -323,20 +341,18 @@ describe("Strategy Search completed dashboard", () => {
     expect(recIdx).toBeGreaterThan(upperIdx);
   });
 
-  it("pass/fail donut receives exact passed and failed statistics", () => {
-    render(
-      <CompletedDashboard job={baseJob()} passCount={1} onNewSearch={() => {}} />,
+  it("verification flow receives exact evaluated and qualified counts", () => {
+    renderDashboard();
+    expect(screen.getByTestId("ss-verification-flow-evaluated").textContent).toContain(
+      "30",
     );
-    const ring = screen.getByTestId("ss-completed-passfail-ring-pass");
-    expect(ring.getAttribute("data-passed")).toBe("5");
-    expect(ring.getAttribute("data-failed")).toBe("25");
+    expect(screen.getByTestId("ss-verification-flow-qualified").textContent).toContain(
+      "1",
+    );
   });
 
   it("recommendation badge appears only on canonical bestPassed candidate", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob(),
-      qualifiedCount: 1,
-    });
+    const model = vm(baseJob());
     render(<CompletedCandidateReturnComparison model={model} />);
     const badges = screen.getAllByTestId("ss-completed-return-recommend-badge");
     expect(badges).toHaveLength(1);
@@ -354,10 +370,7 @@ describe("Strategy Search completed dashboard", () => {
   });
 
   it("return bars expose actual candidate net returns", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob(),
-      qualifiedCount: 1,
-    });
+    const model = vm(baseJob());
     render(<CompletedCandidateReturnComparison model={model} />);
     expect(screen.getByTestId("ss-completed-return-row-1").getAttribute("data-net-return")).toBe(
       "0.12",
@@ -368,26 +381,22 @@ describe("Strategy Search completed dashboard", () => {
   });
 
   it("AI researcher briefing renders deterministic metric chips", () => {
-    render(
-      <CompletedDashboard job={baseJob()} passCount={1} onNewSearch={() => {}} />,
-    );
-    expect(screen.getByText("AI 연구원 브리핑")).toBeTruthy();
-    expect(screen.getByTestId("ss-briefing-chip-return").textContent).toContain("수익률");
-    expect(screen.getByText(/과거 검증 결과이며 미래 성과를 보장하지 않습니다/)).toBeTruthy();
+    renderDashboard();
+    expect(screen.getByText("AI 연구원 인사이트")).toBeTruthy();
+    expect(screen.getByTestId("ss-briefing-chip-return").textContent).toContain("12.00");
+    expect(screen.getByTestId("ss-insight-caution").textContent).toContain("미래 성과 보장 아님");
   });
 
-  it("mobile scatter fallback list is present in DOM", () => {
-    render(
-      <CompletedDashboard job={baseJob()} passCount={1} onNewSearch={() => {}} />,
-    );
-    expect(screen.getByTestId("ss-completed-return-mdd-cards")).toBeTruthy();
+  it("completed dashboard does not mount risk-map mobile fallback", () => {
+    renderDashboard();
+    expect(screen.queryByTestId("ss-completed-return-mdd-cards")).toBeNull();
+    expect(screen.getByTestId("ss-completed-matrix-mobile")).toBeTruthy();
   });
 
   it("STOP reason uses error hero tone", () => {
-    const model = buildCompletedDashboardViewModel({
-      job: baseJob({ completionReason: "FATAL_ERROR", status: "completed" }),
-      qualifiedCount: 0,
-    });
+    const model = vm(
+      baseJob({ completionReason: "FATAL_ERROR", status: "completed", qualifiedCount: 0 }),
+    );
     expect(model.heroTone).toBe("error");
   });
 });

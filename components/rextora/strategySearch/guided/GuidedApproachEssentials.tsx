@@ -144,7 +144,7 @@ export function GuidedApproachEssentials(props: {
       <div className="ss-guided-approach-essentials__grid">
         <label className="ss-guided-field" htmlFor="ss-depth-guided">
           <span className="ss-field-label mb-1 block">
-            탐색 수준
+            탐색 깊이
             <StrategySearchFieldHelp fieldId="depthProfile" />
           </span>
           <select

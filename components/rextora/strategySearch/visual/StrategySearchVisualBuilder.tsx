@@ -2,12 +2,14 @@
 
 import type { StrategySearchOperatorFormState } from "../formDefaults";
 import {
+  GUIDED_STEP1_FIELD_DEFAULTS,
   HISTORICAL_PERIOD_PRESETS,
   OPERATOR_SUPPORTED_SYMBOLS,
   OPERATOR_SUPPORTED_TIMEFRAMES,
   type HistoricalPeriodPresetId,
   type TradingStyleId,
 } from "../formDefaults";
+import { formatTimeframeCustomerKo } from "../completed/completedDisplayFormat";
 import { StrategyAutoPresetPanel } from "./StrategyAutoPresetPanel";
 import { StrategyPatternLayerPanel } from "./StrategyPatternLayerPanel";
 import { StrategySearchModeSelector } from "./StrategySearchModeSelector";
@@ -91,6 +93,7 @@ export function StrategySearchVisualBuilder({
   periodError,
   progress,
   panels: panelsProp,
+  showDefaultBadges = false,
   onSelectAutomatic,
   onSelectDirect,
   onSymbol,
@@ -110,6 +113,7 @@ export function StrategySearchVisualBuilder({
   periodError?: string;
   progress?: SearchScopeProgress | null;
   panels?: StrategySearchVisualBuilderPanels;
+  showDefaultBadges?: boolean;
   onSelectAutomatic: () => void;
   onSelectDirect: () => void;
   onSymbol: (symbol: string) => void;
@@ -122,6 +126,7 @@ export function StrategySearchVisualBuilder({
   onCustomPeriodTo?: (value: string) => void;
 }) {
   const resolved = resolveVisualBuilderPanels(panelsProp);
+  const showDefaults = showDefaultBadges === true;
   const showControls = resolved.workspaceControls;
   const showMap = resolved.scopeMap;
   const panels = resolved;
@@ -148,7 +153,16 @@ export function StrategySearchVisualBuilder({
       {panels.market ? (
       <div className="ss-visual-market">
         <label className="block" htmlFor="ss-symbol">
-          <span className="ss-field-label mb-1 block">코인</span>
+          <span className="ss-field-label mb-1 block ss-field-label-row">
+            코인
+            {showDefaults &&
+            form.symbol.trim().toUpperCase() ===
+              GUIDED_STEP1_FIELD_DEFAULTS.symbol ? (
+              <span className="ss-guided-default-badge" data-testid="ss-default-badge-symbol">
+                기본값
+              </span>
+            ) : null}
+          </span>
           <select
             id="ss-symbol"
             data-testid="ss-symbols"
@@ -171,7 +185,18 @@ export function StrategySearchVisualBuilder({
         </label>
 
         <label className="block" htmlFor="ss-timeframe">
-          <span className="ss-field-label mb-1 block">타임프레임</span>
+          <span className="ss-field-label mb-1 block ss-field-label-row">
+            타임프레임
+            {showDefaults &&
+            form.timeframe === GUIDED_STEP1_FIELD_DEFAULTS.timeframe ? (
+              <span
+                className="ss-guided-default-badge"
+                data-testid="ss-default-badge-timeframe"
+              >
+                기본값
+              </span>
+            ) : null}
+          </span>
           <select
             id="ss-timeframe"
             data-testid="ss-timeframe"
@@ -182,7 +207,7 @@ export function StrategySearchVisualBuilder({
           >
             {OPERATOR_SUPPORTED_TIMEFRAMES.map((timeframe) => (
               <option key={timeframe} value={timeframe}>
-                {timeframe}
+                {formatTimeframeCustomerKo(timeframe)}
               </option>
             ))}
           </select>
@@ -197,7 +222,15 @@ export function StrategySearchVisualBuilder({
         </label>
 
         <label className="block" htmlFor="ss-period">
-          <span className="ss-field-label mb-1 block">분석 기간</span>
+          <span className="ss-field-label mb-1 block ss-field-label-row">
+            분석 기간
+            {showDefaults &&
+            form.periodPreset === GUIDED_STEP1_FIELD_DEFAULTS.periodPreset ? (
+              <span className="ss-guided-default-badge" data-testid="ss-default-badge-period">
+                기본값
+              </span>
+            ) : null}
+          </span>
           <select
             id="ss-period"
             data-testid="ss-period"

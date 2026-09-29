@@ -4,7 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/primitives";
 import type { StrategySearchJobStatus } from "./types";
 import { useAuth } from "@/components/rextora/auth/AuthSessionProvider";
-import { visibleJobLifecycleActions } from "./jobActionVisibility";
+import {
+  visibleJobLifecycleActions,
+  type JobLifecycleAction,
+} from "./jobActionVisibility";
 import {
   isSearchCancellationPending,
   searchCancellationPendingCopy,
@@ -25,17 +28,24 @@ export function ExecutionControls(props: {
   hasSelection?: boolean;
   /** Job-scoped results route. Used for completed "결과 보기". */
   resultsHref?: string | null;
+  /** Lifecycle actions rendered elsewhere (e.g. running visual header). */
+  omitLifecycleActions?: readonly JobLifecycleAction[];
 }) {
   const { can } = useAuth();
   const { status, pending, onStart, onPause, onResume, onCancel } = props;
   const allowed = can("research:run");
   const hasSelection = props.hasSelection !== false;
-  const actions = visibleJobLifecycleActions({
+  const lifecycleActions = visibleJobLifecycleActions({
     status,
     hasSelection,
     jobMissing: props.jobMissing,
     retryable: props.retryable,
   });
+  const omit = props.omitLifecycleActions ?? [];
+  const actions =
+    omit.length === 0
+      ? lifecycleActions
+      : lifecycleActions.filter((action) => !omit.includes(action));
   const showStart = allowed && actions.includes("start");
   const showPause = allowed && actions.includes("pause");
   const showResume = allowed && actions.includes("resume");
@@ -62,6 +72,18 @@ export function ExecutionControls(props: {
     (status === "cancelled" || (status === "failed" && !showRetry));
 
   if (!hasSelection && !props.jobMissing) {
+    return null;
+  }
+
+  const cancellationNotice = isSearchCancellationPending(status);
+  if (
+    hasSelection &&
+    !props.jobMissing &&
+    allowed &&
+    !hasVisibleAction &&
+    !cancellationNotice &&
+    !terminal
+  ) {
     return null;
   }
 

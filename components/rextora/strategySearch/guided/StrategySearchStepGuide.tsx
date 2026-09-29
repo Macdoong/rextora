@@ -9,8 +9,9 @@ import {
 export function StrategySearchStepGuide(props: {
   stepId: StrategySearchSetupStepId;
   warningKo?: string;
+  copyOverride?: (typeof GUIDE_COPY)[StrategySearchSetupStepId];
 }) {
-  const copy = GUIDE_COPY[props.stepId];
+  const copy = props.copyOverride ?? GUIDE_COPY[props.stepId];
   return (
     <aside
       key={props.stepId}

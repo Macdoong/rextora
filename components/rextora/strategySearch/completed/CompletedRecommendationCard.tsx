@@ -1,12 +1,14 @@
 "use client";
 
-import { formatPct } from "../formatters";
-import type { CompletedRecommendationView } from "./completedViewModel";
+import type { CompletedDashboardViewModel } from "./completedViewModel";
+import { formatRecommendationCustomerName } from "./completedDisplayFormat";
+import { CompletedRecommendationVisuals } from "./CompletedRecommendationVisuals";
 
 export function CompletedRecommendationCard(props: {
-  recommendation: CompletedRecommendationView | null;
+  model: CompletedDashboardViewModel;
 }) {
-  if (!props.recommendation) {
+  const r = props.model.recommendation;
+  if (!r) {
     return (
       <section
         className="ss-completed-recommend ss-completed-recommend--empty"
@@ -21,48 +23,32 @@ export function CompletedRecommendationCard(props: {
     );
   }
 
-  const r = props.recommendation;
   return (
     <section
       className="ss-completed-recommend ss-completed-recommend--enter"
       data-testid="ss-completed-recommendation"
     >
       <div className="ss-completed-recommend__head">
-        <h3 className="ss-completed-recommend__title">최종 추천 전략</h3>
-        <p className="ss-completed-recommend__hint">
+        <h3 className="ss-completed-recommend__title ss-completed-type-section">최종 추천 전략</h3>
+        <p className="ss-completed-recommend__hint ss-completed-type-helper">
           검증 조건을 통과한 후보 중 현재 추천 결과입니다.
         </p>
       </div>
-      <p className="ss-completed-recommend__name">{r.readableName}</p>
-      {r.strategyFamily ? (
-        <p className="ss-completed-recommend__family">{r.strategyFamily}</p>
-      ) : null}
-      <dl className="ss-completed-recommend__metrics">
-        <div>
-          <dt>수익률</dt>
-          <dd data-testid="ss-completed-rec-return">
-            {r.netReturn != null ? formatPct(r.netReturn) : "—"}
-          </dd>
-        </div>
-        <div>
-          <dt>최대 낙폭</dt>
-          <dd data-testid="ss-completed-rec-mdd">
-            {r.maxDrawdown != null ? formatPct(r.maxDrawdown) : "—"}
-          </dd>
-        </div>
-        <div>
-          <dt>거래수</dt>
-          <dd>{r.tradeCount ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>승률</dt>
-          <dd>{r.winRate != null ? formatPct(r.winRate) : "—"}</dd>
-        </div>
-        <div>
-          <dt>점수</dt>
-          <dd>{r.score != null ? r.score.toFixed(3) : "—"}</dd>
-        </div>
-      </dl>
+      <p
+        className="ss-completed-recommend__name ss-completed-type-major"
+        data-testid="ss-completed-recommendation-name"
+      >
+        {formatRecommendationCustomerName({
+          readableName: r.readableName,
+          symbol: props.model.symbol,
+          timeframe: props.model.timeframe,
+        })}
+      </p>
+      <CompletedRecommendationVisuals
+        recommendation={r}
+        dataStable={props.model.dataStable}
+        minScoreEnabled={props.model.minScoreEnabled}
+      />
     </section>
   );
 }

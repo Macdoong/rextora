@@ -35,10 +35,13 @@ describe("Strategy Search full customer UX", () => {
   });
 
   it("C/D: advanced sections and selects use light outlined surfaces", () => {
-    const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    const form =
+      read("components/rextora/strategySearch/JobCreateForm.tsx") +
+      read("components/rextora/strategySearch/guided/GuidedValidationStep.tsx") +
+      read("components/rextora/strategySearch/guided/step4ValidationPresentation.ts");
     const css = read("components/rextora/v3/strategy-search.css");
     expect(form).toContain("ss-adv-section");
-    expect(form).toContain("설정 수준");
+    expect(form).toContain("설정 범위");
     expect(form).toContain("탐색 방식");
     expect(form).toContain("검증 · 위험 기준");
     expect(form).toContain("패턴 · 조합 조건");

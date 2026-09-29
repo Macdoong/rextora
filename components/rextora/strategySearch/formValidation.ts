@@ -25,6 +25,7 @@ import {
   searchModeCustomerLabel,
   tradingStyleCustomerLabel,
 } from "./customerDisplay";
+import { formatDecimalRateAsPercentHint } from "./guided/formatDecimalRateHint";
 
 export interface FormFieldError {
   field: string;
@@ -560,6 +561,14 @@ function periodCustomerLabel(form: StrategySearchOperatorFormState): string {
   return HISTORICAL_PERIOD_PRESETS[form.periodPreset].labelKo;
 }
 
+/** Review display only. Stored ratio stays unchanged. */
+function formatStoredRateReview(rate: string): string {
+  const raw = rate.trim();
+  if (!raw) return "—";
+  const hint = formatDecimalRateAsPercentHint(raw);
+  return hint ? `${raw} (≈ ${hint})` : raw;
+}
+
 function leverageCustomerLabel(form: StrategySearchOperatorFormState): string {
   if (form.leverageMode === "fixed") return `고정 ${form.leverageFixed}x`;
   if (form.leverageMode === "range") {
@@ -645,6 +654,14 @@ export function buildAppliedSettingsPreview(
         : "프리셋 기본",
     },
     {
+      labelKo: "수수료율",
+      valueKo: formatStoredRateReview(form.feeRate),
+    },
+    {
+      labelKo: "슬리피지율",
+      valueKo: formatStoredRateReview(form.slippageRate),
+    },
+    {
       labelKo: "비용 검증",
       valueKo: form.stressEnabled ? "사용" : "미사용",
     },
@@ -667,8 +684,10 @@ export function buildAppliedSettingsPreview(
       valueKo: qualificationCustomerLabel(form.qualificationProfile),
     },
     {
-      labelKo: "안정성 검증",
-      valueKo: form.jitterEnabled ? "사용" : "미사용",
+      labelKo: "파라미터 재확인",
+      valueKo: form.jitterEnabled
+        ? "파라미터 재확인: 사용"
+        : "파라미터 재확인: 사용 안 함",
     },
     {
       labelKo: "패턴 설정",

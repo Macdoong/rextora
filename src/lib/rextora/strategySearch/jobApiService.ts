@@ -38,6 +38,7 @@ import {
   listSearchTrials,
   type StrategySearchStoreOptions,
 } from "./jobStore";
+import { buildCompletedAnalysisContextApi } from "./completedAnalysisContext";
 import {
   activeElapsedMs,
   computeExpectedCompletionAtMs,
@@ -445,7 +446,12 @@ export interface StrategySearchJobSummary {
   } | null;
 }
 
+export type CompletedAnalysisContextApi =
+  import("./completedAnalysisContext").CompletedAnalysisContextApi;
+
 export interface StrategySearchJobDetail extends StrategySearchJobSummary {
+  /** Customer-safe completed analysis context (completed jobs only). */
+  completedAnalysisContext?: CompletedAnalysisContextApi | null;
   config: {
     searchVersion: string;
     strategyTemplateId: string;
@@ -1242,6 +1248,7 @@ function detailJob(
   options?: StrategySearchStoreOptions,
 ): StrategySearchJobDetail {
   const summary = summarizeJob(job, options);
+  const plan = getSearchPlan(job.id, options);
   let hasRunnerPayload = false;
   try {
     hasRunnerPayload = readRunnerPayloadFromCheckpoint(job.checkpoint) != null;
@@ -1250,6 +1257,7 @@ function detailJob(
   }
   return {
     ...summary,
+    completedAnalysisContext: buildCompletedAnalysisContextApi(job, plan, options),
     config: {
       searchVersion: job.config.searchVersion,
       strategyTemplateId: job.config.strategyTemplateId,

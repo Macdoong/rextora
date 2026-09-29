@@ -206,7 +206,8 @@ describe("Strategy Search scope visualizer", () => {
     expect(form).toContain("탐색 시작");
     expect(form).not.toContain("선택 범위로 탐색 시작");
     expect(form).not.toContain("직접 전략 탐색 시작");
-    expect(form).toContain("범위 지도 · 워크스페이스");
+    expect(form).toContain('title="범위 지도"');
+    expect(form).toContain('summaryMeta={["워크스페이스", "전략군"]}');
     expect(form).not.toContain("전략 작성");
     expect(searchFamilyLabelKo("full_safe")).not.toMatch(/SAFE|SafeV44/);
   });

@@ -5,10 +5,10 @@ import { patternSelectionModeLabelKo } from "@/src/lib/rextora/patternSelectionM
 import {
   BEGINNER_PRESET_MAP,
   SEARCH_DEPTH_PROFILES,
-  SEARCHABLE_SPACE_OPTIONS,
   type StrategySearchOperatorFormState,
   type TradingStyleId,
 } from "../formDefaults";
+import { formatCustomerSearchValue } from "../customerDisplay";
 
 const DIRECTION_KO: Record<string, string> = {
   both: "롱·숏",
@@ -40,10 +40,7 @@ export function GuidedMobileScopeSummary(props: {
     selectionMode === "manual" && form.selectedSpaceIds.length > 0
       ? form.selectedSpaceIds
           .slice(0, 3)
-          .map(
-            (id) =>
-              SEARCHABLE_SPACE_OPTIONS.find((s) => s.id === id)?.labelKo ?? id,
-          )
+          .map((id) => formatCustomerSearchValue(id))
           .join(" · ")
       : null;
 

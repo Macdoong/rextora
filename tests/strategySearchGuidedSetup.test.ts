@@ -212,7 +212,9 @@ describe("Strategy Search guided visual polish (semantics)", () => {
   });
 
   it("Step 4 numeric fields use guided control input styling", () => {
-    const formSrc = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    const formSrc =
+      read("components/rextora/strategySearch/JobCreateForm.tsx") +
+      read("components/rextora/strategySearch/guided/GuidedValidationStep.tsx");
     expect(formSrc).toContain("const inputClass = guidedControlClass");
     expect(formSrc).toMatch(
       /data-testid="ss-min-trades"[\s\S]{0,120}type="number"/,

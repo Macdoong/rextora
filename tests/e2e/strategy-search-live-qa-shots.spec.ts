@@ -86,8 +86,11 @@ test.describe("strategy search live QA screenshots", () => {
     await page.getByTestId("ss-guided-next").click();
     await page.getByTestId("ss-guided-next").click();
     await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
-    await expect(page.getByTestId("ss-guided-launch-compact")).toContainText(
+    await expect(page.getByTestId("ss-guided-launch-summary")).toContainText(
       "시간 기준 자동 탐색",
+    );
+    await expect(page.getByTestId("ss-guided-launch-compact")).toContainText(
+      "15분봉",
     );
     await page.getByText("상세 보기").click();
     await expect(

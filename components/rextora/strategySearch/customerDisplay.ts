@@ -46,6 +46,11 @@ const CUSTOMER_VALUE_LABELS: Record<string, string> = {
   single_close: "한 봉 마감",
   consecutive_closes: "연속 마감",
   threshold_count: "횟수 기준",
+  and: "모두 충족 (AND)",
+  or: "하나 이상 (OR)",
+  sequence: "순서 (SEQUENCE)",
+  weighted_score: "가중 점수 (Weighted Score)",
+  priority: "우선순위 (Priority)",
 };
 
 const LOOKS_INTERNAL =

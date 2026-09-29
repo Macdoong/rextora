@@ -93,7 +93,7 @@ describe("strategySearch operator UX", () => {
     expect(src).toContain("ss-error-warning-rate");
     expect(src).toContain("ss-section-execution");
     expect(src).toContain("ss-section-engine");
-    expect(src).toContain("설정 저장 및 관리");
+    expect(src).toContain("설정 저장 (선택)");
     const advancedPage = fs.readFileSync(
       path.join(process.cwd(), "app/strategy-search/advanced/page.tsx"),
       "utf8",

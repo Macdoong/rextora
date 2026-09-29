@@ -5,19 +5,25 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/primitives";
 import { fetchResearchResultsSummary } from "../apiClient";
 import type { ResearchResultsSummaryView, StrategySearchJobDetail } from "../types";
-import { ResearchRankingGroups } from "../ResearchRankingGroups";
 import { SearchJobExportMenu } from "../SearchJobExportMenu";
 import { CompletedHero } from "./CompletedHero";
+import { CompletedAskAiAction } from "./CompletedAskAiAction";
 import { CompletedKpiStrip } from "./CompletedKpiStrip";
-import { CompletedCandidateReturnComparison } from "./CompletedCandidateReturnComparison";
+import { CompletedAnalysisContextCard } from "./CompletedAnalysisContextCard";
+import { CompletedCandidateVisualComparison } from "./CompletedCandidateVisualComparison";
+import { CompletedQualificationGaugeGrid } from "./CompletedQualificationGaugeGrid";
+import { CompletedInsightTiles } from "./CompletedInsightTiles";
 import { CompletedRecommendationBriefingRow } from "./CompletedRecommendationBriefingRow";
-import { CompletedReturnRiskChart } from "./CompletedReturnRiskChart";
 import { CompletedSummaryRow } from "./CompletedSummaryRow";
+import { CompletedRegisterSection } from "./CompletedRegisterSection";
+import { CompletedGroupRankingCta } from "./CompletedGroupRankingCta";
 import { buildCompletedDashboardViewModel } from "./completedViewModel";
+import type { StrategySearchTrialsPage } from "../types";
 
 export function CompletedDashboard(props: {
   job: StrategySearchJobDetail;
-  passCount: number;
+  payloadReady: boolean;
+  trials: StrategySearchTrialsPage | null;
   onNewSearch: () => void;
   onRetryWithSettings?: (() => void) | null;
   onRegisterBest?: (() => void) | null;
@@ -37,28 +43,38 @@ export function CompletedDashboard(props: {
     () =>
       buildCompletedDashboardViewModel({
         job: props.job,
-        qualifiedCount: props.passCount,
+        payloadReady: props.payloadReady,
+        trials: props.trials,
         summary,
       }),
-    [props.job, props.passCount, summary],
+    [props.job, props.payloadReady, props.trials, summary],
   );
 
   return (
     <div
-      className="ss-completed-dashboard-layout"
+      className="ss-completed-dashboard-layout ss-completed-dashboard-layout--stable ss-completed-dashboard-layout--typography"
       data-testid="ss-completed-dashboard-layout"
+      data-completed-data-stable={props.payloadReady ? "true" : "false"}
     >
       <CompletedHero model={model} />
+      <CompletedAskAiAction />
+      <CompletedAnalysisContextCard model={model} />
       <CompletedKpiStrip model={model} />
       <CompletedSummaryRow model={model} />
       <CompletedRecommendationBriefingRow model={model} />
-      <CompletedCandidateReturnComparison model={model} />
-      <CompletedReturnRiskChart model={model} />
+      <CompletedQualificationGaugeGrid model={model} />
+      <CompletedInsightTiles model={model} />
+      <CompletedCandidateVisualComparison model={model} />
+      <CompletedGroupRankingCta model={model} job={props.job} />
 
-      <div className="ss-completed-actions" data-testid="ss-completed-actions">
+      <div
+        className="ss-completed-actions ss-completed-actions--hierarchy"
+        data-testid="ss-completed-actions"
+      >
         <Link
           href={model.resultsHref}
-          className="ss-btn-primary"
+          className="ss-completed-actions__primary"
+          data-completed-action="primary"
           data-testid="ss-completion-open-results"
         >
           상세 결과 보기
@@ -66,7 +82,8 @@ export function CompletedDashboard(props: {
         {props.onRetryWithSettings ? (
           <Button
             type="button"
-            className="ss-btn-secondary"
+            className="ss-completed-actions__secondary"
+            data-completed-action="secondary"
             data-testid="ss-completed-retry-settings"
             onClick={props.onRetryWithSettings}
           >
@@ -75,44 +92,22 @@ export function CompletedDashboard(props: {
         ) : null}
         <Button
           type="button"
-          className="ss-btn-tertiary"
+          className="ss-completed-actions__tertiary"
+          data-completed-action="tertiary"
           data-testid="ss-completion-new-research"
           onClick={props.onNewSearch}
         >
           새 탐색
         </Button>
-        <SearchJobExportMenu jobId={props.job.id} status={props.job.status} />
+        <div className="ss-completed-actions__utility">
+          <SearchJobExportMenu jobId={props.job.id} status={props.job.status} />
+        </div>
       </div>
 
-      {model.groupAware ? (
-        <details
-          className="ss-completed-details"
-          data-testid="ss-completed-ranking-disclosure"
-        >
-          <summary>그룹별 순위 (상세)</summary>
-          <ResearchRankingGroups
-            source={props.job}
-            unknownLegacy={props.job.unknownLegacy}
-            operatorFacing
-          />
-        </details>
-      ) : null}
-
-      <details className="ss-completed-details" data-testid="ss-completed-ops-disclosure">
-        <summary>등록 · 운영 (선택)</summary>
-        <div className="ss-completed-details__ops">
-          {props.onRegisterBest ? (
-            <Button type="button" className="ss-btn-secondary" onClick={props.onRegisterBest}>
-              통과 후보 등록
-            </Button>
-          ) : null}
-          {props.onPromoteTop ? (
-            <Button type="button" className="ss-btn-secondary" onClick={props.onPromoteTop}>
-              추천 후보 등록
-            </Button>
-          ) : null}
-        </div>
-      </details>
+      <CompletedRegisterSection
+        onRegisterBest={props.onRegisterBest}
+        onPromoteTop={props.onPromoteTop}
+      />
     </div>
   );
 }

@@ -42,12 +42,17 @@ describe("Strategy Search visual feedback", () => {
     expect(form).toContain('data-testid="ss-launch-panel"');
     expect(form).toContain('data-contrast="readable"');
     expect(form).toContain("탐색 준비 완료");
-    expect(form).toContain("예상 최대 시간");
-    expect(form).toContain("formatRuntimeKo(");
-    expect(form).toContain("form.maxRuntimeMinutesOverride");
+    expect(form).toContain("Step5LaunchFlowMap");
+    expect(form).toContain("ss-launch-ready-badge");
+    const flowMap = readUi("guided/Step5LaunchPipelineVisual.tsx");
+    expect(flowMap).toContain('data-testid="ss-step5-launch-flow"');
+    const flowModel = readUi("guided/step5LaunchFlowModel.ts");
+    expect(flowModel).toContain("durationPresetLabelKo");
     expect(form).toContain("추천 패턴을 자동으로 조합");
     expect(form).toContain('data-testid="ss-create-submit"');
-    expect(form).toContain("className=\"ss-btn-primary\"");
+    expect(form).toMatch(/ss-launch-panel-actions/);
+    expect(form).toMatch(/ss-btn-primary ss-launch-submit/);
+    expect(flowModel).toContain("ss-launch-strategy-composition");
     expect(form).toContain("탐색 시작");
     const launchSlice = form.slice(
       form.indexOf("ss-launch-panel"),
@@ -156,15 +161,16 @@ describe("Strategy Search visual feedback", () => {
       "안전하게 탐색을 종료하고 있습니다.",
     );
     expect(form).toContain('{launchState === "ready" ? (');
+    expect(form).toContain("showGuidedFooterSubmitInLaunchBar");
     expect(form).toContain('data-testid="ss-create-submit"');
     expect(form).toContain("탐색 시작");
-    const submitIdx = form.indexOf('data-testid="ss-create-submit"');
-    const readyGuardIdx = form.lastIndexOf(
-      '{launchState === "ready" ? (',
-      submitIdx,
+    const launchSubmitIdx = form.indexOf("showGuidedFooterSubmitInLaunchBar");
+    const stickySubmitIdx = form.indexOf(
+      'data-testid="ss-create-submit"',
+      launchSubmitIdx,
     );
-    expect(readyGuardIdx).toBeGreaterThan(-1);
-    expect(submitIdx).toBeGreaterThan(readyGuardIdx);
+    expect(launchSubmitIdx).toBeGreaterThan(-1);
+    expect(stickySubmitIdx).toBeGreaterThan(launchSubmitIdx);
     expect(form).toContain("현재 탐색 전략군");
     expect(form).toContain("ss-launch-evaluated");
     const exec = readUi("ExecutionControls.tsx");
@@ -499,7 +505,7 @@ describe("Strategy Search visual feedback", () => {
     expect(stacked).toContain("width: 100%");
     const desktopPanel = css.slice(
       css.indexOf(".v3-strategy-search .ss-launch-panel {"),
-      css.indexOf(".v3-strategy-search .ss-launch-ready,"),
+      css.indexOf(".v3-strategy-search .ss-launch-panel-actions"),
     );
     expect(desktopPanel).toContain("flex: 1 1 240px");
     expect(desktopPanel).not.toContain("min-height:");

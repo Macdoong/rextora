@@ -14,11 +14,13 @@ import {
 } from "@/src/lib/rextora/researchRankingReadModel";
 import { ResearchEvaluationEvidence } from "./ResearchEvaluationEvidence";
 import { StrategyHelpTooltip } from "./visual/StrategyHelpTooltip";
+import { COMPLETED_COMPARE_SCORE_LABEL } from "./completed/completedDisplayFormat";
 import {
   formatRankingScore,
   isCompactNoRecommendGroup,
   noRecommendCompactReason,
   resolveRankingRecommendFlow,
+  sameRankingCandidate,
 } from "./rankingGroupCardVisual";
 
 function passLabel(
@@ -33,15 +35,20 @@ function passLabel(
 export function ResearchRankingGroupCard(props: {
   group: ResearchRankingGroupView;
   operatorFacing?: boolean;
+  completedDashboardVariant?: boolean;
+  animationIndex?: number;
 }) {
   const group = props.group;
   const operatorFacing = props.operatorFacing === true;
+  const completedVariant =
+    props.completedDashboardVariant === true && operatorFacing;
   const champ = group.bestPassedCandidate;
   const best = group.bestCandidate;
   const recommendLabel = groupRecommendationLabel(group);
   const flow = resolveRankingRecommendFlow(group);
   const compactDefault = isCompactNoRecommendGroup(group);
   const [detailsOpen, setDetailsOpen] = useState(!compactDefault);
+  const [shortlistOpen, setShortlistOpen] = useState(false);
   const shortlist = topCandidatesForGroup(
     [group],
     group.rankingCompatibilityGroup,
@@ -56,6 +63,119 @@ export function ResearchRankingGroupCard(props: {
         ? "이 카드의 점수는 통합 기술 전략 안에서만 비교합니다."
         : "SAFE 그룹 점수만 이 카드에서 비교합니다."
       : "패턴 그룹 점수만 이 카드에서 비교합니다.";
+
+  if (completedVariant) {
+    const hasRec = champ != null;
+    const statusLabel = hasRec ? "추천 후보 있음" : "추천 후보 없음";
+    const showBest =
+      best != null && champ != null && !sameRankingCandidate(best, champ);
+    const emptyCopy =
+      flow === "empty"
+        ? "이 전략군에 표시할 후보가 없습니다."
+        : "이 전략 유형에서는 검증 기준을 충족한 추천 후보가 없습니다.";
+
+    return (
+      <article
+        className="ss-completed-rank-card"
+        data-testid={`research-ranking-group-${group.rankingCompatibilityGroup}`}
+        data-ranking-group={group.rankingCompatibilityGroup}
+        data-has-recommend={hasRec ? "true" : "false"}
+        style={{
+          animationDelay: `${(props.animationIndex ?? 0) * 70}ms`,
+        }}
+      >
+        <header className="ss-completed-rank-card__head">
+          <span
+            className="ss-rank-card__glyph"
+            aria-hidden="true"
+            data-group-glyph={group.rankingCompatibilityGroup}
+          />
+          <div className="ss-completed-rank-card__titles">
+            <h3 className="ss-completed-type-card-title">{heading}</h3>
+            <span
+              className={
+                "ss-completed-rank-badge" +
+                (hasRec
+                  ? " ss-completed-rank-badge--ok"
+                  : " ss-completed-rank-badge--neutral")
+              }
+              data-testid={`research-group-recommend-${group.rankingCompatibilityGroup}`}
+            >
+              {statusLabel}
+            </span>
+          </div>
+        </header>
+
+        {hasRec ? (
+          <div className="ss-completed-rank-card__body">
+            <div className="ss-completed-rank-card__row">
+              <span className="ss-completed-type-caption">최종 추천</span>
+              <span className="ss-completed-type-metric">
+                {COMPLETED_COMPARE_SCORE_LABEL} {formatRankingScore(champ.score)}
+              </span>
+              <span className="ss-completed-rank-badge ss-completed-rank-badge--pass">
+                자격 통과
+              </span>
+            </div>
+            {showBest ? (
+              <div className="ss-completed-rank-card__row">
+                <span className="ss-completed-type-caption">최고 평가 후보</span>
+                <span className="ss-completed-type-metric">
+                  {COMPLETED_COMPARE_SCORE_LABEL} {formatRankingScore(best?.score)}
+                </span>
+                <span
+                  className={
+                    "ss-completed-rank-badge" +
+                    (best?.passed
+                      ? " ss-completed-rank-badge--pass"
+                      : " ss-completed-rank-badge--neutral")
+                  }
+                >
+                  {best?.passed ? "자격 통과" : "자격 미충족"}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <p
+            className="ss-completed-rank-card__empty ss-completed-type-helper"
+            data-testid={`research-group-empty-${group.rankingCompatibilityGroup}`}
+          >
+            {emptyCopy}
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="ss-completed-rank-card__details-btn"
+          aria-expanded={shortlistOpen}
+          onClick={() => setShortlistOpen((o) => !o)}
+        >
+          {shortlistOpen ? "접기" : "자세히 보기"}
+        </button>
+        {shortlistOpen ? (
+          <div className="ss-completed-rank-card__shortlist">
+            {shortlist.length === 0 ? (
+              <p className="ss-completed-type-helper">숏리스트 없음</p>
+            ) : (
+              <ol>
+                {groupLocalShortlistRanks(shortlist).map(({ rank, candidate }) => (
+                  <li key={`${candidate.iteration}-${candidate.paramsHash}`}>
+                    {rank}. {COMPLETED_COMPARE_SCORE_LABEL}{" "}
+                    {formatRankingScore(candidate.score)} ·{" "}
+                    {candidate.passed ? "자격 통과" : "자격 미충족"}
+                    {isCanonicalGroupRecommendation(group, candidate.paramsHash)
+                      ? " · 최종 추천"
+                      : ""}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        ) : null}
+      </article>
+    );
+  }
 
   return (
     <article

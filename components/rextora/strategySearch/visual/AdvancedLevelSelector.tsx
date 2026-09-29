@@ -29,7 +29,7 @@ export function AdvancedLevelSelector(props: {
     <div
       className="ss-level-selector"
       role="radiogroup"
-      aria-label="설정 수준"
+      aria-label="설정 범위"
       data-testid="ss-config-level-control"
     >
       {LEVELS.map((level) => {

@@ -1,109 +1,97 @@
 "use client";
 
-import { ArrowRight, ChevronDown } from "lucide-react";
-import { useState } from "react";
-import type { StrategySearchSetupStepId } from "./strategySearchStepModel";
-import { STRATEGY_SEARCH_SETUP_STEPS } from "./strategySearchStepModel";
-import { buildAppliedSettingsPreview } from "../formValidation";
 import {
-  SEARCH_DEPTH_PROFILES,
-  type StrategySearchOperatorFormState,
-} from "../formDefaults";
+  ArrowRight,
+  Layers,
+  Settings2,
+  ShieldCheck,
+  Target,
+  type LucideIcon,
+} from "lucide-react";
+import type { StrategySearchSetupStepId } from "./strategySearchStepModel";
+import { buildAppliedSettingsPreview } from "../formValidation";
+import { type StrategySearchOperatorFormState } from "../formDefaults";
 import { guidedStepBadgeKo } from "./guidedStepBadge";
 import { resolvePatternSelectionMode } from "@/src/lib/rextora/patternSelectionMode";
-import { searchModeCustomerLabel } from "../customerDisplay";
-import { qualificationTargetSummaryLines } from "./GuidedQualificationTargets";
-import { durationPresetLabelKo } from "./GuidedApproachEssentials";
+import { qualifiedTargetComparisonProfileLabel } from "./qualifiedTargetComparisonProfileDisplay";
+import { formatTimeframeCustomerKo } from "../customerTimeframeKo";
+import { Step5TargetKpiPanel } from "./Step5TargetKpiPanel";
+import {
+  step5ApplyDepthToRowMap,
+  step5CardReviewRows,
+  step5CustomerTimeframeInRowMap,
+  step5SearchObjectiveLabel,
+  type Step5ReviewCardId,
+} from "./step5ReviewPresentation";
+import { step5StoredRateDisplay } from "./step5RateReviewDisplay";
+import { Step5ReviewCardVisual } from "./Step5ReviewCardVisual";
 
-/** Target-mode Step 5 shows these in the dedicated target review block. */
-const TARGET_MODE_VALIDATION_REVIEW_LABELS = [
-  "비용 검증",
-  "레버리지",
-  "안정성 검증",
-] as const;
+export { step5SearchObjectiveLabel };
 
-const REVIEW_GROUPS: Array<{
+const REVIEW_CARD_GROUPS: Array<{
   stepId: StrategySearchSetupStepId;
+  cardId: Step5ReviewCardId;
   titleKo: string;
-  pickLabels: string[];
+  Icon: LucideIcon;
 }> = [
-  {
-    stepId: "market",
-    titleKo: "분석 대상",
-    pickLabels: ["코인", "타임프레임", "분석 기간"],
-  },
-  {
-    stepId: "approach",
-    titleKo: "탐색 방식",
-    pickLabels: ["탐색 방식", "탐색 프리셋", "탐색 수준"],
-  },
-  {
-    stepId: "strategy",
-    titleKo: "전략 · 범위",
-    pickLabels: ["선택 전략군", "탐색 방향", "전략군 수"],
-  },
+  { stepId: "market", cardId: "market", titleKo: "분석 대상", Icon: Target },
+  { stepId: "approach", cardId: "approach", titleKo: "탐색 방식", Icon: Settings2 },
+  { stepId: "strategy", cardId: "strategy", titleKo: "전략 · 범위", Icon: Layers },
   {
     stepId: "validation",
+    cardId: "validation",
     titleKo: "검증 · 위험",
-    pickLabels: [
-      "최대 허용 낙폭",
-      "최소 거래 수",
-      "최소 수익률",
-      "합격 기준",
-      "비용 검증",
-      "레버리지",
-      "합격 목표",
-    ],
+    Icon: ShieldCheck,
   },
 ];
 
 function reviewValueMap(form: StrategySearchOperatorFormState) {
   const preview = buildAppliedSettingsPreview(form);
+  const targetMode =
+    resolvePatternSelectionMode({
+      patternConfigLevel: form.patternConfigLevel,
+      autoStrategyCombo: form.autoStrategyCombo,
+    }) === "automatic" && form.autoSearchObjective === "qualified_target";
+  const rows = preview.rows.map((row) => {
+    if (row.labelKo === "탐색 방식") {
+      return { ...row, valueKo: step5SearchObjectiveLabel(form) };
+    }
+    if (targetMode && row.labelKo === "합격 기준") {
+      return {
+        ...row,
+        labelKo: "후보 비교 기준",
+        valueKo: qualifiedTargetComparisonProfileLabel(form.qualificationProfile),
+      };
+    }
+    return row;
+  });
+  const detailRows = preview.detailRows.map((row) => {
+    if (!targetMode || row.labelKo !== "합격 기준") return row;
+    return {
+      ...row,
+      labelKo: "후보 비교 기준",
+      valueKo: qualifiedTargetComparisonProfileLabel(form.qualificationProfile),
+    };
+  });
   const rowMap = new Map<string, string>();
-  for (const row of [...preview.rows, ...preview.detailRows]) {
+  for (const row of [...rows, ...detailRows]) {
     if (!rowMap.has(row.labelKo)) rowMap.set(row.labelKo, row.valueKo);
   }
-  const depth = SEARCH_DEPTH_PROFILES[form.depthProfile];
-  if (depth) rowMap.set("탐색 수준", depth.labelKo);
-  return { preview, rowMap };
+  const withDepth = step5ApplyDepthToRowMap(rowMap, form);
+  const customerRowMap = step5CustomerTimeframeInRowMap(withDepth, form);
+  return { preview: { ...preview, rows, detailRows }, rowMap: customerRowMap };
 }
 
 function launchSummaryLines(form: StrategySearchOperatorFormState): string[] {
   const { rowMap } = reviewValueMap(form);
-  const mode = resolvePatternSelectionMode({
-    patternConfigLevel: form.patternConfigLevel,
-    autoStrategyCombo: form.autoStrategyCombo,
-  });
   return [
-    `${rowMap.get("코인") ?? form.symbol} · ${rowMap.get("타임프레임") ?? form.timeframe}`,
+    `${rowMap.get("코인") ?? form.symbol} · ${rowMap.get("타임프레임") ?? formatTimeframeCustomerKo(form.timeframe)}`,
     rowMap.get("분석 기간") ?? "—",
-    searchModeCustomerLabel(mode),
-    rowMap.get("탐색 수준") ?? "—",
+    step5SearchObjectiveLabel(form),
+    rowMap.get("탐색 깊이") ?? "—",
     rowMap.get("선택 전략군") ?? "—",
-    rowMap.get("합격 기준") ?? "—",
+    rowMap.get("후보 비교 기준") ?? rowMap.get("합격 기준") ?? "—",
   ];
-}
-
-function launchSummaryCompactLine(
-  form: StrategySearchOperatorFormState,
-  targetMode: boolean,
-): string {
-  const { rowMap } = reviewValueMap(form);
-  const mode = resolvePatternSelectionMode({
-    patternConfigLevel: form.patternConfigLevel,
-    autoStrategyCombo: form.autoStrategyCombo,
-  });
-  const modeLabel = targetMode
-    ? "목표 기준 자동 탐색"
-    : mode === "automatic"
-      ? "시간 기준 자동 탐색"
-      : searchModeCustomerLabel(mode);
-  return [
-    rowMap.get("코인") ?? form.symbol,
-    rowMap.get("타임프레임") ?? form.timeframe,
-    rowMap.get("분석 기간") ?? "—",
-    modeLabel,
-  ].join(" · ");
 }
 
 export function StrategySearchFinalReview(props: {
@@ -111,41 +99,58 @@ export function StrategySearchFinalReview(props: {
   onEditStep: (stepId: StrategySearchSetupStepId) => void;
 }) {
   const { preview, rowMap } = reviewValueMap(props.form);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const launchLines = launchSummaryLines(props.form);
   const targetMode =
     resolvePatternSelectionMode({
       patternConfigLevel: props.form.patternConfigLevel,
       autoStrategyCombo: props.form.autoStrategyCombo,
     }) === "automatic" &&
     props.form.autoSearchObjective === "qualified_target";
-  const launchCompactLine = launchSummaryCompactLine(props.form, targetMode);
+  const launchLines = launchSummaryLines(props.form);
+  const searchName = props.form.searchName.trim();
+  const fee = step5StoredRateDisplay(props.form.feeRate);
+  const slippage = step5StoredRateDisplay(props.form.slippageRate);
 
   return (
     <div
       className="ss-guided-review ss-guided-review--enter"
       data-testid="ss-guided-final-review"
     >
+      {searchName ? (
+        <p
+          className="ss-guided-review__search-name"
+          data-testid="ss-guided-review-search-name"
+        >
+          <span className="ss-guided-review__search-name-label">탐색 이름</span>
+          <span className="ss-guided-review__search-name-value">{searchName}</span>
+        </p>
+      ) : null}
+
       <div className="ss-guided-review__grid">
-        {REVIEW_GROUPS.map((group, index) => {
-          const pickLabels =
-            targetMode && group.stepId === "validation"
-              ? [...TARGET_MODE_VALIDATION_REVIEW_LABELS]
-              : group.pickLabels;
-          const values = pickLabels
-            .map((label) => rowMap.get(label))
-            .filter((v) => v && v !== "—");
-          const headline =
-            values.slice(0, 3).join(" · ") || values.join(" · ") || "—";
+        {REVIEW_CARD_GROUPS.map((group, index) => {
+          const cardRows = step5CardReviewRows(
+            group.cardId,
+            rowMap,
+            props.form,
+            { targetMode },
+          );
+          const Icon = group.Icon;
           return (
             <article
               key={group.titleKo}
               className="ss-guided-review__card"
               data-testid={`ss-guided-review-${group.titleKo}`}
+              data-step5-card-icon={group.cardId}
               style={{ animationDelay: `${index * 40}ms` }}
             >
               <header className="ss-guided-review__head">
-                <h3 className="ss-guided-review__title">{group.titleKo}</h3>
+                <h3 className="ss-guided-review__title">
+                  <Icon
+                    className="ss-guided-review__title-icon"
+                    aria-hidden="true"
+                    strokeWidth={2}
+                  />
+                  {group.titleKo}
+                </h3>
                 <span
                   className="ss-guided-review__step-badge"
                   data-testid={`ss-guided-review-step-badge-${group.stepId}`}
@@ -153,7 +158,28 @@ export function StrategySearchFinalReview(props: {
                   {guidedStepBadgeKo(group.stepId)}
                 </span>
               </header>
-              <p className="ss-guided-review__headline">{headline}</p>
+              <div
+                className="ss-guided-review__card-visual"
+                data-testid={`ss-guided-review-primary-${group.cardId}`}
+              >
+                <Step5ReviewCardVisual
+                  cardId={group.cardId}
+                  form={props.form}
+                  rowMap={rowMap}
+                  targetMode={targetMode}
+                />
+              </div>
+              <dl className="ss-guided-review__card-rows ss-guided-review__card-rows--sr">
+                {cardRows.map((row) => (
+                  <div
+                    key={`${group.cardId}:${row.labelKo}`}
+                    className="ss-guided-review__card-row"
+                  >
+                    <dt>{row.labelKo}</dt>
+                    <dd>{row.valueKo}</dd>
+                  </div>
+                ))}
+              </dl>
               <button
                 type="button"
                 className="ss-guided-review__jump"
@@ -168,64 +194,46 @@ export function StrategySearchFinalReview(props: {
         })}
       </div>
 
-      {targetMode ? (
-        <section
-          className="ss-guided-target-review"
-          data-testid="ss-guided-target-review"
-          aria-label="목표 기준 자동 탐색"
-        >
-          <h3 className="ss-guided-target-review__title">목표 기준 자동 탐색</h3>
-          <dl className="ss-guided-target-review__rows">
-            <div>
-              <dt>탐색 방식</dt>
-              <dd>목표 기준 자동 탐색</dd>
-            </div>
-            <div>
-              <dt>목표 조건</dt>
-              <dd>{qualificationTargetSummaryLines(props.form).join(" · ")}</dd>
-            </div>
-            <div>
-              <dt>최대 탐색 시간</dt>
-              <dd>
-                {durationPresetLabelKo(
-                  props.form.durationPreset,
-                  props.form.maxRuntimeMinutesOverride,
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>종료 조건</dt>
-              <dd>
-                검증 조건을 만족하는 후보를 찾으면 종료합니다. 못 찾으면 최대
-                탐색 시간 또는 안전 한도에서 종료됩니다.
-              </dd>
-            </div>
-          </dl>
-        </section>
-      ) : null}
+      {targetMode ? <Step5TargetKpiPanel form={props.form} /> : null}
 
       <section
-        className="ss-guided-launch-summary ss-guided-launch-summary--compact"
+        className="ss-guided-launch-summary ss-guided-launch-summary--compact ss-guided-launch-summary--visual"
         data-testid="ss-guided-launch-summary"
       >
-        <h3 className="ss-guided-launch-summary__title">탐색 시작 요약</h3>
-        <p
-          className="ss-guided-launch-summary__compact-line"
-          data-testid="ss-guided-launch-compact"
-        >
-          {launchCompactLine}
+        <h3 className="ss-guided-launch-summary__title">비용 · 실행 요약</h3>
+        <p className="ss-guided-launch-summary__mode-line" data-testid="ss-guided-launch-compact">
+          {[
+            step5SearchObjectiveLabel(props.form),
+            formatTimeframeCustomerKo(props.form.timeframe),
+          ].join(" · ")}
         </p>
+        <div className="ss-guided-launch-summary__cost-cards">
+          <div className="ss-guided-launch-summary__cost-card">
+            <span className="ss-guided-launch-summary__cost-label">수수료율</span>
+            <span className="ss-guided-launch-summary__cost-raw" data-testid="ss-guided-review-fee">
+              {fee.rawKo}
+            </span>
+            {fee.hintKo ? (
+              <span className="ss-guided-launch-summary__cost-hint">≈ {fee.hintKo}</span>
+            ) : null}
+          </div>
+          <div className="ss-guided-launch-summary__cost-card">
+            <span className="ss-guided-launch-summary__cost-label">슬리피지율</span>
+            <span
+              className="ss-guided-launch-summary__cost-raw"
+              data-testid="ss-guided-review-slippage"
+            >
+              {slippage.rawKo}
+            </span>
+            {slippage.hintKo ? (
+              <span className="ss-guided-launch-summary__cost-hint">≈ {slippage.hintKo}</span>
+            ) : null}
+          </div>
+        </div>
       </section>
 
-      <details
-        className="ss-guided-review__details"
-        open={detailsOpen}
-        onToggle={(e) => setDetailsOpen((e.target as HTMLDetailsElement).open)}
-      >
-        <summary className="ss-guided-review__details-summary">
-          상세 보기
-          <ChevronDown className="ss-guided-review__details-chevron" aria-hidden />
-        </summary>
+      <details className="ss-guided-review__details" data-testid="ss-guided-review-details">
+        <summary className="ss-guided-review__details-summary">상세 보기</summary>
         <dl className="ss-guided-review__details-rows">
           <div className="ss-guided-review__row">
             <dt>탐색 상세</dt>
@@ -237,14 +245,20 @@ export function StrategySearchFinalReview(props: {
               </ul>
             </dd>
           </div>
-          <div className="ss-guided-review__row">
-            <dt>탐색 이름</dt>
-            <dd>{props.form.searchName.trim() || "—"}</dd>
-          </div>
+          {searchName ? (
+            <div className="ss-guided-review__row">
+              <dt>탐색 이름</dt>
+              <dd>{searchName}</dd>
+            </div>
+          ) : null}
           {preview.rows.map((row) => (
             <div key={row.labelKo} className="ss-guided-review__row">
-              <dt>{row.labelKo}</dt>
-              <dd>{row.valueKo}</dd>
+              <dt>{row.labelKo === "타임프레임" ? "시간봉" : row.labelKo}</dt>
+              <dd>
+                {row.labelKo === "타임프레임"
+                  ? formatTimeframeCustomerKo(props.form.timeframe)
+                  : row.valueKo}
+              </dd>
             </div>
           ))}
         </dl>

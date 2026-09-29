@@ -14,6 +14,34 @@ function formatTargetSummaryTradeCount(value: string): string {
   return trimmed ? `${trimmed}회` : "—";
 }
 
+export type QualificationTargetKpiCell = {
+  labelKo: string;
+  valueKo: string;
+};
+
+/** Core target KPIs for Step 5 visual panel (same thresholds as summary lines). */
+export function qualificationTargetCoreKpis(
+  form: Pick<
+    StrategySearchOperatorFormState,
+    "minTotalReturn" | "maxMdd" | "minTradeCount"
+  >,
+): QualificationTargetKpiCell[] {
+  return [
+    {
+      labelKo: "최소 수익률",
+      valueKo: `≥ ${formatTargetSummaryPercent(form.minTotalReturn)}`,
+    },
+    {
+      labelKo: "최대 낙폭",
+      valueKo: `≤ ${formatTargetSummaryPercent(form.maxMdd)}`,
+    },
+    {
+      labelKo: "최소 거래 수",
+      valueKo: `≥ ${formatTargetSummaryTradeCount(form.minTradeCount)}`,
+    },
+  ];
+}
+
 /** Customer-facing target threshold lines (Step 4/5 summaries; not input suffixes). */
 export function qualificationTargetSummaryLines(
   form: Pick<

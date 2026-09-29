@@ -33,17 +33,24 @@ import {
   discoverInterruptedRecoveryJobs,
 } from "./interruptedRecoveryDiscovery";
 import { ExecutionControls } from "./ExecutionControls";
+import { visibleJobLifecycleActions } from "./jobActionVisibility";
 import { displayJobSearchTitle, jobSearchNameTooltip } from "./jobDisplayName";
+import {
+  releaseSubmitLock,
+  strategySearchStartedDetail,
+  tryAcquireSubmitLock,
+} from "./guided/strategySearchStartFeedback";
 import {
   formatErrorDetails,
   mapStrategySearchErrorCode,
 } from "./errorMessages";
 import { createDefaultOperatorFormState } from "./formDefaults";
 import { buildCreateBodyIfValid, type FormFieldError } from "./formValidation";
-import { SetupResultsCollapsible } from "./guided/SetupResultsCollapsible";
+import { GuidedSetupCompactContinuations } from "./guided/GuidedSetupCompactContinuations";
 import {
   isGuidedSetupActive,
   resolveStrategySearchPresentationMode,
+  shouldShowGuidedCompactSecondary,
 } from "./guided/strategySearchPresentation";
 import { JobCreateForm } from "./JobCreateForm";
 import {
@@ -57,6 +64,13 @@ import {
 } from "./QualifiedResultsPanel";
 import { ResearchCompletionPanel } from "./ResearchCompletionPanel";
 import { StrategySearchCompletedDashboard } from "./StrategySearchCompletedDashboard";
+import { CompletedResultLoading } from "./completed/CompletedResultLoading";
+import {
+  isCompletedResultPayloadReady,
+  shouldHideLegacyWorkbenchForCompleted,
+  shouldShowCompletedResultLoading,
+  type DetailFetchState,
+} from "./completed/completedLoadingGate";
 import { ResearchRankingGroups } from "./ResearchRankingGroups";
 import { SearchStatusCard } from "./SearchStatusCard";
 import { StrategySearchClientError } from "./types";
@@ -246,7 +260,15 @@ export function StrategySearchWorkbench() {
   );
   const [formErrors, setFormErrors] = useState<FormFieldError[]>([]);
   const [creating, setCreating] = useState(false);
+  const [validationRedirectErrors, setValidationRedirectErrors] = useState<
+    FormFieldError[] | null
+  >(null);
+  const startSearchLockRef = useRef(false);
   const [clientReady, setClientReady] = useState(false);
+  const [resumeJobId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return readInitialJobId(readSearchQueryBootstrap().jobId);
+  });
 
   const [jobs, setJobs] = useState<StrategySearchJobSummary[]>([]);
   const [listLoading, setListLoading] = useState(true);
@@ -262,6 +284,8 @@ export function StrategySearchWorkbench() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<StrategySearchJobDetail | null>(null);
+  const [detailFetchState, setDetailFetchState] =
+    useState<DetailFetchState>("idle");
   const [trials, setTrials] = useState<StrategySearchTrialsPage | null>(null);
   const [jobMissing, setJobMissing] = useState(false);
   const [missingJobId, setMissingJobId] = useState<string | null>(null);
@@ -427,7 +451,15 @@ export function StrategySearchWorkbench() {
       if (selectedIdRef.current === jobId) setTrials(page);
       return page;
     } catch {
-      return null;
+      const empty = {
+        jobId,
+        total: 0,
+        limit: 200,
+        offset: 0,
+        trials: [],
+      };
+      if (selectedIdRef.current === jobId) setTrials(empty);
+      return empty;
     }
   }, []);
 
@@ -453,6 +485,9 @@ export function StrategySearchWorkbench() {
 
   const refreshDetail = useCallback(
     async (jobId: string, opts?: { retryNotFound?: boolean }) => {
+      if (selectedIdRef.current === jobId) {
+        setDetailFetchState("loading");
+      }
       try {
         const data = await getStrategySearchJobWithRetry(jobId, {
           retryNotFound: opts?.retryNotFound,
@@ -461,6 +496,9 @@ export function StrategySearchWorkbench() {
         setJobMissing(false);
         setMissingJobId(null);
         setDetail(data);
+        if (data.status === "completed") {
+          setOutcomeViewPrimary(true);
+        }
         await refreshTrials(jobId);
         try {
           const gRes = await fetch(
@@ -483,8 +521,14 @@ export function StrategySearchWorkbench() {
         } catch {
           /* generations optional for older jobs */
         }
+        if (selectedIdRef.current === jobId) {
+          setDetailFetchState("ready");
+        }
         return data;
       } catch (err) {
+        if (selectedIdRef.current === jobId) {
+          setDetailFetchState("error");
+        }
         if (
           err instanceof StrategySearchClientError &&
           err.code === "JOB_NOT_FOUND"
@@ -634,7 +678,11 @@ export function StrategySearchWorkbench() {
     setRegistrationSummary(null);
     setTrials(null);
     setDetail(null);
+    setDetailFetchState("loading");
     setGenerationMeta(null);
+    if (listed?.status === "completed") {
+      setOutcomeViewPrimary(true);
+    }
     persistSelectedJobId(id);
     syncJobIdToUrl(id);
     void refreshDetail(id);
@@ -664,6 +712,9 @@ export function StrategySearchWorkbench() {
 
   useEffect(() => {
     if (!detail || jobMissing) return;
+    if (isOperationallyActiveStatus(detail.status, detail.executionActive)) {
+      return;
+    }
     const groupAwareNow = hasAuthoritativeRankingGroups(detail);
     setRankPanel((current) => {
       const normalized = normalizeResultRankPanel({
@@ -859,6 +910,7 @@ export function StrategySearchWorkbench() {
     const validated = buildCreateBodyIfValid(form);
     if (!validated.ok) {
       setFormErrors(validated.errors);
+      setValidationRedirectErrors(validated.errors);
       setFeedback({
         message: "입력값을 확인하세요.",
         detail: validated.errors.map((e) => e.message).join(" · "),
@@ -866,6 +918,8 @@ export function StrategySearchWorkbench() {
       });
       return;
     }
+    if (!tryAcquireSubmitLock(startSearchLockRef)) return;
+    setValidationRedirectErrors(null);
     setCreating(true);
     setFeedback(null);
     setFormErrors([]);
@@ -888,7 +942,10 @@ export function StrategySearchWorkbench() {
       await refreshList();
       setFeedback({
         message: "탐색을 시작했습니다.",
-        detail: `${created.searchName || form.searchName} · 합격 목표까지 AI가 연구를 이어갑니다.`,
+        detail: strategySearchStartedDetail(
+          form,
+          created.searchName || form.searchName,
+        ),
         tone: "info",
       });
     } catch (err) {
@@ -896,6 +953,7 @@ export function StrategySearchWorkbench() {
       setFeedback({ ...mapped, tone: "error" });
     } finally {
       setCreating(false);
+      releaseSubmitLock(startSearchLockRef);
     }
   }
 
@@ -948,22 +1006,6 @@ export function StrategySearchWorkbench() {
           .filter((t) => t.passed)
           .map((t) => trialToCard(t, detail))
       : [];
-
-  const showOutcomeFirst = Boolean(
-    detail &&
-      (detail.status === "completed" ||
-        detail.status === "cancelled" ||
-        detail.status === "cancel_requested" ||
-        detail.status === "failed" ||
-        detail.status === "paused" ||
-        detail.outcomePresentation === "partial_completed" ||
-        (qualifiedFromTrials.length > 0 &&
-          detail.status !== "running" &&
-          detail.status !== "queued" &&
-          detail.status !== "interrupted" &&
-          detail.status !== "pause_requested" &&
-          !detail.executionActive)),
-  );
 
   const selectedJobForName =
     detail ?? jobs.find((job) => job.id === selectedId) ?? null;
@@ -1020,6 +1062,15 @@ export function StrategySearchWorkbench() {
   const groupAware = Boolean(
     detail && !jobMissing && hasAuthoritativeRankingGroups(detail),
   );
+  const operationallyActiveDetail = Boolean(
+    detail &&
+      !jobMissing &&
+      isOperationallyActiveStatus(detail.status, detail.executionActive),
+  );
+  const showLiveTop10RankChrome =
+    !groupAware || operationallyActiveDetail;
+  const liveTop10RankSurfaceActive =
+    rankPanel === "top10" && showLiveTop10RankChrome;
   const demoteNewSearch = Boolean(
     detail &&
       !jobMissing &&
@@ -1028,7 +1079,8 @@ export function StrategySearchWorkbench() {
         ((detail.status === "failed" || detail.status === "paused") &&
           (detail.qualifiedCount ?? 0) > 0)),
   );
-  const hasLiveTop10 = !groupAware && liveTop10Entries.length > 0;
+  const hasLiveTop10 =
+    showLiveTop10RankChrome && liveTop10Entries.length > 0;
   const searchProgress =
     detail && !jobMissing
       ? {
@@ -1053,18 +1105,76 @@ export function StrategySearchWorkbench() {
         }
       : null;
   const showRunningVisual = shouldRenderRunningVisual(searchProgress?.status);
+  const runningVisualLifecycleActions =
+    showRunningVisual && detail && !jobMissing
+      ? visibleJobLifecycleActions({
+          status: detail.status,
+          hasSelection: true,
+          jobMissing: false,
+          retryable: detail.retryable === true,
+        })
+      : [];
   const presentationMode = resolveStrategySearchPresentationMode({
     clientReady,
     showRunningVisual,
     outcomeViewPrimary,
   });
   const guidedSetupActive = isGuidedSetupActive(presentationMode);
+  const [guidedOperationalExpanded, setGuidedOperationalExpanded] = useState(false);
+  const completedPayloadReady = isCompletedResultPayloadReady({
+    jobMissing,
+    detail,
+    detailFetchState,
+    trials,
+  });
+  const showCompletedResultLoading = shouldShowCompletedResultLoading({
+    clientReady,
+    selectedId,
+    jobMissing,
+    detail,
+    detailFetchState,
+    trials,
+  });
   const showCompletedDashboardPrimary = Boolean(
     detail &&
       !jobMissing &&
       detail.status === "completed" &&
-      outcomeViewPrimary,
+      outcomeViewPrimary &&
+      completedPayloadReady,
   );
+  const hideLegacyWorkbenchSurfaces = shouldHideLegacyWorkbenchForCompleted({
+    showCompletedDashboardPrimary,
+    showCompletedResultLoading,
+  });
+  const showCompletedRouteBootstrapLoading =
+    !clientReady && Boolean(resumeJobId);
+
+  useEffect(() => {
+    if (!guidedSetupActive) setGuidedOperationalExpanded(false);
+  }, [guidedSetupActive]);
+
+  const recentCompletedJob =
+    jobs.find((job) => job.status === "completed") ?? null;
+  const listedSelectedJob = selectedId
+    ? jobs.find((job) => job.id === selectedId)
+    : null;
+  const selectedJobStatus =
+    detail?.status ?? listedSelectedJob?.status ?? null;
+  const guidedCompactByPolicy = shouldShowGuidedCompactSecondary({
+    guidedSetupActive,
+    guidedOperationalExpanded,
+    hasSelectedJob: Boolean(selectedId),
+    jobMissing,
+    selectedJobStatus,
+  });
+  const requireFullOperationalForSelectedJob = Boolean(
+    selectedId &&
+      detail?.id === selectedId &&
+      !jobMissing &&
+      detail.status !== "completed",
+  );
+  const showGuidedCompactSecondary =
+    guidedCompactByPolicy && !requireFullOperationalForSelectedJob;
   const runningAutomatic =
     resolvePatternSelectionMode({
       patternConfigLevel: form.patternConfigLevel,
@@ -1142,11 +1252,6 @@ export function StrategySearchWorkbench() {
           : "전문가");
   const symbolChip = detail?.symbols?.join(", ") || form.symbol || "—";
   const timeframeChip = detail?.timeframe || form.timeframe || "—";
-  const setupResultsSummaryMeta =
-    jobs.length > 0
-      ? `${formatCount(jobs.length)}건 · ${symbolChip} · ${timeframeChip}${selectedStatusKo ? ` · ${selectedStatusKo}` : ""}`
-      : "기록 없음";
-
   const createForm = (
     <div
       className={
@@ -1163,6 +1268,7 @@ export function StrategySearchWorkbench() {
         readOnly={showRunningVisual}
         onChange={setForm}
         onSubmit={() => void handleStartSearch()}
+        validationRedirectErrors={validationRedirectErrors}
       />
     </div>
   );
@@ -1199,8 +1305,13 @@ export function StrategySearchWorkbench() {
       data-testid="strategy-search-workbench"
       data-presentation-mode={presentationMode}
       data-guided-setup-active={guidedSetupActive ? "true" : "false"}
+      data-completed-result-primary={
+        hideLegacyWorkbenchSurfaces ? "true" : "false"
+      }
     >
-      {!clientReady ? (
+      {showCompletedRouteBootstrapLoading ? (
+        <CompletedResultLoading />
+      ) : !clientReady ? (
         <div
           className="rextora-card p-4 text-sm text-slate-400"
           data-testid="ss-form-hydrating"
@@ -1215,17 +1326,36 @@ export function StrategySearchWorkbench() {
               familyIds={runningFamilyIds}
               symbol={detail?.symbols?.[0] || form.symbol}
               timeframe={detail?.timeframe || form.timeframe}
+              headerActions={
+                detail && !jobMissing ? (
+                  <V3PermissionGate allowed={canRunResearch}>
+                    <ExecutionControls
+                      status={detail.status}
+                      pending={actionPending}
+                      retryable={detail.retryable === true}
+                      jobMissing={false}
+                      hasSelection
+                      resultsHref={
+                        detail?.id
+                          ? `/results?jobId=${encodeURIComponent(detail.id)}`
+                          : null
+                      }
+                      onStart={() => void runAction("start")}
+                      onPause={() => void runAction("pause")}
+                      onResume={() => void runAction("resume")}
+                      onCancel={() => void runAction("cancel")}
+                    />
+                  </V3PermissionGate>
+                ) : null
+              }
             />
+          ) : showCompletedResultLoading ? (
+            <CompletedResultLoading />
           ) : showCompletedDashboardPrimary && detail ? (
             <StrategySearchCompletedDashboard
               job={detail}
-              passCount={qualifiedFromTrials.length}
-              bestStrategyName={
-                qualifiedFromTrials[0]?.name ?? detail.currentBestSummary
-              }
-              bestStrategyId={
-                qualifiedFromTrials.find((q) => q.strategyId)?.strategyId ?? null
-              }
+              payloadReady={completedPayloadReady}
+              trials={trials}
               onNewSearch={beginFreshSearch}
               onRetryWithSettings={retrySearchWithCurrentSettings}
               onRegisterBest={
@@ -1256,27 +1386,31 @@ export function StrategySearchWorkbench() {
                   }
                 })();
               }}
-              onRegisterForBacktest={(iteration) => {
-                void handleRegisterForBacktest(iteration);
-              }}
-              registeringForBacktest={registering}
             />
           ) : (
             <>{createForm}</>
           )}
 
-          {showOutcomeFirst && !showCompletedDashboardPrimary ? (
-            <p className="ss-helper" data-testid="ss-config-collapsed">
-              완료된 탐색이 있습니다. 아래 결과에서 확인하거나, 위에서 새 탐색을
-              시작하세요.
-            </p>
-          ) : null}
-
-          {showCompletedDashboardPrimary ? null : (
-          <SetupResultsCollapsible
-            active={guidedSetupActive}
-            summaryMeta={setupResultsSummaryMeta}
-          >
+          {hideLegacyWorkbenchSurfaces ? null : showGuidedCompactSecondary ? (
+            <GuidedSetupCompactContinuations
+              recentCompletedJob={recentCompletedJob}
+              resumableCount={recoveryJobs.length}
+              onViewRecentResult={() => {
+                setGuidedOperationalExpanded(true);
+                if (recentCompletedJob) {
+                  void handleSelect(recentCompletedJob.id);
+                  setOutcomeViewPrimary(true);
+                } else {
+                  setOutcomeViewPrimary(true);
+                }
+              }}
+              onViewResumableList={() => {
+                setGuidedOperationalExpanded(true);
+                probeRecovery();
+              }}
+            />
+          ) : (
+          <>
           <section
             className="v3-ss-statusbar"
             data-testid="ss-sticky-status-header"
@@ -1362,6 +1496,9 @@ export function StrategySearchWorkbench() {
                   detail?.id
                     ? `/results?jobId=${encodeURIComponent(detail.id)}`
                     : null
+                }
+                omitLifecycleActions={
+                  showRunningVisual ? runningVisualLifecycleActions : undefined
                 }
                 onStart={() => void runAction("start")}
                 onPause={() => void runAction("pause")}
@@ -1583,10 +1720,14 @@ export function StrategySearchWorkbench() {
 
             <V3Card
               className="v3-ss-s8"
-              title={groupAware ? "상위 후보 · 순위 그룹" : "상위 후보 · Live TOP10"}
+              title={
+                groupAware && !showLiveTop10RankChrome
+                  ? "상위 후보 · 순위 그룹"
+                  : "상위 후보 · Live TOP10"
+              }
               headerAction={
                 <div className="v3-ss-tabs" role="tablist" aria-label="순위 보기">
-                  {groupAware ? null : (
+                  {showLiveTop10RankChrome ? (
                   <button
                     type="button"
                     role="tab"
@@ -1600,7 +1741,7 @@ export function StrategySearchWorkbench() {
                   >
                     Live TOP10
                   </button>
-                  )}
+                  ) : null}
                   <button
                     type="button"
                     role="tab"
@@ -1630,7 +1771,7 @@ export function StrategySearchWorkbench() {
                 </div>
               }
             >
-              {rankPanel === "top10" && !groupAware && !hasLiveTop10 ? (
+              {liveTop10RankSurfaceActive && !hasLiveTop10 ? (
                 <div
                   className={
                     "v3-ss-top10-empty" +
@@ -1678,7 +1819,7 @@ export function StrategySearchWorkbench() {
               ) : null}
               {detail && !jobMissing ? (
                 <>
-                  {rankPanel === "top10" && !groupAware ? (
+                  {liveTop10RankSurfaceActive ? (
                     <section
                       data-testid="ss-job-detail"
                       aria-labelledby="ss-job-detail-title"
@@ -1855,7 +1996,7 @@ export function StrategySearchWorkbench() {
               </div>
             </section>
           </div>
-          </SetupResultsCollapsible>
+          </>
           )}
 
           {completionRegisterIter != null ? (

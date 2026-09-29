@@ -22,6 +22,30 @@ async function goToStep(page: import("@playwright/test").Page, index: number) {
   }
 }
 
+/** Step 5 content width vs guided body (catches sidebar-column auto-placement). */
+async function guidedContentWidthRatio(page: import("@playwright/test").Page) {
+  return page.evaluate(() => {
+    const body = document.querySelector(".ss-guided-setup__body");
+    const content = document.querySelector(".ss-guided-setup__content");
+    if (!body || !content) return null;
+    const bodyWidth = body.getBoundingClientRect().width;
+    const contentWidth = content.getBoundingClientRect().width;
+    return {
+      bodyWidth,
+      contentWidth,
+      ratio: bodyWidth > 0 ? contentWidth / bodyWidth : 0,
+      hasDirectSidebarGuide: Boolean(
+        body.querySelector(":scope > .ss-guided-guide"),
+      ),
+      guideAfterContent: body.classList.contains(
+        "ss-guided-setup__body--guide-after-content",
+      ),
+    };
+  });
+}
+
+const STEP5_MIN_CONTENT_BODY_WIDTH_RATIO = 0.75;
+
 test.describe("guided visual audit", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsE2eCeo(page);
@@ -202,6 +226,51 @@ test.describe("guided visual audit", () => {
         2,
       ),
     );
+  });
+
+  test("Step 5 desktop content uses full guided body width", async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    for (const stepIndex of [0, 1, 2, 3]) {
+      await goToStep(page, stepIndex);
+      const layout = await guidedContentWidthRatio(page);
+      expect(layout).not.toBeNull();
+      expect(layout!.hasDirectSidebarGuide).toBe(true);
+      expect(layout!.guideAfterContent).toBe(false);
+    }
+
+    await goToStep(page, 4);
+    const step5Desktop = await guidedContentWidthRatio(page);
+    expect(step5Desktop).not.toBeNull();
+    expect(step5Desktop!.guideAfterContent).toBe(true);
+    expect(step5Desktop!.hasDirectSidebarGuide).toBe(false);
+    expect(step5Desktop!.ratio).toBeGreaterThanOrEqual(
+      STEP5_MIN_CONTENT_BODY_WIDTH_RATIO,
+    );
+
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-review-분석 대상")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-review-탐색 방식")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-review-전략 · 범위")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-review-검증 · 위험")).toBeVisible();
+    await expect(page.getByTestId("ss-launch-panel")).toBeVisible();
+    await expect(page.getByTestId("ss-create-submit")).toBeVisible();
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await goToStep(page, 4);
+    const step5Mobile = await guidedContentWidthRatio(page);
+    expect(step5Mobile!.ratio).toBeGreaterThanOrEqual(
+      STEP5_MIN_CONTENT_BODY_WIDTH_RATIO,
+    );
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(false);
+    await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
+    await expect(page.getByTestId("ss-create-submit")).toBeVisible();
   });
 
   test("capture automatic target-mode screenshots", async ({ page }) => {

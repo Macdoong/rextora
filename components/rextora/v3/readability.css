@@ -25,7 +25,7 @@
 
 /* Default Button (tone→secondary) is dark-slate + text-slate-100.
    A later V3 remap of .text-slate-100 to primary made CTA text dark-on-dark. */
-.v3 button.rextora-btn-text.text-slate-100:not([data-testid^="delete-job-"]):not([data-testid^="library-delete-"]):not([data-testid="bulk-delete"]):not([data-testid="raw-trial-cleanup"]):not([data-testid="risk-settings-reset"]),
+.v3 button.rextora-btn-text.text-slate-100:not([data-testid^="delete-job-"]):not([data-testid^="library-delete-"]):not([data-testid="bulk-delete"]):not([data-testid="raw-trial-cleanup"]):not([data-testid="risk-settings-reset"]):not([data-completed-action="secondary"]):not([data-completed-action="tertiary"]),
 .v3-oc-page button.rextora-btn-text.text-slate-100,
 .v3-oc button.rextora-btn-text.text-slate-100 {
   background: linear-gradient(180deg, var(--v3-brand), var(--v3-brand-hover)) !important;

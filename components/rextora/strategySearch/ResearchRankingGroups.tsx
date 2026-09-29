@@ -51,8 +51,10 @@ export function ResearchRankingGroups(props: {
   source: ResearchRankingAuthoritySource;
   unknownLegacy?: ResearchUnknownLegacyView | null;
   operatorFacing?: boolean;
+  completedDashboardVariant?: boolean;
 }) {
   const operatorFacing = props.operatorFacing === true;
+  const completedVariant = props.completedDashboardVariant === true;
   const authoritative = hasAuthoritativeRankingGroups(props.source);
   if (!authoritative) {
     return (
@@ -81,47 +83,81 @@ export function ResearchRankingGroups(props: {
 
   return (
     <section
-      className="ss-ranking-groups min-w-0 space-y-3"
+      className={
+        "ss-ranking-groups min-w-0 space-y-3" +
+        (completedVariant ? " ss-ranking-groups--completed" : "")
+      }
       data-testid="research-ranking-groups"
     >
       <aside
-        className="ss-rank-principle"
+        className={
+          completedVariant
+            ? "ss-completed-rank-principle"
+            : "ss-rank-principle"
+        }
         data-testid="ss-ranking-champ-rule"
       >
-        <strong>평가 원칙</strong>
-        <p>
-          전략군끼리 점수를 직접 비교하지 않습니다. 각 전략군은 독립적으로 평가되며, 각 전략군 안에서 자격을 통과한 후보 중 최종 추천을 선택합니다.
-        </p>
+        {completedVariant ? (
+          <span className="ss-completed-rank-principle__icon" aria-hidden="true">
+            i
+          </span>
+        ) : null}
+        <div>
+          {completedVariant ? null : <strong>평가 원칙</strong>}
+          <p className={completedVariant ? "ss-completed-type-helper" : undefined}>
+            {completedVariant ? (
+              <>
+                <strong className="ss-completed-type-caption">평가 원칙</strong>{" "}
+                전략군끼리 점수를 직접 비교하지 않습니다. 각 전략군은 독립적으로
+                평가하며, 각 전략군 안에서 자격을 통과한 후보 중 최종 추천을
+                선택합니다.
+              </>
+            ) : (
+              "전략군끼리 점수를 직접 비교하지 않습니다. 각 전략군은 독립적으로 평가되며, 각 전략군 안에서 자격을 통과한 후보 중 최종 추천을 선택합니다."
+            )}
+          </p>
+        </div>
       </aside>
-      <ul
-        className="ss-rank-summary"
-        data-testid="ss-ranking-group-summary"
-        data-group-count={summary.groupCount}
-        data-recommendable-count={summary.recommendableCount}
-        data-none-count={summary.noneCount}
+      {completedVariant ? null : (
+        <ul
+          className="ss-rank-summary"
+          data-testid="ss-ranking-group-summary"
+          data-group-count={summary.groupCount}
+          data-recommendable-count={summary.recommendableCount}
+          data-none-count={summary.noneCount}
+        >
+          <li>
+            <span>전략군</span>
+            <strong>{summary.groupCount}</strong>
+          </li>
+          <li data-summary="recommendable">
+            <span>추천 가능</span>
+            <strong>{summary.recommendableCount}</strong>
+          </li>
+          <li data-summary="none">
+            <span>추천 없음</span>
+            <strong>{summary.noneCount}</strong>
+          </li>
+        </ul>
+      )}
+      <div
+        className={
+          completedVariant
+            ? "ss-completed-ranking-group-grid"
+            : "ss-ranking-group-grid grid grid-cols-1 gap-3 sm:grid-cols-2"
+        }
       >
-        <li>
-          <span>전략군</span>
-          <strong>{summary.groupCount}</strong>
-        </li>
-        <li data-summary="recommendable">
-          <span>추천 가능</span>
-          <strong>{summary.recommendableCount}</strong>
-        </li>
-        <li data-summary="none">
-          <span>추천 없음</span>
-          <strong>{summary.noneCount}</strong>
-        </li>
-      </ul>
-      <div className="ss-ranking-group-grid grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {groups.map((group) => (
+        {groups.map((group, index) => (
           <ResearchRankingGroupCard
             key={group.rankingCompatibilityGroup}
             group={group}
             operatorFacing={operatorFacing}
+            completedDashboardVariant={completedVariant}
+            animationIndex={completedVariant ? index : undefined}
           />
         ))}
       </div>
+      {completedVariant ? null : (
       <p
         className="text-xs text-slate-500"
         data-testid="research-no-global-champion"
@@ -130,6 +166,7 @@ export function ResearchRankingGroups(props: {
           ? "통합 기술 전략과 패턴 점수는 서로 비교하지 않습니다. 그룹을 한데 모아 순위를 만들지 않습니다."
           : "SAFE와 패턴 점수는 서로 비교하지 않습니다. 그룹을 한데 모아 순위를 만들지 않습니다."}
       </p>
+      )}
       {props.unknownLegacy && props.unknownLegacy.count > 0 ? (
         <aside
           className="ss-ranking-legacy-note min-w-0 overflow-hidden rounded-xl border border-slate-700 p-4"

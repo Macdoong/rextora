@@ -1,8 +1,7 @@
 "use client";
 
 import type { CompletedDashboardViewModel } from "./completedViewModel";
-import { CompletedEvaluationFunnel } from "./CompletedEvaluationFunnel";
-import { CompletedPassFailDistribution } from "./CompletedPassFailDistribution";
+import { CompletedFilterDonutFlow } from "./CompletedFilterDonutFlow";
 
 export function CompletedSummaryRow(props: {
   model: CompletedDashboardViewModel;
@@ -12,8 +11,7 @@ export function CompletedSummaryRow(props: {
       className="ss-completed-upper-summary ss-completed-upper-summary--enter"
       data-testid="ss-completed-upper-summary"
     >
-      <CompletedPassFailDistribution model={props.model} />
-      <CompletedEvaluationFunnel model={props.model} />
+      <CompletedFilterDonutFlow model={props.model} />
     </div>
   );
 }

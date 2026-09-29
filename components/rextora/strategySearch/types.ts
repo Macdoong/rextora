@@ -497,7 +497,27 @@ export interface StrategySearchJobSummary {
   } | null;
 }
 
+export type CompletedAnalysisContextView = {
+  symbol: string;
+  timeframe: string;
+  evaluationWindowLabel: string | null;
+  evaluationStartUtc: string | null;
+  evaluationEndUtc: string | null;
+  searchApproachKo: string | null;
+  completionReason: string | null;
+  completionReasonLabelKo: string | null;
+  passThresholds: {
+    minTotalReturn: number | null;
+    maxMdd: number | null;
+    minTradeCount: number | null;
+    minWinRate: number | null;
+    minScore: number | null;
+  };
+  jitterEnabled: boolean | null;
+};
+
 export interface StrategySearchJobDetail extends StrategySearchJobSummary {
+  completedAnalysisContext?: CompletedAnalysisContextView | null;
   config: {
     searchVersion: string;
     strategyTemplateId: string;

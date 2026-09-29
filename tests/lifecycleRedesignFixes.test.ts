@@ -75,7 +75,7 @@ describe("lifecycle redesign fixes", () => {
     expect(form).toContain("탐색 시간");
     expect(form).toContain("탐색 프리셋");
     expect(form).toContain("최대 허용 낙폭");
-    expect(form).toContain("탐색 기준");
+    expect(form).toContain("탐색 출발점");
     expect(form).toContain("ss-section-expert");
     expect(form).toContain("전문가 조건");
     expect(form).toContain("ss-config-manager");

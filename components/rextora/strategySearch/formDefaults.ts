@@ -21,6 +21,7 @@ import {
   isSupportedTimeframe,
   resolveTimeframe,
 } from "@/src/lib/rextora/data/timeframes";
+import { formatTimeframeCustomerKo } from "./customerTimeframeKo";
 import {
   maxDrawdownPercentToPolicy,
   percentInputToRatio,
@@ -526,8 +527,25 @@ export function generateDefaultSearchName(
   timeframe: string,
 ): string {
   const s = symbol.trim().toUpperCase() || "BTCUSDT";
-  const tf = timeframe.trim() || "15m";
-  return `${s} ${tf} 탐색`;
+  const tfRaw = timeframe.trim() || "15m";
+  const tfLabel = formatTimeframeCustomerKo(tfRaw);
+  return `${s} ${tfLabel} 탐색`;
+}
+
+/** Matches auto-filled / default search names (incl. legacy raw timeframe tokens). */
+export function isSystemGeneratedSearchName(
+  name: string,
+  symbol: string,
+  timeframe: string,
+): boolean {
+  const n = name.trim();
+  if (!n) return true;
+  const s = symbol.trim().toUpperCase() || "BTCUSDT";
+  const tfRaw = timeframe.trim() || "15m";
+  if (n === generateDefaultSearchName(symbol, timeframe)) return true;
+  if (n === `${s} ${tfRaw} 탐색`) return true;
+  if (/^[A-Z0-9]+ \S+ 탐색$/.test(n)) return true;
+  return false;
 }
 
 export function datesForPeriodPreset(
@@ -707,6 +725,13 @@ export function resolveScoreWeights(
   const q = getQualificationProfile(profile);
   return { returnWeight: q.returnWeight, mddWeight: q.mddWeight };
 }
+
+/** Proven operator-form defaults for guided Step 1 (market) badges. */
+export const GUIDED_STEP1_FIELD_DEFAULTS = {
+  symbol: "BTCUSDT",
+  timeframe: "15m",
+  periodPreset: "standard" as HistoricalPeriodPresetId,
+} as const;
 
 export function createDefaultOperatorFormState(): StrategySearchOperatorFormState {
   const dates = datesForPeriodPreset("standard");

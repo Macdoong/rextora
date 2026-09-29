@@ -115,7 +115,7 @@ describe("operator center v2 and shell motion/icons", () => {
     expect(ctx).toContain("primarySymbolTimeframe?.trim()");
     expect(ctx).not.toMatch(/displayValue\(primaryStrategy\)/);
     expect(ctx).not.toMatch(/displayValue\(primarySymbolTimeframe\)/);
-    expect(OPERATOR_STATUS.noStrategy).toBe("전략 없음");
+    expect(OPERATOR_STATUS.noStrategy).toBe("적용 전략 없음");
     expect(OPERATOR_STATUS.unavailable).toBe("선택 없음");
   });
 

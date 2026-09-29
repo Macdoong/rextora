@@ -42,8 +42,8 @@ describe("Strategy Search customer decision UX", () => {
     const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
     expect(mode).toContain("자동 탐색");
     expect(mode).toContain("탐색 범위 직접 선택");
-    expect(level).toContain("설정 수준");
-    expect(form).toContain("설정 수준");
+    expect(level).toContain("설정 범위");
+    expect(form).toContain("설정 범위");
     expect(form).toContain("탐색 방식");
     expect(form).not.toMatch(/ss-adv-section__title">탐색 방식/);
   });
@@ -95,7 +95,9 @@ describe("Strategy Search customer decision UX", () => {
   });
 
   it("F: editable vs read-only fields use distinct presentation", () => {
-    const form = read("components/rextora/strategySearch/JobCreateForm.tsx");
+    const form =
+      read("components/rextora/strategySearch/JobCreateForm.tsx") +
+      read("components/rextora/strategySearch/guided/GuidedValidationStep.tsx");
     expect(form).toContain('origin="editable"');
     expect(form).toContain("ss-field--readonly");
     expect(form).toContain("ss-field-origin");

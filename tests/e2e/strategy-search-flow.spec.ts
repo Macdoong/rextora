@@ -17,6 +17,24 @@ function envelope<T>(data: T) {
   return { ok: true, data, meta: { ts: new Date().toISOString() }, error: null };
 }
 
+const COMPLETED_DOM_CONSOLE_PATTERNS =
+  /hydration error|validateDOMNesting|cannot be a descendant|cannot contain a nested/i;
+
+function attachCompletedDashboardConsoleGuard(
+  page: import("@playwright/test").Page,
+) {
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      errors.push(msg.text());
+    }
+  });
+  return () => {
+    const domNesting = errors.filter((e) => COMPLETED_DOM_CONSOLE_PATTERNS.test(e));
+    expect(domNesting, domNesting.join("\n")).toEqual([]);
+  };
+}
+
 function jobDetail(input: {
   id: string;
   status: JobStatus;
@@ -642,6 +660,9 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-guided-target-summary")).toContainText("8");
     await clickGuidedNext(page, 1);
     await expect(page.getByTestId("ss-guided-target-review")).toContainText(
+      "목표 조건",
+    );
+    await expect(page.getByTestId("ss-guided-review-탐색 방식")).toContainText(
       "목표 기준 자동 탐색",
     );
     await page.getByTestId("ss-create-submit").click();
@@ -790,7 +811,11 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await page.getByTestId("ss-guided-nav-step-review").click();
     await expect(page.getByTestId("ss-guided-final-review")).toBeVisible();
     await page.getByTestId("ss-create-submit").click();
-    await expect(page.getByTestId("ss-form-errors")).toBeVisible();
+    await expect(page.getByTestId("ss-guided-step-surface")).toHaveAttribute(
+      "data-guided-step-id",
+      "validation",
+    );
+    await expect(page.getByText("최소 거래 수는 0 이상이어야 합니다.")).toBeVisible();
 
     await page.getByTestId("ss-guided-nav-step-validation").click();
     await fillControlledNumberInput(page.getByTestId("ss-min-trades"), "10");
@@ -850,6 +875,7 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
       detailGets: [] as number[],
     };
     await installSearchMocks(page, state);
+    const assertCompletedConsole = attachCompletedDashboardConsoleGuard(page);
 
     await openSearchJob(page, state.jobId);
     await expect(page.getByTestId("ss-action-pause")).toBeVisible();
@@ -866,6 +892,7 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
       timeout: 15_000,
     });
+    assertCompletedConsole();
     // Stay on Search after completion — never auto-navigate to Results.
     await expect(page).toHaveURL(/\/strategy-search/);
     await expect(page).toHaveURL(/\/strategy-search/);
@@ -888,6 +915,228 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
     await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible();
   });
 
+  test("running P2 polish: header controls, static workflow, mobile strip clearance", async ({
+    page,
+  }) => {
+    const state = {
+      jobId: "search_e2e_running_p2_0001",
+      status: "running" as JobStatus,
+      completedIterations: 6,
+      executionActive: true,
+      detailGets: [] as number[],
+    };
+    await installSearchMocks(page, state);
+    await openSearchJob(page, state.jobId);
+    await expect(page.getByTestId("ss-running-visual")).toBeVisible();
+    await expect(page.getByTestId("ss-running-workflow")).toHaveAttribute(
+      "data-workflow",
+      "static",
+    );
+
+    for (const { w, h, maxHeaderY } of [
+      { w: 1440, h: 900, maxHeaderY: 520 },
+      { w: 1100, h: 640, maxHeaderY: 520 },
+      { w: 390, h: 844, maxHeaderY: 620 },
+    ]) {
+      await page.setViewportSize({ width: w, height: h });
+      const headerPause = page
+        .getByTestId("ss-running-header-controls")
+        .getByTestId("ss-action-pause");
+      await expect(headerPause).toBeVisible();
+      await expect(page.getByTestId("ss-execution-controls")).toHaveCount(1);
+      const box = await headerPause.boundingBox();
+      expect(box?.y ?? 9999).toBeLessThan(maxHeaderY);
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    const stripPad = await page.evaluate(() => {
+      const list = document.querySelector(".ss-cand-strip__list");
+      if (!list) return { ok: true, skipped: true };
+      const pad = parseFloat(getComputedStyle(list).paddingInlineEnd);
+      return { ok: Number.isFinite(pad) && pad >= 48, skipped: false, pad };
+    });
+    expect(stripPad.skipped || stripPad.ok).toBe(true);
+  });
+
+  test("running detail poll keeps the lower workbench and scroll position", async ({
+    page,
+  }) => {
+    test.setTimeout(25_000);
+    const state = {
+      jobId: "search_e2e_scroll_0001",
+      status: "running" as JobStatus,
+      completedIterations: 4,
+      executionActive: true,
+      detailGets: [] as number[],
+    };
+    await installSearchMocks(page, state);
+    await openSearchJob(page, state.jobId);
+    await expect(page.getByTestId("ss-running-visual")).toBeVisible();
+    await expect(page.getByTestId("ss-job-detail")).toBeVisible();
+    await page.setViewportSize({ width: 1100, height: 640 });
+
+    const before = await page.evaluate(() => {
+      const target = document.querySelector('[data-testid="ss-job-detail"]');
+      if (!(target instanceof HTMLElement)) {
+        return { scrollTop: 0, missing: true };
+      }
+      let scroller: HTMLElement | null = target.parentElement;
+      while (scroller) {
+        const style = getComputedStyle(scroller);
+        if (
+          /(auto|scroll)/.test(style.overflowY) &&
+          scroller.scrollHeight > scroller.clientHeight + 40
+        ) {
+          break;
+        }
+        scroller = scroller.parentElement;
+      }
+      const scrollEl =
+        scroller ?? (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+      const root = document.documentElement;
+      root.style.scrollBehavior = "auto";
+      scrollEl.scrollTop = scrollEl.scrollHeight;
+      window.scrollTo({ top: scrollEl.scrollHeight, behavior: "auto" });
+      const win = window as Window & {
+        __ssScrollEl?: HTMLElement;
+        __ssDetailRemoved?: boolean;
+      };
+      win.__ssScrollEl = scrollEl;
+      win.__ssDetailRemoved = false;
+      const observer = new MutationObserver(() => {
+        if (!document.querySelector('[data-testid="ss-job-detail"]')) {
+          win.__ssDetailRemoved = true;
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      return {
+        scrollTop: Math.max(scrollEl.scrollTop, window.scrollY),
+        missing: false,
+      };
+    });
+    expect(before.missing, JSON.stringify(before)).toBe(false);
+    expect(before.scrollTop, JSON.stringify(before)).toBeGreaterThan(120);
+    const getsBefore = state.detailGets.length;
+
+    await expect
+      .poll(() => state.detailGets.length, { timeout: 8_000 })
+      .toBeGreaterThan(getsBefore);
+
+    await expect(page.getByTestId("ss-running-visual")).toBeVisible();
+    await expect(page.getByTestId("ss-job-detail")).toBeVisible();
+    const after = await page.evaluate(() => {
+      const win = window as Window & {
+        __ssScrollEl?: HTMLElement;
+        __ssDetailRemoved?: boolean;
+      };
+      const scrollEl = win.__ssScrollEl;
+      return {
+        scrollTop: Math.max(scrollEl?.scrollTop ?? 0, window.scrollY),
+        removed: Boolean(win.__ssDetailRemoved),
+      };
+    });
+    expect(after.removed).toBe(false);
+    expect(after.scrollTop).toBeGreaterThan(before.scrollTop * 0.75);
+  });
+
+  test("completed P2: unsigned reject count and mobile qualification FAB clearance", async ({
+    page,
+  }) => {
+    const state = {
+      jobId: "search_e2e_completed_p2_0001",
+      status: "completed" as JobStatus,
+      completedIterations: 30,
+      executionActive: false,
+      completionReason: "QUALIFIED_TARGET_REACHED",
+      detailGets: [] as number[],
+    };
+    await installSearchMocks(page, state);
+    await page.route(
+      `**/api/rextora/strategy-search/${state.jobId}`,
+      async (route) => {
+        if (route.request().method() !== "GET") {
+          await route.fallback();
+          return;
+        }
+        const base = jobDetail({
+          id: state.jobId,
+          status: state.status,
+          completedIterations: state.completedIterations,
+          executionActive: state.executionActive,
+          completionReason: state.completionReason,
+        });
+        await fulfillJson(
+          route,
+          200,
+          envelope({
+            ...base,
+            qualifiedCount: 2,
+            rejectedCount: 25,
+            evaluatedCount: 30,
+            gatePassedCount: 5,
+            elapsedMs: 118_000,
+            statistics: {
+              ...base.statistics,
+              generated: 40,
+              evaluated: 30,
+              passed: 5,
+              failed: 25,
+            },
+          }),
+        );
+      },
+    );
+    await openSearchJob(page, state.jobId);
+    await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible();
+    const failed = page.getByTestId("ss-waterfall-value-failed");
+    await expect(failed).toHaveText("25");
+    await expect(failed).not.toHaveText(/^−/);
+
+    for (const { w, h } of [
+      { w: 1440, h: 900 },
+      { w: 1100, h: 640 },
+    ]) {
+      await page.setViewportSize({ width: w, height: h });
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth + 2,
+        ),
+      ).toBe(true);
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page
+      .getByTestId("ss-verification-flow-qualified")
+      .scrollIntoViewIfNeeded();
+    const mobile = await page.evaluate(() => {
+      const head = document.querySelector(
+        ".ss-completed-waterfall__row--qualified .ss-completed-waterfall__row-head",
+      );
+      const fab = document.querySelector(".rextora-agent-fab");
+      const doc = document.documentElement;
+      if (!(head instanceof HTMLElement) || !(fab instanceof HTMLElement)) {
+        return { ok: false, reason: "missing-nodes" };
+      }
+      const pad = parseFloat(getComputedStyle(head).paddingInlineEnd);
+      const hr = head.getBoundingClientRect();
+      const fr = fab.getBoundingClientRect();
+      const overlap =
+        hr.right > fr.left + 2 &&
+        hr.bottom > fr.top + 2 &&
+        hr.top < fr.bottom - 2;
+      return {
+        ok: pad >= 48 && !overlap,
+        pad,
+        overlap,
+        overflowX: doc.scrollWidth > doc.clientWidth + 2,
+      };
+    });
+    expect(mobile.overflowX).toBe(false);
+    expect(mobile.ok).toBe(true);
+  });
+
   test("completed job shows primary dashboard until customer starts 새 탐색", async ({
     page,
   }) => {
@@ -901,11 +1150,13 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
       detailGets: [] as number[],
     };
     await installSearchMocks(page, state);
+    const assertCompletedConsole = attachCompletedDashboardConsoleGuard(page);
     await openSearchJob(page, state.jobId);
 
     await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
       timeout: 12_000,
     });
+    assertCompletedConsole();
     await expect(page.getByTestId("ss-completion-hero-reason")).toContainText(
       "목표 조건",
     );
@@ -950,10 +1201,12 @@ test.describe("Strategy Search operator UI (intercepted API)", () => {
       searchSpaceExhausted: true,
     };
     await installSearchMocks(page, exhausted);
+    const assertCompletedConsole = attachCompletedDashboardConsoleGuard(page);
     await openSearchJob(page, exhausted.jobId);
     await expect(page.getByTestId("ss-completed-dashboard")).toBeVisible({
       timeout: 12_000,
     });
+    assertCompletedConsole();
     await expect(page.getByTestId("ss-stop-reason")).toContainText("연구 범위 소진");
   });
 
