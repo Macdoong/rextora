@@ -13,6 +13,7 @@ const CUSTOMER_VALUE_LABELS: Record<string, string> = {
   balanced: "균형형",
   aggressive: "공격형",
   custom: "직접 입력",
+  deep: "심층 탐색",
   support_resistance: "지지·저항",
   supply_demand: "공급·수요",
   ema_core: "EMA / 추세 추종",

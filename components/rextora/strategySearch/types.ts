@@ -237,6 +237,9 @@ export interface StrategySearchJobSummary {
   updatedAt: string;
   startedAt: string | null;
   finishedAt: string | null;
+  /** Inclusive analysis-window bounds, expressed as ISO UTC timestamps. */
+  analysisStartUtc: string | null;
+  analysisEndUtc: string | null;
   elapsedMs?: number | null;
   remainingMs?: number | null;
   maxRuntimeMs?: number | null;

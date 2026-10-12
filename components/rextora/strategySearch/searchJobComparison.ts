@@ -4,7 +4,11 @@
  * rank across compatibility groups, or declare a winner.
  */
 
-import { rankingGroupLabel } from "@/src/lib/rextora/researchRankingReadModel";
+import {
+  GROUP_PATTERN,
+  GROUP_SAFE,
+  rankingGroupLabel,
+} from "@/src/lib/rextora/researchRankingReadModel";
 import { formatCustomerSearchValue } from "./customerDisplay";
 import { formatMs, formatScore, formatTimeKo } from "./formatters";
 import { displayJobSearchTitle } from "./jobDisplayName";
@@ -103,6 +107,12 @@ const COST_LABELS = [
   "레버리지 모드",
   "레버리지 값",
 ];
+
+function compareGroupLabel(group: string): string {
+  if (group === GROUP_SAFE) return "보수적 체결가 평가 그룹";
+  if (group === GROUP_PATTERN) return "패턴·기존 비용 산정 평가 그룹";
+  return rankingGroupLabel(group);
+}
 
 export function isComparableSearchJobStatus(
   status: string | null | undefined,
@@ -240,7 +250,7 @@ function pairRankingGroups(
     const comparable = Boolean(leftGroup && rightGroup);
     return {
       groupId,
-      groupLabel: rankingGroupLabel(groupId),
+      groupLabel: compareGroupLabel(groupId),
       comparable,
       leftRecommended: candidateView(
         "최종 추천 후보",
@@ -303,14 +313,15 @@ export function buildSearchJobComparison(input: {
     ),
   ).filter((item) => item.left !== "—" || item.right !== "—");
 
-  const costRisk = COST_LABELS.map((label) =>
-    row(
+  const costRisk = COST_LABELS.map((label) => {
+    const displayLabel = label === "최소 수익" ? "최소 수익 기준" : label;
+    return row(
       `cost-${label}`,
-      label,
+      displayLabel,
       summaryRowValue(input.leftJob.appliedSearchSummary, COST_SECTION_IDS, label),
       summaryRowValue(input.rightJob.appliedSearchSummary, COST_SECTION_IDS, label),
-    ),
-  ).filter((item) => item.left !== "—" || item.right !== "—");
+    );
+  }).filter((item) => item.left !== "—" || item.right !== "—");
 
   const groups = pairRankingGroups(
     input.leftSummary.rankingGroups,

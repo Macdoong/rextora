@@ -192,6 +192,9 @@ export interface StrategySearchJobSummary {
   updatedAt: string;
   startedAt: string | null;
   finishedAt: string | null;
+  /** Authoritative evaluation-window bounds from completed analysis context (UTC ISO). */
+  analysisStartUtc: string | null;
+  analysisEndUtc: string | null;
   /** Flat active elapsed for Dashboard/Research (null for legacy). */
   elapsedMs?: number | null;
   /** Remaining active duration vs maxRuntimeMs (null for legacy). */
@@ -776,6 +779,11 @@ function summarizeJob(
   }
 
   const plan = getSearchPlan(job.id, options);
+  const completedAnalysisContext = buildCompletedAnalysisContextApi(
+    job,
+    plan,
+    options,
+  );
   const errorWarning = deriveErrorRateWarning(
     statistics,
     plan?.errorWarningRate,
@@ -842,6 +850,8 @@ function summarizeJob(
     updatedAt: job.updatedAt,
     startedAt: job.startedAt,
     finishedAt: job.finishedAt,
+    analysisStartUtc: completedAnalysisContext?.evaluationStartUtc ?? null,
+    analysisEndUtc: completedAnalysisContext?.evaluationEndUtc ?? null,
     /** Flat timing for Dashboard / Research (canonical deadline fields). */
     elapsedMs,
     remainingMs,

@@ -13,7 +13,7 @@ export default function StrategySearchComparePage() {
         <PageHeader
           compact
           title="탐색 결과 비교"
-          description="완료된 탐색 두 건을 나란히 확인합니다. 값이 다르다고 더 나은 탐색을 뜻하지는 않습니다."
+          description="결과, 기간, 조건을 한 화면에서 비교합니다."
         />
       </div>
       <ClientHydrated
