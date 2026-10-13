@@ -308,26 +308,29 @@ describe("backtest polish UI source contracts", () => {
 
   it("shows shared Paper/Live block once when codes match", () => {
     const src = wb();
-    expect(src).toContain("승격 불가");
+    expect(src).toContain("다음 단계 진행 조건 미충족");
     expect(src).toContain("sharedPromotionBlock");
-    expect(src).toContain("모의매매 등록 불가");
-    expect(src).toContain("실전 후보 등록 불가");
+    expect(src).toContain("모의매매 조건 미충족");
+    expect(src).toContain("실전 단계 이용 전 확인");
     expect(src).toContain("backtest-paper-block-reason");
     expect(src).toContain("backtest-live-block-reason");
   });
 
-  it("defaults Key Performance to six primary metrics with collapsed extras", () => {
+  it("keeps supporting evidence separate from the primary KPI hero", () => {
     const src = av();
-    expect(src).toContain('data-testid="backtest-primary-metrics"');
-    expect(src).toContain('data-testid="backtest-extra-metrics"');
-    expect(src).toContain("extraMetricsOpen");
-    expect(src).toContain('label: "순수익률"');
-    expect(src).toContain('label: "최대 낙폭"');
-    expect(src).toContain('label: "순손익"');
-    expect(src).toContain('label: "거래 수"');
-    expect(src).toContain('label: "승률"');
-    expect(src).toContain('label: "총거래비용"');
-    expect(src).toContain("추가 성과 지표");
+    const evidence = src.slice(
+      src.indexOf('data-testid="backtest-evidence-metrics"'),
+      src.indexOf('data-testid="backtest-extra-metrics"'),
+    );
+    expect(evidence).toContain('data-testid="backtest-evidence-metrics"');
+    expect(src).not.toContain('data-testid="backtest-primary-metrics"');
+    expect(evidence).not.toContain('label: "순수익률"');
+    expect(evidence).not.toContain('label: "최대 낙폭"');
+    expect(evidence).not.toContain('label: "순손익"');
+    expect(evidence).toContain('label: "이익 거래"');
+    expect(evidence).toContain('label: "손실 거래"');
+    expect(evidence).toContain('label: "별도 차감 비용"');
+    expect(src).toContain("추가 위험 지표");
     expect(src).toContain("summary-mdd-warning");
     expect(src).toContain("summary-cost-warning");
   });
@@ -339,23 +342,49 @@ describe("backtest polish UI source contracts", () => {
     expect(navStart).toBeGreaterThan(0);
     expect(navEnd).toBeGreaterThan(navStart);
     const nav = src.slice(navStart, navEnd);
-    expect(nav.indexOf('"차트"')).toBeLessThan(nav.indexOf('"거래"'));
-    expect(nav.indexOf('"거래"')).toBeLessThan(nav.indexOf('"월별"'));
-    expect(nav.indexOf('"월별"')).toBeGreaterThan(0);
+    expect(nav).toContain('{ id: "overview", label: "개요" }');
+    expect(nav).toContain('{ id: "price", label: "차트" }');
+    expect(nav).toContain('{ id: "trades", label: "거래" }');
+    expect(nav).toContain('{ id: "equity", label: "성과·위험" }');
+    expect(nav).toContain('{ id: "validation", label: "검증" }');
+    expect(nav).toContain('id: "monthly"');
+    expect(nav).toContain('id: "cost"');
+    expect(nav).toContain('id: "timeline"');
+    expect(nav).toContain('id: "advanced"');
+    expect(nav).toContain('id: "technical"');
+    expect(nav).toContain('id: "expert"');
     expect(src).toContain("activeNavSection");
     expect(src).toContain("selectWorkbenchSection");
     expect(src).toContain("analysisSection");
+    expect(src).toContain('data-testid="backtest-more-section-select"');
+    expect(src).toContain('aria-label="다른 백테스트 보기"');
     // Click-owned tabs — scroll-spy lock / bottom-gap pin removed.
     expect(src).not.toContain("navClickLocked");
     expect(src).not.toContain("scrollBottomGap");
     expect(src).not.toContain("IntersectionObserver");
   });
 
+  it("places one primary KPI hero before settings and omits repeated overview metrics", () => {
+    const src = wb();
+    const headerAt = src.indexOf("<BacktestOperatorHeader");
+    const heroAt = src.indexOf("{primaryKpiHero}");
+    const runAt = src.indexOf('id="bt-run"');
+    expect(headerAt).toBeGreaterThan(0);
+    expect(heroAt).toBeGreaterThan(headerAt);
+    expect(runAt).toBeGreaterThan(heroAt);
+    expect(src.match(/<BacktestKpiGrid/g)).toHaveLength(1);
+    expect(src).not.toContain("<BacktestOperatorAnalysis");
+    expect(src).not.toContain('data-testid="backtest-statusbar"');
+    expect(src).toContain('data-testid="backtest-history-disclosure"');
+    expect(src).toContain("open={!historicalReview}");
+    expect(src).toContain('data-testid="backtest-more-section-select"');
+  });
+
   it("overlay controls keep three groups with accessible disabled reasons", () => {
     const src = av();
     expect(src).toContain("기본 표시");
     expect(src).toContain("기술 패턴");
-    expect(src).toContain("이벤트");
+    expect(src).toContain("패턴 감지");
     expect(src).toContain("pattern-group-status");
     expect(src).toContain("aria-describedby");
     expect(src).toContain("EQUITY_BASIS_TITLE_KO");

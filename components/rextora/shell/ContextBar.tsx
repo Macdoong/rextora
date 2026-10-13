@@ -217,7 +217,11 @@ export function ContextBar() {
     session.sessionHydrated && session.canResume && !session.isThinking;
 
   return (
-    <div className="rextora-context-bar v3-shell-topbar" data-testid="shell-context-bar">
+    <div
+      className="rextora-context-bar v3-shell-topbar"
+      data-testid="shell-context-bar"
+      data-shell-stage={shellStage?.toLowerCase() ?? "unmapped"}
+    >
       <p className="rextora-context-mobile-summary">{mobileContextSummary}</p>
 
       <div className="v3-shell-topbar-row">
@@ -236,7 +240,7 @@ export function ContextBar() {
           </Badge>
         </div>
 
-        <div className="rextora-context-primary-item v3-shell-chip">
+        <div className="rextora-context-primary-item v3-shell-chip rextora-context-strategy-chip">
           <span className="rextora-context-primary-label">
             {OPERATOR_LABEL.selectedStrategy}
           </span>
@@ -249,7 +253,7 @@ export function ContextBar() {
         </div>
 
         {primarySymbolTimeframe?.trim() ? (
-          <div className="rextora-context-primary-item v3-shell-chip">
+          <div className="rextora-context-primary-item v3-shell-chip rextora-context-market-chip">
             <span className="rextora-context-primary-label">
               {OPERATOR_LABEL.symbolTimeframe}
             </span>

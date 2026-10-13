@@ -21,7 +21,7 @@ export const COVERAGE_UI = {
   requestedPeriodKo: "요청 기간",
   actualPeriodKo: "실제 데이터 기간",
   candleCountKo: "캔들 수",
-  coverageKo: "coverage",
+  coverageKo: "데이터 충족률",
   expectedBarsKo: "기대 캔들",
   actualBarsKo: "실제 캔들",
 } as const;

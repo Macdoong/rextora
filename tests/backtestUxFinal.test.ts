@@ -31,6 +31,11 @@ describe("backtest UX final completion", () => {
       path.join(ROOT, "components/rextora/charts/BacktestAnalysisView.tsx"),
       "utf8",
     );
+  const kpi = () =>
+    fs.readFileSync(
+      path.join(ROOT, "components/rextora/backtest/operator/BacktestKpiGrid.tsx"),
+      "utf8",
+    );
 
   it("decision summary appears before next actions", () => {
     const src = wb();
@@ -46,19 +51,35 @@ describe("backtest UX final completion", () => {
       src.indexOf('data-testid="backtest-decision-summary"'),
       src.indexOf('data-testid="backtest-review-actions"'),
     );
-    expect(block).toContain("최종 판정");
-    expect(block).toContain("부적격 이유");
+    expect(block).toContain('label="백테스트 기준"');
+    expect(block).toContain("미통과 이유");
+    expect(block).not.toContain("실전 후보");
     expect(block).toContain("다음 권장 행동");
     expect(block).not.toContain('label="승률"');
     expect(block).not.toContain('label="손익비"');
     expect(block).not.toContain('label="순수익률"');
   });
 
+  it("does not render an empty run-status banner shell", () => {
+    const src = wb();
+    expect(src).toContain("const showRunStatusBanner = Boolean(");
+    expect(src).toContain('className={showRunStatusBanner ? "mt-2" : ""}');
+    expect(src).toContain("{showRunStatusBanner ? (");
+  });
+
+  it("labels stored profit factor as 수익계수 with its calculation", () => {
+    const src = kpi();
+    expect(src).toContain('label={typeof profitFactor === "number" ? "수익계수" : "평균 손익비"}');
+    expect(src).toContain("이익 거래 수익률 합계 ÷ 손실 거래 수익률 절댓값 합계");
+    expect(src).toContain("평균 이익 / 평균 손실");
+    expect(src).toContain("backtestOperatorFormatNumber(profitFactor)");
+  });
+
   it("disabled Paper/Live reasons are prominent panels", () => {
     const src = wb();
-    expect(src).toContain("모의매매 등록 불가");
-    expect(src).toContain("실전 후보 등록 불가");
-    expect(src).toContain("승격 불가");
+    expect(src).toContain("모의매매 조건 미충족");
+    expect(src).toContain("실전 단계 이용 전 확인");
+    expect(src).toContain("다음 단계 진행 조건 미충족");
     expect(src).toContain("border-2 border-rose-500/60");
     expect(src).toContain("backtest-handoff-block-reason");
   });
@@ -66,11 +87,12 @@ describe("backtest UX final completion", () => {
   it("uses beginner-friendly Korean labels", () => {
     const src = wb() + av();
     expect(src).toContain("저장된 백테스트");
-    expect(src).toContain("실행 ID");
-    expect(src).toContain("실행 방식");
-    expect(src).toContain("백테스트 엔진 버전");
+    expect(src).toContain('label="실행 ID"');
+    expect(src).toContain('label="실행 방식"');
+    expect(src).toContain('label="백테스트 엔진 버전"');
+    expect(src).toContain("(expertMode || expertQuery) && selectedRun");
     expect(src).toContain("거래 수 신뢰도");
-    expect(src).toContain("차트 근거 데이터");
+    expect(src).toContain("저장된 패턴 영역");
     expect(MAX_TRADE_LOSS_LABEL_KO).toBe("최대 단일 거래 손실");
     expect(LEVERAGED_POSITION_PNL_LABEL_KO).toContain("레버리지");
     expect(ACCOUNT_EQUITY_IMPACT_LABEL_KO).toBe("계좌 자산 영향");
@@ -109,13 +131,14 @@ describe("backtest UX final completion", () => {
     expect(monthly).toBeGreaterThan(trades);
   });
 
-  it("chart↔trade navigation status messages and selectTrade sources exist", () => {
+  it("chart↔trade selection preserves the live id and announces the selected state", () => {
     const src = av();
     expect(src).toContain('selectTrade(id, "chart")');
     expect(src).toContain('selectTrade(t.id, "list")');
-    expect(src).toContain("차트에서 선택한 거래");
-    expect(src).toContain("구간을 차트에 표시했습니다");
+    expect(src).toContain("선택 거래 <strong data-testid=\"chart-trade-link-id\">{selectedTradeId}</strong> · 진입·청산 위치 표시 중");
     expect(src).toContain("chart-trade-link-status");
+    expect(src).toContain('aria-label="선택 거래 해제"');
+    expect(src).toContain('aria-live="polite"');
   });
 
   it("trade list is compact preview by default and keeps selected trade", () => {
@@ -139,7 +162,7 @@ describe("backtest UX final completion", () => {
   it("critical warnings remain outside collapsed advanced content", () => {
     const src = av() + wb();
     expect(src).toContain("cost-critical-warning");
-    expect(src).toContain("거래비용이 총수익의");
+    expect(src).toContain("경제적 비용이 비용 전 총손익");
     expect(src).toContain("backtest-handoff-block-reason");
   });
 
@@ -167,7 +190,7 @@ describe("backtest UX final completion", () => {
     expect(stats.labelKo).toBe("최대 단일 거래 손실");
     expect(stats.leveragedPnlPct).toBeCloseTo(-1.7446, 4);
     expect(stats.accountEquityImpactPct).toBeCloseTo(-0.5682, 4);
-    expect(av()).toContain("LEVERAGED_POSITION_PNL_LABEL_KO");
+    expect(av()).toContain("maxLossStats.leveragedPnlPct");
     expect(av()).toContain("ACCOUNT_EQUITY_IMPACT_LABEL_KO");
   });
 
@@ -181,24 +204,65 @@ describe("backtest UX final completion", () => {
     });
     expect(r.identityHolds).toBe(true);
     expect(r.totalCostPctOfGrossProfit).toBeCloseTo(0.744, 2);
-    expect(av()).toContain("수익 대부분이 수수료와 슬리피지로 줄어들었습니다");
+    expect(av()).toContain("체결가에 반영된 슬리피지 영향을 합한 경제적 비용");
+  });
+
+  it("separates explicit ledger deductions from slippage attribution", () => {
+    const ratios = computeCostRatios({
+      grossPnLBeforeCosts: 6706.3974,
+      netPnLAfterCosts: 5625.5943,
+      totalCostUsdt: 1080.803,
+      totalEconomicFrictionUsdt: 1623.9957,
+      feeCostUsdt: 1080.803,
+      slippageCostUsdt: 543.1927,
+    });
+    expect(ratios.identityHolds).toBe(true);
+    expect(ratios.totalCostPctOfGrossProfit).toBeCloseTo(0.1612, 3);
+    expect(ratios.economicFrictionPctOfGrossProfit).toBeCloseTo(0.2421, 3);
+    expect(ratios.economicFrictionUsdt).toBe(1623.9957);
+    expect(wb()).toContain("비용 전 총손익 대비 (별도 차감 비용 + 체결가에 반영된 슬리피지 영향) 비율");
+    expect(av()).toContain("순손익에서 별도로 다시 차감하지 않습니다");
+  });
+
+  it("keeps downstream paper/live gates separate from Backtest validation", () => {
+    const src = wb() + av();
+    expect(src).toContain("eligibilityBlocksPaperLive(eligibility)");
+    expect(src).toContain("모의매매 조건 미충족");
+    expect(src).toContain("실전 단계 이용 전 확인");
+    expect(src).not.toContain('title: "실전 후보 자격"');
+    expect(src).not.toContain('title: "모의매매 자격"');
+    expect(src).toContain('status: !patternApplicable ? "not_applicable"');
+    expect(src).toContain('status: !patternApplicable ? "not_applicable" : hasRejectedTraces');
+  });
+
+  it("keeps raw execution identifiers behind the expert-only disclosure", () => {
+    const workbench = wb();
+    const chart = av();
+    expect(workbench).toContain("(expertMode || expertQuery) && selectedRun");
+    expect(workbench).toContain('hidden={activeNavSection !== "technical" || !(expertMode || expertQuery)');
+    expect(chart).toContain("{allowTechnicalDetails ? <details");
+    expect(workbench).toContain("allowTechnicalDetails={expertMode || expertQuery}");
+    expect(chart).toContain("tradeId:");
   });
 
   it("sticky section navigation order matches hierarchy", () => {
     const src = wb();
     const order = [
+      "개요",
       "차트",
       "거래",
-      "월별",
-      "비용",
-      "자산·낙폭",
+      "성과·위험",
+      "검증",
+      "월별 성과",
+      "비용 분석",
       "타임라인",
       "상세 분석",
-      "검증",
+      "기술 정보",
+      "전문가",
     ];
     let prev = -1;
     for (const label of order) {
-      const i = src.indexOf(`label: "${label}"`);
+      const i = src.indexOf(`label: "${label}"`, src.indexOf("const workbenchSections"));
       expect(i).toBeGreaterThan(prev);
       prev = i;
     }

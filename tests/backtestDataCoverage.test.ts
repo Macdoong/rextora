@@ -25,7 +25,7 @@ import * as backtestEngine from "../src/lib/rextora/backtest/backtestEngine";
 import * as binanceReadOnly from "../src/lib/rextora/binance/binanceReadOnlyService";
 import { createStrategy, ensureStrategyStore, saveStrategy } from "../src/lib/rextora/strategy/strategyStore";
 
-import { authedRequest } from "./helpers/authSession";
+import { authedRequest, ensureTestUser } from "./helpers/authSession";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 import { RETIRED_SAFE_PARAMS_HASH, RETIRED_SAFE_STRATEGY_ID } from "../src/lib/rextora/strategy/retiredSafeBaseline";
 
@@ -454,11 +454,13 @@ describe("P3-A2 fail-closed engine spy + API + UI + SAFE", () => {
   let isolated: ReturnType<typeof installIsolatedStrategyStore>;
   let fixtureStrategyId = "";
 
-  beforeAll(() => {
+  beforeAll(async () => {
     isolated = installIsolatedStrategyStore();
     ensureStrategyStore();
+    const owner = await ensureTestUser("operator");
     fixtureStrategyId = saveStrategy(
       createStrategy({
+        ownerUserId: owner.user.userId,
         name: "fixture-coverage",
         timeframe: "15m",
       }).id,

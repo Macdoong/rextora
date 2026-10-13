@@ -6,6 +6,7 @@ import {
   createLinearScale,
   formatAxisNumber,
   niceDomain,
+  nonNegativeDomain,
   ticks,
 } from "@/src/lib/rextora/charts/scales";
 import {
@@ -21,6 +22,7 @@ export function EquityCurveChart({
   height = 220,
   area = true,
   unit = "usdt",
+  domainMode = "auto",
   onCrosshairX,
   syncCrosshairX,
 }: {
@@ -30,6 +32,7 @@ export function EquityCurveChart({
   height?: number;
   area?: boolean;
   unit?: "usdt" | "percent" | "raw";
+  domainMode?: "auto" | "nonnegative" | "percent";
   onCrosshairX?: (xFraction: number | null) => void;
   syncCrosshairX?: number | null;
 }) {
@@ -48,7 +51,15 @@ export function EquityCurveChart({
       onCrosshairX={onCrosshairX}
       syncCrosshairX={syncCrosshairX}
     >
-      {(ctx) => <LinePlot ctx={ctx} series={list} area={area} unit={unit} />}
+      {(ctx) => (
+        <LinePlot
+          ctx={ctx}
+          series={list}
+          area={area}
+          unit={unit}
+          domainMode={domainMode}
+        />
+      )}
     </ChartShell>
   );
 }
@@ -107,11 +118,13 @@ function LinePlot({
   series,
   area,
   unit,
+  domainMode,
 }: {
   ctx: ChartRenderContext;
   series: ChartSeries[];
   area: boolean;
   unit: "usdt" | "percent" | "raw";
+  domainMode: "auto" | "nonnegative" | "percent";
 }) {
   const { pad, plotW, plotH, zoom, setTooltip, crosshair } = ctx;
   const all = series.flatMap((s) => s.data);
@@ -128,7 +141,14 @@ function LinePlot({
   }));
   const ys = visible.flatMap((s) => s.data.map((p) => p.y));
   if (!ys.length) return null;
-  const yDom = niceDomain(Math.min(...ys), Math.max(...ys));
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const yDom =
+    domainMode === "percent"
+      ? ([0, 100] as [number, number])
+      : domainMode === "nonnegative"
+        ? nonNegativeDomain(minY, maxY)
+        : niceDomain(minY, maxY);
   const xScale = createLinearScale(
     [viewStart, viewEnd],
     [pad.left, pad.left + plotW],

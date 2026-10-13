@@ -109,3 +109,18 @@
   color: var(--v3-danger) !important;
   border-color: #f3c4c4 !important;
 }
+
+.v3-backtest :is(p, li)[class*="text-emerald-"],
+.v3-backtest :is(p, li)[class*="text-amber-"],
+.v3-backtest :is(p, li)[class*="text-sky-"],
+.v3-backtest :is(p, li)[class*="text-green-"],
+.v3-backtest [data-testid="backtest-demo-banner"],
+.v3-backtest [data-testid="decision-cost-warning"],
+.v3-backtest [data-testid="summary-cost-warning"],
+.v3-backtest [data-testid="backtest-safe-fallback-note"] {
+  color: var(--v3-text-primary) !important;
+}
+
+.v3.v3-backtest [data-testid="expert-guard-blocked"] {
+  color: var(--v3-text-primary) !important;
+}

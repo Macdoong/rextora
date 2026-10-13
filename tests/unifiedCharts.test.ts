@@ -8,7 +8,11 @@ import {
   strategyScatter,
   marketStructureLevels
 } from "../src/lib/rextora/charts/adapters";
-import { niceDomain, createLinearScale } from "../src/lib/rextora/charts/scales";
+import {
+  niceDomain,
+  nonNegativeDomain,
+  createLinearScale,
+} from "../src/lib/rextora/charts/scales";
 import { CHART_THEME } from "../src/lib/rextora/charts/theme";
 
 describe("unified chart engine", () => {
@@ -30,6 +34,47 @@ describe("unified chart engine", () => {
     expect(b).toBeGreaterThan(20);
     const s = createLinearScale([0, 10], [0, 100]);
     expect(s(5)).toBe(50);
+  });
+
+  it("keeps verified nonnegative performance metrics on truthful domains", () => {
+    const containsAll = (domain: [number, number], values: number[]) =>
+      values.every((value) => value >= domain[0] && value <= domain[1]);
+    const winRates = [0, 29, 33.3, 100];
+    const winRateDomain: [number, number] = [0, 100];
+    const profitFactors = [0.2, 1.1, 2.24, 21.96];
+    const profitFactorDomain = nonNegativeDomain(
+      Math.min(...profitFactors),
+      Math.max(...profitFactors),
+    );
+
+    expect(containsAll(winRateDomain, winRates)).toBe(true);
+    expect(profitFactorDomain[0]).toBe(0);
+    expect(containsAll(profitFactorDomain, profitFactors)).toBe(true);
+
+    const positive = nonNegativeDomain(2, 9);
+    expect(positive[0]).toBe(0);
+    expect(containsAll(positive, [2, 9])).toBe(true);
+
+    const negativeOnly = nonNegativeDomain(-9, -4);
+    expect(negativeOnly[0]).toBeLessThan(-9);
+    expect(negativeOnly[1]).toBeGreaterThan(-4);
+
+    const mixedSigned = nonNegativeDomain(-2, 4);
+    expect(mixedSigned[0]).toBeLessThan(-2);
+    expect(mixedSigned[1]).toBeGreaterThan(4);
+
+    expect(nonNegativeDomain(0, 0)).toEqual([0, 1]);
+    expect(nonNegativeDomain(7, 7)).toEqual([0, 7.35]);
+    expect(nonNegativeDomain(Infinity, -Infinity)).toEqual([0, 1]);
+
+    const fractional = nonNegativeDomain(0.00001, 0.00002);
+    expect(fractional[0]).toBe(0);
+    expect(containsAll(fractional, [0.00001, 0.00002])).toBe(true);
+
+    const assetPriceDomain = niceDomain(60_000, 80_000);
+    expect(assetPriceDomain[0]).toBeGreaterThan(0);
+    expect(containsAll(assetPriceDomain, [60_000, 80_000])).toBe(true);
+    expect(containsAll(niceDomain(-15, -2), [-15, -2])).toBe(true);
   });
 
   it("builds distributions and meters from real fields", () => {

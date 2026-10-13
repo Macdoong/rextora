@@ -8,6 +8,20 @@ export function niceDomain(min: number, max: number, pad = 0.05): [number, numbe
   return [min - span * pad, max + span * pad];
 }
 
+/** A zero-based domain for data whose verified semantics cannot be negative. */
+export function nonNegativeDomain(
+  min: number,
+  max: number,
+  pad = 0.05,
+): [number, number] {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [0, 1];
+  // Preserve the full range if a caller violates the non-negative contract.
+  if (min < 0) return niceDomain(min, max, pad);
+  const upperPadding = max > min ? (max - min) * pad : Math.abs(max) * pad;
+  const upper = max + upperPadding;
+  return [0, upper > 0 ? upper : 1];
+}
+
 export function createLinearScale(domain: [number, number], range: [number, number]) {
   const [d0, d1] = domain;
   const [r0, r1] = range;

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, afterEach, afterAll } from "vitest";
+import { describe, expect, it, vi, afterEach, afterAll, beforeAll } from "vitest";
 import {
   runConfiguredBacktest,
   type SymbolBacktestResult,
@@ -18,18 +18,23 @@ import {
 } from "../src/lib/rextora/backtest/visualAnalysis";
 import { createStrategy, ensureStrategyStore, saveStrategy } from "../src/lib/rextora/strategy/strategyStore";
 import * as loader from "../src/lib/rextora/data/historicalCandleLoader";
-import { authedRequest } from "./helpers/authSession";
+import { authedRequest, ensureTestUser } from "./helpers/authSession";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
 
 const isolatedStrategies = installIsolatedStrategyStore();
-ensureStrategyStore();
-const fixtureStrategy = saveStrategy(
-  createStrategy({
-    name: "fixture-multi-symbol",
-    timeframe: "15m",
-  }).id,
-  { symbols: ["BTCUSDT", "ETHUSDT", "SOLUSDT"] },
-);
+let fixtureStrategy: ReturnType<typeof createStrategy>;
+beforeAll(async () => {
+  ensureStrategyStore();
+  const owner = await ensureTestUser("operator");
+  fixtureStrategy = saveStrategy(
+    createStrategy({
+      ownerUserId: owner.user.userId,
+      name: "fixture-multi-symbol",
+      timeframe: "15m",
+    }).id,
+    { symbols: ["BTCUSDT", "ETHUSDT", "SOLUSDT"] },
+  );
+});
 afterAll(() => {
   isolatedStrategies.cleanup();
 });
@@ -85,7 +90,9 @@ function mockOkLoad(seedBySymbol: Record<string, number>) {
 }
 
 const baseConfig = {
-  strategyId: fixtureStrategy.id,
+  get strategyId() {
+    return fixtureStrategy.id;
+  },
   timeframe: "15m",
   fromOpenTime: FROM,
   toOpenTime: TO,

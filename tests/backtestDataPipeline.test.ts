@@ -18,7 +18,7 @@ import { runSafeV44Backtest } from "../src/lib/rextora/backtest/backtestEngine";
 import { createStrategy, ensureStrategyStore } from "../src/lib/rextora/strategy/strategyStore";
 import { CONTEXT_FALLBACK_PARAMS } from "../src/lib/rextora/strategy/safeV44Params";
 import { loadSafeV44Strategy } from "../src/lib/rextora/strategy/safeV44Strategy";
-import { authedRequest } from "./helpers/authSession";
+import { authedRequest, ensureTestUser } from "./helpers/authSession";
 import * as marketDataStore from "../src/lib/rextora/marketDataStore";
 import * as binanceReadOnly from "../src/lib/rextora/binance/binanceReadOnlyService";
 import { installIsolatedStrategyStore } from "./helpers/isolatedStrategyStore";
@@ -143,10 +143,12 @@ describe("backtest data pipeline", () => {
   let cleanupIsolated: (() => void) | undefined;
   let fixtureId = "";
 
-  beforeAll(() => {
+  beforeAll(async () => {
     cleanupIsolated = installIsolatedStrategyStore().cleanup;
     ensureStrategyStore();
+    const owner = await ensureTestUser("operator");
     fixtureId = createStrategy({
+      ownerUserId: owner.user.userId,
       name: "pipeline-fixture",
       timeframe: "15m",
       strategyType: "safe_params",

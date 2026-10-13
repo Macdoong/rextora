@@ -864,12 +864,24 @@ function CandlePlot({
         })()}
 
       {clusters
-        ? clusters.map((c) => (
+        ? clusters.map((c) => {
+            const firstTradeId = c.tradeIds[0] ?? null;
+            const selectable = Boolean(onSelectTrade && firstTradeId);
+            return (
             <g
               key={`cluster-${c.x}-${c.y}`}
               className="cursor-pointer"
               data-testid="marker-cluster"
-              onClick={() => onSelectTrade?.(c.tradeIds[0] ?? null)}
+              role={selectable ? "button" : undefined}
+              tabIndex={selectable ? 0 : undefined}
+              aria-label={selectable ? `거래 표식 ${c.count}개가 모여 있습니다. 활성화하면 ${firstTradeId}를 선택합니다.` : undefined}
+              onClick={() => onSelectTrade?.(firstTradeId)}
+              onKeyDown={selectable ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelectTrade?.(firstTradeId);
+                }
+              } : undefined}
               opacity={MARKER_OPACITY}
             >
               <circle
@@ -892,10 +904,12 @@ function CandlePlot({
                 {c.count}
               </text>
             </g>
-          ))
+            );
+          })
         : visibleMarkers.map((m, idx) => {
             const selected = Boolean(m.tradeId && m.tradeId === selectedTradeId);
             const hovered = Boolean(m.tradeId && m.tradeId === hoveredTradeId);
+            const selectable = Boolean(onSelectTrade && m.tradeId);
             if (
               !selected &&
               !hovered &&
@@ -954,12 +968,26 @@ function CandlePlot({
                 className="cursor-pointer"
                 data-testid="trade-marker"
                 data-marker-kind={m.kind}
+                data-trade-id={m.tradeId ?? undefined}
+                data-selected={selected ? "true" : "false"}
+                role={selectable ? "button" : undefined}
+                tabIndex={selectable ? 0 : undefined}
+                aria-label={selectable ? `거래 ${m.tradeId} ${sideKo} ${phaseKo} · ${kindLbl.text} · ${Number(m.price).toLocaleString("ko-KR")}` : undefined}
                 opacity={selected || hovered ? 1 : MARKER_OPACITY}
                 style={{ transition: "opacity 120ms ease-out" }}
+                onFocus={() => {
+                  if (m.tradeId) setHoveredTradeId(m.tradeId);
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelectTrade?.(m.tradeId ?? null);
                 }}
+                onKeyDown={selectable ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelectTrade?.(m.tradeId ?? null);
+                  }
+                } : undefined}
                 onMouseEnter={() => {
                   if (m.tradeId) setHoveredTradeId(m.tradeId);
                   const pnl =

@@ -159,8 +159,16 @@ describe("eventSequenceBacktest", () => {
       maxHoldBars: 48,
       zoneLookback: 40,
     });
-    const base = buildObLongCandles();
-    const i = 28;
+    const base = buildObLongCandles({
+      after: [
+        candle(29, 100.05, 101.5, 99.8, 101.2, 1500),
+        candle(30, 101.2, 112, 100.5, 110, 1600),
+        candle(31, 110, 110.5, 109.5, 110.1, 1500),
+      ],
+    });
+    // Keep sufficient post-entry history for a meaningful position result,
+    // then mutate only candles after the decision bar.
+    const i = 30;
     const trunc = runEventSequenceBacktest({
       def: makeDef(seq),
       symbol: "BTCUSDT",
@@ -169,17 +177,17 @@ describe("eventSequenceBacktest", () => {
       feeRate: 0,
       slippageRate: 0,
     });
-    const forceClosed = trunc.trades.find((t) => t.exitReason === "end");
-    expect(forceClosed?.patternBlocks?.length).toBeGreaterThan(0);
-    expect(forceClosed?.patternBlocks?.[0]?.exitPrice).toBe(
-      forceClosed?.exitPrice,
+    const firstTrade = trunc.trades[0];
+    expect(firstTrade?.patternBlocks?.length).toBeGreaterThan(0);
+    expect(firstTrade?.patternBlocks?.[0]?.exitPrice).toBe(
+      firstTrade?.exitPrice,
     );
-    expect(forceClosed?.patternBlocks?.[0]?.exitTime).toBeTruthy();
-    expect(forceClosed?.patternBlocks?.[0]?.stopPrice).toBe(
-      forceClosed?.stopPrice,
+    expect(firstTrade?.patternBlocks?.[0]?.exitTime).toBeTruthy();
+    expect(firstTrade?.patternBlocks?.[0]?.stopPrice).toBe(
+      firstTrade?.stopPrice,
     );
-    expect(forceClosed?.patternBlocks?.[0]?.targetPrice).toBe(
-      forceClosed?.takeProfitPrice,
+    expect(firstTrade?.patternBlocks?.[0]?.targetPrice).toBe(
+      firstTrade?.takeProfitPrice,
     );
 
     const mutated = base.map((c, idx) =>

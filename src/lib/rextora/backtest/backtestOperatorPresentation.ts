@@ -11,6 +11,8 @@ export type BacktestOperatorResultContext = "current_run" | "saved_historical";
 
 export type BacktestOperatorPageState =
   | "no_strategy"
+  | "missing_strategy"
+  | "missing_run"
   | "ready"
   | "running"
   | "loading"
@@ -172,8 +174,8 @@ const KNOWN_FAILURES: Record<
   },
   STRATEGY_HASH_MISMATCH: {
     titleKo: "전략 설정값이 일치하지 않습니다.",
-    reasonKo: "요청한 전략 해시가 저장된 전략과 다릅니다.",
-    failedWhatKo: "전략 해시 / paramsHash",
+    reasonKo: "요청한 전략 설정이 저장된 전략과 다릅니다.",
+    failedWhatKo: "전략 설정 일치",
     nextActionKo: "현재 저장된 전략을 다시 선택한 뒤 백테스트를 실행하세요.",
   },
   STRATEGY_VALIDATION_FAILED: {
@@ -184,13 +186,13 @@ const KNOWN_FAILURES: Record<
   },
   STRATEGY_NOT_FOUND: {
     titleKo: "전략을 찾을 수 없습니다.",
-    reasonKo: "선택한 전략 ID가 저장소에 없습니다.",
+    reasonKo: "선택한 전략을 저장된 목록에서 찾지 못했습니다.",
     failedWhatKo: "전략 식별",
     nextActionKo: "목록에서 존재하는 전략을 다시 선택하세요.",
   },
   STRATEGY_ID_REQUIRED: {
     titleKo: "전략이 선택되지 않았습니다.",
-    reasonKo: "백테스트는 전략 ID 없이 실행하지 않습니다. SAFE로 대체하지 않습니다.",
+    reasonKo: "전략을 선택해야 실행할 수 있습니다. 다른 전략으로 자동 대체하지 않습니다.",
     failedWhatKo: "전략 선택",
     nextActionKo: "전략을 선택한 뒤 실행하세요.",
   },
@@ -341,6 +343,8 @@ export function backtestOperatorStrategyTypeLabel(input: {
 
 export function backtestOperatorPageState(input: {
   strategyId?: string | null;
+  missingStrategy?: boolean;
+  missingRun?: boolean;
   running?: boolean;
   loading?: boolean;
   report?: BacktestOperatorReportLike | null;
@@ -353,6 +357,8 @@ export function backtestOperatorPageState(input: {
   if (input.failureCode) return "validation_failed";
   if (input.running) return "running";
   if (input.loading && !input.report) return "loading";
+  if (input.missingStrategy) return "missing_strategy";
+  if (input.missingRun) return "missing_run";
   if (!input.strategyId) return "no_strategy";
   if (!input.report) return "ready";
   if (input.historicalSelected) return "saved_historical";
@@ -367,7 +373,17 @@ export function backtestOperatorPageStateCopy(
     case "no_strategy":
       return {
         titleKo: "전략을 선택하세요",
-        bodyKo: "탐색 결과 또는 전략 목록에서 검토할 전략을 고르세요. SAFE로 자동 대체하지 않습니다.",
+        bodyKo: "탐색 결과 또는 전략 목록에서 검토할 전략을 고르세요. 다른 전략으로 자동 대체하지 않습니다.",
+      };
+    case "missing_strategy":
+      return {
+        titleKo: "저장된 전략을 찾을 수 없습니다",
+        bodyKo: "요청한 전략은 현재 목록에 없습니다. 아래 전략 선택에서 다른 전략을 고르거나, 전략이 삭제되지 않았는지 확인하세요.",
+      };
+    case "missing_run":
+      return {
+        titleKo: "저장된 백테스트를 찾을 수 없습니다",
+        bodyKo: "요청한 실행 기록을 찾거나 읽을 수 없습니다. 저장된 백테스트 목록에서 다른 실행을 선택하세요.",
       };
     case "ready":
       return {
@@ -433,16 +449,16 @@ export function backtestOperatorFailurePresentation(
       code: raw,
       known: false,
       titleKo: BACKTEST_OPERATOR_UNKNOWN_FAILURE_TITLE,
-      reasonKo: detail?.trim() || "이 코드에 대한 운영 설명을 만들지 않습니다.",
+      reasonKo: "실행을 완료하지 못했습니다. 아래의 다음 조치를 확인하고 다시 시도하세요.",
       failedWhatKo: "검증",
-      nextActionKo: "기술 상세의 원본 코드를 확인하세요. 원인을 추정하지 않습니다.",
+      nextActionKo: "실행 조건을 확인하세요. 문제가 계속되면 기술 상세를 관리자에게 전달하세요.",
     };
   }
   return {
     code: raw,
     known: true,
     ...mapped,
-    reasonKo: detail?.trim() ? `${mapped.reasonKo} ${detail.trim()}` : mapped.reasonKo,
+    reasonKo: mapped.reasonKo,
   };
 }
 
@@ -453,13 +469,13 @@ export function backtestOperatorParamsHashExplanation(verified: boolean): {
   if (verified) {
     return {
       titleKo: "전략 설정값 일치",
-      explanationKo: "저장된 paramsHash가 이 실행과 일치하는 것으로 기록되어 있습니다.",
+      explanationKo: "저장된 전략 설정 정보가 이 실행과 일치하는 것으로 기록되어 있습니다.",
     };
   }
   return {
     titleKo: "전략 설정값이 일치하지 않습니다.",
     explanationKo:
-      "paramsHash 검증이 통과하지 않았습니다. 저장된 전략을 다시 선택한 뒤 백테스트를 재실행하세요.",
+      "전략 설정 일치 검증이 통과하지 않았습니다. 저장된 전략을 다시 선택한 뒤 백테스트를 재실행하세요.",
   };
 }
 
@@ -478,7 +494,7 @@ export function backtestOperatorUsableLabel(input: {
     return { usable: false, labelKo: "사용 불가" };
   }
   if (input.eligible === true) {
-    return { usable: true, labelKo: "사용 가능" };
+    return { usable: true, labelKo: "모의매매 진행 가능" };
   }
   return { usable: false, labelKo: "판정 전" };
 }
@@ -500,7 +516,7 @@ export function backtestOperatorDeriveTradeStats(
     averageTrade?: number | null;
     profitFactor?: number | null;
     maxConsecutiveLosses?: number | null;
-    feeTotal?: number | null;
+    feeBurdenUsdt?: number | null;
     netPnl?: number | null;
   },
 ): BacktestOperatorDerivedTradeStats {
@@ -532,9 +548,9 @@ export function backtestOperatorDeriveTradeStats(
       maxConsecutiveWins: 0,
       losingTradeFrequency: BACKTEST_OPERATOR_UNAVAILABLE,
       feeBurdenUsdt:
-        stored?.feeTotal == null || !Number.isFinite(stored.feeTotal)
+        stored?.feeBurdenUsdt == null || !Number.isFinite(stored.feeBurdenUsdt)
           ? BACKTEST_OPERATOR_UNAVAILABLE
-          : stored.feeTotal,
+          : stored.feeBurdenUsdt,
     };
   }
 
@@ -564,9 +580,9 @@ export function backtestOperatorDeriveTradeStats(
       maxConsecutiveWins: BACKTEST_OPERATOR_UNAVAILABLE,
       losingTradeFrequency: BACKTEST_OPERATOR_UNAVAILABLE,
       feeBurdenUsdt:
-        stored?.feeTotal == null || !Number.isFinite(stored.feeTotal)
+        stored?.feeBurdenUsdt == null || !Number.isFinite(stored.feeBurdenUsdt)
           ? BACKTEST_OPERATOR_UNAVAILABLE
-          : stored.feeTotal,
+          : stored.feeBurdenUsdt,
     };
   }
 
@@ -616,8 +632,8 @@ export function backtestOperatorDeriveTradeStats(
     .map((t) => finiteOrNull(t.feeCostUsdt))
     .filter((v): v is number => v != null);
   const feeBurden =
-    stored?.feeTotal != null && Number.isFinite(stored.feeTotal)
-      ? stored.feeTotal
+    stored?.feeBurdenUsdt != null && Number.isFinite(stored.feeBurdenUsdt)
+      ? stored.feeBurdenUsdt
       : feeFromTrades.length
         ? feeFromTrades.reduce((a, b) => a + b, 0)
         : BACKTEST_OPERATOR_UNAVAILABLE;
@@ -722,17 +738,17 @@ export function backtestOperatorValidationChecks(input: {
   return [
     {
       id: "strategy_hash",
-      labelKo: "전략 해시",
+      labelKo: "전략 등록 정보",
       status: report?.strategyHash ? "pass" : "warn",
       statusLabelKo: report?.strategyHash ? "기록됨" : "없음",
       explanationKo: report?.strategyHash
-        ? "이 실행에 전략 해시가 저장되어 있습니다."
-        : "전략 해시가 이 기록에 없습니다.",
+        ? "이 실행에 등록 전략 정보가 연결되어 있습니다."
+        : "등록 전략 정보를 이 기록에서 확인할 수 없습니다.",
       technical: report?.strategyHash ?? null,
     },
     {
       id: "params_hash",
-      labelKo: "paramsHash",
+      labelKo: "전략 설정 검증",
       status: validation?.paramsHashVerified ? "pass" : "fail",
       statusLabelKo: validation?.paramsHashVerified ? "일치" : "불일치",
       explanationKo: params.explanationKo,
@@ -813,6 +829,12 @@ export function backtestOperatorNextAction(input: {
   if (input.state === "no_strategy") {
     return "전략을 먼저 선택하세요.";
   }
+  if (input.state === "missing_strategy") {
+    return "전략 선택에서 현재 목록에 있는 전략을 고르세요.";
+  }
+  if (input.state === "missing_run") {
+    return "저장된 백테스트 목록에서 확인 가능한 실행을 선택하세요.";
+  }
   if (input.state === "ready") {
     return "기간을 확인한 뒤 백테스트 실행을 누르세요.";
   }
@@ -830,7 +852,9 @@ export function backtestOperatorNextAction(input: {
 export type BacktestOperatorPageContext = {
   source: "backtest";
   strategyId: string | null;
+  strategyLabel?: string | null;
   runId: string | null;
+  runLabel?: string | null;
   symbol: string | null;
   timeframe: string | null;
   statusLabel: string | null;
@@ -858,8 +882,12 @@ export function backtestOperatorShellContext(input: {
     };
   }
   const ctx = input.backtestContext;
-  const strategy = ctx?.strategyId?.trim() || null;
-  const runId = ctx?.runId?.trim() || null;
+  const strategy =
+    ctx?.strategyLabel?.trim() ||
+    (ctx?.strategyId?.trim() ? "선택된 전략" : null);
+  const runId =
+    ctx?.runLabel?.trim() ||
+    (ctx?.runId?.trim() ? "저장된 실행 결과" : null);
   const symbol = ctx?.symbol?.trim() || null;
   const timeframe = ctx?.timeframe?.trim() || null;
   const symbolTimeframe =
@@ -879,8 +907,8 @@ export function backtestOperatorCompactStatusLabel(input: {
   eligible?: boolean | null;
 }): string {
   if (input.failure) return "검증 실패";
-  if (input.eligible === false) return "부적격";
-  if (input.eligible === true) return "적격";
+  if (input.eligible === false) return "백테스트 기준 미통과";
+  if (input.eligible === true) return "백테스트 기준 통과";
   return "검증 전";
 }
 

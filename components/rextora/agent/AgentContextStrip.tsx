@@ -101,13 +101,9 @@ export function AgentContextStrip({ pageLabelKo }: AgentContextStripProps) {
     : null;
   const backtestObjective = backtestPageContext
     ? [
-        backtestPageContext.strategyId
-          ? `전략 ${backtestPageContext.strategyId}`
-          : "선택된 백테스트 전략 없음",
-        backtestPageContext.runId
-          ? `실행 ${backtestPageContext.runId}`
-          : "선택된 실행 없음",
-        backtestPageContext.symbol,
+        backtestPageContext.runLabel || backtestPageContext.runId
+          ? backtestPageContext.runLabel || "저장된 실행 결과"
+          : "백테스트 결과 검토",
       ]
         .filter(Boolean)
         .join(" · ")
@@ -144,6 +140,7 @@ export function AgentContextStrip({ pageLabelKo }: AgentContextStripProps) {
     <div
       className="mb-4 flex flex-col gap-2 rounded-xl border border-emerald-500/20 bg-emerald-950/15 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
       data-testid="agent-context-strip"
+      data-context-source={backtestPageContext ? "backtest" : undefined}
       aria-label="AI 트레이딩 직원 작업 컨텍스트"
     >
       <div className="min-w-0 flex items-start gap-2.5">

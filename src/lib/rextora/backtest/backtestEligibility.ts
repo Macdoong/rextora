@@ -314,7 +314,7 @@ export function evaluateBacktestEligibility(
     ? primary.labelKo
     : reasons[0]?.labelKo ?? "주요 위험 없음";
   const recommendedNextActionKo = eligible
-    ? "모의매매 등록 후 실시간 괴리를 검증하세요."
+    ? "모의매매를 시작해 실시간 데이터와의 차이를 확인하세요."
     : primary?.code === "maximum_drawdown_exceeded"
       ? "낙폭 한도를 충족하는 기간·설정으로 재백테스트하거나 전략을 재탐색하세요."
       : primary?.code === "insufficient_trade_sample"
@@ -322,12 +322,12 @@ export function evaluateBacktestEligibility(
     : primary?.code === "excessive_cost_ratio"
       ? "비용 설정을 점검하고 진입 빈도를 줄인 뒤 재검증하세요."
       : primary?.code === "legacy_slippage_model"
-        ? "execution_price_v1 슬리피지 모델로 재백테스트한 뒤 Paper/Live로 진행하세요."
+        ? "체결 가격을 반영하는 슬리피지 방식으로 새 백테스트를 실행한 뒤 모의매매 자격을 다시 확인하세요."
         : primary?.code === "missing_cost_assumptions" ||
             primary?.code === "unsupported_cost_assumptions_version" ||
             primary?.code === "missing_stress_cost_assumptions"
-          ? "비용 가정이 기록된 최신 백테스트를 다시 실행한 뒤 Paper/Live로 진행하세요."
-        : "부적격 사유를 해소한 뒤 Paper/Live로 진행하세요.";
+          ? "비용 가정이 기록된 최신 백테스트를 다시 실행한 뒤 모의매매 자격을 다시 확인하세요."
+        : "부적격 사유를 해소한 뒤 모의매매 자격을 다시 확인하세요.";
 
   return {
     eligible,

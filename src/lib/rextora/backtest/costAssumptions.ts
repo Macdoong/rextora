@@ -412,9 +412,12 @@ export function formatCostAssumptionsDisclosure(report: {
 }): string {
   const a = report.costAssumptions;
   if (!a) {
-    return report.slippageModelVersion
-      ? `레거시 결과 · 슬리피지 ${report.slippageModelVersion}`
-      : "레거시 결과 · 비용 가정 미기록";
+    const slippageLabel = report.slippageModelVersion === "execution_price_v1"
+      ? "체결 가격에 반영"
+      : report.slippageModelVersion
+        ? "기존 방식"
+        : "기록 없음";
+    return `기존 백테스트 · 슬리피지 ${slippageLabel} · 비용 가정 미기록`;
   }
   const primary = report.primaryCostAssumptions;
   const fee = primary?.feeRate ?? a.fee.effectiveRate;
@@ -427,11 +430,10 @@ export function formatCostAssumptionsDisclosure(report: {
     : "미적용";
   return [
     `수수료 ${formatDecimalRateAsPercentLabel(fee)}`,
-    `슬리피지 ${formatDecimalRateAsPercentLabel(slip)} (${a.slippage.modelVersion})`,
+    `슬리피지 ${formatDecimalRateAsPercentLabel(slip)} (${a.slippage.modelVersion === "execution_price_v1" ? "체결 가격에 반영" : "기존 방식"})`,
     `펀딩 ${fundingLabel}`,
     `스프레드 ${spreadLabel}`,
-    `비용가드 k=${a.costGuard.k}`,
-    a.version,
+    "비용 가정 기록됨",
   ].join(" · ");
 }
 

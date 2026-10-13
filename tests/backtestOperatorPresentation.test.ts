@@ -12,9 +12,12 @@ import {
   backtestOperatorDeriveTradeStats,
   backtestOperatorFailurePresentation,
   backtestOperatorFormatPct,
+  backtestOperatorFormatUsdt,
   backtestOperatorLoadingPreservesPrevious,
   backtestOperatorNetPnl,
+  backtestOperatorNextAction,
   backtestOperatorPageState,
+  backtestOperatorPageStateCopy,
   backtestOperatorParamsHashExplanation,
   backtestOperatorPeriodStats,
   backtestOperatorPrimaryVerdictReason,
@@ -44,7 +47,7 @@ describe("Backtest operator presentation", () => {
       status: "completed",
     });
     expect(usable.usable).toBe(true);
-    expect(usable.labelKo).toBe("사용 가능");
+    expect(usable.labelKo).toBe("모의매매 진행 가능");
     expect(backtestOperatorResultContextLabel("current_run")).toBe(
       "현재 실행 결과",
     );
@@ -55,6 +58,29 @@ describe("Backtest operator presentation", () => {
         eligible: true,
       }),
     ).toBe("completed_valid");
+  });
+
+  it("shows missing deep-link identities instead of a ready state", () => {
+    const missingStrategy = backtestOperatorPageState({
+      strategyId: "stale-id",
+      missingStrategy: true,
+    });
+    expect(missingStrategy).toBe("missing_strategy");
+    expect(backtestOperatorPageStateCopy(missingStrategy).titleKo).toBe(
+      "저장된 전략을 찾을 수 없습니다",
+    );
+    expect(backtestOperatorNextAction({ state: missingStrategy })).toContain(
+      "현재 목록",
+    );
+
+    const missingRun = backtestOperatorPageState({
+      strategyId: "custom_x",
+      missingRun: true,
+    });
+    expect(missingRun).toBe("missing_run");
+    expect(backtestOperatorPageStateCopy(missingRun).titleKo).toBe(
+      "저장된 백테스트를 찾을 수 없습니다",
+    );
   });
 
   it("2. failed validation presentation is not usable", () => {
@@ -84,6 +110,12 @@ describe("Backtest operator presentation", () => {
     expect(failure.code).toBe("NOT_A_REAL_CODE");
     expect(failure.reasonKo).not.toContain("미래");
     expect(failure.reasonKo).not.toContain("paramsHash");
+    const sanitized = backtestOperatorFailurePresentation(
+      "UNKNOWN_FAILURE",
+      "database row bt_internal_123 failed",
+    );
+    expect(sanitized.reasonKo).not.toContain("bt_internal_123");
+    expect(sanitized.reasonKo).not.toContain("database row");
   });
 
   it("4. paramsHash mismatch explanation is source-backed", () => {
@@ -93,6 +125,8 @@ describe("Backtest operator presentation", () => {
       "STRATEGY_HASH_MISMATCH",
     );
     expect(hashMismatch.titleKo).toBe("전략 설정값이 일치하지 않습니다.");
+    expect(hashMismatch.reasonKo).not.toContain("paramsHash");
+    expect(explained.explanationKo).not.toContain("paramsHash");
     expect(hashMismatch.known).toBe(true);
   });
 
@@ -158,6 +192,15 @@ describe("Backtest operator presentation", () => {
       { maxConsecutiveLosses: 11 },
     );
     expect(storedWins.maxConsecutiveLosses).toBe(11);
+  });
+
+  it("fee burden uses the authoritative USDT cost, not the decimal fee-rate sum", () => {
+    const stats = backtestOperatorDeriveTradeStats([], {
+      tradeCount: 31,
+      feeBurdenUsdt: 1080.803,
+    });
+    expect(stats.feeBurdenUsdt).toBe(1080.803);
+    expect(backtestOperatorFormatUsdt(stats.feeBurdenUsdt)).toBe("1,080.80 USDT");
   });
 
   it("11. profit factor / payoff derive from stored trades when needed", () => {
@@ -327,6 +370,11 @@ describe("Backtest operator workbench wiring", () => {
     expect(wb).not.toContain("FUTURE_DATA_DETECTED");
     expect(wb).not.toContain("DATA_RANGE_INVALID");
   });
+
+  it("passes fee burden from the authoritative USDT amount field", () => {
+    expect(wb).toContain("feeBurdenUsdt: report?.costs?.feeCostUsdt");
+    expect(wb).not.toContain("report?.feeTotal ?? report?.costs?.feeCostUsdt");
+  });
 });
 
 describe("Backtest UX final closure", () => {
@@ -343,15 +391,19 @@ describe("Backtest UX final closure", () => {
       backtestContext: {
         source: "backtest",
         strategyId: "custom_mt03i30x",
+        strategyLabel: "Order Block",
         runId: "bt_mt1kh58k_762ad9",
+        runLabel: "저장된 실행 결과",
         symbol: "BTCUSDT",
         timeframe: "15m",
         statusLabel: "부적격",
       },
     });
     expect(selected.usedBacktestPageContext).toBe(true);
-    expect(selected.strategy).toBe("custom_mt03i30x");
-    expect(selected.runId).toBe("bt_mt1kh58k_762ad9");
+    expect(selected.strategy).toBe("Order Block");
+    expect(selected.runId).toBe("저장된 실행 결과");
+    expect(selected.strategy).not.toContain("custom_mt03i30x");
+    expect(selected.runId).not.toContain("bt_mt1kh58k_762ad9");
     expect(selected.symbolTimeframe).toBe("BTCUSDT · 15m");
     expect(selected.researchJobId).toBeNull();
     expect(selected.paperSessionLabel).toBe("Not selected");
@@ -435,7 +487,7 @@ describe("Backtest UX final closure", () => {
       wb.indexOf('data-testid="backtest-decision-summary"'),
       wb.indexOf('data-testid="backtest-review-actions"'),
     );
-    expect(decision).toContain("부적격 이유");
+    expect(decision).toContain("미통과 이유");
     expect(decision).toContain("primaryBlockReason?.labelKo");
     expect(decision).not.toContain("가장 큰 위험");
     expect(wb).toContain("BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER");
@@ -446,7 +498,7 @@ describe("Backtest UX final closure", () => {
     expect(av).not.toMatch(
       /summary-mdd-warning[\s\S]{0,180}eligibility\.verdictLabel/,
     );
-    expect(wb).toContain("BacktestOperatorAnalysis");
+    expect(wb).not.toContain("<BacktestOperatorAnalysis");
     const validationPanel = fs.readFileSync(
       path.join(
         ROOT,
@@ -466,9 +518,19 @@ describe("Backtest UX final closure", () => {
         verdictLabel: "적격",
       }),
     ).toBe("해당 없음");
-    expect(backtestOperatorCompactStatusLabel({ eligible: true })).toBe("적격");
+    expect(backtestOperatorCompactStatusLabel({ eligible: true })).toBe("백테스트 기준 통과");
     expect(ctx).toContain("backtestOperatorShellContext");
     expect(ctx).toContain("OPERATOR_LABEL.agentPaperSession");
+    expect(ctx).toContain('data-shell-stage={shellStage?.toLowerCase() ?? "unmapped"}');
+    expect(ctx).toContain("rextora-context-strategy-chip");
+    expect(ctx).toContain("rextora-context-market-chip");
+    const shellCss = fs.readFileSync(
+      path.join(ROOT, "components/rextora/v3/shell.css"),
+      "utf8",
+    );
+    expect(shellCss).toContain('.v3-shell-topbar[data-shell-stage="backtest"] .rextora-context-strategy-chip');
+    expect(shellCss).toContain('.v3-shell-topbar[data-shell-stage="backtest"] .rextora-context-market-chip');
+    expect(shellCss).toContain("@media (max-width: 767px)");
   });
 
   it("12-15. analysis views stay reachable without a second full tab row", () => {
@@ -501,6 +563,7 @@ describe("Backtest UX final closure", () => {
     expect(wb).toContain("backtest-workspace-tab-");
     expect(wb).toContain('id: "advanced"');
     expect(wb).toContain('id: "validation"');
+    expect(wb).toContain('data-testid="backtest-more-section-select"');
     expect(analysis).toContain("aria-selected={tab === item.id}");
     expect(analysis).toContain("is-active");
     expect(BACKTEST_OPERATOR_SECONDARY_VERDICT_POINTER).toContain("판정 요약");

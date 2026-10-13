@@ -30,7 +30,10 @@ export function BacktestValidationPanel({
             </div>
             <p className="bt-op-check-explain">{check.explanationKo}</p>
             {check.technical ? (
-              <p className="bt-op-check-tech">{check.technical}</p>
+              <details className="bt-op-check-tech">
+                <summary>개발자 정보 보기</summary>
+                <code className="break-all">{check.technical}</code>
+              </details>
             ) : null}
           </li>
         ))}

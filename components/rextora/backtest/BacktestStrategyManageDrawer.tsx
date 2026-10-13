@@ -207,7 +207,7 @@ export function BacktestStrategyManageDrawer({
         <div className="space-y-2 border-b border-slate-800 px-4 py-3">
           <input
             className="min-h-11 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100"
-            placeholder="이름·ID·해시 검색"
+            placeholder="전략명으로 검색"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             data-testid="strategy-manage-search"
@@ -245,8 +245,7 @@ export function BacktestStrategyManageDrawer({
                     {archived ? " · 보관됨" : ""}
                   </p>
                   <p className="mt-0.5 text-[11px] text-slate-500">
-                    ID {s.id} · 해시 {(s.paramsHash ?? "—").slice(0, 12)} ·{" "}
-                    {s.timeframe ?? "—"}
+                    {s.timeframe ?? "시간봉 미지정"}
                   </p>
                 </button>
                 <div className="mt-2 flex flex-wrap gap-1.5">

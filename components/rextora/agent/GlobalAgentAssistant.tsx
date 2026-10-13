@@ -106,6 +106,7 @@ export function GlobalAgentAssistant() {
       data-agent-surface={surface}
       data-agent-expanded="false"
       data-agent-host="global"
+      data-agent-backtest={pathname === "/backtest" || pathname.startsWith("/backtest/") ? "true" : "false"}
     >
       {!open ? (
         <button

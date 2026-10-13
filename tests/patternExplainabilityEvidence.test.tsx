@@ -180,6 +180,63 @@ describe("persisted pattern explainability evidence", () => {
     expect(html).toContain('data-lifecycle-kind="rejected"');
   });
 
+  it("exposes trade markers as buttons only when trade selection is supported", () => {
+    const candles = [
+      { time: T0, open: 100, high: 102, low: 98, close: 101 },
+      { time: T1, open: 101, high: 105, low: 100, close: 104 },
+    ];
+    const markers = [
+      { time: T1, price: 101, kind: "entry_long" as const, tradeId: "T0001" },
+    ];
+    const passiveHtml = renderToStaticMarkup(
+      <CandlestickChart candles={candles} markers={markers} />,
+    );
+    const selectableHtml = renderToStaticMarkup(
+      <CandlestickChart
+        candles={candles}
+        markers={markers}
+        onSelectTrade={() => undefined}
+      />,
+    );
+
+    const markerWithButtonSemantics = /<g[^>]*data-testid="trade-marker"[^>]*role="button"/;
+    expect(passiveHtml).toContain('data-testid="trade-marker"');
+    expect(passiveHtml).not.toMatch(markerWithButtonSemantics);
+    expect(selectableHtml).toMatch(markerWithButtonSemantics);
+    expect(selectableHtml).toContain('aria-label="거래 T0001 롱 진입');
+  });
+
+  it("does not expose inert marker clusters as buttons", () => {
+    const candles = Array.from({ length: 240 }, (_, index) => ({
+      time: T0 + index * 60_000,
+      open: 100,
+      high: 102,
+      low: 98,
+      close: 101,
+    }));
+    const markers = Array.from({ length: 60 }, (_, index) => ({
+      time: T0 + 120 * 60_000,
+      price: 101,
+      kind: "entry_long" as const,
+      tradeId: `T${String(index + 1).padStart(4, "0")}`,
+    }));
+    const passiveHtml = renderToStaticMarkup(
+      <CandlestickChart candles={candles} markers={markers} />,
+    );
+    const selectableHtml = renderToStaticMarkup(
+      <CandlestickChart
+        candles={candles}
+        markers={markers}
+        onSelectTrade={() => undefined}
+      />,
+    );
+    const clusterWithButtonSemantics = /<g[^>]*data-testid="marker-cluster"[^>]*role="button"/;
+
+    expect(passiveHtml).toContain('data-testid="marker-cluster"');
+    expect(passiveHtml).not.toMatch(clusterWithButtonSemantics);
+    expect(selectableHtml).toMatch(clusterWithButtonSemantics);
+  });
+
   it("wires every overlay toggle to rendered evidence", () => {
     const src = fs.readFileSync(
       path.join(

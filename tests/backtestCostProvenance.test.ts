@@ -818,11 +818,14 @@ describe("P3-A6.2 cost provenance + versioned identity", () => {
     expect(sha256File(SAFE_PATH)).toBeNull();
   });
 
-  it("disclosure names the resolved model", () => {
+  it("customer disclosure describes the resolved model without internal identifiers", () => {
     const text = formatCostAssumptionsDisclosure(v1Saved().report);
     expect(text).toContain("0.04%");
-    expect(text).toContain("execution_price_v1");
-    expect(text).toContain("cost_assumptions_v1");
+    expect(text).toContain("체결 가격에 반영");
+    expect(text).toContain("비용 가정 기록됨");
+    expect(text).not.toContain("execution_price_v1");
+    expect(text).not.toContain("cost_assumptions_v1");
+    expect(text).not.toContain("비용가드 k=");
   });
 });
 

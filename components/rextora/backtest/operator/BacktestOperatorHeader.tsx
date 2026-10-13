@@ -18,7 +18,6 @@ export function BacktestOperatorHeader({
   validationTone,
   usableLabel,
   resultContext,
-  runId,
   createdAt,
 }: {
   strategyLabel: string;
@@ -58,7 +57,7 @@ export function BacktestOperatorHeader({
         </div>
         <div className="bt-op-header-badges">
           <Badge tone={validationTone}>{validationLabel}</Badge>
-          <Badge tone={usableLabel === "사용 가능" ? "success" : "danger"}>
+          <Badge tone={usableLabel === "모의매매 진행 가능" ? "success" : "danger"}>
             {usableLabel}
           </Badge>
           <Badge tone={resultContext === "saved_historical" ? "warning" : "info"}>
@@ -66,11 +65,9 @@ export function BacktestOperatorHeader({
           </Badge>
         </div>
       </div>
-      {(runId || createdAt) ? (
+      {createdAt ? (
         <p className="bt-op-identity" data-testid="backtest-operator-identity">
-          {createdAt ? `실행 시각 ${createdAt}` : null}
-          {createdAt && runId ? " · " : null}
-          {runId ? `결과 ID ${runId}` : null}
+          실행 시각 {createdAt}
         </p>
       ) : null}
     </header>

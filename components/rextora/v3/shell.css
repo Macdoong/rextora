@@ -736,6 +736,12 @@
   .v3-shell-chip.rextora-context-primary-item {
     min-height: 44px;
   }
+
+  /* Backtest presents this same strategy and market context in its result header. */
+  .v3-shell-topbar[data-shell-stage="backtest"] .rextora-context-strategy-chip,
+  .v3-shell-topbar[data-shell-stage="backtest"] .rextora-context-market-chip {
+    display: none;
+  }
 }
 
 @media (min-width: 1180px) {

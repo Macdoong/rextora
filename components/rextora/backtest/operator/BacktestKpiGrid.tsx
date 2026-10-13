@@ -48,7 +48,7 @@ export function BacktestKpiGrid({
       data-stale={stale ? "true" : "false"}
     >
       <div className="bt-op-section-head">
-        <h3 className="bt-op-section-title">성과 KPI</h3>
+        <h3 className="bt-op-section-title">핵심 성과</h3>
         {stale ? (
           <p className="bt-op-stale-note">이전 결과 · 새로고침 중</p>
         ) : null}
@@ -62,6 +62,15 @@ export function BacktestKpiGrid({
               : BACKTEST_OPERATOR_UNAVAILABLE
           }
           tone={toneFromSigned(totalReturn)}
+        />
+        <Metric
+          label="최대 낙폭"
+          value={
+            typeof mdd === "number"
+              ? backtestOperatorFormatPct(mdd)
+              : BACKTEST_OPERATOR_UNAVAILABLE
+          }
+          tone="danger"
         />
         <Metric
           label="순손익"
@@ -89,15 +98,15 @@ export function BacktestKpiGrid({
           }
         />
         <Metric
-          label="평균 거래"
+          label="평균 거래 수익률"
           value={
             typeof averageTrade === "number"
-              ? backtestOperatorFormatNumber(averageTrade, 4)
+              ? backtestOperatorFormatPct(averageTrade)
               : BACKTEST_OPERATOR_UNAVAILABLE
           }
         />
         <Metric
-          label="손익비"
+          label={typeof profitFactor === "number" ? "수익계수" : "평균 손익비"}
           value={
             typeof profitFactor === "number"
               ? backtestOperatorFormatNumber(profitFactor)
@@ -107,20 +116,11 @@ export function BacktestKpiGrid({
           }
           help={
             typeof profitFactor === "number"
-              ? "Profit factor"
+              ? "이익 거래 수익률 합계 ÷ 손실 거래 수익률 절댓값 합계"
               : typeof payoffRatio === "number"
                 ? "평균 이익 / 평균 손실"
                 : undefined
           }
-        />
-        <Metric
-          label="최대 낙폭"
-          value={
-            typeof mdd === "number"
-              ? backtestOperatorFormatPct(mdd)
-              : BACKTEST_OPERATOR_UNAVAILABLE
-          }
-          tone="danger"
         />
         <Metric
           label="최대 연속 손실"
